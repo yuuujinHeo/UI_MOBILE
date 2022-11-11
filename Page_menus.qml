@@ -70,7 +70,8 @@ Item {
             id: btn_curmap
             anchors.fill: parent
             onClicked: {
-                stackview.push(curMap);
+                stackview.push(pmap);
+//                stackview.push(curMap);
             }
         }
     }

@@ -17,7 +17,7 @@ CXX           = g++
 DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_QML_DEBUG -DQT_QUICKCONTROLS2_LIB -DQT_QUICK_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_QMLMODELS_LIB -DQT_QML_LIB -DQT_WEBSOCKETS_LIB -DQT_NETWORK_LIB -DQT_SQL_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++11 -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I../../MAIN_MOBILE1 -I. -isystem /usr/include/opencv4 -isystem /usr/local/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuickControls2 -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuick -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQmlModels -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQml -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWebSockets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtSql -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++
+INCPATH       = -I../../UI_MOBILE -I. -isystem /usr/include/opencv4 -isystem /usr/local/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuickControls2 -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuick -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQmlModels -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQml -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWebSockets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtSql -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++
 QMAKE         = /opt/Qt5.14.2/5.14.2/gcc_64/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -37,7 +37,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = MAIN_MOBILE1.0.0
-DISTDIR = /home/rainbow/Desktop/MAIN_MOBILE1/build/.tmp/MAIN_MOBILE1.0.0
+DISTDIR = /home/rainbow/Desktop/UI_MOBILE/build/.tmp/MAIN_MOBILE1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-rpath,/opt/Qt5.14.2/5.14.2/gcc_64/lib -Wl,-rpath-link,/opt/Qt5.14.2/5.14.2/gcc_64/lib
 LIBS          = $(SUBLIBS) -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_calib3d -lopencv_features2d -lopencv_flann -lopencv_objdetect -lopencv_photo -lopencv_video -lopencv_videoio -lopencv_ximgproc -L/usr/local/lib/ -llcm /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5QuickControls2.so /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Quick.so /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Widgets.so /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Gui.so /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5QmlModels.so /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Qml.so /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5WebSockets.so /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Network.so /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Sql.so /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Core.so -lGL -lpthread   
@@ -790,10 +790,11 @@ qrc_qml.cpp: ../qml.qrc \
 		../Page_mapview.qml \
 		../Page_pickup.qml \
 		../Map_current.qml \
+		../Page_map.qml \
 		../Page_kitchen.qml \
+		../Item_joystick.qml \
 		../Page_moving.qml \
 		../Page_menus.qml \
-		../Page_jog.qml \
 		../main.qml \
 		icon/icon_undo.png \
 		icon/icon_redo.png \
@@ -934,7 +935,7 @@ moc_DBHandler.cpp: ../DBHandler.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui/qpainterpath.h \
 		moc_predefs.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc
-	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/rainbow/Desktop/MAIN_MOBILE1/build/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/rainbow/Desktop/MAIN_MOBILE1 -I/usr/include/opencv4 -I/usr/local/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuickControls2 -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuick -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQmlModels -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQml -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWebSockets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtSql -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../DBHandler.h -o moc_DBHandler.cpp
+	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/rainbow/Desktop/UI_MOBILE/build/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/rainbow/Desktop/UI_MOBILE -I/usr/include/opencv4 -I/usr/local/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuickControls2 -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuick -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQmlModels -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQml -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWebSockets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtSql -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../DBHandler.h -o moc_DBHandler.cpp
 
 moc_LCMHandler.cpp: ../LCMHandler.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore/QObject \
@@ -1043,7 +1044,7 @@ moc_LCMHandler.cpp: ../LCMHandler.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui/qpainterpath.h \
 		moc_predefs.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc
-	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/rainbow/Desktop/MAIN_MOBILE1/build/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/rainbow/Desktop/MAIN_MOBILE1 -I/usr/include/opencv4 -I/usr/local/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuickControls2 -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuick -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQmlModels -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQml -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWebSockets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtSql -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../LCMHandler.h -o moc_LCMHandler.cpp
+	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/rainbow/Desktop/UI_MOBILE/build/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/rainbow/Desktop/UI_MOBILE -I/usr/include/opencv4 -I/usr/local/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuickControls2 -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuick -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQmlModels -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQml -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWebSockets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtSql -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../LCMHandler.h -o moc_LCMHandler.cpp
 
 moc_Logger.cpp: ../Logger.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore/QObject \
@@ -1119,7 +1120,7 @@ moc_Logger.cpp: ../Logger.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore/qdatetime.h \
 		moc_predefs.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc
-	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/rainbow/Desktop/MAIN_MOBILE1/build/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/rainbow/Desktop/MAIN_MOBILE1 -I/usr/include/opencv4 -I/usr/local/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuickControls2 -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuick -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQmlModels -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQml -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWebSockets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtSql -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../Logger.h -o moc_Logger.cpp
+	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/rainbow/Desktop/UI_MOBILE/build/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/rainbow/Desktop/UI_MOBILE -I/usr/include/opencv4 -I/usr/local/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuickControls2 -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuick -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQmlModels -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQml -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWebSockets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtSql -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../Logger.h -o moc_Logger.cpp
 
 moc_ServerHandler.cpp: ../ServerHandler.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore/QObject \
@@ -1262,7 +1263,7 @@ moc_ServerHandler.cpp: ../ServerHandler.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui/qpainterpath.h \
 		moc_predefs.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc
-	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/rainbow/Desktop/MAIN_MOBILE1/build/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/rainbow/Desktop/MAIN_MOBILE1 -I/usr/include/opencv4 -I/usr/local/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuickControls2 -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuick -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQmlModels -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQml -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWebSockets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtSql -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../ServerHandler.h -o moc_ServerHandler.cpp
+	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/rainbow/Desktop/UI_MOBILE/build/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/rainbow/Desktop/UI_MOBILE -I/usr/include/opencv4 -I/usr/local/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuickControls2 -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuick -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQmlModels -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQml -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWebSockets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtSql -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../ServerHandler.h -o moc_ServerHandler.cpp
 
 moc_Supervisor.cpp: ../Supervisor.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore/QObject \
@@ -1461,7 +1462,7 @@ moc_Supervisor.cpp: ../Supervisor.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore/qjsonarray.h \
 		moc_predefs.h \
 		/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc
-	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/rainbow/Desktop/MAIN_MOBILE1/build/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/rainbow/Desktop/MAIN_MOBILE1 -I/usr/include/opencv4 -I/usr/local/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuickControls2 -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuick -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQmlModels -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQml -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWebSockets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtSql -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../Supervisor.h -o moc_Supervisor.cpp
+	/opt/Qt5.14.2/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/rainbow/Desktop/UI_MOBILE/build/moc_predefs.h -I/opt/Qt5.14.2/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/rainbow/Desktop/UI_MOBILE -I/usr/include/opencv4 -I/usr/local/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuickControls2 -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQuick -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWidgets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtGui -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQmlModels -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtQml -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtWebSockets -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtNetwork -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtSql -I/opt/Qt5.14.2/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../Supervisor.h -o moc_Supervisor.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:

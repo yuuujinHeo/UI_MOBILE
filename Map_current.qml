@@ -239,9 +239,6 @@ Item {
                     ctx.stroke()
 
                 }
-
-
-
             }
             Behavior on scale{
                 NumberAnimation{
@@ -365,8 +362,6 @@ Item {
 
                         canvas_cur_map.requestPaint()
                     }
-
-
                 }
             }
 
