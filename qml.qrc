@@ -1,0 +1,33 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>build/icon/icon_clear.png</file>
+        <file>build/icon/icon_folder.png</file>
+        <file>build/icon/icon_mouse.png</file>
+        <file>build/icon/icon_redo.png</file>
+        <file>build/icon/icon_save.png</file>
+        <file>build/icon/icon_touch.png</file>
+        <file>build/icon/icon_undo.png</file>
+        <file>build/icon/add.png</file>
+        <file>Page_kitchen.qml</file>
+        <file>Page_moving.qml</file>
+        <file>Page_pickup.qml</file>
+        <file>Page_menus.qml</file>
+        <file>Page_jog.qml</file>
+        <file>Page_mapview.qml</file>
+        <file>image/rainbow1.png</file>
+        <file>image/rainbow2.png</file>
+        <file>image/rainbow3.png</file>
+        <file>image/rainbow4.png</file>
+        <file>image/loading1.gif</file>
+        <file>image/loading2.gif</file>
+        <file>image/robot.png</file>
+        <file>image/robot_moving.gif</file>
+        <file>image/robot_hello.gif</file>
+        <file>Page_setting.qml</file>
+        <file>Map_current.qml</file>
+        <file>bgm/song.mp3</file>
+        <file>Page_charge.qml</file>
+        <file>image/robot_charging.gif</file>
+    </qresource>
+</RCC>
