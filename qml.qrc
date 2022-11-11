@@ -13,7 +13,7 @@
         <file>Page_moving.qml</file>
         <file>Page_pickup.qml</file>
         <file>Page_menus.qml</file>
-        <file>Page_jog.qml</file>
+        <file>Page_map.qml</file>
         <file>Page_mapview.qml</file>
         <file>image/rainbow1.png</file>
         <file>image/rainbow2.png</file>
@@ -29,5 +29,6 @@
         <file>bgm/song.mp3</file>
         <file>Page_charge.qml</file>
         <file>image/robot_charging.gif</file>
+        <file>Item_joystick.qml</file>
     </qresource>
 </RCC>

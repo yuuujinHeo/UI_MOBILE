@@ -343,9 +343,10 @@ void Supervisor::readSetting(){
 
     ST_POSE temp_pose;
     for(int i=0; i<charge_num; i++){
-        temp_pose.x = setting_anot.value("x").toFloat();
-        temp_pose.y = setting_anot.value("y").toFloat();
-        temp_pose.th = setting_anot.value("th").toFloat();
+        QString str = "loc"+QString::number(i);
+        temp_pose.x = setting_anot.value(str+"_x").toFloat();
+        temp_pose.y = setting_anot.value(str+"_y").toFloat();
+        temp_pose.th = setting_anot.value(str+"_th").toFloat();
         map.locationsPose.push_back(temp_pose);
     }
     setting_anot.endGroup();
@@ -357,9 +358,10 @@ void Supervisor::readSetting(){
     map.locationSize+=wait_num;
 
     for(int i=0; i<wait_num; i++){
-        temp_pose.x = setting_anot.value("x").toFloat();
-        temp_pose.y = setting_anot.value("y").toFloat();
-        temp_pose.th = setting_anot.value("th").toFloat();
+        QString str = "loc"+QString::number(i);
+        temp_pose.x = setting_anot.value(str+"_x").toFloat();
+        temp_pose.y = setting_anot.value(str+"_y").toFloat();
+        temp_pose.th = setting_anot.value(str+"_th").toFloat();
         map.locationsPose.push_back(temp_pose);
     }
     setting_anot.endGroup();

@@ -489,3 +489,13 @@
 2022-11-11 15:26:20 [LCM] SEND COMMAND : MOVE LOCATION TO serving_1
 2022-11-11 15:26:21 [LCM] SEND COMMAND : MOVE LOCATION TO serving_1
 2022-11-11 15:26:22 [LCM] SEND COMMAND : MOVE LOCATION TO serving_1
+2022-11-11 16:47:57 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-11 16:47:57 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-11 17:11:14 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-11 17:11:14 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-11 17:14:18 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-11 17:14:18 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-11 17:20:47 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-11 17:20:47 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-11 17:25:35 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-11 17:25:35 [DB]Load DB Table_Base : prefer_mouse -> yes

@@ -116,10 +116,15 @@ Window {
         visible: false
     }
 
-    Page_jog{
-        id: pjog;
+//    Page_jog{
+//        id: pjog;
+//        visible: false
+//    }
+    Page_map{
+        id: pmap;
         visible: false
     }
+
     Page_mapview{
         id: pmapview;
         visible: false
@@ -145,10 +150,10 @@ Window {
         id:supervisor
     }
 
-    Map_current{
-        id:curMap
-        visible: false
-    }
+//    Map_current{
+//        id:curMap
+//        visible: false
+//    }
 
     Timer{
         id: timer_init

@@ -87,9 +87,9 @@ Item {
         color: "gray"
         opacity: 0.6
         Text{
-            anchors.horizontalCenter: rect_popup.horizontalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
             text: "DO START?"
-            anchors.top: rect_popup.top
+            anchors.top: parent.top
             anchors.topMargin: 50
         }
         Rectangle{
@@ -98,9 +98,9 @@ Item {
             height: 100
             radius: 10
             color: "yellow"
-            anchors.bottom: rect_popup.bottom
+            anchors.bottom: parent.bottom
             anchors.bottomMargin: 20
-            anchors.left: rect_popup.left
+            anchors.left: parent.left
             anchors.leftMargin: 30
             Text{
                 anchors.centerIn: parent
@@ -121,9 +121,9 @@ Item {
             height: 100
             radius: 10
             color: "yellow"
-            anchors.bottom: rect_popup.bottom
+            anchors.bottom: parent.bottom
             anchors.bottomMargin: 20
-            anchors.right: rect_popup.right
+            anchors.right: parent.right
             anchors.rightMargin: 30
             Text{
                 anchors.centerIn: parent
