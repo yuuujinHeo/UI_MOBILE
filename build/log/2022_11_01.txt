@@ -1,0 +1,4 @@
+2022-11-01 17:30:28 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map.png
+2022-11-01 17:30:28 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-01 18:31:01 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map.png
+2022-11-01 18:31:01 [DB]Load DB Table_Base : prefer_mouse -> yes

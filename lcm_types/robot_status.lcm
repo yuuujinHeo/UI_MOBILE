@@ -1,0 +1,8 @@
+struct robot_status
+{
+    float bat;
+    int8_t state;
+    int8_t err_code;
+
+    float robot_pose[3];
+}
