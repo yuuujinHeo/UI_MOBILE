@@ -1,9 +1,9 @@
 import QtQuick 2.9
 import QtQuick.Window 2.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls 2.12
 //import QtQuick.Shapes 1.
-import QtQuick.Dialogs 1.2
-import Qt.labs.platform 1.0
+//import QtQuick.Dialogs 1.2
+//import Qt.labs.platform 1.0
 import QtGraphicalEffects 1.0
 //import QtQuick.Templates 2.5
 import "."

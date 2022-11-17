@@ -57,6 +57,11 @@ typedef struct{
     //mine
     int tray_num[NUM_TRAY] = {0,};
     ST_POSE targetPose;
+    float joy_x = 0.;
+    float joy_y = 0.;
+    float joy_th = 0.;
+    float vel_xy = 1.0;
+    float vel_th = 1.0;
 }ST_ROBOT;
 
 enum ROBOT_CMD{

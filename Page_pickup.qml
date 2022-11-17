@@ -1,14 +1,15 @@
 import QtQuick 2.9
 import QtQuick.Window 2.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls 2.12
 //import QtQuick.Shapes 1.
-import QtQuick.Dialogs 1.2
-import Qt.labs.platform 1.0
+//import QtQuick.Dialogs 1.2
+//import Qt.labs.platform 1.0
 import QtGraphicalEffects 1.0
 //import QtQuick.Templates 2.5
 import "."
 import io.qt.Supervisor 1.0
 import QtQml 2.2
+import QtMultimedia 5.9
 
 Item {
     id: page_pickup
@@ -25,6 +26,7 @@ Item {
         rect_confirm.visible = true;
         rect_hello.visible = false;
         timer_hello.stop();
+        voice_pickup.play();
     }
 
     Text{
@@ -52,6 +54,11 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top : target_pos.bottom
         anchors.topMargin: 30
+    }
+    Audio{
+        id: voice_pickup
+        autoPlay: false
+        source: "bgm/voice_pickup.mp3"
     }
 
     Rectangle{

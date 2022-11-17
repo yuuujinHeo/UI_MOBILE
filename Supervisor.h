@@ -104,6 +104,8 @@ public:
     Q_INVOKABLE int getErrcode();
     Q_INVOKABLE QString getRobotName();
     Q_INVOKABLE void setRobotName(QString name);
+    Q_INVOKABLE float getVelocityXY();
+    Q_INVOKABLE float getVelocityTH();
 
     Q_INVOKABLE QVector<int> getPickuptrays();
     Q_INVOKABLE QString getcurLoc();
@@ -138,9 +140,8 @@ public:
     Q_INVOKABLE float getPathy(int num);
     Q_INVOKABLE float getPathth(int num);
 
-
-
-
+    Q_INVOKABLE void joyMoveXY(float x, float y);
+    Q_INVOKABLE void joyMoveR(float r);
 
     //Outlet Functions
     Q_INVOKABLE int getCanvasSize();
@@ -163,6 +164,11 @@ public:
 
     Q_INVOKABLE QString getDBvalue(QString name);
 
+    Q_INVOKABLE void startRecordPath();
+    Q_INVOKABLE void startcurPath();
+    Q_INVOKABLE void stopcurPath();
+    Q_INVOKABLE void pausecurPath();
+
     DBHandler  *dbHandler;
     ServerHandler *server;
     QVector<ST_LINE>    canvas;
@@ -170,6 +176,10 @@ public:
     int flag_clear;
     ST_LINE   temp_line;
 
+    bool flag_joy = false;
+    float joyx = 0.;
+    float joyy = 0.;
+    float joyr = 0.;
 
 public slots:
     void onTimer();

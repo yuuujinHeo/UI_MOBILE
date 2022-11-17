@@ -32,6 +32,15 @@ void LCMHandler::onTimer(){
         RequestMap();
     }
 
+    if(flagJoystick){
+        moveJog();
+        flagJoystick = false;
+    }else{
+        if(robot.joy_x != 0 || robot.joy_y != 0 || robot.joy_th != 0){
+            moveJog();
+        }
+    }
+
     cnt++;
 }
 
@@ -107,6 +116,30 @@ void LCMHandler::moveJog(float vx, float vy, float vth){
     plog->write("[LCM] SEND COMMAND : MOVE TARGET TO "+QString().sprintf("%f, %f, %f",vx,vy,vth));
     lcm.publish("COMMAND",&send_msg);
 }
+void LCMHandler::moveJog(){
+    command send_msg;
+    send_msg.cmd = ROBOT_CMD_MOVE_JOG;
+    uint8_t *array;
+    array = reinterpret_cast<uint8_t*>(&robot.joy_x);
+    send_msg.params[0] = array[0];
+    send_msg.params[1] = array[1];
+    send_msg.params[2] = array[2];
+    send_msg.params[3] = array[3];
+
+    array = reinterpret_cast<uint8_t*>(&robot.joy_y);
+    send_msg.params[4] = array[0];
+    send_msg.params[5] = array[1];
+    send_msg.params[6] = array[2];
+    send_msg.params[7] = array[3];
+
+    array = reinterpret_cast<uint8_t*>(&robot.joy_th);
+    send_msg.params[8] = array[0];
+    send_msg.params[9] = array[1];
+    send_msg.params[10]= array[2];
+    send_msg.params[11]= array[3];
+    plog->write("[LCM] SEND COMMAND : MOVE TARGET TO "+QString().sprintf("%f, %f, %f",robot.joy_x,robot.joy_y,robot.joy_th));
+    lcm.publish("COMMAND",&send_msg);
+}
 
 void LCMHandler::moveStop(){
     command send_msg;
@@ -139,6 +172,7 @@ void LCMHandler::setVelocity(float vel, float velth){
     plog->write("[LCM] SEND COMMAND : SET VELOCITY TO "+QString().sprintf("%f, %f",vel,velth));
     lcm.publish("COMMAND",&send_msg);
 }
+
 
 void LCMHandler::map_data_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data_t *msg){
 //    printf("SUB(MAP_DATA): %s, %d, %d\n", msg->map_name.data(), msg->data[msg->len-2], msg->data[msg->len-1]);

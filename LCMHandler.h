@@ -31,9 +31,12 @@ public:
     void movePause();
     void moveResume();
     void moveJog(float vx, float vy, float vth);
+    void moveJog();
     void moveStop();
     void moveManual();
     void setVelocity(float vel, float velth);
+    void setVelocityXY(float vel);
+    void setVelocityTH(float vel);
 
     ST_POSE setAxis(ST_POSE _pose);
     // lcm message loop
@@ -41,6 +44,7 @@ public:
     void bLoop();
     std::thread* bThread = NULL;
     bool isdownloadMap = false;
+    bool flagJoystick = false;
     ST_ROBOT    robot;
     ST_MAP      map;
     QTimer  *timer;
