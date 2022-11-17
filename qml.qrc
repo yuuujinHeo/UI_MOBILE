@@ -30,5 +30,19 @@
         <file>Page_charge.qml</file>
         <file>image/robot_charging.gif</file>
         <file>Item_joystick.qml</file>
+        <file>image/joy_finger.png</file>
+        <file>image/joy_background.png</file>
+        <file>Button.qml</file>
+        <file>bgm/voice_start_serving.mp3</file>
+        <file>bgm/voice_pickup.mp3</file>
+        <file>bgm/voice_move_wait.mpga</file>
+        <file>bgm/voice_move_charge.mp3</file>
+        <file>bgm/voice_avoid.mp3</file>
+        <file>build/icon/icon_stop.png</file>
+        <file>build/icon/icon_save2.png</file>
+        <file>build/icon/icon_record.png</file>
+        <file>build/icon/icon_play.png</file>
+        <file>build/icon/icon_pause.png</file>
+        <file>build/icon/icon_folder2.png</file>
     </qresource>
 </RCC>

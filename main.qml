@@ -1,6 +1,7 @@
 import QtQuick 2.9
 import QtQuick.Window 2.3
-import QtQuick.Controls 2.2
+import QtQuick.Controls 2.12
+//import QtQuick.Controls 2.2
 //import QtQuick.Shapes 1.
 import QtQuick.Dialogs 1.2
 import Qt.labs.platform 1.0
@@ -8,6 +9,7 @@ import QtGraphicalEffects 1.0
 //import QtQuick.Templates 2.5
 import "."
 import io.qt.Supervisor 1.0
+import QtMultimedia 5.9
 
 //import QtQuick 2.12
 //import QtQuick.Window 2.12
@@ -33,9 +35,12 @@ Window {
         console.log("moving. location : " + curloc.slice(0,4));
         if(curloc.slice(0,4) == "char"){
             pmoving.pos = "충전기";
+            voice_movecharge.play();
         }else if(curloc.slice(0,4) == "wait"){
             pmoving.pos = "대기장소";
+            voice_movewait.play();
         }else{
+            voice_serving.play();
             var curtable = supervisor.getcurTable();
             pmoving.pos = curtable + "번 테이블";
         }
@@ -45,6 +50,10 @@ Window {
         }
         pmoving.init();
         stackview.push(pmoving);
+    }
+
+    function play_avoidmsg(){
+        voice_avoid.play();
     }
 
     function docharge(){
@@ -161,6 +170,7 @@ Window {
         running: true
         repeat: false
         onTriggered: {
+//            stackview.push(psetting);
             stackview.push(pkitchen);
 //            stackview.push(curMap);
         }
@@ -182,6 +192,26 @@ Window {
         }
     }
 
+    Audio{
+        id: voice_movewait
+        autoPlay: false
+        source: "bgm/voice_move_wait.mpga"
+    }
+    Audio{
+        id: voice_movecharge
+        autoPlay: false
+        source: "bgm/voice_move_charge.mp3"
+    }
+    Audio{
+        id: voice_serving
+        autoPlay: false
+        source: "bgm/voice_start_serving.mp3"
+    }
+    Audio{
+        id: voice_avoid
+        autoPlay: false
+        source: "bgm/voice_avoid.mp3"
+    }
 
     StackView{
         id: stackview

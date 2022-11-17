@@ -421,10 +421,14 @@ void Supervisor::moveJog(float vx, float vy, float vth){
 void Supervisor::moveStop(){
     lcm.moveStop();
 }
+
 void Supervisor::moveManual(){
     lcm.moveManual();
 }
+
 void Supervisor::setVelocity(float vel, float velth){
+    lcm.robot.vel_xy = vel;
+    lcm.robot.vel_th = velth;
     lcm.setVelocity(vel,velth);
 }
 
@@ -465,6 +469,16 @@ QString Supervisor::getcurTable(){
     return "0";
 }
 
+void Supervisor::joyMoveXY(float x, float y){
+    lcm.robot.joy_x = x;
+    lcm.robot.joy_y = y;
+    lcm.flagJoystick = true;
+}
+void Supervisor::joyMoveR(float r){
+    lcm.robot.joy_th = r;
+    lcm.flagJoystick = true;
+}
+
 QVector<float> Supervisor::getcurTarget(){
     QVector<float> temp;
     temp.push_back(lcm.robot.curTarget.x);
@@ -488,6 +502,20 @@ unsigned int Supervisor::getImageSize(){
 //    return temp;
 //}
 
+
+
+void Supervisor::startRecordPath(){
+
+}
+void Supervisor::startcurPath(){
+
+}
+void Supervisor::stopcurPath(){
+
+}
+void Supervisor::pausecurPath(){
+
+}
 
 #include <iostream>
 QString Supervisor::getImageData(){
@@ -539,6 +567,13 @@ bool Supervisor::getMapExist(){
     bool isopen = file->open(QIODevice::ReadOnly);
     delete file;
     return isopen;
+}
+
+float Supervisor::getVelocityXY(){
+    return lcm.robot.vel_xy;
+}
+float Supervisor::getVelocityTH(){
+    return lcm.robot.vel_th;
 }
 
 bool Supervisor::getMapState(){

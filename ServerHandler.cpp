@@ -17,11 +17,6 @@ ServerHandler::ServerHandler()
     robot_name = "test";
 
 
-
-
-
-
-
     QString map_path = "image/raw_map.png";
     cv::Mat map1 = cv::imread(map_path.toStdString());
     cv::flip(map1, map1, 0);

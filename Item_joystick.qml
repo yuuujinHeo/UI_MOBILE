@@ -1,136 +1,175 @@
 import QtQuick 2.0
-//import QtGamepad 1.12
 
-
-//Item {
-//    id: item_jog
-//    objectName: "item_jog"
-//    width: 400
-//    height: 400
-
-//    GamePad{
-
-//    }
-//}
 
 Item {
-    id:item_jog;
-    property int offset:30;
+    id: item_jog
+    objectName: "item_jog"
+    width: joystick_xy.width*2 + 30
+    height: joystick_xy.height
 
-    width: 500
-    height: 500
-    signal dirChanged(string direction);
-    signal pressed();
-    signal released();
 
-    Rectangle {
-        id:totalArea
-        color:"gray"
-        radius: parent.width/2
-        opacity: 0.5
-        width:parent.width;height:parent.height
-    }
+    Image {
+        id: joystick_xy
+        x: 0
+        y: 0
+        property real angle : 0
+        property real distance : 0
 
-    Rectangle{
-        id:stick
-        width:totalArea.width/2; height: width
-        radius: width/2
-        x: totalArea.width/2 - radius;
-        y: totalArea.height/2 - radius;
-        color:"black"
-    }
+        source: "qrc:/image/joy_background.png"
+//        anchors.centerIn: parent
 
-    MouseArea{
-        id:mouseArea1
-        anchors.fill: parent
-
-        onPressed: {
-            joyStick.pressed();
+        ParallelAnimation {
+            id: returnAnimation_xy
+            NumberAnimation { target: thumb_xy.anchors; property: "horizontalCenterOffset";
+                to: 0; duration: 200; easing.type: Easing.OutSine }
+            NumberAnimation { target: thumb_xy.anchors; property: "verticalCenterOffset";
+                to: 0; duration: 200; easing.type: Easing.OutSine }
         }
 
-//        onMousePositionChanged: {
-//         //(x-center_x)^2 + (y - center_y)^2 < radius^2
-//         //if stick need to remain inside larger circle
-//         //var rad = (totalArea.radius - stick.radius);
-//         //if stick can go outside larger circle
-//         var rad = totalArea.radius;
-//         rad =  rad * rad;
+        MouseArea {
+            id: mouse_xy
+            property bool verticalOnly : false
+            property bool horizontalOnly : false
+            property real mouseX2 : verticalOnly ? width * 0.5 : mouseX
+            property real mouseY2 : horizontalOnly ? height * 0.5 : mouseY
+            property real fingerAngle : Math.atan2(mouseX2, mouseY2)
+            property int mcx : mouseX2 - width * 0.5
+            property int mcy : mouseY2 - height * 0.5
+            property bool fingerInBounds : fingerDistance2 < distanceBound2
+            property real fingerDistance2 : mcx * mcx + mcy * mcy
+            property real distanceBound : width * 0.5 - thumb_xy.width * 0.5
+            property real distanceBound2 : distanceBound * distanceBound
 
-//         // calculate distance in x direction
-//         var xDist = mouseX - (totalArea.x + totalArea.radius);
-//         xDist = xDist * xDist;
+            property double signal_x : (mouseX2 - joystick_xy.width/2) / distanceBound
+            property double signal_y : -(mouseY2 - joystick_xy.height/2) / distanceBound
 
-//         // calculate distance in y direction
-//         var yDist = mouseY - (totalArea.y + totalArea.radius);
-//         yDist = yDist * yDist;
+            anchors.fill: parent
 
-//         //total distance for inner circle
-//         var dist = xDist + yDist;
+            onPressed: {
+                returnAnimation_xy.stop();
+            }
 
-//         //if distance if less then radius then inner circle is inside larger circle
-//         if( rad < dist) {
-//             return;
-//         }
+            onReleased: {
+                returnAnimation_xy.restart()
+                supervisor.joyMoveXY(0, 0);
+            }
 
-//         //center of larger circle
-//         var oldX = stick.x; var oldY = stick.y;
-//         stick.x = mouseX - stick.radius;
-//         stick.y = mouseY - stick.radius;
+            onPositionChanged: {
+                if (fingerInBounds) {
+                    thumb_xy.anchors.horizontalCenterOffset = mcx
+                    thumb_xy.anchors.verticalCenterOffset = mcy
+                } else {
+                    var angle = Math.atan2(mcy, mcx)
+                    thumb_xy.anchors.horizontalCenterOffset = Math.cos(angle) * distanceBound
+                    thumb_xy.anchors.verticalCenterOffset = Math.sin(angle) * distanceBound
+                }
 
-//         //using L R U D LU RU LD RD for describe direction
-//         var dir="";
+                // Fire the signal to indicate the joystick has moved
+                angle = Math.atan2(signal_y, signal_x)
 
-//         //check if Right or left direction,
-//         //by checking if inner circle's y is near center of larger circle
-//         if( stick.y >= totalArea.radius - stick.radius - joyStick.offset
-// && stick.y+stick.height <= totalArea.radius + stick.radius + joyStick.offset) {
-//             if( stick.x + stick.radius > totalArea.x + totalArea.radius) {
-//                 dir = "R";
-//             } else if( stick.x < totalArea.x + totalArea.radius) {
-//                 dir = "L";
-//             }
-//         }
+                if(fingerInBounds) {
+                    supervisor.joyMoveXY(
+                        horizontalOnly ? 0 : Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound,
+                        verticalOnly ? 0 : Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound
+                    );
+                } else {
+                    supervisor.joyMoveXY(
+                        horizontalOnly ? 0 : Math.sin(angle) * 1,
+                        verticalOnly ? 0 : Math.cos(angle) * 1
+                    );
+                }
+            }
+        }
 
-//         //check if Up or Down direction,
-//         //by checking if inner circle's x is near center of larger circle
-//         else if( stick.x >= totalArea.radius - stick.radius - joyStick.offset
-// && stick.x + stick.width <= totalArea.radius + stick.radius + joyStick.offset) {
-//            if( stick.y + stick.radius > totalArea.y + totalArea.radius) {
-//                 dir = "D";
-//            } else if( stick.y < totalArea.y + totalArea.radius) {
-//                 dir = "U";
-//            }
-//         }
-
-//         //check if Up Left or Up Right direction,
-//         //by checking if inner circle is near one of top corner of larger circle
-//         else if( stick.y < totalArea.radius - stick.radius ) {
-//            if( stick.x + stick.radius > totalArea.x + totalArea.radius) {
-//                dir = "R";
-//            } else if( stick.x < totalArea.x + totalArea.radius) {
-//                dir = "L";
-//            }
-//            dir = dir +"U";
-//         }
-//         //check if Down Left or Down Right direction,
-//         //by checking if inner circle is near one of bottom corner of larger circle
-//         else if ( stick.y + stick.radius >= totalArea.radius + stick.radius ) {
-//            if( stick.x + stick.radius > totalArea.x + totalArea.radius) {
-//               dir = "R";
-//            } else if( stick.x < totalArea.x + totalArea.radius) {
-//               dir = "L";
-//            }
-//            dir = dir +"D";
-//         }
-
-//         joyStick.dirChanged(dir);
-//        }
-
-        onReleased: {
-            //snap to center
-            stick.x = totalArea.width /2 - stick.radius;
-            stick.y = totalArea.height/2 - stick.radius;
-            joyStick.released();
+        Image {
+            id: thumb_xy
+            source: "qrc:/image/joy_finger.png"
+            anchors.centerIn: parent
         }
     }
+
+    Image {
+        id: joystick_r
+
+        anchors.left: joystick_xy.right
+        anchors.leftMargin: 30
+        y: 0
+
+
+        property real angle : 0
+        property real distance : 0
+
+        source: "qrc:/image/joy_background.png"
+//        anchors.centerIn: parent
+
+        ParallelAnimation {
+            id: returnAnimation_r
+            NumberAnimation { target: thumb_r.anchors; property: "horizontalCenterOffset";
+                to: 0; duration: 200; easing.type: Easing.OutSine }
+            NumberAnimation { target: thumb_r.anchors; property: "verticalCenterOffset";
+                to: 0; duration: 200; easing.type: Easing.OutSine }
+        }
+
+        MouseArea {
+            id: mouse_r
+            property bool verticalOnly : false
+            property bool horizontalOnly : true
+            property real mouseX2 : verticalOnly ? width * 0.5 : mouseX
+            property real mouseY2 : horizontalOnly ? height * 0.5 : mouseY
+            property real fingerAngle : Math.atan2(mouseX2, mouseY2)
+            property int mcx : mouseX2 - width * 0.5
+            property int mcy : mouseY2 - height * 0.5
+            property bool fingerInBounds : fingerDistance2 < distanceBound2
+            property real fingerDistance2 : mcx * mcx + mcy * mcy
+            property real distanceBound : width * 0.5 - thumb_r.width * 0.5
+            property real distanceBound2 : distanceBound * distanceBound
+
+            property double signal_x : (mouseX2 - joystick_r.width/2) / distanceBound
+            property double signal_y : -(mouseY2 - joystick_r.height/2) / distanceBound
+
+            anchors.fill: parent
+
+            onPressed: {
+                returnAnimation_r.stop();
+            }
+
+            onReleased: {
+                returnAnimation_r.restart()
+                supervisor.joyMoveR(0, 0);
+            }
+
+            onPositionChanged: {
+                if (fingerInBounds) {
+                    thumb_r.anchors.horizontalCenterOffset = mcx
+                    thumb_r.anchors.verticalCenterOffset = mcy
+                } else {
+                    var angle = Math.atan2(mcy, mcx)
+                    thumb_r.anchors.horizontalCenterOffset = Math.cos(angle) * distanceBound
+                    thumb_r.anchors.verticalCenterOffset = Math.sin(angle) * distanceBound
+                }
+
+                // Fire the signal to indicate the joystick has moved
+                angle = Math.atan2(signal_y, signal_x)
+
+                if(fingerInBounds) {
+                    supervisor.joyMoveR(
+                        verticalOnly ? 0 : Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound,
+                        horizontalOnly ? 0 : Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound
+                    );
+                } else {
+                    supervisor.joyMoveR(
+                        verticalOnly ? 0 : Math.cos(angle) * 1,
+                        horizontalOnly ? 0 : Math.sin(angle) * 1
+                    );
+                }
+            }
+        }
+
+        Image {
+            id: thumb_r
+            source: "qrc:/image/joy_finger.png"
+            anchors.centerIn: parent
+        }
+    }
+
 }
