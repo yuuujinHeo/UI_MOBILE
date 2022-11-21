@@ -28,7 +28,7 @@ Item {
 
         MouseArea {
             id: mouse_xy
-            property bool verticalOnly : false
+            property bool verticalOnly : true
             property bool horizontalOnly : false
             property real mouseX2 : verticalOnly ? width * 0.5 : mouseX
             property real mouseY2 : horizontalOnly ? height * 0.5 : mouseY
@@ -153,12 +153,12 @@ Item {
 
                 if(fingerInBounds) {
                     supervisor.joyMoveR(
-                        verticalOnly ? 0 : Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound,
+                        verticalOnly ? 0 : -Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound,
                         horizontalOnly ? 0 : Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound
                     );
                 } else {
                     supervisor.joyMoveR(
-                        verticalOnly ? 0 : Math.cos(angle) * 1,
+                        verticalOnly ? 0 : -Math.cos(angle) * 1,
                         horizontalOnly ? 0 : Math.sin(angle) * 1
                     );
                 }

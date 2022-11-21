@@ -16,7 +16,7 @@ typedef struct{
 typedef struct{
     QVector<ST_POINT>   line;
     QString     color;
-    double      width;
+    float      width;
 }ST_LINE;
 
 
@@ -28,6 +28,10 @@ typedef struct{
     float th = 0;
 }ST_POSE;
 typedef struct{
+    float x = 0;
+    float y = 0;
+}ST_FPOINT;
+typedef struct{
     int chunkSize = 0;
     int imageSize = 0;
     QVector<unsigned char> data;
@@ -37,9 +41,16 @@ typedef struct{
     int height = 0;
     float gridwidth = 0;
     int origin[2] = {0,};
+
     int locationSize = 0;
-    QVector<QString> locationTypes;
+    QVector<QString> locationName;
     QVector<ST_POSE> locationsPose;
+
+    int objectSize = 0;
+    QVector<QString> objectName;
+    QVector<QVector<ST_FPOINT>> objectPose;
+
+    float margin;
 }ST_MAP;
 
 typedef struct{

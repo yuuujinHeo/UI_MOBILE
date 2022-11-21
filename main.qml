@@ -9,7 +9,7 @@ import QtGraphicalEffects 1.0
 //import QtQuick.Templates 2.5
 import "."
 import io.qt.Supervisor 1.0
-import QtMultimedia 5.9
+import QtMultimedia 5.12
 
 //import QtQuick 2.12
 //import QtQuick.Window 2.12
@@ -36,7 +36,7 @@ Window {
         if(curloc.slice(0,4) == "char"){
             pmoving.pos = "충전기";
             voice_movecharge.play();
-        }else if(curloc.slice(0,4) == "wait"){
+        }else if(curloc.slice(0,4) == "rest"){
             pmoving.pos = "대기장소";
             voice_movewait.play();
         }else{
@@ -116,6 +116,13 @@ Window {
         stackview.push(ppickup);
     }
 
+    function updatecanvas(){
+        pannotation.updateCanvas();
+    }
+    function updateobject(){
+        pannotation.updateobject();
+    }
+
     Page_kitchen{
         id: pkitchen;
         visible: false
@@ -154,6 +161,10 @@ Window {
         id: pcharge;
         visible: false
     }
+    Page_annotation{
+        id: pannotation;
+        visible: false
+    }
 
     Supervisor{
         id:supervisor
@@ -170,7 +181,7 @@ Window {
         running: true
         repeat: false
         onTriggered: {
-//            stackview.push(psetting);
+//            stackview.push(pannotation);
             stackview.push(pkitchen);
 //            stackview.push(curMap);
         }

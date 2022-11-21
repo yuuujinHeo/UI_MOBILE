@@ -233,3 +233,55 @@
 2022-11-17 10:46:44 [LCM] SEND COMMAND : MOVE TARGET TO 0.000000, 0.000000, 0.000000
 2022-11-17 11:01:26 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
 2022-11-17 11:01:26 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 16:46:46 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-17 16:46:46 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 16:46:51 [LCM] SEND COMMAND : MOVE TARGET TO 0.118213, -0.992988, 0.000000
+2022-11-17 16:46:52 [LCM] SEND COMMAND : MOVE TARGET TO -0.111304, 0.993786, 0.000000
+2022-11-17 16:46:52 [LCM] SEND COMMAND : MOVE TARGET TO 0.450677, 0.892687, 0.000000
+2022-11-17 16:46:52 [LCM] SEND COMMAND : MOVE TARGET TO 0.913402, -0.407059, 0.000000
+2022-11-17 16:46:52 [LCM] SEND COMMAND : MOVE TARGET TO -0.825645, -0.564191, 0.000000
+2022-11-17 16:46:52 [LCM] SEND COMMAND : MOVE TARGET TO -0.332820, 0.942990, 0.000000
+2022-11-17 16:46:53 [LCM] SEND COMMAND : MOVE TARGET TO 0.000000, 0.000000, 0.000000
+2022-11-17 16:46:53 [LCM] SEND COMMAND : MOVE TARGET TO 0.000000, 0.000000, 1.000000
+2022-11-17 16:46:53 [LCM] SEND COMMAND : MOVE TARGET TO 0.000000, 0.000000, 0.000000
+2022-11-17 17:01:13 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-17 17:01:13 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 17:41:11 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-17 17:41:11 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 17:41:22 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-17 17:41:22 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 17:42:17 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-17 17:42:17 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 17:44:58 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-17 17:44:58 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 17:48:15 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-17 17:48:15 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 17:49:24 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-17 17:49:24 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 18:14:47 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-17 18:14:47 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 18:15:21 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-17 18:15:21 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 18:19:27 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-17 18:19:27 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 18:19:36 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-17 18:19:36 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 18:20:10 [DB]Load DB Table_Base : map_url -> file:///home/rainbow/Desktop/MAIN_MOBILE1/build/image/map_downloaded.png
+2022-11-17 18:20:10 [DB]Load DB Table_Base : prefer_mouse -> yes
+2022-11-17 18:20:34 [LCM] SEND COMMAND : MOVE TARGET TO 0.295073, -0.955475, 0.000000
+2022-11-17 18:20:34 [LCM] SEND COMMAND : MOVE TARGET TO 0.992511, -0.122155, 0.000000
+2022-11-17 18:20:34 [LCM] SEND COMMAND : MOVE TARGET TO -0.301131, 0.953583, 0.000000
+2022-11-17 18:20:34 [LCM] SEND COMMAND : MOVE TARGET TO -0.853282, -0.521450, 0.000000
+2022-11-17 18:20:35 [LCM] SEND COMMAND : MOVE TARGET TO -0.018519, 0.870370, 0.000000
+2022-11-17 18:20:35 [LCM] SEND COMMAND : MOVE TARGET TO -0.870022, 0.493013, 0.000000
+2022-11-17 18:20:35 [LCM] SEND COMMAND : MOVE TARGET TO -0.829437, -0.558600, 0.000000
+2022-11-17 18:20:35 [LCM] SEND COMMAND : MOVE TARGET TO -0.607450, -0.794358, 0.000000
+2022-11-17 18:20:35 [LCM] SEND COMMAND : MOVE TARGET TO -0.615032, -0.788502, 0.000000
+2022-11-17 18:20:36 [LCM] SEND COMMAND : MOVE TARGET TO 0.000000, 0.000000, 0.000000
+2022-11-17 18:20:36 [LCM] SEND COMMAND : MOVE TARGET TO 0.000000, 0.000000, 0.388889
+2022-11-17 18:20:36 [LCM] SEND COMMAND : MOVE TARGET TO 0.000000, 0.000000, 0.425926
+2022-11-17 18:20:37 [LCM] SEND COMMAND : MOVE TARGET TO 0.000000, 0.000000, 0.888889
+2022-11-17 18:20:37 [LCM] SEND COMMAND : MOVE TARGET TO 0.000000, 0.000000, 1.000000
+2022-11-17 18:20:37 [LCM] SEND COMMAND : MOVE TARGET TO 0.000000, 0.000000, 0.000000
+2022-11-17 18:20:38 [LCM] SEND COMMAND : MOVE MANUAL START
+2022-11-17 18:20:40 [LCM] SEND COMMAND : MOVE STOP

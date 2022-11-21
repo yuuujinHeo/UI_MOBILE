@@ -30,6 +30,7 @@ Item {
 
     property int location_num: supervisor.getLocationNum();
     property int path_num: supervisor.getPathNum();
+    property int object_num: supervisor.getObjectNum();
 
     property var location_types
     property var location_x
@@ -101,6 +102,8 @@ Item {
                 origin_x = supervisor.getOrigin()[0];
                 origin_y = supervisor.getOrigin()[1];
                 grid_size = supervisor.getGridWidth();
+                object_num = supervisor.getObjectNum();
+                canvas_cur_map.requestPaint();
                 timer_loadmap.stop();
             }
 
@@ -124,7 +127,7 @@ Item {
     Image{
         id: map_image
         visible: false
-        source: "file://" + applicationDirPath + "/image/map_downloaded.png"
+        source: "file://" + applicationDirPath + "/image/map_rotated.png"
     }
 
     Rectangle{
@@ -162,8 +165,9 @@ Item {
                     ctx.drawImage(map_image, 0,0,image_width,image_height);
                     ctx.lineWidth = 1;
                     ctx.lineCap = "round"
-                    //Location Load
 
+
+                    //Location Load
                     for(var i=0; i<location_num; i++){
                         loc_type = supervisor.getLocationTypes(i);
                         loc_x = supervisor.getLocationx(i)/grid_size;
@@ -172,11 +176,13 @@ Item {
 
 //                        console.log(loc_type,loc_x,loc_y,loc_th);
 
-                        if(loc_type == "charge"){
+                        if(loc_type.slice(0,4) == "Char"){
                             ctx.strokeStyle = "green";
-                        }else if(loc_type == "wait"){
+                        }else if(loc_type.slice(0,4) == "Rest"){
                             ctx.strokeStyle = "white";
-                        }else{
+                        }else if(loc_type.slice(0,4) == "Patr"){
+                            ctx.strokeStyle = "blue";
+                        }else if(loc_type.slice(0,4) == "Tabl"){
                             ctx.strokeStyle = "gray";
                         }
                         ctx.beginPath();
@@ -186,11 +192,36 @@ Item {
                         ctx.stroke()
                     }
 
+                    //Object loadImage()
+                    object_num = supervisor.getObjectNum();
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = "white";
+                    for(i=0; i<object_num; i++){
+                        var obj_type = supervisor.getObjectName(i);
+                        var obj_size = supervisor.getObjectPointSize(i);
+
+                        ctx.beginPath();
+                        for(var j=0; j<obj_size-1; j++){
+                            var obj_x = supervisor.getObjectX(i,j)/grid_size +origin_x;
+                            var obj_y = supervisor.getObjectY(i,j)/grid_size +origin_y;
+                            ctx.moveTo(obj_x,obj_y);
+                            obj_x = supervisor.getObjectX(i,j+1)/grid_size +origin_x;
+                            obj_y = supervisor.getObjectY(i,j+1)/grid_size +origin_y;
+                            ctx.lineTo(obj_x,obj_y);
+                        }
+                        ctx.moveTo(obj_x,obj_y);
+                        ctx.lineTo(supervisor.getObjectX(i,0)/grid_size+origin_x,supervisor.getObjectY(i,0)/grid_size+origin_y);
+                        ctx.stroke()
+                    }
+
+
                     //Path Load
                     path_num = supervisor.getPathNum();
+//                    print(path_num);
                     path_x = robot_x;
                     path_y = robot_y;
                     path_th = robot_th;
+                    ctx.lineWidth = 2;
                     for(i=0; i<path_num; i++){
                         var path_x_before = path_x;
                         var path_y_before = path_y;
@@ -223,6 +254,9 @@ Item {
                         ctx.lineTo(path_x+origin_x,path_y+origin_y)
                         ctx.stroke()
                     }
+
+
+
                     //Robot Cur Pos
                     robot_x = supervisor.getRobotx()/grid_size;
                     robot_y = supervisor.getRoboty()/grid_size;

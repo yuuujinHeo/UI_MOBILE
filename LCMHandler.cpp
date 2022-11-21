@@ -26,6 +26,10 @@ LCMHandler::~LCMHandler(){
     }
 }
 
+void LCMHandler::setData(ST_MAP _map, ST_ROBOT _robot){
+    map = _map;
+    robot = _robot;
+}
 void LCMHandler::onTimer(){
     static int cnt = 0;
     if(!isdownloadMap && cnt%50 == 0){
@@ -102,17 +106,18 @@ void LCMHandler::moveJog(float vx, float vy, float vth){
     send_msg.params[2] = array[2];
     send_msg.params[3] = array[3];
 
-    array = reinterpret_cast<uint8_t*>(&vy);
+    array = reinterpret_cast<uint8_t*>(&vth);
     send_msg.params[4] = array[0];
     send_msg.params[5] = array[1];
     send_msg.params[6] = array[2];
     send_msg.params[7] = array[3];
 
-    array = reinterpret_cast<uint8_t*>(&vth);
-    send_msg.params[8] = array[0];
-    send_msg.params[9] = array[1];
-    send_msg.params[10]= array[2];
-    send_msg.params[11]= array[3];
+//    array = reinterpret_cast<uint8_t*>(&vth);
+//    send_msg.params[8] = array[0];
+//    send_msg.params[9] = array[1];
+//    send_msg.params[10]= array[2];
+//    send_msg.params[11]= array[3];
+
     plog->write("[LCM] SEND COMMAND : MOVE TARGET TO "+QString().sprintf("%f, %f, %f",vx,vy,vth));
     lcm.publish("COMMAND",&send_msg);
 }
@@ -126,17 +131,17 @@ void LCMHandler::moveJog(){
     send_msg.params[2] = array[2];
     send_msg.params[3] = array[3];
 
-    array = reinterpret_cast<uint8_t*>(&robot.joy_y);
+    array = reinterpret_cast<uint8_t*>(&robot.joy_th);
     send_msg.params[4] = array[0];
     send_msg.params[5] = array[1];
     send_msg.params[6] = array[2];
     send_msg.params[7] = array[3];
 
-    array = reinterpret_cast<uint8_t*>(&robot.joy_th);
-    send_msg.params[8] = array[0];
-    send_msg.params[9] = array[1];
-    send_msg.params[10]= array[2];
-    send_msg.params[11]= array[3];
+//    array = reinterpret_cast<uint8_t*>(&robot.joy_th);
+//    send_msg.params[8] = array[0];
+//    send_msg.params[9] = array[1];
+//    send_msg.params[10]= array[2];
+//    send_msg.params[11]= array[3];
     plog->write("[LCM] SEND COMMAND : MOVE TARGET TO "+QString().sprintf("%f, %f, %f",robot.joy_x,robot.joy_y,robot.joy_th));
     lcm.publish("COMMAND",&send_msg);
 }
@@ -198,13 +203,13 @@ void LCMHandler::map_data_callback(const lcm::ReceiveBuffer *rbuf, const std::st
     QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(plot_map)).toImage();
 
     //Save PNG File
-    if(temp_image.save("image/map_downloaded2.png","PNG")){
+    if(temp_image.save("image/map_server2.png","PNG")){
         qDebug() << "Success to png";
     }else{
         qDebug() << "FAil to png";
-    }
+    }/*
     map.locationSize = msg->loc_num;
-    map.locationTypes.clear();
+    map.locationName.clear();
     map.locationsPose.clear();
     for(int i=0; i<msg->loc_num; i++){
         map.locationTypes.push_back(msg->loc_name[i].data());
@@ -214,7 +219,7 @@ void LCMHandler::map_data_callback(const lcm::ReceiveBuffer *rbuf, const std::st
         temp1.th = msg->loc_pos[i][2];
         temp2 = setAxis(temp1);
         map.locationsPose.push_back(temp2);
-    }
+    }*/
 
     //Only Test (Debugging)
     //clear
@@ -246,8 +251,23 @@ ST_POSE LCMHandler::setAxis(ST_POSE _pose){
     temp.y = -_pose.x;
     temp.th = _pose.th;
     return temp;
-};
+}
 
+ST_FPOINT LCMHandler::setAxis(ST_FPOINT _point){
+    ST_FPOINT temp;
+    temp.x = -_point.y;
+    temp.y = -_point.x;
+    return temp;
+}
+ST_FPOINT LCMHandler::canvasTomap(int x, int y){
+    ST_FPOINT temp;
+//    qDebug() << map.gridwidth << map.origin[0] << map.origin[1];
+//    qDebug() << x << y;
+    temp.x = -map.gridwidth*(y-map.origin[1]);
+    temp.y = -map.gridwidth*(x-map.origin[0]);
+//    qDebug() << temp.x << temp.y;
+    return temp;
+}
 void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg){
     robot.battery = msg->bat;
     robot.state = msg->state;
@@ -255,10 +275,12 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
     robot.curPose.x = msg->robot_pose[0];
     robot.curPose.y = msg->robot_pose[1];
     robot.curPose.th = msg->robot_pose[2];
+    qDebug() << "status callback";
 }
 
 void LCMHandler::robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg){
     robot.pathSize = msg->num;
+    robot.curPath.clear();
     for(int i=0; i<robot.pathSize; i++){
         ST_POSE temp;
         temp.x = msg->path[i][0];
@@ -266,6 +288,7 @@ void LCMHandler::robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::
         temp.th = msg->path[i][2];
         robot.curPath.push_back(temp);
     }
+    qDebug() << "path callback";
 }
 
 void LCMHandler::bLoop()
