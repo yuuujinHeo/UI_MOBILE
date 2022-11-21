@@ -16,8 +16,7 @@ ServerHandler::ServerHandler()
 
     robot_name = "test";
 
-
-    QString map_path = "image/raw_map.png";
+    QString map_path = "image/map_server.png";
     cv::Mat map1 = cv::imread(map_path.toStdString());
     cv::flip(map1, map1, 0);
     cv::rotate(map1,map1,cv::ROTATE_90_COUNTERCLOCKWISE);
@@ -25,7 +24,7 @@ ServerHandler::ServerHandler()
     QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(map1)).toImage();
 
     //Save PNG File
-    if(temp_image.save("image/map_downloaded.png","PNG")){
+    if(temp_image.save("image/map_rotated.png","PNG")){
         qDebug() << "Success to png";
         isMapExist = true;
     }else{
@@ -54,9 +53,9 @@ void ServerHandler::onTextMessageReceived(QString message){
     }else if(cmd == "STOP"){
 //        stop();
     }else if(cmd == "PAUSE"){
-//        pause();
+        emit server_pause();
     }else if(cmd == "RESUME"){
-//        resume();
+        emit server_resume();
     }else if(cmd == "NEW_TARGET"){
         float x = json["x"].toDouble();
         float y = json["y"].toDouble();
@@ -66,18 +65,18 @@ void ServerHandler::onTextMessageReceived(QString message){
         target_pose.y = y;
         target_pose.th = th;
 //        start();
-    }else if(cmd == "REQ_MAP"){
-        sendMap(QGuiApplication::applicationDirPath()+"/image/raw_map.png");
-    }else if(cmd == "PUSH_MAP"){
+    }else if(cmd == "MAP_REQ"){
+        sendMap(QGuiApplication::applicationDirPath()+"/image/map_server.png", QGuiApplication::applicationDirPath()+"/setting/");
+    }else if(cmd == "MAP_PUB"){
         QFile *file;
         plog->write("[SERVER] Push Map : ");
 
-        file = new QFile(QGuiApplication::applicationDirPath()+"/image/map_server.png");
+        file = new QFile(QGuiApplication::applicationDirPath()+"/image/map_from_server.png");
         file->open(QIODevice::WriteOnly);
-        file->write(QByteArray::fromBase64(json["map"].toString().toLocal8Bit()));
+        file->write(QByteArray::fromBase64(json["raw_map"].toString().toLocal8Bit()));
         file->close();
 
-        QString map_path = "image/map_server.png";
+        QString map_path = "image/map_from_server.png";
         cv::Mat map1 = cv::imread(map_path.toStdString());
         cv::flip(map1, map1, 0);
         cv::rotate(map1,map1,cv::ROTATE_90_COUNTERCLOCKWISE);
@@ -85,7 +84,7 @@ void ServerHandler::onTextMessageReceived(QString message){
         QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(map1)).toImage();
 
         //Save PNG File
-        if(temp_image.save("image/map_downloaded1.png","PNG")){
+        if(temp_image.save("image/map_from_server_rotated.png","PNG")){
             qDebug() << "Success to png";
             isMapExist = true;
         }else{
@@ -93,11 +92,38 @@ void ServerHandler::onTextMessageReceived(QString message){
         }
         delete file;
 
-        file = new QFile(QGuiApplication::applicationDirPath()+"/setting/map.ini");
+        file = new QFile(QGuiApplication::applicationDirPath()+"/image/map_from_server2.png");
         file->open(QIODevice::WriteOnly);
-        file->write(QByteArray::fromBase64(json["annotation"].toString().toLocal8Bit()));
+        file->write(QByteArray::fromBase64(json["annot_map"].toString().toLocal8Bit()));
         file->close();
 
+        map_path = "image/map_from_server2.png";
+        map1 = cv::imread(map_path.toStdString());
+        cv::flip(map1, map1, 0);
+        cv::rotate(map1,map1,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+        temp_image = QPixmap::fromImage(mat_to_qimage_cpy(map1)).toImage();
+
+        //Save PNG File
+        if(temp_image.save("image/map_from_server_rotated2.png","PNG")){
+            qDebug() << "Success to png";
+            isMapExist = true;
+        }else{
+            qDebug() << "Fail to png";
+        }
+        delete file;
+
+
+
+        file = new QFile(QGuiApplication::applicationDirPath()+"/setting/annotation_server.ini");
+        file->open(QIODevice::WriteOnly);
+        file->write(QByteArray::fromBase64(json["annot"].toString().toLocal8Bit()));
+        file->close();
+
+        file = new QFile(QGuiApplication::applicationDirPath()+"/setting/map_meta_server.ini");
+        file->open(QIODevice::WriteOnly);
+        file->write(QByteArray::fromBase64(json["meta"].toString().toLocal8Bit()));
+        file->close();
     }
 }
 
@@ -113,6 +139,7 @@ void ServerHandler::setData(QString name, ST_ROBOT _robot){
 void ServerHandler::setMap(ST_MAP _map){
     map = _map;
 }
+
 void ServerHandler::onTimer(){
     static int cnt = 0;
 
@@ -155,50 +182,50 @@ void ServerHandler::onTimer(){
         QString str(doc.toJson(QJsonDocument::Indented));
         socket.sendTextMessage(str);
 
-//        qDebug() << str;
+        static int count = 0;
+        qDebug() << count++;
     }else if(socket.state() == QAbstractSocket::ConnectingState){
         ;
     }else{
         connection_status = false;
         if(++cnt%5 == 0){
-            socket.open(QUrl("ws://192.168.0.200:22334"));
+            socket.open(QUrl("ws://192.168.1.200:22334"));
         }
     }
 }
 
-void ServerHandler::sendMap(QString path){
-    QFile* imageMap = new QFile(path);
-    imageMap->open(QIODevice::ReadOnly);
-    QByteArray ba = imageMap->readAll();
-    imageMap->close();
+void ServerHandler::sendMap(QString map_path, QString dir){
+    QFile* file = new QFile(map_path);
+    file->open(QIODevice::ReadOnly);
+    QByteArray ba_map = file->readAll();
+    file->close();
+    delete file;
 
-    delete imageMap;
+    file = new QFile(QGuiApplication::applicationDirPath()+"/image/map_server.png");
+    file->open(QIODevice::ReadOnly);
+    QByteArray ba_map2 = file->readAll();
+    file->close();
+    delete file;
+
+    file = new QFile(dir+"map_meta.ini");
+    file->open(QIODevice::ReadOnly);
+    QByteArray ba_meta = file->readAll();
+    file->close();
+    delete file;
+
+    file = new QFile(dir+"annotation.ini");
+    file->open(QIODevice::ReadOnly);
+    QByteArray ba_anot = file->readAll();
+    file->close();
+    delete file;
 
     QJsonObject json;
+    json["name"] = robot_name;
     json["type"] = "MAP";
-    json["map"] = QString(ba.toBase64());
-
-    json["width"] = map.width;
-    json["height"] = map.height;
-    json["grid_width"] = map.gridwidth;
-    json["origin_x"] = map.origin[0];
-    json["origin_y"] = map.origin[1];
-
-    QJsonObject loc_element;
-    QJsonArray loc_array;
-    int loc_num = map.locationSize;
-    QVector<QString> loc_types = map.locationTypes;
-    QVector<ST_POSE> loc_pose = map.locationsPose;
-    for(int i=0; i<loc_num; i++){
-        loc_element["name"] = loc_types[i];
-        loc_element["x"] = loc_pose[i].x;
-        loc_element["y"] = loc_pose[i].y;
-        loc_element["th"] = loc_pose[i].th;
-
-        loc_array.push_back(loc_element);
-    }
-    json["loc_num"] = loc_num;
-    json["locations"] = loc_element;
+    json["raw_map"] = QString(ba_map.toBase64());
+    json["annot_map"] = QString(ba_map2.toBase64());
+    json["annot"] = QString(ba_anot.toBase64());
+    json["meta"] = QString(ba_meta.toBase64());
 
     QJsonDocument doc(json);
     QString str(doc.toJson(QJsonDocument::Indented));

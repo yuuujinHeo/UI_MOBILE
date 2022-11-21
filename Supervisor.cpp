@@ -4,6 +4,7 @@
 #include <iostream>
 #include <QTextCodec>
 #include <QSslSocket>
+#include <QGuiApplication>
 
 //extern QObject *object;
 
@@ -21,11 +22,17 @@ Supervisor::Supervisor(QObject *parent)
 
     mMain = nullptr;
 
+    lcm = new LCMHandler();
     server = new ServerHandler();
     map = server->map;
 
     isaccepted = false;
     readSetting();
+
+    connect(server,SIGNAL(server_pause()),this,SLOT(server_cmd_pause()));
+    connect(server,SIGNAL(server_resume()),this,SLOT(server_cmd_resume()));
+
+
 }
 
 void Supervisor::setWindow(QQuickWindow *Window){
@@ -46,6 +53,17 @@ void Supervisor::setObject(QObject *object)
 QObject *Supervisor::getObject()
 {
     return mObject;//rootobject를 리턴해준다.
+}
+
+void Supervisor::server_cmd_pause(){
+    plog->write("[SERVER] PAUSE");
+    lcm->movePause();
+}
+
+void Supervisor::server_cmd_resume(){
+
+    plog->write("[SERVER] RESUME");
+    lcm->moveResume();
 }
 
 int Supervisor::getCanvasSize(){
@@ -77,7 +95,7 @@ QString Supervisor::getLineColor(int index){
     return "";
 }
 
-double Supervisor::getLineWidth(int index){
+float Supervisor::getLineWidth(int index){
     if(index < canvas.size()){
         return canvas[index].width;
     }
@@ -93,7 +111,7 @@ void Supervisor::setLine(int x, int y){
 
 }
 
-void Supervisor::startLine(QString color, double width){
+void Supervisor::startLine(QString color, float width){
     temp_line.line.clear();
     temp_line.color = color;
     temp_line.width = width;
@@ -152,6 +170,7 @@ void Supervisor::clear_all(){
         canvas_redo.push_back(canvas[i]);
         flag_clear = 1;
     }
+    temp_object.clear();
     canvas.clear();
     qDebug() << "CLEAR [canvas size = "<<canvas.size() << "] redo size = " << canvas_redo.size();
 
@@ -169,7 +188,7 @@ void Supervisor::onTimer(){
 
     switch(ui_cmd){
     case UI_CMD_MOVE_TABLE:{
-        if(lcm.robot.state == ROBOT_STATE_READY){
+        if(lcm->robot.state == ROBOT_STATE_READY){
             if(isaccepted){
                 // pickup
                 qDebug() << "do pickup";
@@ -177,31 +196,31 @@ void Supervisor::onTimer(){
                 ui_cmd = UI_CMD_NONE;
 
                 int curNum = 0;
-                lcm.robot.pickupTrays.clear();
+                lcm->robot.pickupTrays.clear();
                 for(int i=0; i<NUM_TRAY; i++){
-                    if(lcm.robot.tray_num[i] == curNum){
-                        lcm.robot.tray_num[i] = 0;
+                    if(lcm->robot.tray_num[i] == curNum){
+                        lcm->robot.tray_num[i] = 0;
                         if(curNum != 0)
-                            lcm.robot.pickupTrays.push_back(i+1);
+                            lcm->robot.pickupTrays.push_back(i+1);
                     }else if(curNum == 0){
-                        curNum = lcm.robot.tray_num[i];
-                        lcm.robot.pickupTrays.push_back(i+1);
-                        lcm.robot.tray_num[i] = 0;
+                        curNum = lcm->robot.tray_num[i];
+                        lcm->robot.pickupTrays.push_back(i+1);
+                        lcm->robot.tray_num[i] = 0;
                     }
                 }
-                qDebug() << lcm.robot.tray_num[0] << lcm.robot.tray_num[1]<< lcm.robot.tray_num[2];
+                qDebug() << lcm->robot.tray_num[0] << lcm->robot.tray_num[1]<< lcm->robot.tray_num[2];
                 QMetaObject::invokeMethod(mMain, "showpickup");
                 isaccepted = false;
             }else{
                 // move start
                 static int timer_cnt = 0;
                 if(timer_cnt%5==0){
-                    if(lcm.robot.tray_num[0] != 0){
-                        lcm.moveTo("serving_"+QString().sprintf("%d",lcm.robot.tray_num[0]-1));
-                    }else if(lcm.robot.tray_num[1] != 0){
-                        lcm.moveTo("serving_"+QString().sprintf("%d",lcm.robot.tray_num[1]-1));
-                    }else if(lcm.robot.tray_num[2] != 0){
-                        lcm.moveTo("serving_"+QString().sprintf("%d",lcm.robot.tray_num[2]-1));
+                    if(lcm->robot.tray_num[0] != 0){
+                        lcm->moveTo("serving_"+QString().sprintf("%d",lcm->robot.tray_num[0]-1));
+                    }else if(lcm->robot.tray_num[1] != 0){
+                        lcm->moveTo("serving_"+QString().sprintf("%d",lcm->robot.tray_num[1]-1));
+                    }else if(lcm->robot.tray_num[2] != 0){
+                        lcm->moveTo("serving_"+QString().sprintf("%d",lcm->robot.tray_num[2]-1));
                     }else{
                         // move done -> move to wait
                         ui_cmd = UI_CMD_MOVE_WAIT;
@@ -209,7 +228,7 @@ void Supervisor::onTimer(){
                 }
                 timer_cnt++;
             }
-        }else if(lcm.robot.state == ROBOT_STATE_MOVING){
+        }else if(lcm->robot.state == ROBOT_STATE_MOVING){
             // moving
             if(isaccepted){
 
@@ -220,12 +239,12 @@ void Supervisor::onTimer(){
                 QMetaObject::invokeMethod(mMain, "movelocation");
             }
         }else{
-            qDebug() << "state = " << lcm.robot.state;
+//            qDebug() << "state = " << lcm->robot.state;
         }
         break;
     }
     case UI_CMD_MOVE_WAIT:{
-        if(lcm.robot.state == ROBOT_STATE_READY){
+        if(lcm->robot.state == ROBOT_STATE_READY){
             if(isaccepted){
                 // move done
                 qDebug() << "move done";
@@ -236,9 +255,9 @@ void Supervisor::onTimer(){
                 isaccepted = false;
             }else{
                 qDebug() << "move to wait";
-                lcm.moveTo("wait_0");
+                lcm->moveTo("resting_0");
             }
-        }else if(lcm.robot.state == ROBOT_STATE_MOVING){
+        }else if(lcm->robot.state == ROBOT_STATE_MOVING){
             // moving
             if(isaccepted){
 
@@ -257,7 +276,7 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_CMD_MOVE_CHARGE:{
-        if(lcm.robot.state == ROBOT_STATE_READY){
+        if(lcm->robot.state == ROBOT_STATE_READY){
             if(isaccepted){
                 // move done
                 ui_cmd = UI_CMD_NONE;
@@ -265,9 +284,9 @@ void Supervisor::onTimer(){
                 isaccepted = false;
                 QMetaObject::invokeMethod(mMain, "docharge");
             }else{
-                lcm.moveTo("charging_0");
+                lcm->moveTo("charging_0");
             }
-        }else if(lcm.robot.state == ROBOT_STATE_MOVING){
+        }else if(lcm->robot.state == ROBOT_STATE_MOVING){
             // moving
             if(isaccepted){
 
@@ -281,17 +300,17 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_CMD_PAUSE:{
-        if(lcm.robot.state == ROBOT_STATE_MOVING || lcm.robot.state == ROBOT_STATE_AVOID){
-            lcm.movePause();
-        }else if(lcm.robot.state == ROBOT_STATE_PAUSED){
+        if(lcm->robot.state == ROBOT_STATE_MOVING || lcm->robot.state == ROBOT_STATE_AVOID){
+            lcm->movePause();
+        }else if(lcm->robot.state == ROBOT_STATE_PAUSED){
             // pause success
             ui_cmd = UI_CMD_NONE;
         }
         break;
     }
     case UI_CMD_RESUME:{
-        if(lcm.robot.state == ROBOT_STATE_PAUSED){
-            lcm.moveResume();
+        if(lcm->robot.state == ROBOT_STATE_PAUSED){
+            lcm->moveResume();
         }else{
             // resume success
             ui_cmd = UI_CMD_NONE;
@@ -311,13 +330,14 @@ void Supervisor::onTimer(){
     if(server->map.map_name == ""){
         server->setMap(map);
     }
-    server->setData(robot_name, lcm.robot);
-
+    server->setData(robot_name, lcm->robot);
+    lcm->setData(map,lcm->robot);
     //robot state check
 
 }
 
 void Supervisor::readSetting(){
+    //Map Meta Data======================================================================
     QString ini_path = "setting/map_meta.ini";
     QSettings setting_meta(ini_path, QSettings::IniFormat);
 
@@ -330,66 +350,97 @@ void Supervisor::readSetting(){
     map.origin[1] = setting_meta.value("map_origin_v").toInt();
     setting_meta.endGroup();
 
+    //Annotation======================================================================
     ini_path = "setting/annotation.ini";
     QSettings setting_anot(ini_path, QSettings::IniFormat);
     map.locationSize = 0;
 
-
-
-    setting_anot.beginGroup("charging_location");
-    map.locationTypes.push_back("charge");
-    int charge_num = setting_anot.value("total_number").toInt();
-    map.locationSize+=charge_num;
-
+    setting_anot.beginGroup("charging_locations");
+    int charge_num = setting_anot.value("num").toInt();
     ST_POSE temp_pose;
     for(int i=0; i<charge_num; i++){
-        QString str = "loc"+QString::number(i);
-        temp_pose.x = setting_anot.value(str+"_x").toFloat();
-        temp_pose.y = setting_anot.value(str+"_y").toFloat();
-        temp_pose.th = setting_anot.value(str+"_th").toFloat();
+        QString loc_str = setting_anot.value("loc"+QString::number(i)).toString();
+        QStringList strlist = loc_str.split(",");
+        temp_pose.x = strlist[1].toFloat();
+        temp_pose.y = strlist[2].toFloat();
+        temp_pose.th = strlist[3].toFloat();
+        map.locationName.push_back(strlist[0]);
         map.locationsPose.push_back(temp_pose);
+        map.locationSize++;
     }
     setting_anot.endGroup();
 
 
-    setting_anot.beginGroup("resting_location");
-    map.locationTypes.push_back("wait");
-    int wait_num = setting_anot.value("total_number").toInt();
-    map.locationSize+=wait_num;
-
-    for(int i=0; i<wait_num; i++){
-        QString str = "loc"+QString::number(i);
-        temp_pose.x = setting_anot.value(str+"_x").toFloat();
-        temp_pose.y = setting_anot.value(str+"_y").toFloat();
-        temp_pose.th = setting_anot.value(str+"_th").toFloat();
+    setting_anot.beginGroup("patrol_locations");
+    int patrol_num = setting_anot.value("num").toInt();
+    for(int i=0; i<patrol_num; i++){
+        QString loc_str = setting_anot.value("loc"+QString::number(i)).toString();
+        QStringList strlist = loc_str.split(",");
+        temp_pose.x = strlist[1].toFloat();
+        temp_pose.y = strlist[2].toFloat();
+        temp_pose.th = strlist[3].toFloat();
+        map.locationName.push_back(strlist[0]);
         map.locationsPose.push_back(temp_pose);
+        map.locationSize++;
     }
     setting_anot.endGroup();
 
 
-
-    setting_anot.beginGroup("serving_location");
-    int serving_num = setting_anot.value("total_number").toInt();
-    map.locationSize += serving_num;
-
-    for(int i=0; i<serving_num; i++){
-        QString str = "loc"+QString::number(i);
-        map.locationTypes.push_back("table");
-
-        ST_POSE temp_pose;
-        temp_pose.x = setting_anot.value(str+"_x").toFloat();
-        temp_pose.y = setting_anot.value(str+"_y").toFloat();
-        temp_pose.th = setting_anot.value(str+"_th").toFloat();
-        qDebug() << str << temp_pose.x << temp_pose.y << temp_pose.th;
+    setting_anot.beginGroup("resting_locations");
+    int rest_num = setting_anot.value("num").toInt();
+    for(int i=0; i<rest_num; i++){
+        QString loc_str = setting_anot.value("loc"+QString::number(i)).toString();
+        QStringList strlist = loc_str.split(",");
+        temp_pose.x = strlist[1].toFloat();
+        temp_pose.y = strlist[2].toFloat();
+        temp_pose.th = strlist[3].toFloat();
+        map.locationName.push_back(strlist[0]);
         map.locationsPose.push_back(temp_pose);
+        map.locationSize++;
     }
     setting_anot.endGroup();
 
+    setting_anot.beginGroup("serving_locations");
+    int serv_num = setting_anot.value("num").toInt();
+    for(int i=0; i<serv_num; i++){
+        QString loc_str = setting_anot.value("loc"+QString::number(i)).toString();
+        QStringList strlist = loc_str.split(",");
+        temp_pose.x = strlist[1].toFloat();
+        temp_pose.y = strlist[2].toFloat();
+        temp_pose.th = strlist[3].toFloat();
+        map.locationName.push_back(strlist[0]);
+        map.locationsPose.push_back(temp_pose);
+        map.locationSize++;
+    }
+    setting_anot.endGroup();
+
+
+    setting_anot.beginGroup("objects");
+    int obj_num = setting_anot.value("num").toInt();
+    ST_FPOINT temp_point;
+    for(int i=0; i<obj_num; i++){
+        QString loc_str = setting_anot.value("poly"+QString::number(i)).toString();
+        QStringList strlist = loc_str.split(",");
+        QVector<ST_FPOINT> temp_v;
+        for(int j=1; j<strlist.size(); j++){
+            temp_point.x = strlist[j].split(":")[0].toFloat();
+            temp_point.y = strlist[j].split(":")[1].toFloat();
+            temp_v.push_back(temp_point);
+        }
+        map.objectName.push_back(strlist[0]);
+        map.objectPose.push_back(temp_v);
+        map.objectSize++;
+    }
+    setting_anot.endGroup();
+
+
+    //Robot Setting================================================================
     ini_path = "setting/robot.ini";
     QSettings setting_robot(ini_path, QSettings::IniFormat);
 
     setting_robot.beginGroup("ROBOT");
     robot_name = setting_robot.value("name").toString();
+    map.margin = setting_robot.value("margin").toFloat();
     qDebug() << "robot name" <<  robot_name;
     setting_robot.endGroup();
 }
@@ -397,39 +448,39 @@ void Supervisor::readSetting(){
 
 void Supervisor::setTray(int tray1, int tray2, int tray3){
     plog->write("[UI-FUNCTION] SET TRAY : "+QString().sprintf("%d, %d, %d",tray1,tray2,tray3));
-    lcm.robot.tray_num[0] = tray1;
-    lcm.robot.tray_num[1] = tray2;
-    lcm.robot.tray_num[2] = tray3;
+    lcm->robot.tray_num[0] = tray1;
+    lcm->robot.tray_num[1] = tray2;
+    lcm->robot.tray_num[2] = tray3;
     ui_cmd = UI_CMD_MOVE_TABLE;
 }
 
 void Supervisor::moveTo(QString target_num){
-    lcm.moveTo(target_num);
+    lcm->moveTo(target_num);
 }
 void Supervisor::moveTo(float x, float y, float th){
-    lcm.moveTo(x,y,th);
+    lcm->moveTo(x,y,th);
 }
 void Supervisor::movePause(){
-    lcm.movePause();
+    lcm->movePause();
 }
 void Supervisor::moveResume(){
-    lcm.moveResume();
+    lcm->moveResume();
 }
 void Supervisor::moveJog(float vx, float vy, float vth){
-    lcm.moveJog(vx,vy,vth);
+    lcm->moveJog(vx,vy,vth);
 }
 void Supervisor::moveStop(){
-    lcm.moveStop();
+    lcm->moveStop();
 }
 
 void Supervisor::moveManual(){
-    lcm.moveManual();
+    lcm->moveManual();
 }
 
 void Supervisor::setVelocity(float vel, float velth){
-    lcm.robot.vel_xy = vel;
-    lcm.robot.vel_th = velth;
-    lcm.setVelocity(vel,velth);
+    lcm->robot.vel_xy = vel;
+    lcm->robot.vel_th = velth;
+    lcm->setVelocity(vel,velth);
 }
 
 void Supervisor::confirmPickup(){
@@ -444,46 +495,46 @@ void Supervisor::moveToWait(){
     ui_cmd = UI_CMD_MOVE_WAIT;
 }
 float Supervisor::getBattery(){
-    return lcm.robot.battery;
+    return lcm->robot.battery;
 }
 int Supervisor::getState(){
-    return lcm.robot.state;
+    return lcm->robot.state;
 }
 int Supervisor::getErrcode(){
-    return lcm.robot.err_code;
+    return lcm->robot.err_code;
 }
 
 QVector<int> Supervisor::getPickuptrays(){
-    return lcm.robot.pickupTrays;
+    return lcm->robot.pickupTrays;
 }
 QString Supervisor::getcurLoc(){
-    return lcm.robot.curLocation;
+    return lcm->robot.curLocation;
 }
 
 QString Supervisor::getcurTable(){
-    if(lcm.robot.curLocation.left(7) == "serving"){
-        int table = lcm.robot.curLocation.split("_")[1].toInt() + 1;
-        qDebug() << lcm.robot.curLocation << table;
+    if(lcm->robot.curLocation.left(7) == "serving"){
+        int table = lcm->robot.curLocation.split("_")[1].toInt() + 1;
+        qDebug() << lcm->robot.curLocation << table;
         return QString::number(table);
     }
     return "0";
 }
 
 void Supervisor::joyMoveXY(float x, float y){
-    lcm.robot.joy_x = x;
-    lcm.robot.joy_y = y;
-    lcm.flagJoystick = true;
+    lcm->robot.joy_x = x;
+    lcm->robot.joy_y = y;
+    lcm->flagJoystick = true;
 }
 void Supervisor::joyMoveR(float r){
-    lcm.robot.joy_th = r;
-    lcm.flagJoystick = true;
+    lcm->robot.joy_th = r;
+    lcm->flagJoystick = true;
 }
 
 QVector<float> Supervisor::getcurTarget(){
     QVector<float> temp;
-    temp.push_back(lcm.robot.curTarget.x);
-    temp.push_back(lcm.robot.curTarget.y);
-    temp.push_back(lcm.robot.curTarget.th);
+    temp.push_back(lcm->robot.curTarget.x);
+    temp.push_back(lcm->robot.curTarget.y);
+    temp.push_back(lcm->robot.curTarget.th);
     return temp;
 }
 int Supervisor::getImageChunkNum(){
@@ -563,24 +614,27 @@ void Supervisor::setRobotName(QString name){
 }
 bool Supervisor::getMapExist(){
     QFile *file;
-    file = new QFile("image/map_downloaded.png");
+    file = new QFile("image/map_rotated.png");
     bool isopen = file->open(QIODevice::ReadOnly);
     delete file;
     return isopen;
 }
 
 float Supervisor::getVelocityXY(){
-    return lcm.robot.vel_xy;
+    return lcm->robot.vel_xy;
 }
 float Supervisor::getVelocityTH(){
-    return lcm.robot.vel_th;
+    return lcm->robot.vel_th;
 }
 
 bool Supervisor::getMapState(){
-    return lcm.isdownloadMap;
+    return lcm->isdownloadMap;
 }
 QString Supervisor::getMapname(){
     return map.map_name;
+}
+QString Supervisor::getMappath(){
+    return "file://" + QGuiApplication::applicationDirPath() + "/image/" + map.map_name + ".png";
 }
 int Supervisor::getMapWidth(){
     return map.width;
@@ -601,49 +655,233 @@ int Supervisor::getLocationNum(){
     return map.locationSize;
 }
 QString Supervisor::getLocationTypes(int num){
-    return map.locationTypes[num];
+    return map.locationName[num];
 }
 float Supervisor::getLocationx(int num){
-    ST_POSE temp = lcm.setAxis(map.locationsPose[num]);
+    ST_POSE temp = lcm->setAxis(map.locationsPose[num]);
     return temp.x;
 }
 float Supervisor::getLocationy(int num){
-    ST_POSE temp = lcm.setAxis(map.locationsPose[num]);
+    ST_POSE temp = lcm->setAxis(map.locationsPose[num]);
     return temp.y;
 }
 float Supervisor::getLocationth(int num){
-    ST_POSE temp = lcm.setAxis(map.locationsPose[num]);
+    ST_POSE temp = lcm->setAxis(map.locationsPose[num]);
     return temp.th;
+}
+int Supervisor::getObjectNum(){
+    return map.objectSize;
+}
+QString Supervisor::getObjectName(int num){
+    return map.objectName[num];
+}
+int Supervisor::getObjectPointSize(int num){
+    return map.objectPose[num].size();
+}
+float Supervisor::getObjectX(int num, int point){
+    ST_FPOINT temp = lcm->setAxis(map.objectPose[num][point]);
+    return temp.x;
+}
+float Supervisor::getObjectY(int num, int point){
+    ST_FPOINT temp = lcm->setAxis(map.objectPose[num][point]);
+    return temp.y;
+}
+int Supervisor::getTempObjectSize(){
+    return temp_object.size();
+}
+float Supervisor::getTempObjectX(int num){
+    ST_FPOINT temp = lcm->setAxis(temp_object[num]);
+    return temp.x;
+}
+float Supervisor::getTempObjectY(int num){
+    ST_FPOINT temp = lcm->setAxis(temp_object[num]);
+    return temp.y;
+}
+void Supervisor::addObjectPoint(int x, int y){
+    ST_FPOINT temp = lcm->canvasTomap(x,y);
+    plog->write("[DEBUG] addObjectPoint " + QString().sprintf("[%d] %f, %f",temp_object.size(),temp.x,temp.y));
+    temp_object.push_back(temp);
+
+    QMetaObject::invokeMethod(mMain, "updatecanvas");
+}
+void Supervisor::editObjectPoint(int num, int x, int y){
+    if(num < temp_object.size()){
+        plog->write("[DEBUG] editObjectPoint " + QString().sprintf("%d (x)%f -> %f (y)%f -> %f",num,temp_object[num].x,x,temp_object[num].y,y));
+        ST_FPOINT temp = lcm->canvasTomap(x,y);
+        temp_object[num].x = temp.x;
+        temp_object[num].y = temp.y;
+        QMetaObject::invokeMethod(mMain, "updatecanvas");
+    }
+}
+
+void Supervisor::removeObjectPoint(int num){
+    if(num < temp_object.size()){
+        temp_object.remove(num);
+        QMetaObject::invokeMethod(mMain, "updatecanvas");
+    }else{
+        plog->write("[DEBUG] removeObjectPoint " + QString().sprintf("%d, %d",num,temp_object.size()));
+    }
+}
+
+void Supervisor::removeObject(QString name){
+    for(int i=0; i<map.objectSize; i++){
+        if(map.objectName[i] == name){
+            plog->write("[UI-MAP] REMOVE OBJECT "+ name);
+            map.objectName.remove(i);
+            map.objectPose.remove(i);
+            map.objectSize--;
+            QMetaObject::invokeMethod(mMain, "updateobject");
+            return;
+        }
+    }
+    plog->write("[UI-MAP] REMOVE OBJECT BUT FAILED "+ name);
+}
+
+void Supervisor::moveObjectPoint(int obj_num, int point_num, int x, int y){
+    if(obj_num > -1 && obj_num < map.objectSize){
+        if(point_num > -1 && point_num < map.objectPose[obj_num].size()){
+            ST_FPOINT pos = lcm->canvasTomap(x,y);
+            map.objectPose[obj_num][point_num].x = pos.x;
+            map.objectPose[obj_num][point_num].y = pos.y;
+            qDebug() << "Move Point " << pos.x << pos.y;
+            QMetaObject::invokeMethod(mMain, "updatecanvas");
+
+        }
+    }
+}
+
+float Supervisor::getMargin(){
+    return map.margin;
+}
+void Supervisor::removeObjectPointLast(){
+    if(temp_object.size() > 0){
+        temp_object.pop_back();
+        QMetaObject::invokeMethod(mMain, "updatecanvas");
+    }
+}
+
+void Supervisor::clearObjectPoints(){
+    temp_object.clear();
+    QMetaObject::invokeMethod(mMain, "updatecanvas");
+}
+void Supervisor::addObject(QString name){
+    if(temp_object.size() > 0){
+        map.objectName.push_back(name);
+        map.objectPose.push_back(temp_object);
+        temp_object.clear();
+        map.objectSize++;
+        QMetaObject::invokeMethod(mMain, "updatecanvas");
+        QMetaObject::invokeMethod(mMain, "updateobject");
+
+        plog->write("[DEBUG] addObject " + name);
+    }else{
+        plog->write("[DEBUG] addObject " + name + " but size = 0");
+    }
+}
+
+void Supervisor::clickObject(QString name){
+
+}
+
+void Supervisor::clickObject(float x, float y){
+
+}
+
+int Supervisor::getObjNum(QString name){
+    for(int i=0; i<map.objectSize; i++){
+        if(map.objectName[i] == name){
+            return i;
+        }
+    }
+    return -1;
+}
+int Supervisor::getObjNum(int x, int y){
+    for(int i=0; i<map.objectSize; i++){
+        //Find Square Pos
+        ST_FPOINT uL, dR;
+        uL.x = map.objectPose[i][0].x;
+        uL.y = map.objectPose[i][0].y;
+        dR.x = map.objectPose[i][0].x;
+        dR.y = map.objectPose[i][0].y;
+        for(int j=1; j<map.objectPose[i].size(); j++){
+            if(uL.x > map.objectPose[i][j].x){
+                uL.x = map.objectPose[i][j].x;
+            }
+            if(uL.y > map.objectPose[i][j].y){
+                uL.y = map.objectPose[i][j].y;
+            }
+            if(dR.x < map.objectPose[i][j].x){
+                dR.x = map.objectPose[i][j].x;
+            }
+            if(dR.y < map.objectPose[i][j].y){
+                dR.y = map.objectPose[i][j].y;
+            }
+        }
+//        qDebug() << i << " : " << uL.x << uL.y << dR.x << dR.y;
+
+        ST_FPOINT pos = lcm->canvasTomap(x,y);
+
+        if(pos.x>uL.x && pos.x<dR.x){
+            if(pos.y>uL.y && pos.y<dR.y){
+                qDebug() << "Match!! : " << i;
+                return i;
+            }
+        }
+    }
+    return -1;
+    qDebug() << "can't find obj num : " << x << y;
+}
+
+int Supervisor::getObjPointNum(int obj_num, int x, int y){
+    ST_FPOINT pos = lcm->canvasTomap(x,y);
+    qDebug() << pos.x << pos.y;
+    if(obj_num < map.objectSize && obj_num > -1){
+        qDebug() << "check obj" << obj_num << map.objectPose[obj_num].size();
+        if(obj_num != -1){
+            for(int j=0; j<map.objectPose[obj_num].size(); j++){
+                qDebug() << map.objectPose[obj_num][j].x << map.objectPose[obj_num][j].y;
+                if(fabs(map.objectPose[obj_num][j].x - pos.x) < 0.1){
+                    if(fabs(map.objectPose[obj_num][j].y - pos.y) < 0.1){
+                        qDebug() << "Match Point !!" << obj_num << j;
+                        return j;
+                    }
+                }
+            }
+        }
+    }
+    qDebug() << "can't find obj num : " << x << y;
+    return -1;
+
 }
 
 float Supervisor::getRobotx(){
-    ST_POSE temp = lcm.setAxis(lcm.robot.curPose);
+    ST_POSE temp = lcm->setAxis(lcm->robot.curPose);
     return temp.x;
 }
 float Supervisor::getRoboty(){
-    ST_POSE temp = lcm.setAxis(lcm.robot.curPose);
+    ST_POSE temp = lcm->setAxis(lcm->robot.curPose);
     return temp.y;
 }
 float Supervisor::getRobotth(){
-    ST_POSE temp = lcm.setAxis(lcm.robot.curPose);
+    ST_POSE temp = lcm->setAxis(lcm->robot.curPose);
     return temp.th;
 }
 
 int Supervisor::getRobotState(){
-    return lcm.robot.state;
+    return lcm->robot.state;
 }
 int Supervisor::getPathNum(){
-    return lcm.robot.pathSize;
+    return lcm->robot.pathSize;
 }
 float Supervisor::getPathx(int num){
-    ST_POSE temp = lcm.setAxis(lcm.robot.curPath[num]);
+    ST_POSE temp = lcm->setAxis(lcm->robot.curPath[num]);
     return temp.x;
 }
 float Supervisor::getPathy(int num){
-    ST_POSE temp = lcm.setAxis(lcm.robot.curPath[num]);
+    ST_POSE temp = lcm->setAxis(lcm->robot.curPath[num]);
     return temp.y;
 }
 float Supervisor::getPathth(int num){
-    ST_POSE temp = lcm.setAxis(lcm.robot.curPath[num]);
+    ST_POSE temp = lcm->setAxis(lcm->robot.curPath[num]);
     return temp.th;
 }

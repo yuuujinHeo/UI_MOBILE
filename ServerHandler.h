@@ -42,8 +42,11 @@ public:
 
     void setMap(ST_MAP _map);
     void setData(QString name, ST_ROBOT _robot);
-    void sendMap(QString path);
+    void sendMap(QString map_path, QString dir);
 
+signals:
+    void server_pause();
+    void server_resume();
 public slots:
     void onConnected();
     void onDisconnected();

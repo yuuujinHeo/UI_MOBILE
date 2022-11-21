@@ -19,7 +19,7 @@ Item {
     property list<Item> array_canvas;
     property list<Item> array_brush;
     property var map_data;
-    property string image_source: "file://" + applicationDirPath + "/image/map_downloaded.png"
+    property string image_source: "file://" + applicationDirPath + "/image/map_rotated.png"
 
     onMap_dataChanged: {
         canvas_map.requestPaint()

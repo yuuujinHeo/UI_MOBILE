@@ -73,10 +73,11 @@ public:
     int ui_state;
 
     QString robot_name;
+    QVector<ST_FPOINT> temp_object;
 
     ST_MAP map;
     //LCMHandler
-    LCMHandler  lcm;
+    LCMHandler *lcm;
     bool isaccepted;
 
     void setWindow(QQuickWindow* Window);
@@ -117,18 +118,53 @@ public:
     Q_INVOKABLE unsigned int getImageSize();
     Q_INVOKABLE QString getImageData();
 
+    //***********************************************************************Map
     Q_INVOKABLE bool getMapExist();
     Q_INVOKABLE bool getMapState();
     Q_INVOKABLE QString getMapname();
+    Q_INVOKABLE QString getMappath();
     Q_INVOKABLE int getMapWidth();
     Q_INVOKABLE int getMapHeight();
     Q_INVOKABLE float getGridWidth();
     Q_INVOKABLE QVector<int> getOrigin();
+
     Q_INVOKABLE int getLocationNum();
     Q_INVOKABLE QString getLocationTypes(int num);
     Q_INVOKABLE float getLocationx(int num);
     Q_INVOKABLE float getLocationy(int num);
     Q_INVOKABLE float getLocationth(int num);
+
+    //***********************************************************************Object(INI)..
+    Q_INVOKABLE int getObjectNum();
+    Q_INVOKABLE QString getObjectName(int num);
+    Q_INVOKABLE int getObjectPointSize(int num);
+    Q_INVOKABLE float getObjectX(int num, int point);
+    Q_INVOKABLE float getObjectY(int num, int point);
+
+    Q_INVOKABLE void clickObject(QString name);
+    Q_INVOKABLE void clickObject(float x, float y);
+
+    //***********************************************************************Object(NEW)..
+//    Q_INVOKABLE void newObjectPoint(int x, int y);
+    Q_INVOKABLE int getTempObjectSize();
+    Q_INVOKABLE float getTempObjectX(int num);
+    Q_INVOKABLE float getTempObjectY(int num);
+
+    Q_INVOKABLE int getObjNum(QString name);
+    Q_INVOKABLE int getObjNum(int x, int y);
+    Q_INVOKABLE int getObjPointNum(int obj_num, int x, int y);
+
+    Q_INVOKABLE void addObjectPoint(int x, int y);
+    Q_INVOKABLE void editObjectPoint(int num, int x, int y);
+    Q_INVOKABLE void removeObjectPoint(int num);
+    Q_INVOKABLE void removeObjectPointLast();
+    Q_INVOKABLE void clearObjectPoints();
+    Q_INVOKABLE void addObject(QString name);
+
+    Q_INVOKABLE void removeObject(QString name);
+    Q_INVOKABLE void moveObjectPoint(int obj_num, int point_num, int x, int y);
+
+    Q_INVOKABLE float getMargin();
 
     Q_INVOKABLE float getRobotx();
     Q_INVOKABLE float getRoboty();
@@ -149,9 +185,9 @@ public:
     Q_INVOKABLE QVector<int> getLineX(int index);
     Q_INVOKABLE QVector<int> getLineY(int index);
     Q_INVOKABLE QString getLineColor(int index);
-    Q_INVOKABLE double getLineWidth(int index);
+    Q_INVOKABLE float getLineWidth(int index);
 
-    Q_INVOKABLE void startLine(QString color, double width);
+    Q_INVOKABLE void startLine(QString color, float width);
     Q_INVOKABLE void setLine(int x, int y);
     Q_INVOKABLE void stopLine();
 
@@ -169,6 +205,7 @@ public:
     Q_INVOKABLE void stopcurPath();
     Q_INVOKABLE void pausecurPath();
 
+
     DBHandler  *dbHandler;
     ServerHandler *server;
     QVector<ST_LINE>    canvas;
@@ -183,6 +220,8 @@ public:
 
 public slots:
     void onTimer();
+    void server_cmd_pause();
+    void server_cmd_resume();
 
 private:
     QTimer *timer;

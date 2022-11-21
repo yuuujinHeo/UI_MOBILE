@@ -154,5 +154,25 @@ Item {
             }
         }
     }
+    Rectangle{
+        id: rect_pop
+        width: 100
+        height: 100
+        anchors.top: pMap_joy.bottom
+        anchors.topMargin: 100
+        anchors.left: rect_manual_off.right
+        anchors.leftMargin: 30
+        color: "gray"
+        Text{
+            text: "back"
+            anchors.centerIn: parent
+        }
+        MouseArea{
+            anchors.fill: parent
+            onClicked: {
+                stackview.pop();
+            }
+        }
+    }
 
 }

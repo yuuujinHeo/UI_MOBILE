@@ -38,7 +38,11 @@ public:
     void setVelocityXY(float vel);
     void setVelocityTH(float vel);
 
+    void setData(ST_MAP _map, ST_ROBOT _robot);
+
     ST_POSE setAxis(ST_POSE _pose);
+    ST_FPOINT setAxis(ST_FPOINT _point);
+    ST_FPOINT canvasTomap(int x, int y);
     // lcm message loop
     std::atomic<bool> bFlag;
     void bLoop();
