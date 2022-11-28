@@ -31,6 +31,7 @@ typedef struct{
     float x = 0;
     float y = 0;
 }ST_FPOINT;
+
 typedef struct{
     int chunkSize = 0;
     int imageSize = 0;
@@ -45,6 +46,10 @@ typedef struct{
     int locationSize = 0;
     QVector<QString> locationName;
     QVector<ST_POSE> locationsPose;
+
+    int travellineSize = 0;
+    QVector<QString> travellineName;
+    QVector<QVector<ST_FPOINT>> travellinePose;
 
     int objectSize = 0;
     QVector<QString> objectName;
@@ -62,10 +67,15 @@ typedef struct{
     QString curLocation = "";
     QVector<int> pickupTrays;
     ST_POSE curTarget;
+
     int pathSize =0;
     QVector<ST_POSE> curPath;
+    int localpathSize =0;
+    ST_POSE localPath[4];
+//    QVector<ST_POSE> localPath;
 
     //mine
+    QString name = "";
     int tray_num[NUM_TRAY] = {0,};
     ST_POSE targetPose;
     float joy_x = 0.;

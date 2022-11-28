@@ -17,7 +17,12 @@ Item {
     width: _width
     height: _height
 
+    function updatepath(){
+        canvas_cur_map.requestPaint();
+    }
+
     property bool flag_map: supervisor.getMapState()
+    property bool flag_path_changed: false
     property bool flag_map_load: false
     property int image_width: 1000
     property int image_height: 1000
@@ -44,10 +49,6 @@ Item {
     property var robot_x: supervisor.getRobotx()/grid_size;
     property var robot_y: supervisor.getRoboty()/grid_size;
     property var robot_th:-supervisor.getRobotth()-Math.PI/2;
-
-    onLocation_numChanged: {
-        canvas_cur_map.requestPaint();
-    }
     onRobot_xChanged: {
         canvas_cur_map.requestPaint();
     }
@@ -57,7 +58,6 @@ Item {
     onRobot_thChanged: {
         canvas_cur_map.requestPaint();
     }
-
     Behavior on robot_x{
         NumberAnimation{
             duration: 200
@@ -78,7 +78,7 @@ Item {
         id: update_map
         running: true
         repeat: true
-        interval: 100
+        interval: 200
         onTriggered: {
             robot_x = supervisor.getRobotx()/grid_size;
             robot_y = supervisor.getRoboty()/grid_size;
@@ -87,40 +87,31 @@ Item {
         }
     }
 
-    Timer{
-        id: timer_loadmap
-        repeat: true
-        interval: 1000
-        running: true
-        onTriggered: {
-            flag_map = true;//supervisor.getMapState();
-            if(flag_map){
-                print("map downloading..");
-//                map_data = supervisor.getImageData();
-//                print(map_data);
-                location_num = supervisor.getLocationNum();
-                origin_x = supervisor.getOrigin()[0];
-                origin_y = supervisor.getOrigin()[1];
-                grid_size = supervisor.getGridWidth();
-                object_num = supervisor.getObjectNum();
-                canvas_cur_map.requestPaint();
-                timer_loadmap.stop();
-            }
-
-        }
+    Component.onCompleted: {
+        print("map downloading..");
+        location_num = supervisor.getLocationNum();
+        object_num = supervisor.getObjectNum();
+        origin_x = supervisor.getOrigin()[0];
+        origin_y = supervisor.getOrigin()[1];
+        grid_size = supervisor.getGridWidth();
+        canvas_map.requestPaint();
+        canvas_cur_map.requestPaint();
     }
 
-//    Rectangle{
-//        width: 100
-//        height: 100
-//        x: 700
-//        y: 400
-//        color: "gray"
-//        MouseArea{
-//            anchors.fill: parent
-//            onClicked: {
-//                stackview.pop();
-//            }
+//    Timer{
+//        id: timer_loadmap
+//        repeat: true
+//        interval: 1000
+//        running: true
+//        onTriggered: {
+//            print("map downloading..");
+//            location_num = supervisor.getLocationNum();
+//            origin_x = supervisor.getOrigin()[0];
+//            origin_y = supervisor.getOrigin()[1];
+//            grid_size = supervisor.getGridWidth();
+//            object_num = supervisor.getObjectNum();
+//            canvas_cur_map.requestPaint();
+//            timer_loadmap.stop();
 //        }
 //    }
 
@@ -128,6 +119,145 @@ Item {
         id: map_image
         visible: false
         source: "file://" + applicationDirPath + "/image/map_rotated.png"
+    }
+
+    function canvas_draw_path(){
+        var ctx = canvas_cur_map.getContext('2d');
+        path_num = supervisor.getPathNum();
+        path_x = robot_x;
+        path_y = robot_y;
+        path_th = robot_th;
+        ctx.lineWidth = 2;
+        for(var i=0; i<path_num; i++){
+            var path_x_before = path_x;
+            var path_y_before = path_y;
+            var path_th_before = path_th;
+            path_x = supervisor.getPathx(i)/grid_size;
+            path_y = supervisor.getPathy(i)/grid_size;
+            path_th = -supervisor.getPathth(i)-Math.PI/2;
+
+            ctx.strokeStyle = "yellow";
+            ctx.beginPath();
+            if(i>0){
+                ctx.moveTo(path_x_before+origin_x,path_y_before+origin_y);
+                ctx.lineTo(path_x+origin_x,path_y+origin_y);
+                ctx.stroke()
+            }
+
+        }
+
+        if(path_num > 0){
+            //target Pos
+            ctx.strokeStyle = "yellow";
+            ctx.beginPath();
+            ctx.moveTo(path_x+origin_x,path_y+origin_y);
+            ctx.arc(path_x+origin_x,path_y+origin_y,robot_radius/grid_size, path_th, path_th+2*Math.PI, true);
+            ctx.stroke()
+            ctx.fill("black")
+            ctx.moveTo(path_x+origin_x,path_y+origin_y);
+            ctx.lineTo(path_x+origin_x,path_y+origin_y)
+            ctx.stroke()
+        }
+    }
+
+    function canvas_draw_local_path(){
+        var ctx = canvas_cur_map.getContext('2d');
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "red";
+        ctx.fillStyle = "red";
+        if(path_num != 0){
+            var localpath_num = supervisor.getLocalPathNum();
+            for(var i=0; i<localpath_num; i++){
+                ctx.beginPath();
+                var local_x = supervisor.getLocalPathx(i)/grid_size +origin_x;
+                var local_y = supervisor.getLocalPathy(i)/grid_size +origin_y;
+                ctx.moveTo(local_x,local_y);
+                ctx.arc(local_x,local_y,2,0, Math.PI*2);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+        }
+
+    }
+
+    function canvas_draw_robot(){
+        var ctx = canvas_cur_map.getContext('2d');
+        //Robot Cur Pos
+        robot_x = supervisor.getRobotx()/grid_size;
+        robot_y = supervisor.getRoboty()/grid_size;
+        robot_th = -supervisor.getRobotth()-Math.PI/2;
+        ctx.strokeStyle = "cyan";
+        ctx.fillStyle = "black";
+        ctx.beginPath();
+        ctx.moveTo(robot_x+origin_x,robot_y+origin_y);
+        ctx.arc(robot_x+origin_x,robot_y+origin_y,robot_radius/grid_size, robot_th, robot_th+2*Math.PI, true);
+        ctx.stroke()
+        ctx.fill("black")
+        ctx.moveTo(robot_x+origin_x,robot_y+origin_y);
+        ctx.lineTo(robot_x+origin_x,robot_y+origin_y)
+        ctx.stroke()
+    }
+
+    function canvas_draw_locations(){
+        var ctx = canvas_map.getContext('2d');
+        ctx.lineWidth = 1;
+        ctx.lineCap = "round"
+
+        //Location Load
+        location_num = supervisor.getLocationNum();
+        for(var i=0; i<location_num; i++){
+            location_types = supervisor.getLocationTypes(i);
+            location_x = supervisor.getLocationx(i)/grid_size + origin_x;
+            location_y = supervisor.getLocationy(i)/grid_size + origin_y;
+            location_th = -supervisor.getLocationth(i)-Math.PI/2;
+
+            if(location_types.slice(0,4) == "Char"){
+                ctx.strokeStyle = "green";
+            }else if(location_types.slice(0,4) == "Rest"){
+                ctx.strokeStyle = "white";
+            }else if(location_types.slice(0,4) == "Patr"){
+                ctx.strokeStyle = "blue";
+            }else if(location_types.slice(0,4) == "Tabl"){
+                ctx.strokeStyle = "gray";
+            }
+            ctx.beginPath();
+            ctx.moveTo(location_x,location_y);
+            ctx.arc(location_x,location_y,robot_radius/grid_size, location_th, location_th+2*Math.PI, true);
+            ctx.moveTo(location_x,location_y);
+            ctx.stroke()
+        }
+    }
+
+    function canvas_draw_object(){
+        var ctx = canvas_map.getContext('2d');
+        ctx.lineWidth = 1;
+        ctx.lineCap = "round";
+        ctx.fillStyle = "steelblue";
+        ctx.strokeStyle = "blue";
+
+        //Object Load
+        object_num = supervisor.getObjectNum()
+        for(var i=0; i<object_num; i++){
+            var obj_type = supervisor.getObjectName(i);
+            var obj_size = supervisor.getObjectPointSize(i);
+            var obj_x = supervisor.getObjectX(i,0)/grid_size +origin_x;
+            var obj_y = supervisor.getObjectY(i,0)/grid_size +origin_y;
+            var obj_x0 = obj_x;
+            var obj_y0 = obj_y;
+
+            ctx.beginPath();
+            ctx.moveTo(obj_x,obj_y);
+            for(var j=1; j<obj_size; j++){
+                obj_x = supervisor.getObjectX(i,j)/grid_size + origin_x;
+                obj_y = supervisor.getObjectY(i,j)/grid_size + origin_y;
+                ctx.lineTo(obj_x,obj_y);
+            }
+            ctx.lineTo(obj_x0,obj_y0);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
     }
 
     Rectangle{
@@ -143,136 +273,36 @@ Item {
         color: "black"
 
         Canvas{
+            id: canvas_map
+            x: canvas_cur_map.x
+            y: canvas_cur_map.y
+            width: canvas_cur_map.width
+            height: canvas_cur_map.height
+            scale: canvas_cur_map.scale
+            antialiasing: true
+            onPaint:{
+                var ctx = getContext("2d");
+                ctx.clearRect(0,0,canvas_map.width,canvas_map.height);
+                ctx.drawImage(map_image, 0,0,image_width,image_height);
+
+//                canvas_draw_locations();
+                canvas_draw_object();
+            }
+        }
+
+        Canvas{
             id: canvas_cur_map
             x: - origin_x + rect_cur_map.width/2;
             y: - origin_y + rect_cur_map.height/2;
             width: image_width
             height: image_height
             antialiasing: true
-            property var loc_type
-            property var loc_x
-            property var loc_y
-            property var loc_th
-            property var grid_width
-
-
             onPaint:{
                 var ctx = getContext("2d");
-//                ctx.clearRect(0,0,canvas_cur_map.width,canvas_cur_map.height);
-
-                //Map Load
-                if(flag_map){
-                    ctx.drawImage(map_image, 0,0,image_width,image_height);
-                    ctx.lineWidth = 1;
-                    ctx.lineCap = "round"
-
-
-                    //Location Load
-                    for(var i=0; i<location_num; i++){
-                        loc_type = supervisor.getLocationTypes(i);
-                        loc_x = supervisor.getLocationx(i)/grid_size;
-                        loc_y = supervisor.getLocationy(i)/grid_size;
-                        loc_th = -supervisor.getLocationth(i)-Math.PI/2;
-
-//                        console.log(loc_type,loc_x,loc_y,loc_th);
-
-                        if(loc_type.slice(0,4) == "Char"){
-                            ctx.strokeStyle = "green";
-                        }else if(loc_type.slice(0,4) == "Rest"){
-                            ctx.strokeStyle = "white";
-                        }else if(loc_type.slice(0,4) == "Patr"){
-                            ctx.strokeStyle = "blue";
-                        }else if(loc_type.slice(0,4) == "Tabl"){
-                            ctx.strokeStyle = "gray";
-                        }
-                        ctx.beginPath();
-                        ctx.moveTo(loc_x+origin_x,loc_y+origin_y);
-                        ctx.arc(loc_x+origin_x,loc_y+origin_y,robot_radius/grid_size, loc_th, loc_th+2*Math.PI, true);
-                        ctx.moveTo(loc_x+origin_x,loc_y+origin_y);
-                        ctx.stroke()
-                    }
-
-                    //Object loadImage()
-                    object_num = supervisor.getObjectNum();
-                    ctx.lineWidth = 1;
-                    ctx.strokeStyle = "white";
-                    for(i=0; i<object_num; i++){
-                        var obj_type = supervisor.getObjectName(i);
-                        var obj_size = supervisor.getObjectPointSize(i);
-
-                        ctx.beginPath();
-                        for(var j=0; j<obj_size-1; j++){
-                            var obj_x = supervisor.getObjectX(i,j)/grid_size +origin_x;
-                            var obj_y = supervisor.getObjectY(i,j)/grid_size +origin_y;
-                            ctx.moveTo(obj_x,obj_y);
-                            obj_x = supervisor.getObjectX(i,j+1)/grid_size +origin_x;
-                            obj_y = supervisor.getObjectY(i,j+1)/grid_size +origin_y;
-                            ctx.lineTo(obj_x,obj_y);
-                        }
-                        ctx.moveTo(obj_x,obj_y);
-                        ctx.lineTo(supervisor.getObjectX(i,0)/grid_size+origin_x,supervisor.getObjectY(i,0)/grid_size+origin_y);
-                        ctx.stroke()
-                    }
-
-
-                    //Path Load
-                    path_num = supervisor.getPathNum();
-//                    print(path_num);
-                    path_x = robot_x;
-                    path_y = robot_y;
-                    path_th = robot_th;
-                    ctx.lineWidth = 2;
-                    for(i=0; i<path_num; i++){
-                        var path_x_before = path_x;
-                        var path_y_before = path_y;
-                        var path_th_before = path_th;
-                        path_x = supervisor.getPathx(i)/grid_size;
-                        path_y = supervisor.getPathy(i)/grid_size;
-                        path_th = -supervisor.getPathth(i)-Math.PI/2;//supervisor.getLocationth(i);
-
-//                        console.log(path_x,path_y,path_th);
-                        ctx.strokeStyle = "yellow";
-
-                        ctx.beginPath();
-                        if(i>0){
-                            ctx.moveTo(path_x_before+origin_x,path_y_before+origin_y);
-                            ctx.lineTo(path_x+origin_x,path_y+origin_y);
-                            ctx.stroke()
-                        }
-
-                    }
-
-                    if(path_num > 0){
-                        //target Pos
-                        ctx.strokeStyle = "yellow";
-                        ctx.beginPath();
-                        ctx.moveTo(path_x+origin_x,path_y+origin_y);
-                        ctx.arc(path_x+origin_x,path_y+origin_y,robot_radius/grid_size, path_th, path_th+2*Math.PI, true);
-                        ctx.stroke()
-                        ctx.fill("black")
-                        ctx.moveTo(path_x+origin_x,path_y+origin_y);
-                        ctx.lineTo(path_x+origin_x,path_y+origin_y)
-                        ctx.stroke()
-                    }
-
-
-
-                    //Robot Cur Pos
-                    robot_x = supervisor.getRobotx()/grid_size;
-                    robot_y = supervisor.getRoboty()/grid_size;
-                    robot_th = -supervisor.getRobotth()-Math.PI/2;
-//                    print(robot_x,robot_y,robot_th);
-                    ctx.strokeStyle = "cyan";
-                    ctx.beginPath();
-                    ctx.moveTo(robot_x+origin_x,robot_y+origin_y);
-                    ctx.arc(robot_x+origin_x,robot_y+origin_y,robot_radius/grid_size, robot_th, robot_th+2*Math.PI, true);
-                    ctx.stroke()
-                    ctx.fill("black")
-                    ctx.moveTo(robot_x+origin_x,robot_y+origin_y);
-                    ctx.lineTo(robot_x+origin_x,robot_y+origin_y)
-                    ctx.stroke()
-
-                }
+                ctx.clearRect(0,0,canvas_cur_map.width,canvas_cur_map.height);
+                canvas_draw_path();
+                canvas_draw_local_path();
+                canvas_draw_robot();
             }
             Behavior on scale{
                 NumberAnimation{
@@ -289,7 +319,6 @@ Item {
                     duration: 100
                 }
             }
-
             onXChanged: {
                 if(canvas_cur_map.x  > canvas_cur_map.width*(canvas_cur_map.scale - 1)/2){
                     canvas_cur_map.x = canvas_cur_map.width*(canvas_cur_map.scale - 1)/2
@@ -321,13 +350,11 @@ Item {
                 requestPaint();
             }
 
-
             MultiPointTouchArea{
                 id: area_map_touch
                 anchors.fill: parent
                 minimumTouchPoints: 1
                 maximumTouchPoints: 2
-//                mouseEnabled: false
                 property var gesture: "none"
                 property var dmoveX : 0;
                 property var dmoveY : 0;
@@ -336,7 +363,6 @@ Item {
                 property var startDist : 0;
                 touchPoints: [TouchPoint{id:point1},TouchPoint{id:point2}]
                 onPressed: {
-//                    print("pressed ",point1.pressed,point2.pressed)
                     gesture = "drag";
                     if(point1.pressed && point2.pressed){
                         var dx = Math.abs(point1.x-point2.x);
@@ -372,15 +398,7 @@ Item {
                         if(canvas_cur_map.width*new_scale < rect_cur_map.width){
                             new_scale = rect_cur_map.width/canvas_cur_map.width;
                         }
-
-//                        else if(canvas_cur_map.width new_scale < 1){
-
-//                            new_scale = 1;
-
-//                        }
                         canvas_cur_map.scale = new_scale;
-
-//                        print("drag",mx,my,dist,new_scale,canvas_cur_map.scale);
 
                         dmoveX = (mx - startX);
                         dmoveY = (my - startY);
@@ -398,12 +416,6 @@ Item {
                     }
                 }
             }
-
         }
     }
-
-
-
-
-
 }

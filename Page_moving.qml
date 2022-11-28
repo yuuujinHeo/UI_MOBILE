@@ -19,6 +19,9 @@ Item {
     property string pos: "1번테이블"
     property bool robot_paused: false
 
+    function updatepath(){
+        pMap_curmap.updatepath();
+    }
     function init(){
         robot_paused = false;
         popup_pause.visible = false;
@@ -26,6 +29,9 @@ Item {
     }
     function stopMusic(){
         playMusic.stop();
+    }
+    function checkPaused(){
+        timer_check_pause.start();
     }
 
     Audio{
@@ -67,12 +73,11 @@ Item {
             paused: robot_paused
         }
     }
-
-
-
-
-
-
+    Map_current{
+        id: pMap_curmap
+        anchors.right:parent.right
+        anchors.bottom:parent.bottom
+    }
     Rectangle{
         id: popup_pause
         width: 200

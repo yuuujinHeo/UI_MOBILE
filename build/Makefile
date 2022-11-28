@@ -413,6 +413,7 @@ qrc_qml.cpp: ../qml.qrc \
 		../Page_map.qml \
 		../Page_kitchen.qml \
 		../Item_joystick.qml \
+		../Map_minimap.qml \
 		../Page_moving.qml \
 		../Page_menus.qml \
 		../Page_annotation.qml \

@@ -45,5 +45,6 @@
         <file>build/icon/icon_pause.png</file>
         <file>build/icon/icon_folder2.png</file>
         <file>Page_annotation.qml</file>
+        <file>Map_minimap.qml</file>
     </qresource>
 </RCC>

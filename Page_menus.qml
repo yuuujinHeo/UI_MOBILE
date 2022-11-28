@@ -54,6 +54,26 @@ Item {
         }
     }
     Rectangle{
+        id: rect_annot
+        width: 100
+        height: 100
+        anchors.top: rect_kitchen.bottom
+        anchors.topMargin: 50
+        anchors.left: rect_kitchen.left
+        color: "gray"
+        Text{
+            anchors.centerIn: parent
+            text: "ANNOT"
+        }
+        MouseArea{
+            anchors.fill: parent
+            onClicked: {
+                stackview.push(pannotation);
+                pannotation.updatecanvas();
+            }
+        }
+    }
+    Rectangle{
         id: rect_curmap
         width: 100
         height: 100
