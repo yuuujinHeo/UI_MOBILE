@@ -31,7 +31,6 @@ public:
     ServerHandler();
     int connection_status;
     int client_number;
-    bool isMapExist;
 
     QString server_cmd;
     ST_POSE target_pose;
@@ -40,13 +39,18 @@ public:
     QString robot_name;
     QSettings map_annotation;
 
+    bool is_debug = false;
+    QString debug_name = "C1";
+
     void setMap(ST_MAP _map);
     void setData(QString name, ST_ROBOT _robot);
     void sendMap(QString map_path, QString dir);
+    void requestMap();
 
 signals:
     void server_pause();
     void server_resume();
+    void server_new_target();
 public slots:
     void onConnected();
     void onDisconnected();

@@ -1,24 +1,12 @@
 import QtQuick 2.9
 import QtQuick.Window 2.3
 import QtQuick.Controls 2.12
-//import QtQuick.Controls 2.2
-//import QtQuick.Shapes 1.
 import QtQuick.Dialogs 1.2
 import Qt.labs.platform 1.0
 import QtGraphicalEffects 1.0
-//import QtQuick.Templates 2.5
 import "."
 import io.qt.Supervisor 1.0
 import QtMultimedia 5.12
-
-//import QtQuick 2.12
-//import QtQuick.Window 2.12
-//import QtQuick.Controls 2.12
-//import QtQuick.Shapes 1.12
-//import QtQuick.Dialogs 1.2
-//import Qt.labs.platform 1.0
-//import QtGraphicalEffects 1.12
-//import QtQuick.Templates 2.5
 
 Window {
     visible: true
@@ -61,7 +49,6 @@ Window {
             pkitchen.init();
             pmoving.stopMusic();
             stackview.pop();
-
         }
         stackview.push(pcharge);
     }
@@ -83,13 +70,9 @@ Window {
     function movejog(){
 
     }
-    function movepaused(){
-        pmoving.robot_paused = true;
-        pmoving.popup_pause.visible = true;
-    }
-    function moveresumed(){
-        pmoving.robot_paused = false;
-        pmoving.popup_pause.visible = false;
+
+    function pausedcheck(){
+        pmoving.checkPaused();
     }
 
     function movemanual(){
@@ -117,10 +100,24 @@ Window {
     }
 
     function updatecanvas(){
-        pannotation.updateCanvas();
+        pannotation.updatecanvas();
     }
     function updateobject(){
         pannotation.updateobject();
+    }
+    function updatelocation(){
+        pannotation.updatelocation();
+    }
+    function updatetravelline(){
+        pannotation.updatetravelline();
+    }
+
+    function updatepath(){
+        pmoving.updatepath();
+        pmap.updatepath();
+    }
+    function loadmap(){
+        p
     }
 
     Page_kitchen{
@@ -131,20 +128,19 @@ Window {
         id: psetting;
         visible: false
     }
-
-//    Page_jog{
-//        id: pjog;
-//        visible: false
-//    }
     Page_map{
         id: pmap;
         visible: false
     }
-
     Page_mapview{
         id: pmapview;
         visible: false
     }
+    Map_minimap{
+        id: pminimap;
+        visible: false
+    }
+
     Page_menus{
         id: pmenus;
         visible: false
@@ -165,15 +161,9 @@ Window {
         id: pannotation;
         visible: false
     }
-
     Supervisor{
         id:supervisor
     }
-
-//    Map_current{
-//        id:curMap
-//        visible: false
-//    }
 
     Timer{
         id: timer_init
@@ -183,6 +173,7 @@ Window {
         onTriggered: {
 //            stackview.push(pannotation);
             stackview.push(pkitchen);
+//            stackview.push(pminimap);
 //            stackview.push(curMap);
         }
     }
@@ -190,7 +181,7 @@ Window {
 
     Timer{
         id: timer_update
-        interval: 100
+        interval: 5000
         running: true
         repeat: true
         onTriggered: {
@@ -277,7 +268,7 @@ Window {
                     target: image_logo;
                     from: 0;
                     to: 1;
-                    duration: 3000
+                    duration: 2000
                     running: true
                 }
 

@@ -13,6 +13,11 @@ Item {
     objectName: "page_map"
     width: 1280
     height: 800
+    property bool isrun: false
+
+    function updatepath(){
+        pMap_curmap.updatepath();
+    }
 
     Row{
         id: menubar_map
@@ -58,10 +63,13 @@ Item {
                     }else if(modelData == "record"){
                         supervisor.startRecordPath();
                     }else if(modelData == "run"){
-                        supervisor.startcurPath();
-                        modelData = "pause";
+//                        supervisor.startcurPath();
+//                        modelData = "pause";
+                        supervisor.runRotateTables();
+
                     }else if(modelData == "stop"){
-                        supervisor.stopcurPath();
+                        supervisor.stopRotateTables();
+//                        supervisor.stopcurPath();
                     }else if(modelData == "pause"){
                         modelData = "run";
 
@@ -171,6 +179,33 @@ Item {
             anchors.fill: parent
             onClicked: {
                 stackview.pop();
+            }
+        }
+    }
+    Rectangle{
+        id: rect_rotate
+        width: 100
+        height: 100
+        anchors.top: pMap_joy.bottom
+        anchors.topMargin: 100
+        anchors.left: rect_pop.right
+        anchors.leftMargin: 30
+        color: "gray"
+        Text{
+            text: isrun?"stop":"test run"
+            anchors.centerIn: parent
+        }
+        MouseArea{
+            anchors.fill: parent
+            onClicked: {
+                if(isrun){
+                    isrun = false;
+                    supervisor.stopRotateTables();
+                }else{
+                    isrun = true;
+                    supervisor.runRotateTables();
+                }
+
             }
         }
     }

@@ -20,38 +20,51 @@ class LCMHandler : public QObject
 public:
     LCMHandler();
     ~LCMHandler();
+    void setMapData(ST_MAP _map);
+
     // lcm
     lcm::LCM lcm;
-    void robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg);
-    void map_data_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data_t *msg);
-    void robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
+    // lcm message loop
+    std::atomic<bool> bFlag;
+    std::thread* bThread = NULL;
+    bool isdownloadMap = false;
+    bool flagJoystick = false;
+    bool flagPath = false;
+    bool flagLocalPath = false;
+
+    bool isdebug = false;
+    bool robotnamechanged = false;
+    QString debug_robot_name = "";
+
+    ST_ROBOT    robot;
+    ST_MAP      map;
+    QTimer  *timer;
+
+    ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
     void RequestMap();
     void moveTo(QString target_loc);
     void moveTo(float x, float y, float th);
     void movePause();
     void moveResume();
-    void moveJog(float vx, float vy, float vth);
     void moveJog();
     void moveStop();
     void moveManual();
     void setVelocity(float vel, float velth);
-    void setVelocityXY(float vel);
-    void setVelocityTH(float vel);
+//    void setVelocityXY(float vel);
+//    void setVelocityTH(float vel);
 
-    void setData(ST_MAP _map, ST_ROBOT _robot);
+    ////*********************************************  CALLBACK FUNCTIONS   ***************************************************////
+    void robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg);
+    void map_data_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data_t *msg);
+    void robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
+    void robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
 
-    ST_POSE setAxis(ST_POSE _pose);
-    ST_FPOINT setAxis(ST_FPOINT _point);
-    ST_FPOINT canvasTomap(int x, int y);
-    // lcm message loop
-    std::atomic<bool> bFlag;
+    ////***********************************************   THREADS  ********************************************************////
     void bLoop();
-    std::thread* bThread = NULL;
-    bool isdownloadMap = false;
-    bool flagJoystick = false;
-    ST_ROBOT    robot;
-    ST_MAP      map;
-    QTimer  *timer;
+
+signals:
+    void pathchanged();
+
 public slots:
     void onTimer();
 };

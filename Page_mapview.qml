@@ -511,7 +511,7 @@ Item {
         y: {
             if(colorTools.paintColor == "#000000"){
                 colorTools.y + 0 - 10
-            }else if(colorTools.paintColor == "#191919"){
+            }else if(colorTools.paintColor == "#262626"){
                 colorTools.y + 80 - 10
             }else{
                 colorTools.y + 160 - 10
@@ -535,7 +535,7 @@ Item {
         }
 
         Repeater {
-            model: ["black", "#191919", "white"]
+            model: ["black", "#262626", "white"]
             Rectangle {
                 id: red
                 width: 60

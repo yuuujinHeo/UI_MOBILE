@@ -21,6 +21,8 @@ Item {
     }
     property var rect_height: 70
     property string platform_name: supervisor.getRobotName()
+    property string debug_platform_name: ""
+    property bool is_debug: false
 
     function uiupdate(){
         platform_name = supervisor.getRobotName();
@@ -116,9 +118,60 @@ Item {
             width: parent.width
             height: rect_height
             color: "yellow"
+            Text{
+                id: text_dd
+                anchors.left: parent.left
+                anchors.leftMargin: 250
+                font.pixelSize: 30
+                anchors.verticalCenter: parent.verticalCenter
+                text: "Debug : " + debug_platform_name
+            }
+            Rectangle{
+                width: rect_height
+                height: rect_height
+                anchors.left: text_dd.right
+                anchors.leftMargin: 200
+                color: is_debug?"blue":"gray"
+                Text{
+                    anchors.centerIn: parent
+                    text: is_debug?"OFF":"ON"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        is_debug = !is_debug;
+                        debug_platform_name = textfield_debug.text
+                    }
+                }
+            }
+            TextField{
+                id: textfield_debug
+                width: 100
+                height: rect_height
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: 200
+                placeholderText: "(debug name)"
+                text: "C1"
+                font.pointSize: 20
+
+            }
         }
     }
 
+    Timer{
+        running: true
+        interval: 1000
+        repeat: true
+        onTriggered: {
+            if(is_debug != supervisor.getDebugState()){
+                supervisor.setDebugState(is_debug);
+            }
+            if(debug_platform_name != supervisor.getDebugName()){
+                supervisor.setDebugName(debug_platform_name);
+            }
+        }
+    }
 
 
     Rectangle{

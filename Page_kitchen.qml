@@ -25,7 +25,7 @@ Item {
     }
 
     property int tray_num: 3
-    property int table_num: 4
+    property int table_num: 5
     property double battery: 0
     property string robotName: "test"
     property date curDate: new Date()
@@ -41,17 +41,6 @@ Item {
 
     property int cur_table_num: 0
     property bool flag_moving: false
-
-//    Timer{
-//        id: timer_update
-//        interval: 100
-//        running: true
-//        repeat: true
-//        onTriggered: {
-//            curTime = Qt.formatTime(new Date(), "hh:mm")
-//            battery = supervisor.getBattery();
-//        }
-//    }
 
     Rectangle{
         anchors.fill : parent
