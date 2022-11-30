@@ -60,6 +60,12 @@ Window {
             stackview.pop();
         }
     }
+    function disconnected(){
+
+    }
+    function connected(){
+
+    }
 
     function movetarget(){
         pmoving.pos = "지정장소";
@@ -78,8 +84,21 @@ Window {
     function movemanual(){
 
     }
-    function movestop(){
+    function nopathfound(){
+        play_avoidmsg();
+        pmoving.movefail();
+    }
+    function robotresume(){
 
+    }
+
+    function movestopped(){
+        pmoving.stopMusic();
+        pkitchen.init();
+        while(stackview.currentItem.objectName != "page_kitchen"){
+            print(stackview.currentItem.objectName," pop");
+            stackview.pop();
+        }
     }
     function showpickup(){
         pmoving.stopMusic();
@@ -111,17 +130,34 @@ Window {
     function updatetravelline(){
         pannotation.updatetravelline();
     }
+    function newcall(){
+        if(stackview.currentItem.objectName == "page_kitchen"){
+
+        }else{
+            supervisor.acceptCall(false);
+        }
+    }
+
 
     function updatepath(){
         pmoving.updatepath();
         pmap.updatepath();
     }
     function loadmap(){
-        p
+
     }
 
     Page_kitchen{
         id: pkitchen;
+        visible: false
+    }
+
+    Page_init{
+        id:pinit;
+        visible: false
+    }
+    Page_MoveFail{
+        id:pmovefail
         visible: false
     }
     Page_setting{
@@ -132,15 +168,10 @@ Window {
         id: pmap;
         visible: false
     }
-    Page_mapview{
-        id: pmapview;
-        visible: false
-    }
     Map_minimap{
         id: pminimap;
         visible: false
     }
-
     Page_menus{
         id: pmenus;
         visible: false
@@ -171,17 +202,15 @@ Window {
         running: true
         repeat: false
         onTriggered: {
-//            stackview.push(pannotation);
-            stackview.push(pkitchen);
-//            stackview.push(pminimap);
-//            stackview.push(curMap);
+            pinit.check_timer();
+            stackview.push(pinit);
         }
     }
-
 
     Timer{
         id: timer_update
         interval: 5000
+        triggeredOnStart: true
         running: true
         repeat: true
         onTriggered: {

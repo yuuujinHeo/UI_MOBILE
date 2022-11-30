@@ -21,6 +21,11 @@ Item {
         canvas_cur_map.requestPaint();
     }
 
+    function loadmap(path){
+        map_image.source = "file://"+applicationDirPath + "/image/map_mini.png"// path;
+    }
+
+    property bool show_meta_data: true
     property bool flag_map: supervisor.getMapState()
     property bool flag_path_changed: false
     property bool flag_map_load: false
@@ -98,27 +103,13 @@ Item {
         canvas_cur_map.requestPaint();
     }
 
-//    Timer{
-//        id: timer_loadmap
-//        repeat: true
-//        interval: 1000
-//        running: true
-//        onTriggered: {
-//            print("map downloading..");
-//            location_num = supervisor.getLocationNum();
-//            origin_x = supervisor.getOrigin()[0];
-//            origin_y = supervisor.getOrigin()[1];
-//            grid_size = supervisor.getGridWidth();
-//            object_num = supervisor.getObjectNum();
-//            canvas_cur_map.requestPaint();
-//            timer_loadmap.stop();
-//        }
-//    }
-
     Image{
         id: map_image
         visible: false
-        source: "file://" + applicationDirPath + "/image/map_rotated.png"
+        onSourceChanged: {
+            print("Map Current source changed: "+source);
+            canvas_map.requestPaint();
+        }
     }
 
     function canvas_draw_path(){
@@ -285,8 +276,10 @@ Item {
                 ctx.clearRect(0,0,canvas_map.width,canvas_map.height);
                 ctx.drawImage(map_image, 0,0,image_width,image_height);
 
-//                canvas_draw_locations();
-                canvas_draw_object();
+                if(show_meta_data){
+                    canvas_draw_object();
+                }
+
             }
         }
 
@@ -300,9 +293,12 @@ Item {
             onPaint:{
                 var ctx = getContext("2d");
                 ctx.clearRect(0,0,canvas_cur_map.width,canvas_cur_map.height);
-                canvas_draw_path();
-                canvas_draw_local_path();
-                canvas_draw_robot();
+                if(show_meta_data){
+                    canvas_draw_path();
+                    canvas_draw_local_path();
+                    canvas_draw_robot();
+                }
+
             }
             Behavior on scale{
                 NumberAnimation{

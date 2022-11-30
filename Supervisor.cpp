@@ -28,15 +28,16 @@ Supervisor::Supervisor(QObject *parent)
 
     isaccepted = false;
     readSetting();
+    ui_state = UI_STATE_NONE;
 
     connect(server,SIGNAL(server_pause()),this,SLOT(server_cmd_pause()));
     connect(server,SIGNAL(server_resume()),this,SLOT(server_cmd_resume()));
     connect(server,SIGNAL(server_new_target()),this,SLOT(server_cmd_newtarget()));
+    connect(server,SIGNAL(server_new_call()),this,SLOT(server_cmd_newcall()));
+    connect(server,SIGNAL(server_set_ini()),this,SLOT(server_cmd_setini()));
     connect(lcm, SIGNAL(pathchanged()),this,SLOT(path_changed()));
 
-
-
-    calculateGrid2();
+    make_minimap();
 }
 
 void Supervisor::setWindow(QQuickWindow *Window){
@@ -59,6 +60,178 @@ QObject *Supervisor::getObject()
     return mObject;//rootobject를 리턴해준다.
 }
 
+
+//// ******************************** Init Check ************************************////
+bool Supervisor::isConnectServer(){
+    return server->connection_status;
+}
+bool Supervisor::isloadMap(){
+    return map.map_loaded;
+}
+void Supervisor::setloadMap(bool load){
+    QString ini_path = "setting/robot.ini";
+    QSettings settings(ini_path, QSettings::IniFormat);
+    if(settings.value("ROBOT/map_load").toBool() == load){
+
+    }else{
+        settings.setValue("ROBOT/map_load",load);
+        if(load){
+            plog->write("[SETTING] LOAD MAP Changed : True");
+        }else{
+            plog->write("[SETTING] LOAD MAP Changed : False");
+        }
+        readSetting();
+    }
+}
+//0:no map, 1:map_server, 2: map_edited, 3:raw_map only
+int Supervisor::isExistMap(){
+    isMapExist = false;
+    QFile *file = new QFile(QGuiApplication::applicationDirPath()+"/image/map_rotated.png");
+    if(file->open(QIODevice::ReadOnly)){
+        isMapExist = true;
+    }else{
+        if(rotate_map("image/map_server.png","image/map_rotated.png",0))
+            isMapExist = true;
+    }
+
+    if(isMapExist){
+        return 1;
+    }else{
+        QFile *file_raw = new QFile(QGuiApplication::applicationDirPath()+"/image/raw_map.png");
+        QFile *file_edit = new QFile(QGuiApplication::applicationDirPath()+"/image/map_edited.png");
+        QFile *file_meta = new QFile(QGuiApplication::applicationDirPath()+"/setting/map_meta.ini");
+        QFile *file_annot = new QFile(QGuiApplication::applicationDirPath()+"/setting/annotation.ini");
+        file_edit->open(QIODevice::ReadOnly);
+        file_raw->open(QIODevice::ReadOnly);
+        file_meta->open(QIODevice::ReadOnly);
+        file_annot->open(QIODevice::ReadOnly);
+
+        if(file_meta->isOpen()){
+            if(file_raw->isOpen() && file_edit->isOpen() && file_annot->isOpen()){
+                return 2;
+            }else if(file_edit->isOpen()){
+                if(file_annot->isOpen()){
+                    //make raw_map
+                    if(rotate_map("image/map_edited.png","image/raw_map.png",1)){
+                        return 2;
+                    }else{
+                        setloadMap(false);
+                        return 0;
+                    }
+                }else{
+                    if(rotate_map("image/map_edited.png","image/raw_map.png",1)){
+                        return 3;
+                    }else{
+                        setloadMap(false);
+                        return 0;
+                    }
+                }
+            }else if(file_raw->isOpen()){
+                if(rotate_map("image/raw_map.png","image/map_raw.png",1)){
+                    return 3;
+                }else{
+                    setloadMap(false);
+                    return 0;
+                }
+            }else{
+                setloadMap(false);
+                return 0;
+            }
+        }else{
+            //Make metadata
+            QString filename = "setting/map_meta.ini";
+            QSettings settings(filename, QSettings::IniFormat);
+            settings.clear();
+            settings.setValue("map_metadata/map_w",1000);
+            settings.setValue("map_metadata/map_h",1000);
+            settings.setValue("map_metadata/map_grid_width",QString::number(0.03));
+            settings.setValue("map_metadata/map_origin_u",500);
+            settings.setValue("map_metadata/map_origin_v",500);
+            setloadMap(false);
+            return 0;
+        }
+    }
+}
+bool Supervisor::loadMaptoServer(){
+    if(server->connection_status){
+        server->requestMap();
+        return true;
+    }else{
+        return false;
+    }
+}
+bool Supervisor::loadMaptoUSB(){
+    return false;
+}
+bool Supervisor::isUSBFile(){
+    return false;
+}
+QString Supervisor::getUSBFilename(){
+    return "";
+}
+
+bool Supervisor::isuseServerMap(){
+    return map.use_server;
+}
+void Supervisor::setuseServerMap(bool use){
+    QString ini_path = "setting/robot.ini";
+    QSettings settings(ini_path, QSettings::IniFormat);
+    settings.setValue("ROBOT/map_server",use);
+    if(use){
+        plog->write("[SETTING] USE SERVER MAP Changed : True");
+    }else{
+        plog->write("[SETTING] USE SERVER MAP Changed : False");
+    }
+}
+
+void Supervisor::removeRawMap(){
+    QFile *file_1 = new QFile(QGuiApplication::applicationDirPath()+"/image/raw_map.png");
+    QFile *file_2 = new QFile(QGuiApplication::applicationDirPath()+"/image/map_raw.png");
+    file_1->remove();
+    file_2->remove();
+}
+void Supervisor::removeEditedMap(){
+    QFile *file_1 = new QFile(QGuiApplication::applicationDirPath()+"/image/raw_map.png");
+    QFile *file_2 = new QFile(QGuiApplication::applicationDirPath()+"/image/map_raw.png");
+    QFile *file_3 = new QFile(QGuiApplication::applicationDirPath()+"/image/map_edited.png");
+    file_1->remove();
+    file_2->remove();
+    file_3->remove();
+}
+void Supervisor::removeServerMap(){
+    QFile *file_1= new QFile(QGuiApplication::applicationDirPath()+"/image/map_server.png");
+    QFile *file_2 = new QFile(QGuiApplication::applicationDirPath()+"/image/map_rotated.png");
+    file_1->remove();
+    file_2->remove();
+}
+//// *********************************** SLAM *********************************** ////
+void Supervisor::startSLAM(){
+
+}
+void Supervisor::stopSLAM(){
+
+}
+void Supervisor::setSLAMMode(int mode){
+
+}
+bool Supervisor::isConnectJoystick(){
+    return false;
+}
+QString Supervisor::getKeyboard(int mode){
+    return "";
+}
+QString Supervisor::getJoystick(int mode){
+    return "";
+}
+
+void Supervisor::acceptCall(bool yes){
+
+}
+
+void Supervisor::server_cmd_setini(){
+    readSetting();
+}
+
 void Supervisor::path_changed(){
     QMetaObject::invokeMethod(mMain, "updatepath");
 }
@@ -79,10 +252,14 @@ void Supervisor::server_cmd_newtarget(){
         state_rotate_tables = 4;
     lcm->moveTo(server->target_pose.x, server->target_pose.y, server->target_pose.th);
 }
+void Supervisor::server_cmd_newcall(){
+    QMetaObject::invokeMethod(mMain,"newcall");
+}
 
 void Supervisor::runRotateTables(){
     plog->write("[UI] START ROTATE TEST");
-    flag_rotate_tables = true;
+    ui_state = UI_STATE_PATROLLING;
+    ui_cmd = UI_CMD_TABLE_PATROL;
     state_rotate_tables = 1;
 }
 
@@ -248,24 +425,14 @@ void Supervisor::saveAnnotation(QString filename){
         settings.setValue("travel_lines/line"+QString::number(i),str_name);
     }
     settings.setValue("travel_lines/num",map.travellinePose.size());
+
+    readSetting();
 }
 
 void Supervisor::sendMaptoServer(){
-
-    QString map_path = "image/map_edited.png";
-    cv::Mat map1 = cv::imread(map_path.toStdString());
-    cv::rotate(map1,map1,cv::ROTATE_90_CLOCKWISE);
-    cv::flip(map1, map1, 0);
-
-    QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(map1)).toImage();
-
-    //Save PNG File
-    if(temp_image.save("image/map_raw.png","PNG")){
-        qDebug() << "Success to png";
-    }else{
-        qDebug() << "Fail to png";
+    if(rotate_map("image/map_edited.png","image/map_raw.png",1)){
+        server->sendMap(QGuiApplication::applicationDirPath()+"/image/map_raw.png",QGuiApplication::applicationDirPath()+"/setting/");
     }
-    server->sendMap(QGuiApplication::applicationDirPath()+"/image/map_raw.png",QGuiApplication::applicationDirPath()+"/setting/");
 }
 void Supervisor::startLine(QString color, float width){
     temp_line.line.clear();
@@ -279,446 +446,123 @@ void Supervisor::stopLine(){
     canvas_redo.clear();
 }
 
-//bool Supervisor::isoutline(int x, int y){
-//    bool find_floor = false;
-//    bool find_wall = false;
-//    for(int i=x; i<minimap_grid.size(); i++){
-//        if(minimap_grid[i][y] == "floor"){
-//            find_floor = true;
-//        }
-//        if(minimap_grid[i][y] == "nothing"){
-//            if(find_floor){
-//                return true;
-//            }
-//            if(!find_wall){
-
-//            }
-//        }
-//        if(minimap_grid[i][y] == "wall"){
-//            find_wall = true;
-//        }
-//    }
-//}
-
-
-void Supervisor::calculateGrid2(){
-    QString map_path = "image/map_rotated.png";
+void Supervisor::make_minimap(){
+    QString map_path;
+    if(map.use_server){
+        map_path = "image/map_rotated.png";
+    }else{
+        map_path = "image/map_edited.png";
+    }
     minimap = cv::imread(map_path.toStdString());
     cv::Mat minimap_1, minimap_2;
 
-//    for(int i=0; i<minimap.rows; i=i+3){
-//        for(int j=0; j<minimap.cols; j=j+3){
-//            int pixel = 0;
-//            for(int k=0; k<3; k++){
-//                for(int m=0; m<3; m++){
-//                    pixel+=minimap.at<int>(i+k,j+m);
-//                }
-//            }
-//            pixel = pixel/9;
+    int dp = 3;
+    for(int i=0; i<minimap.rows; i=i+dp){
+        for(int j=0; j<minimap.cols; j=j+dp){
+            int pixel = 0;
+            bool outline = false;
+            for(int k=0; k<dp; k++){
+                for(int m=0; m<dp; m++){
+                    if(i+k>minimap.rows-1)
+                        continue;
+                    if(j+m>minimap.cols-1)
+                        continue;
+                    pixel+=minimap.at<cv::Vec3b>(i+k,j+m)[0];
+                    if(minimap.at<cv::Vec3b>(i+k,j+m)[0] == 0)
+                        outline = true;
+                }
+            }
+            float kk = pixel/(dp*dp);
+            if(kk < 10 || outline)
+                pixel = 0;
+            else if(kk > 100)
+                pixel = 255;
+            else
+                pixel = 38;
 
-//            if(pixel < 10)
-//                pixel = 0;
-//            else if(pixel > 100)
-//                pixel = 255;
-//            else
-//                pixel = 38;
-
-////            minimap[i
-//        }
-//    }
-
-//    cv::resize(minimap, minimap_1, cv::Size(300,300),0.5,0.5,cv::INTER_AREA);
-//    minimap = minimap_1;
-//    cv::resize(minimap_1, minimap, cv::Size(1000,1000),0.5,0.5,cv::INTER_AREA);
-    cv::cvtColor(minimap, minimap_1,cv::COLOR_BGR2HSV);
-    cv::GaussianBlur(minimap_1, minimap_2,cv::Size(3,3),0);
-    minimap_2 = minimap_1;
-    cv::Scalar lower(0,0,37);
-    cv::Scalar upper(0,0,255);
-    cv::inRange(minimap_1,lower,upper,minimap_2);
-    minimap_1 = minimap_2;
-    cv::Canny(minimap_1,minimap_2,600,600);
-
-    cv::Mat kernel = getStructuringElement(cv::MORPH_RECT, cv::Size(5,5));
-    dilate(minimap_2, minimap_1, kernel);
-     minimap_2 = minimap_1;
-
-//    std::cout << minimap_1;
-
-
-    std::vector<std::vector<cv::Point>> contours;
-    std::vector<cv::Vec4i> hierarchy;
-
-    cv::findContours(minimap_2,contours,hierarchy,cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
-
-    std::vector<std::vector<cv::Point>> conPoly(contours.size());
-
-    for (int i = 0; i < contours.size(); i++)
-    {
-//        int area = contourArea(contours[i]);
-//        if (area > 1000)
-//        {
-//            // contours요소의 아크 길이를 리턴. 두번째 요소는 아크가 닫혀있으면(boolean true) 그 값을 리턴하는 듯.
-//            float peri = arcLength(contours[i], true);
-//            // 감지한 윤곽에 대해서, 해당 윤곽이 사각형인지 삼각형인지를 파악한다. 선분 갯수를 계산해서 아웃풋 어레이로 반환한다.
-//            approxPolyDP(contours[i], conPoly[i], 0.02 * peri, true);
-
-//                drawContours(minimap_2, conPoly, i, cv::Scalar(255, 0, 255), 3);
-//                imwrite("img_wContours.jpg", minimap_2);
-
-//        }
+            for(int k=0; k<dp; k++){
+                for(int m=0; m<dp; m++){
+                    if(i+k>minimap.rows-1)
+                        continue;
+                    if(j+m>minimap.cols-1)
+                        continue;
+                    minimap.data[((i+k)*minimap.cols + (j+m))*3] = pixel;
+                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 1] = pixel;
+                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 2] = pixel;
+                }
+            }
+        }
     }
 
-//    std::vector<cv::Vec2f> lines;
-
-
-//    cv::HoughLines(minimap_canny,lines, 1, CV_PI/180,150);
-
-
-//    for(int i=0; i<lines.size(); i++){
-//        qDebug() << lines[i][0] << lines[i][1];
-//        float rho = lines[i][0];
-//        float theta = lines[i][1];
-//        cv::Point pt1, pt2;
-//        double a = cos(theta);
-//        double b = sin(theta);
-//        double x0 = a*rho;
-//        double y0 = b*rho;
-//        pt1.x = cvRound(x0+1000*(-b));
-//        pt1.y = cvRound(x0+1000*(a));
-//        pt2.x = cvRound(x0-1000*(-b));
-//        pt2.y = cvRound(x0-1000*(a));
-//        cv::line(minimap_canny, pt1,pt2,cv::Scalar::all(255),1,8);
-//    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(minimap_2)).toImage();
-    if(temp_image.save("image/map_mini.png","PNG")){
+    QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(minimap)).toImage();
+    if(temp_image.save("image/map_mini1.png","PNG")){
         qDebug() << "Success to png";
     }else{
         qDebug() << "Fail to png";
     }
 
-}
+    dp = 15;
+    for(int i=0; i<minimap.rows; i=i+dp){
+        for(int j=0; j<minimap.cols; j=j+dp){
 
-void Supervisor::calculateGrid(){
-    ST_POINT min, max;
-    for(int x=0; x<minimap_grid.size(); x++){
-        bool is_find = false;
-        for(int y=0; y<minimap_grid[x].size(); y++){
-            //Find Init Floor Group
-            int floor_grid_min = 10;
-            if(minimap_grid[x][y] == "floor"){
-                ST_GRID right = getRightFloor(x,y);
-                ST_GRID bottom = getBottomFloor(x,y);
-                int last_x = right.x;
-                int last_y = bottom.y;
-                for(int xx = x; xx<right.x; xx++){
-                    for(int yy = y; yy<last_y; yy++){
-                        if(minimap_grid[xx][yy] != "floor"){
-                            last_y = yy;
-                            last_x = xx;
-                            break;
-                        }
-                        map_y[xx].push_back(yy);
-                    }
+            int pixel = 0;
+            int outline = 0;
+            for(int k=0; k<dp; k++){
+                for(int m=0; m<dp; m++){
+                    if(i+k>minimap.rows-1)
+                        continue;
+                    if(j+m>minimap.cols-1)
+                        continue;
+                    pixel+=minimap.at<cv::Vec3b>(i+k,j+m)[0];
+                    if(minimap.at<cv::Vec3b>(i+k,j+m)[0] == 0)
+                        outline++;
                 }
+            }
+            float kk = pixel/(dp*dp);
+            if(outline > (dp*dp)/3)
+                pixel = 0;
+            else if(kk > 100)
+                pixel = 255;
+            else
+                pixel = 38;
 
-                if(last_x-x > floor_grid_min && last_y-y > floor_grid_min){
-                    qDebug() << "FIND FLOOR GROUP!!!!!";
-                    qDebug() << x << y <<  last_x << last_y;
-                    min.x = x;
-                    min.y = y;
-                    max.x = last_x;
-                    max.y = last_y;
-
-                    is_find = true;
-                    break;
-                }else{
-                    map_y.clear();
+            for(int k=0; k<dp; k++){
+                for(int m=0; m<dp; m++){
+                    if(i+k>minimap.rows-1)
+                        continue;
+                    if(j+m>minimap.cols-1)
+                        continue;
+                    minimap.data[((i+k)*minimap.cols + (j+m))*3] = pixel;
+                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 1] = pixel;
+                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 2] = pixel;
                 }
             }
         }
-            if(is_find)
-                break;
     }
-
-    QList<int> map_x = map_y.keys();
-
-    //위로 올라가면서 확인 (기준축 : x)
-    for(int x=0; x<map_x.size(); x++){
-        for(int y=0; y<map_y[map_x[x]].size(); y++){
-            calculateUpper(map_x[x],map_y[map_x[x]][y]-1);
-        }
-    }
-    map_x = map_y.keys();
-    //위로 올라가면서 확인 (기준축 : x)
-    for(int x=0; x<map_x.size(); x++){
-        for(int y=0; y<map_y[map_x[x]].size(); y++){
-            calculateRight(map_x[x]+1,map_y[map_x[x]][y]);
-        }
-    }
-    map_x = map_y.keys();
-    //아래로 내려가면서 확인 (기준축 : x)
-    for(int x=0; x<map_x.size(); x++){
-        for(int y=0; y<map_y[map_x[x]].size(); y++){
-            calculateBottom(map_x[x],map_y[map_x[x]][y]+1);
-        }
-    }
-    map_x = map_y.keys();
-    //위로 올라가면서 확인 (기준축 : x)
-    for(int x=0; x<map_x.size(); x++){
-        for(int y=0; y<map_y[map_x[x]].size(); y++){
-            calculateLeft(map_x[x]-1,map_y[map_x[x]][y]);
-        }
-    }
-    map_x = map_y.keys();
-    //위로 올라가면서 확인 (기준축 : x)
-    for(int x=0; x<map_x.size(); x++){
-        for(int y=0; y<map_y[map_x[x]].size(); y++){
-            calculateRight(map_x[x]+1,map_y[map_x[x]][y]);
-        }
-    }
-}
-
-void Supervisor::calculateUpper(int x, int y){
-    QVector<int> y_wall;
-    QVector<int> y_unknown;
-
-
-    for(int i=0; i<map_y[x].size(); i++){
-        if(map_y[x][i] == y){
-            //already find
-            return;
-        }
-    }
-    for(int i=y; i>-1; i--){
-        QString up_grid = minimap_grid[x][i];
-        if(up_grid == "floor"){
-            map_y[x].push_back(i);
-        }else if(up_grid == "unknown"){
-            y_unknown.push_back(i);
-        }else{
-            for(int j=0; j<y_unknown.size(); j++)
-                map_y[x].push_back(y_unknown[j]);
-            return;
-        }
-    }
-}
-
-void Supervisor::calculateBottom(int x, int y){
-    QVector<int> y_wall;
-    QVector<int> y_unknown;
-
-
-    for(int i=0; i<map_y[x].size(); i++){
-        if(map_y[x][i] == y){
-            //already find
-            return;
-        }
-    }
-    for(int i=y; i<minimap_grid[x].size(); i++){
-        QString bottom_grid = minimap_grid[x][i];
-        if(bottom_grid == "floor"){
-            map_y[x].push_back(i);
-        }else if(bottom_grid == "unknown"){
-            y_unknown.push_back(i);
-        }else{
-            for(int j=0; j<y_unknown.size(); j++)
-                map_y[x].push_back(y_unknown[j]);
-            return;
-        }
-    }
-}
-
-void Supervisor::calculateLeft(int x, int y){
-    QVector<int> y_wall;
-    QVector<int> y_unknown;
-
-    for(int i=0; i<map_y[x].size(); i++){
-        if(map_y[x][i] == y){
-            //already find
-            return;
-        }
-    }
-    for(int i=x; i>-1; i--){
-        QString bottom_grid = minimap_grid[i][y];
-        if(bottom_grid == "floor"){
-            map_y[i].push_back(y);
-        }else if(bottom_grid == "unknown"){
-            y_unknown.push_back(i);
-        }else{
-            for(int j=0; j<y_unknown.size(); j++)
-                map_y[y_unknown[j]].push_back(y);
-            return;
-        }
-    }
-}
-
-void Supervisor::calculateRight(int x, int y){
-    QVector<int> y_wall;
-    QVector<int> y_unknown;
-
-    for(int i=0; i<map_y[x].size(); i++){
-        if(map_y[x][i] == y){
-            //already find
-            return;
-        }
-    }
-    for(int i=x; i<minimap_grid[x].size(); i++){
-        QString bottom_grid = minimap_grid[i][y];
-        if(bottom_grid == "floor"){
-            map_y[i].push_back(y);
-        }else if(bottom_grid == "unknown"){
-            y_unknown.push_back(i);
-        }else{
-            for(int j=0; j<y_unknown.size(); j++)
-                map_y[y_unknown[j]].push_back(y);
-            return;
-        }
-    }
-}
-ST_GRID Supervisor::getNextGrid(QString cur, int x, int y){
-    ST_GRID temp;
-    if(x > minimap_grid.size()-1){
-        temp.name = "nothing";
-        temp.x = x;
-        temp.y = y;
-        return temp;
-    }else if(minimap_grid[x][y] != cur){
-        temp.name = minimap_grid[x][y];
-        temp.x = x;
-        temp.y = y;
-        return temp;
+    temp_image = QPixmap::fromImage(mat_to_qimage_cpy(minimap)).toImage();
+    if(temp_image.save("image/map_mini2.png","PNG")){
+        qDebug() << "Success to png";
     }else{
-        return getNextGrid(cur,++x,y);
+        qDebug() << "Fail to png";
+    }
+
+    cv::cvtColor(minimap, minimap_1,cv::COLOR_BGR2HSV);
+    cv::GaussianBlur(minimap_1, minimap_2,cv::Size(3,3),0);
+    cv::Scalar lower(0,0,37);
+    cv::Scalar upper(0,0,255);
+    cv::inRange(minimap_2,lower,upper,minimap_1);
+    cv::Canny(minimap_1,minimap_2,600,600);
+
+    cv::Mat kernel = getStructuringElement(cv::MORPH_RECT, cv::Size(5,5));
+    dilate(minimap_2, minimap_1, kernel);
+    temp_image = QPixmap::fromImage(mat_to_qimage_cpy(minimap_1)).toImage();
+    if(temp_image.save("image/map_mini.png","PNG")){
+        qDebug() << "Success to png";
+    }else{
+        qDebug() << "Fail to png";
     }
 }
 
-ST_GRID Supervisor::getRightFloor(int x, int y){
-    ST_GRID temp;
-    if(x > minimap_grid.size()-1){
-        temp.name = "floor";
-        temp.x = x;
-        temp.y = y;
-        return temp;
-    }else if(minimap_grid[x][y] != "floor"){
-        temp.name = minimap_grid[x][y];
-        temp.x = x;
-        temp.y = y;
-        return temp;
-    }else{
-        return getRightFloor(++x,y);
-    }
-}
-ST_GRID Supervisor::getBottomFloor(int x, int y){
-    ST_GRID temp;
-    if(y > minimap_grid[x].size()-1){
-        temp.name = "floor";
-        temp.x = x;
-        temp.y = y;
-        return temp;
-    }else if(minimap_grid[x][y] != "floor"){
-        temp.name = minimap_grid[x][y];
-        temp.x = x;
-        temp.y = y;
-        return temp;
-    }else{
-        return getBottomFloor(x,++y);
-    }
-}
-
-ST_GRID Supervisor::getLeftWall(int x, int y){
-    ST_GRID temp;
-    if(x < 0){
-        temp.name = "fail";
-        temp.x = x;
-        temp.y = y;
-        return temp;
-    }else if(minimap_grid[x][y] == "wall" || minimap_grid[x][y] == "nothing"){
-        temp.name = minimap_grid[x][y];
-        temp.x = x;
-        temp.y = y;
-        return temp;
-    }else{
-        return getRightWall(--x,y);
-    }
-}
-ST_GRID Supervisor::getRightWall(int x, int y){
-    ST_GRID temp;
-    if(x > minimap_grid.size()-1){
-        temp.name = "wall";
-        temp.x = x;
-        temp.y = y;
-        return temp;
-    }else if(minimap_grid[x][y] != "wall" && minimap_grid[x][y] != "outline_wall"){
-        temp.name = minimap_grid[x][y];
-        temp.x = x;
-        temp.y = y;
-        return temp;
-    }else{
-        return getRightWall(++x,y);
-    }
-}
-ST_GRID Supervisor::getBottomWall(int x, int y){
-    ST_GRID temp;
-    if(y > minimap_grid[x].size()-1){
-        temp.name = "wall";
-        temp.x = x;
-        temp.y = y;
-        return temp;
-    }else if(minimap_grid[x][y] != "wall" && minimap_grid[x][y] != "outline_wall"){
-        temp.name = minimap_grid[x][y];
-        temp.x = x;
-        temp.y = y;
-        return temp;
-    }else{
-        return getBottomWall(x,++y);
-    }
-}
-bool Supervisor::findNothingRight(int x, int y){
-    if(x > minimap_grid.size()){
-        return false;
-    }else if(minimap_grid[x][y] == "nothing"){
-        return true;
-    }else{
-        return findNothingRight(x++,y);
-    }
-}
-
-bool Supervisor::findWallRight(int x, int y){
-    if(x > minimap_grid.size()){
-        return false;
-    }else if(minimap_grid[x][y] == "wall"){
-        return true;
-    }else{
-        return findWallRight(x++,y);
-    }
-}
-
-bool Supervisor::findFloorRight(int x, int y){
-    if(x > minimap_grid.size()){
-        return false;
-    }else if(minimap_grid[x][y] == "floor"){
-        return true;
-    }else{
-        return findFloorRight(x++,y);
-    }
-}
 
 void Supervisor::setGrid(int x, int y, QString name){
     if(minimap_grid.size() > x){
@@ -751,14 +595,6 @@ QString Supervisor::getGrid(int x, int y){
     }
 }
 
-bool Supervisor::getFloor(int x, int y){
-    for(int i=0; i<map_y[x].size(); i++){
-        if(map_y[x][i] == y){
-            return true;
-        }
-    }
-    return false;
-}
 
 void Supervisor::undo(){
     ST_LINE temp;
@@ -813,9 +649,6 @@ void Supervisor::clear_all(){
 
 }
 
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////
 void Supervisor::onTimer(){
     // QML 오브젝트 매칭
@@ -824,48 +657,197 @@ void Supervisor::onTimer(){
         setWindow(qobject_cast<QQuickWindow*>(object));
     }
 
-    // 맵 유무 확인 -> 없으면 생성성
-    if(!isMapExist){
-//        QFile *file_raw = new QFile(QGuiApplication::applicationDirPath()+"/image/raw_map.png");
-        QFile *file = new QFile(QGuiApplication::applicationDirPath()+"/image/map_rotated.png");
-//        if(file_raw->open(QIODevice::ReadOnly)){
-//            QString map_path = "image/raw_map.png";
-//            cv::Mat map1 = cv::imread(map_path.toStdString());
-//            cv::flip(map1, map1, 0);
-//            cv::rotate(map1,map1,cv::ROTATE_90_COUNTERCLOCKWISE);
-
-//            QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(map1)).toImage();
-
-            //Save PNG File
-//            if(temp_image.save("image/map_raw.png","PNG")){
-//                file_raw->remove();
-//            }
-//        }
-
-        if(file->open(QIODevice::ReadOnly)){
-            isMapExist = true;
-        }else{
-            isMapExist = false;
-            rotate_map();
-        }
-
-    }
-
     // Server, LCM 데이터 매칭
     if(!lcm->flagPath){
-        server->setData(robot_name, lcm->robot);
+        server->setData(robot_name, lcm->robot, ui_state);
     }
     server->setMap(map);
     lcm->setMapData(map);
 
 
+    static int cur_error = ROBOT_ERROR_NONE;
+    static int cur_state = UI_STATE_NONE;
+    if(lcm->robot.state != ROBOT_STATE_ERROR)
+        cur_error = ROBOT_ERROR_NONE;
 
-    if(flag_rotate_tables){
+
+
+    if(lcm->isconnect && ui_state == UI_STATE_NONE){
+        plog->write("[LCM] CONNECT -> UI_STATE = READY");
+        ui_state = UI_STATE_READY;
+    }else if(!lcm->isconnect){
+        ui_state = UI_STATE_NONE;
+        plog->write("[LCM] DISCONNECT -> UI_STATE = NONE");
+        QMetaObject::invokeMethod(mMain,"disconnected");
+    }else if(lcm->robot.state == ROBOT_STATE_ERROR && ui_state != UI_STATE_MOVEFAIL){
+        ui_state = UI_STATE_MOVEFAIL;
+        plog->write(("[LCM] ROBOT ERROR DETECTED!"));
+
+        isaccepted = false;
+    }
+
+
+
+    switch(ui_state){
+    case UI_STATE_READY:{
+        cur_state = ui_state;
+        if(lcm->robot.state == ROBOT_STATE_PAUSED){
+            lcm->moveStop();
+        }
+        if(ui_cmd == UI_CMD_MOVE_TABLE){
+            ui_state = UI_STATE_SERVING;
+        }else if(ui_cmd == UI_CMD_MOVE_CHARGE){
+            ui_state = UI_STATE_GO_CHARGE;
+        }else if(ui_cmd == UI_CMD_MOVE_WAIT){
+            ui_state = UI_STATE_GO_HOME;
+        }
+        break;
+    }
+    case UI_STATE_CHARGING:{
+        cur_state = ui_state;
+        break;
+    }
+    case UI_STATE_GO_HOME:{
+        cur_state = ui_state;
+        if(lcm->robot.state == ROBOT_STATE_READY){
+            if(isaccepted){
+                ui_cmd = UI_CMD_NONE;
+                QMetaObject::invokeMethod(mMain, "waitkitchen");
+                ui_state = UI_STATE_READY;
+                isaccepted = false;
+            }else{
+                lcm->moveTo("resting_0");
+            }
+        }else if(lcm->robot.state == ROBOT_STATE_MOVING){
+            // moving
+            if(!isaccepted){
+                isaccepted = true;
+                QMetaObject::invokeMethod(mMain, "movelocation");
+            }
+        }
+        break;
+    }
+    case UI_STATE_GO_CHARGE:{
+        cur_state = ui_state;
+        if(lcm->robot.state == ROBOT_STATE_READY){
+            if(isaccepted){
+                ui_cmd = UI_CMD_NONE;
+                isaccepted = false;
+                QMetaObject::invokeMethod(mMain, "docharge");
+            }else{
+                lcm->moveTo("charging_0");
+            }
+        }else if(lcm->robot.state == ROBOT_STATE_MOVING){
+            // moving
+            if(!isaccepted){
+                isaccepted = true;
+                QMetaObject::invokeMethod(mMain, "movelocation");
+            }
+        }
+        break;
+    }
+    case UI_STATE_SERVING:{
+        cur_state = ui_state;
+        if(lcm->robot.state == ROBOT_STATE_READY){
+            //Check Done Signal
+            if(isaccepted){
+                ui_state = UI_STATE_PICKUP;
+                int curNum = 0;
+                lcm->robot.pickupTrays.clear();
+                for(int i=0; i<setting.tray_num; i++){
+                    if(lcm->robot.trays[i] == curNum){
+                        lcm->robot.trays[i] = 0;
+                        if(curNum != 0)
+                            lcm->robot.pickupTrays.push_back(i+1);
+                    }else if(curNum == 0){
+                        curNum = lcm->robot.trays[i];
+                        lcm->robot.pickupTrays.push_back(i+1);
+                        lcm->robot.trays[i] = 0;
+                    }
+                }
+                plog->write("[SCHEDULER] SERVING : PICK UP (Table"+QString::number(curNum)+")");
+                QMetaObject::invokeMethod(mMain, "showpickup");
+                isaccepted = false;
+            }else{
+                // move start
+                static int timer_cnt = 0;
+                bool serveDone = true;
+                if(timer_cnt%5==0){
+                    for(int i=0; i<setting.tray_num; i++){
+                        if(lcm->robot.trays[i] != 0){
+                            plog->write("[SCHEDULER] SERVING : MOVE TO (Table"+QString::number(lcm->robot.trays[i])+")");
+                            lcm->moveTo("serving_"+QString().sprintf("%d",lcm->robot.trays[i]-1));
+                            serveDone = false;
+                            break;
+                        }
+                    }
+                    if(serveDone){
+                        // move done -> move to wait
+                        plog->write("[SCHEDULER] SERVING : SERVE DONE");
+                        ui_state = UI_STATE_GO_HOME;
+                    }
+                }
+                timer_cnt++;
+            }
+        }else if(lcm->robot.state == ROBOT_STATE_MOVING){
+            // moving
+            if(!isaccepted){
+                isaccepted = true;
+                plog->write("[SCHEDULER] SERVING : MOVE START");
+                QMetaObject::invokeMethod(mMain, "movelocation");
+            }
+        }else if(lcm->robot.state == ROBOT_STATE_ERROR){
+            if(cur_error != lcm->robot.err_code){
+                cur_error = lcm->robot.err_code;
+                if(cur_error == ROBOT_ERROR_NO_PATH){
+                    isaccepted = false;
+                    cur_error = lcm->robot.err_code;
+                    ui_state = UI_STATE_MOVEFAIL;
+                    plog->write("[SCHEDULER] ROBOT ERROR : NO PATH");
+                    QMetaObject::invokeMethod(mMain, "nopathfound");
+                }else{
+                    plog->write("[SCHEDULER] ROBOT ERROR : " + QString::number(lcm->robot.err_code));
+                }
+            }
+        }
+        break;
+    }
+    case UI_STATE_CALLING:{
+        cur_state = ui_state;
+
+        break;
+    }
+    case UI_STATE_PICKUP:{
+        cur_state = ui_state;
+        if(lcm->robot.state == ROBOT_STATE_PAUSED){
+            lcm->moveResume();
+        }
+        if(ui_cmd == UI_CMD_PICKUP_CONFIRM){
+            ui_state = UI_STATE_SERVING;
+        }
+        break;
+    }
+    case UI_STATE_PATROLLING:{
+        cur_state = ui_state;
+        // 테스트용 테이블 로테이션
+        if(ui_cmd == UI_CMD_TABLE_PATROL){
+            state_rotate_tables = 1;
+            ui_cmd = UI_CMD_NONE;
+        }else if(ui_cmd == UI_CMD_PATROL_STOP){
+            ui_cmd = UI_CMD_NONE;
+            if(state_rotate_tables != 0){
+                ui_state = UI_STATE_NONE;
+                lcm->moveStop();
+                state_rotate_tables = 0;
+            }
+        }
+
         static int table_num_last = 0;
         switch(state_rotate_tables){
         case 1:
         {//Start
             if(lcm->robot.state == ROBOT_STATE_READY){
+                ui_state = UI_STATE_PATROLLING;
                 int table_num = qrand()%5;
                 while(table_num_last == table_num){
                     table_num = qrand()%5;
@@ -915,159 +897,33 @@ void Supervisor::onTimer(){
             break;
         }
         }
-    }else{
-        if(state_rotate_tables != 0){
-            qDebug() << "Moving Stop Signal!!";
-            lcm->moveStop();
-            state_rotate_tables = 0;
-        }else{
-
-        }
+        break;
     }
-
-    // 로봇 커맨드 스케줄러
-    switch(ui_cmd){
-    case UI_CMD_MOVE_TABLE:{
-        if(lcm->robot.state == ROBOT_STATE_READY){
-            if(isaccepted){
-                // pickup
-                qDebug() << "do pickup";
-                ui_state = UI_STATE_PICKUP;
-                ui_cmd = UI_CMD_NONE;
-
-                int curNum = 0;
-                lcm->robot.pickupTrays.clear();
-                for(int i=0; i<NUM_TRAY; i++){
-                    if(lcm->robot.tray_num[i] == curNum){
-                        lcm->robot.tray_num[i] = 0;
-                        if(curNum != 0)
-                            lcm->robot.pickupTrays.push_back(i+1);
-                    }else if(curNum == 0){
-                        curNum = lcm->robot.tray_num[i];
-                        lcm->robot.pickupTrays.push_back(i+1);
-                        lcm->robot.tray_num[i] = 0;
-                    }
-                }
-                qDebug() << lcm->robot.tray_num[0] << lcm->robot.tray_num[1]<< lcm->robot.tray_num[2];
-                QMetaObject::invokeMethod(mMain, "showpickup");
-                isaccepted = false;
+    case UI_STATE_MOVEFAIL:{
+        if(cur_error != lcm->robot.err_code){
+            cur_error = lcm->robot.err_code;
+            if(cur_error == ROBOT_ERROR_NO_PATH){
+                cur_error = lcm->robot.err_code;
+                plog->write("[SCHEDULER] ROBOT ERROR : NO PATH");
+                QMetaObject::invokeMethod(mMain, "nopathfound");
             }else{
-                // move start
-                static int timer_cnt = 0;
-                if(timer_cnt%5==0){
-                    if(lcm->robot.tray_num[0] != 0){
-                        lcm->moveTo("serving_"+QString().sprintf("%d",lcm->robot.tray_num[0]-1));
-                    }else if(lcm->robot.tray_num[1] != 0){
-                        lcm->moveTo("serving_"+QString().sprintf("%d",lcm->robot.tray_num[1]-1));
-                    }else if(lcm->robot.tray_num[2] != 0){
-                        lcm->moveTo("serving_"+QString().sprintf("%d",lcm->robot.tray_num[2]-1));
-                    }else{
-                        // move done -> move to wait
-                        ui_cmd = UI_CMD_MOVE_WAIT;
-                    }
-                }
-                timer_cnt++;
+                plog->write("[SCHEDULER] ROBOT ERROR : " + QString::number(lcm->robot.err_code));
             }
-        }else if(lcm->robot.state == ROBOT_STATE_MOVING){
-            // moving
-            if(isaccepted){
-
-            }else{
-                qDebug() << "robot moving start";
-                isaccepted = true;
-                ui_state = UI_STATE_MOVING;
-                QMetaObject::invokeMethod(mMain, "movelocation");
-            }
-        }else{
-//            qDebug() << "state = " << lcm->robot.state;
+        }
+        if(lcm->robot.state == ROBOT_STATE_MOVING){
+            ui_state = cur_state;
         }
         break;
     }
-    case UI_CMD_MOVE_WAIT:{
-        if(lcm->robot.state == ROBOT_STATE_READY){
-            if(isaccepted){
-                // move done
-                qDebug() << "move done";
-                ui_cmd = UI_CMD_NONE;
-                QMetaObject::invokeMethod(mMain, "waitkitchen");
-//                ui_cmd = UI_CMD_WAIT_KITCHEN;
-                ui_state = UI_STATE_READY;
-                isaccepted = false;
-            }else{
-                qDebug() << "move to wait";
-                lcm->moveTo("resting_0");
-            }
-        }else if(lcm->robot.state == ROBOT_STATE_MOVING){
-            // moving
-            if(isaccepted){
-
-            }else{
-                qDebug() << "robot wait moving start";
-                isaccepted = true;
-                ui_state = UI_STATE_MOVING;
-                QMetaObject::invokeMethod(mMain, "movelocation");
-            }
-        }
-        break;
-    }
-    case UI_CMD_WAIT_KITCHEN:{
-        QMetaObject::invokeMethod(mMain, "waitkitchen");
-        ui_cmd = UI_CMD_NONE;
-        break;
-    }
-    case UI_CMD_MOVE_CHARGE:{
-        if(lcm->robot.state == ROBOT_STATE_READY){
-            if(isaccepted){
-                // move done
-                ui_cmd = UI_CMD_NONE;
-                ui_state = UI_STATE_CHARGE;
-                isaccepted = false;
-                QMetaObject::invokeMethod(mMain, "docharge");
-            }else{
-                lcm->moveTo("charging_0");
-            }
-        }else if(lcm->robot.state == ROBOT_STATE_MOVING){
-            // moving
-            if(isaccepted){
-
-            }else{
-                qDebug() << "robot charge moving start";
-                isaccepted = true;
-                ui_state = UI_STATE_MOVING;
-                QMetaObject::invokeMethod(mMain, "movelocation");
-            }
-        }
-        break;
-    }
-    case UI_CMD_PAUSE:{
-        if(lcm->robot.state == ROBOT_STATE_MOVING || lcm->robot.state == ROBOT_STATE_AVOID){
-            lcm->movePause();
-        }else if(lcm->robot.state == ROBOT_STATE_PAUSED){
-            // pause success
-            ui_cmd = UI_CMD_NONE;
-        }
-        break;
-    }
-    case UI_CMD_RESUME:{
-        if(lcm->robot.state == ROBOT_STATE_PAUSED){
-            lcm->moveResume();
-        }else{
-            // resume success
-            ui_cmd = UI_CMD_NONE;
-        }
-        break;
-    }
-    case UI_CMD_PICKUP_CONFIRM:{
-        ui_cmd = UI_CMD_MOVE_TABLE;
-        break;
-    }
-    default:{
-
-    }
     }
 
+}
 
-
+void Supervisor::setSetting(QString name, QString value){
+    QString ini_path = "setting/robot.ini";
+    QSettings setting(ini_path, QSettings::IniFormat);
+    setting.setValue(name,value);
+    plog->write("[SETTING] SET "+name+" VALUE TO "+value);
 }
 
 void Supervisor::readSetting(){
@@ -1193,20 +1049,42 @@ void Supervisor::readSetting(){
     setting_robot.beginGroup("ROBOT");
     robot_name = setting_robot.value("name").toString();
     lcm->robot.name = setting_robot.value("name").toString();
-    map.margin = setting_robot.value("margin").toFloat();
     robot_radius = setting_robot.value("radius").toFloat();
-    qDebug() << "robot name" <<  robot_name;
+    lcm->robot.type = setting_robot.value("type").toString();
+    lcm->robot.velocity = setting_robot.value("velocity").toFloat();
+    setting.tray_num = setting_robot.value("tray_num").toInt();
+    setting.useVoice = setting_robot.value("use_voice").toBool();
+    setting.useBGM = setting_robot.value("use_bgm").toBool();
     setting_robot.endGroup();
+
+    setting_robot.beginGroup("FLOOR");
+    map.margin = setting_robot.value("margin").toFloat();
+    map.use_server = setting_robot.value("map_server").toBool();
+    map.map_loaded = setting_robot.value("map_load").toBool();
+    setting.table_num = setting_robot.value("table_num").toInt();
+    setting_robot.endGroup();
+
+    setting_robot.beginGroup("SERVER");
+    setting.useServerCMD = setting_robot.value("use_servercmd").toBool();
+    setting.useTravelline = setting_robot.value("use_travelline").toBool();
+    setting.travelline = setting_robot.value("travelline").toInt();
+    setting_robot.endGroup();
+
+    //Set Variable
+    lcm->robot.trays.clear();
+    for(int i=0; i<setting.tray_num; i++){
+        lcm->robot.trays.push_back(0);
+    }
+
+    lcm->robotnamechanged = true;
 }
 
-void Supervisor::setTray(int tray1, int tray2, int tray3){
-    plog->write("[UI-FUNCTION] SET TRAY : "+QString().sprintf("%d, %d, %d",tray1,tray2,tray3));
-    lcm->robot.tray_num[0] = tray1;
-    lcm->robot.tray_num[1] = tray2;
-    lcm->robot.tray_num[2] = tray3;
+void Supervisor::setTray(int tray_num, int table_num){
+    if(tray_num > -1 && tray_num < setting.tray_num){
+        lcm->robot.trays[tray_num] = table_num;
+    }
     ui_cmd = UI_CMD_MOVE_TABLE;
 }
-
 void Supervisor::moveTo(QString target_num){
     lcm->moveTo(target_num);
 }
@@ -1221,18 +1099,76 @@ void Supervisor::moveResume(){
 }
 void Supervisor::moveStop(){
     lcm->moveStop();
+    ui_cmd = UI_CMD_NONE;
+    isaccepted = false;
+    QMetaObject::invokeMethod(mMain, "movestopped");
 }
 
 void Supervisor::moveManual(){
     lcm->moveManual();
 }
 
-void Supervisor::setVelocity(float vel, float velth){
-    lcm->robot.vel_xy = vel;
-    lcm->robot.vel_th = velth;
-    lcm->setVelocity(vel,velth);
+//// ********************************* SETTING ************************************ ////
+bool Supervisor::getuseTravelline(){
+    return setting.useTravelline;
+}
+void Supervisor::setuseTravelline(bool use){
+    setSetting("SERVER/use_travelline",QVariant(use).toString());
+}
+int Supervisor::getnumTravelline(){
+    return setting.travelline;
+}
+void Supervisor::setnumTravelline(int num){
+    setSetting("SERVER/travelline",QString::number(num));
+}
+int Supervisor::getTrayNum(){
+    return setting.tray_num;
+}
+void Supervisor::setTrayNum(int tray_num){
+    setSetting("ROBOT/tray_num",QString::number(tray_num));
+}
+int Supervisor::getTableNum(){
+    return setting.table_num;
+}
+void Supervisor::setTableNum(int table_num){
+    setSetting("ROBOT/table_num",QString::number(table_num));
+}
+bool Supervisor::getuseVoice(){
+    return setting.useVoice;
+}
+void Supervisor::setuseVoice(bool use){
+    setSetting("ROBOT/use_voice",QVariant(use).toString());
+}
+bool Supervisor::getuseBGM(){
+    return setting.useBGM;
+}
+void Supervisor::setuseBGM(bool use){
+    setSetting("ROBOT/use_bgm",QVariant(use).toString());
+}
+bool Supervisor::getserverCMD(){
+    return setting.useServerCMD;
+}
+void Supervisor::setserverCMD(bool use){
+    setSetting("SERVER/use_servercmd",QVariant(use).toString());
 }
 
+void Supervisor::setRobotType(int type){
+    if(type == 0){
+        setSetting("ROBOT/type","SERVING");
+    }else{
+        setSetting("ROBOT/type","CALLING");
+    }
+}
+
+QString Supervisor::getRobotType(){
+    return lcm->robot.type;
+}
+
+
+void Supervisor::setVelocity(float vel){
+    lcm->robot.velocity = vel;
+    lcm->setVelocity(vel);
+}
 void Supervisor::confirmPickup(){
     ui_cmd = UI_CMD_PICKUP_CONFIRM;
 }
@@ -1270,13 +1206,12 @@ QString Supervisor::getcurTable(){
     return "0";
 }
 
-void Supervisor::joyMoveXY(float x, float y){
-    lcm->robot.joy_x = x;
-    lcm->robot.joy_y = y;
+void Supervisor::joyMoveXY(float x){
+    lcm->robot.joystick[0] = x;
     lcm->flagJoystick = true;
 }
 void Supervisor::joyMoveR(float r){
-    lcm->robot.joy_th = r;
+    lcm->robot.joystick[1] = r;
     lcm->flagJoystick = true;
 }
 
@@ -1293,17 +1228,6 @@ int Supervisor::getImageChunkNum(){
 unsigned int Supervisor::getImageSize(){
     return map.imageSize;
 }
-//QByteArray Supervisor::getImageData(){
-//    QByteArray temp;
-//    for(int i=0; i<map.imageSize; i++){
-//        temp.push_back(map.data[i]);
-//    }
-
-//    qDebug() << temp;
-//    return temp;
-//}
-
-
 
 void Supervisor::startRecordPath(){
 
@@ -1319,38 +1243,6 @@ void Supervisor::pausecurPath(){
 }
 
 #include <iostream>
-QString Supervisor::getImageData(){
-    QVector<int>  temp;
-    QByteArray teee;
-    for(int i=0; i<map.imageSize; i++){
-        teee.push_back(map.data[i]);
-        teee.push_back(map.data[i]);
-        teee.push_back(map.data[i]);
-        teee.push_back(255);
-
-//        temp.push_back(map.data[i]);
-//        temp.push_back(0);
-//        temp.push_back(0);
-//        temp.push_back(1);
-    }
-
-    QImage temp_image((const unsigned char*)teee.data(),map.width,map.height,QImage::Format_ARGB32);
-//    temp_image = QImage::fromData(teee, "png");
-//    Image imm;
-    if(temp_image.save("image/testplz.png","PNG")){
-        qDebug() << "Success";
-    }else{
-        qDebug() << "FAil";
-    }
-
-
-    QString imagestr("data:image/png;base64,");
-    imagestr.append(teee.toBase64().data());
-//    qDebug() << imagestr;
-
-    return imagestr;
-}
-
 QString Supervisor::getRobotName(){
     if(is_debug){
         return robot_name + "_" + debug_name;
@@ -1361,10 +1253,8 @@ QString Supervisor::getRobotName(){
 
 void Supervisor::setRobotName(QString name){
     robot_name = name;
-    //set ini
-    QString ini_path = "setting/robot.ini";
-    QSettings settings(ini_path, QSettings::IniFormat);
-    settings.setValue("ROBOT/name",robot_name);
+    lcm->robotnamechanged = true;
+    setSetting("ROBOT/name",robot_name);
 }
 bool Supervisor::getMapExist(){
     return isMapExist;
@@ -1376,10 +1266,7 @@ bool Supervisor::getMapExist(){
 }
 
 float Supervisor::getVelocityXY(){
-    return lcm->robot.vel_xy;
-}
-float Supervisor::getVelocityTH(){
-    return lcm->robot.vel_th;
+    return lcm->robot.velocity;
 }
 
 bool Supervisor::getMapState(){
@@ -1557,15 +1444,15 @@ float Supervisor::getTlineY(int num, int point){
 
 
 void Supervisor::addTline(int num, int x1, int y1, int x2, int y2){
-    if(num > map.travellinePose.size()){
+    if(num < map.travellinePose.size() && num > -1){
+        map.travellinePose[num].push_back(canvasTomap(x1,y1));
+        map.travellinePose[num].push_back(canvasTomap(x2,y2));
+    }else{
         QVector<ST_FPOINT> temp;
         temp.push_back(canvasTomap(x1,y1));
         temp.push_back(canvasTomap(x2,y2));
         map.travellinePose.push_back(temp);
         map.travellineSize++;
-    }else if(num > -1){
-        map.travellinePose[num].push_back(canvasTomap(x1,y1));
-        map.travellinePose[num].push_back(canvasTomap(x2,y2));
     }
     QMetaObject::invokeMethod(mMain,"updatetravelline");
 }
@@ -1676,14 +1563,6 @@ void Supervisor::addObject(QString name){
     }else{
         plog->write("[DEBUG] addObject " + name + " but size = 0");
     }
-}
-
-void Supervisor::clickObject(QString name){
-
-}
-
-void Supervisor::clickObject(float x, float y){
-
 }
 
 int Supervisor::getObjNum(QString name){
@@ -1937,19 +1816,24 @@ ST_POINT Supervisor::mapTocanvas(float x, float y){
     temp.y = -x/map.gridwidth + map.origin[0];
     return temp;
 }
-void Supervisor::rotate_map(){
-    QString map_path = "image/map_server.png";
-    cv::Mat map1 = cv::imread(map_path.toStdString());
-    cv::flip(map1, map1, 0);
-    cv::rotate(map1,map1,cv::ROTATE_90_COUNTERCLOCKWISE);
+bool Supervisor::rotate_map(QString _src, QString _dst, int mode){
+    cv::Mat map1 = cv::imread(_src.toStdString());
+
+    if(mode == 0){
+        cv::flip(map1, map1, 0);
+        cv::rotate(map1,map1,cv::ROTATE_90_COUNTERCLOCKWISE);
+    }else{
+        cv::rotate(map1,map1,cv::ROTATE_90_CLOCKWISE);
+        cv::flip(map1, map1, 0);
+
+    }
 
     QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(map1)).toImage();
 
     //Save PNG File
-    if(temp_image.save("image/map_rotated.png","PNG")){
-        qDebug() << "Success to png";
-        isMapExist = true;
+    if(temp_image.save(_dst,"PNG")){
+        return true;
     }else{
-        qDebug() << "Fail to png";
+        return false;
     }
 }

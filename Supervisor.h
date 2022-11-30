@@ -35,16 +35,22 @@ public:
         UI_CMD_MOVE_WAIT,
         UI_CMD_MOVE_CHARGE,
         UI_CMD_PICKUP_CONFIRM,
-        UI_CMD_WAIT_KITCHEN
+        UI_CMD_WAIT_KITCHEN,
+        UI_CMD_TABLE_PATROL,
+        UI_CMD_PATROL_STOP
     };
 
     enum UI_STATE{
         UI_STATE_NONE = 0,
         UI_STATE_READY,
-        UI_STATE_MOVING,
-        UI_STATE_PAUSED,
+        UI_STATE_CHARGING,
+        UI_STATE_GO_HOME,
+        UI_STATE_GO_CHARGE,
+        UI_STATE_SERVING,
+        UI_STATE_CALLING,
         UI_STATE_PICKUP,
-        UI_STATE_CHARGE
+        UI_STATE_PATROLLING,
+        UI_STATE_MOVEFAIL
     };
 
     enum ROBOT_STATE{
@@ -84,6 +90,7 @@ public:
     bool is_debug = false;
 
     ST_MAP map;
+    ST_SETTING setting;
     //LCMHandler
     LCMHandler *lcm;
     bool isaccepted;
@@ -93,6 +100,34 @@ public:
     QQuickWindow *getWindow();
     void setObject(QObject* object);
     QObject* getObject();
+
+    void setSetting(QString name, QString value);
+
+    //// ******************************** Init Check ************************************////
+    Q_INVOKABLE bool isConnectServer();
+    //0:no map, 1:map_server, 2: map_edited only, 3:raw_map only
+    Q_INVOKABLE int isExistMap();
+    Q_INVOKABLE bool loadMaptoServer();
+    Q_INVOKABLE bool isUSBFile();
+    Q_INVOKABLE QString getUSBFilename();
+    Q_INVOKABLE bool loadMaptoUSB();
+    Q_INVOKABLE bool isuseServerMap();
+    Q_INVOKABLE void setuseServerMap(bool use);
+    Q_INVOKABLE void removeRawMap();
+    Q_INVOKABLE void removeEditedMap();
+    Q_INVOKABLE void removeServerMap();
+    Q_INVOKABLE bool isloadMap();
+    Q_INVOKABLE void setloadMap(bool load);
+    bool rotate_map(QString _src, QString _dst, int mode);
+
+    //// *********************************** SLAM *********************************** ////
+    Q_INVOKABLE void startSLAM();
+    Q_INVOKABLE void stopSLAM();
+    Q_INVOKABLE void setSLAMMode(int mode);
+    Q_INVOKABLE bool isConnectJoystick();
+    Q_INVOKABLE QString getKeyboard(int mode);
+    Q_INVOKABLE QString getJoystick(int mode);
+
 
     //// ********************************* PAGE_ANNOTATION ************************************ ////
     QVector<ST_FPOINT> temp_object;
@@ -106,17 +141,17 @@ public:
     Q_INVOKABLE QVector<int> getMarginObj();
 
 
+    Q_INVOKABLE void acceptCall(bool yes);
 
-    void readSetting();
+    Q_INVOKABLE void readSetting();
     //Mobile Move Functions
-    Q_INVOKABLE void setTray(int tray1, int tray2, int tray3);
+    Q_INVOKABLE void setTray(int tray_num, int table_num);
     Q_INVOKABLE void moveTo(QString target_num);
     Q_INVOKABLE void moveTo(float x, float y, float th);
     Q_INVOKABLE void movePause();
     Q_INVOKABLE void moveResume();
     Q_INVOKABLE void moveStop();
     Q_INVOKABLE void moveManual();
-    Q_INVOKABLE void setVelocity(float vel, float velth);
     Q_INVOKABLE void confirmPickup();
     Q_INVOKABLE void moveToCharge();
     Q_INVOKABLE void moveToWait();
@@ -126,8 +161,6 @@ public:
     Q_INVOKABLE int getErrcode();
     Q_INVOKABLE QString getRobotName();
     Q_INVOKABLE void setRobotName(QString name);
-    Q_INVOKABLE float getVelocityXY();
-    Q_INVOKABLE float getVelocityTH();
 
     Q_INVOKABLE QVector<int> getPickuptrays();
     Q_INVOKABLE QString getcurLoc();
@@ -137,7 +170,30 @@ public:
     Q_INVOKABLE int getImageChunkNum();
 //    Q_INVOKABLE int getImageChunkSize();
     Q_INVOKABLE unsigned int getImageSize();
-    Q_INVOKABLE QString getImageData();
+
+    //// ********************************* SETTING ************************************ ////
+    Q_INVOKABLE void setVelocity(float vel);
+    Q_INVOKABLE float getVelocityXY();
+    Q_INVOKABLE bool getuseTravelline();
+    Q_INVOKABLE void setuseTravelline(bool use);
+    Q_INVOKABLE int getnumTravelline();
+    Q_INVOKABLE void setnumTravelline(int num);
+
+    Q_INVOKABLE int getTrayNum();
+    Q_INVOKABLE void setTrayNum(int tray_num);
+    Q_INVOKABLE int getTableNum();
+    Q_INVOKABLE void setTableNum(int table_num);
+
+    Q_INVOKABLE bool getuseVoice();
+    Q_INVOKABLE void setuseVoice(bool use);
+    Q_INVOKABLE bool getuseBGM();
+    Q_INVOKABLE void setuseBGM(bool use);
+    Q_INVOKABLE bool getserverCMD();
+    Q_INVOKABLE void setserverCMD(bool use);
+
+    Q_INVOKABLE QString getRobotType();
+    Q_INVOKABLE void setRobotType(int type);
+
 
     //***********************************************************************Map
     Q_INVOKABLE bool getMapExist();
@@ -159,7 +215,6 @@ public:
     ST_FPOINT setAxis(ST_FPOINT _point);
     ST_FPOINT canvasTomap(int x, int y);
     ST_POINT mapTocanvas(float x, float y);
-    void rotate_map();
     //***********************************************************************Object(INI)..
     Q_INVOKABLE int getObjectNum();
     Q_INVOKABLE QString getObjectName(int num);
@@ -167,8 +222,6 @@ public:
     Q_INVOKABLE float getObjectX(int num, int point);
     Q_INVOKABLE float getObjectY(int num, int point);
 
-    Q_INVOKABLE void clickObject(QString name);
-    Q_INVOKABLE void clickObject(float x, float y);
 
     //***********************************************************************Object(NEW)..
 //    Q_INVOKABLE void newObjectPoint(int x, int y);
@@ -231,7 +284,7 @@ public:
     Q_INVOKABLE float getLocalPathx(int num);
     Q_INVOKABLE float getLocalPathy(int num);
 
-    Q_INVOKABLE void joyMoveXY(float x, float y);
+    Q_INVOKABLE void joyMoveXY(float x);
     Q_INVOKABLE void joyMoveR(float r);
 
     //Outlet Functions
@@ -271,24 +324,7 @@ public:
     Q_INVOKABLE void editGrid(int x, int y, QString name);
     Q_INVOKABLE QString getGrid(int x, int y);
 
-    Q_INVOKABLE void calculateGrid();
-    Q_INVOKABLE void calculateGrid2();
-    ST_GRID getNextGrid(QString cur, int x, int y);
-    ST_GRID getRightFloor(int x, int y);
-    ST_GRID getBottomFloor(int x, int y);
-    ST_GRID getRightWall(int x, int y);
-    ST_GRID getBottomWall(int x, int y);
-    ST_GRID getLeftWall(int x, int y);
-    bool findNothingRight(int x, int y);
-    bool findFloorRight(int x, int y);
-    bool findWallRight(int x, int y);
-
-    void calculateUpper(int x, int y);
-    void calculateBottom(int x, int y);
-    void calculateRight(int x, int y);
-    void calculateLeft(int x, int y);
-
-    Q_INVOKABLE bool getFloor(int x, int y);
+    Q_INVOKABLE void make_minimap();
 
     DBHandler  *dbHandler;
     ServerHandler *server;
@@ -313,6 +349,8 @@ public slots:
     void server_cmd_pause();
     void server_cmd_resume();
     void server_cmd_newtarget();
+    void server_cmd_newcall();
+    void server_cmd_setini();
     void path_changed();
 
 private:

@@ -19,9 +19,6 @@ typedef struct{
     float      width;
 }ST_LINE;
 
-
-
-#define NUM_TRAY 3
 typedef struct{
     float x = 0;
     float y = 0;
@@ -56,6 +53,8 @@ typedef struct{
     QVector<QVector<ST_FPOINT>> objectPose;
 
     float margin;
+    bool use_server;
+    bool map_loaded;
 }ST_MAP;
 
 typedef struct{
@@ -63,6 +62,7 @@ typedef struct{
     float battery = 0;
     int state = 0;
     int err_code = 0;
+
     ST_POSE curPose;
     QString curLocation = "";
     QVector<int> pickupTrays;
@@ -72,18 +72,26 @@ typedef struct{
     QVector<ST_POSE> curPath;
     int localpathSize =0;
     ST_POSE localPath[4];
-//    QVector<ST_POSE> localPath;
 
     //mine
     QString name = "";
-    int tray_num[NUM_TRAY] = {0,};
+    QString type = "SERVING";
+    float velocity = 1.0;
+    QVector<int> trays;
     ST_POSE targetPose;
-    float joy_x = 0.;
-    float joy_y = 0.;
-    float joy_th = 0.;
-    float vel_xy = 1.0;
-    float vel_th = 1.0;
+    float joystick[2];
 }ST_ROBOT;
+
+typedef struct{
+    int tray_num;
+    int travelline;
+    int table_num;
+
+    bool useVoice;
+    bool useBGM;
+    bool useTravelline;
+    bool useServerCMD;
+}ST_SETTING;
 
 enum ROBOT_CMD{
     ROBOT_CMD_NONE = 0,
@@ -95,7 +103,8 @@ enum ROBOT_CMD{
     ROBOT_CMD_MOVE_PAUSE,
     ROBOT_CMD_MOVE_RESUME,
     ROBOT_CMD_SET_VELOCITY,
-    ROBOT_CMD_REQ_MAP
+    ROBOT_CMD_START,
+    ROBOT_CMD_SET_MAP
 };
 
 
