@@ -405,18 +405,18 @@ compiler_rcc_clean:
 qrc_qml.cpp: ../qml.qrc \
 		/usr/lib/qt5/bin/rcc \
 		../Page_setting.qml \
-		../Button.qml \
 		../Page_charge.qml \
-		../Page_mapview.qml \
 		../Page_pickup.qml \
 		../Map_current.qml \
+		../Page_MoveFail.qml \
 		../Page_map.qml \
 		../Page_kitchen.qml \
-		../Item_joystick.qml \
 		../Map_minimap.qml \
+		../Item_joystick.qml \
 		../Page_moving.qml \
 		../Page_menus.qml \
 		../Page_annotation.qml \
+		../Page_init.qml \
 		../main.qml \
 		icon/icon_play.png \
 		icon/icon_undo.png \
@@ -443,6 +443,7 @@ qrc_qml.cpp: ../qml.qrc \
 		../image/joy_background.png \
 		../image/loading1.gif \
 		../image/rainbow2.png \
+		../image/warning.png \
 		../image/rainbow1.png \
 		../bgm/song.mp3 \
 		../bgm/voice_move_charge.mp3 \

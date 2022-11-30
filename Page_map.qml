@@ -19,11 +19,18 @@ Item {
         pMap_curmap.updatepath();
     }
 
+
+    function loadmap(path){
+        pMap_curmap.loadmap(path);
+        supervisor.joyMoveXY(0, 0);
+        supervisor.joyMoveR(0, 0);
+    }
+
     Row{
         id: menubar_map
         spacing: 25
     Repeater{
-        model: ["load","save","record","run","stop"]
+        model: ["load","save","record","run","stop","manual","back"]
         Rectangle{
             id: btn
             width: 60
@@ -49,13 +56,18 @@ Item {
                         "./build/icon/icon_stop.png"
                     }else if(modelData == "pause"){
                         "./build/icon/icon_pause.png"
+                    }else if(modelData == "manual"){
+                        "./build/icon/icon_pause.png"
+                    }else if(modelData == "manualon"){
+                        "./build/icon/icon_stop.png"
+                    }else if(modelData == "back"){
+                        "./build/icon/icon_pause.png"
                     }
                 }
             }
             MouseArea{
                 anchors.fill: parent
                 onClicked:{
-                    print(modelData);
                     if(modelData == "load"){
                         pathload.open();
                     }else if(modelData == "save"){
@@ -66,13 +78,19 @@ Item {
 //                        supervisor.startcurPath();
 //                        modelData = "pause";
                         supervisor.runRotateTables();
-
                     }else if(modelData == "stop"){
                         supervisor.stopRotateTables();
 //                        supervisor.stopcurPath();
                     }else if(modelData == "pause"){
                         modelData = "run";
-
+                    }else if(modelData == "manual"){
+                        supervisor.moveManual();
+                        modelData = "manualon";
+                    }else if(modelData == "manualon"){
+                        supervisor.moveStop();
+                        modelData = "manual";
+                    }else if(modelData == "back"){
+                        stackview.pop();
                     }
                 }
             }
@@ -109,105 +127,44 @@ Item {
     }
 
     Item_joystick{
-        id: pMap_joy
+        id: joy_xy
+        anchors.right: pMap_curmap.left
+        anchors.rightMargin: 100
+        anchors.verticalCenter: parent.verticalCenter
+        verticalOnly: true
+        onUpdate_cntChanged: {
+            if(update_cnt == 0){
+                supervisor.joyMoveXY(0, 0);
+            }else{
+                if(fingerInBounds) {
+                    supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+                }else{
+                    supervisor.joyMoveXY(Math.sin(angle));
+                }
+            }
+        }
+    }
+
+    Item_joystick{
+        id: joy_th
         anchors.left: pMap_curmap.right
         anchors.leftMargin: 100
         anchors.verticalCenter: parent.verticalCenter
+        horizontalOnly: true
+        onUpdate_cntChanged: {
+            if(update_cnt == 0){
+                supervisor.joyMoveR(0, 0);
+            }else{
+                if(fingerInBounds) {
+                    supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+                } else {
+                    supervisor.joyMoveR(-Math.cos(angle));
+                }
+            }
+        }
     }
-
     Map_current{
         id: pMap_curmap
-        anchors.left:parent.left
-        anchors.leftMargin: 50
-        anchors.top:parent.top
-        anchors.topMargin: 100
+        anchors.centerIn: parent
     }
-    Rectangle{
-        id: rect_manual_on
-        width: 100
-        height: 100
-        anchors.top: pMap_joy.bottom
-        anchors.topMargin: 100
-        anchors.left: pMap_joy.left
-        anchors.leftMargin: 60
-        color: "gray"
-        Text{
-            text: "manual on"
-            anchors.centerIn: parent
-        }
-        MouseArea{
-            anchors.fill: parent
-            onClicked: {
-                supervisor.moveManual();
-            }
-        }
-    }
-    Rectangle{
-        id: rect_manual_off
-        width: 100
-        height: 100
-        anchors.top: pMap_joy.bottom
-        anchors.topMargin: 100
-        anchors.left: rect_manual_on.right
-        anchors.leftMargin: 30
-        color: "gray"
-        Text{
-            text: "stop"
-            anchors.centerIn: parent
-        }
-        MouseArea{
-            anchors.fill: parent
-            onClicked: {
-                supervisor.moveStop();
-            }
-        }
-    }
-    Rectangle{
-        id: rect_pop
-        width: 100
-        height: 100
-        anchors.top: pMap_joy.bottom
-        anchors.topMargin: 100
-        anchors.left: rect_manual_off.right
-        anchors.leftMargin: 30
-        color: "gray"
-        Text{
-            text: "back"
-            anchors.centerIn: parent
-        }
-        MouseArea{
-            anchors.fill: parent
-            onClicked: {
-                stackview.pop();
-            }
-        }
-    }
-    Rectangle{
-        id: rect_rotate
-        width: 100
-        height: 100
-        anchors.top: pMap_joy.bottom
-        anchors.topMargin: 100
-        anchors.left: rect_pop.right
-        anchors.leftMargin: 30
-        color: "gray"
-        Text{
-            text: isrun?"stop":"test run"
-            anchors.centerIn: parent
-        }
-        MouseArea{
-            anchors.fill: parent
-            onClicked: {
-                if(isrun){
-                    isrun = false;
-                    supervisor.stopRotateTables();
-                }else{
-                    isrun = true;
-                    supervisor.runRotateTables();
-                }
-
-            }
-        }
-    }
-
 }

@@ -82,6 +82,24 @@ Item {
 
     }
 
+    function loadmap(path){
+        image_map.source = path;
+        image_map.isload = true;
+        refreshMap = true;
+        updatemap();
+        updatecanvas();
+    }
+
+    function init(){
+        while(stackview_menu.currentItem.objectName != "menu_init"){
+            stackview_menu.pop();
+        }
+        anot_state = 0;
+        tool_num = 0;
+        refreshMap = true;
+        updatecanvas();
+    }
+
     function updateobject(){
         var ob_num = supervisor.getObjectNum();
         list_object.model.clear();
@@ -175,6 +193,8 @@ Item {
                                 anot_state = 0;
                                 updatecanvas();
                                 stackview.pop();
+                                if(stackview.currentItem.objectName == "page_init")
+                                    pinit.check_timer();
                             }
                         }
                     }
@@ -217,6 +237,7 @@ Item {
     //Annotation Menu ITEM===================================================
     Item{
         id: menu_state
+        objectName: "menu_init"
         width: parent.width
         height: parent.height
         visible: false
@@ -1241,11 +1262,13 @@ Item {
                     }
                 }
             }
+
             //뒤로가기
             Rectangle{
-                width: parent.width
+                width: parent.width/2
                 height: 60
                 anchors.bottom: parent.bottom
+                anchors.left: parent.left
                 radius: 10
                 border.width: 2
                 border.color: "gray"
@@ -1260,6 +1283,25 @@ Item {
                         tool_num = 0;
                         stackview_menu.pop();
                         updatecanvas();
+                    }
+                }
+            }
+            Rectangle{
+                width: parent.width/2
+                height: 60
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                radius: 10
+                border.width: 2
+                border.color: "gray"
+                Text{
+                    anchors.centerIn: parent
+                    text: "Confirm"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked:{
+                        init();
                     }
                 }
             }
@@ -1293,23 +1335,26 @@ Item {
 //        supervisor.setMarginObj();
     }
     function is_Col_loc(x,y){
-        var ctx = canvas_map.getContext('2d');
-        var ctx1 = canvas_map_margin.getContext('2d');
-        var ctx_robot = canvas_robot.getContext('2d');
-        var map_data = ctx.getImageData(0,0,image_map.width, image_map.height)
-        var map_data1 = ctx1.getImageData(0,0,image_map.width,image_map.height);
-        var robot_data = ctx_robot.getImageData(0,0,canvas_robot.width,canvas_robot.height);
-        for(var i=0; i<robot_data.data.length; i=i+4){
-            if(robot_data.data[i+3] > 0){
-                var robot_x = Math.floor((i/4)%canvas_robot.width + x - canvas_robot.width/2);
-                var robot_y = Math.floor((i/4)/canvas_robot.width + y - canvas_robot.width/2);
-                var pixel_num = robot_y*canvas_map.width + robot_x;
-                if(map_data.data[pixel_num*4] == 0 || map_data.data[pixel_num*4] > 100){
-                    //collision walls
-                    return true;
-                }else if(map_data1.data[pixel_num*4+3] > 0){
-                    //collision to margin
-                    return true;
+        if(image_map.isload){
+
+            var ctx = canvas_map.getContext('2d');
+            var ctx1 = canvas_map_margin.getContext('2d');
+            var ctx_robot = canvas_robot.getContext('2d');
+            var map_data = ctx.getImageData(0,0,image_map.width, image_map.height)
+            var map_data1 = ctx1.getImageData(0,0,image_map.width,image_map.height);
+            var robot_data = ctx_robot.getImageData(0,0,canvas_robot.width,canvas_robot.height);
+            for(var i=0; i<robot_data.data.length; i=i+4){
+                if(robot_data.data[i+3] > 0){
+                    var robot_x = Math.floor((i/4)%canvas_robot.width + x - canvas_robot.width/2);
+                    var robot_y = Math.floor((i/4)/canvas_robot.width + y - canvas_robot.width/2);
+                    var pixel_num = robot_y*canvas_map.width + robot_x;
+                    if(map_data.data[pixel_num*4] == 0 || map_data.data[pixel_num*4] > 100){
+                        //collision walls
+                        return true;
+                    }else if(map_data1.data[pixel_num*4+3] > 0){
+                        //collision to margin
+                        return true;
+                    }
                 }
             }
         }
@@ -1699,34 +1744,37 @@ Item {
             onPaint:{
                 var ctx = canvas_map.getContext('2d');
 
-                if(refreshMap){
-                    refreshMap = false;
-                    ctx.clearRect(0,0,canvas_map.width, canvas_map.height);
-                    draw_canvas_map();
-                    if(anot_state == 1){
-                        draw_canvas_lines();
-                    }else if(anot_state == 3){
-                    }
-                }
+                if(image_map.isload){
 
-                // Draw new object
-                if(tool_num == 1){
-                    ctx.lineWidth = canvas_map.lineWidth
-                    ctx.strokeStyle = canvas_map.color
-                    ctx.lineCap = "round"
-                    ctx.beginPath()
-                    ctx.moveTo(lastX, lastY)
-                    if(point1.pressed){
-                        lastX = point1.x
-                        lastY = point1.y
+                    if(refreshMap){
+                        refreshMap = false;
+                        ctx.clearRect(0,0,canvas_map.width, canvas_map.height);
+                        draw_canvas_map();
+                        if(anot_state == 1){
+                            draw_canvas_lines();
+                        }else if(anot_state == 3){
+                        }
                     }
-                    supervisor.setLine(lastX,lastY);
-                    ctx.lineTo(lastX, lastY)
-                    ctx.stroke()
-                }else{
-//                    if(anot_state == 1){ //draw
-//                        draw_canvas_lines();
-//                    }
+
+                    // Draw new object
+                    if(tool_num == 1){
+                        ctx.lineWidth = canvas_map.lineWidth
+                        ctx.strokeStyle = canvas_map.color
+                        ctx.lineCap = "round"
+                        ctx.beginPath()
+                        ctx.moveTo(lastX, lastY)
+                        if(point1.pressed){
+                            lastX = point1.x
+                            lastY = point1.y
+                        }
+                        supervisor.setLine(lastX,lastY);
+                        ctx.lineTo(lastX, lastY)
+                        ctx.stroke()
+                    }else{
+    //                    if(anot_state == 1){ //draw
+    //                        draw_canvas_lines();
+    //                    }
+                    }
                 }
 
             }
@@ -1742,10 +1790,12 @@ Item {
             scale: canvas_map.scale
             onPaint: {
                 var ctx = canvas_map_margin.getContext('2d');
-                ctx.clearRect(0,0,canvas_map_margin.width,canvas_map_margin.height);
-                if(anot_state == 3 || anot_state == 4){
-                    flag_margin = false;
-                    draw_canvas_margin();
+                if(image_map.isload){
+                    ctx.clearRect(0,0,canvas_map_margin.width,canvas_map_margin.height);
+                    if(anot_state == 3 || anot_state == 4){
+                        flag_margin = false;
+                        draw_canvas_margin();
+                    }
                 }
             }
         }
@@ -1760,12 +1810,14 @@ Item {
             antialiasing: true
             onPaint:{
                 var ctx = getContext("2d");
-                ctx.clearRect(0,0,canvas_object.width,canvas_object.height);
+                if(image_map.isload){
+                    ctx.clearRect(0,0,canvas_object.width,canvas_object.height);
 
-                // Draw canvas
-                if(anot_state != 1){
-                    draw_canvas_new_object();
-                    draw_canvas_object();
+                    // Draw canvas
+                    if(anot_state != 1){
+                        draw_canvas_new_object();
+                        draw_canvas_object();
+                    }
                 }
             }
         }
@@ -1786,11 +1838,14 @@ Item {
             property bool new_loc_available: false
             onPaint:{
                 var ctx = getContext("2d");
-                ctx.clearRect(0,0,canvas_location.width,canvas_location.height);
+                if(image_map.isload){
 
-                if(anot_state == 0 || anot_state == 3){
-                    draw_canvas_location();
-                    draw_canvas_location_temp();
+                    ctx.clearRect(0,0,canvas_location.width,canvas_location.height);
+
+                    if(anot_state == 0 || anot_state == 3){
+                        draw_canvas_location();
+                        draw_canvas_location_temp();
+                    }
                 }
             }
         }
@@ -1812,9 +1867,12 @@ Item {
             property int y2
             onPaint:{
                 var ctx = getContext('2d');
-                ctx.clearRect(0,0,canvas_travelline.width, canvas_travelline.height);
-                if(anot_state == 4){
-                    draw_canvas_travelline();
+                if(image_map.isload){
+
+                    ctx.clearRect(0,0,canvas_travelline.width, canvas_travelline.height);
+                    if(anot_state == 4){
+                        draw_canvas_travelline();
+                    }
                 }
             }
 
@@ -1830,12 +1888,15 @@ Item {
             antialiasing: true
             onPaint:{
                 var ctx = getContext("2d");
-                ctx.clearRect(0,0,canvas_map_cur.width,canvas_map_cur.height);
+                if(image_map.isload){
+                    ctx.clearRect(0,0,canvas_map_cur.width,canvas_map_cur.height);
 
-                // Draw new object
-                if(anot_state == 0 || anot_state == 3){ //show current
-                    draw_canvas_cur_pose();
+                    // Draw new object
+                    if(anot_state == 0 || anot_state == 3){ //show current
+                        draw_canvas_cur_pose();
+                    }
                 }
+
             }
 
             MultiPointTouchArea{
@@ -2043,8 +2104,9 @@ Item {
     //Map Image================================================================
     Image{
         id: image_map
+        property bool isload: false
         visible: false
-        source:image_source
+        cache: false
     }
 
     function updatemap(){
@@ -2060,30 +2122,30 @@ Item {
 
 
     //Timer=====================================================================
-    Timer{
-        id: timer_loadmap
-        interval: 1000
-        running: true
-        triggeredOnStart: true
-        repeat: true
-        onTriggered: {
-            if(!loadImage){
-                if(supervisor.getMapExist()){
-                    loadImage = true;
-                    print("image source = " + image_source);
-                    supervisor.clear_all();
-                    location_num = supervisor.getLocationNum();
-                    origin_x = supervisor.getOrigin()[0];
-                    origin_y = supervisor.getOrigin()[1];
-                    grid_size = supervisor.getGridWidth();
-                    object_num = supervisor.getObjectNum();
-                    draw_canvas_map();
-                    canvas_map.requestPaint();
-                    timer_loadmap.stop();
-                }
-            }
-        }
-    }
+//    Timer{
+//        id: timer_loadmap
+//        interval: 1000
+//        running: true
+//        triggeredOnStart: true
+//        repeat: true
+//        onTriggered: {
+//            if(!loadImage){
+//                if(supervisor.getMapExist()){
+//                    loadImage = true;
+//                    print("image source = " + image_source);
+//                    supervisor.clear_all();
+//                    location_num = supervisor.getLocationNum();
+//                    origin_x = supervisor.getOrigin()[0];
+//                    origin_y = supervisor.getOrigin()[1];
+//                    grid_size = supervisor.getGridWidth();
+//                    object_num = supervisor.getObjectNum();
+//                    draw_canvas_map();
+//                    canvas_map.requestPaint();
+//                    timer_loadmap.stop();
+//                }
+//            }
+//        }
+//    }
 
     Timer{
         id: update_checker

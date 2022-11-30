@@ -14,7 +14,6 @@
         <file>Page_pickup.qml</file>
         <file>Page_menus.qml</file>
         <file>Page_map.qml</file>
-        <file>Page_mapview.qml</file>
         <file>image/rainbow1.png</file>
         <file>image/rainbow2.png</file>
         <file>image/rainbow3.png</file>
@@ -29,10 +28,8 @@
         <file>bgm/song.mp3</file>
         <file>Page_charge.qml</file>
         <file>image/robot_charging.gif</file>
-        <file>Item_joystick.qml</file>
         <file>image/joy_finger.png</file>
         <file>image/joy_background.png</file>
-        <file>Button.qml</file>
         <file>bgm/voice_start_serving.mp3</file>
         <file>bgm/voice_pickup.mp3</file>
         <file>bgm/voice_move_wait.mpga</file>
@@ -46,5 +43,9 @@
         <file>build/icon/icon_folder2.png</file>
         <file>Page_annotation.qml</file>
         <file>Map_minimap.qml</file>
+        <file>Page_init.qml</file>
+        <file>image/warning.png</file>
+        <file>Page_MoveFail.qml</file>
+        <file>Item_joystick.qml</file>
     </qresource>
 </RCC>

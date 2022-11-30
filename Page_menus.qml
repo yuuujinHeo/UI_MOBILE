@@ -28,6 +28,7 @@ Item {
             id: btn_setting
             anchors.fill: parent
             onClicked: {
+                pkitchen.init();
                 stackview.pop();
             }
         }
@@ -43,13 +44,12 @@ Item {
         Text{
             id: text_mapview
             anchors.centerIn: parent
-            text: "MAP"
+            text: ""//"MAP"
         }
         MouseArea{
             id: btn_mapview
             anchors.fill: parent
             onClicked: {
-                stackview.push(pmapview);
             }
         }
     }
@@ -68,8 +68,8 @@ Item {
         MouseArea{
             anchors.fill: parent
             onClicked: {
+                pannotation.init();
                 stackview.push(pannotation);
-                pannotation.updatecanvas();
             }
         }
     }
@@ -113,6 +113,7 @@ Item {
             id: btn_sett
             anchors.fill: parent
             onClicked: {
+                psetting.uiupdate();
                 stackview.push(psetting);
             }
         }

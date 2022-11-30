@@ -51,8 +51,16 @@ void ServerHandler::onTextMessageReceived(QString message){
         target_pose.th = th;
         emit server_new_target();
 //        start();
+    }else if(cmd == "NEW_CALL"){
+        target_location = json["location"].toString();
+        plog->write("[SERVER] NEW CALL : "+target_location);
+        emit server_new_call();
     }else if(cmd == "MAP_REQ"){
-        sendMap(QGuiApplication::applicationDirPath()+"/image/map_server.png", QGuiApplication::applicationDirPath()+"/setting/");
+        if(map.use_server){
+            sendMap(QGuiApplication::applicationDirPath()+"/image/map_server.png", QGuiApplication::applicationDirPath()+"/setting/");
+        }else{
+            sendMap(QGuiApplication::applicationDirPath()+"/image/raw_map.png", QGuiApplication::applicationDirPath()+"/setting/");
+        }
     }else if(cmd == "MAP_PUB"){
         QFile *file;
         plog->write("[SERVER] Push Map : ");
@@ -96,6 +104,14 @@ void ServerHandler::onTextMessageReceived(QString message){
         file->open(QIODevice::WriteOnly);
         file->write(QByteArray::fromBase64(json["meta"].toString().toLocal8Bit()));
         file->close();
+    }else if(cmd == "SET_ROBOT"){
+        QString ini_path = "setting/robot.ini";
+        QSettings settings(ini_path, QSettings::IniFormat);
+        settings.setValue("ROBOT/name",json["name"].toString());
+        settings.setValue("ROBOT/type",json["type"].toString());
+        settings.setValue("ROBOT/travelline",json["travel_line"].toInt());
+        emit server_set_ini();
+        plog->write("[SERVER] Set Robot Data : name("+json["name"].toString()+") type("+json["type"].toString()+")");
     }
 }
 
@@ -103,9 +119,10 @@ void ServerHandler::onBinaryMessageReceived(QByteArray message){
     ;
 }
 
-void ServerHandler::setData(QString name, ST_ROBOT _robot){
+void ServerHandler::setData(QString name, ST_ROBOT _robot, int state){
     robot_name = name;
     robot = _robot;
+    ui_state = state;
 }
 
 void ServerHandler::setMap(ST_MAP _map){
@@ -113,13 +130,14 @@ void ServerHandler::setMap(ST_MAP _map){
 }
 
 void ServerHandler::requestMap(){
+    plog->write("[SERVER] MAP REQUEST");
     QJsonObject json;
     if(is_debug){
         json["name"] = debug_name;
     }else{
         json["name"] = robot_name;
     }
-    json["type"] = "MAP_REQ";
+    json["msg_type"] = "MAP_REQ";
     QJsonDocument doc(json);
     QString str(doc.toJson(QJsonDocument::Indented));
     socket.sendTextMessage(str);
@@ -140,10 +158,11 @@ void ServerHandler::onTimer(){ // 200ms
         }else{
             json["name"] = robot_name;
         }
-        json["type"] = "DATA";
+        json["msg_type"] = "DATA";
 
         // status
-        json["status"] = robot.state;
+        json["robot_state"] = robot.state;
+        json["ui_state"] = ui_state;
 
         // cur_pose
         json["cur_pose_x"] = robot.curPose.x;
@@ -194,7 +213,7 @@ void ServerHandler::sendMap(QString map_path, QString dir){
     file->close();
     delete file;
 
-    file = new QFile(QGuiApplication::applicationDirPath()+"/image/raw_map.png");
+    file = new QFile(map_path);
     file->open(QIODevice::ReadOnly);
     QByteArray ba_map2 = file->readAll();
     file->close();
@@ -218,7 +237,7 @@ void ServerHandler::sendMap(QString map_path, QString dir){
     }else{
         json["name"] = robot.name;
     }
-    json["type"] = "MAP";
+    json["msg_type"] = "MAP";
     json["raw_map"] = QString(ba_map2.toBase64());
     json["annot_map"] = QString(ba_map.toBase64());
     json["annot"] = QString(ba_anot.toBase64());

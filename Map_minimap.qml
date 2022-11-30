@@ -26,7 +26,6 @@ Item {
     Image{
         id: map_image
         visible: false
-        source: "file://" + applicationDirPath + "/image/map_rotated.png"
     }
 
     function set_minimap(){
@@ -87,28 +86,6 @@ Item {
                 }
             }
         }
-
-        print("start set minimap once again");
-
-        supervisor.calculateGrid();
-//        var before_grid = "nothing";
-//        for(y=0; y<image_height-1; y=y+grid_width){
-//            for(x=0; x<image_width; x=x+grid_width){
-//                var cur_grid = supervisor.getGrid(x/grid_width,y/grid_width);
-//                if(cur_grid == "wall"){
-//                    if(before_grid == "nothing"){
-
-//                    }
-//                }else if(cur_grid == "floor"){
-
-//                }else{
-
-//                }
-//                before_grid = cur_grid;
-//            }
-//        }
-
-
         for(x=0; x<image_width; x=x+grid_width){
             for(y=0; y<image_height-1; y=y+grid_width){
                 isoutline = false;

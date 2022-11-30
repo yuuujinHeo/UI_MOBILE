@@ -27,6 +27,8 @@ public:
     // lcm message loop
     std::atomic<bool> bFlag;
     std::thread* bThread = NULL;
+    bool isconnect = false;
+    int connect_count = 0;
     bool isdownloadMap = false;
     bool flagJoystick = false;
     bool flagPath = false;
@@ -41,7 +43,7 @@ public:
     QTimer  *timer;
 
     ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
-    void RequestMap();
+    void programStart();
     void moveTo(QString target_loc);
     void moveTo(float x, float y, float th);
     void movePause();
@@ -50,12 +52,12 @@ public:
     void moveStop();
     void moveManual();
     void setVelocity(float vel, float velth);
-//    void setVelocityXY(float vel);
-//    void setVelocityTH(float vel);
+    void setVelocity(float vel);
+    int getLocationNum(QString name);
+    void sendMapPath(QString path);
 
     ////*********************************************  CALLBACK FUNCTIONS   ***************************************************////
     void robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg);
-    void map_data_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data_t *msg);
     void robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
     void robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
 
