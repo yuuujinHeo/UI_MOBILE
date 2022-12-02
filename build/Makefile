@@ -12,8 +12,8 @@ EQ            = =
 
 ####### Compiler, tools and options
 
-CC            = gcc
-CXX           = g++
+CC            = ccache gcc
+CXX           = ccache g++
 DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_QML_DEBUG -DQT_QUICKCONTROLS2_LIB -DQT_QUICK_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_QML_LIB -DQT_WEBSOCKETS_LIB -DQT_NETWORK_LIB -DQT_SQL_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
@@ -39,7 +39,7 @@ COMPRESS      = gzip -9f
 DISTNAME      = MAIN_MOBILE1.0.0
 DISTDIR = /home/rainbow/Desktop/UI_MOBILE/build/.tmp/MAIN_MOBILE1.0.0
 LINK          = g++
-LFLAGS        = -Wl,-rpath-link,/usr/lib/x86_64-linux-gnu
+LFLAGS        = -fuse-ld=gold -Wl,-rpath-link,/usr/lib/x86_64-linux-gnu
 LIBS          = $(SUBLIBS) -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_calib3d -lopencv_features2d -lopencv_flann -lopencv_objdetect -lopencv_photo -lopencv_video -lopencv_videoio -lopencv_ximgproc -L/usr/local/lib/ -llcm /usr/lib/x86_64-linux-gnu/libQt5QuickControls2.so /usr/lib/x86_64-linux-gnu/libQt5Quick.so /usr/lib/x86_64-linux-gnu/libQt5Widgets.so /usr/lib/x86_64-linux-gnu/libQt5Gui.so /usr/lib/x86_64-linux-gnu/libQt5Qml.so /usr/lib/x86_64-linux-gnu/libQt5WebSockets.so /usr/lib/x86_64-linux-gnu/libQt5Network.so /usr/lib/x86_64-linux-gnu/libQt5Sql.so /usr/lib/x86_64-linux-gnu/libQt5Core.so /usr/lib/x86_64-linux-gnu/libGL.so -lpthread   
 AR            = ar cqs
 RANLIB        = 
@@ -52,27 +52,51 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = ../DBHandler.cpp \
-		../LCMHandler.cpp \
+SOURCES       = ../LCMHandler.cpp \
 		../ServerHandler.cpp \
 		../cv_to_qt.cpp \
 		../Logger.cpp \
 		../Supervisor.cpp \
-		../main.cpp qrc_qml.cpp \
-		moc_DBHandler.cpp \
+		../main.cpp qrc_qml_qmlcache.cpp \
+		Page_setting_qml.cpp \
+		Page_charge_qml.cpp \
+		Page_pickup_qml.cpp \
+		Map_current_qml.cpp \
+		Page_MoveFail_qml.cpp \
+		Page_map_qml.cpp \
+		Page_kitchen_qml.cpp \
+		Map_minimap_qml.cpp \
+		Item_joystick_qml.cpp \
+		Page_moving_qml.cpp \
+		Page_menus_qml.cpp \
+		Page_init_qml.cpp \
+		main_qml.cpp \
+		qmlcache_loader.cpp \
 		moc_LCMHandler.cpp \
 		moc_Logger.cpp \
 		moc_ServerHandler.cpp \
 		moc_Supervisor.cpp
-OBJECTS       = DBHandler.o \
-		LCMHandler.o \
+OBJECTS       = LCMHandler.o \
 		ServerHandler.o \
 		cv_to_qt.o \
 		Logger.o \
 		Supervisor.o \
 		main.o \
-		qrc_qml.o \
-		moc_DBHandler.o \
+		qrc_qml_qmlcache.o \
+		Page_setting_qml.o \
+		Page_charge_qml.o \
+		Page_pickup_qml.o \
+		Map_current_qml.o \
+		Page_MoveFail_qml.o \
+		Page_map_qml.o \
+		Page_kitchen_qml.o \
+		Map_minimap_qml.o \
+		Item_joystick_qml.o \
+		Page_moving_qml.o \
+		Page_menus_qml.o \
+		Page_init_qml.o \
+		main_qml.o \
+		qmlcache_loader.o \
 		moc_LCMHandler.o \
 		moc_Logger.o \
 		moc_ServerHandler.o \
@@ -147,10 +171,11 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resolve_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_post.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qtquickcompiler.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qml_debug.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/warn_on.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/moc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/opengl.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/uic.prf \
@@ -161,14 +186,12 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		../../MAIN_MOBILE.pro ../DBHandler.h \
-		../GlobalHeader.h \
+		../../MAIN_MOBILE.pro ../GlobalHeader.h \
 		../LCMHandler.h \
 		../Logger.h \
 		../ServerHandler.h \
 		../cv_to_qt.h \
-		../Supervisor.h ../DBHandler.cpp \
-		../LCMHandler.cpp \
+		../Supervisor.h ../LCMHandler.cpp \
 		../ServerHandler.cpp \
 		../cv_to_qt.cpp \
 		../Logger.cpp \
@@ -255,10 +278,11 @@ Makefile: ../MAIN_MOBILE.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qma
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resolve_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_post.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qtquickcompiler.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qml_debug.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/warn_on.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/moc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/opengl.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/uic.prf \
@@ -270,7 +294,7 @@ Makefile: ../MAIN_MOBILE.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qma
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		../MAIN_MOBILE.pro \
-		../qml.qrc
+		qml_qmlcache.qrc
 	$(QMAKE) -o Makefile ../MAIN_MOBILE.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf:
@@ -342,10 +366,11 @@ Makefile: ../MAIN_MOBILE.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qma
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resolve_config.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_post.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qtquickcompiler.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qml_debug.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/warn_on.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/moc.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/opengl.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/uic.prf:
@@ -357,7 +382,7 @@ Makefile: ../MAIN_MOBILE.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qma
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf:
 ../MAIN_MOBILE.pro:
-../qml.qrc:
+qml_qmlcache.qrc:
 qmake: FORCE
 	@$(QMAKE) -o Makefile ../MAIN_MOBILE.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
 
@@ -372,10 +397,12 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
+	$(COPY_FILE) --parents qml_qmlcache.qrc $(DISTDIR)/
+	$(COPY_FILE) --parents ../Page_setting.qml ../Page_charge.qml ../Page_pickup.qml ../Map_current.qml ../Page_MoveFail.qml ../Page_map.qml ../Page_kitchen.qml ../Map_minimap.qml ../Item_joystick.qml ../Page_moving.qml ../Page_menus.qml ../Page_init.qml ../main.qml $(DISTDIR)/
 	$(COPY_FILE) --parents ../qml.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../DBHandler.h ../GlobalHeader.h ../LCMHandler.h ../Logger.h ../ServerHandler.h ../cv_to_qt.h ../Supervisor.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../DBHandler.cpp ../LCMHandler.cpp ../ServerHandler.cpp ../cv_to_qt.cpp ../Logger.cpp ../Supervisor.cpp ../main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../GlobalHeader.h ../LCMHandler.h ../Logger.h ../ServerHandler.h ../cv_to_qt.h ../Supervisor.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../LCMHandler.cpp ../ServerHandler.cpp ../cv_to_qt.cpp ../Logger.cpp ../Supervisor.cpp ../main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -399,77 +426,132 @@ check: first
 
 benchmark: first
 
-compiler_rcc_make_all: qrc_qml.cpp
+compiler_rcc_make_all: qrc_qml_qmlcache.cpp
 compiler_rcc_clean:
-	-$(DEL_FILE) qrc_qml.cpp
-qrc_qml.cpp: ../qml.qrc \
+	-$(DEL_FILE) qrc_qml_qmlcache.cpp
+qrc_qml_qmlcache.cpp: qml_qmlcache.qrc \
 		/usr/lib/qt5/bin/rcc \
-		../Page_setting.qml \
-		../Page_charge.qml \
-		../Page_pickup.qml \
-		../Map_current.qml \
-		../Page_MoveFail.qml \
-		../Page_map.qml \
-		../Page_kitchen.qml \
-		../Map_minimap.qml \
-		../Item_joystick.qml \
-		../Page_moving.qml \
-		../Page_menus.qml \
-		../Page_annotation.qml \
-		../Page_init.qml \
-		../main.qml \
-		icon/icon_play.png \
-		icon/icon_undo.png \
-		icon/icon_folder2.png \
-		icon/icon_redo.png \
-		icon/add.png \
-		icon/icon_clear.png \
-		icon/icon_touch.png \
-		icon/icon_folder.png \
-		icon/icon_save2.png \
-		icon/icon_mouse.png \
-		icon/icon_pause.png \
-		icon/icon_save.png \
-		icon/icon_stop.png \
-		icon/icon_record.png \
+		../icon/stop_r.png \
+		../icon/btn_map.png \
+		../icon/icon_power.png \
+		../icon/btn_minimize.png \
+		../icon/joystick_back.png \
+		../icon/icon_warning.png \
+		../icon/btn_home.png \
+		../icon/btn_setting.png \
+		../icon/btn_no.png \
+		../icon/image_setting.png \
+		../icon/record_r.png \
+		../icon/joystick_thumb.png \
+		../icon/btn_reset.png \
+		../icon/btn_wait.png \
+		../icon/btn_confirm.png \
+		../icon/save_r.png \
+		../icon/image_map.png \
+		../icon/load_r.png \
+		../icon/bat_1.png \
+		../icon/bat_2.png \
+		../icon/bat_3.png \
+		../icon/btn_yes.png \
+		../icon/play_r.png \
+		../icon/clock.png \
+		../icon/btn_charge.png \
+		../icon/btn_menu.png \
+		../icon/bat_full.png \
 		../image/joy_finger.png \
-		../image/robot_moving.gif \
+		../image/robot_moving.png \
+		../image/robot_move_charge.png \
 		../image/rainbow4.png \
-		../image/robot.png \
-		../image/robot_charging.gif \
-		../image/loading2.gif \
 		../image/rainbow3.png \
-		../image/robot_hello.gif \
 		../image/joy_background.png \
 		../image/loading1.gif \
 		../image/rainbow2.png \
 		../image/warning.png \
+		../image/robot_pickup.png \
+		../image/robot_move_wait.png \
+		../image/image_location.png \
 		../image/rainbow1.png \
+		../image/robot_head.png \
+		../font/NotoSansKR-Medium.otf \
+		../font/NotoSansKR-Light.otf \
 		../bgm/song.mp3 \
 		../bgm/voice_move_charge.mp3 \
 		../bgm/voice_move_wait.mpga \
 		../bgm/voice_pickup.mp3 \
 		../bgm/voice_start_serving.mp3 \
 		../bgm/voice_avoid.mp3
-	/usr/lib/qt5/bin/rcc -name qml ../qml.qrc -o qrc_qml.cpp
+	/usr/lib/qt5/bin/rcc -name qml_qmlcache qml_qmlcache.qrc -o qrc_qml_qmlcache.cpp
+
+compiler_qmlcache_make_all: Page_setting_qml.cpp Page_charge_qml.cpp Page_pickup_qml.cpp Map_current_qml.cpp Page_MoveFail_qml.cpp Page_map_qml.cpp Page_kitchen_qml.cpp Map_minimap_qml.cpp Item_joystick_qml.cpp Page_moving_qml.cpp Page_menus_qml.cpp Page_init_qml.cpp main_qml.cpp
+compiler_qmlcache_clean:
+	-$(DEL_FILE) Page_setting_qml.cpp Page_charge_qml.cpp Page_pickup_qml.cpp Map_current_qml.cpp Page_MoveFail_qml.cpp Page_map_qml.cpp Page_kitchen_qml.cpp Map_minimap_qml.cpp Item_joystick_qml.cpp Page_moving_qml.cpp Page_menus_qml.cpp Page_init_qml.cpp main_qml.cpp
+Page_setting_qml.cpp: ../Page_setting.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_setting_qml.cpp ../Page_setting.qml
+
+Page_charge_qml.cpp: ../Page_charge.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_charge_qml.cpp ../Page_charge.qml
+
+Page_pickup_qml.cpp: ../Page_pickup.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_pickup_qml.cpp ../Page_pickup.qml
+
+Map_current_qml.cpp: ../Map_current.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Map_current_qml.cpp ../Map_current.qml
+
+Page_MoveFail_qml.cpp: ../Page_MoveFail.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_MoveFail_qml.cpp ../Page_MoveFail.qml
+
+Page_map_qml.cpp: ../Page_map.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_map_qml.cpp ../Page_map.qml
+
+Page_kitchen_qml.cpp: ../Page_kitchen.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_kitchen_qml.cpp ../Page_kitchen.qml
+
+Map_minimap_qml.cpp: ../Map_minimap.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Map_minimap_qml.cpp ../Map_minimap.qml
+
+Item_joystick_qml.cpp: ../Item_joystick.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Item_joystick_qml.cpp ../Item_joystick.qml
+
+Page_moving_qml.cpp: ../Page_moving.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_moving_qml.cpp ../Page_moving.qml
+
+Page_menus_qml.cpp: ../Page_menus.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_menus_qml.cpp ../Page_menus.qml
+
+Page_init_qml.cpp: ../Page_init.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_init_qml.cpp ../Page_init.qml
+
+main_qml.cpp: ../main.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o main_qml.cpp ../main.qml
+
+compiler_qmlcache_loader_make_all: qmlcache_loader.cpp
+compiler_qmlcache_loader_clean:
+	-$(DEL_FILE) qmlcache_loader.cpp
+qmlcache_loader.cpp: ../qml.qrc /usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource-file-mapping=/home/rainbow/Desktop/UI_MOBILE/qml.qrc=/home/rainbow/Desktop/UI_MOBILE/build/qml_qmlcache.qrc -o qmlcache_loader.cpp ../qml.qrc
 
 compiler_moc_predefs_make_all: moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) moc_predefs.h
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
-	g++ -pipe -g -std=gnu++11 -Wall -W -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
+	ccache g++ -pipe -g -std=gnu++11 -Wall -W -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_DBHandler.cpp moc_LCMHandler.cpp moc_Logger.cpp moc_ServerHandler.cpp moc_Supervisor.cpp
+compiler_moc_header_make_all: moc_LCMHandler.cpp moc_Logger.cpp moc_ServerHandler.cpp moc_Supervisor.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_DBHandler.cpp moc_LCMHandler.cpp moc_Logger.cpp moc_ServerHandler.cpp moc_Supervisor.cpp
-moc_DBHandler.cpp: ../DBHandler.h \
-		../GlobalHeader.h \
-		../Logger.h \
-		../cv_to_qt.h \
-		moc_predefs.h \
-		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/rainbow/Desktop/UI_MOBILE/build/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/rainbow/Desktop/UI_MOBILE -I/usr/include/opencv4 -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtQuickControls2 -I/usr/include/x86_64-linux-gnu/qt5/QtQuick -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtQml -I/usr/include/x86_64-linux-gnu/qt5/QtWebSockets -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../DBHandler.h -o moc_DBHandler.cpp
-
+	-$(DEL_FILE) moc_LCMHandler.cpp moc_Logger.cpp moc_ServerHandler.cpp moc_Supervisor.cpp
 moc_LCMHandler.cpp: ../LCMHandler.h \
 		../lcm_types/command.hpp \
 		../lcm_types/robot_status.hpp \
@@ -499,7 +581,6 @@ moc_Supervisor.cpp: ../Supervisor.h \
 		../GlobalHeader.h \
 		../Logger.h \
 		../cv_to_qt.h \
-		../DBHandler.h \
 		../LCMHandler.h \
 		../lcm_types/command.hpp \
 		../lcm_types/robot_status.hpp \
@@ -522,15 +603,9 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_header_clean 
+compiler_clean: compiler_rcc_clean compiler_qmlcache_clean compiler_qmlcache_loader_clean compiler_moc_predefs_clean compiler_moc_header_clean 
 
 ####### Compile
-
-DBHandler.o: ../DBHandler.cpp ../DBHandler.h \
-		../GlobalHeader.h \
-		../Logger.h \
-		../cv_to_qt.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DBHandler.o ../DBHandler.cpp
 
 LCMHandler.o: ../LCMHandler.cpp ../LCMHandler.h \
 		../lcm_types/command.hpp \
@@ -560,7 +635,6 @@ Supervisor.o: ../Supervisor.cpp ../Supervisor.h \
 		../GlobalHeader.h \
 		../Logger.h \
 		../cv_to_qt.h \
-		../DBHandler.h \
 		../LCMHandler.h \
 		../lcm_types/command.hpp \
 		../lcm_types/robot_status.hpp \
@@ -573,7 +647,6 @@ main.o: ../main.cpp ../Supervisor.h \
 		../GlobalHeader.h \
 		../Logger.h \
 		../cv_to_qt.h \
-		../DBHandler.h \
 		../LCMHandler.h \
 		../lcm_types/command.hpp \
 		../lcm_types/robot_status.hpp \
@@ -582,11 +655,50 @@ main.o: ../main.cpp ../Supervisor.h \
 		../ServerHandler.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../main.cpp
 
-qrc_qml.o: qrc_qml.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_qml.o qrc_qml.cpp
+qrc_qml_qmlcache.o: qrc_qml_qmlcache.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_qml_qmlcache.o qrc_qml_qmlcache.cpp
 
-moc_DBHandler.o: moc_DBHandler.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_DBHandler.o moc_DBHandler.cpp
+Page_setting_qml.o: Page_setting_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_setting_qml.o Page_setting_qml.cpp
+
+Page_charge_qml.o: Page_charge_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_charge_qml.o Page_charge_qml.cpp
+
+Page_pickup_qml.o: Page_pickup_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_pickup_qml.o Page_pickup_qml.cpp
+
+Map_current_qml.o: Map_current_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Map_current_qml.o Map_current_qml.cpp
+
+Page_MoveFail_qml.o: Page_MoveFail_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_MoveFail_qml.o Page_MoveFail_qml.cpp
+
+Page_map_qml.o: Page_map_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_map_qml.o Page_map_qml.cpp
+
+Page_kitchen_qml.o: Page_kitchen_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_kitchen_qml.o Page_kitchen_qml.cpp
+
+Map_minimap_qml.o: Map_minimap_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Map_minimap_qml.o Map_minimap_qml.cpp
+
+Item_joystick_qml.o: Item_joystick_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Item_joystick_qml.o Item_joystick_qml.cpp
+
+Page_moving_qml.o: Page_moving_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_moving_qml.o Page_moving_qml.cpp
+
+Page_menus_qml.o: Page_menus_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_menus_qml.o Page_menus_qml.cpp
+
+Page_init_qml.o: Page_init_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_init_qml.o Page_init_qml.cpp
+
+main_qml.o: main_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main_qml.o main_qml.cpp
+
+qmlcache_loader.o: qmlcache_loader.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qmlcache_loader.o qmlcache_loader.cpp
 
 moc_LCMHandler.o: moc_LCMHandler.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_LCMHandler.o moc_LCMHandler.cpp

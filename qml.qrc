@@ -1,14 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>build/icon/icon_clear.png</file>
-        <file>build/icon/icon_folder.png</file>
-        <file>build/icon/icon_mouse.png</file>
-        <file>build/icon/icon_redo.png</file>
-        <file>build/icon/icon_save.png</file>
-        <file>build/icon/icon_touch.png</file>
-        <file>build/icon/icon_undo.png</file>
-        <file>build/icon/add.png</file>
         <file>Page_kitchen.qml</file>
         <file>Page_moving.qml</file>
         <file>Page_pickup.qml</file>
@@ -19,15 +11,10 @@
         <file>image/rainbow3.png</file>
         <file>image/rainbow4.png</file>
         <file>image/loading1.gif</file>
-        <file>image/loading2.gif</file>
-        <file>image/robot.png</file>
-        <file>image/robot_moving.gif</file>
-        <file>image/robot_hello.gif</file>
         <file>Page_setting.qml</file>
         <file>Map_current.qml</file>
         <file>bgm/song.mp3</file>
         <file>Page_charge.qml</file>
-        <file>image/robot_charging.gif</file>
         <file>image/joy_finger.png</file>
         <file>image/joy_background.png</file>
         <file>bgm/voice_start_serving.mp3</file>
@@ -35,17 +22,45 @@
         <file>bgm/voice_move_wait.mpga</file>
         <file>bgm/voice_move_charge.mp3</file>
         <file>bgm/voice_avoid.mp3</file>
-        <file>build/icon/icon_stop.png</file>
-        <file>build/icon/icon_save2.png</file>
-        <file>build/icon/icon_record.png</file>
-        <file>build/icon/icon_play.png</file>
-        <file>build/icon/icon_pause.png</file>
-        <file>build/icon/icon_folder2.png</file>
-        <file>Page_annotation.qml</file>
         <file>Map_minimap.qml</file>
         <file>Page_init.qml</file>
         <file>image/warning.png</file>
         <file>Page_MoveFail.qml</file>
         <file>Item_joystick.qml</file>
+        <file>font/NotoSansKR-Medium.otf</file>
+        <file>font/NotoSansKR-Light.otf</file>
+        <file>icon/stop_r.png</file>
+        <file>icon/save_r.png</file>
+        <file>icon/record_r.png</file>
+        <file>icon/play_r.png</file>
+        <file>icon/load_r.png</file>
+        <file>icon/joystick_thumb.png</file>
+        <file>icon/joystick_back.png</file>
+        <file>icon/clock.png</file>
+        <file>icon/bat_full.png</file>
+        <file>icon/bat_3.png</file>
+        <file>icon/bat_2.png</file>
+        <file>icon/bat_1.png</file>
+        <file>icon/btn_wait.png</file>
+        <file>icon/btn_menu.png</file>
+        <file>icon/btn_charge.png</file>
+        <file>image/robot_pickup.png</file>
+        <file>image/robot_moving.png</file>
+        <file>image/robot_head.png</file>
+        <file>icon/btn_setting.png</file>
+        <file>icon/btn_map.png</file>
+        <file>image/robot_move_wait.png</file>
+        <file>image/robot_move_charge.png</file>
+        <file>icon/btn_confirm.png</file>
+        <file>icon/icon_warning.png</file>
+        <file>icon/image_setting.png</file>
+        <file>icon/image_map.png</file>
+        <file>icon/icon_power.png</file>
+        <file>icon/btn_reset.png</file>
+        <file>icon/btn_minimize.png</file>
+        <file>icon/btn_home.png</file>
+        <file>icon/btn_yes.png</file>
+        <file>icon/btn_no.png</file>
+        <file>image/image_location.png</file>
     </qresource>
 </RCC>

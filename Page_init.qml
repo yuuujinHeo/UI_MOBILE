@@ -1,9 +1,5 @@
-import QtQuick 2.9
-import QtQuick.Window 2.3
-import QtQuick.Controls 2.2
-import QtQuick.Dialogs 1.2
-import Qt.labs.platform 1.0
-import QtGraphicalEffects 1.0
+import QtQuick 2.12
+import QtQuick.Controls 2.12
 import "."
 import io.qt.Supervisor 1.0
 
@@ -25,10 +21,8 @@ Item {
     }
 
     function loadmapall(map_path){
-        pmoving.loadmap(map_path);
         pmap.loadmap(map_path);
         pmovefail.loadmap(map_path);
-        pannotation.loadmap(map_path);
     }
 
     Image{

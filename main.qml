@@ -1,5 +1,5 @@
-import QtQuick 2.9
-import QtQuick.Window 2.3
+import QtQuick 2.12
+import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Dialogs 1.2
 import Qt.labs.platform 1.0
@@ -9,12 +9,24 @@ import io.qt.Supervisor 1.0
 import QtMultimedia 5.12
 
 Window {
+    id: mainwindow
     visible: true
     width: 1280
     height: 800
     title: qsTr("Hello World")
-//    flags: Qt.Window | Qt.FramelessWindowHint
+//    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint
 //    visibility: Window.FullScreen
+
+//    onVisibilityChanged: {
+//        if(mainwindow.visibility == Window.Minimized){
+//            print("minimized");
+//        }else if(mainwindow.visibility == Window.FullScreen){
+//            print("fullscren");
+//        }else{
+//            mainwindow.visibility = Window.FullScreen;
+//        }
+//    }
+
 
     property string curloc;
 
@@ -22,10 +34,10 @@ Window {
         curloc = supervisor.getcurLoc();
         console.log("moving. location : " + curloc.slice(0,4));
         if(curloc.slice(0,4) == "char"){
-            pmoving.pos = "충전기";
+            pmoving.pos = "충전 장소";
             voice_movecharge.play();
         }else if(curloc.slice(0,4) == "rest"){
-            pmoving.pos = "대기장소";
+            pmoving.pos = "대기 장소";
             voice_movewait.play();
         }else{
             voice_serving.play();
@@ -50,6 +62,7 @@ Window {
             pmoving.stopMusic();
             stackview.pop();
         }
+        pcharge.init();
         stackview.push(pcharge);
     }
 
@@ -111,24 +124,30 @@ Window {
             }else{
                 tempstr += "과 " + Number(trays[i])+"번";
             }
+            if(trays[i] == 1){
+                ppickup.pickup_1 = true;
+            }else if(trays[i] == 2){
+                ppickup.pickup_2 = true;
+            }else if(trays[i] == 3){
+                ppickup.pickup_3 = true;
+            }
         }
         ppickup.pos = tempstr;
-
         ppickup.init();
         stackview.push(ppickup);
     }
 
     function updatecanvas(){
-        pannotation.updatecanvas();
+        pmap.updatecanvas();
     }
     function updateobject(){
-        pannotation.updateobject();
+        pmap.updateobject();
     }
     function updatelocation(){
-        pannotation.updatelocation();
+        pmap.updatelocation();
     }
     function updatetravelline(){
-        pannotation.updatetravelline();
+        pmap.updatetravelline();
     }
     function newcall(){
         if(stackview.currentItem.objectName == "page_kitchen"){
@@ -138,9 +157,7 @@ Window {
         }
     }
 
-
     function updatepath(){
-        pmoving.updatepath();
         pmap.updatepath();
     }
     function loadmap(){
@@ -188,10 +205,6 @@ Window {
         id: pcharge;
         visible: false
     }
-    Page_annotation{
-        id: pannotation;
-        visible: false
-    }
     Supervisor{
         id:supervisor
     }
@@ -217,10 +230,26 @@ Window {
             pkitchen.curTime = Qt.formatTime(new Date(), "hh:mm")
             pkitchen.battery = supervisor.getBattery();
             pkitchen.robotName = supervisor.getRobotName();
-            pcharge.curTime = Qt.formatTime(new Date(), "hh:mm")
-            pcharge.battery = supervisor.getBattery();
-            pcharge.robotName = supervisor.getRobotName();
+            pmap.curTime = Qt.formatTime(new Date(), "hh:mm")
+            pmap.battery = supervisor.getBattery();
+            pmap.robotName = supervisor.getRobotName();
+            pmap.robotname_margin = pkitchen.robotname_margin;
+            pmap.tray_center = pkitchen.tray_center;
+            pmenus.curTime = Qt.formatTime(new Date(), "hh:mm")
+            pmenus.battery = supervisor.getBattery();
+            pmenus.robotName = supervisor.getRobotName();
+            pmenus.robotname_margin = pkitchen.robotname_margin;
+            pmenus.tray_center = pkitchen.tray_center;
         }
+    }
+
+    FontLoader{
+        id: font_noto_b
+        source: "font/NotoSansKR-Medium.otf"
+    }
+    FontLoader{
+        id: font_noto_r
+        source: "font/NotoSansKR-Light.otf"
     }
 
     Audio{
@@ -289,9 +318,8 @@ Window {
         initialItem: Item {
             objectName: "page_logo"
             Rectangle{
-                anchors.centerIn: parent
-                width: 748//image_logo.width
-                height: 335//image_logo.height
+                anchors.fill: parent
+                color: "#f4f4f4"
 
                 OpacityAnimator{
                     target: image_logo;
@@ -303,8 +331,23 @@ Window {
 
                 Image{
                     id: image_logo
+                    width: 748/1.5
+                    height: 335/1.5
                     source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
-                    anchors.fill: parent
+                    anchors.horizontalCenter:  parent.horizontalCenter
+                    y: text_copyright.y / 2 - height/2
+                }
+
+                Text{
+                    id: text_copyright
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 100
+                    text: "Copyrights Rainbow Robotics Inc. All rights reserved."
+                    color: "#7e7e7e"
+                    font.family: font_noto_b.name
+                    font.pixelSize: 15
+
                 }
             }
         }
