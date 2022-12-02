@@ -1,14 +1,8 @@
-import QtQuick 2.9
-import QtQuick.Window 2.3
+import QtQuick 2.12
 import QtQuick.Controls 2.12
-//import QtQuick.Shapes 1.
-import QtQuick.Dialogs 1.2
-import Qt.labs.platform 1.0
-import QtGraphicalEffects 1.0
-//import QtQuick.Templates 2.5
 import "."
 import io.qt.Supervisor 1.0
-import QtMultimedia 5.9
+import QtMultimedia 5.12
 
 Item {
     id: page_moving
@@ -16,18 +10,13 @@ Item {
     width: 1280
     height: 800
 
-    property string pos: "1번테이블"
+    property string pos: "1번 테이블"
     property bool robot_paused: false
     property bool move_fail: false
     property int password: 0
 
-    function loadmap(path){
-        pMap_curmap.loadmap(path);
-    }
-    function updatepath(){
-        pMap_curmap.updatepath();
-    }
     function init(){
+        popup_pause.visible = false;
         robot_paused = false;
         playMusic.play();
     }
@@ -50,58 +39,78 @@ Item {
         loops: 99
     }
 
-    Text{
-        id: target_pos
-        text: pos
-        font.pixelSize: 50
-        font.bold: true
-        color: "blue"
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: 150
-    }
-    Text{
-        id: text_mention
-        text: "(으)로 이동 중입니다."
-        font.pixelSize: 50
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top : target_pos.bottom
-        anchors.topMargin: 30
-    }
     Rectangle{
-        id: rect_moving
+        id: rect_background
+        anchors.fill: parent
+        color: "#282828"
+    }
+    Image{
+        id: image_robot
+        source: {
+            if(pos == "충전 장소"){
+                "image/robot_move_charge.png"
+            }else if(pos == "대기 장소"){
+                "image/robot_move_wait.png"
+            }else{
+                "image/robot_moving.png"
+            }
+        }
+        width: 300
+        height: 270
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: text_mention.bottom
-        anchors.topMargin: 40
-        width: ani_moving.width;
-        height: ani_moving.height;
-        AnimatedImage{
-            id: ani_moving
-            source: Qt.resolvedUrl("qrc:/image/robot_moving.gif")
-            width: 350;
-            height: 350;
-            paused: robot_paused
+        anchors.top: parent.top
+        anchors.topMargin: 200
+    }
+
+    Row{
+        id: text_moving
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: image_robot.bottom
+        anchors.topMargin: 80
+        Text{
+            id: target_pos
+            text: pos
+            font.pixelSize: 40
+            font.family: font_noto_b.name
+            color: "#12d27c"
+        }
+        Text{
+            id: text_mention
+            text: "(으)로 이동 중입니다."
+            font.pixelSize: 40
+            font.family: font_noto_r.name
+            color: "white"
         }
     }
-    Map_current{
-        id: pMap_curmap
-        anchors.right:parent.right
-        anchors.bottom:parent.bottom
-    }
 
-
-
-
-    Rectangle{
+    Item{
         id: popup_pause
-        width: 200
-        height: 150
-        visible: robot_paused
+        width: parent.width
+        height: parent.height
         anchors.centerIn: parent
-        color:"gray"
-        opacity: 0.6
+        Rectangle{
+            anchors.fill: parent
+            visible: robot_paused
+            color: "#282828"
+            opacity: 0.8
+        }
+        Image{
+            id: image_warning
+            source: "icon/icon_warning.png"
+            width: 160
+            height: 160
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: 250
+        }
         Text{
-            anchors.centerIn: parent
-            text: move_fail?"패스를 찾을 수 없습니다.":"일시정지"
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top:image_warning.bottom
+            anchors.topMargin: 30
+            font.family: font_noto_b.name
+            font.pixelSize: 40
+            color: "#e2574c"
+            text: move_fail?"패스를 찾을 수 없습니다.":"일시정지 됨"
         }
         MouseArea{
             id: btn_page_popup
@@ -122,6 +131,8 @@ Item {
             }
         }
     }
+
+
     MouseArea{
         id: btn_password_1
         width: 100

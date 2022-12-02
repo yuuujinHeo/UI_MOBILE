@@ -6,7 +6,6 @@
 #include <QThread>
 #include <QQuickWindow>
 #include "GlobalHeader.h"
-#include "DBHandler.h"
 #include "LCMHandler.h"
 #include "ServerHandler.h"
 
@@ -88,6 +87,7 @@ public:
 
     QString debug_name = "C1";
     bool is_debug = false;
+    bool read_ini = false;
 
     ST_MAP map;
     ST_SETTING setting;
@@ -141,6 +141,8 @@ public:
     Q_INVOKABLE QVector<int> getMarginObj();
 
 
+    Q_INVOKABLE void programExit();
+    Q_INVOKABLE void programHide();
     Q_INVOKABLE void acceptCall(bool yes);
 
     Q_INVOKABLE void readSetting();
@@ -303,11 +305,6 @@ public:
     Q_INVOKABLE void redo();
     Q_INVOKABLE void clear_all();
 
-    Q_INVOKABLE QString getMapURL();
-    Q_INVOKABLE void setMapURL(QString url);
-
-    Q_INVOKABLE QString getDBvalue(QString name);
-
     Q_INVOKABLE void startRecordPath();
     Q_INVOKABLE void startcurPath();
     Q_INVOKABLE void stopcurPath();
@@ -326,7 +323,6 @@ public:
 
     Q_INVOKABLE void make_minimap();
 
-    DBHandler  *dbHandler;
     ServerHandler *server;
     QVector<ST_LINE>    canvas;
     QVector<ST_LINE>    canvas_redo;

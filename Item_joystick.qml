@@ -31,7 +31,8 @@ Item {
         id: joystick
         x: 0
         y: 0
-        source: "qrc:/image/joy_background.png"
+        source: "icon/joystick_back.png"
+//        source: "qrc:/image/joy_background.png"
     }
     ParallelAnimation {
         id: returnAnimation
@@ -70,7 +71,7 @@ Item {
 
     Image {
         id: thumb
-        source: "qrc:/image/joy_finger.png"
+        source: "icon/joystick_thumb.png"
         anchors.centerIn: parent
     }
 }

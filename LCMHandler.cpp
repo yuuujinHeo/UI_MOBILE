@@ -35,7 +35,6 @@ void LCMHandler::setMapData(ST_MAP _map){
 }
 
 
-
 ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
 
 void LCMHandler::moveTo(QString target_loc){
@@ -191,7 +190,7 @@ void LCMHandler::setVelocity(float vel){
 }
 void LCMHandler::programStart(){
     command send_msg;
-    send_msg.cmd = ROBOT_CMD_START;
+//    send_msg.cmd = ROBOT_CMD_START;
     if(isdebug){
         lcm.publish("COMMAND_"+debug_robot_name.toStdString(),&send_msg);
     }else{

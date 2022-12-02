@@ -1,13 +1,12 @@
-import QtQuick 2.9
-import QtQuick.Window 2.3
+import QtQuick 2.12
+import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
-//import QtQuick.Shapes 1.
 import QtQuick.Dialogs 1.2
 import Qt.labs.platform 1.0
 import QtGraphicalEffects 1.0
-//import QtQuick.Templates 2.5
 import "."
 import io.qt.Supervisor 1.0
+import QtMultimedia 5.12
 
 Item {
     id: page_annotation
@@ -215,9 +214,6 @@ Item {
 
 
     }
-
-
-
 
     //Annotation Menu========================================================
     Rectangle{
@@ -2165,7 +2161,6 @@ Item {
         folder: "file:"+applicationDirPath+"/image"
         property variant pathlist
         property string path : ""
-        fileMode: FileDialog.OpenFile
         nameFilters: ["*.png"]
         onAccepted: {
             print(fileload.file.toString());
@@ -2183,7 +2178,7 @@ Item {
     }
     FileDialog{
         id: filesaveannot
-        fileMode: FileDialog.SaveFile
+//        fileMode: FileDialog.SaveFile
         property variant pathlist
         property string path : ""
         folder: "file:"+applicationDirPath+"/setting"
@@ -2194,7 +2189,7 @@ Item {
     }
     FileDialog{
         id: filesavemeta
-        fileMode: FileDialog.SaveFile
+//        fileMode: FileDialog.SaveFile
         property variant pathlist
         property string path : ""
         folder: "file:"+applicationDirPath+"/setting"
