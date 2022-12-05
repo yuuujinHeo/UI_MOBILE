@@ -118,7 +118,12 @@ public:
     Q_INVOKABLE void removeServerMap();
     Q_INVOKABLE bool isloadMap();
     Q_INVOKABLE void setloadMap(bool load);
+    Q_INVOKABLE bool isExistRobotINI();
+    Q_INVOKABLE void makeRobotINI();
     bool rotate_map(QString _src, QString _dst, int mode);
+    Q_INVOKABLE bool getLCMConnection();
+    Q_INVOKABLE bool getLCMProcess();
+    Q_INVOKABLE bool getIniRead();
 
     //// *********************************** SLAM *********************************** ////
     Q_INVOKABLE void startSLAM();

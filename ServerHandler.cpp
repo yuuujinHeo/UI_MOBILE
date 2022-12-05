@@ -151,6 +151,7 @@ void ServerHandler::onTimer(){ // 200ms
         QJsonObject json;
         QJsonArray path_array;
         QJsonArray local_path_array;
+        QJsonArray lidar_array;
 
         // name
         if(is_debug){
@@ -163,6 +164,8 @@ void ServerHandler::onTimer(){ // 200ms
         // status
         json["robot_state"] = robot.state;
         json["ui_state"] = ui_state;
+
+        json["robot_type"] = robot.type;
 
         // cur_pose
         json["cur_pose_x"] = robot.curPose.x;
@@ -192,6 +195,13 @@ void ServerHandler::onTimer(){ // 200ms
             local_path_array.push_back(path_element_local);
         }
         json["local_path"] = local_path_array;
+
+        QJsonObject lidar_element;
+        for(int i=0; i<360; i++){
+            lidar_element["data"] = map.lidar_data[i];
+            lidar_array.push_back(lidar_element);
+        }
+        json["lidar"] = lidar_array;
 
         QJsonDocument doc(json);
         QString str(doc.toJson(QJsonDocument::Indented));

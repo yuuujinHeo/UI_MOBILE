@@ -32,7 +32,6 @@ Item {
         x: 0
         y: 0
         source: "icon/joystick_back.png"
-//        source: "qrc:/image/joy_background.png"
     }
     ParallelAnimation {
         id: returnAnimation

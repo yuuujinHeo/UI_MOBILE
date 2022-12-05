@@ -52,6 +52,8 @@ typedef struct{
     QVector<QString> objectName;
     QVector<QVector<ST_FPOINT>> objectPose;
 
+    float lidar_data[360];
+
     float margin;
     bool use_server;
     bool map_loaded;

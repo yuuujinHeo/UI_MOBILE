@@ -22,6 +22,8 @@ class robot_status
 
         float      robot_pose[3];
 
+        float      robot_scan[360];
+
     public:
         /**
          * Encode a message into binary form.
@@ -130,6 +132,9 @@ int robot_status::_encodeNoHash(void *buf, int offset, int maxlen) const
     tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->robot_pose[0], 3);
     if(tlen < 0) return tlen; else pos += tlen;
 
+    tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->robot_scan[0], 360);
+    if(tlen < 0) return tlen; else pos += tlen;
+
     return pos;
 }
 
@@ -149,6 +154,9 @@ int robot_status::_decodeNoHash(const void *buf, int offset, int maxlen)
     tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->robot_pose[0], 3);
     if(tlen < 0) return tlen; else pos += tlen;
 
+    tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->robot_scan[0], 360);
+    if(tlen < 0) return tlen; else pos += tlen;
+
     return pos;
 }
 
@@ -159,12 +167,13 @@ int robot_status::_getEncodedSizeNoHash() const
     enc_size += __int8_t_encoded_array_size(NULL, 1);
     enc_size += __int8_t_encoded_array_size(NULL, 1);
     enc_size += __float_encoded_array_size(NULL, 3);
+    enc_size += __float_encoded_array_size(NULL, 360);
     return enc_size;
 }
 
 uint64_t robot_status::_computeHash(const __lcm_hash_ptr *)
 {
-    uint64_t hash = 0x464eee21d78cc107LL;
+    uint64_t hash = 0x2852874f6b7c88e1LL;
     return (hash<<1) + ((hash>>63)&1);
 }
 

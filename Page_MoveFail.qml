@@ -10,7 +10,7 @@ Item {
     height: 800
 
     function loadmap(path){
-        pMap_curmap.loadmap(path);
+        pMap_curmap.loadmap_mini();
     }
 
     Text{

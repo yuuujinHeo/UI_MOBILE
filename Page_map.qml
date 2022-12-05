@@ -2034,9 +2034,6 @@ Item {
     }
 
 
-
-
-
     //Map Image================================================================
     Image{
         id: image_map
@@ -2791,9 +2788,9 @@ Item {
     }
 
     function loadmap(path){
-        pMap_curmap.loadmap(path);
         image_map.source = path;
         image_map.isload = true;
+        pMap_curmap.loadmap_mini();
         refreshMap = true;
         updatemap();
         updatecanvas();

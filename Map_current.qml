@@ -17,8 +17,12 @@ Item {
         canvas_cur_map.requestPaint();
     }
 
+    function loadmap_mini(){
+        map_image.source = "file://"+applicationDirPath + "/image/map_mini.png"
+    }
+
     function loadmap(path){
-        map_image.source = "file://"+applicationDirPath + "/image/map_mini.png"// path;
+        map_image.source = path;
     }
 
     property bool show_meta_data: true

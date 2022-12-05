@@ -38,6 +38,7 @@ Item {
     property bool go_wait: false
     property bool go_charge: false
     property int robotname_margin: rect_table_box.width/2 - textName.width/2
+    property string robot_type: supervisor.getRobotType()
 
     Rectangle{
         anchors.fill : parent
@@ -132,6 +133,7 @@ Item {
 
     Rectangle{
         id: rect_tray_box
+        visible: robot_type=="SERVING"?true:false
         width: 500
         height: tray_num*tray_height + (tray_num - 1)*spacing_tray + 50
         color: "#e8e8e8"
@@ -254,6 +256,7 @@ Item {
 
     Rectangle{
         id: rect_table_box
+        visible: robot_type=="SERVING"?true:false
         width: (table_num/5).toFixed(0)*100 - 20 + 160
         height: parent.height - status_bar.height
         anchors.left: parent.left
@@ -322,6 +325,7 @@ Item {
     Rectangle{
         id: rect_go
         width: 300
+        visible: robot_type=="SERVING"?true:false
         height: 100
         radius: 100
         anchors.horizontalCenter: rect_tray_box.horizontalCenter
@@ -346,6 +350,78 @@ Item {
                 for(var i=0; i<tray_num; i++){
                     supervisor.setTray(i,traymodel.get(i).set_table);
                 }
+            }
+        }
+    }
+    Rectangle{
+        id: rect_patrol_box
+        visible: robot_type=="CALLING"?true:false
+        width: (table_num/5).toFixed(0)*100 - 20 + 160
+        height: parent.height - status_bar.height
+        anchors.left: parent.left
+        anchors.top: status_bar.bottom
+        color: "#282828"
+        onWidthChanged: {
+            robotname_margin = rect_table_box.width/2 - textName.width/2
+        }
+
+        Text{
+            color:"white"
+            font.bold: true
+            font.family: font_noto_b.name
+            text: "패트롤 위치"
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: 40
+            font.pixelSize: 30
+        }
+    }
+    Rectangle{
+        id: rect_calling_box
+        visible: robot_type=="CALLING"?true:false
+        width: 500
+        height: tray_num*tray_height + (tray_num - 1)*spacing_tray + 50
+        color: "#e8e8e8"
+        radius: 30
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: rect_table_box.right
+        anchors.leftMargin: traybox_margin
+        Text{
+            color:"white"
+            font.bold: true
+            font.family: font_noto_b.name
+            text: "호출 대기 중"
+            anchors.centerIn: parent
+            font.pixelSize: 50
+        }
+    }
+
+
+    Rectangle{
+        id: rect_go_patrol
+        width: 300
+        visible: robot_type=="CALLING"?true:false
+        height: 100
+        radius: 100
+        anchors.horizontalCenter: rect_tray_box.horizontalCenter
+        anchors.top: rect_tray_box.bottom
+        anchors.topMargin: 40
+        color: "#24a9f7"
+        Text{
+            id: text_go2
+            anchors.centerIn: parent
+            text: "패트롤 시작"
+            font.family: font_noto_r.name
+            font.pixelSize: 35
+            font.bold: true
+            color: "white"
+        }
+        MouseArea{
+            id: btn_go2
+            anchors.fill: parent
+            onClicked: {
+                popup_question.visible = true;
+                print("patrol start button");
             }
         }
     }
@@ -500,6 +576,8 @@ Item {
                     "대기 장소로 이동<font color=\"white\">하시겠습니까?</font>"
                 }else if(go_charge){
                     "충전기로 이동<font color=\"white\">하시겠습니까?</font>"
+                }else if(robot_type == "CALLING"){
+                    "패트롤을 시작 <font color=\"white\">하시겠습니까?</font>"
                 }else{
                     ""
                 }
@@ -581,6 +659,8 @@ Item {
                         supervisor.moveToWait();
                     }else if(go_charge){
                         supervisor.moveToCharge();
+                    }else if(robot_type == "CALLING"){
+                        print("patrol start command");
                     }
                     go_wait = false;
                     go_charge = false;
