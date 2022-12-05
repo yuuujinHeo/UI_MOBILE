@@ -219,6 +219,9 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
     robot.curPose.x = msg->robot_pose[0];
     robot.curPose.y = msg->robot_pose[1];
     robot.curPose.th = msg->robot_pose[2];
+    for(int i=0; i<360; i++){
+        map.lidar_data[i] = msg->robot_scan[i];
+    }
 }
 
 void LCMHandler::robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg){

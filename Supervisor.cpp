@@ -34,7 +34,7 @@ Supervisor::Supervisor(QObject *parent)
     connect(server,SIGNAL(server_set_ini()),this,SLOT(server_cmd_setini()));
     connect(lcm, SIGNAL(pathchanged()),this,SLOT(path_changed()));
 
-    make_minimap();
+//    make_minimap();
 }
 
 void Supervisor::programExit(){
@@ -75,10 +75,10 @@ bool Supervisor::isloadMap(){
 void Supervisor::setloadMap(bool load){
     QString ini_path = "setting/robot.ini";
     QSettings settings(ini_path, QSettings::IniFormat);
-    if(settings.value("ROBOT/map_load").toBool() == load){
+    if(settings.value("FLOOR/map_load").toBool() == load){
 
     }else{
-        settings.setValue("ROBOT/map_load",load);
+        settings.setValue("FLOOR/map_load",load);
         if(load){
             plog->write("[SETTING] LOAD MAP Changed : True");
         }else{
@@ -120,6 +120,7 @@ int Supervisor::isExistMap(){
                         return 2;
                     }else{
                         setloadMap(false);
+                        setSetting("FLOOR/map_load","false");
                         return 0;
                     }
                 }else{
@@ -127,6 +128,7 @@ int Supervisor::isExistMap(){
                         return 3;
                     }else{
                         setloadMap(false);
+                        setSetting("FLOOR/map_load","false");
                         return 0;
                     }
                 }
@@ -135,10 +137,12 @@ int Supervisor::isExistMap(){
                     return 3;
                 }else{
                     setloadMap(false);
+                    setSetting("FLOOR/map_load","false");
                     return 0;
                 }
             }else{
                 setloadMap(false);
+                setSetting("FLOOR/map_load","false");
                 return 0;
             }
         }else{
@@ -152,6 +156,7 @@ int Supervisor::isExistMap(){
             settings.setValue("map_metadata/map_origin_u",500);
             settings.setValue("map_metadata/map_origin_v",500);
             setloadMap(false);
+            setSetting("FLOOR/map_load","false");
             return 0;
         }
     }
@@ -180,12 +185,13 @@ bool Supervisor::isuseServerMap(){
 void Supervisor::setuseServerMap(bool use){
     QString ini_path = "setting/robot.ini";
     QSettings settings(ini_path, QSettings::IniFormat);
-    settings.setValue("ROBOT/map_server",use);
+    settings.setValue("FLOOR/map_server",use);
     if(use){
         plog->write("[SETTING] USE SERVER MAP Changed : True");
     }else{
         plog->write("[SETTING] USE SERVER MAP Changed : False");
     }
+    readSetting();
 }
 
 void Supervisor::removeRawMap(){
@@ -452,6 +458,8 @@ void Supervisor::make_minimap(){
     }else{
         map_path = "image/map_edited.png";
     }
+
+    qDebug() << map.use_server << map_path;
     minimap = cv::imread(map_path.toStdString());
     cv::Mat minimap_1, minimap_2;
 
@@ -866,6 +874,7 @@ void Supervisor::onTimer(){
             if(isaccepted){
                 ui_cmd = UI_CMD_NONE;
                 isaccepted = false;
+                ui_state = UI_STATE_CHARGING;
                 QMetaObject::invokeMethod(mMain, "docharge");
             }else{
                 lcm->moveTo("charging_0");
@@ -957,6 +966,7 @@ void Supervisor::onTimer(){
         }
         if(ui_cmd == UI_CMD_PICKUP_CONFIRM){
             ui_state = UI_STATE_SERVING;
+            ui_cmd = UI_CMD_NONE;
         }
         break;
     }
@@ -1056,6 +1066,36 @@ void Supervisor::onTimer(){
 }
 
 //// *********************************** SETTING(INI) *********************************** ////
+bool Supervisor::isExistRobotINI(){
+    QFile *file = new QFile(QGuiApplication::applicationDirPath()+"/setting/robot.ini");
+    return file->open(QIODevice::ReadOnly);
+}
+void Supervisor::makeRobotINI(){
+    setSetting("ROBOT/name","test1");
+    setSetting("ROBOT/radius","0.25");
+    setSetting("ROBOT/tray_num","3");
+    setSetting("ROBOT/type","SERVING");
+    setSetting("ROBOT/use_bgm","true");
+    setSetting("ROBOT/use_voice","true");
+    setSetting("ROBOT/velocity","1");
+    setSetting("SERVER/travelline","0");
+    setSetting("SERVER/use_servercmd","true");
+    setSetting("SERVER/use_travelline","true");
+    setSetting("FLOOR/map_load","true");
+    setSetting("FLOOR/map_server","false");
+    setSetting("FLOOR/margin","0.25");
+    setSetting("FLOOR/table_num","5");
+    readSetting();
+}
+bool Supervisor::getLCMConnection(){
+    return lcm->isconnect;
+}
+bool Supervisor::getLCMProcess(){
+    return false;
+}
+bool Supervisor::getIniRead(){
+    return read_ini;
+}
 void Supervisor::setSetting(QString name, QString value){
     QString ini_path = "setting/robot.ini";
     QSettings setting(ini_path, QSettings::IniFormat);
@@ -1272,8 +1312,6 @@ void Supervisor::setVelocity(float vel){
     lcm->robot.velocity = vel;
     lcm->setVelocity(vel);
 }
-
-
 
 
 float Supervisor::getVelocityXY(){

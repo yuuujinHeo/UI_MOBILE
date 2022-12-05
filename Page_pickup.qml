@@ -16,6 +16,9 @@ Item {
     property bool pickup_3: false
 
     function init(){
+        pickup_1 = false;
+        pickup_2 = false;
+        pickup_3 = false;
         text_mention.visible = true;
         text_mention3.visible = true;
         target_pos.visible = true;

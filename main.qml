@@ -116,6 +116,7 @@ Window {
     function showpickup(){
         pmoving.stopMusic();
         stackview.pop();
+        ppickup.init();
         var trays = supervisor.getPickuptrays();
         var tempstr = "";
         for(var i=0; i<trays.length; i++){
@@ -133,7 +134,6 @@ Window {
             }
         }
         ppickup.pos = tempstr;
-        ppickup.init();
         stackview.push(ppickup);
     }
 
@@ -211,12 +211,18 @@ Window {
 
     Timer{
         id: timer_init
-        interval: 2000
+        interval: 3000
         running: true
         repeat: false
         onTriggered: {
-            pinit.check_timer();
-            stackview.push(pinit);
+//            stackview.push(pmovefail);
+            if(pinit.init_mode == 4){
+                pkitchen.init();
+                stackview.push(pkitchen);
+                print("init all done. pass to kitchen page")
+            }else{
+                stackview.push(pinit);
+            }
         }
     }
 
