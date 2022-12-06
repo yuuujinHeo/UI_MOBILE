@@ -91,6 +91,7 @@ public:
 
     ST_MAP map;
     ST_SETTING setting;
+    ST_PATROLMODE patrol;
     //LCMHandler
     LCMHandler *lcm;
     bool isaccepted;
@@ -178,6 +179,26 @@ public:
 //    Q_INVOKABLE int getImageChunkSize();
     Q_INVOKABLE unsigned int getImageSize();
 
+    //// ********************************* PATROL ************************************ ////
+    Q_INVOKABLE QString getPatrolFileName();
+    Q_INVOKABLE void makePatrol();
+    Q_INVOKABLE void loadPatrolFile(QString path);
+    Q_INVOKABLE void savePatrolFile(QString path);
+    Q_INVOKABLE void addPatrol(QString type, QString location, float x, float y, float th);
+    Q_INVOKABLE int getPatrolNum();
+    Q_INVOKABLE QString getPatrolType(int num);
+    Q_INVOKABLE QString getPatrolLocation(int num);
+    Q_INVOKABLE float getPatrolX(int num);
+    Q_INVOKABLE float getPatrolY(int num);
+    Q_INVOKABLE float getPatrolTH(int num);
+    Q_INVOKABLE void removePatrol(int num);
+    Q_INVOKABLE void movePatrolUp(int num);
+    Q_INVOKABLE void movePatrolDown(int num);
+    Q_INVOKABLE int getPatrolMode();
+
+    Q_INVOKABLE void setPatrolMode(int mode);
+
+
     //// ********************************* SETTING ************************************ ////
     Q_INVOKABLE void setVelocity(float vel);
     Q_INVOKABLE float getVelocityXY();
@@ -217,6 +238,8 @@ public:
     Q_INVOKABLE float getLocationx(int num);
     Q_INVOKABLE float getLocationy(int num);
     Q_INVOKABLE float getLocationth(int num);
+
+    Q_INVOKABLE float getLidar(int num);
 
     ST_POSE setAxis(ST_POSE _pose);
     ST_FPOINT setAxis(ST_FPOINT _point);

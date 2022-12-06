@@ -11,6 +11,63 @@ Item {
 
     property string map_path: "file://" + applicationDirPath + "/image/map_rotated.png"
     property int init_mode: 0 //0:inifile, 1:mapfile, 2:connection, 3:slam, 4:done
+    property bool ui_slam_init: false
+
+    onUi_slam_initChanged: {
+        print(ui_slam_init);
+        if(ui_slam_init){
+            ani_do_init.start();
+        }else{
+            ani_do_init_return.start();
+        }
+    }
+
+    SequentialAnimation{
+        id: ani_do_init
+        running: false
+        onStarted: {
+            text_slam_minimize.visible = false;
+        }
+
+        ParallelAnimation{
+            NumberAnimation{target: btn_slam_minimize; property:"width"; from:200; to:50; duration: 500;}
+            NumberAnimation{target: btn_slam_minimize; property:"height"; from:150; to:50; duration: 500;}
+            NumberAnimation{target: btn_slam_minimize; property:"radius"; from:15; to:50; duration: 500;}
+            NumberAnimation{target: btn_slam_do_init; property:"opacity"; from:1; to:0; duration: 500;}
+        }
+        ParallelAnimation{
+            NumberAnimation{target: image_logo4; property:"anchors.topMargin"; from:80; to:-200; duration: 500;}
+            NumberAnimation{target: btn_slam_minimize; property:"anchors.rightMargin"; from:30; to:-500; duration: 500;}
+            NumberAnimation{target: btn_slam_minimize; property:"anchors.topMargin"; from:50; to:-50; duration: 500;}
+        }
+        onFinished: {
+            btn_slam_do_init.visible = false;
+            map_slam_init.visible = true;
+        }
+    }
+    SequentialAnimation{
+        id: ani_do_init_return
+        running: false
+        onStarted: {
+            btn_slam_do_init.visible = true;
+            map_slam_init.visible = false;
+        }
+
+        ParallelAnimation{
+            NumberAnimation{target: image_logo4; property:"anchors.topMargin"; from:-200; to:80; duration: 500;}
+            NumberAnimation{target: btn_slam_minimize; property:"anchors.rightMargin"; from:-500; to:30; duration: 500;}
+            NumberAnimation{target: btn_slam_minimize; property:"anchors.topMargin"; from:-50; to:50; duration: 500;}
+        }
+        ParallelAnimation{
+            NumberAnimation{target: btn_slam_minimize; property:"width"; from:50; to:200; duration: 500;}
+            NumberAnimation{target: btn_slam_minimize; property:"height"; from:50; to:150; duration: 500;}
+            NumberAnimation{target: btn_slam_minimize; property:"radius"; from:50; to:15; duration: 500;}
+            NumberAnimation{target: btn_slam_do_init; property:"opacity"; from:0; to:1; duration: 500;}
+        }
+        onFinished: {
+            text_slam_minimize.visible = true;
+        }
+    }
 
     function check_timer(){
         init_mode = 0;
@@ -25,6 +82,7 @@ Item {
     function loadmapall(map_path){
         pmap.loadmap(map_path);
         pmovefail.loadmap(map_path);
+        map_slam_init.loadmap(map_path);
     }
 
     StackView{
@@ -70,9 +128,7 @@ Item {
             font.pixelSize: 20
         }
 
-
         Row{
-
             spacing: 50
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: text_notice.bottom
@@ -361,10 +417,67 @@ Item {
             text: "SLAM 자동 초기화에 실패하였습니다.\n맵 상에서 로봇의 현재 위치를 바로 잡아주신 뒤 수동으로 초기화를 진행해 주세요."
             font.pixelSize: 20
         }
+        Rectangle{
+            id: btn_slam_minimize
+            width: 200
+            height: 150
+            radius: 15
+            color: "gray"
+            anchors.right: parent.horizontalCenter
+            anchors.rightMargin: 30
+            anchors.top: text_notice4.bottom
+            anchors.topMargin: 50
+            Text{
+                id: text_slaminimize
+                anchors.centerIn: parent
+                text: "창 최소화"
+                font.pixelSize: 20
+                color:"white"
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    mainwindow.showMinimized()
+                }
+            }
+        }
+        Rectangle{
+            id: btn_slam_do_init
+            width: 200
+            height: 150
+            radius: 15
+            color: "gray"
+            anchors.left: parent.horizontalCenter
+            anchors.leftMargin: 30
+            anchors.top: text_notice4.bottom
+            anchors.topMargin: 50
+            Text{
+                anchors.centerIn: parent
+                text: "UI에서 직접 초기화"
+                font.pixelSize: 20
+                color:"white"
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    ui_slam_init = true;
+                }
+            }
+        }
 
+        Map_full{
+            id: map_slam_init
+            width: 600
+            height: 600
+            visible: false
+            show_object: true
+            show_robot: true
+            show_lidar: true
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: text_notice4.bottom
+            anchors.topMargin: 50
+        }
     }
-
-
 
     Timer{
         id: update_timer

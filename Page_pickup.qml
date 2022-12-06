@@ -23,6 +23,7 @@ Item {
         text_mention3.visible = true;
         target_pos.visible = true;
         btn_confirm.visible = true;
+        voice_pickup.play();
         text_hello.visible = false;
         timer_hello.stop();
     }
