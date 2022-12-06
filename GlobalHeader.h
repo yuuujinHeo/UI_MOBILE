@@ -85,6 +85,18 @@ typedef struct{
 }ST_ROBOT;
 
 typedef struct{
+    QString type;
+    QString location;
+    ST_POSE pose;
+}ST_PATROL;
+
+typedef struct{
+    QVector<ST_PATROL> path;
+    QString filename;
+    int mode;
+}ST_PATROLMODE;
+
+typedef struct{
     int tray_num;
     int travelline;
     int table_num;

@@ -797,11 +797,11 @@ void Supervisor::onTimer(){
         if(lcm->robot.state == ROBOT_STATE_NOT_READY){
             if(read_ini){
                 if(map.use_server){
-                    plog->write("[LCM] CONNECT -> INIT START");
+//                    plog->write("[LCM] CONNECT -> INIT START");
                     lcm->sendMapPath("file://"+QCoreApplication::applicationDirPath()+"/image/map_server.png");
                     ui_state = UI_STATE_NONE;
                 }else{
-                    plog->write("[LCM] CONNECT -> INIT START");
+//                    plog->write("[LCM] CONNECT -> INIT START");
                     lcm->sendMapPath("file://"+QCoreApplication::applicationDirPath()+"/image/map_raw.png");
                     ui_state = UI_STATE_NONE;
                 }
@@ -1065,6 +1065,169 @@ void Supervisor::onTimer(){
 
 }
 
+
+//// ********************************* PATROL ************************************ ////
+QString Supervisor::getPatrolFileName(){
+    if(patrol.filename == ""){
+        return patrol.filename;
+    }else{
+        QFile *file  = new QFile(patrol.filename);
+        if(file->open(QIODevice::ReadOnly)){
+            return patrol.filename;
+        }else{
+            return "";
+        }
+    }
+}
+void Supervisor::makePatrol(){
+    setSetting("PATROL/curfile","");
+    patrol.path.clear();
+    patrol.filename = "";
+}
+void Supervisor::loadPatrolFile(QString path){
+    QStringList list1 = path.split("/");
+    QStringList list = list1[list1.size()-1].split(".");
+    if(list.size() == 1){
+        path = "patrol/" + list1[list1.size()-1] + ".ini";
+    }else{
+        path = "patrol/" + list1[list1.size()-1];
+    }
+    qDebug() << "loadPatrolFile " << path;
+    QSettings patrols(path, QSettings::IniFormat);
+    patrol.path.clear();
+    patrol.filename = path;
+    ST_PATROL temp;
+    patrols.beginGroup("PATH");
+    int num = patrols.value("num").toInt();
+    patrol.mode = patrols.value("mode").toInt();
+    for(int i=0; i<num; i++){
+        temp.type = patrols.value("type_"+QString::number(i)).toString();
+        temp.location = patrols.value("location_"+QString::number(i)).toString();
+        temp.pose.x = patrols.value("x_"+QString::number(i)).toFloat();
+        temp.pose.y = patrols.value("y_"+QString::number(i)).toFloat();
+        temp.pose.th = patrols.value("th_"+QString::number(i)).toFloat();
+        patrol.path.push_back(temp);
+    }
+    patrols.endGroup();
+    setSetting("PATROL/curfile",path);
+}
+void Supervisor::savePatrolFile(QString path){
+    qDebug() << "savePatrolFile " << path;
+    QStringList list1 = path.split("/");
+    QStringList list = list1[list1.size()-1].split(".");
+    if(list.size() == 1){
+        path = "patrol/" + list1[list1.size()-1] + ".ini";
+    }else{
+        path = "patrol/" + list1[list1.size()-1];
+    }
+    QSettings patrols(path, QSettings::IniFormat);
+    patrols.clear();
+    for(int i=0; i<patrol.path.size(); i++){
+        patrols.setValue("PATH/type_"+QString::number(i),patrol.path[i].type);
+        patrols.setValue("PATH/location_"+QString::number(i),patrol.path[i].location);
+        patrols.setValue("PATH/x_"+QString::number(i),QString::number(patrol.path[i].pose.x));
+        patrols.setValue("PATH/y_"+QString::number(i),QString::number(patrol.path[i].pose.y));
+        patrols.setValue("PATH/th_"+QString::number(i),QString::number(patrol.path[i].pose.th));
+    }
+    patrols.setValue("PATH/num",patrol.path.size());
+    patrols.setValue("PATH/mode",QString::number(patrol.mode));
+
+    setSetting("PATROL/curfile",path);
+}
+void Supervisor::addPatrol(QString type, QString location, float x, float y, float th){
+    ST_PATROL temp;
+    temp.type = type;
+    temp.location = location;
+
+    if(temp.location != ""){
+        for(int i=0; i<map.locationsPose.size(); i++){
+            if(map.locationName[i] == temp.location){
+                temp.pose.x = map.locationsPose[i].x;
+                temp.pose.y = map.locationsPose[i].y;
+                temp.pose.th = map.locationsPose[i].th;
+                patrol.path.push_back(temp);
+                break;
+            }
+        }
+    }else{
+        ST_FPOINT temp1 = canvasTomap(x,y);
+        temp.pose.x = temp1.x;
+        temp.pose.y = temp1.y;
+        temp.pose.th = th;
+        patrol.path.push_back(temp);
+    }
+}
+void Supervisor::removePatrol(int num){
+    if(num > -1 && num < patrol.path.size()){
+        patrol.path.remove(num);
+    }
+}
+void Supervisor::movePatrolUp(int num){
+    if(num > 1 && num < patrol.path.size()){
+        ST_PATROL temp = patrol.path[num];
+        patrol.path.remove(num);
+        patrol.path.insert(num-1,temp);
+//        patrol.path.move(num,num-1);//patrol.path[num]);
+    }
+}
+void Supervisor::movePatrolDown(int num){
+    if(num > 0 && num < patrol.path.size()-1){
+        ST_PATROL temp = patrol.path[num];
+        patrol.path.remove(num);
+        patrol.path.insert(num+1,temp);
+    }
+
+}
+int Supervisor::getPatrolMode(){
+    return patrol.mode;
+}
+void Supervisor::setPatrolMode(int mode){
+    patrol.mode = mode;
+    QMetaObject::invokeMethod(mMain, "updatepatrol");
+}
+int Supervisor::getPatrolNum(){
+    return patrol.path.size();
+}
+QString Supervisor::getPatrolType(int num){
+    if(num > -1 && num < patrol.path.size()){
+        return patrol.path[num].type;
+    }else{
+        return "";
+    }
+}
+QString Supervisor::getPatrolLocation(int num){
+    if(num > -1 && num < patrol.path.size()){
+        return patrol.path[num].location;
+    }else{
+        return "";
+    }
+}
+float Supervisor::getPatrolX(int num){
+    if(num > -1 && num < patrol.path.size()){
+        ST_POSE temp = setAxis(patrol.path[num].pose);
+        return temp.x;
+    }else{
+        return 0;
+    }
+}
+float Supervisor::getPatrolY(int num){
+    if(num > -1 && num < patrol.path.size()){
+        ST_POSE temp = setAxis(patrol.path[num].pose);
+        return temp.y;
+    }else{
+        return 0;
+    }
+}
+float Supervisor::getPatrolTH(int num){
+    if(num > -1 && num < patrol.path.size()){
+        ST_POSE temp = setAxis(patrol.path[num].pose);
+        return temp.th;
+    }else{
+        return 0;
+    }
+}
+
+
 //// *********************************** SETTING(INI) *********************************** ////
 bool Supervisor::isExistRobotINI(){
     QFile *file = new QFile(QGuiApplication::applicationDirPath()+"/setting/robot.ini");
@@ -1085,6 +1248,8 @@ void Supervisor::makeRobotINI(){
     setSetting("FLOOR/map_server","false");
     setSetting("FLOOR/margin","0.25");
     setSetting("FLOOR/table_num","5");
+    setSetting("PATROL/patrol_mode","0");
+    setSetting("PATROL/curfile","");
     readSetting();
 }
 bool Supervisor::getLCMConnection(){
@@ -1246,6 +1411,11 @@ void Supervisor::readSetting(){
     setting.travelline = setting_robot.value("travelline").toInt();
     setting_robot.endGroup();
 
+    setting_robot.beginGroup("PATROL");
+    patrol.filename = setting_robot.value("curfile").toString();
+    patrol.mode = setting_robot.value("patrol_mode").toInt();
+    setting_robot.endGroup();
+
     //Set Variable
     lcm->robot.trays.clear();
     for(int i=0; i<setting.tray_num; i++){
@@ -1341,6 +1511,12 @@ QVector<int> Supervisor::getOrigin(){
     temp.push_back(map.origin[0]);
     temp.push_back(map.origin[1]);
     return temp;
+}
+float Supervisor::getLidar(int num){
+    if(num > -1 && num < 360)
+        return map.lidar_data[num];
+    else
+        return 0;
 }
 int Supervisor::getLocationNum(){
     return map.locationSize;

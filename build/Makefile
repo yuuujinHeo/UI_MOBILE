@@ -58,19 +58,20 @@ SOURCES       = ../LCMHandler.cpp \
 		../Logger.cpp \
 		../Supervisor.cpp \
 		../main.cpp qrc_qml_qmlcache.cpp \
-		Page_setting_qml.cpp \
-		Page_charge_qml.cpp \
-		Page_pickup_qml.cpp \
-		Map_current_qml.cpp \
-		Page_MoveFail_qml.cpp \
-		Page_map_qml.cpp \
-		Page_kitchen_qml.cpp \
-		Map_minimap_qml.cpp \
-		Item_joystick_qml.cpp \
-		Page_moving_qml.cpp \
-		Page_menus_qml.cpp \
 		Page_init_qml.cpp \
+		Map_current_qml.cpp \
+		Page_menus_qml.cpp \
+		Map_minimap_qml.cpp \
+		Page_pickup_qml.cpp \
+		Page_setting_qml.cpp \
+		Page_moving_qml.cpp \
+		Item_joystick_qml.cpp \
 		main_qml.cpp \
+		Map_full_qml.cpp \
+		Page_map_qml.cpp \
+		Page_MoveFail_qml.cpp \
+		Page_kitchen_qml.cpp \
+		Page_charge_qml.cpp \
 		qmlcache_loader.cpp \
 		moc_LCMHandler.cpp \
 		moc_Logger.cpp \
@@ -83,19 +84,20 @@ OBJECTS       = LCMHandler.o \
 		Supervisor.o \
 		main.o \
 		qrc_qml_qmlcache.o \
-		Page_setting_qml.o \
-		Page_charge_qml.o \
-		Page_pickup_qml.o \
-		Map_current_qml.o \
-		Page_MoveFail_qml.o \
-		Page_map_qml.o \
-		Page_kitchen_qml.o \
-		Map_minimap_qml.o \
-		Item_joystick_qml.o \
-		Page_moving_qml.o \
-		Page_menus_qml.o \
 		Page_init_qml.o \
+		Map_current_qml.o \
+		Page_menus_qml.o \
+		Map_minimap_qml.o \
+		Page_pickup_qml.o \
+		Page_setting_qml.o \
+		Page_moving_qml.o \
+		Item_joystick_qml.o \
 		main_qml.o \
+		Map_full_qml.o \
+		Page_map_qml.o \
+		Page_MoveFail_qml.o \
+		Page_kitchen_qml.o \
+		Page_charge_qml.o \
 		qmlcache_loader.o \
 		moc_LCMHandler.o \
 		moc_Logger.o \
@@ -398,7 +400,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents qml_qmlcache.qrc $(DISTDIR)/
-	$(COPY_FILE) --parents ../Page_setting.qml ../Page_charge.qml ../Page_pickup.qml ../Map_current.qml ../Page_MoveFail.qml ../Page_map.qml ../Page_kitchen.qml ../Map_minimap.qml ../Item_joystick.qml ../Page_moving.qml ../Page_menus.qml ../Page_init.qml ../main.qml $(DISTDIR)/
+	$(COPY_FILE) --parents ../Page_init.qml ../Map_current.qml ../Page_menus.qml ../Map_minimap.qml ../Page_pickup.qml ../Page_setting.qml ../Page_moving.qml ../Item_joystick.qml ../main.qml ../Map_full.qml ../Page_map.qml ../Page_MoveFail.qml ../Page_kitchen.qml ../Page_charge.qml $(DISTDIR)/
 	$(COPY_FILE) --parents ../qml.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../GlobalHeader.h ../LCMHandler.h ../Logger.h ../ServerHandler.h ../cv_to_qt.h ../Supervisor.h $(DISTDIR)/
@@ -482,60 +484,64 @@ qrc_qml_qmlcache.cpp: qml_qmlcache.qrc \
 		../bgm/voice_avoid.mp3
 	/usr/lib/qt5/bin/rcc -name qml_qmlcache qml_qmlcache.qrc -o qrc_qml_qmlcache.cpp
 
-compiler_qmlcache_make_all: Page_setting_qml.cpp Page_charge_qml.cpp Page_pickup_qml.cpp Map_current_qml.cpp Page_MoveFail_qml.cpp Page_map_qml.cpp Page_kitchen_qml.cpp Map_minimap_qml.cpp Item_joystick_qml.cpp Page_moving_qml.cpp Page_menus_qml.cpp Page_init_qml.cpp main_qml.cpp
+compiler_qmlcache_make_all: Page_init_qml.cpp Map_current_qml.cpp Page_menus_qml.cpp Map_minimap_qml.cpp Page_pickup_qml.cpp Page_setting_qml.cpp Page_moving_qml.cpp Item_joystick_qml.cpp main_qml.cpp Map_full_qml.cpp Page_map_qml.cpp Page_MoveFail_qml.cpp Page_kitchen_qml.cpp Page_charge_qml.cpp
 compiler_qmlcache_clean:
-	-$(DEL_FILE) Page_setting_qml.cpp Page_charge_qml.cpp Page_pickup_qml.cpp Map_current_qml.cpp Page_MoveFail_qml.cpp Page_map_qml.cpp Page_kitchen_qml.cpp Map_minimap_qml.cpp Item_joystick_qml.cpp Page_moving_qml.cpp Page_menus_qml.cpp Page_init_qml.cpp main_qml.cpp
-Page_setting_qml.cpp: ../Page_setting.qml \
+	-$(DEL_FILE) Page_init_qml.cpp Map_current_qml.cpp Page_menus_qml.cpp Map_minimap_qml.cpp Page_pickup_qml.cpp Page_setting_qml.cpp Page_moving_qml.cpp Item_joystick_qml.cpp main_qml.cpp Map_full_qml.cpp Page_map_qml.cpp Page_MoveFail_qml.cpp Page_kitchen_qml.cpp Page_charge_qml.cpp
+Page_init_qml.cpp: ../Page_init.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_setting_qml.cpp ../Page_setting.qml
-
-Page_charge_qml.cpp: ../Page_charge.qml \
-		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_charge_qml.cpp ../Page_charge.qml
-
-Page_pickup_qml.cpp: ../Page_pickup.qml \
-		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_pickup_qml.cpp ../Page_pickup.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_init_qml.cpp ../Page_init.qml
 
 Map_current_qml.cpp: ../Map_current.qml \
 		/usr/lib/qt5/bin/qmlcachegen
 	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Map_current_qml.cpp ../Map_current.qml
 
-Page_MoveFail_qml.cpp: ../Page_MoveFail.qml \
+Page_menus_qml.cpp: ../Page_menus.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_MoveFail_qml.cpp ../Page_MoveFail.qml
-
-Page_map_qml.cpp: ../Page_map.qml \
-		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_map_qml.cpp ../Page_map.qml
-
-Page_kitchen_qml.cpp: ../Page_kitchen.qml \
-		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_kitchen_qml.cpp ../Page_kitchen.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_menus_qml.cpp ../Page_menus.qml
 
 Map_minimap_qml.cpp: ../Map_minimap.qml \
 		/usr/lib/qt5/bin/qmlcachegen
 	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Map_minimap_qml.cpp ../Map_minimap.qml
 
-Item_joystick_qml.cpp: ../Item_joystick.qml \
+Page_pickup_qml.cpp: ../Page_pickup.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Item_joystick_qml.cpp ../Item_joystick.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_pickup_qml.cpp ../Page_pickup.qml
+
+Page_setting_qml.cpp: ../Page_setting.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_setting_qml.cpp ../Page_setting.qml
 
 Page_moving_qml.cpp: ../Page_moving.qml \
 		/usr/lib/qt5/bin/qmlcachegen
 	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_moving_qml.cpp ../Page_moving.qml
 
-Page_menus_qml.cpp: ../Page_menus.qml \
+Item_joystick_qml.cpp: ../Item_joystick.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_menus_qml.cpp ../Page_menus.qml
-
-Page_init_qml.cpp: ../Page_init.qml \
-		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_init_qml.cpp ../Page_init.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Item_joystick_qml.cpp ../Item_joystick.qml
 
 main_qml.cpp: ../main.qml \
 		/usr/lib/qt5/bin/qmlcachegen
 	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o main_qml.cpp ../main.qml
+
+Map_full_qml.cpp: ../Map_full.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Map_full_qml.cpp ../Map_full.qml
+
+Page_map_qml.cpp: ../Page_map.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_map_qml.cpp ../Page_map.qml
+
+Page_MoveFail_qml.cpp: ../Page_MoveFail.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_MoveFail_qml.cpp ../Page_MoveFail.qml
+
+Page_kitchen_qml.cpp: ../Page_kitchen.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_kitchen_qml.cpp ../Page_kitchen.qml
+
+Page_charge_qml.cpp: ../Page_charge.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_charge_qml.cpp ../Page_charge.qml
 
 compiler_qmlcache_loader_make_all: qmlcache_loader.cpp
 compiler_qmlcache_loader_clean:
@@ -658,44 +664,47 @@ main.o: ../main.cpp ../Supervisor.h \
 qrc_qml_qmlcache.o: qrc_qml_qmlcache.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_qml_qmlcache.o qrc_qml_qmlcache.cpp
 
-Page_setting_qml.o: Page_setting_qml.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_setting_qml.o Page_setting_qml.cpp
-
-Page_charge_qml.o: Page_charge_qml.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_charge_qml.o Page_charge_qml.cpp
-
-Page_pickup_qml.o: Page_pickup_qml.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_pickup_qml.o Page_pickup_qml.cpp
+Page_init_qml.o: Page_init_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_init_qml.o Page_init_qml.cpp
 
 Map_current_qml.o: Map_current_qml.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Map_current_qml.o Map_current_qml.cpp
 
-Page_MoveFail_qml.o: Page_MoveFail_qml.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_MoveFail_qml.o Page_MoveFail_qml.cpp
-
-Page_map_qml.o: Page_map_qml.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_map_qml.o Page_map_qml.cpp
-
-Page_kitchen_qml.o: Page_kitchen_qml.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_kitchen_qml.o Page_kitchen_qml.cpp
+Page_menus_qml.o: Page_menus_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_menus_qml.o Page_menus_qml.cpp
 
 Map_minimap_qml.o: Map_minimap_qml.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Map_minimap_qml.o Map_minimap_qml.cpp
 
-Item_joystick_qml.o: Item_joystick_qml.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Item_joystick_qml.o Item_joystick_qml.cpp
+Page_pickup_qml.o: Page_pickup_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_pickup_qml.o Page_pickup_qml.cpp
+
+Page_setting_qml.o: Page_setting_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_setting_qml.o Page_setting_qml.cpp
 
 Page_moving_qml.o: Page_moving_qml.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_moving_qml.o Page_moving_qml.cpp
 
-Page_menus_qml.o: Page_menus_qml.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_menus_qml.o Page_menus_qml.cpp
-
-Page_init_qml.o: Page_init_qml.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_init_qml.o Page_init_qml.cpp
+Item_joystick_qml.o: Item_joystick_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Item_joystick_qml.o Item_joystick_qml.cpp
 
 main_qml.o: main_qml.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main_qml.o main_qml.cpp
+
+Map_full_qml.o: Map_full_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Map_full_qml.o Map_full_qml.cpp
+
+Page_map_qml.o: Page_map_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_map_qml.o Page_map_qml.cpp
+
+Page_MoveFail_qml.o: Page_MoveFail_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_MoveFail_qml.o Page_MoveFail_qml.cpp
+
+Page_kitchen_qml.o: Page_kitchen_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_kitchen_qml.o Page_kitchen_qml.cpp
+
+Page_charge_qml.o: Page_charge_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_charge_qml.o Page_charge_qml.cpp
 
 qmlcache_loader.o: qmlcache_loader.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qmlcache_loader.o qmlcache_loader.cpp

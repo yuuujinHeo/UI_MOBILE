@@ -62,5 +62,6 @@
         <file>icon/btn_yes.png</file>
         <file>icon/btn_no.png</file>
         <file>image/image_location.png</file>
+        <file>Map_full.qml</file>
     </qresource>
 </RCC>

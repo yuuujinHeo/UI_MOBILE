@@ -2,7 +2,7 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Dialogs 1.2
-import Qt.labs.platform 1.0
+import Qt.labs.platform 1.0 as Platform
 import QtGraphicalEffects 1.0
 import "."
 import io.qt.Supervisor 1.0
@@ -22,6 +22,9 @@ Item {
 
     //mode : 0(mapview) 1:(slam) 2:(annotation) 3:(patrol)
     property int map_mode: 0
+
+    //0(location patrol) 1:(path patrol)
+    property int patrol_mode: 0
 
     //Tool Num (0: move, 1: drawing, 2: addPoint, 3: editPoint, 4: addLocation, 5: editLocation, 6: addTravelLine)
     property int tool_num: 0
@@ -43,6 +46,7 @@ Item {
     property int select_object: -1
     property int select_object_point: -1
     property int select_location: -1
+    property int select_patrol: -1
     property int select_line: -1
     property int select_travel_line: -1
 
@@ -102,9 +106,9 @@ Item {
         id: ani_modechange
         running: false
         ParallelAnimation{
-            NumberAnimation{target:menubar; property:"opacity"; from:1;to:0;duration:1000;}
-            NumberAnimation{target:rect_menus; property:"width"; from:(robotname_margin + textName.width/2)*2;to:450;duration:1000;}
-            NumberAnimation{target:btn_menu; property:"width"; from:120;to:60;duration:1000;}
+            NumberAnimation{target:menubar; property:"opacity"; from:1;to:0;duration:500;}
+            NumberAnimation{target:rect_menus; property:"width"; from:(robotname_margin + textName.width/2)*2;to:450;duration:500;}
+            NumberAnimation{target:btn_menu; property:"width"; from:120;to:60;duration:500;}
         }
         onStarted: {
             stackview_map.currentItem.visible = false;
@@ -118,8 +122,9 @@ Item {
                 stackview_menu.push(menu_annot);
                 stackview_map.push(map_annot);
             }else if(map_mode == 3){
+                update_patrol_location();
                 stackview_menu.push(menu_patrol);
-                stackview_map.push(map_patrol);
+                stackview_map.push(map_annot);
             }
             stackview_map.currentItem.visible = true;
         }
@@ -295,6 +300,20 @@ Item {
                                         map_mode = 2;
                                     }else if(modelData == "patrol"){
                                         map_mode = 3;
+                                        patrol_location_model.clear();
+                                        if(supervisor.getPatrolFileName() == ""){
+                                            text_patrol.text = "현재 설정 된 패트롤 파일이 없습니다.";
+                                        }else{
+                                            supervisor.loadPatrolFile(supervisor.getPatrolFileName());
+                                            if(supervisor.getPatrolMode() == 0){
+                                                stackview_patrol_menu.push(menu_patrol_location);
+                                                text_patrol.text = "현재 패트롤 파일 : "+supervisor.getPatrolFileName();
+                                            }else{
+                                                stackview_patrol_menu.push(menu_patrol_record);
+                                                text_patrol.text = "현재 패트롤 파일 : "+supervisor.getPatrolFileName();
+                                            }
+
+                                        }
                                     }
                                 }
                             }
@@ -619,10 +638,16 @@ Item {
 
                             ctx.clearRect(0,0,canvas_location.width,canvas_location.height);
 
-                            if(anot_state == 0 || anot_state == 3){
-                                draw_canvas_location();
+                            if(map_mode == 2){
+                                if(anot_state == 0 || anot_state == 3){
+                                    draw_canvas_location();
+                                    draw_canvas_location_temp();
+                                }
+                            }else if(map_mode == 3){
+                                draw_canvas_patrol_location();
                                 draw_canvas_location_temp();
                             }
+
                         }
                     }
                 }
@@ -687,8 +712,31 @@ Item {
                         property var startX : 0;
                         property var startY : 0;
                         property var startDist : 0;
-                        touchPoints: [TouchPoint{id:point1},TouchPoint{id:point2}]
+                        MouseArea{
+                            anchors.fill: parent
+                            onWheel: {
+                                var ctx = canvas_map.getContext('2d');
+                                var new_scale;
+                                wheel.accepted = false;
+                                if(wheel.angleDelta.y > 0){
+                                    new_scale = canvas_map.scale + 0.5;
+                                    if(new_scale > 5){
+                                        canvas_map.scale = 5;
+                                    }else{
+                                        canvas_map.scale = new_scale;
+                                    }
+                                }else{
+                                    new_scale = canvas_map.scale - 0.5;
+                                    if(new_scale < 1){
+                                        canvas_map.scale = 1;
+                                    }else{
+                                        canvas_map.scale = new_scale;
+                                    }
+                                }
+                            }
+                        }
 
+                        touchPoints: [TouchPoint{id:point1},TouchPoint{id:point2}]
                         onPressed: {
                             if(tool_num == 0){//move
                                 gesture = "drag";
@@ -738,7 +786,8 @@ Item {
                                     select_object_point = -1;
                                     supervisor.setObjPose();
                                 }else if(tool_num == 4){
-
+                                    if(canvas_location.isnewLoc)
+                                        popup_add_patrol_1.open();
                                 }else if(tool_num == 5){
                                     updatelocationcollision();
                                     tool_num = 0;
@@ -876,17 +925,6 @@ Item {
         }
     }
 
-    Item{
-        id: map_patrol
-        objectName: "map_patrol"
-        visible: false
-        Rectangle{
-            anchors.fill: parent
-            color: "#282828"
-        }
-    }
-
-
     ////////************************ITEM :: MENU**********************************************************
 
     Item{
@@ -910,7 +948,120 @@ Item {
         id: menu_patrol
         objectName: "menu_patrol"
         visible: false
+        Text{
+            id: text_patrol
+            anchors.top: parent.top
+            anchors.topMargin: 30
+            anchors.horizontalCenter: parent.horizontalCenter
+            font.family: font_noto_b.name
+            text: "현재 설정 된 패트롤 파일이 없습니다."
+        }
+        Row{
+            id: row_patrol_menu
+            spacing: 20
+            anchors.top: text_patrol.bottom
+            anchors.topMargin: 20
+            anchors.horizontalCenter: parent.horizontalCenter
+            Repeater{
+                id:repeat_patrol_menu
+                model:["make","load","save"]
+                Rectangle{
+                    id: btn_patrol_menus
+                    width: 60
+                    height: 60
+                    radius: 30
+                    color: "#282828"
+                    Text{
+                        text: modelData
+                        color: "white"
+                        font.family: font_noto_b.name
+                        font.pixelSize: 15
+                        anchors.centerIn: parent
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            if(modelData == "make"){
+                                if(supervisor.getPatrolMode() == 0){
+                                    stackview_patrol_menu.push(menu_patrol_location);
+                                    supervisor.makePatrol();
+                                    supervisor.addPatrol("START","Resting_0",0,0,0);
+                                }else{
+                                    stackview_patrol_menu.push(menu_patrol_record);
+                                }
+                                update_patrol_location();
+                            }else if(modelData == "load"){
+                                fileopenpatrol.open();
+                            }else if(modelData == "save"){
+                                if(supervisor.getPatrolFileName() == ""){
+                                    filesavepatrol.open();
+                                }else{
+                                    supervisor.savePatrolFile(supervisor.getPatrolFileName());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Row{
+            id: row_patrol_mode
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: row_patrol_menu.bottom
+            anchors.topMargin: 20
+            spacing: 40
+            Rectangle{
+                id: mode_location
+                width: 200
+                height: 50
+                radius: 10
+                color: supervisor.getPatrolMode()===0?"blue":"gray"
+                Text{
+                    anchors.centerIn: parent
+                    text: "location mode"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked:{
+                        supervisor.setPatrolMode(0);
+                    }
+                }
+            }
+            Rectangle{
+                id: mode_record
+                width: 200
+                height: 50
+                radius: 10
+                color: supervisor.getPatrolMode()===1?"blue":"gray"
+                Text{
+                    anchors.centerIn: parent
+                    text: "record mode"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked:{
+                        supervisor.setPatrolMode(1);
+                    }
+                }
+            }
+        }
+
+        StackView{
+            id: stackview_patrol_menu
+            width: rect_menus.width
+            height: rect_menus.height - y
+            anchors.top: row_patrol_mode.bottom
+            anchors.topMargin: 30
+            initialItem: Item{
+                Rectangle{
+                    anchors.fill: parent
+                    color: "white"
+                }
+            }
+        }
     }
+
 
     //Annotation Menu ITEM===================================================
     Item{
@@ -1552,6 +1703,7 @@ Item {
                             select_location = supervisor.getLocNum(name);
                             print("select location = "+select_location);
                             list_location.currentIndex = index;
+                            list_location2.currentIndex = index;
                             canvas_location.requestPaint();
                         }
                     }
@@ -2033,6 +2185,213 @@ Item {
         }
     }
 
+    //Patrol Menu ITEM========================================================
+    Item{
+        id: menu_patrol_location
+        objectName: "menu_patrol_location"
+        width: stackview_patrol_menu.width
+        height: stackview_patrol_menu.height
+        visible: false
+        Rectangle{
+            id: kk
+            anchors.fill: parent
+            color: "red"
+        }
+        ListView{
+            id: listview_patrol_location
+            width: 300
+            height: parent.height - 60
+            clip: true
+            anchors.left: parent.left
+            anchors.leftMargin: 30
+            anchors.top: parent.top
+            anchors.topMargin: 30
+            model: patrol_location_model
+            delegate: compo_patrol_location
+        }
+        Column{
+            id: column_patrol_menus
+            spacing: 20
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+            anchors.rightMargin: 20
+            Repeater{
+                model: ["add","remove","up","down"]
+                Rectangle{
+                    color: "gray"
+                    width: 50
+                    height: 50
+                    radius: 10
+                    Text{
+                        anchors.centerIn: parent
+                        text: modelData
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            if(modelData == "add"){
+                                if(tool_num == 4){
+                                    if(canvas_location.isnewLoc && canvas_location.new_loc_available){
+                                        supervisor.addPatrol("POINT","",canvas_location.new_loc_x, canvas_location.new_loc_y, canvas_location.new_loc_th);
+                                        update_patrol_location();
+                                    }
+                                    canvas_location.isnewLoc = false;
+                                    tool_num = 0;
+                                }else{
+                                    updatelocation();
+                                    popup_add_patrol.open();
+                                }
+                                select_patrol = -1;
+                            }else if(modelData == "remove"){
+                                supervisor.removePatrol(select_patrol);
+                                select_patrol = -1;
+                                update_patrol_location();
+                            }else if(modelData == "up"){
+                                supervisor.movePatrolUp(select_patrol);
+                                update_patrol_location();
+                                if(select_patrol>1)
+                                    select_patrol--;
+                            }else if(modelData == "down"){
+                                supervisor.movePatrolDown(select_patrol);
+                                update_patrol_location();
+                                if(select_patrol<supervisor.getPatrolNum()-1 && select_patrol > 0)
+                                    select_patrol++;
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Item{
+        id: menu_patrol_record
+        objectName: "menu_patrol_record"
+        width: parent.width
+        height: parent.height
+        visible: false
+        Rectangle{
+            anchors.fill: parent
+            color: "blue"
+        }
+        Row{
+            spacing: 20
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: 50
+            Repeater{
+                model:["record","play","pause","stop"]
+                Rectangle{
+                    width: 50
+                    height: 50
+                    radius: 20
+                    color: "gray"
+                    Text{
+                        anchors.centerIn: parent
+                        text: modelData
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            print(modelData);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    ListModel{
+        id: patrol_location_model
+        ListElement{
+            name: "start"
+            location: "charging_0"
+            loc_x: 0
+            loc_y: 0
+            loc_th: 0
+        }
+    }
+
+    function update_patrol_location(){
+        patrol_location_model.clear();
+        if(supervisor.getPatrolFileName() == ""){
+            text_patrol.text = "현재 설정 된 패트롤 파일이 없습니다.";
+        }else{
+            text_patrol.text = "현재 패트롤 파일 : "+supervisor.getPatrolFileName();
+        }
+//        print(supervisor.getPatrolNum());
+        for(var i=0; i<supervisor.getPatrolNum(); i++){
+//            print(supervisor.getPatrolType(i));
+            patrol_location_model.append({name:supervisor.getPatrolType(i),location:supervisor.getPatrolLocation(i),loc_x:supervisor.getPatrolX(i),loc_y:supervisor.getPatrolY(i),loc_th:supervisor.getPatrolTH(i)});
+        }
+        canvas_location.requestPaint();
+    }
+
+    Component{
+        id: compo_patrol_location
+        Item{
+            width: parent.width
+            height: 100
+            Rectangle{
+                anchors.fill: parent
+                radius: 30
+                color:{
+                    if(name=="START"){
+                        "yellow"
+                    }else if(name == "END"){
+                        "blue"
+                    }else{
+                        "gray"
+                    }
+                }
+                border.color: "black"
+                border.width:index==select_patrol?2:0
+                Text{
+                    text: name
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 20
+                    font.family: font_noto_b.name
+                    font.bold: true
+                    font.pixelSize: 30
+                    color: "white"
+                }
+                Text{
+                    visible: location==""?false:true
+                    text: location
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.family: font_noto_b.name
+                    anchors.right: parent.right
+                    anchors.rightMargin: 30
+                    font.pixelSize: 20
+                    color: "white"
+                }
+                Text{
+                    visible: location==""?true:false
+                    text:{
+                        "x : " + Number(loc_x).toFixed(1) + "\n" +
+                        "y : " + Number(loc_y).toFixed(1) + "\n" +
+                        "r : " + Number(loc_th).toFixed(1) + "\n"
+                    }
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.family: font_noto_b.name
+                    anchors.right: parent.right
+                    anchors.rightMargin: 30
+                    font.pixelSize: 10
+                    color: "white"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        select_patrol = index;
+                        update_patrol_location();
+                    }
+                }
+            }
+
+        }
+    }
+
 
     //Map Image================================================================
     Image{
@@ -2083,9 +2442,9 @@ Item {
 
         }
     }
-    FileDialog{
+    Platform.FileDialog{
         id: filesaveannot
-//        fileMode: FileDialog.SaveFile
+        fileMode: Platform.FileDialog.SaveFile
         property variant pathlist
         property string path : ""
         folder: "file:"+applicationDirPath+"/setting"
@@ -2094,9 +2453,31 @@ Item {
             supervisor.saveAnnotation(filesaveannot.file.toString());
         }
     }
-    FileDialog{
+    Platform.FileDialog{
+        id: filesavepatrol
+        fileMode: Platform.FileDialog.SaveFile
+        property variant pathlist
+        property string path : ""
+        folder: "file:"+applicationDirPath+"/patrol"
+        onAccepted: {
+            print(filesavepatrol.file.toString())
+            supervisor.savePatrolFile(filesavepatrol.file.toString());
+        }
+    }
+    Platform.FileDialog{
+        id: fileopenpatrol
+        fileMode: Platform.FileDialog.OpenFile
+        property variant pathlist
+        property string path : ""
+        folder: "file:"+applicationDirPath+"/patrol"
+        onAccepted: {
+            supervisor.loadPatrolFile(fileopenpatrol.file.toString());
+            update_patrol_location();
+        }
+    }
+    Platform.FileDialog{
         id: filesavemeta
-//        fileMode: FileDialog.SaveFile
+        fileMode: Platform.FileDialog.SaveFile
         property variant pathlist
         property string path : ""
         folder: "file:"+applicationDirPath+"/setting"
@@ -2106,6 +2487,83 @@ Item {
             supervisor.saveMetaData(filesavemeta.file.toString());
         }
     }
+    Popup{
+        id: popup_add_patrol
+        width: 700
+        height: 600
+        anchors.centerIn: parent
+        Rectangle{
+            id: rect_ba
+            anchors.fill:parent
+            Text{
+                id: text_popup_patrol
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 30
+                text:"왼쪽 리스트에서 사전 정의된 위치를 선택하거나 지도에서 직접 위치를 입력해주세요."
+            }
+
+            ListView {
+                id: list_location2
+                width: 250
+                height: 400
+                anchors.top: text_popup_patrol.bottom
+                anchors.topMargin: 30
+                anchors.left: parent.left
+                anchors.leftMargin: 30
+                clip: true
+                model: ListModel{}
+                delegate: locationCompo
+                highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
+                focus: true
+            }
+            Column{
+                id: menubar22
+                spacing: 30
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: list_location2.right
+                anchors.leftMargin: 50
+                Repeater{
+                    model: ["confirm","cancel","in map"]
+                    Rectangle{
+                        property int btn_size: 100
+                        width: 50
+                        height: 50
+                        radius: 10
+                        color: "white"
+                        Text{
+                            anchors.verticalCenter : parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.family: font_noto_r.name
+                            font.pixelSize: 20
+                            color: "#7e7e7e"
+                            text:modelData
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                if(modelData == "confirm"){
+                                    print(list_location2.model.get(list_location2.currentIndex).name);
+                                    if(list_location2.model.get(list_location2.currentIndex).name != ""){
+                                        supervisor.addPatrol("POINT",list_location2.model.get(list_location2.currentIndex).name,0,0,0);
+                                        popup_add_patrol.close();
+                                        update_patrol_location();
+                                    }
+                                }else if(modelData == "cancel"){
+                                    popup_add_patrol.close();
+                                }else if(modelData == "in map"){
+                                    popup_add_patrol.close();
+                                    tool_num = 4;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
     Popup{
         id: popup_add_object
 //        visible: false
@@ -2178,6 +2636,62 @@ Item {
                 onClicked: {
 //                    popup_add_object.visible = false;
                     popup_add_object.close();
+                }
+            }
+        }
+    }
+
+    Popup{
+        id: popup_add_patrol_1
+        width: 300
+        height:200
+        anchors.centerIn: parent
+        Rectangle{
+            anchors.fill: parent
+            color: "white"
+            Text{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 30
+                text: "지정한 위치로 포인트를 추가 하시겠습니까?"
+            }
+            Row{
+                spacing: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 50
+                Repeater{
+                    model: ["yes","retry","cancel"]
+                    Rectangle{
+                        width: 50
+                        height: 50
+                        color: "gray"
+                        radius: 10
+                        Text{
+                            text: modelData
+                            anchors.centerIn: parent
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                if(modelData == "yes"){
+                                    if(canvas_location.isnewLoc && canvas_location.new_loc_available){
+                                        supervisor.addPatrol("POINT","",canvas_location.new_loc_x, canvas_location.new_loc_y, canvas_location.new_loc_th);
+                                        update_patrol_location();
+                                    }
+                                    canvas_location.isnewLoc = false;
+                                    tool_num = 0;
+                                    popup_add_patrol_1.close();
+                                }else if(modelData == "retry"){
+                                    popup_add_patrol_1.close();
+                                }else if(modelData == "cancel"){
+                                    tool_num = 0;
+                                    canvas_location.isnewLoc = false;
+                                    popup_add_patrol_1.close();
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -2366,81 +2880,6 @@ Item {
         }
     }
 
-
-//    Row{
-//        id: menubar_map
-//        spacing: 25
-//    Repeater{
-//        model: ["load","save","record","run","stop","manual","back"]
-//        Rectangle{
-//            id: btn
-//            width: 60
-//            height: 60
-//            color: "gray"
-//            radius: 10
-//            Image {
-//                id: image_icon
-//                anchors.centerIn:  parent
-//                antialiasing: true
-//                mipmap: true
-//                scale: {height>width?60/height:60/width}
-//                source: {
-//                    if(modelData == "load"){
-//                        "./build/icon/icon_folder2.png"
-//                    }else if(modelData == "save"){
-//                        "./build/icon/icon_save2.png"
-//                    }else if(modelData == "record"){
-//                        "./build/icon/icon_record.png"
-//                    }else if(modelData == "run"){
-//                        "./build/icon/icon_play.png"
-//                    }else if(modelData == "stop"){
-//                        "./build/icon/icon_stop.png"
-//                    }else if(modelData == "pause"){
-//                        "./build/icon/icon_pause.png"
-//                    }else if(modelData == "manual"){
-//                        "./build/icon/icon_pause.png"
-//                    }else if(modelData == "manualon"){
-//                        "./build/icon/icon_stop.png"
-//                    }else if(modelData == "back"){
-//                        "./build/icon/icon_pause.png"
-//                    }
-//                }
-//            }
-//            MouseArea{
-//                anchors.fill: parent
-//                onClicked:{
-//                    if(modelData == "load"){
-//                        pathload.open();
-//                    }else if(modelData == "save"){
-//                        pathsave.open();
-//                    }else if(modelData == "record"){
-//                        supervisor.startRecordPath();
-//                    }else if(modelData == "run"){
-////                        supervisor.startcurPath();
-////                        modelData = "pause";
-//                        supervisor.runRotateTables();
-//                    }else if(modelData == "stop"){
-//                        supervisor.stopRotateTables();
-////                        supervisor.stopcurPath();
-//                    }else if(modelData == "pause"){
-//                        modelData = "run";
-//                    }else if(modelData == "manual"){
-//                        supervisor.moveManual();
-//                        modelData = "manualon";
-//                    }else if(modelData == "manualon"){
-//                        supervisor.moveStop();
-//                        modelData = "manual";
-//                    }else if(modelData == "back"){
-//                        stackview.pop();
-//                    }
-//                }
-//            }
-//        }
-//    }
-//    }
-
-
-
     //Map Canvas ===========================================================
     function find_map_walls(){
         print("find map walls");
@@ -2548,6 +2987,46 @@ Item {
             ctx.stroke()
         }
     }
+    function draw_canvas_patrol_location(){
+        var ctx = canvas_location.getContext('2d');
+        var patrol_num = supervisor.getPatrolNum();
+        for(var i=0; i<patrol_num; i++){
+            var loc_type = supervisor.getPatrolType(i);
+            var loc_name = supervisor.getPatrolLocation(i);
+            var loc_x = supervisor.getPatrolX(i)/grid_size+origin_x;
+            var loc_y = supervisor.getPatrolY(i)/grid_size+origin_y;
+            var loc_th = -supervisor.getPatrolTH(i)-Math.PI/2;
+
+//            console.log(loc_type,loc_name,loc_x,loc_y,loc_th);
+
+            if(select_patrol == i){
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "yellow";
+            }else{
+                ctx.lineWidth = 1;
+                if(loc_type == "START"){
+                    ctx.strokeStyle = "green";
+                }else if(loc_type == "END"){
+                    ctx.strokeStyle = "red";
+                }else{
+                    ctx.strokeStyle = "white";
+                }
+            }
+            ctx.beginPath();
+            ctx.moveTo(loc_x,loc_y);
+            ctx.arc(loc_x,loc_y,robot_radius/grid_size, loc_th, loc_th+2*Math.PI, true);
+            ctx.moveTo(loc_x,loc_y);
+            ctx.fillStyle="red"
+            ctx.font="bold 20px sans-serif";
+            if(i==0){
+                ctx.fillText("START",loc_x+10,loc_y+5);
+            }else{
+                ctx.fillText(Number(i),loc_x+10,loc_y+5);
+            }
+
+            ctx.stroke()
+        }
+    }
     function draw_canvas_location_temp(){
         if(canvas_location.isnewLoc){
             var ctx = canvas_location.getContext('2d');
@@ -2564,6 +3043,24 @@ Item {
             ctx.arc(canvas_location.new_loc_x,canvas_location.new_loc_y,robot_radius/grid_size, -canvas_location.new_loc_th-Math.PI/2, -canvas_location.new_loc_th-Math.PI/2+2*Math.PI, true);
             ctx.moveTo(canvas_location.new_loc_x,canvas_location.new_loc_y);
             ctx.stroke()
+        }
+    }
+
+    function updatepatrol(){
+        if(supervisor.getPatrolMode() == 0){
+            mode_location.color = "blue";
+            mode_record.color = "gray";
+            if(stackview_patrol_menu.currentItem.objectName !== "menu_patrol_location"){
+                stackview_patrol_menu.pop();
+                stackview_patrol_menu.push(menu_patrol_location);
+            }
+        }else{
+            mode_location.color = "gray";
+            mode_record.color = "blue";
+            if(stackview_patrol_menu.currentItem.objectName != "menu_patrol_record"){
+                stackview_patrol_menu.pop();
+                stackview_patrol_menu.push(menu_patrol_record);
+            }
         }
     }
 
@@ -2688,7 +3185,6 @@ Item {
         }
 
     }
-
     function draw_canvas_margin(){
         var ctx1 = canvas_map.getContext('2d');
         var map_data = ctx1.getImageData(0,0,image_map.width, image_map.height);
@@ -2828,18 +3324,27 @@ Item {
     function updatelocation(){
         var loc_num = supervisor.getLocationNum();
         list_location.model.clear();
+        list_location2.model.clear();
         for(var i=0; i<loc_num; i++){
             list_location.model.append({"name":supervisor.getLocationTypes(i),"iscol":false});
+            list_location2.model.append({"name":supervisor.getLocationTypes(i),"iscol":false});
         }
         list_location.currentIndex = loc_num-1;
+        list_location2.currentIndex = 0;
     }
     function updatecanvas(){
-        canvas_map.requestPaint();
-        canvas_object.requestPaint();
-        canvas_location.requestPaint();
-        canvas_map_margin.requestPaint();
-        canvas_map_cur.requestPaint();
-        canvas_travelline.requestPaint();
+        if(map_mode == 2){
+            canvas_map.requestPaint();
+            canvas_object.requestPaint();
+            canvas_location.requestPaint();
+            canvas_map_margin.requestPaint();
+            canvas_map_cur.requestPaint();
+            canvas_travelline.requestPaint();
+        }else if(map_mode == 3){
+            canvas_map.requestPaint();
+            canvas_map_cur.requestPaint();
+        }
+
     }
     function updatelocationcollision(){
         for(var i=0; i<list_location.model.count; i++){
@@ -2873,6 +3378,5 @@ Item {
             list_line.model.append({"name":"line_" + Number(i/2)});
         }
     }
-
 
 }

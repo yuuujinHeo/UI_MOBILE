@@ -24,7 +24,16 @@ Item {
     function loadmap(path){
         map_image.source = path;
     }
+    function start_update(){
+        is_enabled = true;
+        update_map.start();
+    }
+    function stop_update(){
+        is_enabled = false;
+        update_map.stop();
+    }
 
+    property bool is_enabled: false
     property bool show_meta_data: true
     property bool flag_map: supervisor.getMapState()
     property bool flag_path_changed: false
@@ -272,14 +281,15 @@ Item {
             scale: canvas_cur_map.scale
             antialiasing: true
             onPaint:{
-                var ctx = getContext("2d");
-                ctx.clearRect(0,0,canvas_map.width,canvas_map.height);
-                ctx.drawImage(map_image, 0,0,image_width,image_height);
+                if(is_enabled){
+                    var ctx = getContext("2d");
+                    ctx.clearRect(0,0,canvas_map.width,canvas_map.height);
+                    ctx.drawImage(map_image, 0,0,image_width,image_height);
 
-                if(show_meta_data){
-                    canvas_draw_object();
+                    if(show_meta_data){
+                        canvas_draw_object();
+                    }
                 }
-
             }
         }
 
@@ -291,14 +301,15 @@ Item {
             height: image_height
             antialiasing: true
             onPaint:{
-                var ctx = getContext("2d");
-                ctx.clearRect(0,0,canvas_cur_map.width,canvas_cur_map.height);
-                if(show_meta_data){
-                    canvas_draw_path();
-                    canvas_draw_local_path();
-                    canvas_draw_robot();
+                if(is_enabled){
+                    var ctx = getContext("2d");
+                    ctx.clearRect(0,0,canvas_cur_map.width,canvas_cur_map.height);
+                    if(show_meta_data){
+                        canvas_draw_path();
+                        canvas_draw_local_path();
+                        canvas_draw_robot();
+                    }
                 }
-
             }
             Behavior on scale{
                 NumberAnimation{
@@ -379,36 +390,38 @@ Item {
                     }
                 }
                 onTouchUpdated:{
-                    var ctx = canvas_cur_map.getContext('2d');
-                    var dx = Math.abs(point1.x-point2.x);
-                    var dy = Math.abs(point1.y-point2.y);
-                    var mx = (point1.x+point2.x)/2;
-                    var my = (point1.y+point2.y)/2;
-                    var dist = Math.sqrt(dx*dx + dy*dy);
-                    var dscale = (dist)/startDist;
-                    var new_scale = canvas_cur_map.scale*dscale;
-                    if(point1.pressed&&point2.pressed){
+                    if(is_enabled){
+                        var ctx = canvas_cur_map.getContext('2d');
+                        var dx = Math.abs(point1.x-point2.x);
+                        var dy = Math.abs(point1.y-point2.y);
+                        var mx = (point1.x+point2.x)/2;
+                        var my = (point1.y+point2.y)/2;
+                        var dist = Math.sqrt(dx*dx + dy*dy);
+                        var dscale = (dist)/startDist;
+                        var new_scale = canvas_cur_map.scale*dscale;
+                        if(point1.pressed&&point2.pressed){
 
-                        if(new_scale > 5)   new_scale = 5;
+                            if(new_scale > 5)   new_scale = 5;
 
-                        if(canvas_cur_map.width*new_scale < rect_cur_map.width){
-                            new_scale = rect_cur_map.width/canvas_cur_map.width;
+                            if(canvas_cur_map.width*new_scale < rect_cur_map.width){
+                                new_scale = rect_cur_map.width/canvas_cur_map.width;
+                            }
+                            canvas_cur_map.scale = new_scale;
+
+                            dmoveX = (mx - startX);
+                            dmoveY = (my - startY);
+                            canvas_cur_map.x += dmoveX;
+                            canvas_cur_map.y += dmoveY;
+
+                            canvas_cur_map.requestPaint()
+                        }else{
+                            dmoveX = (point1.x - startX);
+                            dmoveY = (point1.y - startY);
+                            canvas_cur_map.x += dmoveX;
+                            canvas_cur_map.y += dmoveY;
+
+                            canvas_cur_map.requestPaint()
                         }
-                        canvas_cur_map.scale = new_scale;
-
-                        dmoveX = (mx - startX);
-                        dmoveY = (my - startY);
-                        canvas_cur_map.x += dmoveX;
-                        canvas_cur_map.y += dmoveY;
-
-                        canvas_cur_map.requestPaint()
-                    }else{
-                        dmoveX = (point1.x - startX);
-                        dmoveY = (point1.y - startY);
-                        canvas_cur_map.x += dmoveX;
-                        canvas_cur_map.y += dmoveY;
-
-                        canvas_cur_map.requestPaint()
                     }
                 }
             }

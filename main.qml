@@ -136,6 +136,9 @@ Window {
         ppickup.pos = tempstr;
         stackview.push(ppickup);
     }
+    function updatepatrol(){
+        pmap.updatepatrol();
+    }
 
     function updatecanvas(){
         pmap.updatecanvas();
@@ -215,7 +218,6 @@ Window {
         running: true
         repeat: false
         onTriggered: {
-//            stackview.push(pmovefail);
             if(pinit.init_mode == 4){
                 pkitchen.init();
                 stackview.push(pkitchen);
