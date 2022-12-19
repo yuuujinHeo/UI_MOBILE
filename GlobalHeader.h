@@ -2,16 +2,24 @@
 #define GLOBALHEADER_H
 
 #include "Logger.h"
-// opencv
 #include <opencv2/opencv.hpp>
 #include "cv_to_qt.h"
 
 extern Logger *plog;
+extern int ui_state;
+extern bool is_debug;
 
 typedef struct{
     int x;
     int y;
 }ST_POINT;
+
+typedef struct{
+    QString name;
+    bool check;
+    int x;
+    int y;
+}ST_GRID;
 
 typedef struct{
     QVector<ST_POINT>   line;
@@ -52,12 +60,14 @@ typedef struct{
     QVector<QString> objectName;
     QVector<QVector<ST_FPOINT>> objectPose;
 
-    float lidar_data[360];
 
     float margin;
     bool use_server;
     bool map_loaded;
+
+    ST_POSE init_pose;
 }ST_MAP;
+extern ST_MAP *pmap;
 
 typedef struct{
     //from Robot
@@ -77,12 +87,23 @@ typedef struct{
 
     //mine
     QString name = "";
+    QString name_debug = "";
     QString type = "SERVING";
     float velocity = 1.0;
+
     QVector<int> trays;
+    QVector<QString> call_list;
+
     ST_POSE targetPose;
+    QString targetLocation;
+
+    int call_moving_count;
+    int max_moving_count;
     float joystick[2];
+    float lidar_data[360];
+    float radius;
 }ST_ROBOT;
+extern ST_ROBOT *probot;
 
 typedef struct{
     QString type;
@@ -107,20 +128,83 @@ typedef struct{
     bool useServerCMD;
 }ST_SETTING;
 
+
 enum ROBOT_CMD{
     ROBOT_CMD_NONE = 0,
     ROBOT_CMD_MOVE_LOCATION,
     ROBOT_CMD_MOVE_TARGET,
     ROBOT_CMD_MOVE_JOG,
     ROBOT_CMD_MOVE_MANUAL,
-    ROBOT_CMD_MOVE_STOP,
+
+    ROBOT_CMD_MOVE_STOP,//=5
     ROBOT_CMD_MOVE_PAUSE,
     ROBOT_CMD_MOVE_RESUME,
     ROBOT_CMD_SET_VELOCITY,
     ROBOT_CMD_SET_MAP,
-    ROBOT_CMD_dSET_MAP
+
+    ROBOT_CMD_SET_INIT,//=10
+    ROBOT_CMD_SLAM_RUN,
+    ROBOT_CMD_SLAM_STOP,
+    ROBOT_CMD_SLAM_AUTO
 };
 
 
+enum TOOL_NUM{
+    TOOL_MOUSE = 0,
+    TOOL_BRUSH,
+    TOOL_ERASER
+};
+enum UI_CMD{
+    UI_CMD_NONE = 0,
+    UI_CMD_MOVE_TABLE,
+    UI_CMD_PAUSE,
+    UI_CMD_RESUME,
+    UI_CMD_MOVE_WAIT,
+
+    UI_CMD_MOVE_CHARGE,//5
+    UI_CMD_PICKUP_CONFIRM,
+    UI_CMD_WAIT_KITCHEN,
+    UI_CMD_TABLE_PATROL,
+    UI_CMD_PATROL_STOP,
+
+    UI_CMD_MOVE_CALLING//10
+};
+
+enum UI_STATE{
+    UI_STATE_NONE = 0,
+    UI_STATE_READY,
+    UI_STATE_CHARGING,
+    UI_STATE_GO_HOME,
+    UI_STATE_GO_CHARGE,
+
+    UI_STATE_SERVING,//5
+    UI_STATE_CALLING,
+    UI_STATE_PICKUP,
+    UI_STATE_PATROLLING,
+    UI_STATE_MOVEFAIL
+};
+
+enum ROBOT_STATE{
+    ROBOT_STATE_NOT_READY = 0,
+    ROBOT_STATE_READY,
+    ROBOT_STATE_MOVING,
+    ROBOT_STATE_AVOID,
+    ROBOT_STATE_PAUSED,
+
+    ROBOT_STATE_ERROR,//5
+    ROBOT_STATE_MANUALMODE,
+    ROBOT_STATE_BUSY
+};
+
+enum ROBOT_ERROR{
+    ROBOT_ERROR_NONE = 0,
+    ROBOT_ERROR_COL,
+    ROBOT_ERROR_NO_PATH,
+    ROBOT_ERROR_MOTOR_COMM,
+    ROBOT_ERROR_MOTOR,
+
+    ROBOT_ERROR_VOLTAGE,//5
+    ROBOT_ERROR_SENSOR
+};
 
 #endif // GLOBALHEADER_H

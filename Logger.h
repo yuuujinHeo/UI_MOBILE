@@ -15,7 +15,7 @@ class Logger : QObject
 public:
     Logger();
 
-    void write(const QString &str, bool print=true);
+    void write(const QString str, bool print=true);
     static void write_space();
 
 private:

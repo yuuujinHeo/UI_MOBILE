@@ -13,13 +13,14 @@ LCMHandler::LCMHandler()
         bThread = new std::thread(&LCMHandler::bLoop, this);
     }
 
-    robot.joystick[0] = 0;
-    robot.joystick[1] = 0;
-
+    probot->joystick[0] = 0;
+    probot->joystick[1] = 0;
 
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()),this,SLOT(onTimer()));
     timer->start(200);
+
+    plog->write("[BUILDER] LCM HANDLER constructed");
 }
 
 LCMHandler::~LCMHandler(){
@@ -28,27 +29,60 @@ LCMHandler::~LCMHandler(){
         bFlag = false;
         bThread->join();
     }
+    plog->write("[BUILDER] LCM HANDLER destroyed");
 }
 
-void LCMHandler::setMapData(ST_MAP _map){
-    map = _map;
-}
 
 
 ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
+void LCMHandler::sendCommand(command cmd, QString msg){
+    if(isconnect){
+        if(probot->state != ROBOT_STATE_BUSY){
+            if(is_debug){
+                lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&cmd);
+            }else{
+                lcm.publish("COMMAND_"+probot->name.toStdString(),&cmd);
+            }
+            plog->write("[LCM] SEND COMMAND : " + msg);
+            flag_tx = true;
+        }else{
+            plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) : " + msg);
+        }
+    }else{
+        plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) : " + msg);
+    }
+}
+
+void LCMHandler::sendCommand(int cmd, QString msg){
+    command send_msg;
+    send_msg.cmd = cmd;
+
+    if(isconnect){
+        if(probot->state != ROBOT_STATE_BUSY){
+            if(is_debug){
+                lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&send_msg);
+            }else{
+                lcm.publish("COMMAND_"+probot->name.toStdString(),&send_msg);
+            }
+            plog->write("[LCM] SEND COMMAND : " + msg);
+            flag_tx = true;
+        }else{
+            plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) : " + msg);
+        }
+    }else{
+        plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) : " + msg);
+    }
+}
 
 void LCMHandler::moveTo(QString target_loc){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_MOVE_LOCATION;
     memcpy(send_msg.params,target_loc.toUtf8(),sizeof(char)*255);
-    robot.curLocation = target_loc;
-    plog->write("[LCM] SEND COMMAND : MOVE LOCATION TO "+target_loc);
-    if(isdebug){
-        lcm.publish("COMMAND_"+debug_robot_name.toStdString(),&send_msg);
-    }else{
-        lcm.publish("COMMAND_"+robot.name.toStdString(),&send_msg);
-    }
+
+    probot->curLocation = target_loc;
+    sendCommand(send_msg, "MOVE LOCATION TO"+target_loc);
 }
+
 void LCMHandler::moveTo(float x, float y, float th){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_MOVE_TARGET;
@@ -69,109 +103,50 @@ void LCMHandler::moveTo(float x, float y, float th){
     send_msg.params[10]= array[2];
     send_msg.params[11]= array[3];
 
-    robot.curTarget.x = x;
-    robot.curTarget.y = y;
-    robot.curTarget.th = th;
-    plog->write("[LCM] SEND COMMAND : MOVE TARGET TO "+QString().sprintf("%f, %f, %f",x,y,th));
-    qDebug() << isdebug << robot.name;
-    if(isdebug){
-        lcm.publish("COMMAND_"+debug_robot_name.toStdString(),&send_msg);
-    }else{
-        lcm.publish("COMMAND_"+robot.name.toStdString(),&send_msg);
-    }
+    probot->curTarget.x = x;
+    probot->curTarget.y = y;
+    probot->curTarget.th = th;
+    sendCommand(send_msg, "MOVE TARGET TO"+QString().sprintf("%f, %f, %f",x,y,th));
 }
 void LCMHandler::movePause(){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_MOVE_PAUSE;
-    plog->write("[LCM] SEND COMMAND : MOVE PAUSE");
-    if(isdebug){
-        lcm.publish("COMMAND_"+debug_robot_name.toStdString(),&send_msg);
-    }else{
-        lcm.publish("COMMAND_"+robot.name.toStdString(),&send_msg);
-    }
+    sendCommand(send_msg, "MOVE PAUSE");
 }
 void LCMHandler::moveResume(){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_MOVE_RESUME;
-    plog->write("[LCM] SEND COMMAND : MOVE RESUME");
-    if(isdebug){
-        lcm.publish("COMMAND_"+debug_robot_name.toStdString(),&send_msg);
-    }else{
-        lcm.publish("COMMAND_"+robot.name.toStdString(),&send_msg);
-    }
+    sendCommand(send_msg, "MOVE RESUME");
 }
 void LCMHandler::moveJog(){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_MOVE_JOG;
     uint8_t *array;
-    array = reinterpret_cast<uint8_t*>(&robot.joystick[0]);
+    array = reinterpret_cast<uint8_t*>(&probot->joystick[0]);
     send_msg.params[0] = array[0];
     send_msg.params[1] = array[1];
     send_msg.params[2] = array[2];
     send_msg.params[3] = array[3];
 
-    array = reinterpret_cast<uint8_t*>(&robot.joystick[1]);
+    array = reinterpret_cast<uint8_t*>(&probot->joystick[1]);
     send_msg.params[4] = array[0];
     send_msg.params[5] = array[1];
     send_msg.params[6] = array[2];
     send_msg.params[7] = array[3];
-    plog->write("[LCM] SEND COMMAND : MOVE TARGET TO "+QString().sprintf("%f, %f",robot.joystick[0],robot.joystick[1]));
-    if(isdebug){
-        qDebug() << debug_robot_name;
-        lcm.publish("COMMAND_"+debug_robot_name.toStdString(),&send_msg);
-    }else{
-        lcm.publish("COMMAND_"+robot.name.toStdString(),&send_msg);
-    }
+
+    sendCommand(send_msg, "MOVE JOYSTICK "+QString().sprintf("%f, %f",probot->joystick[0],probot->joystick[1]));
 }
 void LCMHandler::moveStop(){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_MOVE_STOP;
-    plog->write("[LCM] SEND COMMAND : MOVE STOP");
-    if(isdebug){
-        lcm.publish("COMMAND_"+debug_robot_name.toStdString(),&send_msg);
-    }else{
-        lcm.publish("COMMAND_"+robot.name.toStdString(),&send_msg);
-    }
+    sendCommand(send_msg, "MOVE STOP");
 }
 void LCMHandler::moveManual(){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_MOVE_MANUAL;
-    plog->write("[LCM] SEND COMMAND : MOVE MANUAL START");
-    if(isdebug){
-        lcm.publish("COMMAND_"+debug_robot_name.toStdString(),&send_msg);
-    }else{
-        lcm.publish("COMMAND_"+robot.name.toStdString(),&send_msg);
-    }
+    sendCommand(send_msg, "MOVE MANUAL START");
 }
 
-int LCMHandler::getLocationNum(QString name){
-    for(int i=0; i<map.locationName.size(); i++){
-        if(map.locationName[i] == name){
-            return i + 2;
-        }
-    }
-}
-void LCMHandler::setVelocity(float vel, float velth){
-    command send_msg;
-    send_msg.cmd = ROBOT_CMD_SET_VELOCITY;
-    uint8_t *array;
-    array = reinterpret_cast<uint8_t*>(&vel);
-    send_msg.params[0] = array[0];
-    send_msg.params[1] = array[1];
-    send_msg.params[2] = array[2];
-    send_msg.params[3] = array[3];
-    array = reinterpret_cast<uint8_t*>(&velth);
-    send_msg.params[4] = array[0];
-    send_msg.params[5] = array[1];
-    send_msg.params[6] = array[2];
-    send_msg.params[7] = array[3];
-    plog->write("[LCM] SEND COMMAND : SET VELOCITY TO "+QString().sprintf("%f, %f",vel,velth));
-    if(isdebug){
-        lcm.publish("COMMAND_"+debug_robot_name.toStdString(),&send_msg);
-    }else{
-        lcm.publish("COMMAND_"+robot.name.toStdString(),&send_msg);
-    }
-}
 void LCMHandler::setVelocity(float vel){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_SET_VELOCITY;
@@ -181,63 +156,75 @@ void LCMHandler::setVelocity(float vel){
     send_msg.params[1] = array[1];
     send_msg.params[2] = array[2];
     send_msg.params[3] = array[3];
-    plog->write("[LCM] SEND COMMAND : SET VELOCITY TO "+QString().sprintf("%f",vel));
-    if(isdebug){
-        lcm.publish("COMMAND_"+debug_robot_name.toStdString(),&send_msg);
-    }else{
-        lcm.publish("COMMAND_"+robot.name.toStdString(),&send_msg);
-    }
+
+    sendCommand(send_msg, "SET VELOCITY TO "+QString().sprintf("%f",vel));
 }
+
 void LCMHandler::programStart(){
+}
+
+void LCMHandler::setInitPose(float x, float y, float th){
     command send_msg;
-//    send_msg.cmd = ROBOT_CMD_START;
-    if(isdebug){
-        lcm.publish("COMMAND_"+debug_robot_name.toStdString(),&send_msg);
-    }else{
-        lcm.publish("COMMAND_"+robot.name.toStdString(),&send_msg);
-    }
+    send_msg.cmd = ROBOT_CMD_SET_INIT;
+    uint8_t *array;
+    array = reinterpret_cast<uint8_t*>(&x);
+    send_msg.params[0] = array[0];
+    send_msg.params[1] = array[1];
+    send_msg.params[2] = array[2];
+    send_msg.params[3] = array[3];
+    array = reinterpret_cast<uint8_t*>(&y);
+    send_msg.params[4] = array[0];
+    send_msg.params[5] = array[1];
+    send_msg.params[6] = array[2];
+    send_msg.params[7] = array[3];
+    array = reinterpret_cast<uint8_t*>(&th);
+    send_msg.params[8] = array[0];
+    send_msg.params[9] = array[1];
+    send_msg.params[10] = array[2];
+    send_msg.params[11] = array[3];
+
+    sendCommand(send_msg, "SET INIT "+QString().sprintf("%f, %f, %f",x,y,th));
 }
 
 void LCMHandler::sendMapPath(QString path){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_SET_MAP;
     memcpy(send_msg.params,path.toUtf8(),sizeof(char)*255);
-    if(isdebug){
-        lcm.publish("COMMAND_"+debug_robot_name.toStdString(),&send_msg);
-    }else{
-        lcm.publish("COMMAND_"+robot.name.toStdString(),&send_msg);
-    }
+
+    sendCommand(send_msg,"SEND MAP PATH ("+path+")");
 }
 
 ////*********************************************  CALLBACK FUNCTIONS   ***************************************************////
 void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg){
     isconnect = true;
+    flag_rx = true;
     connect_count = 0;
-    robot.battery = msg->bat;
-    robot.state = msg->state;
-    robot.err_code = msg->err_code;
-    robot.curPose.x = msg->robot_pose[0];
-    robot.curPose.y = msg->robot_pose[1];
-    robot.curPose.th = msg->robot_pose[2];
+    probot->battery = msg->bat;
+    probot->state = msg->state;
+    probot->err_code = msg->err_code;
+    probot->curPose.x = msg->robot_pose[0];
+    probot->curPose.y = msg->robot_pose[1];
+    probot->curPose.th = msg->robot_pose[2];
     for(int i=0; i<360; i++){
-        map.lidar_data[i] = msg->robot_scan[i];
+        probot->lidar_data[i] = msg->robot_scan[i];
     }
 }
 
 void LCMHandler::robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg){
     isconnect = true;
+    flag_rx = true;
     connect_count = 0;
     flagPath = true;
-    robot.pathSize = msg->num;
-    for(int i=0; i<robot.pathSize; i++){
+    probot->pathSize = msg->num;
+    for(int i=0; i<probot->pathSize; i++){
         ST_POSE temp;
         temp.x = msg->path[i][0];
         temp.y = msg->path[i][1];
         temp.th = msg->path[i][2];
-        if(robot.curPath.size() > i){
-            robot.curPath[i] = temp;
+        if(probot->curPath.size() > i){
+            probot->curPath[i] = temp;
         }else{
-            robot.curPath.push_back(temp);
+            probot->curPath.push_back(temp);
         }
     }
     emit pathchanged();
@@ -246,15 +233,16 @@ void LCMHandler::robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::
 
 void LCMHandler::robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg){
     isconnect = true;
+    flag_rx = true;
     connect_count = 0;
     flagLocalPath = true;
-    robot.localpathSize = msg->num;
-    for(int i=0; i<robot.localpathSize; i++){
+    probot->localpathSize = msg->num;
+    for(int i=0; i<probot->localpathSize; i++){
         ST_POSE temp;
         temp.x = msg->path[i][0];
         temp.y = msg->path[i][1];
         temp.th = msg->path[i][2];
-        robot.localPath[i] = temp;
+        probot->localPath[i] = temp;
     }
     flagLocalPath = false;
 }
@@ -268,50 +256,50 @@ void LCMHandler::bLoop()
     */
 
     // lcm init
-    if(lcm.good())
+    if(!lcm.good())
     {
-        lcm.subscribe("STATUS_DATA_"+robot.name.toStdString(), &LCMHandler::robot_status_callback, this);
-        lcm.subscribe("ROBOT_PATH_"+robot.name.toStdString(), &LCMHandler::robot_path_callback, this);
-        lcm.subscribe("ROBOT_LOCAL_PATH_"+robot.name.toStdString(), &LCMHandler::robot_local_path_callback, this);
-    }
-    else
-    {
+        plog->write("[LCM ERROR] LCM CONNECT FAILED");
         isconnect = false;
-        qDebug() << "lcm init failed";
     }
 
     while(bFlag)
     {
         lcm.handleTimeout(1);
-
-        if(robotnamechanged){
-            robotnamechanged = false;
-            if(isdebug){
-                lcm.subscribe("STATUS_DATA_"+debug_robot_name.toStdString(), &LCMHandler::robot_status_callback, this);
-                lcm.subscribe("ROBOT_PATH_"+debug_robot_name.toStdString(), &LCMHandler::robot_path_callback, this);
-                lcm.subscribe("ROBOT_LOCAL_PATH_"+debug_robot_name.toStdString(), &LCMHandler::robot_local_path_callback, this);
-            }else{
-                lcm.subscribe("STATUS_DATA_"+robot.name.toStdString(), &LCMHandler::robot_status_callback, this);
-                lcm.subscribe("ROBOT_PATH_"+robot.name.toStdString(), &LCMHandler::robot_path_callback, this);
-                lcm.subscribe("ROBOT_LOCAL_PATH_"+robot.name.toStdString(), &LCMHandler::robot_local_path_callback, this);
-            }
-        }
     }
 }
 
+void LCMHandler::subscribe(){
+    lcm.unsubscribe(sub_status);
+    lcm.unsubscribe(sub_path);
+    lcm.unsubscribe(sub_localpath);
+    if(is_debug){
+        sub_status = lcm.subscribe("STATUS_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_status_callback, this);
+        sub_path = lcm.subscribe("ROBOT_PATH_"+probot->name_debug.toStdString(), &LCMHandler::robot_path_callback, this);
+        sub_localpath = lcm.subscribe("ROBOT_LOCAL_PATH_"+probot->name_debug.toStdString(), &LCMHandler::robot_local_path_callback, this);
+    }else{
+        sub_status = lcm.subscribe("STATUS_DATA_"+probot->name.toStdString(), &LCMHandler::robot_status_callback, this);
+        sub_path = lcm.subscribe("ROBOT_PATH_"+probot->name.toStdString(), &LCMHandler::robot_path_callback, this);
+        sub_localpath = lcm.subscribe("ROBOT_LOCAL_PATH_"+probot->name.toStdString(), &LCMHandler::robot_local_path_callback, this);
+    }
+}
 void LCMHandler::onTimer(){
+    //10ms 조이스틱 값 읽어오기
     if(flagJoystick){
         moveJog();
         flagJoystick = false;
     }else{
-        if(robot.joystick[0] != 0 || robot.joystick[1] != 0 ){
+        if(probot->joystick[0] != 0 || probot->joystick[1] != 0 ){
             moveJog();
         }
     }
 
-    if(connect_count++ > 25){
+    static int count=0;
+    if(count++%10==0){
+        flag_rx = false;
+        flag_tx = false;
+    }
+    //LCM 통신 연결상태 확인(3초)
+    if(connect_count++ > 300){
         isconnect = false;
     }
-
-
 }

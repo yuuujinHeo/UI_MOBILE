@@ -6,12 +6,6 @@ Item {
     width: 1280
     height: 800
 
-    property string robotName: "test"
-    property double battery: 0
-    property date curDate: new Date()
-    property string curTime: curDate.toLocaleTimeString()
-    property int robotname_margin: 300
-    property int tray_center: 700
     function init(){
 
     }
@@ -23,60 +17,6 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         color: "white"
-        Text{
-            id: textName
-            anchors.left: parent.left
-            anchors.leftMargin: robotname_margin
-            anchors.verticalCenter: parent.verticalCenter
-            font.family: font_noto_r.name
-            font.pixelSize: 20
-            text: robotName
-        }
-        Text{
-            id: textTime
-            x: tray_center - width/2
-            anchors.verticalCenter: parent.verticalCenter
-            text: curTime
-            font.family: font_noto_b.name
-            font.pixelSize: 20
-        }
-        Image{
-            id: image_clock
-            source:"icon/clock.png"
-            anchors.right: textTime.left
-            anchors.rightMargin: 10
-            anchors.verticalCenter: textTime.verticalCenter
-        }
-
-        Image{
-            id: image_battery
-            source: {
-                if(battery > 90){
-                    "icon/bat_full.png"
-                }else if(battery > 60){
-                    "icon/bat_3.png"
-                }else if(battery > 30){
-                    "icon/bat_2.png"
-                }else{
-                    "icon/bat_1.png"
-                }
-            }
-            height: textBattery.height
-            width: height*2
-            anchors.verticalCenter: textBattery.verticalCenter
-            anchors.right: textBattery.left
-            anchors.rightMargin: 20
-        }
-
-        Text{
-            id: textBattery
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-            anchors.rightMargin: 50
-            color: "#7e7e7e"
-            font.pixelSize: 20
-            text: battery.toFixed(0)+' %'
-        }
     }
 
     Rectangle{
@@ -230,6 +170,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        supervisor.programHide();
                         mainwindow.showMinimized()
                     }
                 }

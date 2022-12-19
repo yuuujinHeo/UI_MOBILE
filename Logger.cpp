@@ -18,8 +18,9 @@ Logger::Logger()
 
 }
 
-void Logger::write(const QString &str, bool print){
+void Logger::write(const QString str, bool print){
     QString text = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + " " + str + "\n";
+    QString text1 = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + " " + str;
 
 
     QString tempname = instance.getFileName();
@@ -35,8 +36,9 @@ void Logger::write(const QString &str, bool print){
         instance.file->open(QIODevice::Append | QIODevice::Text);
     }
 
-    if(print == true)
-        qDebug() << str;
+    if(print == true){
+        std::cout << text1.toStdString() << std::endl;
+    }
 
     QTextStream out(instance.file);
     out.setCodec("UTF-8");

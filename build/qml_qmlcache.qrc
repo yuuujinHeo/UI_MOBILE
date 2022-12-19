@@ -50,5 +50,23 @@
         <file alias="icon/btn_yes.png">../icon/btn_yes.png</file>
         <file alias="icon/btn_no.png">../icon/btn_no.png</file>
         <file alias="image/image_location.png">../image/image_location.png</file>
+        <file alias="icon/joy_up.png">../icon/joy_up.png</file>
+        <file alias="icon/joy_right.png">../icon/joy_right.png</file>
+        <file alias="icon/joy_left.png">../icon/joy_left.png</file>
+        <file alias="icon/joy_down.png">../icon/joy_down.png</file>
+        <file alias="icon/joy_connect.png">../icon/joy_connect.png</file>
+        <file alias="icon/data_green.png">../icon/data_green.png</file>
+        <file alias="icon/data_gray.png">../icon/data_gray.png</file>
+        <file alias="icon/icon_researching.png">../icon/icon_researching.png</file>
+        <file alias="icon/icon_manualmove.png">../icon/icon_manualmove.png</file>
+        <file alias="icon/icon_connect_error.png">../icon/icon_connect_error.png</file>
+        <file alias="icon/icon_connect.png">../icon/icon_connect.png</file>
+        <file alias="icon/icon_cancelpath.png">../icon/icon_cancelpath.png</file>
+        <file alias="image/robot_head_sleep.png">../image/robot_head_sleep.png</file>
+        <file alias="image/robot_clear.png">../image/robot_clear.png</file>
+        <file alias="image/robot_callme.png">../image/robot_callme.png</file>
+        <file alias="icon/patrol_down.png">../icon/patrol_down.png</file>
+        <file alias="icon/icon_server_connect.png">../icon/icon_server_connect.png</file>
+        <file alias="icon/icon_joy_connect.png">../icon/icon_joy_connect.png</file>
     </qresource>
 </RCC>
