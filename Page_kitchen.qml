@@ -12,9 +12,31 @@ Item {
         table_num = supervisor.getTableNum();
         tray_num = supervisor.getTrayNum();
         traymodel.clear();
+        robot_type = supervisor.getRobotType();
         for(var i=0; i<tray_num; i++){
             traymodel.append({x:0,y:0,tray_num:i+1,set_table:0,color:"white"});
         }
+        if(robot_type == "CALLING"){
+            popup_question.visible = true;
+            supervisor.loadPatrolFile(supervisor.getPatrolFileName());
+            var num=supervisor.getPatrolNum();
+
+            repeat_patrol.model.clear();
+            repeat_patrol.model.append({type:0,name:"Start"});
+
+            for(var i=0; i<num; i++){
+                repeat_patrol.model.append({type:2,name:""});
+                print(supervisor.getPatrolLocation(i));
+                if(supervisor.getPatrolLocation(i) == ""){
+                    var text="x:"+supervisor.getPatrolX(i)+", y:"+supervisor.getPatrolY(i)+", th:"+supervisor.getPatrolTH(i);
+                    repeat_patrol.model.append({type:1,name:text});
+                    print(text);
+                }else{
+                    repeat_patrol.model.append({type:1,name:supervisor.getPatrolLocation(i)});
+                }
+            }
+        }
+        statusbar.visible = true;
     }
     property int tray_num: 3
     property int table_num: 5
@@ -37,77 +59,13 @@ Item {
     property int cur_table: 0
     property bool go_wait: false
     property bool go_charge: false
-    property int robotname_margin: rect_table_box.width/2 - textName.width/2
+    property bool go_patrol: false
+    property int robotname_margin: rect_table_box.width/2
     property string robot_type: supervisor.getRobotType()
 
     Rectangle{
         anchors.fill : parent
         color: "#f4f4f4"
-    }
-
-    Rectangle{
-        id: status_bar
-        width: parent.width
-        height: 60
-        anchors.top: parent.top
-        color: "white"
-        Text{
-            id: textName
-            anchors.left: parent.left
-            anchors.leftMargin: robotname_margin
-            anchors.verticalCenter: parent.verticalCenter
-            font.family: font_noto_r.name
-            font.pixelSize: 20
-            text: robotName
-            onTextChanged: {
-                robotname_margin = rect_table_box.width/2 - textName.width/2
-            }
-        }
-        Text{
-            id: textTime
-            x: tray_center - width/2
-            anchors.verticalCenter: parent.verticalCenter
-            text: curTime
-            font.family: font_noto_b.name
-            font.pixelSize: 20
-        }
-        Image{
-            id: image_clock
-            source:"icon/clock.png"
-            anchors.right: textTime.left
-            anchors.rightMargin: 10
-            anchors.verticalCenter: textTime.verticalCenter
-        }
-
-        Image{
-            id: image_battery
-            source: {
-                if(battery > 90){
-                    "icon/bat_full.png"
-                }else if(battery > 60){
-                    "icon/bat_3.png"
-                }else if(battery > 30){
-                    "icon/bat_2.png"
-                }else{
-                    "icon/bat_1.png"
-                }
-            }
-            height: textBattery.height
-            width: height*2
-            anchors.verticalCenter: textBattery.verticalCenter
-            anchors.right: textBattery.left
-            anchors.rightMargin: 20
-        }
-
-        Text{
-            id: textBattery
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-            anchors.rightMargin: 50
-            color: "#7e7e7e"
-            font.pixelSize: 20
-            text: battery.toFixed(0)+' %'
-        }
     }
 
     ListModel{
@@ -119,6 +77,13 @@ Item {
             set_table: 0
             color: "white"
         }
+    }
+    ListModel{
+        id: patrolmodel
+//        ListElement{
+//            type: 0
+//            name: "Start"
+//        }
     }
 
     Image{
@@ -258,12 +223,13 @@ Item {
         id: rect_table_box
         visible: robot_type=="SERVING"?true:false
         width: (table_num/5).toFixed(0)*100 - 20 + 160
-        height: parent.height - status_bar.height
+        height: parent.height - statusbar.height
         anchors.left: parent.left
-        anchors.top: status_bar.bottom
+        anchors.top: parent.top
+        anchors.topMargin: statusbar.height
         color: "#282828"
         onWidthChanged: {
-            robotname_margin = rect_table_box.width/2 - textName.width/2
+            robotname_margin = rect_table_box.width/2
         }
 
         Text{
@@ -357,24 +323,80 @@ Item {
         id: rect_patrol_box
         visible: robot_type=="CALLING"?true:false
         width: (table_num/5).toFixed(0)*100 - 20 + 160
-        height: parent.height - status_bar.height
+        height: parent.height - statusbar.height
         anchors.left: parent.left
-        anchors.top: status_bar.bottom
+        anchors.top: parent.top
+        anchors.topMargin: statusbar.height
         color: "#282828"
         onWidthChanged: {
-            robotname_margin = rect_table_box.width/2 - textName.width/2
+            robotname_margin = rect_table_box.width/2
         }
 
         Text{
+            id: text_patrol
             color:"white"
             font.bold: true
             font.family: font_noto_b.name
-            text: "패트롤 위치"
+            text: "로봇 이동경로"
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 40
             font.pixelSize: 30
         }
+
+        Flickable{
+            width: 180
+            height: parent.height - y - 100
+            contentHeight: column_patrol.height
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: text_patrol.bottom
+            anchors.topMargin: 50
+            clip: true
+            Column{
+                id: column_patrol
+                anchors.centerIn: parent
+                Repeater{
+                    id: repeat_patrol
+                    model: patrolmodel
+                    Rectangle{
+                        width: 179
+                        height: 44
+                        color: "transparent"
+                        Rectangle{
+                            enabled: patrolmodel.get(index).type===2?false:true
+                            visible:patrolmodel.get(index).type===2?false:true
+                            anchors.fill: parent
+                            color:{
+                                if(patrolmodel.get(index).type == 0){
+                                    "#282828"
+                                }else{
+                                    "#d0d0d0"
+                                }
+                            }
+                            radius: 10
+                            border.width: 4
+                            border.color: "#d0d0d0"
+                            Text{
+                                anchors.centerIn: parent
+                                color:patrolmodel.get(index).type===0?"#d0d0d0":"#282828"
+                                text:patrolmodel.get(index).name
+                                font.family: font_noto_r.name
+                                font.pixelSize: 20
+                            }
+                        }
+                        Image{
+                            visible:patrolmodel.get(index).type===2?true:false
+                            anchors.centerIn: parent
+                            width: 22
+                            height: 13
+                            source: "icon/patrol_down.png"
+                        }
+                    }
+                }
+            }
+
+        }
+
     }
     Rectangle{
         id: rect_calling_box
@@ -420,6 +442,7 @@ Item {
             id: btn_go2
             anchors.fill: parent
             onClicked: {
+                go_patrol = true;
                 popup_question.visible = true;
                 print("patrol start button");
             }
@@ -433,8 +456,8 @@ Item {
         height: width*3
         anchors.right: parent.right
         anchors.rightMargin: 50
-        anchors.top: status_bar.bottom
-        anchors.topMargin: 50
+        anchors.top: parent.top
+        anchors.topMargin: statusbar.height + 50
         color: "white"
         radius: 30
         Column{
@@ -542,7 +565,6 @@ Item {
         }
     }
 
-
     Item{
         id: popup_question
         width: parent.width
@@ -576,10 +598,49 @@ Item {
                     "대기 장소로 이동<font color=\"white\">하시겠습니까?</font>"
                 }else if(go_charge){
                     "충전기로 이동<font color=\"white\">하시겠습니까?</font>"
-                }else if(robot_type == "CALLING"){
+                }else if(go_patrol){
                     "패트롤을 시작 <font color=\"white\">하시겠습니까?</font>"
+                }else if(robot_type == "CALLING"){
+                    "트레이를 모두 비우고<font color=\"white\"> 확인 버튼을 눌러주세요.</font>"
                 }else{
                     ""
+                }
+            }
+        }
+        Rectangle{
+            id: btn_confirm
+            width: 250
+            height: 90
+            radius: 20
+            visible: !go_charge&&!go_wait&&!go_patrol
+            color: "#d0d0d0"
+            anchors.top: text_quest.bottom
+            anchors.topMargin: 50
+            anchors.horizontalCenter: parent.horizontalCenter
+            Image{
+                id: image_confirm
+                source: "icon/btn_yes.png"
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: 20
+            }
+            Text{
+                id:text_confirm
+                text:"확인"
+                font.family: font_noto_b.name
+                font.pixelSize: 30
+                color:"#282828"
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: image_confirm.right
+                anchors.leftMargin : (parent.width - image_confirm.x - image_confirm.width)/2 - text_confirm.width/2
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    go_wait = false;
+                    go_charge = false;
+                    go_patrol = false;
+                    popup_question.visible = false;
                 }
             }
         }
@@ -588,6 +649,7 @@ Item {
             width: 250
             height: 90
             radius: 20
+            visible: go_charge||go_wait||go_patrol
             color: "#d0d0d0"
             anchors.top: text_quest.bottom
             anchors.topMargin: 50
@@ -615,6 +677,7 @@ Item {
                 onClicked: {
                     go_wait = false;
                     go_charge = false;
+                    go_patrol = false;
                     popup_question.visible = false;
                 }
             }
@@ -624,6 +687,7 @@ Item {
             width: 250
             height: 90
             radius: 20
+            visible: go_charge||go_wait||go_patrol
             color: "#d0d0d0"
             anchors.top: text_quest.bottom
             anchors.topMargin: 50
@@ -659,11 +723,13 @@ Item {
                         supervisor.moveToWait();
                     }else if(go_charge){
                         supervisor.moveToCharge();
-                    }else if(robot_type == "CALLING"){
+                    }else if(go_patrol){
                         print("patrol start command");
+                    }else if(robot_type == "CALLING"){
                     }
                     go_wait = false;
                     go_charge = false;
+                    go_patrol = false;
                     popup_question.visible = false;
                 }
             }

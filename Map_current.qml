@@ -13,26 +13,6 @@ Item {
     width: _width
     height: _height
 
-    function updatepath(){
-        canvas_cur_map.requestPaint();
-    }
-
-    function loadmap_mini(){
-        map_image.source = "file://"+applicationDirPath + "/image/map_mini.png"
-    }
-
-    function loadmap(path){
-        map_image.source = path;
-    }
-    function start_update(){
-        is_enabled = true;
-        update_map.start();
-    }
-    function stop_update(){
-        is_enabled = false;
-        update_map.stop();
-    }
-
     property bool is_enabled: false
     property bool show_meta_data: true
     property bool flag_map: supervisor.getMapState()

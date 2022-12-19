@@ -1,0 +1,543 @@
+2022-12-19 09:27:08 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:27:08 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:27:08 [USB] NEW USB Detected
+2022-12-19 09:27:08 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:27:09 [BUILDER] SET WINDOW 
+2022-12-19 09:27:09 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:27:09 [MAP] Make Minimap : 1/3
+2022-12-19 09:27:09 [MAP] Make Minimap : 2/3
+2022-12-19 09:27:10 [MAP] Make Minimap : DONE
+2022-12-19 09:27:10 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:27:46 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:27:46 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:27:46 [USB] NEW USB Detected
+2022-12-19 09:27:46 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:27:46 [BUILDER] SET WINDOW 
+2022-12-19 09:27:47 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:27:47 [MAP] Make Minimap : 1/3
+2022-12-19 09:27:47 [MAP] Make Minimap : 2/3
+2022-12-19 09:27:47 [MAP] Make Minimap : DONE
+2022-12-19 09:27:48 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:29:33 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:29:33 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:29:33 [USB] NEW USB Detected
+2022-12-19 09:29:33 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:29:33 [BUILDER] SET WINDOW 
+2022-12-19 09:29:34 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:29:34 [MAP] Make Minimap : 1/3
+2022-12-19 09:29:34 [MAP] Make Minimap : 2/3
+2022-12-19 09:29:34 [MAP] Make Minimap : DONE
+2022-12-19 09:29:35 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:30:22 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:30:22 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:30:22 [USB] NEW USB Detected
+2022-12-19 09:30:22 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:30:22 [BUILDER] SET WINDOW 
+2022-12-19 09:30:23 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:30:49 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:30:49 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:30:49 [USB] NEW USB Detected
+2022-12-19 09:30:49 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:30:49 [BUILDER] SET WINDOW 
+2022-12-19 09:30:50 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:30:50 [MAP] Make Minimap : 1/3
+2022-12-19 09:30:50 [MAP] Make Minimap : 2/3
+2022-12-19 09:30:50 [MAP] Make Minimap : DONE
+2022-12-19 09:30:51 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:33:21 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:33:21 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:33:21 [USB] NEW USB Detected
+2022-12-19 09:33:21 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:33:21 [BUILDER] SET WINDOW 
+2022-12-19 09:33:22 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:33:22 [MAP] Make Minimap : 1/3
+2022-12-19 09:33:22 [MAP] Make Minimap : 2/3
+2022-12-19 09:33:22 [MAP] Make Minimap : DONE
+2022-12-19 09:33:23 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:33:25 [USER INPUT] Load Patrol : patrol/patrol_basic.ini
+2022-12-19 09:33:25 [SETTING] SET PATROL/curfile VALUE TO patrol/patrol_basic.ini
+2022-12-19 09:36:12 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:36:12 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:36:12 [USB] NEW USB Detected
+2022-12-19 09:36:12 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:36:12 [BUILDER] SET WINDOW 
+2022-12-19 09:36:13 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:36:13 [MAP] Make Minimap : 1/3
+2022-12-19 09:36:13 [MAP] Make Minimap : 2/3
+2022-12-19 09:36:13 [MAP] Make Minimap : DONE
+2022-12-19 09:36:14 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:37:12 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:37:12 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:37:12 [USB] NEW USB Detected
+2022-12-19 09:37:12 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:37:12 [BUILDER] SET WINDOW 
+2022-12-19 09:37:13 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:37:13 [MAP] Make Minimap : 1/3
+2022-12-19 09:37:13 [MAP] Make Minimap : 2/3
+2022-12-19 09:37:13 [MAP] Make Minimap : DONE
+2022-12-19 09:37:14 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:38:57 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:38:57 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:38:57 [USB] NEW USB Detected
+2022-12-19 09:38:57 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:38:57 [BUILDER] SET WINDOW 
+2022-12-19 09:38:58 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:38:58 [MAP] Make Minimap : 1/3
+2022-12-19 09:38:58 [MAP] Make Minimap : 2/3
+2022-12-19 09:38:58 [MAP] Make Minimap : DONE
+2022-12-19 09:38:59 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:39:01 [USER INPUT] Load Patrol : patrol/patrol_basic.ini
+2022-12-19 09:39:01 [SETTING] SET PATROL/curfile VALUE TO patrol/patrol_basic.ini
+2022-12-19 09:39:58 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:39:58 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:39:58 [USB] NEW USB Detected
+2022-12-19 09:39:58 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:39:58 [BUILDER] SET WINDOW 
+2022-12-19 09:39:59 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:39:59 [MAP] Make Minimap : 1/3
+2022-12-19 09:39:59 [MAP] Make Minimap : 2/3
+2022-12-19 09:39:59 [MAP] Make Minimap : DONE
+2022-12-19 09:40:00 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:40:07 [USER INPUT] Load Patrol : patrol/patrol_basic.ini
+2022-12-19 09:40:07 [SETTING] SET PATROL/curfile VALUE TO patrol/patrol_basic.ini
+2022-12-19 09:40:12 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:40:12 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:40:12 [USB] NEW USB Detected
+2022-12-19 09:40:12 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:40:12 [BUILDER] SET WINDOW 
+2022-12-19 09:40:13 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:40:13 [MAP] Make Minimap : 1/3
+2022-12-19 09:40:13 [MAP] Make Minimap : 2/3
+2022-12-19 09:40:13 [MAP] Make Minimap : DONE
+2022-12-19 09:40:14 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:42:13 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:42:13 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:42:13 [USB] NEW USB Detected
+2022-12-19 09:42:13 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:42:13 [BUILDER] SET WINDOW 
+2022-12-19 09:42:14 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:42:14 [MAP] Make Minimap : 1/3
+2022-12-19 09:42:14 [MAP] Make Minimap : 2/3
+2022-12-19 09:42:14 [MAP] Make Minimap : DONE
+2022-12-19 09:42:15 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:42:16 [USER INPUT] Load Patrol : patrol/patrol_basic.ini
+2022-12-19 09:42:16 [SETTING] SET PATROL/curfile VALUE TO patrol/patrol_basic.ini
+2022-12-19 09:43:28 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:43:28 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:43:28 [USB] NEW USB Detected
+2022-12-19 09:43:28 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:43:28 [BUILDER] SET WINDOW 
+2022-12-19 09:43:29 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:43:29 [MAP] Make Minimap : 1/3
+2022-12-19 09:43:29 [MAP] Make Minimap : 2/3
+2022-12-19 09:43:29 [MAP] Make Minimap : DONE
+2022-12-19 09:43:30 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:43:31 [USER INPUT] Load Patrol : patrol/patrol_basic.ini
+2022-12-19 09:43:31 [SETTING] SET PATROL/curfile VALUE TO patrol/patrol_basic.ini
+2022-12-19 09:43:48 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:43:48 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:43:48 [USB] NEW USB Detected
+2022-12-19 09:43:48 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:43:48 [BUILDER] SET WINDOW 
+2022-12-19 09:43:49 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:43:49 [MAP] Make Minimap : 1/3
+2022-12-19 09:43:49 [MAP] Make Minimap : 2/3
+2022-12-19 09:43:49 [MAP] Make Minimap : DONE
+2022-12-19 09:43:50 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:43:51 [USER INPUT] Load Patrol : patrol/patrol_basic.ini
+2022-12-19 09:43:51 [SETTING] SET PATROL/curfile VALUE TO patrol/patrol_basic.ini
+2022-12-19 09:44:06 [LCM] CONNECT -> INIT START
+2022-12-19 09:44:06 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:44:06 [LCM] CONNECT -> UI_STATE = READY
+2022-12-19 09:45:48 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:45:49 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:45:49 [USB] NEW USB Detected
+2022-12-19 09:45:49 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:45:49 [BUILDER] SET WINDOW 
+2022-12-19 09:45:49 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:45:50 [MAP] Make Minimap : 1/3
+2022-12-19 09:45:50 [MAP] Make Minimap : 2/3
+2022-12-19 09:45:50 [MAP] Make Minimap : DONE
+2022-12-19 09:45:50 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:45:51 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:51 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:51 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:51 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:51 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:51 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:51 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:51 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:52 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:52 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:52 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:52 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:52 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:52 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:52 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:52 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:52 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:52 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:53 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:53 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:53 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:53 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:53 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:53 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:53 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:53 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:53 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:53 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:54 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:54 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:54 [USER INPUT] Load Patrol : patrol/patrol_basic.ini
+2022-12-19 09:45:54 [SETTING] SET PATROL/curfile VALUE TO patrol/patrol_basic.ini
+2022-12-19 09:45:54 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:54 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:54 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:54 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:54 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:54 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:54 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:54 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:55 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:55 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:55 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:55 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:55 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:55 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:55 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:55 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:55 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:55 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:56 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:56 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:56 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:56 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:56 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:56 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:56 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:56 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:56 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:56 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:57 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:57 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:57 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:57 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:57 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:57 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:57 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:57 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:57 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:57 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:58 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:58 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:58 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:58 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:58 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:58 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:58 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:58 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:58 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:58 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:59 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:59 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:59 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:59 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:59 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:59 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:59 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:59 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:45:59 [LCM] CONNECT -> INIT START
+2022-12-19 09:45:59 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:00 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:00 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:00 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:00 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:00 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:00 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:00 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:00 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:00 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:00 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:01 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:01 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:01 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:01 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:01 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:01 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:01 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:01 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:01 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:01 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:02 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:02 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:02 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:02 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:02 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:02 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:02 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:02 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:02 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:02 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:03 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:03 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:03 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:03 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:03 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:03 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:03 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:03 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:03 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:03 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:04 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:04 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:04 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:04 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:04 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:04 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:04 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:04 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:04 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:04 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:05 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:05 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:05 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:05 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:05 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:05 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:05 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:05 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:05 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:05 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:06 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:06 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:06 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:06 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:06 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:06 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:06 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:06 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:06 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:06 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:07 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:07 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:07 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:07 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:07 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:07 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:07 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:07 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:07 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:07 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:08 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:08 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:08 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:08 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:08 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:08 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:08 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:08 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:08 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:08 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:09 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:09 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:09 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:09 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:09 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:09 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:09 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:09 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:09 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:09 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:10 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:10 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:10 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:10 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:10 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:10 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:10 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:10 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:10 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:10 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:11 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:11 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:11 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:11 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:11 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:11 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:11 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:11 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:11 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:11 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:12 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:12 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:12 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:12 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:12 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:12 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:12 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:12 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:12 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:12 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:13 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:13 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:13 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:13 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:13 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:13 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:13 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:13 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:13 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:13 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:14 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:14 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:14 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:14 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:14 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:14 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:14 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:14 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:14 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:14 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:15 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:15 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:15 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:15 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:15 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:15 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:15 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:15 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:15 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:15 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:16 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:16 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:16 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:16 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:16 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:16 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:16 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:16 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:16 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:16 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:17 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:17 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:17 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:17 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:17 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:17 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:17 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:17 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:17 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:17 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:18 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:18 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:18 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:18 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:18 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:18 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:18 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:18 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:18 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:18 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:19 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:19 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:19 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:19 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:19 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:19 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:19 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:19 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:19 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:19 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:20 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:20 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:20 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:20 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:20 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:20 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:20 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:20 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:20 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:20 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:21 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:21 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:21 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:21 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:21 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:21 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:21 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:21 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:21 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:21 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:22 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:22 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:22 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:22 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:22 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:22 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:22 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:22 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:22 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:22 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:23 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:23 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:23 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:23 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:23 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:23 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:23 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:23 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:23 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:23 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:46:24 [LCM] CONNECT -> INIT START
+2022-12-19 09:46:24 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:48:14 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:48:14 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:48:14 [USB] NEW USB Detected
+2022-12-19 09:48:14 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:48:15 [BUILDER] SET WINDOW 
+2022-12-19 09:48:15 [LCM] CONNECT -> INIT START
+2022-12-19 09:48:15 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:48:15 [LCM] CONNECT -> UI_STATE = READY
+2022-12-19 09:48:15 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:48:15 [MAP] Make Minimap : 1/3
+2022-12-19 09:48:15 [MAP] Make Minimap : 2/3
+2022-12-19 09:48:15 [MAP] Make Minimap : DONE
+2022-12-19 09:48:16 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:48:18 [USER INPUT] Load Patrol : patrol/patrol_basic.ini
+2022-12-19 09:48:18 [SETTING] SET PATROL/curfile VALUE TO patrol/patrol_basic.ini
+2022-12-19 09:49:01 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:49:01 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:49:01 [USB] NEW USB Detected
+2022-12-19 09:49:01 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:49:01 [BUILDER] SET WINDOW 
+2022-12-19 09:49:01 [LCM] CONNECT -> INIT START
+2022-12-19 09:49:01 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:49:01 [LCM] CONNECT -> UI_STATE = READY
+2022-12-19 09:49:02 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:49:02 [MAP] Make Minimap : 1/3
+2022-12-19 09:49:02 [MAP] Make Minimap : 2/3
+2022-12-19 09:49:02 [MAP] Make Minimap : DONE
+2022-12-19 09:49:03 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:49:04 [USER INPUT] Load Patrol : patrol/patrol_basic.ini
+2022-12-19 09:49:04 [SETTING] SET PATROL/curfile VALUE TO patrol/patrol_basic.ini
+2022-12-19 09:51:53 [BUILDER] LCM HANDLER constructed
+2022-12-19 09:51:53 [BUILDER] SERVER HANDLER constructed
+2022-12-19 09:51:53 [USB] NEW USB Detected
+2022-12-19 09:51:53 [BUILDER] SUPERVISOR constructed
+2022-12-19 09:51:53 [BUILDER] SET WINDOW 
+2022-12-19 09:51:53 [LCM] CONNECT -> INIT START
+2022-12-19 09:51:53 [LCM] SEND COMMAND : SEND MAP PATH (file:///home/rainbow/Desktop/UI_MOBILE/build/image/map_server.png)
+2022-12-19 09:51:53 [LCM] CONNECT -> UI_STATE = READY
+2022-12-19 09:51:54 [MAP] Make Minimap Start : image/map_rotated.png
+2022-12-19 09:51:54 [MAP] Make Minimap : 1/3
+2022-12-19 09:51:54 [MAP] Make Minimap : 2/3
+2022-12-19 09:51:54 [MAP] Make Minimap : DONE
+2022-12-19 09:51:55 [QML - INIT] Init Failed -> Show Init Page
+2022-12-19 09:51:56 [USER INPUT] Load Patrol : patrol/patrol_basic.ini
+2022-12-19 09:51:56 [SETTING] SET PATROL/curfile VALUE TO patrol/patrol_basic.ini
+2022-12-19 09:52:17 [USER INPUT] Load Patrol : patrol/patrol_basic.ini
+2022-12-19 09:52:17 [SETTING] SET PATROL/curfile VALUE TO patrol/patrol_basic.ini
+2022-12-19 09:52:54 [LCM] DISCONNECT -> UI_STATE = NONE
+2022-12-19 09:52:55 [USER INPUT] Load Patrol : patrol/patrol_basic.ini
+2022-12-19 09:52:55 [SETTING] SET PATROL/curfile VALUE TO patrol/patrol_basic.ini

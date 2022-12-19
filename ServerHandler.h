@@ -8,9 +8,7 @@
 #include <chrono>
 #include <thread>
 #include <math.h>
-// websocket
 #include <QWebSocket>
-// json
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -29,23 +27,14 @@ class ServerHandler : public QObject
     Q_OBJECT
 public:
     ServerHandler();
-    int connection_status;
-    int client_number;
+    ~ServerHandler();
 
-    QString server_cmd;
-    QString target_location;
-    ST_POSE target_pose;
-    ST_MAP      map;
-    ST_ROBOT    robot;
-    QString robot_name;
-    QSettings map_annotation;
+    ////*********************************************  FLAGS   ***************************************************////
+    //서버 연결상태
+    bool isconnect = false;
 
-    int ui_state = 0;
-    bool is_debug = false;
-    QString debug_name = "C1";
-
-    void setMap(ST_MAP _map);
-    void setData(QString name, ST_ROBOT _robot, int state);
+    ////*********************************************  SEND FUNCTIONS   ***************************************************////
+    void sendCalllist();
     void sendMap(QString map_path, QString dir);
     void requestMap();
 

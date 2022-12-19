@@ -11,7 +11,6 @@
 #include "lcm_types/robot_status.hpp"
 #include "lcm_types/map_data_t.hpp"
 #include "lcm_types/robot_path.hpp"
-//#include "Supervisor.h"
 #include "GlobalHeader.h"
 
 class LCMHandler : public QObject
@@ -20,29 +19,38 @@ class LCMHandler : public QObject
 public:
     LCMHandler();
     ~LCMHandler();
-    void setMapData(ST_MAP _map);
 
-    // lcm
+    //LCM 관련
     lcm::LCM lcm;
-    // lcm message loop
     std::atomic<bool> bFlag;
     std::thread* bThread = NULL;
+    lcm::Subscription *sub_status;
+    lcm::Subscription *sub_path;
+    lcm::Subscription *sub_localpath;
+
+    ////*********************************************  FLAGS   ***************************************************////
+    //LCM 연결상태
     bool isconnect = false;
     int connect_count = 0;
-    bool isdownloadMap = false;
+    bool flag_tx = false;
+    bool flag_rx = false;
+
+    //맵 리퀘스트(프로그램 실행 시 1번 보냄)
+    bool map_updated = false;
+
+    //조이스틱 명령 플래그
     bool flagJoystick = false;
+
+    //Path 덮어쓰기 플래그
     bool flagPath = false;
     bool flagLocalPath = false;
 
-    bool isdebug = false;
-    bool robotnamechanged = false;
-    QString debug_robot_name = "";
-
-    ST_ROBOT    robot;
-    ST_MAP      map;
-    QTimer  *timer;
+    //로봇 이름이 달라졌을 때 subscribe 다시
+    void subscribe();
 
     ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
+    void sendCommand(command cmd, QString msg);
+    void sendCommand(int cmd, QString msg);
     void programStart();
     void moveTo(QString target_loc);
     void moveTo(float x, float y, float th);
@@ -51,9 +59,10 @@ public:
     void moveJog();
     void moveStop();
     void moveManual();
+    void setInitPose(float x, float y, float th);
+    void sendCommand(int cmd);
     void setVelocity(float vel, float velth);
     void setVelocity(float vel);
-    int getLocationNum(QString name);
     void sendMapPath(QString path);
 
     ////*********************************************  CALLBACK FUNCTIONS   ***************************************************////
@@ -69,6 +78,9 @@ signals:
 
 public slots:
     void onTimer();
+
+private:
+    QTimer  *timer;
 };
 
 #endif // LCMHANDLER_H

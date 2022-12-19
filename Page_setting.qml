@@ -27,7 +27,7 @@ Item {
 
     function uiupdate(){
         textfield_name.text = supervisor.getRobotName();
-        slider_vxy.value = supervisor.getVelocityXY();
+        slider_vxy.value = supervisor.getVelocity();
         if(supervisor.getRobotType() == "SERVING"){
             combo_platform_type.currentIndex = 0;
         }else{
@@ -128,7 +128,7 @@ Item {
                     height: 50
                     from: 0
                     to: 1
-                    value: supervisor.getVelocityXY()
+                    value: supervisor.getVelocity()
                 }
             }
             Rectangle{

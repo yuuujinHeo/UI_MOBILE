@@ -4,7 +4,8 @@
 
 ServerHandler::ServerHandler()
 {
-    connection_status = 0;
+    isconnect = false;
+
     connect(&socket, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(&socket, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
     connect(&socket, SIGNAL(textMessageReceived(QString)), this, SLOT(onTextMessageReceived(QString)));
@@ -13,8 +14,11 @@ ServerHandler::ServerHandler()
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     timer->start(200);
+    plog->write("[BUILDER] SERVER HANDLER constructed");
+}
 
-    robot_name = "test";
+ServerHandler::~ServerHandler(){
+    plog->write("[BUILDER] SERVER HANDLER destroyed");
 }
 
 void ServerHandler::onConnected(){
@@ -22,22 +26,18 @@ void ServerHandler::onConnected(){
 }
 
 void ServerHandler::onDisconnected(){
-    if(connection_status){
+    if(isconnect){
+        isconnect = false;
         plog->write("[SERVER] DISCONNECTED TO SERVER");
     }
 }
+
 void ServerHandler::onTextMessageReceived(QString message){
     QJsonObject json = QJsonDocument::fromJson(message.toUtf8()).object();
-
     QString cmd = json["cmd"].toString();
     plog->write("[SERVER] NEW COMMAND : "+cmd);
 
-    server_cmd = cmd;
-    if(cmd == "START"){
-//        start();
-    }else if(cmd == "STOP"){
-//        stop();
-    }else if(cmd == "PAUSE"){
+    if(cmd == "PAUSE"){
         emit server_pause();
     }else if(cmd == "RESUME"){
         emit server_resume();
@@ -46,17 +46,27 @@ void ServerHandler::onTextMessageReceived(QString message){
         float y = json["y"].toDouble();
         float th = json["th"].toDouble();
 
-        target_pose.x = x;
-        target_pose.y = y;
-        target_pose.th = th;
+        probot->targetPose.x = x;
+        probot->targetPose.y = y;
+        probot->targetPose.th = th;
         emit server_new_target();
-//        start();
     }else if(cmd == "NEW_CALL"){
-        target_location = json["location"].toString();
-        plog->write("[SERVER] NEW CALL : "+target_location);
-        emit server_new_call();
+        probot->targetLocation = json["location"].toString();
+        bool check = false;
+        for(int i=0; i<probot->call_list.size(); i++){
+            if(probot->call_list[i] == probot->targetLocation){
+                plog->write("[SERVER] NEW CALL : " + probot->targetLocation + " BUT IGNORE (CALL LIST SIZE = " + QString::number(probot->call_list.size()) + ")");
+                check = true;
+                break;
+            }
+        }
+        if(!check){
+            probot->call_list.push_back(probot->targetLocation);
+            plog->write("[SERVER] NEW CALL : " + probot->targetLocation + " (CALL LIST SIZE = " + QString::number(probot->call_list.size()) + ")");
+            emit server_new_call();
+        }
     }else if(cmd == "MAP_REQ"){
-        if(map.use_server){
+        if(pmap->use_server){
             sendMap(QGuiApplication::applicationDirPath()+"/image/map_server.png", QGuiApplication::applicationDirPath()+"/setting/");
         }else{
             sendMap(QGuiApplication::applicationDirPath()+"/image/raw_map.png", QGuiApplication::applicationDirPath()+"/setting/");
@@ -112,41 +122,58 @@ void ServerHandler::onTextMessageReceived(QString message){
         settings.setValue("ROBOT/travelline",json["travel_line"].toInt());
         emit server_set_ini();
         plog->write("[SERVER] Set Robot Data : name("+json["name"].toString()+") type("+json["type"].toString()+")");
+    }else if(cmd == "CALL_REQ"){
+        sendCalllist();
     }
+}
+
+void ServerHandler::sendCalllist(){
+    QJsonObject json;
+    if(is_debug){
+        json["name"] = probot->name_debug;
+    }else{
+        json["name"] = probot->name;
+    }
+    json["msg_type"] = "CALL_LIST";
+    json["move_count"] = probot->call_moving_count;
+    json["num"] = probot->call_list.size();
+
+    QJsonArray call_array;
+    for(int i=0; i<probot->call_list.size(); i++){
+        QJsonObject temp;
+        temp["location"] = probot->call_list[i];
+        call_array.push_back(temp);
+    }
+    json["call_list"] = call_array;
+
+    QJsonDocument doc(json);
+    QString str(doc.toJson(QJsonDocument::Indented));
+    socket.sendTextMessage(str);
+    plog->write("[SERVER] SEND CALL LIST");
 }
 
 void ServerHandler::onBinaryMessageReceived(QByteArray message){
     ;
 }
 
-void ServerHandler::setData(QString name, ST_ROBOT _robot, int state){
-    robot_name = name;
-    robot = _robot;
-    ui_state = state;
-}
-
-void ServerHandler::setMap(ST_MAP _map){
-    map = _map;
-}
-
 void ServerHandler::requestMap(){
-    plog->write("[SERVER] MAP REQUEST");
     QJsonObject json;
     if(is_debug){
-        json["name"] = debug_name;
+        json["name"] = probot->name_debug;
     }else{
-        json["name"] = robot_name;
+        json["name"] = probot->name;
     }
     json["msg_type"] = "MAP_REQ";
     QJsonDocument doc(json);
     QString str(doc.toJson(QJsonDocument::Indented));
     socket.sendTextMessage(str);
+    plog->write("[SERVER] MAP REQUEST");
 }
 void ServerHandler::onTimer(){ // 200ms
     static int cnt = 0;
 
     if(socket.state() == QAbstractSocket::ConnectedState){
-        connection_status = true;
+        isconnect = true;
 
         QJsonObject json;
         QJsonArray path_array;
@@ -155,50 +182,49 @@ void ServerHandler::onTimer(){ // 200ms
 
         // name
         if(is_debug){
-            json["name"] = debug_name;
+            json["name"] = probot->name_debug;
         }else{
-            json["name"] = robot_name;
+            json["name"] = probot->name;
         }
         json["msg_type"] = "DATA";
 
         // status
-        json["robot_state"] = robot.state;
+        json["robot_state"] = probot->state;
         json["ui_state"] = ui_state;
 
-        json["robot_type"] = robot.type;
-
+        json["robot_type"] = probot->type;
         // cur_pose
-        json["cur_pose_x"] = robot.curPose.x;
-        json["cur_pose_y"] = robot.curPose.y;
-        json["cur_pose_th"] = robot.curPose.th;
+        json["cur_pose_x"] = probot->curPose.x;
+        json["cur_pose_y"] = probot->curPose.y;
+        json["cur_pose_th"] = probot->curPose.th;
 
         // target_pose
-        json["target_pose_x"] = target_pose.x;
-        json["target_pose_y"] = target_pose.y;
-        json["target_pose_th"] = target_pose.th;
+        json["target_pose_x"] = probot->targetPose.x;
+        json["target_pose_y"] = probot->targetPose.y;
+        json["target_pose_th"] = probot->targetPose.th;
 
         // path
         QJsonObject path_element;
-        for(int i=0; i<robot.pathSize; i++){
-            path_element["x"] = robot.curPath[i].x;
-            path_element["y"] = robot.curPath[i].y;
-            path_element["th"] = robot.curPath[i].th;
+        for(int i=0; i<probot->pathSize; i++){
+            path_element["x"] = probot->curPath[i].x;
+            path_element["y"] = probot->curPath[i].y;
+            path_element["th"] = probot->curPath[i].th;
             path_array.push_back(path_element);
         }
         json["path"] = path_array;
 
         QJsonObject path_element_local;
-        for(int i=0; i<robot.localpathSize; i++){
-            path_element_local["x"] = robot.localPath[i].x;
-            path_element_local["y"] = robot.localPath[i].y;
-            path_element_local["th"] = robot.localPath[i].th;
+        for(int i=0; i<probot->localpathSize; i++){
+            path_element_local["x"] = probot->localPath[i].x;
+            path_element_local["y"] = probot->localPath[i].y;
+            path_element_local["th"] = probot->localPath[i].th;
             local_path_array.push_back(path_element_local);
         }
         json["local_path"] = local_path_array;
 
         QJsonObject lidar_element;
         for(int i=0; i<360; i++){
-            lidar_element["data"] = map.lidar_data[i];
+            lidar_element["data"] = std::round(probot->lidar_data[i]*1000)/1000;
             lidar_array.push_back(lidar_element);
         }
         json["lidar"] = lidar_array;
@@ -209,9 +235,9 @@ void ServerHandler::onTimer(){ // 200ms
     }else if(socket.state() == QAbstractSocket::ConnectingState){
         ;
     }else{
-        connection_status = false;
+        isconnect = false;
         if(++cnt%5 == 0){
-            socket.open(QUrl("ws://192.168.1.200:22334"));
+            socket.open(QUrl("ws://192.168.100.200:22334"));
         }
     }
 }
@@ -243,9 +269,9 @@ void ServerHandler::sendMap(QString map_path, QString dir){
 
     QJsonObject json;
     if(is_debug){
-        json["name"] = robot.name + "_" + debug_name;
+        json["name"] = probot->name + "_" + probot->name_debug;
     }else{
-        json["name"] = robot.name;
+        json["name"] = probot->name;
     }
     json["msg_type"] = "MAP";
     json["raw_map"] = QString(ba_map2.toBase64());
@@ -256,4 +282,5 @@ void ServerHandler::sendMap(QString map_path, QString dir){
     QJsonDocument doc(json);
     QString str(doc.toJson(QJsonDocument::Indented));
     socket.sendTextMessage(str);
+    plog->write("[SERVER] SEND MAP");
 }

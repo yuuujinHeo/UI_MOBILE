@@ -7,7 +7,7 @@ Item {
     width: joystick.width
     height: joystick.height
 
-    property real angle : mousearea.angle
+    property real angle : 0//mousearea.angle
     property real distance : 0
 
     property bool pressed: mousearea.pressed
@@ -40,6 +40,32 @@ Item {
         NumberAnimation { target: thumb.anchors; property: "verticalCenterOffset";
             to: 0; duration: 200; easing.type: Easing.OutSine }
     }
+    function remote_input(re_x, re_y){
+        returnAnimation.stop();
+        update_cnt++;
+        if(verticalOnly){
+            mcy = (width/2)*re_x/32767;
+            mcx = 0;
+        }else if(horizontalOnly){
+            mcx = (width/2)*re_y/32767;
+            mcy = 0;
+        }
+        if (fingerInBounds) {
+            thumb.anchors.horizontalCenterOffset = mcx
+            thumb.anchors.verticalCenterOffset = mcy
+        } else {
+            angle = Math.atan2(mcy, mcx)
+            thumb.anchors.horizontalCenterOffset = Math.cos(angle) * distanceBound
+            thumb.anchors.verticalCenterOffset = Math.sin(angle) * distanceBound
+        }
+    }
+    function remote_stop(){
+        update_cnt = 0;
+        mcx = 0
+        mcy = 0
+        returnAnimation.restart();
+    }
+
     MouseArea {
         id: mousearea
         anchors.fill: parent
@@ -54,6 +80,8 @@ Item {
         }
         onPositionChanged: {
             update_cnt++;
+            mcx =mouseX2 - width * 0.5
+            mcy =mouseY2 - height * 0.5
             if (fingerInBounds) {
                 thumb.anchors.horizontalCenterOffset = mcx
                 thumb.anchors.verticalCenterOffset = mcy

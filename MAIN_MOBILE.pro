@@ -19,6 +19,7 @@ unix{
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        JoystickHandler.cpp \
         LCMHandler.cpp \
         ServerHandler.cpp \
         cv_to_qt.cpp \
@@ -41,6 +42,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     GlobalHeader.h \
+    JoystickHandler.h \
     LCMHandler.h \
     Logger.h \
     ServerHandler.h \
@@ -62,7 +64,8 @@ LIBS += -lopencv_core \
         -lopencv_photo \
         -lopencv_video \
         -lopencv_videoio \
-        -lopencv_ximgproc
+        -lopencv_ximgproc \
+        -lusb
 # LCM
 INCLUDEPATH += /usr/local/include/
 LIBS += -L/usr/local/lib/

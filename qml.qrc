@@ -12,7 +12,6 @@
         <file>image/rainbow4.png</file>
         <file>image/loading1.gif</file>
         <file>Page_setting.qml</file>
-        <file>Map_current.qml</file>
         <file>bgm/song.mp3</file>
         <file>Page_charge.qml</file>
         <file>image/joy_finger.png</file>
@@ -22,7 +21,6 @@
         <file>bgm/voice_move_wait.mpga</file>
         <file>bgm/voice_move_charge.mp3</file>
         <file>bgm/voice_avoid.mp3</file>
-        <file>Map_minimap.qml</file>
         <file>Page_init.qml</file>
         <file>image/warning.png</file>
         <file>Page_MoveFail.qml</file>
@@ -63,5 +61,26 @@
         <file>icon/btn_no.png</file>
         <file>image/image_location.png</file>
         <file>Map_full.qml</file>
+        <file>Item_switch.qml</file>
+        <file>Item_statusbar.qml</file>
+        <file>icon/joy_up.png</file>
+        <file>icon/joy_right.png</file>
+        <file>icon/joy_left.png</file>
+        <file>icon/joy_down.png</file>
+        <file>icon/joy_connect.png</file>
+        <file>icon/data_green.png</file>
+        <file>icon/data_gray.png</file>
+        <file>icon/icon_researching.png</file>
+        <file>icon/icon_manualmove.png</file>
+        <file>icon/icon_connect_error.png</file>
+        <file>icon/icon_connect.png</file>
+        <file>icon/icon_cancelpath.png</file>
+        <file>image/robot_head_sleep.png</file>
+        <file>image/robot_clear.png</file>
+        <file>image/robot_callme.png</file>
+        <file>Page_pickup_calling.qml</file>
+        <file>icon/patrol_down.png</file>
+        <file>icon/icon_server_connect.png</file>
+        <file>icon/icon_joy_connect.png</file>
     </qresource>
 </RCC>

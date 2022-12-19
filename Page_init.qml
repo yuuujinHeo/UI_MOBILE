@@ -14,7 +14,6 @@ Item {
     property bool ui_slam_init: false
 
     onUi_slam_initChanged: {
-        print(ui_slam_init);
         if(ui_slam_init){
             ani_do_init.start();
         }else{
@@ -26,19 +25,25 @@ Item {
         id: ani_do_init
         running: false
         onStarted: {
-            text_slam_minimize.visible = false;
+            text_slaminimize.visible = false;
+            text_slam_pass.visible = false;
         }
 
         ParallelAnimation{
             NumberAnimation{target: btn_slam_minimize; property:"width"; from:200; to:50; duration: 500;}
             NumberAnimation{target: btn_slam_minimize; property:"height"; from:150; to:50; duration: 500;}
             NumberAnimation{target: btn_slam_minimize; property:"radius"; from:15; to:50; duration: 500;}
+            NumberAnimation{target: btn_slam_pass; property:"width"; from:200; to:50; duration: 500;}
+            NumberAnimation{target: btn_slam_pass; property:"height"; from:150; to:50; duration: 500;}
+            NumberAnimation{target: btn_slam_pass; property:"radius"; from:15; to:50; duration: 500;}
             NumberAnimation{target: btn_slam_do_init; property:"opacity"; from:1; to:0; duration: 500;}
         }
         ParallelAnimation{
             NumberAnimation{target: image_logo4; property:"anchors.topMargin"; from:80; to:-200; duration: 500;}
-            NumberAnimation{target: btn_slam_minimize; property:"anchors.rightMargin"; from:30; to:-500; duration: 500;}
-            NumberAnimation{target: btn_slam_minimize; property:"anchors.topMargin"; from:50; to:-50; duration: 500;}
+            NumberAnimation{target: btn_slam_minimize; property:"anchors.rightMargin"; from:50; to:400; duration: 500;}
+            NumberAnimation{target: btn_slam_minimize; property:"anchors.topMargin"; from:50; to:-100; duration: 500;}
+            NumberAnimation{target: btn_slam_pass; property:"anchors.leftMargin"; from:50; to:400; duration: 500;}
+            NumberAnimation{target: btn_slam_pass; property:"anchors.topMargin"; from:50; to:-100; duration: 500;}
         }
         onFinished: {
             btn_slam_do_init.visible = false;
@@ -65,7 +70,8 @@ Item {
             NumberAnimation{target: btn_slam_do_init; property:"opacity"; from:0; to:1; duration: 500;}
         }
         onFinished: {
-            text_slam_minimize.visible = true;
+            text_slaminimize.visible = true;
+            text_slam_pass.visible = true;
         }
     }
 
@@ -187,8 +193,9 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        supervisor.loadMaptoUSB();
-                        update_timer.start();
+                        popup_usb_map.open();
+//                        supervisor.loadMaptoUSB();
+//                        update_timer.start();
                     }
                 }
             }
@@ -423,7 +430,7 @@ Item {
             height: 150
             radius: 15
             color: "gray"
-            anchors.right: parent.horizontalCenter
+            anchors.right: btn_slam_do_init.left
             anchors.rightMargin: 30
             anchors.top: text_notice4.bottom
             anchors.topMargin: 50
@@ -447,11 +454,11 @@ Item {
             height: 150
             radius: 15
             color: "gray"
-            anchors.left: parent.horizontalCenter
-            anchors.leftMargin: 30
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: text_notice4.bottom
             anchors.topMargin: 50
             Text{
+                id: text_slam_do_init
                 anchors.centerIn: parent
                 text: "UI에서 직접 초기화"
                 font.pixelSize: 20
@@ -461,6 +468,33 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     ui_slam_init = true;
+
+                }
+            }
+        }
+        Rectangle{
+            id: btn_slam_pass
+            width: 200
+            height: 150
+            radius: 15
+            color: "gray"
+            anchors.left: btn_slam_do_init.right
+            anchors.leftMargin: 30
+            anchors.top: text_notice4.bottom
+            anchors.topMargin: 50
+            Text{
+                id: text_slam_pass
+                anchors.centerIn: parent
+                text: "넘어가기 (디버그 용)"
+                font.pixelSize: 20
+                color:"white"
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    pkitchen.init();
+                    stackview.push(pkitchen);
+                    update_timer.stop();
                 }
             }
         }
@@ -477,6 +511,10 @@ Item {
             anchors.top: text_notice4.bottom
             anchors.topMargin: 50
         }
+
+
+
+
     }
 
     Timer{
@@ -497,7 +535,6 @@ Item {
             }else if(init_mode == 1){
                 if(supervisor.getIniRead()){
                     var map_exist = supervisor.isExistMap();
-                    print(map_exist);
                     if(supervisor.isloadMap() && map_exist == 1){
                         if(supervisor.isuseServerMap()){
                             map_path = "file://" + applicationDirPath + "/image/map_rotated.png";
@@ -522,7 +559,12 @@ Item {
                             popup_show_map.open();
                         }else{
                             btn_server_load.enabled = supervisor.isConnectServer();
-                            btn_usb_load.enabled = supervisor.isUSBFile();
+                            if(supervisor.getUsbMapSize() > 0){
+                                btn_usb_load.enabled = true;
+                            }else{
+                                btn_usb_load.enabled = false;
+                            }
+
                             if(map_exist== 2){
                                 //show map_edited exist
                                 notice_map_edited.enabled = true;
@@ -563,6 +605,128 @@ Item {
     }
 
     Popup{
+        id:popup_usb_map
+        width: 800
+        height: 800
+        anchors.centerIn: parent
+        onOpened: {
+            list_map_usb.model.clear();
+            var num = supervisor.getUsbMapSize();
+            for(var i=0; i<num; i++){
+                list_map_usb.model.append({"name":supervisor.getUsbMapPath(i),"selected":false});
+            }
+        }
+
+        Rectangle{
+            anchors.fill:parent
+            color: "#DFDFDF"
+            Text{
+                id: text_popup_usb
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 100
+                horizontalAlignment: Text.AlignHCenter
+                text: "USB에서 아래와 같은 맵 파일을 찾았습니다.\n 가져오시려면 원하는 파일을 선택 후 확인 버튼을 누르세요."
+            }
+            ListView {
+                id: list_map_usb
+                width: 400
+                height: 250
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: text_popup_usb.bottom
+                anchors.topMargin: 50
+                clip: true
+                model: ListModel{}
+                delegate: usbCompo
+                focus: true
+            }
+            Row{
+                spacing: 50
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: list_map_usb.bottom
+                anchors.topMargin: 50
+                Rectangle{
+                    width: 150
+                    height: 100
+                    radius: 30
+                    color: "gray"
+                    Text{
+                        anchors.centerIn: parent
+                        text: "확인"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            for(var i=0; i<supervisor.getUsbMapSize(); i++){
+                                print(i,list_map_usb.model.get(i).selected,list_map_usb.model.get(i).name);
+                                if(list_map_usb.model.get(i).selected){
+                                    supervisor.saveMapfromUsb(list_map_usb.model.get(i).name);
+                                }
+                            }
+                            popup_usb_map.close();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 150
+                    height: 100
+                    radius: 30
+                    color: "gray"
+                    Text{
+                        anchors.centerIn: parent
+                        text: "취소"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_map.close();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Component {
+        id: usbCompo
+        Item {
+            width: parent.width
+            height: 40
+            Rectangle {
+                visible: selected
+                anchors.fill: parent
+                color: "lightsteelblue"
+                radius: 5
+            }
+            Text {
+                id: text_loc
+                anchors.centerIn: parent
+                text: name
+                font.family: font_noto_b.name
+            }
+            Rectangle//리스트의 구분선
+            {
+                id:line
+                width:parent.width
+                anchors.bottom:parent.bottom//현재 객체의 아래 기준점을 부모객체의 아래로 잡아주어서 위치가 아래로가게 설정
+                height:1
+                color:"black"
+            }
+            MouseArea{
+                id:area_compo
+                anchors.fill:parent
+                onClicked: {
+                    list_map_usb.currentIndex = index;
+                    if(selected){
+                        selected = false;
+                    }else{
+                        selected = true;
+                    }
+                }
+            }
+        }
+    }
+
+    Popup{
         id: popup_show_map
         width: 800
         height: 800
@@ -577,16 +741,18 @@ Item {
         onOpened: {
             if(show_mode == 0){
                 text_show_popup.text = "서버로부터 맵을 로드했습니다. 매장의 환경과 일치하는 맵인지 확인해주세요."
-                map_view.show_meta_data = true;
-                map_view.loadmap("file://"+applicationDirPath+"/image/map_rotated.png");
+                map_load.loadmap("file://"+applicationDirPath+"/image/map_rotated.png");
+                map_load.show_object = true;
+                map_load.show_location = true;
             }else if(show_mode == 1){
                 text_show_popup.text = "저장된 맵을 로드했습니다. 매장의 환경과 일치하는 맵인지 확인해주세요.\n 맵이 일치하지 않다면 [맵 삭제] 버튼을, 오브젝트나 로케이션을 수정하길 원하시면 [맵 수정] 버튼을 눌러주세요."
-                map_view.show_meta_data = true;
-                map_view.loadmap("file://"+applicationDirPath+"/image/map_edited.png");
+                map_load.loadmap("file://"+applicationDirPath+"/image/map_edited.png");
+                map_load.show_object = true;
+                map_load.show_location = true;
             }else{
                 text_show_popup.text = "저장된 맵을 로드했습니다. 매장의 환경과 일치하는 맵이면 [맵 수정] 버튼을, 일치하지 않다면 [맵 삭제] 버튼을 눌러주세요.";
-                map_view.show_meta_data = false;
-                map_view.loadmap("file://"+applicationDirPath+"/image/map_raw.png");
+                map_load.loadmap("file://"+applicationDirPath+"/image/map_raw.png");
+                map_load.init_mode();
             }
         }
         Text{
@@ -598,8 +764,8 @@ Item {
             color: "black"
         }
 
-        Map_current{
-            id: map_view
+        Map_full{
+            id: map_load
             width: 550
             height: 550
             anchors.horizontalCenter: rect_back.horizontalCenter
@@ -609,7 +775,7 @@ Item {
         Row{
             id: row_button_2
             anchors.horizontalCenter: rect_back.horizontalCenter
-            anchors.top: map_view.bottom
+            anchors.top: map_load.bottom
             anchors.topMargin: 30
             spacing: 30
             Repeater{
@@ -644,6 +810,7 @@ Item {
                                     supervisor.make_minimap();
                                     map_path = "file://" + applicationDirPath + "/image/map_rotated.png";
                                     loadmapall(map_path);
+                                    pmap.setmapname("map_rotated.png");
                                     supervisor.setloadMap(true);
                                 }else{
                                     popup_show_map.close();
@@ -652,19 +819,22 @@ Item {
                                     map_path = "file://" + applicationDirPath + "/image/map_edited.png";
                                     loadmapall(map_path);
                                     supervisor.setloadMap(true);
+                                    pmap.setmapname("map_edited.png");
                                 }
                                 init_mode = 2;
                             }else if(modelData == "맵 수정"){
                                 if(popup_show_map.show_mode == 1){
                                     popup_show_map.close();
                                     map_path = "file://" + applicationDirPath + "/image/map_edited.png";
-                                    pannotation.loadmap(map_path);
-                                    stackview.push(pannotation);
+                                    loadmapall(map_path);
+                                    pmap.setmapname("map_edited.png");
+                                    stackview.push(pmap);
                                 }else if(popup_show_map.show_mode == 2){
                                     popup_show_map.close();
                                     map_path = "file://" + applicationDirPath + "/image/map_raw.png";
-                                    pannotation.loadmap(map_path);
-                                    stackview.push(pannotation);
+                                    pmap.setmapname("map_raw.png");
+                                    loadmapall(map_path);
+                                    stackview.push(pmap);
                                 }
                             }else if(modelData == "맵 삭제"){
                                 if(popup_show_map.show_mode == 1){
