@@ -15,6 +15,13 @@ Item {
     property bool move_fail: false
     property int password: 0
 
+    Component.onCompleted: {
+        init();
+    }
+    Component.onDestruction:  {
+        playMusic.stop();
+    }
+
     function init(){
         popup_pause.visible = false;
         robot_paused = false;
@@ -146,7 +153,7 @@ Item {
             print(password);
             if(password > 4){
                 password = 0;
-                stackview.push(pmovefail);
+                loadPage(pmovefail);
             }
         }
     }

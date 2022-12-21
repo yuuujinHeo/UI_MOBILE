@@ -22,7 +22,6 @@ public:
     int ui_cmd;
     bool flag_read_ini = false;
     bool isaccepted;
-    bool isMapExist = false;
     bool flag_clear;
     int state_rotate_tables;
 
@@ -105,7 +104,7 @@ public:
     Q_INVOKABLE void setloadMap(bool load);
     Q_INVOKABLE bool isExistRobotINI();
     Q_INVOKABLE void makeRobotINI();
-    bool rotate_map(QString _src, QString _dst, int mode);
+    Q_INVOKABLE bool rotate_map(QString _src, QString _dst, int mode);
     Q_INVOKABLE bool getLCMConnection();
     Q_INVOKABLE bool getLCMRX();
     Q_INVOKABLE bool getLCMTX();
@@ -113,11 +112,12 @@ public:
     Q_INVOKABLE bool getIniRead();
     Q_INVOKABLE int getUsbMapSize();
     Q_INVOKABLE QString getUsbMapPath(int num);
+    Q_INVOKABLE QString getUsbMapPathFull(int num);
     Q_INVOKABLE void saveMapfromUsb(QString path);
 
     ////*********************************************  SLAM(LOCALIZATION) 관련   ***************************************************////
-    Q_INVOKABLE void startSLAM();
-    Q_INVOKABLE void stopSLAM();
+    Q_INVOKABLE void startMapping();
+    Q_INVOKABLE void stopMapping();
     Q_INVOKABLE void setSLAMMode(int mode);
 
     Q_INVOKABLE void setInitPos(int x, int y, float th);
@@ -125,12 +125,18 @@ public:
     Q_INVOKABLE float getInitPoseY();
     Q_INVOKABLE float getInitPoseTH();
 
-    Q_INVOKABLE void slam_set_init();
+    Q_INVOKABLE void slam_setInit();
     Q_INVOKABLE void slam_run();
     Q_INVOKABLE void slam_stop();
-    Q_INVOKABLE void slam_auto_init();
+    Q_INVOKABLE void slam_autoInit();
     Q_INVOKABLE bool is_slam_running();
 
+    Q_INVOKABLE bool getMappingflag();
+    Q_INVOKABLE void setMappingflag(bool flag);
+
+    Q_INVOKABLE QList<int> getMapping();
+//    Q_INVOKABLE void pushMapData(QVector<unsigned char> data);
+    Q_INVOKABLE void pushMapData(QList<int> data);
 
 
     ////*********************************************  JOYSTICK 관련   ***************************************************////
@@ -258,6 +264,8 @@ public:
     Q_INVOKABLE QVector<float> getcurTarget();
     Q_INVOKABLE void joyMoveXY(float x);
     Q_INVOKABLE void joyMoveR(float r);
+    Q_INVOKABLE float getJoyXY();
+    Q_INVOKABLE float getJoyR();
 
 
 

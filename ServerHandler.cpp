@@ -169,6 +169,7 @@ void ServerHandler::requestMap(){
     socket.sendTextMessage(str);
     plog->write("[SERVER] MAP REQUEST");
 }
+
 void ServerHandler::onTimer(){ // 200ms
     static int cnt = 0;
 

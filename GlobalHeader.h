@@ -40,7 +40,7 @@ typedef struct{
 typedef struct{
     int chunkSize = 0;
     int imageSize = 0;
-    QVector<unsigned char> data;
+    QVector<int> data;
 
     QString map_name = "";
     int width = 0;
@@ -145,7 +145,10 @@ enum ROBOT_CMD{
     ROBOT_CMD_SET_INIT,//=10
     ROBOT_CMD_SLAM_RUN,
     ROBOT_CMD_SLAM_STOP,
-    ROBOT_CMD_SLAM_AUTO
+    ROBOT_CMD_SLAM_AUTO,
+    ROBOT_CMD_MAPPING_START,
+
+    ROBOT_CMD_MAPPING_STOP//=15
 };
 
 

@@ -13,18 +13,19 @@ Item {
     width: 1280
     height: 800
     property bool isrun: false
-    property string image_name: ""
-    property int robotname_margin: 300
-    property int tray_center: 700
     property bool slam_initializing: false
     property bool joystick_connection: false
 
     property var joy_axis_left_ud: 0
     property var joy_axis_right_rl: 0
+
     //mode : 0(mapview) 1:(slam) 2:(annotation) 3:(patrol)
     property int map_mode: 0
 
     Component.onCompleted: {
+        init();
+        loadmap(map_path);
+
         var ob_num = supervisor.getObjectNum();
         list_object.model.clear();
         for(var i=0; i<ob_num; i++){
@@ -55,6 +56,16 @@ Item {
 
 
 
+
+
+    }
+    Component.onDestruction:  {
+        if(supervisor.getJoyXY() !== 0){
+            supervisor.joyMoveXY(0,0);
+        }
+        if(supervisor.getJoyR() !== 0){
+            supervisor.joyMoveR(0,0);
+        }
     }
 
     onMap_modeChanged: {
@@ -71,7 +82,7 @@ Item {
         running: false
         ParallelAnimation{
             NumberAnimation{target:menubar; property:"opacity"; from:1;to:0;duration:500;}
-            NumberAnimation{target:rect_menus; property:"width"; from:(robotname_margin)*2;to:450;duration:500;}
+            NumberAnimation{target:rect_menus; property:"width"; from:margin_name;to:450;duration:500;}
             NumberAnimation{target:btn_menu; property:"width"; from:120;to:60;duration:500;}
         }
         onStarted: {
@@ -121,7 +132,7 @@ Item {
         NumberAnimation{target:menubar; property:"opacity"; from:1;to:0;duration:1;}
         ParallelAnimation{
             NumberAnimation{target:btn_menu; property:"width"; from:btn_menu.width;to:120;duration:300;}
-            NumberAnimation{target:rect_menus; property:"width"; from:450;to:(robotname_margin)*2;duration:300;}
+            NumberAnimation{target:rect_menus; property:"width"; from:450;to:margin_name;duration:300;}
         }
         NumberAnimation{target:menubar; property:"opacity"; from:0;to:1;duration:300;}
     }
@@ -145,7 +156,7 @@ Item {
 
     Rectangle{
         id: rect_menus
-        width: (robotname_margin)*2
+        width: margin_name
         height: parent.height - status_bar.height
         anchors.left: parent.left
         anchors.top: status_bar.bottom
@@ -314,28 +325,28 @@ Item {
                     show_lidar: true
                     show_object: true
                     anchors.left: parent.left
-                    anchors.leftMargin: tray_center - width/2 - rect_menus.width
+                    anchors.leftMargin: parent.width/2 - width/2
                     anchors.top: text_curmap.bottom
                     anchors.topMargin: 20
                 }
-                Text{
-                    text: "joystick\nconnection"
-                    anchors.horizontalCenter: switch_joy.horizontalCenter
-                    anchors.bottom: switch_joy.top
-                    anchors.bottomMargin: 20
-                    font.family: font_noto_b.name
-                    color: "white"
-                    font.pixelSize: 20
-                    horizontalAlignment: Text.AlignHCenter
-                }
-                Item_switch{
-                    id: switch_joy
-                    anchors.left: joy_th.right
-                    anchors.leftMargin: 50
-                    anchors.verticalCenter: joy_th.verticalCenter
-                    onoff: joystick_connection
-                    touchEnabled: false
-                }
+//                Text{
+//                    text: "joystick\nconnection"
+//                    anchors.horizontalCenter: switch_joy.horizontalCenter
+//                    anchors.bottom: switch_joy.top
+//                    anchors.bottomMargin: 20
+//                    font.family: font_noto_b.name
+//                    color: "white"
+//                    font.pixelSize: 20
+//                    horizontalAlignment: Text.AlignHCenter
+//                }
+//                Item_switch{
+//                    id: switch_joy
+//                    anchors.left: joy_th.right
+//                    anchors.leftMargin: 50
+//                    anchors.verticalCenter: joy_th.verticalCenter
+//                    onoff: joystick_connection
+//                    touchEnabled: false
+//                }
 
                 Image{
                     id: image_joy_up
@@ -382,7 +393,7 @@ Item {
                     anchors.rightMargin: 30
                     verticalOnly: true
                     onUpdate_cntChanged: {
-                        if(update_cnt == 0 && angle != 0){
+                        if(update_cnt == 0 && supervisor.getJoyXY() != 0){
                             supervisor.joyMoveXY(0, 0);
                         }else{
                             if(fingerInBounds) {
@@ -401,7 +412,7 @@ Item {
                     anchors.leftMargin: 30
                     horizontalOnly: true
                     onUpdate_cntChanged: {
-                        if(update_cnt == 0 && angle != 0){
+                        if(update_cnt == 0 && supervisor.getJoyR() != 0){
                             supervisor.joyMoveR(0, 0);
                         }else{
                             if(fingerInBounds) {
@@ -434,7 +445,7 @@ Item {
         MouseArea{
             anchors.fill: parent
             onClicked: {
-                stackview.pop();
+                backPage();
             }
         }
     }
@@ -736,13 +747,13 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 if(modelData == "set init"){
-                                    supervisor.slam_set_init();
+                                    supervisor.slam_setInit();
                                 }else if(modelData == "run"){
                                     supervisor.slam_run();
                                 }else if(modelData == "stop"){
                                     supervisor.slam_stop();
                                 }else if(modelData == "auto"){
-                                    supervisor.slam_auto_init();
+                                    supervisor.slam_autoInit();
                                     check_slam_init_timer.trigger_cnt = 0;
                                     check_slam_init_timer.start();
                                 }
@@ -885,7 +896,7 @@ Item {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.rightMargin: 15
-                    text: "/image/"+image_name + ".png";
+                    text: "/image/"+map_name + ".png";
                 }
             }
             Rectangle{
@@ -1911,7 +1922,7 @@ Item {
                         anchors.fill: parent
                         onClicked: {
                             if(modelData == "add"){
-                                if(map.tool == "ADD_LOCATION"){
+                                if(map.tool == "ADD_PATROL_LOCATION"){
                                     if(canvas_location.isnewLoc && canvas_location.new_loc_available){
                                         supervisor.addPatrol("POINT","",canvas_location.new_loc_x, canvas_location.new_loc_y, canvas_location.new_loc_th);
                                         update_patrol_location();
@@ -2180,10 +2191,8 @@ Item {
         property string path : ""
         nameFilters: ["*.png"]
         onAccepted: {
-            image_name = pathlist[9].split(".")[0];
+            setMapPath(fileload.file.toString(),pathlist[9].split(".")[0])
             print(fileload.file.toString());
-            map.loadmap(fileload.file.toString());
-
         }
     }
     Platform.FileDialog{
@@ -2297,7 +2306,7 @@ Item {
                                     popup_add_patrol.close();
                                 }else if(modelData == "in map"){
                                     popup_add_patrol.close();
-                                    map.tool = "ADD_LOCATION";
+                                    map.tool = "ADD_PATROL_LOCATION";
                                 }
                             }
                         }
@@ -2633,13 +2642,11 @@ Item {
         }
     }
 
-    function setmapname(name){
-        image_name = name;
-    }
 
     function loadmap(path){
         map.loadmap(path);
         map_current.loadmap_mini();
+
         updatemap();
         map.update_canvas_all();
     }

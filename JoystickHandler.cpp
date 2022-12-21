@@ -1,6 +1,8 @@
 #include "JoystickHandler.h"
 #include <QDebug>
 #include <iostream>
+#include "Logger.h"
+extern Logger *plog;
 
 int		numAxis;
 int		numButton;
@@ -31,9 +33,9 @@ JoystickHandler::~JoystickHandler(){
 
 int JoystickHandler::CheckJoy(){
     if(connection && open(devName.toStdString().c_str(), O_RDONLY) == -1){
-//        plog->write("[JOYSTICK] DISCONNECTED");
+        plog->write("[JOYSTICK] DISCONNECTED");
         connection = false;
-        close(fdJoy);
+//        close(fdJoy);
     }
 }
 
@@ -49,7 +51,6 @@ int JoystickHandler::ConnectJoy(const QString _devName){
     if((fdJoy = open(devName.toStdString().c_str(), O_RDONLY)) == -1){
         connection = false;
     }else if(!connection){
-//        plog->write("[JOYSTICK] CONNECTED : "+QString().sprintf("%s",nameJoy));
 
         int version;
         ioctl(fdJoy, JSIOCGVERSION, &version);
@@ -57,9 +58,7 @@ int JoystickHandler::ConnectJoy(const QString _devName){
         ioctl(fdJoy, JSIOCGBUTTONS, &numButton);
         ioctl(fdJoy, JSIOCGNAME(80), &nameJoy);
 
-
-        cout << "Version: " << version<<endl;
-        cout << "Joy Connect: " << nameJoy << "(" << numAxis << ", " << numButton << ")"<<endl;
+        plog->write("[JOYSTICK] CONNECTED : "+ QString(nameJoy) + QString().sprintf(" (%d, %d, %d)",version,numAxis,numButton));
 
         fcntl(fdJoy, F_SETFL, O_NONBLOCK);	// use non-blocking methods
         connection = true;
@@ -117,7 +116,7 @@ void JoystickHandler::updatejoy(){
         }
     }else{
         init_count = 0;
-        if(connect_count++%100 == 0){
+        if(connect_count%100 == 0){
             ConnectJoy("/dev/input/js0");
         }
     }

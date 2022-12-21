@@ -8,6 +8,10 @@ Item {
     width: 1280
     height: 800
 
+    Component.onCompleted: {
+        init();
+    }
+
     function init(){
         table_num = supervisor.getTableNum();
         tray_num = supervisor.getTrayNum();
@@ -17,7 +21,8 @@ Item {
             traymodel.append({x:0,y:0,tray_num:i+1,set_table:0,color:"white"});
         }
         if(robot_type == "CALLING"){
-            popup_question.visible = true;
+            if(pbefore != pmenu)
+                popup_question.visible = true;
             supervisor.loadPatrolFile(supervisor.getPatrolFileName());
             var num=supervisor.getPatrolNum();
 
@@ -40,10 +45,6 @@ Item {
     }
     property int tray_num: 3
     property int table_num: 5
-    property double battery: 0
-    property string robotName: "test"
-    property date curDate: new Date()
-    property string curTime: curDate.toLocaleTimeString()
 
     property int tray_width: 400
     property int tray_height: 80
@@ -54,14 +55,11 @@ Item {
 
     property int rect_size: 70
     property int traybox_margin: 150
-    property int tray_center: rect_table_box.width + traybox_margin + rect_tray_box.width/2
 
     property int cur_table: 0
     property bool go_wait: false
     property bool go_charge: false
     property bool go_patrol: false
-    property int robotname_margin: rect_table_box.width/2
-    property string robot_type: supervisor.getRobotType()
 
     Rectangle{
         anchors.fill : parent
@@ -80,10 +78,6 @@ Item {
     }
     ListModel{
         id: patrolmodel
-//        ListElement{
-//            type: 0
-//            name: "Start"
-//        }
     }
 
     Image{
@@ -229,7 +223,7 @@ Item {
         anchors.topMargin: statusbar.height
         color: "#282828"
         onWidthChanged: {
-            robotname_margin = rect_table_box.width/2
+            margin_name = rect_table_box.width
         }
 
         Text{
@@ -329,7 +323,7 @@ Item {
         anchors.topMargin: statusbar.height
         color: "#282828"
         onWidthChanged: {
-            robotname_margin = rect_table_box.width/2
+            margin_name = rect_table_box.width
         }
 
         Text{
@@ -478,7 +472,7 @@ Item {
                         anchors.fill: parent
                         onClicked: {
                             cur_table = 0;
-                            stackview.push(pmenus);
+                            loadPage(pmenu);
                         }
                     }
                 }

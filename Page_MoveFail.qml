@@ -13,15 +13,15 @@ Item {
     property var joy_axis_right_rl: 0
 
     function init(){
-//        statusbar.visible = true;
-//        notice.y = 0;
-//        area_swipe.enabled = true;
+        statusbar.visible = true;
+        notice.y = 0;
+        area_swipe.enabled = true;
     }
 
     function loadmap(path){
 //        map.loadmap_mini();
     }
-/*
+
     SequentialAnimation{
         id: ani_swipe
         running: true;
@@ -321,12 +321,11 @@ Item {
         running: false
         repeat: true
         onTriggered: {
-            print(supervisor.getRobotState());
             if(supervisor.getRobotState() == 4){
                 supervisor.moveResume();
             }else{
-                pmoving.checkPaused();
-                stackview.pop();
+                backPage();
+                loader_page.item.checkPaused();
                 timer_check_pause.stop();
             }
         }
@@ -365,5 +364,5 @@ Item {
                 joy_th.remote_stop();
             }
         }
-    }*/
+    }
 }

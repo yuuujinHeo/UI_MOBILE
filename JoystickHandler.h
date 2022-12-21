@@ -12,7 +12,6 @@
 #include <sys/ioctl.h>
 #include <QThread>
 #include <linux/joystick.h>
-#include "GlobalHeader.h"
 #include <QString>
 
 typedef enum{JAXIS_LJOG_RL = 0, JAXIS_LJOG_UD, JAXIS_RJOG_RL, JAXIS_RJOG_UD, JAXIS_ARW_RL, JAXIS_ARW_UD} JOY_AXIS_SEQ;

@@ -16,7 +16,7 @@ Item {
         MouseArea{
             anchors.fill: parent
             onClicked: {
-                stackview.pop();
+                loadPage(pmenu);
             }
         }
     }
@@ -25,7 +25,11 @@ Item {
     property string debug_platform_name: ""
     property bool is_debug: false
 
-    function uiupdate(){
+    Component.onCompleted: {
+        init();
+    }
+
+    function init(){
         textfield_name.text = supervisor.getRobotName();
         slider_vxy.value = supervisor.getVelocity();
         if(supervisor.getRobotType() == "SERVING"){
@@ -420,7 +424,7 @@ Item {
 
                 supervisor.readSetting();
 
-                uiupdate();
+                init();
             }
         }
     }
@@ -443,7 +447,7 @@ Item {
         MouseArea{
             anchors.fill: parent
             onClicked: {
-                uiupdate();
+                init();
             }
         }
     }
