@@ -60,9 +60,9 @@ Item {
         }
     }
     function remote_stop(){
-        update_cnt = 0;
         mcx = 0
         mcy = 0
+        update_cnt = 0;
         returnAnimation.restart();
     }
 

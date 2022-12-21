@@ -8,6 +8,7 @@
 #include <usb.h>
 #include <QDir>
 #include <QFileSystemWatcher>
+#include <QtQuick/qquickimageprovider.h>
 
 extern QObject *object;
 
@@ -348,76 +349,68 @@ bool Supervisor::isConnectServer(){
 }
 int Supervisor::isExistMap(){
 //0:no map, 1:map_server, 2: map_edited, 3:raw_map only
-    isMapExist = false;
-    QFile *file = new QFile(QGuiApplication::applicationDirPath()+"/image/map_rotated.png");
-    if(file->open(QIODevice::ReadOnly)){
-        isMapExist = true;
-    }else{
-        if(rotate_map("image/map_server.png","image/map_rotated.png",0))
-            isMapExist = true;
+    QString file_rotated = QGuiApplication::applicationDirPath()+"/image/map_rotated.png";
+
+
+    QString map_server = "image/map_server.png";
+    QString map_rotated = "image/map_rotated.png";
+
+    QString map_raw = "image/raw_map.png";
+    QString map_raw_rotated = "image/map_raw.png";
+    QString map_edited = "image/map_edited.png";
+
+    QString file_meta = "setting/map_meta.ini";
+    QString file_annot = "setting/annotation.ini";
+
+
+    //map_meta.ini 파일이 없으면 기본세팅된 값으로 만든다. (필수)
+    if(!QFile::exists(file_meta)){
+        QString filename = "setting/map_meta.ini";
+        QSettings settings(filename, QSettings::IniFormat);
+        settings.clear();
+        settings.setValue("map_metadata/map_w",1000);
+        settings.setValue("map_metadata/map_h",1000);
+        settings.setValue("map_metadata/map_grid_width",QString::number(0.03));
+        settings.setValue("map_metadata/map_origin_u",500);
+        settings.setValue("map_metadata/map_origin_v",500);
+        qDebug() << QGuiApplication::applicationDirPath()+"/setting/map_meta.ini" << filename;
+        plog->write("[SETTING] map_meta.ini not found -> make basic format");
+        if(pmap->map_loaded){
+            setSetting("FLOOR/map_load","false");
+        }
     }
 
-    if(isMapExist){
-        return 1;
-    }else{
-        QFile *file_raw = new QFile(QGuiApplication::applicationDirPath()+"/image/raw_map.png");
-        QFile *file_edit = new QFile(QGuiApplication::applicationDirPath()+"/image/map_edited.png");
-        QFile *file_meta = new QFile(QGuiApplication::applicationDirPath()+"/setting/map_meta.ini");
-        QFile *file_annot = new QFile(QGuiApplication::applicationDirPath()+"/setting/annotation.ini");
-        file_edit->open(QIODevice::ReadOnly);
-        file_raw->open(QIODevice::ReadOnly);
-        file_meta->open(QIODevice::ReadOnly);
-        file_annot->open(QIODevice::ReadOnly);
-
-        if(file_meta->isOpen()){
-            if(file_raw->isOpen() && file_edit->isOpen() && file_annot->isOpen()){
-                return 2;
-            }else if(file_edit->isOpen()){
-                if(file_annot->isOpen()){
-                    //make raw_map
-                    if(rotate_map("image/map_edited.png","image/raw_map.png",1)){
-                        return 2;
-                    }else{
-                        setSetting("FLOOR/map_load","false");
-                        return 0;
-                    }
-                }else{
-                    if(rotate_map("image/map_edited.png","image/raw_map.png",1)){
-                        return 3;
-                    }else{
-                        setSetting("FLOOR/map_load","false");
-                        return 0;
-                    }
-                }
-            }else if(file_raw->isOpen()){
-                if(rotate_map("image/raw_map.png","image/map_raw.png",1)){
-                    return 3;
-                }else{
-                    setSetting("FLOOR/map_load","false");
-                    return 0;
-                }
-            }else{
-                if(pmap->map_loaded){
-                    setSetting("FLOOR/map_load","false");
-                }
-                return 0;
-            }
-        }else{
-            //Make metadata
-            QString filename = "setting/map_meta.ini";
-            QSettings settings(filename, QSettings::IniFormat);
-            settings.clear();
-            settings.setValue("map_metadata/map_w",1000);
-            settings.setValue("map_metadata/map_h",1000);
-            settings.setValue("map_metadata/map_grid_width",QString::number(0.03));
-            settings.setValue("map_metadata/map_origin_u",500);
-            settings.setValue("map_metadata/map_origin_v",500);
-            plog->write("[SETTING] map_meta.ini not found -> make basic format");
-            if(pmap->map_loaded){
-                setSetting("FLOOR/map_load","false");
-            }
-            return 0;
+    if(QFile::exists(file_annot)){
+        //서버에서 받아온 맵(회전된 버전)
+        if(QFile::exists(map_rotated)){
+            return 1;
         }
+
+        //서버에서 받아온 원본 맵
+        if(QFile::exists(map_server)){
+            if(rotate_map(map_server,map_rotated,0)){
+                return 1;
+            }
+        }
+
+        //로컬에서 만들어진 맵(회전되고 수정된 버전)
+        if(QFile::exists(map_edited)){
+            return 2;
+        }
+    }else{
+        if(pmap->map_loaded){
+            setSetting("FLOOR/map_load","false");
+        }
+    }
+
+    //로컬에서 만든 맵(매핑 로우 파일)
+    if(QFile::exists(map_raw)){
+        if(!QFile::exists(map_raw_rotated)){
+            rotate_map(map_raw, map_raw_rotated,0);
+        }
+        return 3;
+    }else{
+        return 0;
     }
 }
 bool Supervisor::loadMaptoServer(){
@@ -495,8 +488,8 @@ void Supervisor::setloadMap(bool load){
     }
 }
 bool Supervisor::isExistRobotINI(){
-    QFile *file = new QFile(QGuiApplication::applicationDirPath()+"/setting/robot.ini");
-    return file->open(QIODevice::ReadOnly);
+    QString file = "setting/robot.ini";
+    return QFile::exists(file);
 }
 void Supervisor::makeRobotINI(){
     plog->write("[SETTING] Make Robot.ini basic format");
@@ -562,6 +555,9 @@ QString Supervisor::getUsbMapPath(int num){
     QString temp = templist[templist.size() - 2] + "/" + templist[templist.size()-1];
     return temp;
 }
+QString Supervisor::getUsbMapPathFull(int num){
+    return usb_map_list[num];
+}
 void Supervisor::saveMapfromUsb(QString path){
     std::string user = getenv("USER");
     std::string path1 = "/media/" + user + "/";
@@ -584,11 +580,14 @@ void Supervisor::saveMapfromUsb(QString path){
 
 
 
-////*********************************************  SLAM(LOCALIZATION) 관련   ***************************************************////
-void Supervisor::startSLAM(){
-
+////*******************************************  SLAM(LOCALIZATION) 관련   ************************************************////
+void Supervisor::startMapping(){
+    plog->write("[USER INPUT] START MAPPING");
+    lcm->sendCommand(ROBOT_CMD_MAPPING_START, "MAPPING START");
 }
-void Supervisor::stopSLAM(){
+void Supervisor::stopMapping(){
+    plog->write("[USER INPUT] STOP MAPPING");
+    lcm->sendCommand(ROBOT_CMD_MAPPING_STOP, "MAPPING STOP");
 
 }
 void Supervisor::setSLAMMode(int mode){
@@ -613,7 +612,7 @@ float Supervisor::getInitPoseTH(){
     ST_POSE temp = setAxis(pmap->init_pose);
     return temp.th;
 }
-void Supervisor::slam_set_init(){
+void Supervisor::slam_setInit(){
     plog->write("[SLAM] SLAM SET INIT : "+QString().sprintf("%f, %f, %f",pmap->init_pose.x,pmap->init_pose.y,pmap->init_pose.th));
     lcm->setInitPose(pmap->init_pose.x, pmap->init_pose.y, pmap->init_pose.th);
 }
@@ -623,7 +622,7 @@ void Supervisor::slam_run(){
 void Supervisor::slam_stop(){
     lcm->sendCommand(ROBOT_CMD_SLAM_STOP, "LOCALIZATION STOP");
 }
-void Supervisor::slam_auto_init(){
+void Supervisor::slam_autoInit(){
     lcm->sendCommand(ROBOT_CMD_SLAM_AUTO, "LOCALIZATION AUTO INIT");
 }
 bool Supervisor::is_slam_running(){
@@ -634,7 +633,24 @@ bool Supervisor::is_slam_running(){
     }
 }
 
+bool Supervisor::getMappingflag(){
+    return true;
+    return lcm->flagMapping;
+}
 
+void Supervisor::setMappingflag(bool flag){
+    lcm->flagMapping = flag;
+}
+
+QList<int> Supervisor::getMapping(){
+    return pmap->data.toList();
+}
+void Supervisor::pushMapData(QList<int> data){
+    pmap->data.clear();
+    for(int i=0; i<data.size(); i++){
+        pmap->data.push_back(data[i]);
+    }
+}
 
 ////*********************************************  JOYSTICK 관련   ***************************************************////
 bool Supervisor::isconnectJoy(){
@@ -1159,11 +1175,12 @@ void Supervisor::addTline(int num, int x1, int y1, int x2, int y2){
 }
 void Supervisor::removeTline(int num, int line){
     if(num > -1 && num < pmap->travellinePose.size()){
-        if(line > -1 && line < pmap->travellinePose[num].size()){
-            pmap->travellinePose[num].remove(line);
+        if(line > -1 && line*2+1 < pmap->travellinePose[num].size()){
+            pmap->travellinePose[num].remove(line*2);
+            pmap->travellinePose[num].remove(line*2);
             if(pmap->travellinePose[num].size() < 1){
-                pmap->travellinePose.remove(num);
                 pmap->travellineSize--;
+                pmap->travellinePose.remove(num);
                 plog->write("[ANNOTATION] REMOVE Travel Line "+ QString().sprintf("%d : line(%d)",num,line));
             }
             QMetaObject::invokeMethod(mMain,"updatetravelline");
@@ -1182,38 +1199,40 @@ int Supervisor::getTlineNum(int x, int y){
     ST_FPOINT temp = canvasTomap(x,y);
     ST_FPOINT uL;
     ST_FPOINT dR;
-    for(int i=0; i<pmap->travellinePose[0].size(); i=i+2){
-        uL.x = pmap->travellinePose[0][i].x;
-        uL.y = pmap->travellinePose[0][i].y;
-        dR.x = pmap->travellinePose[0][i].x;
-        dR.y = pmap->travellinePose[0][i].y;
+    if(pmap->travellinePose.size() > 0){for(int i=0; i<pmap->travellinePose[0].size(); i=i+2){
+            uL.x = pmap->travellinePose[0][i].x;
+            uL.y = pmap->travellinePose[0][i].y;
+            dR.x = pmap->travellinePose[0][i].x;
+            dR.y = pmap->travellinePose[0][i].y;
 
 
-        if(uL.x < pmap->travellinePose[0][i+1].x)
-            uL.x = pmap->travellinePose[0][i+1].x;
-        if(dR.x > pmap->travellinePose[0][i+1].x)
-            dR.x = pmap->travellinePose[0][i+1].x;
+            if(uL.x < pmap->travellinePose[0][i+1].x)
+                uL.x = pmap->travellinePose[0][i+1].x;
+            if(dR.x > pmap->travellinePose[0][i+1].x)
+                dR.x = pmap->travellinePose[0][i+1].x;
 
-        if(uL.y < pmap->travellinePose[0][i+1].y)
-            uL.y = pmap->travellinePose[0][i+1].y;
-        if(dR.y > pmap->travellinePose[0][i+1].y)
-            dR.y = pmap->travellinePose[0][i+1].y;
+            if(uL.y < pmap->travellinePose[0][i+1].y)
+                uL.y = pmap->travellinePose[0][i+1].y;
+            if(dR.y > pmap->travellinePose[0][i+1].y)
+                dR.y = pmap->travellinePose[0][i+1].y;
 
-        float margin = 0.3;
+            float margin = 0.3;
 
-        if(temp.x < uL.x+margin && temp.x > dR.x-margin){
-            if(temp.y < uL.y+margin && temp.y > dR.y-margin){
-                //match box
+            if(temp.x < uL.x+margin && temp.x > dR.x-margin){
+                if(temp.y < uL.y+margin && temp.y > dR.y-margin){
+                    //match box
 
-                float ang_line = atan2(uL.y-dR.y,uL.x-dR.x);
-//                qDebug() << i << atan2(uL.y-dR.y,uL.x-dR.x) << fabs(ang_line - atan2(uL.y-temp.y, uL.x-temp.x)) ;
-                if(fabs(ang_line - atan2(uL.y-temp.y, uL.x-temp.x)) < 0.5){
-                    return i;
+                    float ang_line = atan2(uL.y-dR.y,uL.x-dR.x);
+    //                qDebug() << i << atan2(uL.y-dR.y,uL.x-dR.x) << fabs(ang_line - atan2(uL.y-temp.y, uL.x-temp.x)) ;
+                    if(fabs(ang_line - atan2(uL.y-temp.y, uL.x-temp.x)) < 0.5){
+                        return i;
+                    }
+
                 }
-
             }
         }
     }
+
     return -1;
 }
 
@@ -1420,7 +1439,12 @@ void Supervisor::joyMoveR(float r){
     probot->joystick[1] = r;
     lcm->flagJoystick = true;
 }
-
+float Supervisor::getJoyXY(){
+    return probot->joystick[0];
+}
+float Supervisor::getJoyR(){
+    return probot->joystick[1];
+}
 
 
 
@@ -2005,7 +2029,6 @@ void Supervisor::onTimer(){
         if(ui_state != UI_STATE_NONE){
             ui_state = UI_STATE_NONE;
             plog->write("[LCM] DISCONNECT -> UI_STATE = NONE");
-            QMetaObject::invokeMethod(mMain,"disconnected");
         }
     }
 

@@ -66,7 +66,9 @@ SOURCES       = ../JoystickHandler.cpp \
 		Page_setting_qml.cpp \
 		Page_moving_qml.cpp \
 		Item_joystick_qml.cpp \
+		Page_map_init_qml.cpp \
 		main_qml.cpp \
+		Item_keyboard_qml.cpp \
 		Map_full_qml.cpp \
 		Page_map_qml.cpp \
 		Page_MoveFail_qml.cpp \
@@ -95,7 +97,9 @@ OBJECTS       = JoystickHandler.o \
 		Page_setting_qml.o \
 		Page_moving_qml.o \
 		Item_joystick_qml.o \
+		Page_map_init_qml.o \
 		main_qml.o \
+		Item_keyboard_qml.o \
 		Map_full_qml.o \
 		Page_map_qml.o \
 		Page_MoveFail_qml.o \
@@ -408,7 +412,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents qml_qmlcache.qrc $(DISTDIR)/
-	$(COPY_FILE) --parents ../Page_init.qml ../Page_menus.qml ../Item_statusbar.qml ../Page_pickup.qml ../Page_setting.qml ../Page_moving.qml ../Item_joystick.qml ../main.qml ../Map_full.qml ../Page_map.qml ../Page_MoveFail.qml ../Page_pickup_calling.qml ../Item_switch.qml ../Page_kitchen.qml ../Page_charge.qml $(DISTDIR)/
+	$(COPY_FILE) --parents ../Page_init.qml ../Page_menus.qml ../Item_statusbar.qml ../Page_pickup.qml ../Page_setting.qml ../Page_moving.qml ../Item_joystick.qml ../Page_map_init.qml ../main.qml ../Item_keyboard.qml ../Map_full.qml ../Page_map.qml ../Page_MoveFail.qml ../Page_pickup_calling.qml ../Item_switch.qml ../Page_kitchen.qml ../Page_charge.qml $(DISTDIR)/
 	$(COPY_FILE) --parents ../qml.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../GlobalHeader.h ../JoystickHandler.h ../LCMHandler.h ../Logger.h ../ServerHandler.h ../cv_to_qt.h ../Supervisor.h $(DISTDIR)/
@@ -510,9 +514,9 @@ qrc_qml_qmlcache.cpp: qml_qmlcache.qrc \
 		../bgm/voice_avoid.mp3
 	/usr/lib/qt5/bin/rcc -name qml_qmlcache qml_qmlcache.qrc -o qrc_qml_qmlcache.cpp
 
-compiler_qmlcache_make_all: Page_init_qml.cpp Page_menus_qml.cpp Item_statusbar_qml.cpp Page_pickup_qml.cpp Page_setting_qml.cpp Page_moving_qml.cpp Item_joystick_qml.cpp main_qml.cpp Map_full_qml.cpp Page_map_qml.cpp Page_MoveFail_qml.cpp Page_pickup_calling_qml.cpp Item_switch_qml.cpp Page_kitchen_qml.cpp Page_charge_qml.cpp
+compiler_qmlcache_make_all: Page_init_qml.cpp Page_menus_qml.cpp Item_statusbar_qml.cpp Page_pickup_qml.cpp Page_setting_qml.cpp Page_moving_qml.cpp Item_joystick_qml.cpp Page_map_init_qml.cpp main_qml.cpp Item_keyboard_qml.cpp Map_full_qml.cpp Page_map_qml.cpp Page_MoveFail_qml.cpp Page_pickup_calling_qml.cpp Item_switch_qml.cpp Page_kitchen_qml.cpp Page_charge_qml.cpp
 compiler_qmlcache_clean:
-	-$(DEL_FILE) Page_init_qml.cpp Page_menus_qml.cpp Item_statusbar_qml.cpp Page_pickup_qml.cpp Page_setting_qml.cpp Page_moving_qml.cpp Item_joystick_qml.cpp main_qml.cpp Map_full_qml.cpp Page_map_qml.cpp Page_MoveFail_qml.cpp Page_pickup_calling_qml.cpp Item_switch_qml.cpp Page_kitchen_qml.cpp Page_charge_qml.cpp
+	-$(DEL_FILE) Page_init_qml.cpp Page_menus_qml.cpp Item_statusbar_qml.cpp Page_pickup_qml.cpp Page_setting_qml.cpp Page_moving_qml.cpp Item_joystick_qml.cpp Page_map_init_qml.cpp main_qml.cpp Item_keyboard_qml.cpp Map_full_qml.cpp Page_map_qml.cpp Page_MoveFail_qml.cpp Page_pickup_calling_qml.cpp Item_switch_qml.cpp Page_kitchen_qml.cpp Page_charge_qml.cpp
 Page_init_qml.cpp: ../Page_init.qml \
 		/usr/lib/qt5/bin/qmlcachegen
 	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_init_qml.cpp ../Page_init.qml
@@ -541,9 +545,17 @@ Item_joystick_qml.cpp: ../Item_joystick.qml \
 		/usr/lib/qt5/bin/qmlcachegen
 	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Item_joystick_qml.cpp ../Item_joystick.qml
 
+Page_map_init_qml.cpp: ../Page_map_init.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_map_init_qml.cpp ../Page_map_init.qml
+
 main_qml.cpp: ../main.qml \
 		/usr/lib/qt5/bin/qmlcachegen
 	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o main_qml.cpp ../main.qml
+
+Item_keyboard_qml.cpp: ../Item_keyboard.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Item_keyboard_qml.cpp ../Item_keyboard.qml
 
 Map_full_qml.cpp: ../Map_full.qml \
 		/usr/lib/qt5/bin/qmlcachegen
@@ -589,9 +601,6 @@ compiler_moc_header_make_all: moc_JoystickHandler.cpp moc_LCMHandler.cpp moc_Log
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_JoystickHandler.cpp moc_LCMHandler.cpp moc_Logger.cpp moc_ServerHandler.cpp moc_Supervisor.cpp
 moc_JoystickHandler.cpp: ../JoystickHandler.h \
-		../GlobalHeader.h \
-		../Logger.h \
-		../cv_to_qt.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/rainbow/Desktop/UI_MOBILE/build/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/rainbow/Desktop/UI_MOBILE -I/usr/include/opencv4 -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtQuickControls2 -I/usr/include/x86_64-linux-gnu/qt5/QtQuick -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtQml -I/usr/include/x86_64-linux-gnu/qt5/QtWebSockets -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../JoystickHandler.h -o moc_JoystickHandler.cpp
@@ -653,9 +662,7 @@ compiler_clean: compiler_rcc_clean compiler_qmlcache_clean compiler_qmlcache_loa
 ####### Compile
 
 JoystickHandler.o: ../JoystickHandler.cpp ../JoystickHandler.h \
-		../GlobalHeader.h \
-		../Logger.h \
-		../cv_to_qt.h
+		../Logger.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o JoystickHandler.o ../JoystickHandler.cpp
 
 LCMHandler.o: ../LCMHandler.cpp ../LCMHandler.h \
@@ -732,8 +739,14 @@ Page_moving_qml.o: Page_moving_qml.cpp
 Item_joystick_qml.o: Item_joystick_qml.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Item_joystick_qml.o Item_joystick_qml.cpp
 
+Page_map_init_qml.o: Page_map_init_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_map_init_qml.o Page_map_init_qml.cpp
+
 main_qml.o: main_qml.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main_qml.o main_qml.cpp
+
+Item_keyboard_qml.o: Item_keyboard_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Item_keyboard_qml.o Item_keyboard_qml.cpp
 
 Map_full_qml.o: Map_full_qml.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Map_full_qml.o Map_full_qml.cpp

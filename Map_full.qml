@@ -14,6 +14,9 @@ Item {
     height: 800
 
     //////========================================================================================Mode
+    property bool just_show_map: false
+    property bool mapping_mode: false
+
     property bool is_slam_running: false
     property bool show_object: false
     property bool show_location: false
@@ -31,10 +34,10 @@ Item {
     property string state_annotation: "NONE"
     //Annotation State (0: state, 1: load/edit, 2: object, 3: location, 4: travel line)
 
-    property bool robot_following: true
+    property bool robot_following: just_show_map?false:true
 
     //////========================================================================================Annotation Tool
-    //Tool Num (MOVE, BRUSH, ADD_OBJECT, ADD_POINT, EDIT_POINT, ADD_LOCATION, EDIT_LOCATION, ADD_LINE, SLAM_INIT)
+    //Tool Num (MOVE, BRUSH, ADD_OBJECT, ADD_POINT, EDIT_POINT, ADD_LOCATION, EDIT_LOCATION, ADD_LINE, SLAM_INIT, ADD_PATROL_LOCATION)
     property string tool: "MOVE"
     property var brush_size: 10
     property color brush_color: "black"
@@ -130,6 +133,12 @@ Item {
         }
     }
 
+    Component.onCompleted: {
+        if(just_show_map){
+            canvas_map.scale = rect_map.width/canvas_map.width;
+        }
+    }
+
     //Annotation State (None, Drawing, Object, Location, Travelline)
 
     onState_annotationChanged: {
@@ -175,8 +184,8 @@ Item {
         clip: true
         Canvas{
             id: canvas_map
-            width: image_map.width
-            height: image_map.height
+            width: 1000//image_map.width
+            height: 1000//image_map.height
             antialiasing: true
             property var lineWidth: brush_size
 
@@ -187,7 +196,7 @@ Item {
 
             Behavior on scale{
                 NumberAnimation{
-                    duration: 300
+                    duration: just_show_map?0:300
                 }
             }
             Behavior on x{
@@ -259,6 +268,14 @@ Item {
                         ctx.stroke()
                     }
                 }
+
+                if(mapping_mode){
+                    if(supervisor.getMappingflag()){
+
+                        supervisor.setMappingflag(false);
+                    }
+                }
+
             }
         }
 
@@ -319,7 +336,6 @@ Item {
                         draw_canvas_location();
                     }
                     draw_canvas_location_temp();
-
                 }
             }
         }
@@ -423,11 +439,17 @@ Item {
                         select_object_point = supervisor.getObjPointNum(select_object, point1.x, point1.y);
 
                     }else if(tool == "ADD_LOCATION"){
-                        canvas_location.new_location = true;
-                        canvas_location.new_loc_available = false;
-                        canvas_location.new_loc_x = point1.x;
-                        canvas_location.new_loc_y = point1.y;
-                        canvas_location.new_loc_th = 0;
+                        new_location = true;
+                        new_loc_available = false;
+                        new_loc_x = point1.x;
+                        new_loc_y = point1.y;
+                        new_loc_th = 0;
+                    }else if(tool == "ADD_PATROL_LOCATION"){
+                        new_location = true;
+                        new_loc_available = false;
+                        new_loc_x = point1.x;
+                        new_loc_y = point1.y;
+                        new_loc_th = 0;
                     }else if(tool == "EDIT_LOCATION"){
                         supervisor.moveLocationPoint(select_location, point1.x, point1.y, 0);
                     }else if(tool == "SLAM_INIT"){
@@ -457,9 +479,10 @@ Item {
                         }else if(tool == "EDIT_OBJECT"){
                             select_object_point = -1;
                             supervisor.setObjPose();
-                        }else if(tool == "ADD_LOCATION"){
-                            if(canvas_location.new_location)
+                        }else if(tool == "ADD_PATROL_LOCATION"){
+                            if(new_location){
                                 popup_add_patrol_1.open();
+                            }
                         }else if(tool == "EDIT_LOCATION"){
                             updatelocationcollision();
                             tool = "NONE";
@@ -468,13 +491,13 @@ Item {
                         }else if(tool == "ADD_LINE"){
                             if(state_annotation == "TRAVELLINE"){
                                 if(new_line_point1){
-                                    canvas_travelline.x2 = point1.x;
-                                    canvas_travelline.y2 = point1.y;
+                                    new_line_x2 = point1.x;
+                                    new_line_y2 = point1.y;
                                     new_line_point2 = true;
                                 }else{
                                     new_line_point1 = true;
-                                    canvas_travelline.x1 = point1.x;
-                                    canvas_travelline.y1 = point1.y;
+                                    new_line_x1 = point1.x;
+                                    new_line_y1 = point1.y;
                                 }
                                 canvas_travelline.requestPaint();
                             }else{
@@ -488,15 +511,15 @@ Item {
                         }else{
                             if(state_annotation == "OBJECT"){
                                 select_object = supervisor.getObjNum(point1.x,point1.y);
-                                list_object.currentIndex = select_object;
+                                loader_menu.item.setcur(select_object);
                                 canvas_object.requestPaint();
                             }else if(state_annotation == "LOCATION"){
                                 select_location = supervisor.getLocNum(point1.x,point1.y);
-                                list_location.currentIndex = select_location;
+                                loader_menu.item.setcur(select_location);
                                 canvas_location.requestPaint();
                             }else if(state_annotation == "TRAVELLINE"){
                                 select_line = supervisor.getTlineNum(point1.x, point1.y)/2;
-                                list_line.currentIndex = select_line;
+                                loader_menu.item.setcur(select_line);
                                 canvas_travelline.requestPaint();
                             }
                         }
@@ -567,10 +590,17 @@ Item {
                             supervisor.editObjectRect(select_object, select_object_point, point1.x, point1.y);
                         }
                     }else if(tool == "ADD_LOCATION"){
-                        if(point1.y-canvas_location.new_loc_y == 0){
-                            canvas_location.new_loc_th = 0;
+                        if(point1.y-new_loc_y == 0){
+                            new_loc_th = 0;
                         }else{
-                            canvas_location.new_loc_th = Math.atan2(-(point1.x-canvas_location.new_loc_x),-(point1.y-canvas_location.new_loc_y));
+                            new_loc_th = Math.atan2(-(point1.x-new_loc_x),-(point1.y-new_loc_y));
+                        }
+                        canvas_location.requestPaint();
+                    }else if(tool == "ADD_PATROL_LOCATION"){
+                        if(point1.y-new_loc_y == 0){
+                            new_loc_th = 0;
+                        }else{
+                            new_loc_th = Math.atan2(-(point1.x-new_loc_x),-(point1.y-new_loc_y));
                         }
                         canvas_location.requestPaint();
                     }else if(tool == "EDIT_LOCATION"){
@@ -605,6 +635,7 @@ Item {
             width: 40
             height: 40
             radius: 40
+            visible: !just_show_map
             anchors.top: parent.top
             anchors.right: parent.right
             color: "white"
@@ -626,6 +657,7 @@ Item {
             width: 40
             height: 40
             radius: 40
+            visible: !just_show_map
             anchors.top: btn_robot_following.bottom
             anchors.right: parent.right
             color: show_lidar?"blue":"gray"
@@ -660,7 +692,7 @@ Item {
         Rectangle{
             anchors.fill: parent
             color: "transparent"
-            visible: !is_slam_running
+            visible: !is_slam_running && !just_show_map
             border.color: "red"
             border.width: 5
             Text{
@@ -694,6 +726,14 @@ Item {
             ctx.stroke()
         }
     }
+
+    Canvas{
+        id: canvas_map_temp
+        visible: false
+        width: 1000//image_map.width
+        height: 1000//image_map.height
+    }
+
 
     //////========================================================================================Timer
     Timer{
@@ -738,6 +778,7 @@ Item {
         show_robot = false;
         show_travelline = false;
         update_canvas_all();
+
     }
     function init_mode(){
         tool = "MOVE";
@@ -761,13 +802,48 @@ Item {
         update_canvas_all();
     }
 
-    function loadmap(path){
-        update_map_variable();
-        image_map.source = path;
-        image_map.isload = true;
-        update_canvas_all();
-        nn();
+    property var map_array:[]
+    function loadmapping(){
+        var ctx = canvas_map_temp.getContext('2d');
+        image_map.source = "file://"+applicationDirPath+"/image1/map_edited.png";
+        ctx.drawImage(image_map,0,0,1000,1000);
+        var map_data = ctx.getImageData(0,0,image_map.width, image_map.height);
+
+        for(var i=0; i<map_data.data.length; i=i+4){
+            map_array.push(map_data.data[i]);
+        }
+        supervisor.pushMapData(map_array);
+
+        var ctx = canvas_map.getContext('2d');
+        ctx.clearRect(0,0,1000,1000);
+
+        var data = supervisor.getMapping();
+        var temp = ctx.createImageData(1000,1000);
+        for(var i=0; i<temp.data.length; i=i+4){
+            temp.data[i] = data[i/4];
+            temp.data[i+1] = data[i/4];
+            temp.data[i+2] = data[i/4];
+            temp.data[i+3] = 255;
+        }
+        ctx.drawImage(temp,0,0,1000,1000);
+        canvas_map.requestPaint();
     }
+
+    function loadmap(path){
+        if(!mapping_mode){
+            update_map_variable();
+            image_map.source = path;
+            image_map.isload = true;
+            update_canvas_all();
+            nn();
+        }
+
+        if(just_show_map){
+            canvas_map.scale = map_full.width/canvas_map.width;
+        }
+    }
+
+
     function loadmap_mini(){
         image_map.source = "file://"+applicationDirPath + "/image/map_mini.png"
         image_map.isload = true;
@@ -826,13 +902,7 @@ Item {
         }
     }
     function updatelocationcollision(){
-        for(var i=0; i<list_location.model.count; i++){
-            if(is_Col_loc(supervisor.getLocationx(i)/grid_size + origin_x,supervisor.getLocationy(i)/grid_size + origin_y)){
-                list_location.model.get(i).iscol = true;
-            }else{
-                list_location.model.get(i).iscol = false;
-            }
-        }
+        loader_menu.item.update();
     }
     function is_Col_loc(x,y){
         if(image_map.isload){
@@ -863,6 +933,9 @@ Item {
     function save_canvas_temp(){
         canvas_map.save("image/map_edited.png");
     }
+    function save_map(path){
+        canvas_map.save(path);
+    }
 
     //////========================================================================================Canvas drawing function
     function draw_canvas_lines(){
@@ -880,6 +953,32 @@ Item {
             }
             ctx.stroke()
         }
+    }
+    function draw_canvas_mapping(){
+        var ctx = canvas_map.getContext('2d');
+
+        var data = supervisor.getMapping();
+
+        var temp = createImageData(1000,1000);
+        print(temp);
+
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "red";
+        ctx.fillStyle = "red";
+        for(var i=0; i<360; i++){
+            var data = supervisor.getLidar(i)/grid_size;
+            if(data > 0.01){
+                ctx.beginPath();
+                var lidar_x = robot_x + origin_x + data*Math.cos((-Math.PI*i)/180 + robot_th);
+                var lidar_y = robot_y + origin_y + data*Math.sin((-Math.PI*i)/180 + robot_th);
+                ctx.moveTo(lidar_x, lidar_y);
+                ctx.arc(lidar_x,lidar_y,1,0,Math.PI*2);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+        }
+
     }
     function draw_canvas_map(){
         var ctx = canvas_map.getContext('2d');
@@ -960,20 +1059,20 @@ Item {
         }
     }
     function draw_canvas_location_temp(){
-        if(canvas_location.new_location){
+        if(new_location){
             var ctx = canvas_location.getContext('2d');
             ctx.lineWidth = 3;
-            if(is_Col_loc(canvas_location.new_loc_x,canvas_location.new_loc_y)){
+            if(is_Col_loc(new_loc_x,new_loc_y)){
                 ctx.strokeStyle = "red";
-                canvas_location.new_loc_available = false;
+                new_loc_available = false;
             }else{
                 ctx.strokeStyle = "yellow";
-                canvas_location.new_loc_available = true;
+                new_loc_available = true;
             }
             ctx.beginPath();
-            ctx.moveTo(canvas_location.new_loc_x,canvas_location.new_loc_y);
-            ctx.arc(canvas_location.new_loc_x,canvas_location.new_loc_y,robot_radius/grid_size, -canvas_location.new_loc_th-Math.PI/2, -canvas_location.new_loc_th-Math.PI/2+2*Math.PI, true);
-            ctx.moveTo(canvas_location.new_loc_x,canvas_location.new_loc_y);
+            ctx.moveTo(new_loc_x,new_loc_y);
+            ctx.arc(new_loc_x,new_loc_y,robot_radius/grid_size, -new_loc_th-Math.PI/2, -new_loc_th-Math.PI/2+2*Math.PI, true);
+            ctx.moveTo(new_loc_x,new_loc_y);
             ctx.stroke()
         }
     }
@@ -1178,7 +1277,7 @@ Item {
             var point_y = Math.floor((margin_obj[i])/image_map.width);
             ctx.beginPath();
             ctx.moveTo(point_x,point_y);
-            ctx.arc(point_x,point_y,slider_margin.value/grid_size,0,Math.PI*2);
+            ctx.arc(point_x,point_y,loader_menu.item.getslider()/grid_size,0,Math.PI*2);
             ctx.fill();
             ctx.stroke();
         }
@@ -1220,9 +1319,9 @@ Item {
         ctx.lineCap = "round";
 
         var tline_num = supervisor.getTlineSize();
-        print(tline_num);
         for(var i=0; i<tline_num; i++){
             var linenum = supervisor.getTlineSize(i);
+            print(linenum);
             for(var j=0; j<linenum; j=j+2){
 
                 if(select_travel_line == i && select_line == j/2){
@@ -1249,8 +1348,8 @@ Item {
         if(new_line_point1 && new_line_point2){
             ctx.strokeStyle = "red";
             ctx.beginPath();
-            ctx.moveTo(canvas_travelline.x1,canvas_travelline.y1);
-            ctx.lineTo(canvas_travelline.x2, canvas_travelline.y2);
+            ctx.moveTo(new_line_x1,new_line_y1);
+            ctx.lineTo(new_line_x2, new_line_y2);
             ctx.stroke();
         }
 
@@ -1258,8 +1357,8 @@ Item {
             ctx.fillStyle = "yellow";
             ctx.strokeStyle = "yellow";
             ctx.beginPath();
-            ctx.moveTo(canvas_travelline.x1,canvas_travelline.y1);
-            ctx.arc(canvas_travelline.x1,canvas_travelline.y1,2,0,Math.PI*2);
+            ctx.moveTo(new_line_x1,new_line_y1);
+            ctx.arc(new_line_x1,new_line_y1,2,0,Math.PI*2);
             ctx.fill();
             ctx.stroke();
         }
@@ -1267,8 +1366,8 @@ Item {
             ctx.fillStyle = "yellow";
             ctx.strokeStyle = "yellow";
             ctx.beginPath();
-            ctx.moveTo(canvas_travelline.x2,canvas_travelline.y2);
-            ctx.arc(canvas_travelline.x2,canvas_travelline.y2,2,0,Math.PI*2);
+            ctx.moveTo(new_line_x2,new_line_y2);
+            ctx.arc(new_line_x2,new_line_y2,2,0,Math.PI*2);
             ctx.fill();
             ctx.stroke();
         }

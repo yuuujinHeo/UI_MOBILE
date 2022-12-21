@@ -28,196 +28,173 @@ Window {
 //        }
 //    }
 
-    property string curloc;
+    property string pbefore: pinit
+    property string ploading: "qrc:/Page_loading.qml"
+    property string pkitchen: "qrc:/Page_kitchen.qml"
+    property string pinit: "qrc:/Page_init.qml"
+    property string pcharging: "qrc:/Page_charge.qml"
+    property string pmap: "qrc:/Page_map.qml"
+    property string pmapinit: "qrc:/Page_map_init.qml"
+    property string pmenu: "qrc:/Page_menus.qml"
+    property string pmovefail: "qrc:/Page_MoveFail.qml"
+    property string pmoving: "qrc:/Page_moving.qml"
+    property string ppickup: "qrc:/Page_pickup.qml"
+    property string ppickupCall: "qrc:/Page_pickup_calling.qml"
+    property string psetting: "qrc:/Page_setting.qml"
+
+    property string map_path: "file://" + applicationDirPath + "/image/map_rotated.png";
+    property string map_name: "map_rotated.png"
+
+    property string robot_type: supervisor.getRobotType()
+    property string robot_name: supervisor.getRobotName()
+    property var robot_battery: 0
+
+    property int margin_name: 250
+
+    property string cur_location;
+
+    function setMapPath(path,name){
+        map_path = path;
+        map_name = name;
+    }
+
     function movelocation(){
-        curloc = supervisor.getcurLoc();
-        supervisor.writelog("[QML - MAIN] MOVE TO "+curloc);
-        if(curloc.slice(0,4) == "char"){
+        cur_location = supervisor.getcurLoc();
+        var str_target;
+        supervisor.writelog("[QML - MAIN] MOVE TO "+cur_location);
+        if(cur_location.slice(0,4) == "char"){
             supervisor.writelog("[QML - MOVING] MOVE TO CHARGING LOCATION");
-            pmoving.pos = "충전 장소";
+            str_target = "충전 장소";
             voice_movecharge.play();
-        }else if(curloc.slice(0,4) == "rest"){
+        }else if(cur_location.slice(0,4) == "rest"){
             supervisor.writelog("[QML - MOVING] MOVE TO RESTING LOCATION");
-            pmoving.pos = "대기 장소";
+            str_target = "대기 장소";
             voice_movewait.play();
         }else{
             voice_serving.play();
             var curtable = supervisor.getcurTable();
-            pmoving.pos = curtable + "번 테이블";
-            supervisor.writelog("[QML - MOVING] MOVE TO " + pmoving.pos);
+            str_target = curtable + "번 테이블";
+            supervisor.writelog("[QML - MOVING] MOVE TO " + str_target);
         }
-
-        if(stackview.currentItem.objectName != "page_kitchen"){
-            supervisor.writelog("[QML - MAIN] current page : "+stackview.currentItem.objectName+" -> pop");
-            pmoving.stopMusic();
-            stackview.pop();
-        }
-
-        pmoving.init();
-        stackview.push(pmoving);
+        loadPage(pmoving)
+        loader_page.pos = str_target;
     }
     function play_avoidmsg(){
         voice_avoid.play();
     }
     function docharge(){
-        if(stackview.currentItem.objectName != "page_kitchen"){
-            supervisor.writelog("[QML - MAIN] current page : "+stackview.currentItem.objectName+" -> pop");
-            pkitchen.init();
-            pmoving.stopMusic();
-            stackview.pop();
-        }
+        loadPage(pcharging)
         supervisor.writelog("[QML - MAIN] Do Charging");
-        pcharge.init();
-        stackview.push(pcharge);
     }
     function waitkitchen(){
-        if(stackview.currentItem.objectName != "page_kitchen"){
-            supervisor.writelog("[QML - MAIN] current page : "+stackview.currentItem.objectName+" -> pop");
-            pkitchen.init();
-            pmoving.stopMusic();
-            stackview.pop();
-        }
+        loadPage(pkitchen)
         supervisor.writelog("[QML - MAIN] Do Wait Kitchen");
     }
     function movetarget(){
-        pmoving.pos = "지정장소";
-        supervisor.writelog("[QML - MOVING] MOVE TO " + pmoving.pos);
-        pmoving.init();
-        stackview.push(pmoving);
+        loadPage(pmoving);
+        loader_page.pos = "지정장소";
+        supervisor.writelog("[QML - MOVING] MOVE TO " + loader_page.pos);
     }
     function pausedcheck(){
         supervisor.writelog("[QML - MAIN] Check Robot Paused");
-        pmoving.checkPaused();
+        if(loader_page.item.objectName == "page_moving"){
+            loader_page.item.checkPaused();
+        }
     }
     function nopathfound(){
         supervisor.writelog("[QML - MAIN] No path found -> movefail");
         play_avoidmsg();
-        pmoving.movefail();
+        if(loader_page.item.objectName == "page_moving"){
+            loader_page.item.movefail();
+        }
     }
     function movestopped(){
         supervisor.writelog("[QML - MAIN] Move Stopped");
-        pmoving.stopMusic();
-        pkitchen.init();
-        while(stackview.currentItem.objectName != "page_kitchen"){
-            supervisor.writelog("[QML - MAIN] current page : "+stackview.currentItem.objectName+" -> pop");
-            stackview.pop();
-        }
+        loadPage(pkitchen);
     }
     function showpickup(){
-        pmoving.stopMusic();
-        stackview.pop();
-        ppickup.init();
-        var trays = supervisor.getPickuptrays();
-        var tempstr = "";
-        for(var i=0; i<trays.length; i++){
-            if(tempstr == ""){
-                tempstr = Number(trays[i])+"번";
-            }else{
-                tempstr += "과 " + Number(trays[i])+"번";
+        robot_type = supervisor.getRobotType();
+        if(robot_type == "SERVING"){
+            loadPage(ppickup);
+            var trays = supervisor.getPickuptrays();
+            var tempstr = "";
+            for(var i=0; i<trays.length; i++){
+                if(tempstr == ""){
+                    tempstr = Number(trays[i])+"번";
+                }else{
+                    tempstr += "과 " + Number(trays[i])+"번";
+                }
+                if(trays[i] == 1){
+                    loader_page.pickup_1 = true;
+                }else if(trays[i] == 2){
+                    loader_page.pickup_2 = true;
+                }else if(trays[i] == 3){
+                    loader_page.pickup_3 = true;
+                }
             }
-            if(trays[i] == 1){
-                ppickup.pickup_1 = true;
-            }else if(trays[i] == 2){
-                ppickup.pickup_2 = true;
-            }else if(trays[i] == 3){
-                ppickup.pickup_3 = true;
-            }
+            loader_page.pos = tempstr;
+            supervisor.writelog("[QML - MAIN] Show Pickup Page : " + loader_page.pos);
+        }else if(robot_type == "CALLING"){
+            loadPage(ppickupCall);
         }
-        ppickup.pos = tempstr;
-        supervisor.writelog("[QML - MAIN] Show Pickup Page : " + ppickup.pos);
-        stackview.push(ppickup);
     }
 
     function updatepatrol(){
-        pmap.updatepatrol();
+        if(loader_page.item.objectName == "page_map")
+            loader_page.item.updatepatrol();
     }
     function updatecanvas(){
-        pmap.updatecanvas();
+        if(loader_page.item.objectName == "page_map" || loader_page.item.objectName == "page_map_init")
+            loader_page.item.updatecanvas();
     }
     function updateobject(){
-        pmap.updateobject();
+        if(loader_page.item.objectName == "page_map" || loader_page.item.objectName == "page_map_init")
+            loader_page.item.updateobject();
     }
     function updatelocation(){
-        pmap.updatelocation();
+        if(loader_page.item.objectName == "page_map" || loader_page.item.objectName == "page_map_init")
+            loader_page.item.updatelocation();
     }
     function updatetravelline(){
-        pmap.updatetravelline();
+        if(loader_page.item.objectName == "page_map" || loader_page.item.objectName == "page_map_init")
+            loader_page.item.updatetravelline();
     }
     function updatepath(){
-        pmap.updatepath();
+        if(loader_page.item.objectName == "page_map")
+            loader_page.item.updatepath();
     }
 
     function newcall(){
-        if(stackview.currentItem.objectName == "page_kitchen"){
+        if(loader_page.item.objectName == "page_kitchen"){
 
         }else{
             supervisor.acceptCall(false);
         }
     }
 
+    function loadPage(page){
+        pbefore = loader_page.source;
+        loader_page.source = page;
+    }
+    function backPage(){
+        loader_page.source = pbefore;
+    }
 
-    Page_kitchen{
-        id: pkitchen;
-        visible: false
+    Loader{
+        id: loader_page
+        focus: true
+        anchors.fill: parent
+        onLoaded: {
+            supervisor.writelog("[QML] Load Page : "+source);
+            timer_update.start();
+        }
+        source: pinit
     }
-    Page_init{
-        id:pinit;
-        visible: false
-    }
-    Page_MoveFail{
-        id:pmovefail
-        visible: false
-    }
-    Page_setting{
-        id: psetting;
-        visible: false
-    }
-    Page_map{
-        id: pmap;
-        visible: false
-    }
-    Page_menus{
-        id: pmenus;
-        visible: false
-    }
-    Page_moving{
-        id: pmoving;
-        visible: false
-    }
-    Page_pickup{
-        id: ppickup;
-        visible: false
-    }
-    Page_charge{
-        id: pcharge;
-        visible: false
-    }
+
     Supervisor{
         id:supervisor
     }
-    Page_pickup_calling{
-        id: ppickup_calling
-        visible: false
-    }
 
-    Timer{
-        id: timer_init
-        interval: 1000
-        running: true
-        repeat: false
-        onTriggered: {
-            if(pinit.init_mode == 4){
-                pkitchen.init();
-                stackview.push(pkitchen);
-                supervisor.writelog("[QML - INIT] Init All Pass -> Wait Kitchen");
-            }else{
-                supervisor.writelog("[QML - INIT] Init Failed -> Show Init Page");
-                stackview.push(pinit);
-//                pmovefail.init();
-//                stackview.push(pmovefail);
-            }
-        }
-    }
 
     Timer{
         id: timer_update
@@ -227,13 +204,6 @@ Window {
         repeat: true
         onTriggered: {
             statusbar.curTime = Qt.formatTime(new Date(), "hh:mm")
-            statusbar.battery = supervisor.getBattery();
-            statusbar.robotName = supervisor.getRobotName();
-            statusbar.robotname_margin = pkitchen.robotname_margin;
-            statusbar.tray_center = pkitchen.tray_center;
-            pmap.tray_center = pkitchen.tray_center;
-            pmap.robotname_margin = pkitchen.robotname_margin;
-
         }
     }
 
@@ -265,85 +235,6 @@ Window {
         id: voice_avoid
         autoPlay: false
         source: "bgm/voice_avoid.mp3"
-    }
-
-    StackView{
-        id: stackview
-        anchors.fill: parent
-
-        replaceEnter: Transition { PropertyAnimation {//뷰를 replace 한 화면이 그려질때 출력하는 애니메이션
-                property: "opacity"
-                from: 1
-                to:1
-                duration: 0
-        }}
-        replaceExit: Transition { PropertyAnimation {//뷰를 replace 한 화면이 그려질때 이전화면이 없어지는 애니메이션
-                property: "opacity"
-                from: 1
-                to:1
-                duration: 0
-        }}
-        pushEnter: Transition { PropertyAnimation { //뷰를 push 한 화면이 그려지는 애니메이션
-                property: "opacity"                 //투명도가 설정 되게 설정 x,나 y등 다른 속성값으로 설정할수 있음
-                from: 0.5                           //투명도를 1에서 1로 바꿔줌 즉 투명도가 변하지 않아서 애니메이션이 없는 것처럼 된다.
-                to:1
-                duration: 0
-        }}
-        pushExit: Transition { PropertyAnimation {  //뷰를 push 한 화면이 그려질때 이전화면이 없어지는 애니메이션
-                property: "opacity"                 //투명도가 설정 되게 설정 x,나 y등 다른 속성값으로 설정할수 있음
-                from: 0.5
-                to:1                                //투명도를 1에서 1로 바꿔줌 즉 투명도가 변하지 않아서 애니메이션이 없는 것처럼 된다.
-                duration: 0
-        }}
-        popEnter: Transition { PropertyAnimation { //뷰를 push 한 화면이 그려지는 애니메이션
-                property: "opacity"                 //투명도가 설정 되게 설정 x,나 y등 다른 속성값으로 설정할수 있음
-                from: 0.5                           //투명도를 1에서 1로 바꿔줌 즉 투명도가 변하지 않아서 애니메이션이 없는 것처럼 된다.
-                to:1
-                duration: 0
-        }}
-        popExit: Transition { PropertyAnimation {  //뷰를 push 한 화면이 그려질때 이전화면이 없어지는 애니메이션
-                property: "opacity"                 //투명도가 설정 되게 설정 x,나 y등 다른 속성값으로 설정할수 있음
-                from: 0.5
-                to:1                                //투명도를 1에서 1로 바꿔줌 즉 투명도가 변하지 않아서 애니메이션이 없는 것처럼 된다.
-                duration: 0
-        }}
-
-
-        initialItem: Item {
-            objectName: "page_logo"
-            Rectangle{
-                anchors.fill: parent
-                color: "#f4f4f4"
-
-                OpacityAnimator{
-                    target: image_logo;
-                    from: 0;
-                    to: 1;
-                    duration: 2000
-                    running: true
-                }
-
-                Image{
-                    id: image_logo
-                    width: 748/1.5
-                    height: 335/1.5
-                    source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
-                    anchors.horizontalCenter:  parent.horizontalCenter
-                    y: text_copyright.y / 2 - height/2
-                }
-
-                Text{
-                    id: text_copyright
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 100
-                    text: "Copyrights Rainbow Robotics Inc. All rights reserved."
-                    color: "#7e7e7e"
-                    font.family: font_noto_b.name
-                    font.pixelSize: 15
-                }
-            }
-        }
     }
 
     Item_statusbar{

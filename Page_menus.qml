@@ -49,8 +49,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    pmap.init();
-                    stackview.push(pmap);
+                    loadPage(pmap);
                 }
             }
         }
@@ -67,8 +66,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    psetting.uiupdate();
-                    stackview.push(psetting);
+                    loadPage(psetting);
                 }
             }
         }
@@ -127,8 +125,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            pkitchen.init();
-                            stackview.pop();
+                            loadPage(pkitchen);
                         }
                     }
                 }

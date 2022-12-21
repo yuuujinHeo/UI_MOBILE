@@ -7,18 +7,16 @@ Item {
     id: item_statusbar
     width: parent.width
     height: 60
-    property double battery: 0
-    property string robotName: "test"
+
     property date curDate: new Date()
     property string curTime: curDate.toLocaleTimeString()
-    property int robotname_margin: 300
-    property int tray_center: 700
 
     property bool is_con_joystick: false
     property bool is_con_server: false
     property bool is_con_robot: false
     property bool robot_tx: false
     property bool robot_rx: false
+
 
 
     Rectangle{
@@ -30,16 +28,16 @@ Item {
         color: "white"
         Text{
             id: textName
-            anchors.left: parent.left
-            anchors.leftMargin: robotname_margin - textName.width/2
+            width: margin_name
+            horizontalAlignment: Text.AlignHCenter
             anchors.verticalCenter: parent.verticalCenter
             font.family: font_noto_r.name
             font.pixelSize: 20
-            text: robotName
+            text: robot_name
         }
         Text{
             id: textTime
-            x: tray_center - width/2
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             text: curTime
             font.family: font_noto_b.name
@@ -103,11 +101,11 @@ Item {
             Image{
                 id: image_battery
                 source: {
-                    if(battery > 90){
+                    if(robot_battery > 90){
                         "icon/bat_full.png"
-                    }else if(battery > 60){
+                    }else if(robot_battery > 60){
                         "icon/bat_3.png"
-                    }else if(battery > 30){
+                    }else if(robot_battery > 30){
                         "icon/bat_2.png"
                     }else{
                         "icon/bat_1.png"
@@ -123,7 +121,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 color: "#7e7e7e"
                 font.pixelSize: 20
-                text: battery.toFixed(0)+' %'
+                text: robot_battery.toFixed(0)+' %'
             }
 
         }
@@ -155,7 +153,7 @@ Item {
         if(!is_con_robot){
             model_details.append({"detail":"로봇과 연결되지 않았습니다.","icon":"icon/icon_connect_error.png","error":true});
         }
-        if(battery < 30 && is_con_robot){
+        if(robot_battery < 30 && is_con_robot){
             model_details.append({"detail":"배터리가 부족합니다.","icon":"","error":true});
         }
     }
@@ -211,6 +209,7 @@ Item {
         repeat: true
         running: true
         onTriggered: {
+            curTime = Qt.formatTime(new Date(), "hh:mm");
             robot_rx = supervisor.getLCMRX();
             robot_tx = supervisor.getLCMTX();
             is_con_joystick = supervisor.isconnectJoy();

@@ -27,6 +27,7 @@ public:
     lcm::Subscription *sub_status;
     lcm::Subscription *sub_path;
     lcm::Subscription *sub_localpath;
+    lcm::Subscription *sub_mapping;
 
     ////*********************************************  FLAGS   ***************************************************////
     //LCM 연결상태
@@ -37,6 +38,9 @@ public:
 
     //맵 리퀘스트(프로그램 실행 시 1번 보냄)
     bool map_updated = false;
+
+    //매핑 맵 저장 플래그
+    bool flagMapping = false;
 
     //조이스틱 명령 플래그
     bool flagJoystick = false;
@@ -69,6 +73,7 @@ public:
     void robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg);
     void robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
     void robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
+    void robot_mapping_calliback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data_t *msg);
 
     ////***********************************************   THREADS  ********************************************************////
     void bLoop();
