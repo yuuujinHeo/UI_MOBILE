@@ -1,4 +1,4 @@
-QT += quick widgets network websockets sql quickcontrols2
+QT += core gui quick widgets network websockets sql quickcontrols2
 
 CONFIG += c++11 qtquickcompiler
 
@@ -48,25 +48,59 @@ HEADERS += \
     ServerHandler.h \
     cv_to_qt.h \
     Supervisor.h
+# Libraries setting (for x86_64)
+contains(QT_ARCH, x86_64){
+    # OpenCV library all
+    INCLUDEPATH += /usr/include/opencv4/
+    LIBS += -L/usr/lib/x86_64-linux-gnu/
+    LIBS += -lopencv_core \
+            -lopencv_highgui \
+            -lopencv_imgcodecs \
+            -lopencv_imgproc \
+            -lopencv_calib3d \
+            -lopencv_features2d \
+            -lopencv_flann \
+            -lopencv_objdetect \
+            -lopencv_photo \
+            -lopencv_video \
+            -lopencv_videoio \
+            -lboost_system \
+            -lopencv_ximgproc
+
+    # LCM
+    INCLUDEPATH += /usr/local/include/
+    LIBS += -L/usr/local/lib/
+    LIBS += -llcm
+
+    # USB
+#    LIBS += -lusb
+}
+
+# Libraries setting (for aarch64)
+contains(QT_ARCH, arm64) {
+    # OpenCV library all
+    INCLUDEPATH += /usr/include/opencv4/
+    LIBS += -L/usr/lib/aarch64-linux-gnu/
+    LIBS += -lopencv_core \
+            -lopencv_highgui \
+            -lopencv_imgcodecs \
+            -lopencv_imgproc \
+            -lopencv_calib3d \
+            -lopencv_features2d \
+            -lopencv_flann \
+            -lopencv_objdetect \
+            -lopencv_photo \
+            -lopencv_video \
+            -lopencv_videoio \
+            -lboost_system \
+            -lopencv_ximgproc
+
+    # LCM
+    INCLUDEPATH += /usr/include/lcm/
+    LIBS += -L/usr/lib/aarch64-linux-gnu/
+    LIBS += -llcm
 
 
-# OpenCV library all
-INCLUDEPATH += /usr/include/opencv4/
-#LIBS += -L/usr/lib/x86_64-linux-gnu/
-LIBS += -lopencv_core \
-        -lopencv_highgui \
-        -lopencv_imgcodecs \
-        -lopencv_imgproc \
-        -lopencv_calib3d \
-        -lopencv_features2d \
-        -lopencv_flann \
-        -lopencv_objdetect \
-        -lopencv_photo \
-        -lopencv_video \
-        -lopencv_videoio \
-        -lopencv_ximgproc \
-        -lusb
-# LCM
-INCLUDEPATH += /usr/local/include/
-LIBS += -L/usr/local/lib/
-LIBS += -llcm
+    # USB
+#    LIBS += -lusb
+}

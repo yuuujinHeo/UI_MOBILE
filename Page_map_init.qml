@@ -1896,6 +1896,7 @@ Item {
             loader_menu.sourceComponent = menu_slam;
             timer_get_joy.start();
         }else if(map_mode == 2){
+            timer_get_joy.stop();
             loader_menu.sourceComponent = menu_annot_state;
             map.state_annotation = "NONE";
         }

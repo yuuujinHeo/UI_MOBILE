@@ -605,7 +605,7 @@ Item {
                     var map_exist = supervisor.isExistMap();
 
                     //이미 설정확인된 맵이 존재한다면 다음으로 넘어감
-                    if(supervisor.isloadMap() && map_exist == 1){
+                    if(supervisor.isloadMap() || map_exist == 1){
                         if(supervisor.isuseServerMap()){
                             setMapPath("file://" + applicationDirPath + "/image/map_rotated.png","map_rotated.png");
                         }else{
