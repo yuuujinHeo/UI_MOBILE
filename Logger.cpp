@@ -4,7 +4,7 @@
 #include <iostream>
 #include <QDebug>
 
-
+using namespace std;
 
 Logger Logger::instance;
 

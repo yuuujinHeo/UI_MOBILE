@@ -17,7 +17,7 @@ CXX           = ccache g++
 DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_QML_DEBUG -DQT_QUICKCONTROLS2_LIB -DQT_QUICK_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_QML_LIB -DQT_WEBSOCKETS_LIB -DQT_NETWORK_LIB -DQT_SQL_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I../../UI_MOBILE -I. -isystem /usr/include/opencv4 -isystem /usr/local/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtQuickControls2 -isystem /usr/include/x86_64-linux-gnu/qt5/QtQuick -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtQml -isystem /usr/include/x86_64-linux-gnu/qt5/QtWebSockets -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -isystem /usr/include/x86_64-linux-gnu/qt5/QtSql -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
+INCPATH       = -I../../UI_MOBILE -I. -isystem /usr/include/opencv4 -isystem /usr/include/lcm -isystem /usr/include/aarch64-linux-gnu/qt5 -isystem /usr/include/aarch64-linux-gnu/qt5/QtQuickControls2 -isystem /usr/include/aarch64-linux-gnu/qt5/QtQuick -isystem /usr/include/aarch64-linux-gnu/qt5/QtWidgets -isystem /usr/include/aarch64-linux-gnu/qt5/QtGui -isystem /usr/include/aarch64-linux-gnu/qt5/QtQml -isystem /usr/include/aarch64-linux-gnu/qt5/QtWebSockets -isystem /usr/include/aarch64-linux-gnu/qt5/QtNetwork -isystem /usr/include/aarch64-linux-gnu/qt5/QtSql -isystem /usr/include/aarch64-linux-gnu/qt5/QtCore -I. -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++
 QMAKE         = /usr/lib/qt5/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -37,10 +37,10 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = MAIN_MOBILE1.0.0
-DISTDIR = /home/rainbow/Desktop/UI_MOBILE/build/.tmp/MAIN_MOBILE1.0.0
+DISTDIR = /home/odroid/UI_MOBILE/build/.tmp/MAIN_MOBILE1.0.0
 LINK          = g++
-LFLAGS        = -fuse-ld=gold -Wl,-rpath-link,/usr/lib/x86_64-linux-gnu
-LIBS          = $(SUBLIBS) -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_calib3d -lopencv_features2d -lopencv_flann -lopencv_objdetect -lopencv_photo -lopencv_video -lopencv_videoio -lopencv_ximgproc -lusb -L/usr/local/lib/ -llcm /usr/lib/x86_64-linux-gnu/libQt5QuickControls2.so /usr/lib/x86_64-linux-gnu/libQt5Quick.so /usr/lib/x86_64-linux-gnu/libQt5Widgets.so /usr/lib/x86_64-linux-gnu/libQt5Gui.so /usr/lib/x86_64-linux-gnu/libQt5Qml.so /usr/lib/x86_64-linux-gnu/libQt5WebSockets.so /usr/lib/x86_64-linux-gnu/libQt5Network.so /usr/lib/x86_64-linux-gnu/libQt5Sql.so /usr/lib/x86_64-linux-gnu/libQt5Core.so /usr/lib/x86_64-linux-gnu/libGL.so -lpthread   
+LFLAGS        = -fuse-ld=gold -Wl,-rpath-link,/usr/lib/aarch64-linux-gnu
+LIBS          = $(SUBLIBS) -L/usr/lib/aarch64-linux-gnu/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_calib3d -lopencv_features2d -lopencv_flann -lopencv_objdetect -lopencv_photo -lopencv_video -lopencv_videoio -lboost_system -lopencv_ximgproc -llcm /usr/lib/aarch64-linux-gnu/libQt5QuickControls2.so /usr/lib/aarch64-linux-gnu/libQt5Quick.so /usr/lib/aarch64-linux-gnu/libQt5Widgets.so /usr/lib/aarch64-linux-gnu/libQt5Gui.so /usr/lib/aarch64-linux-gnu/libQt5Qml.so /usr/lib/aarch64-linux-gnu/libQt5WebSockets.so /usr/lib/aarch64-linux-gnu/libQt5Network.so /usr/lib/aarch64-linux-gnu/libQt5Sql.so /usr/lib/aarch64-linux-gnu/libQt5Core.so /usr/lib/aarch64-linux-gnu/libGL.so -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -113,91 +113,95 @@ OBJECTS       = JoystickHandler.o \
 		moc_Logger.o \
 		moc_ServerHandler.o \
 		moc_Supervisor.o
-DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/sanitize.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/gcc-base.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/gcc-base-unix.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-base.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-unix.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/qconfig.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_accessibility_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_core.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_core_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_devicediscovery_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_edid_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_egl_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfs_kms_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfsdeviceintegration_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_fb_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_fontdatabase_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_glx_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_input_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_kms_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_network.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_network_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_platformcompositor_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_qml.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_qmltest.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_quick.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_quickcontrols2.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_quicktemplates2.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_quickwidgets.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_service_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_theme_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_vulkan_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_websockets.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_x11extras.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_functions.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+DIST          = /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/unix.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/linux.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/sanitize.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/gcc-base.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/gcc-base-unix.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/g++-base.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/g++-unix.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/qconfig.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_accessibility_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_core.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_core_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_designer.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_devicediscovery_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_edid_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_egl_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfs_kms_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfsdeviceintegration_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_fb_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_fontdatabase_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_glx_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_help.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_input_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_kms_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_network.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_network_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_platformcompositor_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_qml.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_qmltest.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_quick.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_quickcontrols2.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_quicktemplates2.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_quickwidgets.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_service_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_theme_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_uiplugin.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_uitools.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_vulkan_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_websockets.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_x11extras.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt_functions.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
 		../.qmake.stash \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resolve_config.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_post.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qtquickcompiler.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qml_debug.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/warn_on.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/moc.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/opengl.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/uic.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/thread.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qmake_use.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/file_copies.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/testcase_targets.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/resolve_config.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_post.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/resources.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qtquickcompiler.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qml_debug.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/warn_on.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/moc.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/unix/opengl.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/uic.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/unix/thread.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qmake_use.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/file_copies.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/testcase_targets.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/yacc.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		../../MAIN_MOBILE.pro ../GlobalHeader.h \
 		../JoystickHandler.h \
 		../LCMHandler.h \
@@ -222,179 +226,187 @@ first: all
 MAIN_MOBILE:  $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
-Makefile: ../MAIN_MOBILE.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/sanitize.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/gcc-base.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/gcc-base-unix.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-base.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-unix.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/qconfig.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_accessibility_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_core.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_core_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_devicediscovery_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_edid_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_egl_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfs_kms_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfsdeviceintegration_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_fb_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_fontdatabase_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_glx_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_input_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_kms_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_network.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_network_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_platformcompositor_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_qml.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_qmltest.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_quick.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_quickcontrols2.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_quicktemplates2.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_quickwidgets.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_service_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_theme_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_vulkan_support_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_websockets.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_x11extras.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml_private.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_functions.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+Makefile: ../MAIN_MOBILE.pro /usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/unix.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/linux.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/sanitize.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/gcc-base.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/gcc-base-unix.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/g++-base.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/g++-unix.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/qconfig.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_accessibility_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_core.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_core_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_designer.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_devicediscovery_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_edid_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_egl_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfs_kms_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfsdeviceintegration_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_fb_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_fontdatabase_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_glx_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_help.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_input_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_kms_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_network.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_network_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_platformcompositor_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_qml.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_qmltest.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_quick.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_quickcontrols2.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_quicktemplates2.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_quickwidgets.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_service_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_theme_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_uiplugin.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_uitools.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_vulkan_support_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_websockets.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_x11extras.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml_private.pri \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt_functions.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
 		.qmake.stash \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resolve_config.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_post.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qtquickcompiler.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qml_debug.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/warn_on.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/moc.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/opengl.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/uic.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/thread.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qmake_use.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/file_copies.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/testcase_targets.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/resolve_config.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_post.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/resources.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qtquickcompiler.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qml_debug.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/warn_on.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/moc.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/unix/opengl.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/uic.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/unix/thread.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qmake_use.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/file_copies.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/testcase_targets.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/yacc.prf \
+		/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		../MAIN_MOBILE.pro \
 		qml_qmlcache.qrc
 	$(QMAKE) -o Makefile ../MAIN_MOBILE.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/sanitize.conf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/gcc-base.conf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/gcc-base-unix.conf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-base.conf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-unix.conf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/qconfig.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_accessibility_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_core.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_core_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_devicediscovery_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_edid_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_egl_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfs_kms_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfsdeviceintegration_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_fb_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_fontdatabase_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_glx_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_input_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_kms_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_network.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_network_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_platformcompositor_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_qml.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_qmltest.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_quick.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_quickcontrols2.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_quicktemplates2.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_quickwidgets.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_service_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_theme_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_vulkan_support_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_websockets.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_x11extras.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml_private.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_functions.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_pre.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/unix.conf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/linux.conf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/sanitize.conf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/gcc-base.conf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/gcc-base-unix.conf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/g++-base.conf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/common/g++-unix.conf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/qconfig.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_accessibility_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_core.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_core_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_designer.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_devicediscovery_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_edid_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_egl_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfs_kms_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfsdeviceintegration_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_fb_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_fontdatabase_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_glx_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_help.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_input_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_kms_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_network.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_network_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_platformcompositor_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_qml.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_qmltest.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_quick.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_quickcontrols2.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_quicktemplates2.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_quickwidgets.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_service_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_theme_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_uiplugin.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_uitools.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_vulkan_support_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_websockets.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_x11extras.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml_private.pri:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt_functions.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt_config.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/spec_post.prf:
 .qmake.stash:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resolve_config.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_post.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qtquickcompiler.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qml_debug.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/warn_on.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/moc.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/opengl.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/uic.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/thread.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qmake_use.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/file_copies.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/testcase_targets.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/toolchain.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_pre.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/resolve_config.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/default_post.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/resources.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qtquickcompiler.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qml_debug.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/warn_on.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qt.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/moc.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/unix/opengl.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/uic.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/unix/thread.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/qmake_use.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/file_copies.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/testcase_targets.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/exceptions.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/yacc.prf:
+/usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/lex.prf:
 ../MAIN_MOBILE.pro:
 qml_qmlcache.qrc:
 qmake: FORCE
@@ -414,7 +426,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents qml_qmlcache.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents ../Page_init.qml ../Page_menus.qml ../Item_statusbar.qml ../Page_pickup.qml ../Page_setting.qml ../Page_moving.qml ../Item_joystick.qml ../Page_map_init.qml ../main.qml ../Item_keyboard.qml ../Map_full.qml ../Page_map.qml ../Page_MoveFail.qml ../Page_pickup_calling.qml ../Item_switch.qml ../Page_kitchen.qml ../Page_charge.qml $(DISTDIR)/
 	$(COPY_FILE) --parents ../qml.qrc $(DISTDIR)/
-	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../GlobalHeader.h ../JoystickHandler.h ../LCMHandler.h ../Logger.h ../ServerHandler.h ../cv_to_qt.h ../Supervisor.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../JoystickHandler.cpp ../LCMHandler.cpp ../ServerHandler.cpp ../cv_to_qt.cpp ../Logger.cpp ../Supervisor.cpp ../main.cpp $(DISTDIR)/
 
@@ -519,83 +531,83 @@ compiler_qmlcache_clean:
 	-$(DEL_FILE) Page_init_qml.cpp Page_menus_qml.cpp Item_statusbar_qml.cpp Page_pickup_qml.cpp Page_setting_qml.cpp Page_moving_qml.cpp Item_joystick_qml.cpp Page_map_init_qml.cpp main_qml.cpp Item_keyboard_qml.cpp Map_full_qml.cpp Page_map_qml.cpp Page_MoveFail_qml.cpp Page_pickup_calling_qml.cpp Item_switch_qml.cpp Page_kitchen_qml.cpp Page_charge_qml.cpp
 Page_init_qml.cpp: ../Page_init.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_init_qml.cpp ../Page_init.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Page_init_qml.cpp ../Page_init.qml
 
 Page_menus_qml.cpp: ../Page_menus.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_menus_qml.cpp ../Page_menus.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Page_menus_qml.cpp ../Page_menus.qml
 
 Item_statusbar_qml.cpp: ../Item_statusbar.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Item_statusbar_qml.cpp ../Item_statusbar.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Item_statusbar_qml.cpp ../Item_statusbar.qml
 
 Page_pickup_qml.cpp: ../Page_pickup.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_pickup_qml.cpp ../Page_pickup.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Page_pickup_qml.cpp ../Page_pickup.qml
 
 Page_setting_qml.cpp: ../Page_setting.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_setting_qml.cpp ../Page_setting.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Page_setting_qml.cpp ../Page_setting.qml
 
 Page_moving_qml.cpp: ../Page_moving.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_moving_qml.cpp ../Page_moving.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Page_moving_qml.cpp ../Page_moving.qml
 
 Item_joystick_qml.cpp: ../Item_joystick.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Item_joystick_qml.cpp ../Item_joystick.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Item_joystick_qml.cpp ../Item_joystick.qml
 
 Page_map_init_qml.cpp: ../Page_map_init.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_map_init_qml.cpp ../Page_map_init.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Page_map_init_qml.cpp ../Page_map_init.qml
 
 main_qml.cpp: ../main.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o main_qml.cpp ../main.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o main_qml.cpp ../main.qml
 
 Item_keyboard_qml.cpp: ../Item_keyboard.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Item_keyboard_qml.cpp ../Item_keyboard.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Item_keyboard_qml.cpp ../Item_keyboard.qml
 
 Map_full_qml.cpp: ../Map_full.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Map_full_qml.cpp ../Map_full.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Map_full_qml.cpp ../Map_full.qml
 
 Page_map_qml.cpp: ../Page_map.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_map_qml.cpp ../Page_map.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Page_map_qml.cpp ../Page_map.qml
 
 Page_MoveFail_qml.cpp: ../Page_MoveFail.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_MoveFail_qml.cpp ../Page_MoveFail.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Page_MoveFail_qml.cpp ../Page_MoveFail.qml
 
 Page_pickup_calling_qml.cpp: ../Page_pickup_calling.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_pickup_calling_qml.cpp ../Page_pickup_calling.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Page_pickup_calling_qml.cpp ../Page_pickup_calling.qml
 
 Item_switch_qml.cpp: ../Item_switch.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Item_switch_qml.cpp ../Item_switch.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Item_switch_qml.cpp ../Item_switch.qml
 
 Page_kitchen_qml.cpp: ../Page_kitchen.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_kitchen_qml.cpp ../Page_kitchen.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Page_kitchen_qml.cpp ../Page_kitchen.qml
 
 Page_charge_qml.cpp: ../Page_charge.qml \
 		/usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/Desktop/UI_MOBILE/qml.qrc -o Page_charge_qml.cpp ../Page_charge.qml
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/odroid/UI_MOBILE/qml.qrc -o Page_charge_qml.cpp ../Page_charge.qml
 
 compiler_qmlcache_loader_make_all: qmlcache_loader.cpp
 compiler_qmlcache_loader_clean:
 	-$(DEL_FILE) qmlcache_loader.cpp
 qmlcache_loader.cpp: ../qml.qrc /usr/lib/qt5/bin/qmlcachegen
-	/usr/lib/qt5/bin/qmlcachegen --resource-file-mapping=/home/rainbow/Desktop/UI_MOBILE/qml.qrc=/home/rainbow/Desktop/UI_MOBILE/build/qml_qmlcache.qrc -o qmlcache_loader.cpp ../qml.qrc
+	/usr/lib/qt5/bin/qmlcachegen --resource-file-mapping=/home/odroid/UI_MOBILE/qml.qrc=/home/odroid/UI_MOBILE/build/qml_qmlcache.qrc -o qmlcache_loader.cpp ../qml.qrc
 
 compiler_moc_predefs_make_all: moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) moc_predefs.h
-moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
-	ccache g++ -pipe -g -std=gnu++11 -Wall -W -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
+moc_predefs.h: /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
+	ccache g++ -pipe -g -std=gnu++11 -Wall -W -dM -E -o moc_predefs.h /usr/lib/aarch64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
 compiler_moc_header_make_all: moc_JoystickHandler.cpp moc_LCMHandler.cpp moc_Logger.cpp moc_ServerHandler.cpp moc_Supervisor.cpp
 compiler_moc_header_clean:
@@ -603,7 +615,7 @@ compiler_moc_header_clean:
 moc_JoystickHandler.cpp: ../JoystickHandler.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/rainbow/Desktop/UI_MOBILE/build/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/rainbow/Desktop/UI_MOBILE -I/usr/include/opencv4 -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtQuickControls2 -I/usr/include/x86_64-linux-gnu/qt5/QtQuick -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtQml -I/usr/include/x86_64-linux-gnu/qt5/QtWebSockets -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../JoystickHandler.h -o moc_JoystickHandler.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/odroid/UI_MOBILE/build/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/odroid/UI_MOBILE -I/usr/include/opencv4 -I/usr/include/lcm -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtQuickControls2 -I/usr/include/aarch64-linux-gnu/qt5/QtQuick -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtQml -I/usr/include/aarch64-linux-gnu/qt5/QtWebSockets -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtSql -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/aarch64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/aarch64-linux-gnu/9/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include ../JoystickHandler.h -o moc_JoystickHandler.cpp
 
 moc_LCMHandler.cpp: ../LCMHandler.h \
 		../lcm_types/command.hpp \
@@ -615,12 +627,12 @@ moc_LCMHandler.cpp: ../LCMHandler.h \
 		../cv_to_qt.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/rainbow/Desktop/UI_MOBILE/build/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/rainbow/Desktop/UI_MOBILE -I/usr/include/opencv4 -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtQuickControls2 -I/usr/include/x86_64-linux-gnu/qt5/QtQuick -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtQml -I/usr/include/x86_64-linux-gnu/qt5/QtWebSockets -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../LCMHandler.h -o moc_LCMHandler.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/odroid/UI_MOBILE/build/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/odroid/UI_MOBILE -I/usr/include/opencv4 -I/usr/include/lcm -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtQuickControls2 -I/usr/include/aarch64-linux-gnu/qt5/QtQuick -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtQml -I/usr/include/aarch64-linux-gnu/qt5/QtWebSockets -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtSql -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/aarch64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/aarch64-linux-gnu/9/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include ../LCMHandler.h -o moc_LCMHandler.cpp
 
 moc_Logger.cpp: ../Logger.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/rainbow/Desktop/UI_MOBILE/build/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/rainbow/Desktop/UI_MOBILE -I/usr/include/opencv4 -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtQuickControls2 -I/usr/include/x86_64-linux-gnu/qt5/QtQuick -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtQml -I/usr/include/x86_64-linux-gnu/qt5/QtWebSockets -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../Logger.h -o moc_Logger.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/odroid/UI_MOBILE/build/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/odroid/UI_MOBILE -I/usr/include/opencv4 -I/usr/include/lcm -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtQuickControls2 -I/usr/include/aarch64-linux-gnu/qt5/QtQuick -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtQml -I/usr/include/aarch64-linux-gnu/qt5/QtWebSockets -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtSql -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/aarch64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/aarch64-linux-gnu/9/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include ../Logger.h -o moc_Logger.cpp
 
 moc_ServerHandler.cpp: ../ServerHandler.h \
 		../GlobalHeader.h \
@@ -628,7 +640,7 @@ moc_ServerHandler.cpp: ../ServerHandler.h \
 		../cv_to_qt.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/rainbow/Desktop/UI_MOBILE/build/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/rainbow/Desktop/UI_MOBILE -I/usr/include/opencv4 -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtQuickControls2 -I/usr/include/x86_64-linux-gnu/qt5/QtQuick -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtQml -I/usr/include/x86_64-linux-gnu/qt5/QtWebSockets -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../ServerHandler.h -o moc_ServerHandler.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/odroid/UI_MOBILE/build/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/odroid/UI_MOBILE -I/usr/include/opencv4 -I/usr/include/lcm -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtQuickControls2 -I/usr/include/aarch64-linux-gnu/qt5/QtQuick -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtQml -I/usr/include/aarch64-linux-gnu/qt5/QtWebSockets -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtSql -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/aarch64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/aarch64-linux-gnu/9/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include ../ServerHandler.h -o moc_ServerHandler.cpp
 
 moc_Supervisor.cpp: ../Supervisor.h \
 		../GlobalHeader.h \
@@ -643,7 +655,7 @@ moc_Supervisor.cpp: ../Supervisor.h \
 		../ServerHandler.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/rainbow/Desktop/UI_MOBILE/build/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/rainbow/Desktop/UI_MOBILE -I/usr/include/opencv4 -I/usr/local/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtQuickControls2 -I/usr/include/x86_64-linux-gnu/qt5/QtQuick -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtQml -I/usr/include/x86_64-linux-gnu/qt5/QtWebSockets -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../Supervisor.h -o moc_Supervisor.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/odroid/UI_MOBILE/build/moc_predefs.h -I/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/odroid/UI_MOBILE -I/usr/include/opencv4 -I/usr/include/lcm -I/usr/include/aarch64-linux-gnu/qt5 -I/usr/include/aarch64-linux-gnu/qt5/QtQuickControls2 -I/usr/include/aarch64-linux-gnu/qt5/QtQuick -I/usr/include/aarch64-linux-gnu/qt5/QtWidgets -I/usr/include/aarch64-linux-gnu/qt5/QtGui -I/usr/include/aarch64-linux-gnu/qt5/QtQml -I/usr/include/aarch64-linux-gnu/qt5/QtWebSockets -I/usr/include/aarch64-linux-gnu/qt5/QtNetwork -I/usr/include/aarch64-linux-gnu/qt5/QtSql -I/usr/include/aarch64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/aarch64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/aarch64-linux-gnu/9/include -I/usr/local/include -I/usr/include/aarch64-linux-gnu -I/usr/include ../Supervisor.h -o moc_Supervisor.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:

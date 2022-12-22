@@ -5,9 +5,9 @@
 #include <QTextCodec>
 #include <QSslSocket>
 #include <QGuiApplication>
-#include <usb.h>
+//#include <usb.h>
 #include <QDir>
-#include <QFileSystemWatcher>
+//#include <QFileSystemWatcher>
 #include <QtQuick/qquickimageprovider.h>
 
 extern QObject *object;
@@ -45,12 +45,12 @@ Supervisor::Supervisor(QObject *parent)
     joystick = new JoystickHandler();
 
     //Test USB
-    QFileSystemWatcher *FSwatcher;
-    FSwatcher = new QFileSystemWatcher(this);
+//    QFileSystemWatcher *FSwatcher;
+//    FSwatcher = new QFileSystemWatcher(this);
     std::string user = getenv("USER");
     std::string path = "/media/" + user;
-    FSwatcher->addPath(path.c_str());
-    connect(FSwatcher, SIGNAL(directoryChanged(QString)),this,SLOT(usb_detect()));
+//    FSwatcher->addPath(path.c_str());
+//    connect(FSwatcher, SIGNAL(directoryChanged(QString)),this,SLOT(usb_detect()));
     usb_detect();
 
     isaccepted = false;

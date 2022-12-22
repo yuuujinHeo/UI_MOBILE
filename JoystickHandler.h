@@ -17,7 +17,6 @@
 typedef enum{JAXIS_LJOG_RL = 0, JAXIS_LJOG_UD, JAXIS_RJOG_RL, JAXIS_RJOG_UD, JAXIS_ARW_RL, JAXIS_ARW_UD} JOY_AXIS_SEQ;
 typedef enum{JBTN_X = 0, JBTN_A, JBTN_B, JBTN_Y, JBTN_LB, JBTN_RB, JBTN_LT, JBTN_RT, JBTN_BACK, JBTN_START, JBTN_LJOG, JBTN_RJOG} JOY_BTN_SEQ;
 
-using namespace std;
 class JoystickHandler : public QObject
 {
     Q_OBJECT
