@@ -5,9 +5,10 @@
 #include <QTextCodec>
 #include <QSslSocket>
 #include <QGuiApplication>
-//#include <usb.h>
+#include <usb.h>
+
 #include <QDir>
-//#include <QFileSystemWatcher>
+#include <QFileSystemWatcher>
 #include <QtQuick/qquickimageprovider.h>
 
 extern QObject *object;
@@ -45,12 +46,12 @@ Supervisor::Supervisor(QObject *parent)
     joystick = new JoystickHandler();
 
     //Test USB
-//    QFileSystemWatcher *FSwatcher;
-//    FSwatcher = new QFileSystemWatcher(this);
+    QFileSystemWatcher *FSwatcher;
+    FSwatcher = new QFileSystemWatcher(this);
     std::string user = getenv("USER");
     std::string path = "/media/" + user;
-//    FSwatcher->addPath(path.c_str());
-//    connect(FSwatcher, SIGNAL(directoryChanged(QString)),this,SLOT(usb_detect()));
+    FSwatcher->addPath(path.c_str());
+    connect(FSwatcher, SIGNAL(directoryChanged(QString)),this,SLOT(usb_detect()));
     usb_detect();
 
     isaccepted = false;
@@ -412,11 +413,21 @@ int Supervisor::isExistMap(){
 
     //로컬에서 만든 맵(매핑 로우 파일)
     if(QFile::exists(map_raw)){
+        if(pmap->map_loaded)
+            setSetting("FLOOR/map_load","false");
         if(!QFile::exists(map_raw_rotated)){
             rotate_map(map_raw, map_raw_rotated,0);
         }
+        if(QFile::exists(file_annot)){
+            if(!QFile::exists(map_edited)){
+                rotate_map(map_raw, map_edited,0);
+            }
+            return 2;
+        }
         return 3;
     }else{
+        if(pmap->map_loaded)
+            setSetting("FLOOR/map_load","false");
         return 0;
     }
 }

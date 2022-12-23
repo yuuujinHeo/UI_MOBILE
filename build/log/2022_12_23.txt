@@ -26,3 +26,121 @@
 2022-12-23 09:49:00 [QML] Load Page : qrc:/Page_menus.qml
 2022-12-23 09:49:01 [QML] Load Page : qrc:/Page_kitchen.qml
 2022-12-23 09:49:04 [QML] Load Page : qrc:/Page_menus.qml
+2022-12-23 01:00:56 [BUILDER] LCM HANDLER constructed
+2022-12-23 01:00:56 [BUILDER] SERVER HANDLER constructed
+2022-12-23 01:00:56 [USB] NEW USB Detected
+2022-12-23 01:00:56 [BUILDER] SUPERVISOR constructed
+2022-12-23 01:00:57 [QML] Load Page : qrc:/Page_init.qml
+2022-12-23 01:00:57 [BUILDER] SET WINDOW 
+2022-12-23 01:00:58 [MAP] Make Minimap Start : image/map_edited.png
+2022-12-23 01:00:58 [MAP] Make Minimap : 1/3
+2022-12-23 01:00:59 [MAP] Make Minimap : 2/3
+2022-12-23 01:00:59 [MAP] Make Minimap : DONE
+2022-12-23 01:01:05 [QML] Load Page : qrc:/Page_kitchen.qml
+2022-12-23 01:19:53 [BUILDER] LCM HANDLER constructed
+2022-12-23 01:19:53 [BUILDER] SERVER HANDLER constructed
+2022-12-23 01:19:53 [USB] NEW USB Detected
+2022-12-23 01:19:53 [BUILDER] SUPERVISOR constructed
+2022-12-23 01:19:54 [QML] Load Page : qrc:/Page_init.qml
+2022-12-23 01:19:54 [BUILDER] SET WINDOW 
+2022-12-23 01:19:56 [MAP] Make Minimap Start : image/map_edited.png
+2022-12-23 01:19:56 [MAP] Make Minimap : 1/3
+2022-12-23 01:19:56 [MAP] Make Minimap : 2/3
+2022-12-23 01:19:56 [MAP] Make Minimap : DONE
+2022-12-23 01:20:00 [QML] Load Page : qrc:/Page_kitchen.qml
+2022-12-23 01:20:01 [QML] Load Page : qrc:/Page_menus.qml
+2022-12-23 01:20:02 [QML] Load Page : qrc:/Page_map.qml
+2022-12-23 01:20:52 [BUILDER] LCM HANDLER constructed
+2022-12-23 01:20:52 [BUILDER] SERVER HANDLER constructed
+2022-12-23 01:20:52 [USB] NEW USB Detected
+2022-12-23 01:20:52 [BUILDER] SUPERVISOR constructed
+2022-12-23 01:20:53 [QML] Load Page : qrc:/Page_init.qml
+2022-12-23 01:20:53 [BUILDER] SET WINDOW 
+2022-12-23 01:20:54 [MAP] Make Minimap Start : image/map_edited.png
+2022-12-23 01:20:55 [MAP] Make Minimap : 1/3
+2022-12-23 01:20:55 [MAP] Make Minimap : 2/3
+2022-12-23 01:20:55 [MAP] Make Minimap : DONE
+2022-12-23 01:20:56 [QML] Load Page : qrc:/Page_kitchen.qml
+2022-12-23 01:20:57 [QML] Load Page : qrc:/Page_menus.qml
+2022-12-23 01:20:58 [QML] Load Page : qrc:/Page_map.qml
+2022-12-23 01:21:27 [BUILDER] LCM HANDLER constructed
+2022-12-23 01:21:27 [BUILDER] SERVER HANDLER constructed
+2022-12-23 01:21:27 [USB] NEW USB Detected
+2022-12-23 01:21:27 [BUILDER] SUPERVISOR constructed
+2022-12-23 01:21:28 [QML] Load Page : qrc:/Page_init.qml
+2022-12-23 01:21:28 [BUILDER] SET WINDOW 
+2022-12-23 01:21:30 [MAP] Make Minimap Start : image/map_edited.png
+2022-12-23 01:21:30 [MAP - ERROR] Make Minimap (Fail to save): 1/3
+2022-12-23 01:21:30 [MAP - ERROR] Make Minimap (Fail to save): 2/3
+2022-12-23 01:21:36 [BUILDER] LCM HANDLER constructed
+2022-12-23 01:21:36 [BUILDER] SERVER HANDLER constructed
+2022-12-23 01:21:36 [USB] NEW USB Detected
+2022-12-23 01:21:36 [BUILDER] SUPERVISOR constructed
+2022-12-23 01:21:37 [QML] Load Page : qrc:/Page_init.qml
+2022-12-23 01:21:37 [BUILDER] SET WINDOW 
+2022-12-23 01:21:38 [MAP] Make Minimap Start : image/map_edited.png
+2022-12-23 01:21:38 [MAP - ERROR] Make Minimap (Fail to save): 1/3
+2022-12-23 01:21:38 [MAP - ERROR] Make Minimap (Fail to save): 2/3
+2022-12-23 01:21:48 [BUILDER] LCM HANDLER constructed
+2022-12-23 01:21:48 [BUILDER] SERVER HANDLER constructed
+2022-12-23 01:21:48 [USB] NEW USB Detected
+2022-12-23 01:21:48 [BUILDER] SUPERVISOR constructed
+2022-12-23 01:21:49 [QML] Load Page : qrc:/Page_init.qml
+2022-12-23 01:21:49 [BUILDER] SET WINDOW 
+2022-12-23 01:21:56 [MAP] Make Minimap Start : image/map_edited.png
+2022-12-23 01:21:56 [MAP - ERROR] Make Minimap (Fail to save): 1/3
+2022-12-23 01:21:56 [MAP - ERROR] Make Minimap (Fail to save): 2/3
+2022-12-23 01:23:17 [BUILDER] LCM HANDLER constructed
+2022-12-23 01:23:17 [BUILDER] SERVER HANDLER constructed
+2022-12-23 01:23:17 [USB] NEW USB Detected
+2022-12-23 01:23:17 [BUILDER] SUPERVISOR constructed
+2022-12-23 01:23:18 [QML] Load Page : qrc:/Page_init.qml
+2022-12-23 01:23:18 [BUILDER] SET WINDOW 
+2022-12-23 01:23:58 [MAP] Make Minimap Start : image/map_edited.png
+2022-12-23 01:23:58 [MAP - ERROR] Make Minimap (Fail to save): 1/3
+2022-12-23 01:23:58 [MAP - ERROR] Make Minimap (Fail to save): 2/3
+2022-12-23 01:38:02 [BUILDER] LCM HANDLER constructed
+2022-12-23 01:38:02 [BUILDER] SERVER HANDLER constructed
+2022-12-23 01:38:02 [USB] NEW USB Detected
+2022-12-23 01:38:02 [BUILDER] SUPERVISOR constructed
+2022-12-23 01:38:02 [QML] Load Page : qrc:/Page_init.qml
+2022-12-23 01:38:02 [BUILDER] SET WINDOW 
+2022-12-23 01:38:04 [SETTING] SET FLOOR/map_load VALUE TO false
+2022-12-23 01:38:04 [SETTING] SET FLOOR/map_load VALUE TO false
+2022-12-23 01:38:05 [SETTING] SET FLOOR/map_load VALUE TO false
+2022-12-23 01:38:05 [SETTING] SET FLOOR/map_load VALUE TO false
+2022-12-23 01:38:06 [SETTING] SET FLOOR/map_load VALUE TO false
+2022-12-23 01:38:06 [SETTING] SET FLOOR/map_load VALUE TO false
+2022-12-23 01:38:06 [SETTING] SET FLOOR/map_load VALUE TO false
+2022-12-23 01:38:07 [SETTING] SET FLOOR/map_load VALUE TO false
+2022-12-23 01:38:07 [SETTING] SET FLOOR/map_load VALUE TO false
+2022-12-23 01:38:08 [SETTING] SET FLOOR/map_load VALUE TO false
+2022-12-23 01:38:08 [SETTING] SET FLOOR/map_load VALUE TO false
+2022-12-23 01:38:09 [SETTING] SET FLOOR/map_load VALUE TO false
+2022-12-23 01:38:38 [BUILDER] LCM HANDLER constructed
+2022-12-23 01:38:38 [BUILDER] SERVER HANDLER constructed
+2022-12-23 01:38:38 [USB] NEW USB Detected
+2022-12-23 01:38:38 [BUILDER] SUPERVISOR constructed
+2022-12-23 01:38:38 [QML] Load Page : qrc:/Page_init.qml
+2022-12-23 01:38:38 [BUILDER] SET WINDOW 
+2022-12-23 01:39:00 [BUILDER] LCM HANDLER constructed
+2022-12-23 01:39:00 [BUILDER] SERVER HANDLER constructed
+2022-12-23 01:39:00 [USB] NEW USB Detected
+2022-12-23 01:39:00 [BUILDER] SUPERVISOR constructed
+2022-12-23 01:39:00 [QML] Load Page : qrc:/Page_init.qml
+2022-12-23 01:39:00 [BUILDER] SET WINDOW 
+2022-12-23 01:41:40 [BUILDER] LCM HANDLER constructed
+2022-12-23 01:41:40 [BUILDER] SERVER HANDLER constructed
+2022-12-23 01:41:40 [USB] NEW USB Detected
+2022-12-23 01:41:40 [BUILDER] SUPERVISOR constructed
+2022-12-23 01:41:40 [QML] Load Page : qrc:/Page_init.qml
+2022-12-23 01:41:40 [BUILDER] SET WINDOW 
+2022-12-23 01:41:51 [SETTING] USE SERVER MAP Changed : False
+2022-12-23 01:41:51 [MAP] Make Minimap Start : image/map_edited.png
+2022-12-23 01:41:51 [MAP] Make Minimap : 1/3
+2022-12-23 01:41:51 [MAP] Make Minimap : 2/3
+2022-12-23 01:41:52 [MAP] Make Minimap : DONE
+2022-12-23 01:41:52 [SETTING] LOAD MAP Changed : True
+2022-12-23 01:41:53 [QML] Load Page : qrc:/Page_kitchen.qml
+2022-12-23 01:41:54 [QML] Load Page : qrc:/Page_menus.qml
+2022-12-23 01:41:55 [QML] Load Page : qrc:/Page_map.qml
