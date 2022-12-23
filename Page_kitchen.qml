@@ -15,6 +15,7 @@ Item {
     function init(){
         table_num = supervisor.getTableNum();
         tray_num = supervisor.getTrayNum();
+        table_col_num = supervisor.getTableColNum();
         traymodel.clear();
         robot_type = supervisor.getRobotType();
         for(var i=0; i<tray_num; i++){
@@ -45,6 +46,7 @@ Item {
     }
     property int tray_num: 3
     property int table_num: 5
+    property int table_col_num: 1
 
     property int tray_width: 400
     property int tray_height: 80
@@ -99,7 +101,7 @@ Item {
         radius: 30
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: rect_table_box.right
-        anchors.leftMargin: traybox_margin
+        anchors.leftMargin: (rect_menu_box.x-rect_table_box.width - width)/2
         Column{
             id: column_tray
             anchors.centerIn: parent
@@ -123,9 +125,7 @@ Item {
                         id: ani_tray
                         running: false
                         ParallelAnimation{
-//                            NumberAnimation{target:rect_tray; property:"scale"; from:1;to:1.2;duration:300;}
                             NumberAnimation{target:rect_tray_fill; property:"scale"; from:1;to:1.2;duration:300;}
-//                            NumberAnimation{target:rect_tray; property:"scale"; from:1.2;to:1;duration:300;}
                             NumberAnimation{target:rect_tray_fill; property:"scale"; from:1.2;to:1;duration:300;}
                         }
                     }
@@ -206,9 +206,7 @@ Item {
                         text: (model.set_table==0)?"Tray "+Number(model.tray_num):Number(model.set_table)
                     }
                 }
-
             }
-
         }
 
     }
@@ -216,7 +214,7 @@ Item {
     Rectangle{
         id: rect_table_box
         visible: robot_type=="SERVING"?true:false
-        width: (table_num/5).toFixed(0)*100 - 20 + 160
+        width: (table_col_num)*100 - 20 + 160
         height: parent.height - statusbar.height
         anchors.left: parent.left
         anchors.top: parent.top
@@ -227,6 +225,7 @@ Item {
         }
 
         Text{
+            id: text_tables
             color:"white"
             font.bold: true
             font.family: font_noto_b.name
@@ -236,50 +235,194 @@ Item {
             anchors.topMargin: 40
             font.pixelSize: 30
         }
-        Grid{
-            id: grid_tables
-            rows: 5
-            columns: (table_num/5).toFixed(0)
-            spacing: 20
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            flow: Grid.TopToBottom
+        SwipeView{
+            id: swipeview_tables
+            width: parent.width
+            currentIndex: 0
+            clip: true
+            anchors.top: text_tables.bottom
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 100
             Repeater{
-                id: column_table
-                model: table_num
-                Rectangle{
-                    id: rect_table
-                    width:80
-                    height:80
-                    radius:80
-                    color: (index+1 == cur_table)?"#12d27c":"#d0d0d0"
-                    Rectangle{
-                        width:68
-                        height:68
-                        radius:68
-                        color: "#f4f4f4"
-                        anchors.centerIn: parent
-                        Text{
-                            anchors.centerIn: parent
-                            text: index+1
-                            color: "#525252"
-                            font.family: font_noto_r.name
-                            font.pixelSize: 25
-                        }
-                    }
-                    MouseArea{
-                        anchors.fill:parent
-                        onClicked: {
-                            if(cur_table == index+1){
-                                cur_table = 0;
-                            }else{
-                                cur_table = index+1;
+                id: page_table
+                model: Math.ceil((table_num/(table_col_num*5)))
+                onModelChanged: {
+                    swipeview_tables.currentIndex = 0;
+                }
+
+                Item{
+                    property int pageNum: index
+                    Grid{
+                        rows: 5
+                        columns: table_num-(table_col_num*5*(pageNum+1))>0?table_col_num:((table_num-(table_col_num*5*pageNum))/5 + 1).toFixed(0)
+                        spacing: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                        flow: Grid.TopToBottom
+                        Repeater{
+                            id: column_table
+                            model: table_num-(table_col_num*5*pageNum)>table_col_num*5 + 1?table_col_num*5:table_num-(table_col_num*5*pageNum)
+                            Rectangle{
+                                id: rect_table
+                                width:80
+                                height:80
+                                radius:80
+                                color: ((table_col_num*5*pageNum)+index+1 == cur_table)?"#12d27c":"#d0d0d0"
+                                Rectangle{
+                                    width:68
+                                    height:68
+                                    radius:68
+                                    color: "#f4f4f4"
+                                    anchors.centerIn: parent
+                                    Text{
+                                        anchors.centerIn: parent
+                                        text: (table_col_num*5*pageNum)+index+1
+                                        color: "#525252"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 25
+                                    }
+                                }
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(cur_table == (table_col_num*5*pageNum)+index+1){
+                                            cur_table = 0;
+                                        }else{
+                                            cur_table = (table_col_num*5*pageNum)+index+1;
+                                        }
+                                    }
+                                }
                             }
                         }
+
                     }
                 }
             }
         }
+        PageIndicator{
+            id: indicator_tables1
+            count: swipeview_tables.count
+            currentIndex: swipeview_tables.currentIndex
+            anchors.bottom: swipeview_tables.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            delegate: Rectangle{
+                implicitWidth: 15
+                implicitHeight: 15
+                radius: width
+                color: index===swipeview_tables.currentIndex?"#12d27c":"#525252"
+                Behavior on color{
+                    ColorAnimation {
+                        duration: 200
+                    }
+                }
+            }
+        }
+        Rectangle{
+            id: btn_lock
+            color: "transparent"
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 30
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 50
+            radius: 50
+            height: 50
+            visible: table_num>5?true:false
+            Image{
+                anchors.fill: parent
+                source: "icon/btn_lock.png"
+            }
+            MouseArea{
+                anchors.fill: parent
+                onPressAndHold: {
+                    supervisor.writelog("[USER INPUT] TABLE NUM CHANGED DONE : "+Number(table_col_num));
+                    btn_lock.visible = false;
+                    btns_table.visible = true;
+                }
+            }
+        }
+        Row{
+            id: btns_table
+            visible: false
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 30
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 10
+            Rectangle{
+                id: btn_minus
+                color: "#282828"
+                width: 40
+                height: 40
+                radius: 40
+                enabled: table_num>5?true:false
+                border.color: "#e8e8e8"
+                border.width: 1
+                Text{
+                    anchors.centerIn: parent
+                    text:"-"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    font.family: font_noto_b.name
+                    font.pixelSize: 40
+                    color: "#e8e8e8"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        if(table_col_num > 1)
+                            supervisor.setTableColNum(--table_col_num);
+                    }
+                }
+            }
+            Rectangle{
+                id: btn_plus
+                color: "#282828"
+                width: 40
+                height: 40
+                radius: 40
+                enabled: table_num>table_col_num*5?true:false
+                border.color: "#e8e8e8"
+                border.width: 1
+                Text{
+                    anchors.centerIn: parent
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    text:"+"
+                    font.family: font_noto_b.name
+                    font.pixelSize: 40
+                    color: "#e8e8e8"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        if(table_col_num < 3)
+                            supervisor.setTableColNum(++table_col_num);
+                    }
+                }
+            }
+            Rectangle{
+                id: btn_confirm_tables
+                color: "#282828"
+                width: 40
+                height: 40
+                radius: 40
+                border.color: "#e8e8e8"
+                border.width: 1
+                Image{
+                    anchors.fill: parent
+                    source: "icon/btn_yes.png"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        supervisor.writelog("[USER INPUT] TABLE NUM CHANGED");
+                        btn_lock.visible = true;
+                        btns_table.visible = false;
+                    }
+                }
+            }
+
+        }
+
     }
 
     Rectangle{

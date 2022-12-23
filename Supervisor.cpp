@@ -239,6 +239,7 @@ void Supervisor::readSetting(){
     pmap->use_server = setting_robot.value("map_server").toBool();
     pmap->map_loaded = setting_robot.value("map_load").toBool();
     setting.table_num = setting_robot.value("table_num").toInt();
+    setting.table_col_num = setting_robot.value("table_col_num").toInt();
     setting_robot.endGroup();
 
     setting_robot.beginGroup("SERVER");
@@ -292,6 +293,12 @@ int Supervisor::getTableNum(){
 }
 void Supervisor::setTableNum(int table_num){
     setSetting("FLOOR/table_num",QString::number(table_num));
+}
+int Supervisor::getTableColNum(){
+    return setting.table_col_num;
+}
+void Supervisor::setTableColNum(int col_num){
+    setSetting("FLOOR/table_col_num",QString::number(col_num));
 }
 bool Supervisor::getuseVoice(){
     return setting.useVoice;
@@ -2005,7 +2012,6 @@ void Supervisor::onTimer(){
                 }
             }
             lcm->map_updated = true;
-
         }else if(probot->state == ROBOT_STATE_ERROR){
             //로봇이 에러상태면 ui에 movefail 화면 띄움
             if(ui_state != UI_STATE_MOVEFAIL){
@@ -2070,7 +2076,7 @@ void Supervisor::onTimer(){
                 ui_state = UI_STATE_READY;
                 isaccepted = false;
             }else{
-                lcm->moveTo("resting_0");
+                lcm->moveTo("Resting_0");
             }
         }else if(probot->state == ROBOT_STATE_MOVING){
             // moving
@@ -2090,7 +2096,7 @@ void Supervisor::onTimer(){
                 ui_state = UI_STATE_CHARGING;
                 QMetaObject::invokeMethod(mMain, "docharge");
             }else{
-                lcm->moveTo("charging_0");
+                lcm->moveTo("Charging_0");
             }
         }else if(probot->state == ROBOT_STATE_MOVING){
             // moving
@@ -2131,7 +2137,7 @@ void Supervisor::onTimer(){
                     for(int i=0; i<setting.tray_num; i++){
                         if(probot->trays[i] != 0){
                             plog->write("[SCHEDULER] SERVING : MOVE TO (Table"+QString::number(probot->trays[i])+")");
-                            lcm->moveTo("serving_"+QString().sprintf("%d",probot->trays[i]-1));
+                            lcm->moveTo("Serving_"+QString().sprintf("%d",probot->trays[i]-1));
                             serveDone = false;
                             break;
                         }

@@ -7,6 +7,7 @@
 #include <thread>
 #include <QTimer>
 #include <fcntl.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <QTimer>
 #include <sys/ioctl.h>

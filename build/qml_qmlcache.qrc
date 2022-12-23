@@ -68,5 +68,6 @@
         <file alias="icon/patrol_down.png">../icon/patrol_down.png</file>
         <file alias="icon/icon_server_connect.png">../icon/icon_server_connect.png</file>
         <file alias="icon/icon_joy_connect.png">../icon/icon_joy_connect.png</file>
+        <file alias="icon/btn_lock.png">../icon/btn_lock.png</file>
     </qresource>
 </RCC>

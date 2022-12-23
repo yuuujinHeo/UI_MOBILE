@@ -24,7 +24,7 @@ JoystickHandler::JoystickHandler(){
 
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()),this, SLOT(updatejoy()));
-    timer->start(10);
+    timer->start(50);
 }
 
 JoystickHandler::~JoystickHandler(){
@@ -32,10 +32,13 @@ JoystickHandler::~JoystickHandler(){
 }
 
 int JoystickHandler::CheckJoy(){
-    if(connection && open(devName.toStdString().c_str(), O_RDONLY) == -1){
-        plog->write("[JOYSTICK] DISCONNECTED");
-        connection = false;
-//        close(fdJoy);
+    if(connection){
+        struct stat buf;
+        if(stat(devName.toStdString().c_str(),&buf) == -1){
+            plog->write("[JOYSTICK] DISCONNECTED");
+            connection = false;
+            close(fdJoy);
+        }
     }
 }
 
@@ -95,23 +98,21 @@ void JoystickHandler::updatejoy(){
     static int connect_count = 0;
     static int init_count = 0;
     if(connection == true){
-        if(init_count++ > 300){
-            // read the joystick
-            if(sizeof(struct js_event) == read(fdJoy, &(JoyEvent), sizeof(struct js_event))){
-                switch(JoyEvent.type & ~JS_EVENT_INIT){
-                case JS_EVENT_AXIS:
-                    if(JoyEvent.number < 8)
-                    {
-                        (JoyAxis)[JoyEvent.number] = JoyEvent.value;
-                    }
-                    break;
-                case JS_EVENT_BUTTON:
-                    if(JoyEvent.number < 12)
-                    {
-                        (JoyButton)[JoyEvent.number] = JoyEvent.value;
-                    }
-                    break;
+        // read the joystick
+        while((read(fdJoy, &(JoyEvent),sizeof(struct js_event))) > 0){
+            switch(JoyEvent.type & ~JS_EVENT_INIT){
+            case JS_EVENT_AXIS:
+                if(JoyEvent.number < 8)
+                {
+                    (JoyAxis)[JoyEvent.number] = JoyEvent.value;
                 }
+                break;
+            case JS_EVENT_BUTTON:
+                if(JoyEvent.number < 12)
+                {
+                    (JoyButton)[JoyEvent.number] = JoyEvent.value;
+                }
+                break;
             }
         }
     }else{
@@ -120,6 +121,7 @@ void JoystickHandler::updatejoy(){
             ConnectJoy("/dev/input/js0");
         }
     }
+
     if(connect_count++%100 == 0){
         CheckJoy();
     }

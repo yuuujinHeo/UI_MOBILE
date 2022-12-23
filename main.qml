@@ -62,11 +62,11 @@ Window {
         cur_location = supervisor.getcurLoc();
         var str_target;
         supervisor.writelog("[QML - MAIN] MOVE TO "+cur_location);
-        if(cur_location.slice(0,4) == "char"){
+        if(cur_location.slice(0,4) == "Char"){
             supervisor.writelog("[QML - MOVING] MOVE TO CHARGING LOCATION");
             str_target = "충전 장소";
             voice_movecharge.play();
-        }else if(cur_location.slice(0,4) == "rest"){
+        }else if(cur_location.slice(0,4) == "Rest"){
             supervisor.writelog("[QML - MOVING] MOVE TO RESTING LOCATION");
             str_target = "대기 장소";
             voice_movewait.play();

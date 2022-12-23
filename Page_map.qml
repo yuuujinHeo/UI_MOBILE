@@ -15,6 +15,7 @@ Item {
     property bool isrun: false
     property bool slam_initializing: false
     property bool joystick_connection: false
+    property bool joy_init: false
 
     property var joy_axis_left_ud: 0
     property var joy_axis_right_rl: 0
@@ -2133,24 +2134,32 @@ Item {
         onTriggered: {
             joystick_connection = supervisor.isconnectJoy();
             if(joystick_connection){
-                if(joy_axis_left_ud == supervisor.getJoyAxis(1) && joy_axis_right_rl == supervisor.getJoyAxis(2)){
+                if(joy_init){
+                    if(joy_axis_left_ud == supervisor.getJoyAxis(1) && joy_axis_right_rl == supervisor.getJoyAxis(2)){
 
-                }else{
-                    joy_axis_left_ud = supervisor.getJoyAxis(1);
-                    joy_axis_right_rl = supervisor.getJoyAxis(2);
-                    if(joy_axis_left_ud != 0){
-                        joy_xy.remote_input(joy_axis_left_ud,0);
                     }else{
-                        joy_xy.remote_stop();
+                        joy_axis_left_ud = supervisor.getJoyAxis(1);
+                        joy_axis_right_rl = supervisor.getJoyAxis(2);
+                        if(joy_axis_left_ud != 0){
+                            joy_xy.remote_input(joy_axis_left_ud,0);
+                        }else{
+                            joy_xy.remote_stop();
+                        }
+
+                        if(joy_axis_right_rl != 0){
+                            joy_th.remote_input(0,joy_axis_right_rl);
+                        }else{
+                            joy_th.remote_stop();
+                        }
                     }
-
-                    if(joy_axis_right_rl != 0){
-                        joy_th.remote_input(0,joy_axis_right_rl);
-                    }else{
-                        joy_th.remote_stop();
+                }else{
+                    if(supervisor.getJoyAxis(1) === 0 && supervisor.getJoyAxis(2) === 0){
+                        supervisor.writelog("[JOYSTICK] ALL 0 , READ START");
+                        joy_init =true;
                     }
                 }
             }else{
+                joy_init = false;
                 joy_axis_left_ud = 0;
                 joy_axis_right_rl = 0;
                 joy_xy.remote_stop();

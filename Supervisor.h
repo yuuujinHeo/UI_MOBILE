@@ -72,6 +72,8 @@ public:
     Q_INVOKABLE void setTrayNum(int tray_num);
     Q_INVOKABLE int getTableNum();
     Q_INVOKABLE void setTableNum(int table_num);
+    Q_INVOKABLE int getTableColNum();
+    Q_INVOKABLE void setTableColNum(int col_num);
 
     Q_INVOKABLE bool getuseVoice();
     Q_INVOKABLE void setuseVoice(bool use);
