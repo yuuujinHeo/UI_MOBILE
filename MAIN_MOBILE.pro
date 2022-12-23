@@ -73,7 +73,7 @@ contains(QT_ARCH, x86_64){
     LIBS += -llcm
 
     # USB
-#    LIBS += -lusb
+    LIBS += -lusb
 }
 
 # Libraries setting (for aarch64)
@@ -102,5 +102,5 @@ contains(QT_ARCH, arm64) {
 
 
     # USB
-#    LIBS += -lusb
+    LIBS += -lusb
 }

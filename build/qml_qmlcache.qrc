@@ -5,7 +5,6 @@
         <file alias="image/rainbow2.png">../image/rainbow2.png</file>
         <file alias="image/rainbow3.png">../image/rainbow3.png</file>
         <file alias="image/rainbow4.png">../image/rainbow4.png</file>
-        <file alias="image/loading1.gif">../image/loading1.gif</file>
         <file alias="bgm/song.mp3">../bgm/song.mp3</file>
         <file alias="image/joy_finger.png">../image/joy_finger.png</file>
         <file alias="image/joy_background.png">../image/joy_background.png</file>

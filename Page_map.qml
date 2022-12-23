@@ -12,6 +12,7 @@ Item {
     objectName: "page_map"
     width: 1280
     height: 800
+
     property bool isrun: false
     property bool slam_initializing: false
     property bool joystick_connection: false
