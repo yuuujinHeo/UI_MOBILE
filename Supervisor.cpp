@@ -1434,7 +1434,7 @@ QString Supervisor::getcurLoc(){
     return probot->curLocation;
 }
 QString Supervisor::getcurTable(){
-    if(probot->curLocation.left(7) == "serving"){
+    if(probot->curLocation.left(7) == "Serving"){
         int table = probot->curLocation.split("_")[1].toInt() + 1;
         qDebug() << probot->curLocation << table;
         return QString::number(table);
@@ -2279,8 +2279,8 @@ void Supervisor::onTimer(){
                 while(table_num_last == table_num){
                     table_num = qrand()%5;
                 }
-                qDebug() << "Move To " << "serving_"+QString().sprintf("%d",table_num);
-                lcm->moveTo("serving_"+QString().sprintf("%d",table_num));
+                qDebug() << "Move To " << "Serving_"+QString().sprintf("%d",table_num);
+                lcm->moveTo("Serving_"+QString().sprintf("%d",table_num));
                 state_rotate_tables = 2;
                 table_num_last = table_num;
             }
@@ -2294,7 +2294,7 @@ void Supervisor::onTimer(){
                 state_rotate_tables = 3;
             }else{
                 if(timer_cnt%10==0){
-                    lcm->moveTo("serving_"+QString().sprintf("%d",table_num_last));
+                    lcm->moveTo("Serving_"+QString().sprintf("%d",table_num_last));
                 }
             }
             break;

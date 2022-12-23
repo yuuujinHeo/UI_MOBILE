@@ -14,19 +14,19 @@ Window {
     width: 1280
     height: 800
     title: qsTr("Hello World")
-//    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint
-//    visibility: Window.FullScreen
+    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint
+    visibility: Window.FullScreen
 
-//    onVisibilityChanged: {
-//        if(mainwindow.visibility == Window.Minimized){
-//            print("minimized");
-//        }else if(mainwindow.visibility == Window.FullScreen){
-//            print("fullscren");
-//        }else{
-//            supervisor.writelog("[QML - MAIN] Window show fullscreen");
-//            mainwindow.visibility = Window.FullScreen;
-//        }
-//    }
+    onVisibilityChanged: {
+        if(mainwindow.visibility == Window.Minimized){
+            print("minimized");
+        }else if(mainwindow.visibility == Window.FullScreen){
+            print("fullscren");
+        }else{
+            supervisor.writelog("[QML - MAIN] Window show fullscreen");
+            mainwindow.visibility = Window.FullScreen;
+        }
+    }
 
     property string pbefore: pinit
     property string ploading: "qrc:/Page_loading.qml"
@@ -77,7 +77,7 @@ Window {
             supervisor.writelog("[QML - MOVING] MOVE TO " + str_target);
         }
         loadPage(pmoving)
-        loader_page.pos = str_target;
+        loader_page.item.pos = str_target;
     }
     function play_avoidmsg(){
         voice_avoid.play();
@@ -116,6 +116,7 @@ Window {
         robot_type = supervisor.getRobotType();
         if(robot_type == "SERVING"){
             loadPage(ppickup);
+            loader_page.item.init();
             var trays = supervisor.getPickuptrays();
             var tempstr = "";
             for(var i=0; i<trays.length; i++){
@@ -125,14 +126,14 @@ Window {
                     tempstr += "과 " + Number(trays[i])+"번";
                 }
                 if(trays[i] == 1){
-                    loader_page.pickup_1 = true;
+                    loader_page.item.pickup_1 = true;
                 }else if(trays[i] == 2){
-                    loader_page.pickup_2 = true;
+                    loader_page.item.pickup_2 = true;
                 }else if(trays[i] == 3){
-                    loader_page.pickup_3 = true;
+                    loader_page.item.pickup_3 = true;
                 }
             }
-            loader_page.pos = tempstr;
+            loader_page.item.pos = tempstr;
             supervisor.writelog("[QML - MAIN] Show Pickup Page : " + loader_page.pos);
         }else if(robot_type == "CALLING"){
             loadPage(ppickupCall);
