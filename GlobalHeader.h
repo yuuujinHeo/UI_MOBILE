@@ -121,6 +121,7 @@ typedef struct{
     int tray_num;
     int travelline;
     int table_num;
+    int table_col_num;
 
     bool useVoice;
     bool useBGM;

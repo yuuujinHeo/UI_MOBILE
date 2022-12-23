@@ -84,5 +84,6 @@
         <file>icon/icon_joy_connect.png</file>
         <file>Page_map_init.qml</file>
         <file>Item_keyboard.qml</file>
+        <file>icon/btn_lock.png</file>
     </qresource>
 </RCC>
