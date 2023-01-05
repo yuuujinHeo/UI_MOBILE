@@ -14,19 +14,19 @@ Window {
     width: 1280
     height: 800
     title: qsTr("Hello World")
-    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint
-    visibility: Window.FullScreen
+//    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint
+//    visibility: Window.FullScreen
 
-    onVisibilityChanged: {
-        if(mainwindow.visibility == Window.Minimized){
-            print("minimized");
-        }else if(mainwindow.visibility == Window.FullScreen){
-            print("fullscren");
-        }else{
-            supervisor.writelog("[QML - MAIN] Window show fullscreen");
-            mainwindow.visibility = Window.FullScreen;
-        }
-    }
+//    onVisibilityChanged: {
+//        if(mainwindow.visibility == Window.Minimized){
+//            print("minimized");
+//        }else if(mainwindow.visibility == Window.FullScreen){
+//            print("fullscren");
+//        }else{
+//            supervisor.writelog("[QML - MAIN] Window show fullscreen");
+//            mainwindow.visibility = Window.FullScreen;
+//        }
+//    }
 
     property string pbefore: pinit
     property string ploading: "qrc:/Page_loading.qml"
@@ -34,7 +34,6 @@ Window {
     property string pinit: "qrc:/Page_init.qml"
     property string pcharging: "qrc:/Page_charge.qml"
     property string pmap: "qrc:/Page_map.qml"
-    property string pmapinit: "qrc:/Page_map_init.qml"
     property string pmenu: "qrc:/Page_menus.qml"
     property string pmovefail: "qrc:/Page_MoveFail.qml"
     property string pmoving: "qrc:/Page_moving.qml"
@@ -134,7 +133,7 @@ Window {
                 }
             }
             loader_page.item.pos = tempstr;
-            supervisor.writelog("[QML - MAIN] Show Pickup Page : " + loader_page.pos);
+            supervisor.writelog("[QML - MAIN] Show Pickup Page : " + loader_page.item.pos);
         }else if(robot_type == "CALLING"){
             loadPage(ppickupCall);
         }
@@ -145,20 +144,24 @@ Window {
             loader_page.item.updatepatrol();
     }
     function updatecanvas(){
-        if(loader_page.item.objectName == "page_map" || loader_page.item.objectName == "page_map_init")
+        if(loader_page.item.objectName == "page_map")
             loader_page.item.updatecanvas();
     }
     function updateobject(){
-        if(loader_page.item.objectName == "page_map" || loader_page.item.objectName == "page_map_init")
+        if(loader_page.item.objectName == "page_map")
             loader_page.item.updateobject();
     }
     function updatelocation(){
-        if(loader_page.item.objectName == "page_map" || loader_page.item.objectName == "page_map_init")
+        if(loader_page.item.objectName == "page_map")
             loader_page.item.updatelocation();
     }
     function updatetravelline(){
-        if(loader_page.item.objectName == "page_map" || loader_page.item.objectName == "page_map_init")
+        if(loader_page.item.objectName == "page_map")
             loader_page.item.updatetravelline();
+    }
+    function updatetravelline2(){
+        if(loader_page.item.objectName == "page_map")
+            loader_page.item.updatetravelline2();
     }
     function updatepath(){
         if(loader_page.item.objectName == "page_map")

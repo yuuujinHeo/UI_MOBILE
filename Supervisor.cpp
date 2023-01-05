@@ -124,25 +124,27 @@ void Supervisor::readSetting(){
     //Annotation======================================================================
     ini_path = "setting/annotation.ini";
     QSettings setting_anot(ini_path, QSettings::IniFormat);
-    pmap->locationSize = 0;
 
     setting_anot.beginGroup("charging_locations");
     int charge_num = setting_anot.value("num").toInt();
+    pmap->vecLocation.clear();
     ST_POSE temp_pose;
+    ST_LOCATION temp_loc;
     for(int i=0; i<charge_num; i++){
         QString loc_str = setting_anot.value("loc"+QString::number(i)).toString();
         QStringList strlist = loc_str.split(",");
         temp_pose.x = strlist[1].toFloat();
         temp_pose.y = strlist[2].toFloat();
         temp_pose.th = strlist[3].toFloat();
-        pmap->locationName.push_back(strlist[0]);
-        pmap->locationsPose.push_back(temp_pose);
-        pmap->locationSize++;
+        temp_loc.pose = temp_pose;
+        temp_loc.type = "Charging";
+        temp_loc.name = strlist[0];
+        pmap->vecLocation.push_back(temp_loc);
     }
     setting_anot.endGroup();
 
 
-    setting_anot.beginGroup("patrol_locations");
+    setting_anot.beginGroup("other_locations");
     int patrol_num = setting_anot.value("num").toInt();
     for(int i=0; i<patrol_num; i++){
         QString loc_str = setting_anot.value("loc"+QString::number(i)).toString();
@@ -150,9 +152,10 @@ void Supervisor::readSetting(){
         temp_pose.x = strlist[1].toFloat();
         temp_pose.y = strlist[2].toFloat();
         temp_pose.th = strlist[3].toFloat();
-        pmap->locationName.push_back(strlist[0]);
-        pmap->locationsPose.push_back(temp_pose);
-        pmap->locationSize++;
+        temp_loc.pose = temp_pose;
+        temp_loc.type = "Other";
+        temp_loc.name = strlist[0];
+        pmap->vecLocation.push_back(temp_loc);
     }
     setting_anot.endGroup();
 
@@ -165,9 +168,10 @@ void Supervisor::readSetting(){
         temp_pose.x = strlist[1].toFloat();
         temp_pose.y = strlist[2].toFloat();
         temp_pose.th = strlist[3].toFloat();
-        pmap->locationName.push_back(strlist[0]);
-        pmap->locationsPose.push_back(temp_pose);
-        pmap->locationSize++;
+        temp_loc.pose = temp_pose;
+        temp_loc.type = "Resting";
+        temp_loc.name = strlist[0];
+        pmap->vecLocation.push_back(temp_loc);
     }
     setting_anot.endGroup();
 
@@ -179,33 +183,50 @@ void Supervisor::readSetting(){
         temp_pose.x = strlist[1].toFloat();
         temp_pose.y = strlist[2].toFloat();
         temp_pose.th = strlist[3].toFloat();
-        pmap->locationName.push_back(strlist[0]);
-        pmap->locationsPose.push_back(temp_pose);
-        pmap->locationSize++;
+        temp_loc.pose = temp_pose;
+        temp_loc.type = "Serving";
+        temp_loc.name = strlist[0];
+        pmap->vecLocation.push_back(temp_loc);
     }
     setting_anot.endGroup();
 
     setting_anot.beginGroup("objects");
     int obj_num = setting_anot.value("num").toInt();
+    pmap->vecObject.clear();
     ST_FPOINT temp_point;
     for(int i=0; i<obj_num; i++){
-        QString loc_str = setting_anot.value("poly"+QString::number(i)).toString();
-        QStringList strlist = loc_str.split(",");
-        QVector<ST_FPOINT> temp_v;
-        for(int j=1; j<strlist.size(); j++){
+        QString name = setting_anot.value("poly"+QString::number(i)).toString();
+        QStringList strlist = name.split(",");
+        ST_OBJECT temp_obj;
+        if(strlist[0].left(5) == "Table"){
+            temp_obj.type = "Table";
+        }else if(strlist[0].left(5) == "Chair"){
+            temp_obj.type = "Chair";
+        }else if(strlist[0].left(4) == "Wall"){
+            temp_obj.type = "Wall";
+        }else{
+            temp_obj.type = "Unknown";
+        }
+
+        if(strlist[1].toInt() == 1){
+            temp_obj.is_rect = true;
+        }else{
+            temp_obj.is_rect = false;
+        }
+
+        for(int j=2; j<strlist.size(); j++){
             temp_point.x = strlist[j].split(":")[0].toFloat();
             temp_point.y = strlist[j].split(":")[1].toFloat();
-            temp_v.push_back(temp_point);
+            temp_obj.pose.push_back(temp_point);
         }
-        pmap->objectName.push_back(strlist[0]);
-        pmap->objectPose.push_back(temp_v);
-        pmap->objectSize++;
+        pmap->vecObject.push_back(temp_obj);
     }
     setObjPose();
     setting_anot.endGroup();
 
     setting_anot.beginGroup("travel_lines");
     int trav_num = setting_anot.value("num").toInt();
+    pmap->vecTline.clear();
     for(int i=0; i<trav_num; i++){
         QString loc_str = setting_anot.value("line"+QString::number(i)).toString();
         QStringList strlist = loc_str.split(",");
@@ -215,9 +236,7 @@ void Supervisor::readSetting(){
             temp_point.y = strlist[j].split(":")[1].toFloat();
             temp_v.push_back(temp_point);
         }
-        pmap->travellineName.push_back(strlist[0]);
-        pmap->travellinePose.push_back(temp_v);
-        pmap->travellineSize++;
+        pmap->vecTline.push_back(temp_v);
     }
     setting_anot.endGroup();
 
@@ -789,26 +808,26 @@ void Supervisor::clear_all(){
 void Supervisor::setObjPose(){
     list_obj_dR.clear();
     list_obj_uL.clear();
-    for(int i=0; i<pmap->objectSize; i++){
+    for(int i=0; i<pmap->vecObject.size(); i++){
         ST_FPOINT temp_uL;
         ST_FPOINT temp_dR;
         //Find Square Pos
-        temp_uL.x = pmap->objectPose[i][0].x;
-        temp_uL.y = pmap->objectPose[i][0].y;
-        temp_dR.x = pmap->objectPose[i][0].x;
-        temp_dR.y = pmap->objectPose[i][0].y;
-        for(int j=1; j<pmap->objectPose[i].size(); j++){
-            if(temp_uL.x > pmap->objectPose[i][j].x){
-                temp_uL.x = pmap->objectPose[i][j].x;
+        temp_uL.x = pmap->vecObject[i].pose[0].x;
+        temp_uL.y = pmap->vecObject[i].pose[0].y;
+        temp_dR.x = pmap->vecObject[i].pose[0].x;
+        temp_dR.y = pmap->vecObject[i].pose[0].y;
+        for(int j=1; j<pmap->vecObject[i].pose.size(); j++){
+            if(temp_uL.x > pmap->vecObject[i].pose[j].x){
+                temp_uL.x = pmap->vecObject[i].pose[j].x;
             }
-            if(temp_uL.y > pmap->objectPose[i][j].y){
-                temp_uL.y = pmap->objectPose[i][j].y;
+            if(temp_uL.y > pmap->vecObject[i].pose[j].y){
+                temp_uL.y = pmap->vecObject[i].pose[j].y;
             }
-            if(temp_dR.x < pmap->objectPose[i][j].x){
-                temp_dR.x = pmap->objectPose[i][j].x;
+            if(temp_dR.x < pmap->vecObject[i].pose[j].x){
+                temp_dR.x = pmap->vecObject[i].pose[j].x;
             }
-            if(temp_dR.y < pmap->objectPose[i][j].y){
-                temp_dR.y = pmap->objectPose[i][j].y;
+            if(temp_dR.y < pmap->vecObject[i].pose[j].y){
+                temp_dR.y = pmap->vecObject[i].pose[j].y;
             }
         }
         list_obj_dR.push_back(temp_uL);
@@ -840,31 +859,51 @@ float Supervisor::getMargin(){
     return pmap->margin;
 }
 int Supervisor::getLocationNum(){
-    return pmap->locationSize;
+    return pmap->vecLocation.size();
+}
+int Supervisor::getLocationSize(QString type){
+    int count = -1;
+    for(int i=0; i<pmap->vecLocation.size(); i++){
+        if(pmap->vecLocation[i].type == type){
+            QStringList namelist = pmap->vecLocation[i].name.split("_");
+            if(namelist[0] == type && namelist.size() >1){
+                if(namelist[1].toInt() > count){
+                    count = namelist[1].toInt();
+                }
+            }
+        }
+    }
+    return count + 1;
+}
+QString Supervisor::getLocationName(int num){
+    if(num > -1 && num < pmap->vecLocation.size()){
+        return pmap->vecLocation[num].name;
+    }
+    return "";
 }
 QString Supervisor::getLocationTypes(int num){
-    if(num > -1 && num < pmap->locationSize){
-        return pmap->locationName[num];
+    if(num > -1 && num < pmap->vecLocation.size()){
+        return pmap->vecLocation[num].type;
     }
     return "";
 }
 float Supervisor::getLocationx(int num){
-    if(num > -1 && num < pmap->locationSize){
-        ST_POSE temp = setAxis(pmap->locationsPose[num]);
+    if(num > -1 && num < pmap->vecLocation.size()){
+        ST_POSE temp = setAxis(pmap->vecLocation[num].pose);
         return temp.x;
     }
     return 0.;
 }
 float Supervisor::getLocationy(int num){
-    if(num > -1 && num < pmap->locationSize){
-        ST_POSE temp = setAxis(pmap->locationsPose[num]);
+    if(num > -1 && num < pmap->vecLocation.size()){
+        ST_POSE temp = setAxis(pmap->vecLocation[num].pose);
         return temp.y;
     }
     return 0.;
 }
 float Supervisor::getLocationth(int num){
-    if(num > -1 && num < pmap->locationSize){
-        ST_POSE temp = setAxis(pmap->locationsPose[num]);
+    if(num > -1 && num < pmap->vecLocation.size()){
+        ST_POSE temp = setAxis(pmap->vecLocation[num].pose);
         return temp.th;
     }
     return 0.;
@@ -900,21 +939,39 @@ ST_POINT Supervisor::mapTocanvas(float x, float y){
 }
 
 int Supervisor::getObjectNum(){
-    return pmap->objectSize;
+    return pmap->vecObject.size();
 }
 QString Supervisor::getObjectName(int num){
-    return pmap->objectName[num];
+    int count = 0;
+    if(num > -1 && num < pmap->vecObject.size()){
+        for(int i=0; i<num; i++){
+            if(pmap->vecObject[i].type == pmap->vecObject[num].type){
+                count++;
+            }
+        }
+        return pmap->vecObject[num].type + "_" + QString::number(count);
+    }
 }
 int Supervisor::getObjectPointSize(int num){
-    return pmap->objectPose[num].size();
+    return pmap->vecObject[num].pose.size();
 }
 float Supervisor::getObjectX(int num, int point){
-    ST_FPOINT temp = setAxis(pmap->objectPose[num][point]);
-    return temp.x;
+    if(num > -1 && num < pmap->vecObject.size()){
+        if(point > -1 && point < pmap->vecObject[num].pose.size()){
+            ST_FPOINT temp = setAxis(pmap->vecObject[num].pose[point]);
+            return temp.x;
+        }
+    }
+    return 0;
 }
 float Supervisor::getObjectY(int num, int point){
-    ST_FPOINT temp = setAxis(pmap->objectPose[num][point]);
-    return temp.y;
+    if(num > -1 && num < pmap->vecObject.size()){
+        if(point > -1 && point < pmap->vecObject[num].pose.size()){
+            ST_FPOINT temp = setAxis(pmap->vecObject[num].pose[point]);
+            return temp.y;
+        }
+    }
+    return 0;
 }
 
 int Supervisor::getTempObjectSize(){
@@ -930,9 +987,16 @@ float Supervisor::getTempObjectY(int num){
 }
 
 int Supervisor::getObjNum(QString name){
-    for(int i=0; i<pmap->objectSize; i++){
-        if(pmap->objectName[i] == name){
-            return i;
+    QStringList namelist = name.split("_");
+    int num = namelist[1].toInt();
+    int count = 0;
+    for(int i=0; i<pmap->vecObject.size(); i++){
+        if(pmap->vecObject[i].type == namelist[0]){
+            if(num == count){
+                return i;
+            }else{
+                count++;
+            }
         }
     }
     return -1;
@@ -950,13 +1014,13 @@ int Supervisor::getObjNum(int x, int y){
 }
 int Supervisor::getObjPointNum(int obj_num, int x, int y){
     ST_FPOINT pos = canvasTomap(x,y);
-    if(obj_num < pmap->objectSize && obj_num > -1){
-        qDebug() << "check obj" << obj_num << pmap->objectPose[obj_num].size();
+    if(obj_num < pmap->vecObject.size() && obj_num > -1){
+        qDebug() << "check obj" << obj_num << pmap->vecObject[obj_num].pose.size();
         if(obj_num != -1){
-            for(int j=0; j<pmap->objectPose[obj_num].size(); j++){
-                qDebug() << pmap->objectPose[obj_num][j].x << pmap->objectPose[obj_num][j].y;
-                if(fabs(pmap->objectPose[obj_num][j].x - pos.x) < 0.1){
-                    if(fabs(pmap->objectPose[obj_num][j].y - pos.y) < 0.1){
+            for(int j=0; j<pmap->vecObject[obj_num].pose.size(); j++){
+                qDebug() << pmap->vecObject[obj_num].pose[j].x << pmap->vecObject[obj_num].pose[j].y;
+                if(fabs(pmap->vecObject[obj_num].pose[j].x - pos.x) < 0.1){
+                    if(fabs(pmap->vecObject[obj_num].pose[j].y - pos.y) < 0.1){
                         qDebug() << "Match Point !!" << obj_num << j;
                         return j;
                     }
@@ -969,18 +1033,18 @@ int Supervisor::getObjPointNum(int obj_num, int x, int y){
 }
 
 int Supervisor::getLocNum(QString name){
-    for(int i=0; i<pmap->locationSize; i++){
-        if(pmap->locationName[i] == name){
+    for(int i=0; i<pmap->vecLocation.size(); i++){
+        if(pmap->vecLocation[i].name == name){
             return i;
         }
     }
     return -1;
 }
 int Supervisor::getLocNum(int x, int y){
-    for(int i=0; i<pmap->locationSize; i++){
+    for(int i=0; i<pmap->vecLocation.size(); i++){
         ST_FPOINT pos = canvasTomap(x,y);
-        if(fabs(pmap->locationsPose[i].x - pos.x) < probot->radius){
-            if(fabs(pmap->locationsPose[i].y - pos.y) < probot->radius){
+        if(fabs(pmap->vecLocation[i].pose.x - pos.x) < probot->radius){
+            if(fabs(pmap->vecLocation[i].pose.y - pos.y) < probot->radius){
                 return i;
             }
         }
@@ -990,38 +1054,38 @@ int Supervisor::getLocNum(int x, int y){
 
 
 void Supervisor::removeLocation(QString name){
-    for(int i=0; i<pmap->locationSize; i++){
-        if(pmap->locationName[i] == name){
+    for(int i=0; i<pmap->vecLocation.size(); i++){
+        if(pmap->vecLocation[i].name == name){
             plog->write("[UI-MAP] REMOVE LOCATION "+ name);
-            pmap->locationSize--;
-            pmap->locationName.remove(i);
-            pmap->locationsPose.remove(i);
+            pmap->vecLocation.remove(i);
             QMetaObject::invokeMethod(mMain, "updatelocation");
             return;
         }
     }
     plog->write("[UI-MAP] REMOVE OBJECT BUT FAILED "+ name);
 }
-void Supervisor::addLocation(QString name, int x, int y, float th){
-    pmap->locationName.push_back(name);
-    pmap->locationSize++;
+void Supervisor::addLocation(QString type, QString name, int x, int y, float th){
+    ST_LOCATION temp_loc;
+    temp_loc.type = type;
+    temp_loc.name = name;
     ST_POSE temp_pose;
     ST_FPOINT temp = canvasTomap(x,y);
     temp_pose.x = temp.x;
     temp_pose.y = temp.y;
     temp_pose.th = th;
-    pmap->locationsPose.push_back(temp_pose);
+    temp_loc.pose = temp_pose;
+    pmap->vecLocation.push_back(temp_loc);
     QMetaObject::invokeMethod(mMain, "updatecanvas");
     QMetaObject::invokeMethod(mMain, "updatelocation");
 
     plog->write("[DEBUG] addLocation "+ name);
 }
 void Supervisor::moveLocationPoint(int loc_num, int x, int y, float th){
-    if(loc_num > -1 && loc_num < pmap->locationSize){
+    if(loc_num > -1 && loc_num < pmap->vecLocation.size()){
         ST_FPOINT temp = canvasTomap(x,y);
-        pmap->locationsPose[loc_num].x = temp.x;
-        pmap->locationsPose[loc_num].y = temp.y;
-        pmap->locationsPose[loc_num].th = th;
+        pmap->vecLocation[loc_num].pose.x = temp.x;
+        pmap->vecLocation[loc_num].pose.y = temp.y;
+        pmap->vecLocation[loc_num].pose.th = th;
         qDebug() << loc_num << x << y << th;
         plog->write("[DEBUG] moveLocation "+QString().sprintf("%d -> %f, %f, %f",loc_num , temp.x ,temp.y , th));
     }
@@ -1033,15 +1097,6 @@ void Supervisor::addObjectPoint(int x, int y){
     temp_object.push_back(temp);
 
     QMetaObject::invokeMethod(mMain, "updatecanvas");
-}
-void Supervisor::editObjectPoint(int num, int x, int y){
-    if(num < temp_object.size()){
-        plog->write("[ANNOTATION] editObjectPoint " + QString().sprintf("%d (x)%f -> %f (y)%f -> %f",num,temp_object[num].x,x,temp_object[num].y,y));
-        ST_FPOINT temp = canvasTomap(x,y);
-        temp_object[num].x = temp.x;
-        temp_object[num].y = temp.y;
-        QMetaObject::invokeMethod(mMain, "updatecanvas");
-    }
 }
 void Supervisor::removeObjectPoint(int num){
     if(num < temp_object.size()){
@@ -1063,114 +1118,139 @@ void Supervisor::clearObjectPoints(){
     plog->write("[ANNOTATION] Clear Object Point");
     QMetaObject::invokeMethod(mMain, "updatecanvas");
 }
-void Supervisor::addObject(QString name){
+int Supervisor::getObjectSize(QString type){
+    int size = 0;
+    for(int i=0; i<pmap->vecObject.size(); i++){
+        if(pmap->vecObject[i].type == type)
+            size++;
+    }
+    return size;
+}
+void Supervisor::addObject(QString type){
+    QString num;
     if(temp_object.size() > 0){
-        pmap->objectName.push_back(name);
-        pmap->objectPose.push_back(temp_object);
+        ST_OBJECT temp;
+        temp.pose = temp_object;
+        temp.is_rect = false;
+        temp.type = type;
+        pmap->vecObject.push_back(temp);
         temp_object.clear();
-        pmap->objectSize++;
         setObjPose();
         QMetaObject::invokeMethod(mMain, "updatecanvas");
         QMetaObject::invokeMethod(mMain, "updateobject");
-
-        plog->write("[DEBUG] addObject " + name);
+        plog->write("[DEBUG] addObject " + type);
     }else{
-        plog->write("[DEBUG] addObject " + name + " but size = 0");
+        plog->write("[DEBUG] addObject " + type + " but size = 0");
     }
 }
-void Supervisor::editObjectRect(int num, int point, int x, int y){
-    if(num > -1 && num < pmap->objectSize){
-        qDebug() << point;
-        if(point == 0){
-            ST_FPOINT pos = canvasTomap(x,y);
-            pmap->objectPose[num][0].x = pos.x;
-            pmap->objectPose[num][0].y = pos.y;
-            pmap->objectPose[num][1].y = pos.y;
-            pmap->objectPose[num][3].x = pos.x;
-            QMetaObject::invokeMethod(mMain, "updatecanvas");
-        }else if(point == 1){
-            ST_FPOINT pos = canvasTomap(x,y);
-            pmap->objectPose[num][1].x = pos.x;
-            pmap->objectPose[num][1].y = pos.y;
-            pmap->objectPose[num][0].y = pos.y;
-            pmap->objectPose[num][2].x = pos.x;
-            QMetaObject::invokeMethod(mMain, "updatecanvas");
-        }else if(point == 2){
-            ST_FPOINT pos = canvasTomap(x,y);
-            pmap->objectPose[num][2].x = pos.x;
-            pmap->objectPose[num][2].y = pos.y;
-            pmap->objectPose[num][3].y = pos.y;
-            pmap->objectPose[num][1].x = pos.x;
-            QMetaObject::invokeMethod(mMain, "updatecanvas");
-        }else if(point == 3){
-            ST_FPOINT pos = canvasTomap(x,y);
-            pmap->objectPose[num][3].x = pos.x;
-            pmap->objectPose[num][3].y = pos.y;
-            pmap->objectPose[num][2].y = pos.y;
-            pmap->objectPose[num][0].x = pos.x;
-            QMetaObject::invokeMethod(mMain, "updatecanvas");
+void Supervisor::addObjectRect(QString type){
+    QString num;
+    if(temp_object.size() > 4){
+        plog->write("[DEBUG] addObjectRect " + type + " but size > 4");
+    }else if(temp_object.size() > 0){
+        ST_OBJECT temp;
+        temp.pose = temp_object;
+        temp.is_rect = true;
+        temp.type = type;
+        pmap->vecObject.push_back(temp);
+        temp_object.clear();
+        setObjPose();
+        QMetaObject::invokeMethod(mMain, "updatecanvas");
+        QMetaObject::invokeMethod(mMain, "updateobject");
+        plog->write("[DEBUG] addObjectRect " + type);
+    }else{
+        plog->write("[DEBUG] addObjectRect " + type + " but size = 0");
+    }
+}
+
+void Supervisor::editObject(int num, int point, int x, int y){
+    if(num > -1 && num < pmap->vecObject.size()){
+        if(pmap->vecObject[num].is_rect){
+            if(point == 0){
+                ST_FPOINT pos = canvasTomap(x,y);
+                pmap->vecObject[num].pose[0].x = pos.x;
+                pmap->vecObject[num].pose[0].y = pos.y;
+                pmap->vecObject[num].pose[1].y = pos.y;
+                pmap->vecObject[num].pose[3].x = pos.x;
+                QMetaObject::invokeMethod(mMain, "updatecanvas");
+            }else if(point == 1){
+                ST_FPOINT pos = canvasTomap(x,y);
+                pmap->vecObject[num].pose[1].x = pos.x;
+                pmap->vecObject[num].pose[1].y = pos.y;
+                pmap->vecObject[num].pose[0].y = pos.y;
+                pmap->vecObject[num].pose[2].x = pos.x;
+                QMetaObject::invokeMethod(mMain, "updatecanvas");
+            }else if(point == 2){
+                ST_FPOINT pos = canvasTomap(x,y);
+                pmap->vecObject[num].pose[2].x = pos.x;
+                pmap->vecObject[num].pose[2].y = pos.y;
+                pmap->vecObject[num].pose[3].y = pos.y;
+                pmap->vecObject[num].pose[1].x = pos.x;
+                QMetaObject::invokeMethod(mMain, "updatecanvas");
+            }else if(point == 3){
+                ST_FPOINT pos = canvasTomap(x,y);
+                pmap->vecObject[num].pose[3].x = pos.x;
+                pmap->vecObject[num].pose[3].y = pos.y;
+                pmap->vecObject[num].pose[2].y = pos.y;
+                pmap->vecObject[num].pose[0].x = pos.x;
+                QMetaObject::invokeMethod(mMain, "updatecanvas");
+            }
+            plog->write("[ANNOTATION] editObject " + QString().sprintf("(%d, %d, %d, %d)",num,point,x,y));
         }else{
-
+            if(point > -1 && point < pmap->vecObject[num].pose.size()){
+                ST_FPOINT pos = canvasTomap(x,y);
+                pmap->vecObject[num].pose[point].x = pos.x;
+                pmap->vecObject[num].pose[point].y = pos.y;
+                plog->write("[ANNOTATION] editObject "+ QString().sprintf("(%d, %d, %d, %d)",num,point,x,y));
+                QMetaObject::invokeMethod(mMain, "updatecanvas");
+            }else{
+                plog->write("[ANNOTATION - ERROR] editObject " + QString().sprintf("(%d, %d, %d, %d)",num,point,x,y) + " but pose size error");
+            }
         }
-        if(point > -1 && point < pmap->objectPose[num].size()){
-
-        }
+    }else{
+        plog->write("[ANNOTATION - ERROR] editObject " + QString().sprintf("(%d, %d, %d, %d)",num,point,x,y) + " but size error");
     }
 }
-void Supervisor::removeObject(QString name){
-    for(int i=0; i<pmap->objectSize; i++){
-        if(pmap->objectName[i] == name){
-            plog->write("[ANNOTATION] REMOVE OBJECT "+ name);
-            pmap->objectName.remove(i);
-            pmap->objectPose.remove(i);
-            pmap->objectSize--;
-            setObjPose();
-            QMetaObject::invokeMethod(mMain, "updateobject");
-            return;
-        }
-    }
-    plog->write("[ANNOTATION] REMOVE OBJECT BUT FAILED "+ name);
-}
-void Supervisor::moveObjectPoint(int obj_num, int point_num, int x, int y){
-    if(obj_num > -1 && obj_num < pmap->objectSize){
-        if(point_num > -1 && point_num < pmap->objectPose[obj_num].size()){
-            ST_FPOINT pos = canvasTomap(x,y);
-            pmap->objectPose[obj_num][point_num].x = pos.x;
-            pmap->objectPose[obj_num][point_num].y = pos.y;
-            plog->write("[ANNOTATION] MOVE OBJECT "+ QString().sprintf("%d, %d : %d, %d",obj_num,point_num,x,y));
-            QMetaObject::invokeMethod(mMain, "updatecanvas");
-        }
+
+void Supervisor::removeObject(int num){
+    if(num > -1 && num < pmap->vecObject.size()){
+        pmap->vecObject.remove(num);
+        setObjPose();
+        QMetaObject::invokeMethod(mMain, "updateobject");
+        plog->write("[ANNOTATION - ERROR] removeObject " + QString().sprintf("(%d)",num));
+    }else{
+        plog->write("[ANNOTATION - ERROR] removeObject " + QString().sprintf("(%d)",num) + " but size error");
     }
 }
 
 int Supervisor::getTlineSize(){
-    return pmap->travellinePose.size();
+    return pmap->vecTline.size();
 }
 int Supervisor::getTlineSize(int num){
-    if(num > -1 && num < pmap->travellinePose.size()){
-        return pmap->travellinePose[num].size();
+    if(num > -1 && num < pmap->vecTline.size()){
+        return pmap->vecTline[num].size();
     }else{
         return 0;
     }
 }
 QString Supervisor::getTlineName(int num){
-    if(num > -1 && num < pmap->travellineSize){
+    if(num > -1 && num < pmap->vecTline.size()){
         return "Travel_line_"+QString::number(num);
     }else{
         return "";
     }
 }
 float Supervisor::getTlineX(int num, int point){
-    if(num > -1 && num < pmap->travellineSize){
-        ST_FPOINT temp = setAxis(pmap->travellinePose[num][point]);
+    if(num > -1 && num < pmap->vecTline.size()){
+        ST_FPOINT temp = setAxis(pmap->vecTline[num][point]);
         return temp.x;
     }else{
         return 0;
     }
 }
 float Supervisor::getTlineY(int num, int point){
-    if(num > -1 && num < pmap->travellineSize){
-        ST_FPOINT temp = setAxis(pmap->travellinePose[num][point]);
+    if(num > -1 && num < pmap->vecTline.size()){
+        ST_FPOINT temp = setAxis(pmap->vecTline[num][point]);
         return temp.y;
     }else{
         return 0;
@@ -1178,61 +1258,56 @@ float Supervisor::getTlineY(int num, int point){
 }
 
 void Supervisor::addTline(int num, int x1, int y1, int x2, int y2){
-    if(num < pmap->travellinePose.size() && num > -1){
-        pmap->travellinePose[num].push_back(canvasTomap(x1,y1));
-        pmap->travellinePose[num].push_back(canvasTomap(x2,y2));
+    if(num < pmap->vecTline.size() && num > -1){
+        pmap->vecTline[num].push_back(canvasTomap(x1,y1));
+        pmap->vecTline[num].push_back(canvasTomap(x2,y2));
+
     }else{
         QVector<ST_FPOINT> temp;
         temp.push_back(canvasTomap(x1,y1));
         temp.push_back(canvasTomap(x2,y2));
-        pmap->travellinePose.push_back(temp);
-        pmap->travellineSize++;
+        pmap->vecTline.push_back(temp);
+
     }
     plog->write("[ANNOTATION] ADD Travel Line "+ QString().sprintf("%d : point1(%d, %d), point2(%d, %d)",num,x1,y1,x2,y2));
     QMetaObject::invokeMethod(mMain,"updatetravelline");
 }
 void Supervisor::removeTline(int num, int line){
-    if(num > -1 && num < pmap->travellinePose.size()){
-        if(line > -1 && line*2+1 < pmap->travellinePose[num].size()){
-            pmap->travellinePose[num].remove(line*2);
-            pmap->travellinePose[num].remove(line*2);
-            if(pmap->travellinePose[num].size() < 1){
-                pmap->travellineSize--;
-                pmap->travellinePose.remove(num);
+    if(num > -1 && num < pmap->vecTline.size()){
+        if(line > -1 && line*2+1 < pmap->vecTline[num].size()){
+            pmap->vecTline[num].remove(line*2);
+            pmap->vecTline[num].remove(line*2);
+            if(pmap->vecTline[num].size() < 1){
+                pmap->vecTline.remove(num);
                 plog->write("[ANNOTATION] REMOVE Travel Line "+ QString().sprintf("%d : line(%d)",num,line));
+                QMetaObject::invokeMethod(mMain,"updatetravelline2");
+            }else{
+                QMetaObject::invokeMethod(mMain,"updatetravelline");
             }
-            QMetaObject::invokeMethod(mMain,"updatetravelline");
         }
     }
-}
-int Supervisor::getTlineNum(QString name){
-    for(int i=0; i<pmap->travellineSize; i++){
-        if(pmap->travellineName[i] == name){
-            return i;
-        }
-    }
-    return -1;
 }
 int Supervisor::getTlineNum(int x, int y){
     ST_FPOINT temp = canvasTomap(x,y);
     ST_FPOINT uL;
     ST_FPOINT dR;
-    if(pmap->travellinePose.size() > 0){for(int i=0; i<pmap->travellinePose[0].size(); i=i+2){
-            uL.x = pmap->travellinePose[0][i].x;
-            uL.y = pmap->travellinePose[0][i].y;
-            dR.x = pmap->travellinePose[0][i].x;
-            dR.y = pmap->travellinePose[0][i].y;
+    if(pmap->vecTline.size() > 0){
+        for(int i=0; i<pmap->vecTline[0].size(); i=i+2){
+            uL.x = pmap->vecTline[0][i].x;
+            uL.y = pmap->vecTline[0][i].y;
+            dR.x = pmap->vecTline[0][i].x;
+            dR.y = pmap->vecTline[0][i].y;
 
 
-            if(uL.x < pmap->travellinePose[0][i+1].x)
-                uL.x = pmap->travellinePose[0][i+1].x;
-            if(dR.x > pmap->travellinePose[0][i+1].x)
-                dR.x = pmap->travellinePose[0][i+1].x;
+            if(uL.x < pmap->vecTline[0][i+1].x)
+                uL.x = pmap->vecTline[0][i+1].x;
+            if(dR.x > pmap->vecTline[0][i+1].x)
+                dR.x = pmap->vecTline[0][i+1].x;
 
-            if(uL.y < pmap->travellinePose[0][i+1].y)
-                uL.y = pmap->travellinePose[0][i+1].y;
-            if(dR.y > pmap->travellinePose[0][i+1].y)
-                dR.y = pmap->travellinePose[0][i+1].y;
+            if(uL.y < pmap->vecTline[0][i+1].y)
+                uL.y = pmap->vecTline[0][i+1].y;
+            if(dR.y > pmap->vecTline[0][i+1].y)
+                dR.y = pmap->vecTline[0][i+1].y;
 
             float margin = 0.3;
 
@@ -1255,7 +1330,7 @@ int Supervisor::getTlineNum(int x, int y){
 }
 
 
-void Supervisor::saveMetaData(QString filename){
+bool Supervisor::saveMetaData(QString filename){
     //파일 유무 확인
     QStringList filenamelist = filename.split("/");
     if(filenamelist[filenamelist.size()-1].split(".").size() <2){
@@ -1274,9 +1349,11 @@ void Supervisor::saveMetaData(QString filename){
             plog->write("[DEBUG] Copy map_meta.ini to map_meta_backup.ini");
         }else{
             plog->write("[DEBUG] Fail to copy map_meta.ini to map_meta_backup.ini");
+            return false;
         }
     }else{
         plog->write("[DEBUG] Fail to copy map_meta.ini to map_meta_backup.ini (No file found)");
+        return false;
     }
 
     //데이터 입력(맵데이터)
@@ -1287,9 +1364,10 @@ void Supervisor::saveMetaData(QString filename){
     settings.setValue("map_metadata/map_grid_width",QString::number(pmap->gridwidth));
     settings.setValue("map_metadata/map_origin_u",pmap->origin[0]);
     settings.setValue("map_metadata/map_origin_v",pmap->origin[1]);
+    return true;
 
 }
-void Supervisor::saveAnnotation(QString filename){
+bool Supervisor::saveAnnotation(QString filename){
     //파일 유무 확인
     QStringList filenamelist = filename.split("/");
     if(filenamelist[filenamelist.size()-1].split(".").size() <2){
@@ -1314,58 +1392,77 @@ void Supervisor::saveAnnotation(QString filename){
     }
 
     //데이터 입력(로케이션)
-    int patrol_num = 0;
+    int other_num = 0;
     int resting_num = 0;
     int charging_num = 0;
     int serving_num = 0;
     QString str_name;
     QSettings settings(filename, QSettings::IniFormat);
     settings.clear();
-    for(int i=0; i<pmap->locationsPose.size(); i++){
-        if(pmap->locationName[i].left(4) == "Rest"){
-            str_name = "Resting_"+QString().sprintf("%d,%f,%f,%f",resting_num,pmap->locationsPose[i].x,pmap->locationsPose[i].y,pmap->locationsPose[i].th);
+    for(int i=0; i<pmap->vecLocation.size(); i++){
+        if(pmap->vecLocation[i].type == "Resting"){
+            str_name = pmap->vecLocation[i].name + QString().sprintf(",%f,%f,%f",pmap->vecLocation[i].pose.x,pmap->vecLocation[i].pose.y,pmap->vecLocation[i].pose.th);
             settings.setValue("resting_locations/loc"+QString::number(resting_num),str_name);
             resting_num++;
-        }else if(pmap->locationName[i].left(4) == "Patr"){
-            str_name = "Patrol_"+QString().sprintf("%d,%f,%f,%f",patrol_num,pmap->locationsPose[i].x,pmap->locationsPose[i].y,pmap->locationsPose[i].th);
-            settings.setValue("patrol_locations/loc"+QString::number(patrol_num),str_name);
-            patrol_num++;
-        }else if(pmap->locationName[i].left(4) == "Tabl"){
-            str_name = "Table_"+QString().sprintf("%d,%f,%f,%f",serving_num,pmap->locationsPose[i].x,pmap->locationsPose[i].y,pmap->locationsPose[i].th);
+        }else if(pmap->vecLocation[i].type == "Other"){
+            str_name = pmap->vecLocation[i].name + QString().sprintf(",%f,%f,%f",pmap->vecLocation[i].pose.x,pmap->vecLocation[i].pose.y,pmap->vecLocation[i].pose.th);
+            settings.setValue("other_locations/loc"+QString::number(other_num),str_name);
+            other_num++;
+        }else if(pmap->vecLocation[i].type == "Serving"){
+            str_name = pmap->vecLocation[i].name + QString().sprintf(",%f,%f,%f",pmap->vecLocation[i].pose.x,pmap->vecLocation[i].pose.y,pmap->vecLocation[i].pose.th);
             settings.setValue("serving_locations/loc"+QString::number(serving_num),str_name);
             serving_num++;
-        }else if(pmap->locationName[i].left(4) == "Char"){
-            str_name = "Charging_"+QString().sprintf("%d,%f,%f,%f",charging_num,pmap->locationsPose[i].x,pmap->locationsPose[i].y,pmap->locationsPose[i].th);
+        }else if(pmap->vecLocation[i].type == "Charging"){
+            str_name = pmap->vecLocation[i].name + QString().sprintf(",%f,%f,%f",pmap->vecLocation[i].pose.x,pmap->vecLocation[i].pose.y,pmap->vecLocation[i].pose.th);
             settings.setValue("charging_locations/loc"+QString::number(charging_num),str_name);
             charging_num++;
         }
     }
     settings.setValue("resting_locations/num",resting_num);
     settings.setValue("serving_locations/num",serving_num);
-    settings.setValue("patrol_locations/num",patrol_num);
+    settings.setValue("other_locations/num",other_num);
     settings.setValue("charging_locations/num",charging_num);
 
     //데이터 입력(오브젝트)
-    for(int i=0; i<pmap->objectPose.size(); i++){
-        str_name = pmap->objectName[i];
-        for(int j=0; j<pmap->objectPose[i].size(); j++){
-            str_name += QString().sprintf(",%f:%f",pmap->objectPose[i][j].x, pmap->objectPose[i][j].y);
+    int table_num = 0;
+    int chair_num = 0;
+    int wall_num = 0;
+    for(int i=0; i<pmap->vecObject.size(); i++){
+        if(pmap->vecObject[i].type == "Table"){
+            str_name = pmap->vecObject[i].type + "_" + QString::number(table_num++);
+        }else if(pmap->vecObject[i].type == "Chair"){
+            str_name = pmap->vecObject[i].type + "_" + QString::number(chair_num++);
+        }else if(pmap->vecObject[i].type == "Wall"){
+            str_name = pmap->vecObject[i].type + "_" + QString::number(wall_num++);
+        }else{
+            str_name = pmap->vecObject[i].type;
+        }
+
+        if(pmap->vecObject[i].is_rect){
+            str_name += ",1";
+        }else{
+            str_name += ",0";
+        }
+
+        for(int j=0; j<pmap->vecObject[i].pose.size(); j++){
+            str_name += QString().sprintf(",%f:%f",pmap->vecObject[i].pose[j].x, pmap->vecObject[i].pose[j].y);
         }
         settings.setValue("objects/poly"+QString::number(i),str_name);
     }
-    settings.setValue("objects/num",pmap->objectPose.size());
+    settings.setValue("objects/num",pmap->vecObject.size());
 
     //데이터 입력(트래블라인)
-    for(int i=0; i<pmap->travellinePose.size(); i++){
+    for(int i=0; i<pmap->vecTline.size(); i++){
         str_name = "Travel_line_"+QString::number(i);
-        for(int j=0; j<pmap->travellinePose[i].size(); j++){
-            str_name += QString().sprintf(",%f:%f",pmap->travellinePose[i][j].x, pmap->travellinePose[i][j].y);
+        for(int j=0; j<pmap->vecTline[i].size(); j++){
+            str_name += QString().sprintf(",%f:%f",pmap->vecTline[i][j].x, pmap->vecTline[i][j].y);
         }
         settings.setValue("travel_lines/line"+QString::number(i),str_name);
     }
-    settings.setValue("travel_lines/num",pmap->travellinePose.size());
+    settings.setValue("travel_lines/num",pmap->vecTline.size());
 
     readSetting();
+    return true;
 }
 void Supervisor::sendMaptoServer(){
     if(rotate_map("image/map_edited.png","image/map_raw.png",1)){
@@ -1813,11 +1910,11 @@ void Supervisor::addPatrol(QString type, QString location, float x, float y, flo
     temp.location = location;
 
     if(temp.location != ""){
-        for(int i=0; i<pmap->locationsPose.size(); i++){
-            if(pmap->locationName[i] == temp.location){
-                temp.pose.x = pmap->locationsPose[i].x;
-                temp.pose.y = pmap->locationsPose[i].y;
-                temp.pose.th = pmap->locationsPose[i].th;
+        for(int i=0; i<pmap->vecLocation.size(); i++){
+            if(pmap->vecLocation[i].name == temp.location){
+                temp.pose.x = pmap->vecLocation[i].pose.x;
+                temp.pose.y = pmap->vecLocation[i].pose.y;
+                temp.pose.th = pmap->vecLocation[i].pose.th;
                 patrol.path.push_back(temp);
                 plog->write("[USER INPUT] Add Patrol Pose : "+QString().sprintf("%f, %f, %f",temp.pose.x, temp.pose.y, temp.pose.th));
                 break;

@@ -13,10 +13,11 @@ Item {
     property bool ui_slam_init: false
 
     onUi_slam_initChanged: {
+        print(ui_slam_init)
         if(ui_slam_init){
-            ani_do_init.start();
+            loader_init.item.startinit();
         }else{
-            ani_do_init_return.start();
+            loader_init.item.startreturn();
         }
     }
 
@@ -54,18 +55,18 @@ Item {
 
                 Image{
                     id: image_logo1
-                    width: 748/1.5
-                    height: 335/1.5
+                    width: 748/2
+                    height: 335/2
                     source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
                     anchors.horizontalCenter:  parent.horizontalCenter
-                    y: text_copyright.y / 2 - height/2
+                    y: 200
                 }
 
                 Text{
                     id: text_copyright
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 100
+                    anchors.bottomMargin: 130
                     text: "Copyrights Rainbow Robotics Inc. All rights reserved."
                     color: "#7e7e7e"
                     font.family: font_noto_b.name
@@ -98,99 +99,139 @@ Item {
                 notice_map_edited.enabled = false;
             }
 
-            Image{
-                id: image_logo
-                width: 748/2
-                height: 335/2
+            Rectangle{
+                anchors.fill: parent
+                color: "#f4f4f4"
+            }
+            Column{
                 anchors.top: parent.top
-                anchors.topMargin: 80
-                anchors.horizontalCenter: parent.horizontalCenter
-                source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
-            }
-
-            Text{
-                id: text_notice
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: image_logo.bottom
-                horizontalAlignment: Text.AlignHCenter
-                anchors.topMargin: 100
-                text: "맵 파일을 찾을 수 없습니다.";
-                font.pixelSize: 20
-            }
-
-            Row{
-                spacing: 50
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: text_notice.bottom
                 anchors.topMargin: 200
-                Rectangle{
-                    id: btn_server_load
-                    width: 200
-                    height: 150
-                    radius: 15
-                    enabled: supervisor.isConnectServer()
-                    color: enabled?"gray":"#DDDDDD"
-                    Text{
-                        anchors.centerIn: parent
-                        text: "서버에서 받아오기"
-                        font.pixelSize: 20
-                        color:enabled?"black":"white"
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            supervisor.loadMaptoServer();
-                            update_timer.start();
-                        }
-                    }
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing:80
+                Image{
+                    id: image_logo
+                    width: 748/2
+                    height: 335/2
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
                 }
-                Rectangle{
-                    id: btn_slam_start
-                    width: 200
-                    height: 150
-                    radius: 15
-                    enabled: true//supervisor.getLCMConnection()
-                    color: enabled?"gray":"#DDDDDD"
-                    Text{
-                        anchors.centerIn: parent
-                        text: "맵 생성"
-                        font.pixelSize: 20
-                        color:enabled?"black":"white"
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            loadPage(pmapinit);
-                            loader_page.item.map_mode = 1;
-    //                        supervisor.startSLAM();
-                        }
-                    }
+                Text{
+                    id: text_notice
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "맵 파일을 찾을 수 없습니다.";
+                    color: "#7e7e7e"
+                    font.family: font_noto_r.name
                 }
-                Rectangle{
-                    id: btn_usb_load
-                    width: 200
-                    height: 150
-                    radius: 15
-                    enabled: supervisor.getUsbMapSize()>0?true:false
-                    color: enabled?"gray":"#DDDDDD"
-                    Text{
-                        anchors.centerIn: parent
-                        text: "로컬 맵 불러오기\n(USB)"
-                        font.pixelSize: 20
-                        horizontalAlignment: Text.AlignHCenter
-                        color:enabled?"black":"white"
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            popup_usb_map.open();
-    //                        supervisor.loadMaptoUSB();
-    //                        update_timer.start();
-                        }
-                    }
-                }
-            }
 
+                Row{
+                    spacing: 50
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Rectangle{
+                        id: btn_server_load
+                        width: 188
+                        height: 100
+                        radius: 60
+                        border.width: 3
+                        border.color: "#e5e5e5"
+                        enabled: supervisor.isConnectServer()
+                        color: enabled?"transparent":"#e5e5e5"
+                        Column{
+                            anchors.centerIn: parent
+                            spacing: 5
+                            Image{
+                                source: "icon/icon_server_download.png"
+                                width: 30
+                                height: 30
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "서버에서 받아오기"
+                                font.pixelSize: 15
+                                font.family: font_noto_r.name
+                                color:enabled?"black":"white"
+                            }
+                        }
+
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                supervisor.loadMaptoServer();
+                                update_timer.start();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: btn_slam_start
+                        width: 188
+                        height: 100
+                        radius: 60
+                        border.width: 3
+                        border.color: "#e5e5e5"
+                        enabled: supervisor.getLCMConnection()
+                        color: enabled?"transparent":"#e5e5e5"
+                        Column{
+                            anchors.centerIn: parent
+                            spacing: 5
+                            Image{
+                                source: "icon/icon_add.png"
+                                width: 30
+                                height: 30
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "맵 생성"
+                                font.pixelSize: 15
+                                font.family: font_noto_r.name
+                                color:enabled?"black":"white"
+                            }
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                loadPage(pmap);
+                                loader_page.item.map_mode = 1;
+        //                        supervisor.startSLAM();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: btn_usb_load
+                        width: 188
+                        height: 100
+                        radius: 60
+                        border.width: 3
+                        border.color: "#e5e5e5"
+                        enabled: supervisor.getUsbMapSize()>0?true:false
+                        color: enabled?"transparent":"#e5e5e5"
+                        Column{
+                            anchors.centerIn: parent
+                            spacing: 5
+                            Image{
+                                scale: 0.8
+                                source: "icon/icon_open.png"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "로컬 맵 불러오기\n(USB)"
+                                font.pixelSize: 15
+                                horizontalAlignment: Text.AlignHCenter
+                                font.family: font_noto_r.name
+                                color:enabled?"black":"white"
+                            }
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                popup_usb_map.open();
+        //                        supervisor.loadMaptoUSB();
+        //                        update_timer.start();
+                            }
+                        }
+                    }
+                }
+
+            }
             Rectangle{
                 id: notice_map_edited
                 width: 180
@@ -207,7 +248,6 @@ Item {
                         damping: 0.2
                     }
                 }
-
                 Rectangle{
                     width: 40
                     height: parent.height
@@ -215,7 +255,6 @@ Item {
                     anchors.horizontalCenter: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     color: parent.color
-
                     Image{
                         width: 30
                         height: 30
@@ -228,6 +267,7 @@ Item {
                     anchors.right: parent.right
                     anchors.rightMargin: 30
                     color: "white"
+                    font.family: font_noto_b.name
                     text: "로컬 맵 파일 확인됨"
                     font.bold: true
                     font.pixelSize: 15
@@ -256,7 +296,6 @@ Item {
                         damping: 0.2
                     }
                 }
-
                 Rectangle{
                     width: 40
                     height: parent.height
@@ -264,7 +303,6 @@ Item {
                     anchors.horizontalCenter: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     color: parent.color
-
                     Image{
                         width: 30
                         height: 30
@@ -276,6 +314,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     anchors.rightMargin: 30
+                    font.family: font_noto_b.name
                     color: "white"
                     text: "설정되지 않은 맵 파일 확인됨"
                     font.bold: true
@@ -289,9 +328,7 @@ Item {
                     }
                 }
             }
-
         }
-
     }
 
     //ini파일을 찾을 수 없을 때
@@ -303,48 +340,93 @@ Item {
             Component.onCompleted: {
                 statusbar.visible = true;
             }
-
-            Image{
-                id: image_logo2
-                width: 748/2
-                height: 335/2
-                anchors.top: parent.top
-                anchors.topMargin: 80
-                anchors.horizontalCenter: parent.horizontalCenter
-                source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
-            }
-
-            Text{
-                id: text_notice2
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: image_logo2.bottom
-                horizontalAlignment: Text.AlignHCenter
-                anchors.topMargin: 100
-                text: "로봇 세팅파일을 찾을 수 없습니다."
-                font.pixelSize: 20
-            }
-
             Rectangle{
-                id: btn_make_ini
-                width: 200
-                height: 150
-                radius: 15
-                color: "gray"
-                anchors.top: text_notice2.bottom
-                anchors.topMargin: 40
+                anchors.fill: parent
+                color: "#f4f4f4"
+            }
+            Column{
+                anchors.top: parent.top
+                anchors.topMargin: 200
                 anchors.horizontalCenter: parent.horizontalCenter
-                Text{
-                    anchors.centerIn: parent
-                    text: "기본내용으로 만들기"
-                    font.pixelSize: 20
-                    horizontalAlignment: Text.AlignHCenter
+                spacing:80
+                Image{
+                    id: image_logo2
+                    width: 748/2
+                    height: 335/2
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
                 }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: {
-                        supervisor.makeRobotINI();
+                Text{
+                    id: text_notice2
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    color: "#7e7e7e"
+                    font.family: font_noto_r.name
+                    text: "로봇 세팅파일을 찾을 수 없습니다."
+                    font.pixelSize: 20
+                }
+                Row{
+                    id: row_menu3
+                    spacing: 30
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Rectangle{
+                        id: btn_make_ini
+                        width: 188
+                        height: 100
+                        radius: 60
+                        color: "transparent"
+                        border.width: 3
+                        border.color: "#e5e5e5"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "기본내용으로 만들기"
+                            font.pixelSize: 15
+                            font.family: font_noto_r.name
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                supervisor.makeRobotINI();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: btn_minimize
+                        width: 188
+                        height: 100
+                        radius: 60
+                        color: "transparent"
+                        border.width: 3
+                        border.color: "#e5e5e5"
+                        Column{
+                            spacing: 5
+                            anchors.centerIn: parent
+                            Image{
+                                id: image_charge
+                                width: 30
+                                height: 30
+                                source:"icon/btn_minimize.png"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "창 최소화"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                supervisor.programHide();
+                                mainwindow.showMinimized()
+                            }
+                        }
                     }
                 }
+
+
             }
         }
 
@@ -360,49 +442,109 @@ Item {
                 statusbar.visible = true;
             }
 
-            Image{
-                id: image_logo3
-                width: 748/2
-                height: 335/2
-                anchors.top: parent.top
-                anchors.topMargin: 80
-                anchors.horizontalCenter: parent.horizontalCenter
-                source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
-            }
-
-            Text{
-                id: text_notice3
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: image_logo3.bottom
-                horizontalAlignment: Text.AlignHCenter
-                anchors.topMargin: 100
-                text: "로봇과 연결이 되지 않습니다."
-                font.pixelSize: 20
-            }
-
             Rectangle{
-                id: btn_lcm_pass
-                width: 200
-                height: 150
-                radius: 15
-                color: "gray"
-                anchors.top: text_notice3.bottom
-                anchors.topMargin: 40
+                anchors.fill: parent
+                color: "#f4f4f4"
+            }
+
+            Column{
+                anchors.top: parent.top
+                anchors.topMargin: 200
                 anchors.horizontalCenter: parent.horizontalCenter
-                Text{
-                    anchors.centerIn: parent
-                    text: "넘어가기(디버그용)"
-                    font.pixelSize: 20
-                    horizontalAlignment: Text.AlignHCenter
+                spacing:80
+                Image{
+                    id: image_logo3
+                    width: 748/2
+                    height: 335/2
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
                 }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: {
-                        loadPage(pkitchen);
-                        update_timer.stop();
+                Text{
+                    id: text_notice3
+                    font.family: font_noto_r.name
+                    color: "#7e7e7e"
+                    horizontalAlignment: Text.AlignHCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "로봇과 연결이 되지 않습니다."
+                    font.pixelSize: 20
+                }
+                Row{
+                    id: row_menu3
+                    spacing: 30
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Rectangle{
+                        id: btn_minimize
+                        width: 188
+                        height: 100
+                        radius: 60
+                        color: "transparent"
+                        border.width: 3
+                        border.color: "#e5e5e5"
+                        Column{
+                            spacing: 5
+                            anchors.centerIn: parent
+                            Image{
+                                id: image_charge
+                                width: 30
+                                height: 30
+                                source:"icon/btn_minimize.png"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "창 최소화"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                supervisor.programHide();
+                                mainwindow.showMinimized()
+                            }
+                        }
                     }
+                    Rectangle{
+                        id: btn_lcm_pass
+                        width: 188
+                        height: 100
+                        radius: 60
+                        color: "transparent"
+                        border.width: 3
+                        border.color: "#e5e5e5"
+                        Column{
+                            spacing: 5
+                            anchors.centerIn: parent
+                            Image{
+                                id: image_charge1
+                                width: 30
+                                height: 30
+                                source:"icon/icon_remove.png"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                id: text_slam_pass
+                                text: "넘어가기 (디버그 용)"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                            }
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                loadPage(pkitchen);
+                                update_timer.stop();
+                            }
+                        }
+                    }
+
                 }
             }
+
+
+
         }
 
     }
@@ -416,11 +558,21 @@ Item {
             Component.onCompleted: {
                 statusbar.visible = true;
             }
+            Rectangle{
+                anchors.fill: parent
+                color: "#f4f4f4"
+            }
+            function startinit(){
+                ani_do_init.start();
+            }
+            function startreturn(){
+                ani_do_init_return.start();
+            }
 
             SequentialAnimation{
                 id: ani_do_init
                 running: false
-                onStarted: {
+                onStarted:  {
                     text_slaminimize.visible = false;
                     text_slam_pass.visible = false;
                 }
@@ -435,15 +587,16 @@ Item {
                     NumberAnimation{target: btn_slam_do_init; property:"opacity"; from:1; to:0; duration: 500;}
                 }
                 ParallelAnimation{
-                    NumberAnimation{target: image_logo4; property:"anchors.topMargin"; from:80; to:-200; duration: 500;}
+                    NumberAnimation{target: image_logo4; property:"anchors.topMargin"; from:200; to:-image_logo4.height; duration: 500;}
                     NumberAnimation{target: btn_slam_minimize; property:"anchors.rightMargin"; from:50; to:400; duration: 500;}
-                    NumberAnimation{target: btn_slam_minimize; property:"anchors.topMargin"; from:50; to:-100; duration: 500;}
+//                    NumberAnimation{target: btn_slam_minimize; property:"anchors.topMargin"; from:80; to:-100; duration: 500;}
                     NumberAnimation{target: btn_slam_pass; property:"anchors.leftMargin"; from:50; to:400; duration: 500;}
-                    NumberAnimation{target: btn_slam_pass; property:"anchors.topMargin"; from:50; to:-100; duration: 500;}
+//                    NumberAnimation{target: btn_slam_pass; property:"anchors.topMargin"; from:80 to:-100; duration: 500;}
                 }
                 onFinished: {
                     btn_slam_do_init.visible = false;
                     map_slam_init.visible = true;
+                    map_slam_init.loadmap(map_path);
                 }
             }
             SequentialAnimation{
@@ -466,8 +619,8 @@ Item {
                     NumberAnimation{target: btn_slam_do_init; property:"opacity"; from:0; to:1; duration: 500;}
                 }
                 onFinished: {
-                    text_slaminimize.visible = true;
-                    text_slam_pass.visible = true;
+//                    text_slaminimize.visible = true;
+//                    text_slam_pass.visible = true;
                 }
             }
 
@@ -476,36 +629,50 @@ Item {
                 width: 748/2
                 height: 335/2
                 anchors.top: parent.top
-                anchors.topMargin: 80
+                anchors.topMargin: 200
                 anchors.horizontalCenter: parent.horizontalCenter
                 source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
             }
-
             Text{
                 id: text_notice4
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: image_logo4.bottom
+                anchors.topMargin: 80
                 horizontalAlignment: Text.AlignHCenter
-                anchors.topMargin: 100
+                color: "#7e7e7e"
+                font.family: font_noto_r.name
                 text: "SLAM 자동 초기화에 실패하였습니다.\n맵 상에서 로봇의 현재 위치를 바로 잡아주신 뒤 수동으로 초기화를 진행해 주세요."
                 font.pixelSize: 20
             }
             Rectangle{
                 id: btn_slam_minimize
-                width: 200
-                height: 150
-                radius: 15
-                color: "gray"
+                width: 188
+                height: 100
+                radius: 60
+                color: "transparent"
+                border.width: 3
+                border.color: "#e5e5e5"
                 anchors.right: btn_slam_do_init.left
                 anchors.rightMargin: 30
                 anchors.top: text_notice4.bottom
-                anchors.topMargin: 50
-                Text{
-                    id: text_slaminimize
+                anchors.topMargin: 80
+                Column{
+                    spacing: 5
                     anchors.centerIn: parent
-                    text: "창 최소화"
-                    font.pixelSize: 20
-                    color:"white"
+                    Image{
+                        id: image_charge
+                        width: 30
+                        height: 30
+                        source:"icon/btn_minimize.png"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        id: text_slaminimize
+                        text: "창 최소화"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        horizontalAlignment: Text.AlignHCenter
+                    }
                 }
                 MouseArea{
                     anchors.fill: parent
@@ -516,44 +683,60 @@ Item {
             }
             Rectangle{
                 id: btn_slam_do_init
-                width: 200
-                height: 150
-                radius: 15
-                color: "gray"
+                width: 188
+                height: 100
+                radius: 60
+                color: "transparent"
+                border.width: 3
+                border.color: "#e5e5e5"
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: text_notice4.bottom
-                anchors.topMargin: 50
+                anchors.topMargin: 80
                 Text{
                     id: text_slam_do_init
                     anchors.centerIn: parent
                     text: "UI에서 직접 초기화"
-                    font.pixelSize: 20
-                    color:"white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
                 }
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        ui_slam_init = true;
-
+                        if(ui_slam_init)
+                            ui_slam_init = false;
+                        else
+                            ui_slam_init = true;
                     }
                 }
             }
             Rectangle{
                 id: btn_slam_pass
-                width: 200
-                height: 150
-                radius: 15
-                color: "gray"
+                width: 188
+                height: 100
+                radius: 60
+                color: "transparent"
+                border.width: 3
+                border.color: "#e5e5e5"
                 anchors.left: btn_slam_do_init.right
                 anchors.leftMargin: 30
                 anchors.top: text_notice4.bottom
-                anchors.topMargin: 50
-                Text{
-                    id: text_slam_pass
+                anchors.topMargin: 80
+                Column{
+                    spacing: 5
                     anchors.centerIn: parent
-                    text: "넘어가기 (디버그 용)"
-                    font.pixelSize: 20
-                    color:"white"
+                    Image{
+                        id: image_charge1
+                        width: 30
+                        height: 30
+                        source:"icon/icon_remove.png"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        id: text_slam_pass
+                        text: "넘어가기 (디버그 용)"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                    }
                 }
                 MouseArea{
                     anchors.fill: parent
@@ -572,6 +755,7 @@ Item {
                 show_object: true
                 show_robot: true
                 show_lidar: true
+                just_show_map: true
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: text_notice4.bottom
                 anchors.topMargin: 50
@@ -662,6 +846,8 @@ Item {
             }
             }
 
+
+
     }
 
     //USB 맵 목록 보여주기
@@ -735,6 +921,7 @@ Item {
                     Text{
                         anchors.centerIn: parent
                         text: "확인"
+                        font.family: font_noto_b.name
                     }
                     MouseArea{
                         anchors.fill: parent
@@ -757,6 +944,7 @@ Item {
                     Text{
                         anchors.centerIn: parent
                         text: "취소"
+                        font.family: font_noto_b.name
                     }
                     MouseArea{
                         anchors.fill: parent
@@ -952,13 +1140,18 @@ Item {
                                 if(popup_show_map.show_mode == 1){
                                     popup_show_map.close();
                                     setMapPath("file://" + applicationDirPath + "/image/map_edited.png", "map_edited.png")
-                                    loadPage(pmapinit);
-                                    loader_page.map_mode = 2;
+                                    loadPage(pmap);
+                                    loader_page.item.map_mode = 2;
+                                    loader_page.item.init();
+//                                    loadPage(pmapinit);
+//                                    loader_page.map_mode = 2;
                                 }else if(popup_show_map.show_mode == 2){
                                     popup_show_map.close();
                                     setMapPath("file://" + applicationDirPath + "/image/map_raw.png", "map_raw.png")
-                                    loadPage(pmapinit);
+                                    loadPage(pmap);
                                     loader_page.item.map_mode = 2;
+//                                    loadPage(pmapinit);
+//                                    loader_page.item.map_mode = 2;
                                     loader_page.item.init();
                                 }
                             }else if(modelData == "맵 삭제"){
