@@ -38,6 +38,18 @@ typedef struct{
 }ST_FPOINT;
 
 typedef struct{
+    QString type;
+    bool is_rect;
+    QVector<ST_FPOINT> pose;
+}ST_OBJECT;
+
+typedef struct{
+    QString type;
+    QString name;
+    ST_POSE pose;
+}ST_LOCATION;
+
+typedef struct{
     int chunkSize = 0;
     int imageSize = 0;
     QVector<int> data;
@@ -48,18 +60,9 @@ typedef struct{
     float gridwidth = 0;
     int origin[2] = {0,};
 
-    int locationSize = 0;
-    QVector<QString> locationName;
-    QVector<ST_POSE> locationsPose;
-
-    int travellineSize = 0;
-    QVector<QString> travellineName;
-    QVector<QVector<ST_FPOINT>> travellinePose;
-
-    int objectSize = 0;
-    QVector<QString> objectName;
-    QVector<QVector<ST_FPOINT>> objectPose;
-
+    QVector<ST_LOCATION> vecLocation;
+    QVector<QVector<ST_FPOINT>> vecTline;
+    QVector<ST_OBJECT> vecObject;
 
     float margin;
     bool use_server;

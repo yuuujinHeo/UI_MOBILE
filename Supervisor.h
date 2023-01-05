@@ -177,6 +177,8 @@ public:
 
     Q_INVOKABLE float getMargin();
     Q_INVOKABLE int getLocationNum();
+    Q_INVOKABLE int getLocationSize(QString type);
+    Q_INVOKABLE QString getLocationName(int num);
     Q_INVOKABLE QString getLocationTypes(int num);
     Q_INVOKABLE float getLocationx(int num);
     Q_INVOKABLE float getLocationy(int num);
@@ -209,18 +211,19 @@ public:
     Q_INVOKABLE int getLocNum(int x, int y);
 
     Q_INVOKABLE void addObjectPoint(int x, int y);
-    Q_INVOKABLE void editObjectPoint(int num, int x, int y);
     Q_INVOKABLE void removeObjectPoint(int num);
     Q_INVOKABLE void removeObjectPointLast();
     Q_INVOKABLE void clearObjectPoints();
-    Q_INVOKABLE void addObject(QString name);
-    Q_INVOKABLE void editObjectRect(int num, int point, int x, int y);
+    Q_INVOKABLE int getObjectSize(QString type);
+    Q_INVOKABLE void addObject(QString type);
+    Q_INVOKABLE void addObjectRect(QString type);
+    Q_INVOKABLE void editObject(int num, int point, int x, int y);
 
-    Q_INVOKABLE void removeObject(QString name);
-    Q_INVOKABLE void moveObjectPoint(int obj_num, int point_num, int x, int y);
+    Q_INVOKABLE void removeObject(int num);
 
+//    Q_INVOKABLE void clearLocationTemp();
     Q_INVOKABLE void removeLocation(QString name);
-    Q_INVOKABLE void addLocation(QString name, int x, int y, float th);
+    Q_INVOKABLE void addLocation(QString type, QString name, int x, int y, float th);
     Q_INVOKABLE void moveLocationPoint(int loc_num, int x, int y, float th);
     //******************************************************************Travel line
     Q_INVOKABLE int getTlineSize();
@@ -231,10 +234,9 @@ public:
 
     Q_INVOKABLE void addTline(int num, int x1, int y1, int x2, int y2);
     Q_INVOKABLE void removeTline(int num, int line);
-    Q_INVOKABLE int getTlineNum(QString name);
     Q_INVOKABLE int getTlineNum(int x, int y);
-    Q_INVOKABLE void saveAnnotation(QString filename);
-    Q_INVOKABLE void saveMetaData(QString filename);
+    Q_INVOKABLE bool saveAnnotation(QString filename);
+    Q_INVOKABLE bool saveMetaData(QString filename);
     Q_INVOKABLE void sendMaptoServer();
 
 

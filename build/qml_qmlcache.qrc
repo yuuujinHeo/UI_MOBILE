@@ -6,8 +6,6 @@
         <file alias="image/rainbow3.png">../image/rainbow3.png</file>
         <file alias="image/rainbow4.png">../image/rainbow4.png</file>
         <file alias="bgm/song.mp3">../bgm/song.mp3</file>
-        <file alias="image/joy_finger.png">../image/joy_finger.png</file>
-        <file alias="image/joy_background.png">../image/joy_background.png</file>
         <file alias="bgm/voice_start_serving.mp3">../bgm/voice_start_serving.mp3</file>
         <file alias="bgm/voice_pickup.mp3">../bgm/voice_pickup.mp3</file>
         <file alias="bgm/voice_move_wait.mpga">../bgm/voice_move_wait.mpga</file>
@@ -68,5 +66,23 @@
         <file alias="icon/icon_server_connect.png">../icon/icon_server_connect.png</file>
         <file alias="icon/icon_joy_connect.png">../icon/icon_joy_connect.png</file>
         <file alias="icon/btn_lock.png">../icon/btn_lock.png</file>
+        <file alias="icon/icon_transmit_server.png">../icon/icon_transmit_server.png</file>
+        <file alias="icon/icon_meta_save.png">../icon/icon_meta_save.png</file>
+        <file alias="icon/icon_annot_save.png">../icon/icon_annot_save.png</file>
+        <file alias="icon/icon_remove.png">../icon/icon_remove.png</file>
+        <file alias="icon/icon_error.png">../icon/icon_error.png</file>
+        <file alias="icon/icon_edit.png">../icon/icon_edit.png</file>
+        <file alias="icon/icon_undo.png">../icon/icon_undo.png</file>
+        <file alias="icon/icon_redo.png">../icon/icon_redo.png</file>
+        <file alias="icon/icon_move.png">../icon/icon_move.png</file>
+        <file alias="icon/icon_erase.png">../icon/icon_erase.png</file>
+        <file alias="icon/icon_draw.png">../icon/icon_draw.png</file>
+        <file alias="icon/btn_reset2.png">../icon/btn_reset2.png</file>
+        <file alias="icon/icon_server_download.png">../icon/icon_server_download.png</file>
+        <file alias="icon/icon_open.png">../icon/icon_open.png</file>
+        <file alias="icon/icon_add.png">../icon/icon_add.png</file>
+        <file alias="image/image_slam.png">../image/image_slam.png</file>
+        <file alias="image/image_patrol.png">../image/image_patrol.png</file>
+        <file alias="image/image_annot.png">../image/image_annot.png</file>
     </qresource>
 </RCC>

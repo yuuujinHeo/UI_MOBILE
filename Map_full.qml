@@ -165,6 +165,12 @@ Item {
         update_canvas_all();
     }
 
+    function brushchanged(){
+        brushview.visible = true;
+    }
+    function brushdisappear(){
+        brushview.visible = false;
+    }
 
     //////========================================================================================Map Image Variable
     property var grid_size: 0.02
@@ -473,6 +479,7 @@ Item {
                             supervisor.stopLine();
                         }else if(tool == "ADD_POINT"){//add point
                             supervisor.addObjectPoint(point1.x, point1.y);
+                            loader_menu.item.check_object_size();
                         }else if(tool == "EDIT_POINT"){
                             select_object_point = -1;
                             supervisor.setObjPose();
@@ -508,6 +515,7 @@ Item {
                             supervisor.addObjectPoint(new_obj_x1,new_obj_y2);
                             supervisor.addObjectPoint(new_obj_x2,new_obj_y2);
                             supervisor.addObjectPoint(new_obj_x2,new_obj_y1);
+                            loader_menu.item.check_object_size();
                         }else{
                             if(state_annotation == "OBJECT"){
                                 select_object = supervisor.getObjNum(point1.x,point1.y);
@@ -583,11 +591,11 @@ Item {
                         canvas_map.requestPaint()
                     }else if(tool == "EDIT_POINT"){
                         if(select_object_point != -1){
-                            supervisor.moveObjectPoint(select_object,select_object_point,point1.x, point1.y);
+                            supervisor.editObject(select_object,select_object_point,point1.x, point1.y);
                         }
                     }else if(tool == "EDIT_OBJECT"){
                         if(select_object_point != -1){
-                            supervisor.editObjectRect(select_object, select_object_point, point1.x, point1.y);
+                            supervisor.editObject(select_object, select_object_point, point1.x, point1.y);
                         }
                     }else if(tool == "ADD_LOCATION"){
                         if(point1.y-new_loc_y == 0){
@@ -678,6 +686,7 @@ Item {
             }
         }
 
+
         Rectangle{
             id: brushview
             visible: false
@@ -693,15 +702,25 @@ Item {
             anchors.fill: parent
             color: "transparent"
             visible: !is_slam_running && !just_show_map
-            border.color: "red"
+            border.color: "#E7584D"
             border.width: 5
-            Text{
+            Column{
                 anchors.centerIn: parent
-                text: "SLAM 활성화 안됨"
-                font.family: font_noto_b.name
-                font.pixelSize: 40
-                color: "red"
+                spacing: 10
+                Image{
+                    width: 100
+                    height: 100
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    source: "icon/icon_warning.png"
+                }
+                Text{
+                    text: "SLAM 활성화 안됨"
+                    font.family: font_noto_b.name
+                    font.pixelSize: 40
+                    color: "#E7584D"
+                }
             }
+
         }
     }
 
@@ -742,6 +761,7 @@ Item {
         running: flag_margin
         repeat: false
         onTriggered: {
+            print("update_checker")
             updatelocationcollision();
             flag_margin = false;
         }
@@ -800,6 +820,7 @@ Item {
         show_robot = false;
         show_travelline = false;
         update_canvas_all();
+        map.clear_margin();
     }
 
     property var map_array:[]
@@ -819,12 +840,14 @@ Item {
 
         var data = supervisor.getMapping();
         var temp = ctx.createImageData(1000,1000);
+
         for(var i=0; i<temp.data.length; i=i+4){
             temp.data[i] = data[i/4];
             temp.data[i+1] = data[i/4];
             temp.data[i+2] = data[i/4];
             temp.data[i+3] = 255;
         }
+
         ctx.drawImage(temp,0,0,1000,1000);
         canvas_map.requestPaint();
     }
@@ -865,7 +888,7 @@ Item {
         canvas_map.requestPaint();
         canvas_object.requestPaint();
         canvas_location.requestPaint();
-        canvas_map_margin.requestPaint();
+//        canvas_map_margin.requestPaint();
         canvas_map_cur.requestPaint();
         canvas_travelline.requestPaint();
     }
@@ -873,7 +896,10 @@ Item {
         canvas_map_cur.requestPaint();
     }
     function update_margin(){
-        update_checker.restart();
+        update_checker.start();
+        canvas_map_margin.requestPaint();
+    }
+    function clear_margin(){
         canvas_map_margin.requestPaint();
     }
 
@@ -902,6 +928,7 @@ Item {
         }
     }
     function updatelocationcollision(){
+        print("updatelocationcollision")
         loader_menu.item.update();
     }
     function is_Col_loc(x,y){
@@ -1315,33 +1342,31 @@ Item {
 
     function draw_canvas_travelline(){
         var ctx = canvas_travelline.getContext('2d');
-
         ctx.lineCap = "round";
-
         var tline_num = supervisor.getTlineSize();
         for(var i=0; i<tline_num; i++){
             var linenum = supervisor.getTlineSize(i);
-            print(linenum);
             for(var j=0; j<linenum; j=j+2){
+                if(select_travel_line == i){
+                    if(select_line == j/2){
+                        ctx.lineWidth = 5;
+                        ctx.strokeStyle = "yellow";
+                    }else{
+                        ctx.lineWidth = 3;
+                        ctx.strokeStyle = "red";
+                    }
 
-                if(select_travel_line == i && select_line == j/2){
-                    ctx.lineWidth = 5;
-                    ctx.strokeStyle = "yellow";
-                }else{
-                    ctx.lineWidth = 3;
-                    ctx.strokeStyle = "red";
+                    var linex = supervisor.getTlineX(i,j)/grid_size + origin_x;
+                    var liney = supervisor.getTlineY(i,j)/grid_size + origin_y;
+                    ctx.beginPath();
+                    ctx.moveTo(linex,liney);
+    //                print(linex,liney);
+                    linex = supervisor.getTlineX(i,j+1)/grid_size + origin_x;
+                    liney = supervisor.getTlineY(i,j+1)/grid_size + origin_y;
+                    ctx.lineTo(linex,liney);
+    //                print(linex,liney);
+                    ctx.stroke();
                 }
-
-                var linex = supervisor.getTlineX(i,j)/grid_size + origin_x;
-                var liney = supervisor.getTlineY(i,j)/grid_size + origin_y;
-                ctx.beginPath();
-                ctx.moveTo(linex,liney);
-                print(linex,liney);
-                linex = supervisor.getTlineX(i,j+1)/grid_size + origin_x;
-                liney = supervisor.getTlineY(i,j+1)/grid_size + origin_y;
-                ctx.lineTo(linex,liney);
-                print(linex,liney);
-                ctx.stroke();
             }
         }
 
