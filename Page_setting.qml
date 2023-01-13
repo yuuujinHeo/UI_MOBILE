@@ -1737,7 +1737,7 @@ Item {
                         else
                             supervisor.setserverCMD(true);
 
-                        supervisor.setSetting("ROBOT/radius",radius.text);
+                        supervisor.setSetting("ROBOT_HW/radius",radius.text);
 
 
                         supervisor.setSetting("MOTOR/gear_ratio",gear_ratio.text);
@@ -1751,17 +1751,17 @@ Item {
                         supervisor.setSetting("MOTOR/wheel_dir",wheel_dir.text);
                         supervisor.setSetting("MOTOR/right_id",right_id.text);
 
-                        supervisor.setSetting("ROBOT/k_curve",k_curve.text);
-                        supervisor.setSetting("ROBOT/k_v",k_v.text);
-                        supervisor.setSetting("ROBOT/k_w",k_w.text);
-                        supervisor.setSetting("ROBOT/limit_manual_v",limit_manual_v.text);
-                        supervisor.setSetting("ROBOT/limit_manual_w",limit_manual_w.text);
-                        supervisor.setSetting("ROBOT/limit_pivot",limit_pivot.text);
-                        supervisor.setSetting("ROBOT/limit_v",limit_v.text);
-                        supervisor.setSetting("ROBOT/limit_w",limit_w.text);
-                        supervisor.setSetting("ROBOT/look_ahead_dist",look_ahead_dist.text);
-                        supervisor.setSetting("ROBOT/wheel_base",wheel_base.text);
-                        supervisor.setSetting("ROBOT/wheel_radius",wheel_radius.text);
+                        supervisor.setSetting("ROBOT_SW/k_curve",k_curve.text);
+                        supervisor.setSetting("ROBOT_SW/k_v",k_v.text);
+                        supervisor.setSetting("ROBOT_SW/k_w",k_w.text);
+                        supervisor.setSetting("ROBOT_SW/limit_manual_v",limit_manual_v.text);
+                        supervisor.setSetting("ROBOT_SW/limit_manual_w",limit_manual_w.text);
+                        supervisor.setSetting("ROBOT_SW/limit_pivot",limit_pivot.text);
+                        supervisor.setSetting("ROBOT_SW/limit_v",limit_v.text);
+                        supervisor.setSetting("ROBOT_SW/limit_w",limit_w.text);
+                        supervisor.setSetting("ROBOT_SW/look_ahead_dist",look_ahead_dist.text);
+                        supervisor.setSetting("ROBOT_HW/wheel_base",wheel_base.text);
+                        supervisor.setSetting("ROBOT_HW/wheel_radius",wheel_radius.text);
 
 
                         supervisor.setSetting("SENSOR/baudrate",baudrate.text);

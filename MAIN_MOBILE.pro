@@ -49,15 +49,12 @@ HEADERS += \
     cv_to_qt.h \
     Supervisor.h
 
-
-
-INCLUDEPATH += $${HOME}
-
 # Libraries setting (for x86_64)
 contains(QT_ARCH, x86_64){
     # OpenCV library all
     INCLUDEPATH += /usr/include/opencv4/
     LIBS += -L/usr/lib/x86_64-linux-gnu/
+    LIBS += -L/usr/lib/aarch64-linux-gnu/
     LIBS += -lopencv_core \
             -lopencv_highgui \
             -lopencv_imgcodecs \
@@ -75,11 +72,14 @@ contains(QT_ARCH, x86_64){
     # LCM
     INCLUDEPATH += /usr/local/include/
     LIBS += -L/usr/local/lib/
+    INCLUDEPATH += /usr/include/lcm/
+    LIBS += -L/usr/lib/aarch64-linux-gnu/
     LIBS += -llcm
 
     # USB
     LIBS += -lusb
 }
+
 
 # Libraries setting (for aarch64)
 contains(QT_ARCH, arm64) {
