@@ -133,10 +133,16 @@ void Supervisor::readSetting(QString map_name){
     QString ini_path = getIniPath();
     QSettings setting_robot(ini_path, QSettings::IniFormat);
 
-    setting_robot.beginGroup("ROBOT");
-    probot->name = setting_robot.value("name").toString();
+    setting_robot.beginGroup("ROBOT_HW");
+    probot->model = setting_robot.value("model").toString();
+    probot->serial_num = setting_robot.value("serial_num").toInt();
+    probot->name = probot->model + QString::number(probot->serial_num);
+
     probot->radius = setting_robot.value("radius").toFloat();
     probot->type = setting_robot.value("type").toString();
+    setting_robot.endGroup();
+
+    setting_robot.beginGroup("ROBOT_SW");
     probot->velocity = setting_robot.value("velocity").toFloat();
     setting.tray_num = setting_robot.value("tray_num").toInt();
     setting.useVoice = setting_robot.value("use_voice").toBool();
@@ -316,7 +322,7 @@ void Supervisor::readSetting(QString map_name){
 }
 void Supervisor::setVelocity(float vel){
     probot->velocity = vel;
-    setSetting("ROBOT/velocity",QString::number(vel));
+    setSetting("ROBOT_SW/velocity",QString::number(vel));
     lcm->setVelocity(vel);
 }
 float Supervisor::getVelocity(){
@@ -338,7 +344,7 @@ int Supervisor::getTrayNum(){
     return setting.tray_num;
 }
 void Supervisor::setTrayNum(int tray_num){
-    setSetting("ROBOT/tray_num",QString::number(tray_num));
+    setSetting("ROBOT_SW/tray_num",QString::number(tray_num));
 }
 int Supervisor::getTableNum(){
     return setting.table_num;
@@ -356,13 +362,13 @@ bool Supervisor::getuseVoice(){
     return setting.useVoice;
 }
 void Supervisor::setuseVoice(bool use){
-    setSetting("ROBOT/use_voice",QVariant(use).toString());
+    setSetting("ROBOT_SW/use_voice",QVariant(use).toString());
 }
 bool Supervisor::getuseBGM(){
     return setting.useBGM;
 }
 void Supervisor::setuseBGM(bool use){
-    setSetting("ROBOT/use_bgm",QVariant(use).toString());
+    setSetting("ROBOT_SW/use_bgm",QVariant(use).toString());
 }
 bool Supervisor::getserverCMD(){
     return setting.useServerCMD;
@@ -372,9 +378,9 @@ void Supervisor::setserverCMD(bool use){
 }
 void Supervisor::setRobotType(int type){
     if(type == 0){
-        setSetting("ROBOT/type","SERVING");
+        setSetting("ROBOT_HW/type","SERVING");
     }else{
-        setSetting("ROBOT/type","CALLING");
+        setSetting("ROBOT_HW/type","CALLING");
     }
 }
 QString Supervisor::getRobotType(){
@@ -595,25 +601,26 @@ bool Supervisor::isExistRobotINI(){
 }
 void Supervisor::makeRobotINI(){
     plog->write("[SETTING] Make robot_config.ini basic format");
-    setSetting("ROBOT/name","test1");
-    setSetting("ROBOT/radius","0.27");
-    setSetting("ROBOT/tray_num","3");
-    setSetting("ROBOT/type","SERVING");
-    setSetting("ROBOT/use_bgm","true");
-    setSetting("ROBOT/use_voice","true");
-    setSetting("ROBOT/velocity","1.0");
-    setSetting("ROBOT/use_uicmd","true");
-    setSetting("ROBOT/k_curve","0.7");
-    setSetting("ROBOT/k_v","0.7");
-    setSetting("ROBOT/k_w","2.5");
-    setSetting("ROBOT/limit_manual_v","0.3");
-    setSetting("ROBOT/limit_manual_w","15.0");
-    setSetting("ROBOT/limit_pivot","45.0");
-    setSetting("ROBOT/limit_v","1.0");
-    setSetting("ROBOT/limit_w","120.0");
-    setSetting("ROBOT/look_ahead_dist","0.45");
-    setSetting("ROBOT/wheel_base","0.3542");
-    setSetting("ROBOT/wheel_radius","0.0635");
+    setSetting("ROBOT_HW/model","test");
+    setSetting("ROBOT_HW/serial_num","1");
+    setSetting("ROBOT_HW/radius","0.27");
+    setSetting("ROBOT_HW/tray_num","3");
+    setSetting("ROBOT_HW/type","SERVING");
+    setSetting("ROBOT_SW/use_bgm","true");
+    setSetting("ROBOT_SW/use_voice","true");
+    setSetting("ROBOT_SW/velocity","1.0");
+    setSetting("ROBOT_SW/use_uicmd","true");
+    setSetting("ROBOT_SW/k_curve","0.7");
+    setSetting("ROBOT_SW/k_v","0.7");
+    setSetting("ROBOT_SW/k_w","2.5");
+    setSetting("ROBOT_SW/limit_manual_v","0.3");
+    setSetting("ROBOT_SW/limit_manual_w","15.0");
+    setSetting("ROBOT_SW/limit_pivot","45.0");
+    setSetting("ROBOT_SW/limit_v","1.0");
+    setSetting("ROBOT_SW/limit_w","120.0");
+    setSetting("ROBOT_SW/look_ahead_dist","0.45");
+    setSetting("ROBOT_HW/wheel_base","0.3542");
+    setSetting("ROBOT_HW/wheel_radius","0.0635");
 
     setSetting("SERVER/travelline","0");
     setSetting("SERVER/use_servercmd","true");

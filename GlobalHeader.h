@@ -103,6 +103,8 @@ typedef struct{
 
     //mine
     QString name = "";
+    QString model = "";
+    int serial_num;
     QString name_debug = "";
     QString type = "SERVING";
     float velocity = 1.0;

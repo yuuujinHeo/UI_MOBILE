@@ -118,9 +118,10 @@ void ServerHandler::onTextMessageReceived(QString message){
         }else if(cmd == "SET_ROBOT"){
             QString ini_path = QDir::homePath()+"/robot_config.ini";
             QSettings settings(ini_path, QSettings::IniFormat);
-            settings.setValue("ROBOT/name",json["name"].toString());
-            settings.setValue("ROBOT/type",json["type"].toString());
-            settings.setValue("ROBOT/travelline",json["travel_line"].toInt());
+            settings.setValue("ROBOT_HW/model",json["model"].toString());
+            settings.setValue("ROBOT_HW/serial_num",json["serial_num"].toString());
+            settings.setValue("ROBOT_HW/type",json["type"].toString());
+            settings.setValue("ROBOT_SW/travelline",json["travel_line"].toInt());
             emit server_set_ini();
             plog->write("[SERVER] Set Robot Data : name("+json["name"].toString()+") type("+json["type"].toString()+")");
         }else if(cmd == "CALL_REQ"){
