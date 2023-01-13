@@ -48,6 +48,11 @@ HEADERS += \
     ServerHandler.h \
     cv_to_qt.h \
     Supervisor.h
+
+
+
+INCLUDEPATH += $${HOME}
+
 # Libraries setting (for x86_64)
 contains(QT_ARCH, x86_64){
     # OpenCV library all

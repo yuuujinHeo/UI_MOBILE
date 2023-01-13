@@ -64,13 +64,10 @@
         <file>icon/joy_right.png</file>
         <file>icon/joy_left.png</file>
         <file>icon/joy_down.png</file>
-        <file>icon/joy_connect.png</file>
         <file>icon/data_green.png</file>
         <file>icon/data_gray.png</file>
         <file>icon/icon_researching.png</file>
         <file>icon/icon_manualmove.png</file>
-        <file>icon/icon_connect_error.png</file>
-        <file>icon/icon_connect.png</file>
         <file>icon/icon_cancelpath.png</file>
         <file>image/robot_head_sleep.png</file>
         <file>image/robot_clear.png</file>
@@ -99,5 +96,20 @@
         <file>image/image_slam.png</file>
         <file>image/image_patrol.png</file>
         <file>image/image_annot.png</file>
+        <file>icon/bat_charge.png</file>
+        <file>icon/icon_server_disconnect.png</file>
+        <file>icon/icon_joy_disconnect.png</file>
+        <file>icon/icon_stop.png</file>
+        <file>icon/icon_cur.png</file>
+        <file>icon/icon_lidar.png</file>
+        <file>icon/icon_auto_init.png</file>
+        <file>icon/icon_point.png</file>
+        <file>icon/icon_run.png</file>
+        <file>icon/icon_set_init.png</file>
+        <file>image/joy_finger.png</file>
+        <file>image/joy_background.png</file>
+        <file>image/image_localization.png</file>
+        <file>icon/icon_connect_error.png</file>
+        <file>Item_button.qml</file>
     </qresource>
 </RCC>

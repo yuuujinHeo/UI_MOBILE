@@ -13,7 +13,6 @@ Item {
     property bool ui_slam_init: false
 
     onUi_slam_initChanged: {
-        print(ui_slam_init)
         if(ui_slam_init){
             loader_init.item.startinit();
         }else{
@@ -23,7 +22,6 @@ Item {
 
     Component.onCompleted: {
         init_mode = 0;
-        popup_show_map.show_mode = 0;
         update_timer.start();
         statusbar.visible = false;
     }
@@ -55,8 +53,8 @@ Item {
 
                 Image{
                     id: image_logo1
-                    width: 748/2
-                    height: 335/2
+                    sourceSize.width: 2245/6
+                    sourceSize.height: 1004/6
                     source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
                     anchors.horizontalCenter:  parent.horizontalCenter
                     y: 200
@@ -92,13 +90,24 @@ Item {
             function disable_rawmap(){
                 notice_map_raw.enabled = false;
             }
-            function enable_editedmap(){
+            function enable_availablemap(){
                 notice_map_edited.enabled = true;
             }
-            function disable_editedmap(){
+            function disable_availablemap(){
                 notice_map_edited.enabled = false;
             }
-
+            function enable_failload(){
+                notice_failload.enabled = true;
+            }
+            function disable_failload(){
+                notice_failload.enabled = false;
+            }
+            function enable_usb(){
+                btn_usb_load.enabled = true;
+            }
+            function disable_usb(){
+                btn_usb_load.enabled = false;
+            }
             Rectangle{
                 anchors.fill: parent
                 color: "#f4f4f4"
@@ -110,8 +119,8 @@ Item {
                 spacing:80
                 Image{
                     id: image_logo
-                    width: 748/2
-                    height: 335/2
+                    sourceSize.width: 2245/6
+                    sourceSize.height: 1004/6
                     anchors.horizontalCenter: parent.horizontalCenter
                     source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
                 }
@@ -191,7 +200,6 @@ Item {
                             onClicked: {
                                 loadPage(pmap);
                                 loader_page.item.map_mode = 1;
-        //                        supervisor.startSLAM();
                             }
                         }
                     }
@@ -230,15 +238,58 @@ Item {
                         }
                     }
                 }
+            }
 
+            Rectangle{
+                id: notice_failload
+                width: 220
+                height: 60
+                radius: 10
+                border.width: 3
+                border.color: "#E7584D"
+                color: "white"
+                enabled: false
+                anchors.right: parent.right
+                anchors.rightMargin: -20
+                visible: (y<200)?true:false
+                y: enabled?100:800
+                Behavior on y{
+                    SpringAnimation{
+                        duration: 1000
+                        spring: 1
+                        damping: 0.2
+                    }
+                }
+                Image{
+                    width: 30
+                    height: 27
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 15
+                    source: "icon/icon_error.png"
+                }
+                Text{
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10 + 20
+                    color: "#E7584D"
+                    font.family: font_noto_b.name
+                    text: "서버로 부터\n맵을 읽어오지 못함"
+                    font.bold: true
+                    font.pixelSize: 15
+                }
             }
             Rectangle{
                 id: notice_map_edited
-                width: 180
-                height: 50
-                color: "red"
+                width: 220
+                height: 60
+                radius: 10
+                border.width: 3
+                border.color: "#E7584D"
+                color: "white"
                 enabled: false
                 anchors.right: parent.right
+                anchors.rightMargin: -20
                 visible: (y<300)?true:false
                 y: enabled?200:800
                 Behavior on y{
@@ -248,25 +299,20 @@ Item {
                         damping: 0.2
                     }
                 }
-                Rectangle{
-                    width: 40
-                    height: parent.height
-                    radius: 10
-                    anchors.horizontalCenter: parent.left
+
+                Image{
+                    width: 30
+                    height: 27
                     anchors.verticalCenter: parent.verticalCenter
-                    color: parent.color
-                    Image{
-                        width: 30
-                        height: 30
-                        anchors.centerIn: parent
-                        source: "image/warning.png"
-                    }
+                    anchors.left: parent.left
+                    anchors.leftMargin: 15
+                    source: "icon/icon_error.png"
                 }
                 Text{
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
-                    anchors.rightMargin: 30
-                    color: "white"
+                    anchors.rightMargin: 10 + 20
+                    color: "#E7584D"
                     font.family: font_noto_b.name
                     text: "로컬 맵 파일 확인됨"
                     font.bold: true
@@ -275,18 +321,21 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        popup_show_map.show_mode = 1;
-                        popup_show_map.open();
+                        popup_map_list.open();
                     }
                 }
             }
             Rectangle{
                 id: notice_map_raw
-                width: 180
-                height: 50
-                color: "red"
+                width: 220
+                height: 60
+                radius: 10
+                border.width: 3
+                border.color: "#E7584D"
+                color: "white"
                 enabled: false
                 anchors.right: parent.right
+                anchors.rightMargin: -20
                 visible: (y<400)?true:false
                 y: enabled?300:800
                 Behavior on y{
@@ -296,34 +345,28 @@ Item {
                         damping: 0.2
                     }
                 }
-                Rectangle{
-                    width: 40
-                    height: parent.height
-                    radius: 10
-                    anchors.horizontalCenter: parent.left
+                Image{
+                    width: 30
+                    height: 27
                     anchors.verticalCenter: parent.verticalCenter
-                    color: parent.color
-                    Image{
-                        width: 30
-                        height: 30
-                        anchors.centerIn: parent
-                        source: "image/warning.png"
-                    }
+                    anchors.left: parent.left
+                    anchors.leftMargin: 15
+                    source: "icon/icon_error.png"
                 }
                 Text{
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
-                    anchors.rightMargin: 30
+                    anchors.rightMargin: 10 + 20
+                    color: "#E7584D"
                     font.family: font_noto_b.name
-                    color: "white"
-                    text: "설정되지 않은 맵 파일 확인됨"
+                    text: "설정되지 않은맵 파일\n확인됨"
                     font.bold: true
-                    font.pixelSize: 10
+                    font.pixelSize: 15
                 }
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        popup_show_map.show_mode = 2;
+                        popup_show_map.is_server = false;
                         popup_show_map.open();
                     }
                 }
@@ -351,8 +394,8 @@ Item {
                 spacing:80
                 Image{
                     id: image_logo2
-                    width: 748/2
-                    height: 335/2
+                    sourceSize.width: 2245/6
+                    sourceSize.height: 1004/6
                     anchors.horizontalCenter: parent.horizontalCenter
                     source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
                 }
@@ -454,8 +497,8 @@ Item {
                 spacing:80
                 Image{
                     id: image_logo3
-                    width: 748/2
-                    height: 335/2
+                    sourceSize.width: 2245/6
+                    sourceSize.height: 1004/6
                     anchors.horizontalCenter: parent.horizontalCenter
                     source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
                 }
@@ -562,72 +605,10 @@ Item {
                 anchors.fill: parent
                 color: "#f4f4f4"
             }
-            function startinit(){
-                ani_do_init.start();
-            }
-            function startreturn(){
-                ani_do_init_return.start();
-            }
-
-            SequentialAnimation{
-                id: ani_do_init
-                running: false
-                onStarted:  {
-                    text_slaminimize.visible = false;
-                    text_slam_pass.visible = false;
-                }
-
-                ParallelAnimation{
-                    NumberAnimation{target: btn_slam_minimize; property:"width"; from:200; to:50; duration: 500;}
-                    NumberAnimation{target: btn_slam_minimize; property:"height"; from:150; to:50; duration: 500;}
-                    NumberAnimation{target: btn_slam_minimize; property:"radius"; from:15; to:50; duration: 500;}
-                    NumberAnimation{target: btn_slam_pass; property:"width"; from:200; to:50; duration: 500;}
-                    NumberAnimation{target: btn_slam_pass; property:"height"; from:150; to:50; duration: 500;}
-                    NumberAnimation{target: btn_slam_pass; property:"radius"; from:15; to:50; duration: 500;}
-                    NumberAnimation{target: btn_slam_do_init; property:"opacity"; from:1; to:0; duration: 500;}
-                }
-                ParallelAnimation{
-                    NumberAnimation{target: image_logo4; property:"anchors.topMargin"; from:200; to:-image_logo4.height; duration: 500;}
-                    NumberAnimation{target: btn_slam_minimize; property:"anchors.rightMargin"; from:50; to:400; duration: 500;}
-//                    NumberAnimation{target: btn_slam_minimize; property:"anchors.topMargin"; from:80; to:-100; duration: 500;}
-                    NumberAnimation{target: btn_slam_pass; property:"anchors.leftMargin"; from:50; to:400; duration: 500;}
-//                    NumberAnimation{target: btn_slam_pass; property:"anchors.topMargin"; from:80 to:-100; duration: 500;}
-                }
-                onFinished: {
-                    btn_slam_do_init.visible = false;
-                    map_slam_init.visible = true;
-                    map_slam_init.loadmap(map_path);
-                }
-            }
-            SequentialAnimation{
-                id: ani_do_init_return
-                running: false
-                onStarted: {
-                    btn_slam_do_init.visible = true;
-                    map_slam_init.visible = false;
-                }
-
-                ParallelAnimation{
-                    NumberAnimation{target: image_logo4; property:"anchors.topMargin"; from:-200; to:80; duration: 500;}
-                    NumberAnimation{target: btn_slam_minimize; property:"anchors.rightMargin"; from:-500; to:30; duration: 500;}
-                    NumberAnimation{target: btn_slam_minimize; property:"anchors.topMargin"; from:-50; to:50; duration: 500;}
-                }
-                ParallelAnimation{
-                    NumberAnimation{target: btn_slam_minimize; property:"width"; from:50; to:200; duration: 500;}
-                    NumberAnimation{target: btn_slam_minimize; property:"height"; from:50; to:150; duration: 500;}
-                    NumberAnimation{target: btn_slam_minimize; property:"radius"; from:50; to:15; duration: 500;}
-                    NumberAnimation{target: btn_slam_do_init; property:"opacity"; from:0; to:1; duration: 500;}
-                }
-                onFinished: {
-//                    text_slaminimize.visible = true;
-//                    text_slam_pass.visible = true;
-                }
-            }
-
             Image{
                 id: image_logo4
-                width: 748/2
-                height: 335/2
+                sourceSize.width: 2245/6
+                sourceSize.height: 1004/6
                 anchors.top: parent.top
                 anchors.topMargin: 200
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -702,10 +683,10 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        if(ui_slam_init)
-                            ui_slam_init = false;
-                        else
-                            ui_slam_init = true;
+                        loadPage(pmap);
+                        loader_page.item.is_init_state = true;
+                        loader_page.item.map_mode = 4;
+                        loader_page.item.init();
                     }
                 }
             }
@@ -746,22 +727,29 @@ Item {
                     }
                 }
             }
-
-            Map_full{
-                id: map_slam_init
-                width: 600
-                height: 600
-                visible: false
-                show_object: true
-                show_robot: true
-                show_lidar: true
-                just_show_map: true
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: text_notice4.bottom
-                anchors.topMargin: 50
-            }
         }
 
+    }
+
+    function loadmap_server(result){
+        if(result){
+            update_timer.stop();
+            popup_show_map.is_server = true;
+            popup_show_map.open();
+        }else{
+            loader_init.item.enable_failload();
+            failload_timer.start();
+        }
+    }
+
+    Timer{
+        id: failload_timer
+        interval: 2000
+        running: false
+        repeat: false
+        onTriggered: {
+            loader_init.item.disable_failload();
+        }
     }
 
     Timer{
@@ -773,55 +761,49 @@ Item {
             //체크 : robot.ini 존재여부
             if(init_mode == 0){
                 if(supervisor.isExistRobotINI()){
+                    supervisor.writelog("[QML] INIT - Ini found");
                     init_mode = 1;
                 }else{
                     if(loader_init.item.objectName != "init_ini"){
                         loader_init.sourceComponent = item_ini_init
-                        supervisor.writelog("[QML - ERROR] robot.ini not found.");
+                        supervisor.writelog("[QML - ERROR] robot_config.ini not found.");
                     }
                 }
             //체크 : 맵 파일 존재여부 및 설정
             }else if(init_mode == 1){
                 //supervisor가 ini파일을 성공적으로 읽었을 때까지 대기
                 if(supervisor.getIniRead()){
-
-                    //map존재여부 확인 -> 0: 아무것도 없음, 1: 서버맵파일 확인 됨, 2: 로컬맵파일 확인 됨, 3: 로컬맵(설정안됨) 확인 됨
-                    var map_exist = supervisor.isExistMap();
-
-                    //이미 설정확인된 맵이 존재한다면 다음으로 넘어감
-                    if(supervisor.isloadMap() || map_exist == 1){
-                        if(supervisor.isuseServerMap()){
-                            setMapPath("file://" + applicationDirPath + "/image/map_rotated.png","map_rotated.png");
-                        }else{
-                            setMapPath("file://" + applicationDirPath + "/image/map_edited.png","map_edited.png");
-                        }
-                        supervisor.make_minimap();
+                    var map_name = supervisor.getMapname();
+                    //annotation과 map 존재여부 확인
+                    if(supervisor.isExistAnnotation(map_name) && supervisor.isExistMap()){
+                        //이미 설정확인된 맵이 존재한다면 다음으로 넘어감
+                        supervisor.writelog("[QML] INIT - Map found");
+                        popup_ask_annotation_use.close();
+                        popup_map_list.close();
                         init_mode = 2;
                     }else{
+                        //annotation, map 둘 중 하나라도 없으면 안내페이지 표시
                         if(loader_init.item.objectName != "init_map"){
                             loader_init.sourceComponent = item_map_init
                         }
-
-                        if(map_exist == 1){
-                            //Map Exist!!!!
-                            print("map find!!");
-                            notice_map_raw.enabled = false;
-                            notice_map_edited.enabled = false;
-                            update_timer.stop();
-                            popup_show_map.show_mode = 0;
-                            popup_show_map.open();
+                        //USB연결 확인
+                        if(supervisor.getUsbMapSize() > 0){
+                            loader_init.item.enable_usb();
                         }else{
-                            if(map_exist== 2){
-                                //show map_edited exist
-                                loader_init.item.disable_rawmap();
-                                loader_init.item.enable_editedmap();
-                            }else if(map_exist == 3){
-                                //show raw_map exist
-                                loader_init.item.enable_rawmap();
-                                loader_init.item.disable_editedmap();
+                            loader_init.item.disable_usb();
+                        }
+
+                        //설정 된 맵은 있지만 annotation은 없는 경우
+                        if(supervisor.isExistMap()){
+                            loader_init.item.enable_rawmap();
+                        }else{
+                            loader_init.item.disable_rawmap();
+                            //가능한 다른 맵이 있는 경우
+                            var available_map_num = supervisor.getAvailableMap();
+                            if(available_map_num > 0){
+                                loader_init.item.enable_availablemap();
                             }else{
-                                loader_init.item.disable_rawmap();
-                                loader_init.item.disable_editedmap();
+                                loader_init.item.disable_availablemap();
                             }
                         }
                     }
@@ -838,16 +820,20 @@ Item {
                     if(loader_init.item.objectName != "init_slam")
                         loader_init.sourceComponent = item_slam_init
                 }else{
+                    if(loader_init.item.objectName != "init_slam")
+                        loader_init.sourceComponent = item_slam_init
+
+
+
+
+
                     init_mode = 4;
-                    update_timer.stop();
-                    loadPage(pkitchen);
+//                    update_timer.stop();
+//                    loadPage(pkitchen);
 
                 }
             }
-            }
-
-
-
+        }
     }
 
     //USB 맵 목록 보여주기
@@ -860,8 +846,6 @@ Item {
             color: "#282828"
             opacity: 0.7
         }
-
-
         onOpened: {
             list_map_usb.model.clear();
             var num = supervisor.getUsbMapSize();
@@ -954,9 +938,127 @@ Item {
                     }
                 }
             }
+        }
+    }
 
+    property int select_map_list: -1
+    Component{
+        id: maplistCompo
+        Item{
+            width: parent.width
+            height: 40
+            Rectangle{
+                id: background
+                visible: select_map_list==index?true:false
+                anchors.fill: parent
+                radius: 5
+                color: "#12d27c"
+            }
+            Text{
+                id: text_map_name
+                anchors.centerIn: parent
+                font.family: font_noto_r.name
+                text: name
+                color: "white"
+            }
+            Rectangle//리스트의 구분선
+            {
+                id:line
+                width:parent.width
+                anchors.bottom:parent.bottom//현재 객체의 아래 기준점을 부모객체의 아래로 잡아주어서 위치가 아래로가게 설정
+                height:1
+                color: "#d0d0d0"
+            }
+            MouseArea{
+                id:area_compo
+                anchors.fill:parent
+                onClicked: {
+                    list_map.currentIndex = index;
+                    if(select_map_list == index){
+                        select_map_list = -1;
+                        map_list_view.loadmap("");
+                        map_list_view.init_mode();
+                        btn_use.enabled = false;
+                        btn_draw.enabled = false;
+                        btn_draw_new.enabled = false;
+                        btn_erase.enabled = false;
+                    }else{
+                        select_map_list = index;
+
+                        btn_erase.enabled = true;
+
+
+                        if(supervisor.isExistMap(name)){
+                            if(supervisor.isExistAnnotation(name)){
+                                btn_use.enabled = true;
+                                btn_draw.enabled = true;
+                                btn_draw_new.enabled = true;
+                            }else{
+                                btn_draw_new.enabled = true;
+                            }
+                        }else{
+                            if(supervisor.isExistRawMap()){
+                                btn_draw_new.enabled = true;
+                                if(supervisor.isExistAnnotation(name)){
+                                    btn_draw.enabled = true;
+                                }
+                            }else{
+
+                            }
+
+                        }
+                        list_map_detail.model.clear();
+                        var num = supervisor.getMapFileSize(name);
+                        for(var i=0; i<num; i++){
+                            list_map_detail.model.append({"name":supervisor.getMapFile(i)});
+                        }
+                        supervisor.readSetting(name);
+                        map_list_view.loadmap(name);
+                        map_list_view.init_mode();
+                        map_list_view.show_location = true;
+                        map_list_view.show_object = true;
+                        map_list_view.show_travelline = true;
+                    }
+                }
+            }
         }
 
+    }
+    Component{
+        id: mapdetaillistCompo
+        Item{
+            width: parent.width
+            height: 40
+            Rectangle{
+                id: background
+                visible: select_map_list==index?true:false
+                anchors.fill: parent
+                radius: 5
+                color: "#12d27c"
+            }
+            Text{
+                id: text_map_name
+                anchors.centerIn: parent
+                font.family: font_noto_r.name
+                text: name
+                color: "white"
+            }
+            Rectangle//리스트의 구분선
+            {
+                id:line
+                width:parent.width
+                anchors.bottom:parent.bottom//현재 객체의 아래 기준점을 부모객체의 아래로 잡아주어서 위치가 아래로가게 설정
+                height:1
+                color: "#d0d0d0"
+            }
+            MouseArea{
+                id:area_compo
+                anchors.fill:parent
+                onClicked: {
+                    list_map_detail.currentIndex = index;
+                }
+            }
+        }
 
     }
     Component {
@@ -967,7 +1069,7 @@ Item {
             Rectangle {
                 visible: selected
                 anchors.fill: parent
-                color: "lightsteelblue"
+                color: "#12d27c"
                 radius: 5
             }
             Text {
@@ -1026,16 +1128,518 @@ Item {
         id: popup_show_map_light
         width: 500
         height: 500
+        leftPadding: 0
+        rightPadding: 0
+        topPadding: 0
+        bottomPadding: 0
         anchors.centerIn: parent
         property string map: ""
         onOpened: {
             map_load2.just_show_map = true;
-            map_load2.loadmap("file:/" + map);
+            map_load2.loadmap(map);
         }
         Map_full{
             id: map_load2
             anchors.fill: parent
         }
+    }
+    Popup{
+        id: popup_ask_annotation_use
+        width: parent.width
+        height: parent.height
+        anchors.centerIn: parent
+        closePolicy: Popup.NoAutoClose
+        background: Rectangle{
+            color:"#282828"
+            opacity: 0.8
+        }
+
+        Rectangle{
+            width: 450
+            height: 200
+            anchors.centerIn: parent
+            color: "white"
+            radius: 10
+            Column{
+                anchors.centerIn: parent
+                spacing: 30
+                Column{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text {
+                        id: text_title_ask
+                        text: "사용가능한 <font color=\"#12d27c\">Annotation</font> 파일을 찾았습니다."
+                        font.family: font_noto_r.name
+                        horizontalAlignment: Text.AlignHCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: 20
+                    }
+                    Text {
+                        id: text_title_ask3
+                        text: "확인 후 사용하지 않거나 수정할 수 있습니다."
+                        font.family: font_noto_r.name
+                        horizontalAlignment: Text.AlignHCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: 15
+                    }
+                }
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 20
+                    Rectangle{
+                        id: btn_prev_0
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color:"transparent"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "사용 안함"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_ask_annotation_use.close();
+                                use_annotation = false;
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: btn_next_0
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color: "#12d27c"
+                        border.width: 1
+                        border.color: "#12d27c"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "사용"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_ask_annotation_use.close();
+                                use_annotation = true;
+                            }
+                        }
+                    }
+                }
+
+            }
+
+        }
+
+    }
+
+    property string temp_name: ""
+    // 가능한 모든 맵 리스트 보여주기
+    Popup{
+        id: popup_map_list
+        width: 1280
+        height: 800
+        closePolicy: Popup.NoAutoClose
+        leftPadding: 0
+        rightPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        background:Rectangle{
+            anchors.fill: parent
+            color: "#282828"
+            opacity: 0.8
+        }
+        onOpened: {
+            list_map.model.clear();
+            var num = supervisor.getAvailableMap();
+            for(var i=0; i<num; i++){
+                list_map.model.append({"name":supervisor.getAvailableMapPath(i),"selected":false});
+            }
+            btn_use.enabled = false;
+            btn_draw.enabled = false;
+            btn_erase.enabled = false;
+        }
+        function update_list(){
+            list_map.model.clear();
+            var num = supervisor.getAvailableMap();
+            for(var i=0; i<num; i++){
+                list_map.model.append({"name":supervisor.getAvailableMapPath(i),"selected":false});
+            }
+            select_map_list = -1;
+            map_list_view.loadmap("");
+            map_list_view.init_mode();
+        }
+
+        Rectangle{
+            id: btn_menu
+            width: 120
+            height: width
+            anchors.right: parent.right
+            anchors.rightMargin: 50
+            anchors.top: parent.top
+            anchors.topMargin: 100
+            color: "white"
+            radius: 30
+            Behavior on width{
+                NumberAnimation{
+                    duration: 500;
+                }
+            }
+            Image{
+                id: image_btn_menu
+                source:"icon/btn_reset2.png"
+                scale: 1-(120-parent.width)/120
+                anchors.centerIn: parent
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    popup_map_list.close();
+                }
+            }
+        }
+
+        Rectangle{
+            width: 900
+            height: 800
+            anchors.centerIn: parent
+            color:"transparent"
+
+            Rectangle{
+                id: rect_list_top
+                height: 100
+                width: parent.width
+                color: "transparent"
+                Column{
+                    anchors.centerIn: parent
+                    spacing: 10
+                    Text{
+                        id: text_list_title
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: "white"
+                        font.family: font_noto_b.name
+                        font.bold: true
+                        text: "확인된 맵 리스트"
+                        font.pixelSize: 30
+                    }
+                    Text{
+                        id: text_list_title2
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: "white"
+                        font.family: font_noto_r.name
+                        text: "로컬 경로를 통해 사용 가능한 맵 파일을 모두 찾았습니다. 원하는 파일을 선택하신 후 확인 버튼을 눌러주세요."
+                        font.pixelSize: 15
+                    }
+                }
+
+            }
+
+            Rectangle{
+                id: rect_list_top2
+                height: 170
+                width: parent.width
+                anchors.top: rect_list_top.bottom
+                Rectangle{
+                    id: rect_list_top_left
+                    width: parent.width
+                    height: parent.height
+                    color: "transparent"
+                    Rectangle{
+                        id: rect_list_menus
+                        width: parent.width*0.7
+                        height: 100
+                        radius: 5
+                        color: "#e8e8e8"
+                        anchors.centerIn: parent
+                        Row{
+                            anchors.centerIn: parent
+                            spacing: 30
+                            Rectangle{
+                                id: btn_use
+                                width: 78
+                                height: width
+                                radius: width
+                                enabled: false
+                                color:enabled?"white":"#f4f4f4"
+                                Column{
+                                    anchors.centerIn: parent
+                                    Image{
+                                        source: "icon/icon_move.png"
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+                                    Text{
+                                        text: "사용"
+                                        font.family: font_noto_r.name
+                                        color: btn_use.enabled?"#525252":"white"
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        if(select_map_list > -1){
+                                            supervisor.writelog("[USER INPUT] Map used changed : " + list_map.model.get(select_map_list).name);
+                                            supervisor.setMap(list_map.model.get(select_map_list).name);
+                                        }
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                id: btn_draw
+                                width: 78
+                                height: width
+                                radius: width
+                                Column{
+                                    anchors.centerIn: parent
+                                    Image{
+                                        source: "icon/icon_draw.png"
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+                                    Text{
+                                        text: "수정"
+                                        color: btn_draw.enabled?"#525252":"white"
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        if(select_map_list > -1){
+                                            var name = list_map.model.get(select_map_list).name;
+                                            popup_map_list.close();
+                                            loadPage(pmap);
+                                            loader_page.item.loadmap(name);
+                                            loader_page.item.is_init_state = true;
+                                            loader_page.item.map_mode = 2;
+                                            loader_page.item.init();
+                                        }
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                id: btn_erase
+                                width: 78
+                                height: width
+                                radius: width
+                                Column{
+                                    anchors.centerIn: parent
+                                    Image{
+                                        source: "icon/icon_erase.png"
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+                                    Text{
+                                        text: "삭제"
+                                        color: btn_erase.enabled?"#525252":"white"
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        supervisor.removeMap(list_map.model.get(select_map_list).name);
+                                        popup_map_list.update_list();
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                id: btn_draw_new
+                                width: 78
+                                height: width
+                                radius: width
+                                Column{
+                                    anchors.centerIn: parent
+                                    Image{
+                                        source: "icon/icon_draw.png"
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+                                    Text{
+                                        text: "새로 수정"
+                                        color: btn_draw_new.enabled?"#525252":"white"
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        if(select_map_list > -1){
+                                            var name = list_map.model.get(select_map_list).name;
+                                            if(supervisor.isExistAnnotation(name)){
+                                                temp_name = list_map.model.get(select_map_list).name;
+                                                popup_annotation_delete.open();
+                                            }else{
+                                                popup_map_list.close();
+                                                loadPage(pmap);
+                                                loader_page.item.loadmap(name);
+                                                loader_page.item.is_init_state = true;
+                                                loader_page.item.map_mode = 2;
+                                                loader_page.item.init();
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            Rectangle{
+                id: rect_list_left
+                height: parent.height - rect_list_top.height - rect_list_top2.height
+                width: 400
+                color: "transparent"
+                anchors.top: rect_list_top2.bottom
+                Row{
+                    anchors.centerIn: parent
+                    ListView {
+                        id: list_map
+                        width: select_map_list==-1?400:200
+                        Behavior on width {
+                            NumberAnimation{
+                                duration : 500;
+                            }
+                        }
+
+                        height: 250
+                        clip: true
+                        model: ListModel{}
+                        delegate: maplistCompo
+                        focus: true
+                    }
+                    ListView {
+                        id: list_map_detail
+//                        visible: select_map_list==-1?false:true
+                        width: select_map_list==-1?0:200
+                        Behavior on width {
+                            NumberAnimation{
+                                duration : 500;
+                            }
+                        }
+//                        width: 200
+                        height: 250
+                        clip: true
+                        model: ListModel{}
+                        delegate: mapdetaillistCompo
+                        focus: true
+                    }
+                }
+
+
+            }
+
+            Rectangle{
+                id: rect_list_right
+                color: "transparent"
+                width: parent.width - rect_list_left.width
+                height: parent.height - rect_list_top.height - rect_list_top2.height
+                anchors.top: rect_list_left.top
+                anchors.left: rect_list_left.right
+
+                Map_full{
+                    id: map_list_view
+                    width: parent.width
+                    height: width
+                    anchors.centerIn: parent
+                    just_show_map: true
+                }
+            }
+        }
+    }
+
+    Popup{
+        id: popup_annotation_delete
+        width: parent.width
+        height: parent.height
+        background:Rectangle{
+            anchors.fill: parent
+            color: "#282828"
+            opacity: 0.7
+        }
+        Rectangle{
+            anchors.centerIn: parent
+            width: 400
+            height: 250
+            color: "white"
+            radius: 10
+
+            Column{
+                anchors.centerIn: parent
+                spacing: 40
+                Column{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        text: "기존 annotation이 삭제됩니다."
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 20
+                    Rectangle{
+                        id: btn_prev_00
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color:"transparent"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "취소"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_annotation_delete.close();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: btn_next_00
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color: "#12d27c"
+                        border.width: 1
+                        border.color: "#12d27c"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "확인"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_annotation_delete.close();
+                                popup_map_list.close();
+                                supervisor.deleteAnnotation();
+                                loadPage(pmap);
+                                loader_page.item.loadmap(temp_name);
+                                loader_page.item.is_init_state = true;
+                                loader_page.item.map_mode = 2;
+                                loader_page.item.init();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     //서버 맵 보여주기
@@ -1048,24 +1652,18 @@ Item {
             color: "#282828"
             opacity: 0.8
         }
-        property int show_mode: 0 //0: server 1: edited 2: raw 3:just map
+        property bool is_server: false
         onOpened: {
             map_load.just_show_map = true;
-            if(show_mode == 0){
+            if(is_server){
                 text_show_popup.text = "서버로부터 맵을 로드했습니다.\n 매장의 환경과 일치하는 맵인지 확인해주세요."
-                map_load.loadmap("file://"+applicationDirPath+"/image/map_rotated.png");
-                map_load.show_object = true;
-                map_load.show_location = true;
-            }else if(show_mode == 1){
-                text_show_popup.text = "저장된 맵을 로드했습니다.\n 매장의 환경과 일치하는 맵인지 확인해주세요.\n 맵이 일치하지 않다면 [맵 삭제] 버튼을, 오브젝트나 로케이션을 수정하길 원하시면 [맵 수정] 버튼을 눌러주세요."
-                map_load.loadmap("file://"+applicationDirPath+"/image/map_edited.png");
-                map_load.show_object = true;
-                map_load.show_location = true;
+                map_load.loadmap(supervisor.getServerMapname());
             }else{
-                text_show_popup.text = "저장된 맵을 로드했습니다.\n 매장의 환경과 일치하는 맵이면 [맵 수정] 버튼을, 일치하지 않다면 [맵 삭제] 버튼을 눌러주세요.";
-                map_load.loadmap("file://"+applicationDirPath+"/image/map_raw.png");
-                map_load.init_mode();
+                text_show_popup.text = "매장의 환경과 일치하는 맵인지 확인해주세요."
+                map_load.loadmap(supervisor.getMapname());
             }
+            map_load.show_object = true;
+            map_load.show_location = true;
         }
         Text{
             id: text_show_popup
@@ -1078,101 +1676,175 @@ Item {
             font.pixelSize: 20
             horizontalAlignment: Text.AlignHCenter
         }
-
         Map_full{
             id: map_load
             width: 500
             height: 500
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: text_show_popup.bottom
-            anchors.topMargin: 30
+            anchors.top: rect_map_name.bottom
+            anchors.topMargin: 10
             just_show_map: true
+        }
+        Rectangle{
+            id: rect_map_name
+            width: map_load.width*0.9
+            radius: 5
+            height: 50
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: text_show_popup.bottom
+            anchors.topMargin: 20
+            color: "white"
+            Text{
+                anchors.centerIn: parent
+                color: "#282828"
+                font.family: font_noto_b.name
+                font.pixelSize: 20
+                text: popup_show_map.is_server?"MAP : " + supervisor.getServerMapname():"MAP : " + supervisor.getMapname();
+                horizontalAlignment: Text.AlignHCenter
+            }
+        }
+        Rectangle{
+            id: btn_menu2
+            width: 120
+            height: width
+            anchors.right: parent.right
+            anchors.rightMargin: 50
+            anchors.top: parent.top
+            anchors.topMargin: 100
+            color: "white"
+            radius: 30
+            Behavior on width{
+                NumberAnimation{
+                    duration: 500;
+                }
+            }
+            Image{
+                id: image_btn_menu2
+                source:"icon/btn_reset2.png"
+                scale: 1-(120-parent.width)/120
+                anchors.centerIn: parent
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    popup_show_map.close();
+                }
+            }
         }
         Row{
             id: row_button_2
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: map_load.bottom
-            anchors.topMargin: 30
+            anchors.topMargin: 20
             spacing: 30
-            Repeater{
-                model:{
-                    if(popup_show_map.show_mode == 0){
-                        ["맵 사용","맵 사용안함"]
-                    }else if(popup_show_map.show_mode == 1){
-                        ["맵 사용","맵 수정","맵 삭제"]
-                    }else if(popup_show_map.show_mode == 2){
-                        ["맵 수정","맵 삭제"]
+
+            Rectangle{
+                id: btn_use_map
+                width: 78
+                height: width
+                radius: width
+                visible: popup_show_map.is_server
+                color:"white"
+                Column{
+                    anchors.centerIn: parent
+                    Image{
+                        source: "icon/icon_move.png"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        text: "사용"
+                        font.family: font_noto_r.name
+                        color: "#525252"
+                        anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }
-                Rectangle{
-                    id: btn
-                    width: 150
-                    height: 70
-                    radius: 15
-                    color: "#D0D0D0"
-                    Text{
-                        anchors.centerIn: parent
-                        text: modelData
-                        font.pixelSize: 20
-                        font.family: font_noto_b.name
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            if(modelData == "맵 사용"){
-                                if(popup_show_map.show_mode == 0){
-                                    print("server use");
-                                    popup_show_map.close();
-                                    supervisor.setuseServerMap(true);
-                                    supervisor.make_minimap();
-                                    setMapPath("file://" + applicationDirPath + "/image/map_rotated.png", "map_rotated.png")
-                                    supervisor.setloadMap(true);
-                                }else{
-                                    popup_show_map.close();
-                                    supervisor.setuseServerMap(false);
-                                    supervisor.make_minimap();
-                                    setMapPath("file://" + applicationDirPath + "/image/map_edited.png", "map_edited.png")
-                                    supervisor.setloadMap(true);
-                                }
-                                init_mode = 2;
-                            }else if(modelData == "맵 수정"){
-                                statusbar.visible = true;
-                                if(popup_show_map.show_mode == 1){
-                                    popup_show_map.close();
-                                    setMapPath("file://" + applicationDirPath + "/image/map_edited.png", "map_edited.png")
-                                    loadPage(pmap);
-                                    loader_page.item.map_mode = 2;
-                                    loader_page.item.init();
-//                                    loadPage(pmapinit);
-//                                    loader_page.map_mode = 2;
-                                }else if(popup_show_map.show_mode == 2){
-                                    popup_show_map.close();
-                                    setMapPath("file://" + applicationDirPath + "/image/map_raw.png", "map_raw.png")
-                                    loadPage(pmap);
-                                    loader_page.item.map_mode = 2;
-//                                    loadPage(pmapinit);
-//                                    loader_page.item.map_mode = 2;
-                                    loader_page.item.init();
-                                }
-                            }else if(modelData == "맵 삭제"){
-                                if(popup_show_map.show_mode == 1){
-                                    supervisor.removeEditedMap();
-                                    popup_show_map.close();
-                                }else{
-                                    supervisor.removeRawMap();
-                                    popup_show_map.close();
-                                }
-                            }else if(modelData == "맵 사용안함"){
-                                supervisor.removeServerMap();
-                                popup_show_map.close();
-                            }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        if(popup_show_map.is_server){
+                            popup_show_map.close();
+                            //robot.ini에 서버맵정보를 넣고 annotation, map_meta.ini 수정
+                            supervisor.setuseServerMap(true);
                             update_timer.start();
                         }
                     }
                 }
             }
-
-
+            Rectangle{
+                id: btn_eidt_map
+                width: 78
+                height: width
+                radius: width
+                color:"white"
+                Column{
+                    anchors.centerIn: parent
+                    Image{
+                        source: "icon/icon_draw.png"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        text: "수정"
+                        font.family: font_noto_r.name
+                        color: "#525252"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        var name;
+                        if(popup_show_map.is_server){
+                            name = supervisor.getServerMapname();
+                        }else{
+                            name = supervisor.getMapname();
+                        }
+                        popup_show_map.close();
+                        loadPage(pmap);
+                        loader_page.item.loadmap(name);
+                        loader_page.item.is_init_state = true;
+                        loader_page.item.map_mode = 2;
+                        loader_page.item.init();
+                        update_timer.start();
+                    }
+                }
+            }
+            Rectangle{
+                id: btn_remove_map
+                width: 78
+                height: width
+                radius: width
+                color:"white"
+                Column{
+                    anchors.centerIn: parent
+                    Image{
+                        source: "icon/icon_erase.png"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        text: "삭제"
+                        font.family: font_noto_r.name
+                        color: "#525252"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        var name;
+                        if(popup_show_map.is_server){
+                            name = supervisor.getServerMapname();
+                        }else{
+                            name = supervisor.getMapname();
+                        }
+                        supervisor.removeMap(name);
+                        popup_show_map.close();
+                        update_timer.start();
+                    }
+                }
+            }
         }
     }
+
+
+
 }

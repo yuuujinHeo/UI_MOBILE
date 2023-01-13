@@ -33,6 +33,8 @@ public:
 
     ////*********************************************  VARIABLE   ***************************************************////
     QVector<QString> usb_map_list;
+    QVector<QString> map_list;
+    QVector<QString> map_detail_list;
     bool usb_check;
     int usb_check_count;
 
@@ -58,9 +60,16 @@ public:
 
     Q_INVOKABLE void writelog(QString msg);
 
+    Q_INVOKABLE QString getRawMapPath(QString name);
+    Q_INVOKABLE QString getMapPath(QString name);
+    Q_INVOKABLE QString getAnnotPath(QString name);
+    Q_INVOKABLE QString getMetaPath(QString name);
+    Q_INVOKABLE QString getIniPath();
+
     ////*********************************************  SETTING 관련   ***************************************************////
-    void setSetting(QString name, QString value);
-    Q_INVOKABLE void readSetting();
+    Q_INVOKABLE void setSetting(QString name, QString value);
+    Q_INVOKABLE void readSetting(QString map_name="");
+    Q_INVOKABLE QString getSetting(QString group, QString name);
     Q_INVOKABLE void setVelocity(float vel);
     Q_INVOKABLE float getVelocity();
     Q_INVOKABLE bool getuseTravelline();
@@ -89,19 +98,34 @@ public:
     Q_INVOKABLE bool getDebugState();
     Q_INVOKABLE void setDebugState(bool isdebug);
 
+    Q_INVOKABLE void requestCamera();
+    Q_INVOKABLE QString getLeftCamera();
+    Q_INVOKABLE QString getRightCamera();
+    Q_INVOKABLE void setCamera(QString left, QString right);
+    Q_INVOKABLE int getCameraNum();
+    Q_INVOKABLE QList<int> getCamera(int num);
+    Q_INVOKABLE QString getCameraSerial(int num);
+
+
     ////*********************************************  INIT PAGE 관련   ***************************************************////
     Q_INVOKABLE bool isConnectServer();
     //0:no map, 1:map_server, 2: map_edited only, 3:raw_map only
-    Q_INVOKABLE int isExistMap();
+    Q_INVOKABLE bool isExistMap(QString name);
+    Q_INVOKABLE bool isExistRawMap(QString name);
+    Q_INVOKABLE bool isExistMap();
+    Q_INVOKABLE int getAvailableMap();
+    Q_INVOKABLE QString getAvailableMapPath(int num);
+    Q_INVOKABLE int getMapFileSize(QString name);
+    Q_INVOKABLE QString getMapFile(int num);
+    Q_INVOKABLE bool isExistAnnotation(QString name);
+    Q_INVOKABLE void deleteAnnotation();
     Q_INVOKABLE bool loadMaptoServer();
     Q_INVOKABLE bool isUSBFile();
     Q_INVOKABLE QString getUSBFilename();
     Q_INVOKABLE bool loadMaptoUSB();
     Q_INVOKABLE bool isuseServerMap();
     Q_INVOKABLE void setuseServerMap(bool use);
-    Q_INVOKABLE void removeRawMap();
-    Q_INVOKABLE void removeEditedMap();
-    Q_INVOKABLE void removeServerMap();
+    Q_INVOKABLE void removeMap(QString filename);
     Q_INVOKABLE bool isloadMap();
     Q_INVOKABLE void setloadMap(bool load);
     Q_INVOKABLE bool isExistRobotINI();
@@ -116,6 +140,7 @@ public:
     Q_INVOKABLE QString getUsbMapPath(int num);
     Q_INVOKABLE QString getUsbMapPathFull(int num);
     Q_INVOKABLE void saveMapfromUsb(QString path);
+    Q_INVOKABLE void setMap(QString name);
 
     ////*********************************************  SLAM(LOCALIZATION) 관련   ***************************************************////
     Q_INVOKABLE void startMapping();
@@ -136,6 +161,9 @@ public:
     Q_INVOKABLE bool getMappingflag();
     Q_INVOKABLE void setMappingflag(bool flag);
 
+    Q_INVOKABLE QList<int> getMap(QString filename);
+    Q_INVOKABLE QList<int> getRawMap(QString filename);
+    Q_INVOKABLE QList<int> getMiniMap(QString filename);
     Q_INVOKABLE QList<int> getMapping();
 //    Q_INVOKABLE void pushMapData(QVector<unsigned char> data);
     Q_INVOKABLE void pushMapData(QList<int> data);
@@ -301,17 +329,12 @@ public:
     ////*********************************************  MAP IMAGE 관련   ***************************************************////
     Q_INVOKABLE QString getMapname();
     Q_INVOKABLE QString getMappath();
+    Q_INVOKABLE QString getServerMapname();
+    Q_INVOKABLE QString getServerMappath();
     Q_INVOKABLE int getMapWidth();
     Q_INVOKABLE int getMapHeight();
     Q_INVOKABLE float getGridWidth();
     Q_INVOKABLE QVector<int> getOrigin();
-
-    Q_INVOKABLE void setGrid(int x, int y, QString name);
-    Q_INVOKABLE void editGrid(int x, int y, QString name);
-    Q_INVOKABLE QString getGrid(int x, int y);
-
-    Q_INVOKABLE void make_minimap();
-
 
 
     ////*********************************************  PATROL 관련   ***************************************************////
@@ -347,6 +370,7 @@ public slots:
     void server_cmd_newtarget();
     void server_cmd_newcall();
     void server_cmd_setini();
+    void server_get_map();
     void path_changed();
     void usb_detect();
 

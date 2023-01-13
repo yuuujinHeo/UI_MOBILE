@@ -23,7 +23,7 @@ Item {
         Row{
             spacing: 5
             Rectangle{
-                width: 264
+                width: 250
                 height: 40
                 color: "#323744"
                 Text{
@@ -36,7 +36,7 @@ Item {
             }
             Rectangle{
                 id: rect_category_1
-                width: 264
+                width: 240
                 height: 40
                 color: "#647087"
                 Text{
@@ -63,7 +63,7 @@ Item {
             }
             Rectangle{
                 id: rect_category_2
-                width: 264
+                width: 240
                 height: 40
                 color: "#647087"
                 Text{
@@ -83,6 +83,60 @@ Item {
                     width: parent.width
                     height: 7
                     visible: select_category==2?true:false
+                    color: "#12d27c"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.bottom
+                }
+            }
+            Rectangle{
+                id: rect_category_3
+                width: 264
+                height: 40
+                color: "#647087"
+                Text{
+                    anchors.centerIn: parent
+                    font.family: font_noto_r.name
+                    color: "white"
+                    text: "SLAM"
+                    font.pixelSize: 20
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                       select_category = 3;
+                    }
+                }
+                Rectangle{
+                    width: parent.width
+                    height: 7
+                    visible: select_category==3?true:false
+                    color: "#12d27c"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.bottom
+                }
+            }
+            Rectangle{
+                id: rect_category_4
+                width: 240
+                height: 40
+                color: "#647087"
+                Text{
+                    anchors.centerIn: parent
+                    font.family: font_noto_r.name
+                    color: "white"
+                    text: "Motor"
+                    font.pixelSize: 20
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                       select_category = 4;
+                    }
+                }
+                Rectangle{
+                    width: parent.width
+                    height: 7
+                    visible: select_category==4?true:false
                     color: "#12d27c"
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.bottom
@@ -137,16 +191,9 @@ Item {
                             width: parent.width - 351
                             height: parent.height
                             TextField{
-                                id: textfield_name
-                                anchors.left: parent.left
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.leftMargin: 30
-                                width: parent.width*0.8
-
-                                height: parent.height
-                                placeholderText: qsTr(platform_name)
-                                font.pointSize: 15
-                                font.family: font_noto_r.name
+                                id: platform_name
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","name");
                             }
                         }
                     }
@@ -211,19 +258,34 @@ Item {
                             color: "#d0d0d0"
                         }
                         Rectangle{
+                            id: rr
                             width: parent.width - 351
                             height: parent.height
-                            Slider{
-                                id: slider_vxy
-                                anchors.left: parent.left
-                                anchors.leftMargin: 30
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: parent.width*0.8
-                                height: 40
-                                from: 0
-                                to: 1
-                                value: supervisor.getVelocity()
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_velocity
+                                        anchors.centerIn: parent
+                                        text: slider_vxy.value.toFixed(2)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_vxy
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0
+                                    to: 1
+                                    value: supervisor.getVelocity()
+                                }
                             }
+
                         }
                     }
                 }
@@ -329,6 +391,40 @@ Item {
                         }
                     }
                 }
+
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"로봇 반지름 반경"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: radius
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","radius");
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -413,6 +509,7 @@ Item {
                             width: parent.width - 351
                             height: parent.height
                             ComboBox{
+                                enabled: combo_use_travelline.currentIndex==1
                                 id: combo_travelline
                                 anchors.fill: parent
                                 model:ListModel{}
@@ -494,6 +591,1051 @@ Item {
             }
         }
 
+        Flickable{
+            id: area_setting_slam
+            visible: select_category==3?true:false
+            width: 880
+            anchors.left: parent.left
+            anchors.leftMargin: 100
+            anchors.top: parent.top
+            anchors.topMargin: 120
+            height: parent.height - 200
+            contentHeight: column_setting3.height
+            clip: true
+            ScrollBar.vertical: ScrollBar{
+                width: 20
+                anchors.right: parent.right
+                policy: ScrollBar.AlwaysOn
+            }
+            Column{
+                id:column_setting3
+                width: parent.width
+                spacing:25
+                Rectangle{
+                    id: set_slam_1
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"baudrate"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: baudrate
+                                anchors.fill: parent
+                                text: supervisor.getSetting("SENSOR","baudrate");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_slam_2
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"mask"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: mask
+                                anchors.fill: parent
+                                text:supervisor.getSetting("SENSOR","mask");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_slam_3
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"max_range"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: max_range
+                                anchors.fill: parent
+                                text:supervisor.getSetting("SENSOR","max_range");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_slam_4
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"offset_x"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: offset_x
+                                anchors.fill: parent
+                                text:supervisor.getSetting("SENSOR","offset_x");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_slam_5
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"offset_y"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: offset_y
+                                anchors.fill: parent
+                                text:supervisor.getSetting("SENSOR","offset_y");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_slam_6
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"left_camera"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: left_camera
+                                height: parent.height
+                                anchors.left: parent.left
+                                anchors.right: btn_view_cam.left
+                                text:supervisor.getSetting("SENSOR","left_camera");
+                            }
+                            Rectangle{
+                                id: btn_view_cam
+                                width: 100
+                                height: parent.height
+                                anchors.right: parent.right
+                                radius: 5
+                                color: "#d0d0d0"
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "viewer"
+                                    font.pixelSize: 15
+                                    font.family: font_noto_r.name
+
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        popup_camera.open();
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_slam_7
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"right_camera"
+                                font.pixelSize: 20
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: right_camera
+                                height: parent.height
+                                anchors.left: parent.left
+                                anchors.right: btn_view_camr.left
+                                text:supervisor.getSetting("SENSOR","right_camera");
+                            }
+                            Rectangle{
+                                id: btn_view_camr
+                                width: 100
+                                height: parent.height
+                                anchors.right: parent.right
+                                radius: 5
+                                color: "#d0d0d0"
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "viewer"
+                                    font.pixelSize: 15
+                                    font.family: font_noto_r.name
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            popup_camera.open();
+
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"k_curve"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: k_curve
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","k_curve");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"k_v"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: k_v
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","k_v");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"k_w"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: k_w
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","k_w");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_pivot"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: limit_pivot
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","limit_pivot");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_v"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: limit_v
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","limit_v");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_w"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: limit_w
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","limit_w");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_manual_v"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: limit_manual_v
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","limit_manual_v");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_manual_w"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: limit_manual_w
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","limit_manual_w");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"look_ahead_dist"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: look_ahead_dist
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","look_ahead_dist");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"wheel_base"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: wheel_base
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","wheel_base");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"wheel_radius"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: wheel_radius
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","wheel_radius");
+                            }
+                        }
+                    }
+                }
+
+
+
+
+
+            }
+        }
+
+        Flickable{
+            id: area_setting_motor
+            visible: select_category==4?true:false
+            width: 880
+            anchors.left: parent.left
+            anchors.leftMargin: 100
+            anchors.top: parent.top
+            anchors.topMargin: 120
+            height: parent.height - 200
+            contentHeight: column_setting4.height
+            clip: true
+            ScrollBar.vertical: ScrollBar{
+                width: 20
+                anchors.right: parent.right
+                policy: ScrollBar.AlwaysOn
+            }
+            Column{
+                id:column_setting4
+                width: parent.width
+                spacing:25
+                Rectangle{
+                    id: set_motor_1
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"gear_ratio"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: gear_ratio
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","gear_ratio");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_motor_2
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"k_p"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: k_p
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","k_p");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_motor_3
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"k_i"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: k_i
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","k_i");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_motor_4
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"k_d"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: k_d
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","k_d");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_acc"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: limit_acc
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","limit_acc");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_dec"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: limit_dec
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","limit_dec");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_vel"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: limit_vel
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","limit_vel");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"wheel_dir"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: wheel_dir
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","wheel_dir");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"left_id"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: left_id
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","left_id");
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"right_id"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: right_id
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","right_id");
+                            }
+                        }
+                    }
+                }
+
+
+
+
+
+            }
+        }
+
         Rectangle{
             id: btn_menu
             width: 120
@@ -567,7 +1709,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
-                        supervisor.setRobotName(textfield_name.text);
+                        supervisor.setRobotName(platform_name.text);
                         supervisor.setVelocity(slider_vxy.value);
                         supervisor.setRobotType(combo_platform_type.currentIndex);
                         if(combo_use_travelline.currentIndex == 0)
@@ -595,7 +1737,49 @@ Item {
                         else
                             supervisor.setserverCMD(true);
 
+                        supervisor.setSetting("ROBOT/radius",radius.text);
+
+
+                        supervisor.setSetting("MOTOR/gear_ratio",gear_ratio.text);
+                        supervisor.setSetting("MOTOR/k_d",k_d.text);
+                        supervisor.setSetting("MOTOR/k_i",k_i.text);
+                        supervisor.setSetting("MOTOR/k_p",k_p.text);
+                        supervisor.setSetting("MOTOR/left_id",left_id.text);
+                        supervisor.setSetting("MOTOR/limit_acc",limit_acc.text);
+                        supervisor.setSetting("MOTOR/limit_dec",limit_dec.text);
+                        supervisor.setSetting("MOTOR/limit_vel",limit_vel.text);
+                        supervisor.setSetting("MOTOR/wheel_dir",wheel_dir.text);
+                        supervisor.setSetting("MOTOR/right_id",right_id.text);
+
+                        supervisor.setSetting("ROBOT/k_curve",k_curve.text);
+                        supervisor.setSetting("ROBOT/k_v",k_v.text);
+                        supervisor.setSetting("ROBOT/k_w",k_w.text);
+                        supervisor.setSetting("ROBOT/limit_manual_v",limit_manual_v.text);
+                        supervisor.setSetting("ROBOT/limit_manual_w",limit_manual_w.text);
+                        supervisor.setSetting("ROBOT/limit_pivot",limit_pivot.text);
+                        supervisor.setSetting("ROBOT/limit_v",limit_v.text);
+                        supervisor.setSetting("ROBOT/limit_w",limit_w.text);
+                        supervisor.setSetting("ROBOT/look_ahead_dist",look_ahead_dist.text);
+                        supervisor.setSetting("ROBOT/wheel_base",wheel_base.text);
+                        supervisor.setSetting("ROBOT/wheel_radius",wheel_radius.text);
+
+
+                        supervisor.setSetting("SENSOR/baudrate",baudrate.text);
+                        supervisor.setSetting("SENSOR/mask",mask.text);
+                        supervisor.setSetting("SENSOR/max_range",max_range.text);
+                        supervisor.setSetting("SENSOR/offset_x",offset_x.text);
+                        supervisor.setSetting("SENSOR/offset_y",offset_y.text);
+                        supervisor.setSetting("SENSOR/right_camera",right_camera.text);
+                        supervisor.setSetting("SENSOR/left_camera",left_camera.text);
+
                         supervisor.readSetting();
+
+
+
+
+
+
+
 
                         init();
                     }
@@ -609,8 +1793,9 @@ Item {
     }
 
     function init(){
-        textfield_name.text = supervisor.getRobotName();
+        platform_name.text = supervisor.getSetting("ROBOT","name");
         slider_vxy.value = supervisor.getVelocity();
+
         if(supervisor.getRobotType() == "SERVING"){
             combo_platform_type.currentIndex = 0;
         }else{
@@ -648,6 +1833,39 @@ Item {
             combo_use_servercmd.currentIndex = 0;
         }
 
+        radius.text = supervisor.getSetting("ROBOT","radius");
+
+        gear_ratio.text = supervisor.getSetting("MOTOR","gear_ratio");
+        k_d.text = supervisor.getSetting("MOTOR","k_d");
+        k_i.text = supervisor.getSetting("MOTOR","k_i");
+        k_p.text = supervisor.getSetting("MOTOR","k_p");
+        left_id.text = supervisor.getSetting("MOTOR","left_id");
+        limit_acc.text = supervisor.getSetting("MOTOR","limit_acc");
+        limit_dec.text = supervisor.getSetting("MOTOR","limit_dec");
+        limit_vel.text = supervisor.getSetting("MOTOR","limit_vel");
+        wheel_dir.text = supervisor.getSetting("MOTOR","wheel_dir");
+        right_id.text = supervisor.getSetting("MOTOR","right_id");
+
+        k_curve.text = supervisor.getSetting("ROBOT","k_curve");
+        k_v.text = supervisor.getSetting("ROBOT","k_v");
+        k_w.text = supervisor.getSetting("ROBOT","k_w");
+        limit_manual_v.text = supervisor.getSetting("ROBOT","limit_manual_v");
+        limit_manual_w.text = supervisor.getSetting("ROBOT","limit_manual_w");
+        limit_pivot.text = supervisor.getSetting("ROBOT","limit_pivot");
+        limit_v.text = supervisor.getSetting("ROBOT","limit_v");
+        limit_w.text = supervisor.getSetting("ROBOT","limit_w");
+        look_ahead_dist.text = supervisor.getSetting("ROBOT","look_ahead_dist");
+        wheel_base.text = supervisor.getSetting("ROBOT","wheel_base");
+        wheel_radius.text = supervisor.getSetting("ROBOT","wheel_radius");
+
+
+        baudrate.text = supervisor.getSetting("SENSOR","baudrate");
+        mask.text = supervisor.getSetting("SENSOR","mask");
+        max_range.text = supervisor.getSetting("SENSOR","max_range");
+        offset_x.text = supervisor.getSetting("SENSOR","offset_x");
+        offset_y.text = supervisor.getSetting("SENSOR","offset_y");
+        right_camera.text = supervisor.getSetting("SENSOR","right_camera");
+        left_camera.text = supervisor.getSetting("SENSOR","left_camera");
     }
 
 
@@ -667,6 +1885,462 @@ Item {
 
 
 
+    Popup{
+        id: popup_camera
+        width: parent.width
+        height: parent.height
+        background: Rectangle{
+            opacity: 0.8
+            color: "#282828"
+        }
 
+        Timer{
+            id: timer_load
+            interval: 500
+            repeat: true
+            triggeredOnStart: true
+            onTriggered:{
+                var is_load = false;
+                //카메라 정보 요청
+                supervisor.requestCamera();
 
+                //카메라 대수에 따라 UI 업데이트
+                if(supervisor.getCameraNum() > 1){
+                    text_camera_1.text = supervisor.getCameraSerial(0);
+                    text_camera_2.text = supervisor.getCameraSerial(1);
+                    is_load = true;
+                }else if(supervisor.getCameraNum() === 1){
+                    text_camera_1.text = supervisor.getCameraSerial(0);
+                    is_load = true;
+                }else{
+                    text_camera_1.text = "";
+                    text_camera_2.text = "";
+                }
+
+                if(is_load){
+                    //지정된 왼쪽카메라 확인
+                    if(supervisor.getLeftCamera() === getCameraSerial(0)){
+                        mousearea_1.is_left = true;
+                        mousearea_2.is_left = false;
+
+                        ani_1.to = popup_camera.pos_left;
+                        ani_2.to = popup_camera.pos_right;
+                        ani_camera.restart();
+                    }
+                    if(supervisor.getRightCamera() === getCameraSerial(0)){
+                        mousearea_1.is_left = false;
+                        mousearea_2.is_left = true;
+                        ani_1.to = popup_camera.pos_right;
+                        ani_2.to = popup_camera.pos_left;
+                        ani_camera.restart();
+                    }
+
+                    if(supervisor.getCameraNum() > 1){
+                        if(mousearea_1.is_left && supervisor.getLeftCamera() === getCameraSerial(0)){
+                            cam_info_1.set = true;
+                        }
+                        if(mousearea_2.is_left && supervisor.getLeftCamera() === getCameraSerial(1)){
+                            cam_info_2.set = true;
+                        }
+                        if(!mousearea_1.is_left && supervisor.getRightCamera() === getCameraSerial(0)){
+                            cam_info_1.set = true;
+                        }
+                        if(!mousearea_2.is_left && supervisor.getRightCamera() === getCameraSerial(1)){
+                            cam_info_2.set = true;
+                        }
+                    }
+
+                    canvas_camera_1.requestPaint();
+                    canvas_camera_2.requestPaint();
+                    timer_load.stop();
+                }else{
+                    cam_info_1.set = false;
+                    cam_info_2.set = false;
+                }
+            }
+        }
+
+        property var pos_left: rect_remain.width/4 - cam_info_1.width/2
+        property var pos_right: rect_remain.width*3/4 - cam_info_1.width/2
+        Rectangle{
+            anchors.centerIn: parent
+            width: 800
+            height: 800
+            Rectangle{
+                id: rect_title
+                width: parent.width
+                height: 100
+                color: "#323744"
+                Text{
+                    anchors.centerIn: parent
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                    text: "카메라 정보를 확인한 후, 위치를 지정하여주세요."
+                }
+            }
+            Rectangle{
+                id: rect_remain
+                width: parent.width
+                height: parent.height - rect_title.height
+                anchors.top: rect_title.bottom
+
+                Rectangle{
+                    id: rect_black_left
+                    width: rect_remain.width/2
+                    height: 500
+                    color: "#282828"
+                    Text{
+                        id: text_left
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.top: parent.top
+                        anchors.topMargin: 10
+                        text: "Left"
+                        font.family: font_noto_b.name
+                        font.pixelSize: 20
+                        color: "white"
+                    }
+                }
+                Rectangle{
+                    id: rect_black_right
+                    width: rect_remain.width/2
+                    anchors.left: rect_black_left.right
+                    height: 500
+                    color: "#282828"
+                    Text{
+                        id: text_right
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.top: parent.top
+                        anchors.topMargin: 10
+                        text: "Right"
+                        font.family: font_noto_b.name
+                        font.pixelSize: 20
+                        color: "white"
+                    }
+                }
+
+                ParallelAnimation{
+                    id: ani_camera;
+                    SpringAnimation{
+                        id:ani_1
+                        target:cam_info_1
+                        property:"x"
+                        duration:500
+                        spring: 2
+                        damping: 0.2
+                    }
+                    SpringAnimation{
+                        id:ani_2
+                        target:cam_info_2
+                        property:"x"
+                        duration:500
+                        spring: 2
+                        damping: 0.2
+                    }
+                }
+
+                Rectangle{
+                    id: cam_info_1
+                    width: 350
+                    height: 400
+                    color: "transparent"
+                    property bool set:false
+                    z: mousearea_1.pressed?2:1
+                    x: parent.width/4 - width/2
+                    y: 60
+
+                    Rectangle{
+                        id: rect_cam_1
+                        clip: true
+                        width: parent.width
+                        height: width
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        Canvas{
+                            id: canvas_camera_1
+                            anchors.fill: parent
+                            onPaint:{
+                                var ctx = getContext('2d');
+                                ctx.clearRect(0,0,width,height);
+
+                                if(supervisor.getCameraNum() > 0){
+                                    var image_data = supervisor.getCamera(0);
+                                    var temp_image = ctx.createImageData(width,height);
+
+                                    for(var i=0; i<image_data.length; i++){
+                                        temp_image.data[4*i+0] = image_data[i];
+                                        temp_image.data[4*i+1] = image_data[i];
+                                        temp_image.data[4*i+2] = image_data[i];
+                                        temp_image.data[4*i+3] = 255;
+                                    }
+                                    ctx.drawImage(temp_image,0,0,width,height);
+                                }
+
+                            }
+                        }
+
+                    }
+
+                    Rectangle{
+                        anchors.top: rect_cam_1.bottom
+                        width: parent.width
+                        height: 50
+                        radius: 5
+                        color: cam_info_1.set?"#12d27c":"#d0d0d0"
+                        Row{
+                            spacing: 10
+                            anchors.centerIn: parent
+                            Text{
+                                text: "Serial : "
+                                font.family: font_noto_r.name
+
+                            }
+                            Text{
+                                id: text_camera_1
+                                text: {
+                                    if(supervisor.getCameraNum() > 0){
+                                        supervisor.getCameraSerial(0);
+                                    }else{
+                                        ""
+                                    }
+                                }
+                                font.family: font_noto_r.name
+
+                            }
+                        }
+                    }
+
+                    MouseArea{
+                        id:mousearea_1
+                        anchors.fill: parent
+                        property var firstX;
+                        property var firstY;
+                        property bool is_left: true
+                        propagateComposedEvents: true
+                        preventStealing: false
+
+                        onPressed:{
+                            firstX = mouseX;
+                            firstY = mouseY;
+                        }
+                        onReleased: {
+                            if(is_left){
+                                ani_1.from = cam_info_1.x;
+                                ani_1.to = popup_camera.pos_left;
+
+                                ani_2.from = cam_info_2.x;
+                                ani_2.to = popup_camera.pos_right;
+
+                                print("LEFT ",ani_1.to, ani_2.to);
+                                ani_camera.restart();
+
+                            }else{
+                                ani_1.from = cam_info_1.x;
+                                ani_1.to = popup_camera.pos_right;
+                                ani_2.from = cam_info_2.x;
+                                ani_2.to = popup_camera.pos_left;
+                                print("RIGHT ",ani_1.to, ani_2.to);
+                                ani_camera.restart();
+                            }
+                        }
+                        onPositionChanged: {
+                            cam_info_1.x += mouseX - firstX;
+                            if(mouseX - firstX > 0){
+                                is_left = false;
+                            }else{
+                                is_left = true;
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: cam_info_2
+                    width: 350
+                    height: 400
+                    color: "transparent"
+                    property bool set: false
+                    z: mousearea_2.pressed?2:1
+                    x: parent.width*3/4 - width/2
+                    y: 60
+                    Rectangle{
+                        id: rect_cam_2
+                        clip: true
+                        width: parent.width
+                        height: width
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        Canvas{
+                            id: canvas_camera_2
+                            anchors.fill: parent
+                            onPaint:{
+                                var ctx = getContext('2d');
+                                ctx.clearRect(0,0,width,height);
+
+                                if(supervisor.getCameraNum() > 1){
+                                    var image_data = supervisor.getCamera(1);
+                                    var temp_image = ctx.createImageData(width,height);
+
+                                    for(var i=0; i<image_data.length; i++){
+                                        temp_image.data[4*i+0] = image_data[i];
+                                        temp_image.data[4*i+1] = image_data[i];
+                                        temp_image.data[4*i+2] = image_data[i];
+                                        temp_image.data[4*i+3] = 255;
+                                    }
+                                    ctx.drawImage(temp_image,0,0,width,height);
+                                }
+
+                            }
+                        }
+
+                    }
+
+                    Rectangle{
+                        anchors.top: rect_cam_2.bottom
+                        width: parent.width
+                        height: 50
+                        radius: 5
+                        color: cam_info_2.set?"#12d27c":"#d0d0d0"
+                        Row{
+                            spacing: 10
+                            anchors.centerIn: parent
+                            Text{
+                                text: "Serial : "
+                                font.family: font_noto_r.name
+
+                            }
+                            Text{
+                                id: text_camera_2
+                                text: {
+                                    if(supervisor.getCameraNum() > 1){
+                                        supervisor.getCameraSerial(1);
+                                    }else{
+                                        ""
+                                    }
+                                }
+                                font.family: font_noto_r.name
+
+                            }
+                        }
+                    }
+
+                    MouseArea{
+                        id:mousearea_2
+                        anchors.fill: parent
+                        property var firstX;
+                        property var firstY;
+                        property bool is_left: true
+                        propagateComposedEvents: true
+                        preventStealing: false
+
+                        onPressed:{
+                            firstX = mouseX;
+                            firstY = mouseY;
+                        }
+                        onReleased: {
+                            if(!is_left){
+                                ani_1.from = cam_info_1.x;
+                                ani_1.to = popup_camera.pos_left;
+
+                                ani_2.from = cam_info_2.x;
+                                ani_2.to = popup_camera.pos_right;
+
+                                ani_camera.restart();
+
+                            }else{
+                                ani_1.from = cam_info_1.x;
+                                ani_1.to = popup_camera.pos_right;
+                                ani_2.from = cam_info_2.x;
+                                ani_2.to = popup_camera.pos_left;
+                                ani_camera.restart();
+                            }
+                        }
+                        onPositionChanged: {
+                            cam_info_2.x += mouseX - firstX;
+                            if(mouseX - firstX > 0){
+                                is_left = false;
+                            }else{
+                                is_left = true;
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    width: rect_remain.width
+                    height: rect_remain.height - rect_black_left.height
+                    anchors.top: rect_black_left.bottom
+                    Row{
+                        spacing: 50
+                        anchors.centerIn: parent
+                        Rectangle{
+                            width: 180
+                            height: 60
+                            radius: 10
+                            color: "#12d27c"
+                            border.width: 1
+                            border.color: "#12d27c"
+                            Text{
+                                anchors.centerIn: parent
+                                text: "확인"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 25
+                                color: "white"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    if(mousearea_1.is_left){
+                                        supervisor.setCamera(text_camera_1.text,text_camera_2.text);
+                                    }else{
+                                        supervisor.setCamera(text_camera_2.text,text_camera_1.text);
+                                    }
+                                    popup_camera.close();
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 180
+                            height: 60
+                            radius: 10
+                            color:"transparent"
+                            border.width: 1
+                            border.color: "#7e7e7e"
+                            Text{
+                                anchors.centerIn: parent
+                                text: "취소"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 25
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    popup_camera.close();
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 180
+                            height: 60
+                            radius: 10
+                            color:"transparent"
+                            border.width: 1
+                            border.color: "#7e7e7e"
+                            Text{
+                                anchors.centerIn: parent
+                                text: "사진 요청"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 25
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    supervisor.requestCamera();
+                                    timer_load.start();
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+    }
 }

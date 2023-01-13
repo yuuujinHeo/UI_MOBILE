@@ -90,7 +90,7 @@ Item {
                 onPressed: {
                     firstY = mouseY;
                     width_dis = 0;
-                    title_text.visible = false;
+//                    title_text.visible = false;
                 }
                 onPositionChanged: {
                     width_dis = mouseY-firstY;
@@ -136,7 +136,7 @@ Item {
                             onoff = true;
                         }
                     }
-                    title_text.visible = show_title;
+//                    title_text.visible = show_title;
                 }
             }
         }

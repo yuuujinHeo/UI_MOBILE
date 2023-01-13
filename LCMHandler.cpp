@@ -36,7 +36,9 @@ LCMHandler::~LCMHandler(){
 
 ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
 void LCMHandler::sendCommand(command cmd, QString msg){
-    if(isconnect){
+    if(!pmap->use_uicmd){
+        plog->write("[LCM ERROR] SEND COMMAND (BLOCKED) : " + msg);
+    }else if(isconnect){
         if(probot->state != ROBOT_STATE_BUSY){
             if(is_debug){
                 lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&cmd);
@@ -57,7 +59,9 @@ void LCMHandler::sendCommand(int cmd, QString msg){
     command send_msg;
     send_msg.cmd = cmd;
 
-    if(isconnect){
+    if(!pmap->use_uicmd){
+        plog->write("[LCM ERROR] SEND COMMAND (BLOCKED) : " + msg);
+    }else if(isconnect){
         if(probot->state != ROBOT_STATE_BUSY){
             if(is_debug){
                 lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&send_msg);
@@ -188,7 +192,7 @@ void LCMHandler::setInitPose(float x, float y, float th){
 
 void LCMHandler::sendMapPath(QString path){
     command send_msg;
-    send_msg.cmd = ROBOT_CMD_SET_MAP;
+    send_msg.cmd = ROBOT_CMD_RESTART;
     memcpy(send_msg.params,path.toUtf8(),sizeof(char)*255);
 
     sendCommand(send_msg,"SEND MAP PATH ("+path+")");
@@ -270,6 +274,19 @@ void LCMHandler::robot_mapping_calliback(const lcm::ReceiveBuffer *rbuf, const s
 
     memcpy(plot_map.data, pmap->data.data(), msg->len);
     flagMapping = true;
+}
+
+void LCMHandler::robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const camera_data *msg){
+    pmap->camera_info.clear();
+    for(int i=0; i<msg->num; i++){
+        ST_CAMERA temp_info;
+        temp_info.serial = msg->serial[i].data();
+        temp_info.imageSize = msg->image_len;
+        for(int k=0; k<temp_info.imageSize; k++){
+            temp_info.data.push_back(msg->image[i][k]);
+        }
+        pmap->camera_info.push_back(temp_info);
+    }
 }
 ////***********************************************   THREADS  ********************************************************////
 void LCMHandler::bLoop()
