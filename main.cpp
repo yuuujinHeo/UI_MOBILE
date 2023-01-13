@@ -19,6 +19,8 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("applicationDirPath", QGuiApplication::applicationDirPath());
+    engine.rootContext()->setContextProperty("homePath", QDir::homePath());
+//    QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     object = engine.rootObjects()[0];
     return app.exec();

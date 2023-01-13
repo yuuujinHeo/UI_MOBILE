@@ -33,6 +33,52 @@ Item {
         y: 0
         source: "icon/joystick_back.png"
     }
+
+    Image{
+        id: image_joy_up
+        source: "icon/joy_up.png"
+        visible: horizontalOnly?false:true
+        width: 13
+        height: 8
+        anchors.horizontalCenter: joystick.horizontalCenter
+        anchors.bottom: joystick.top
+        anchors.bottomMargin: 8
+    }
+    Image{
+        id: image_joy_down
+        source: "icon/joy_down.png"
+        visible: horizontalOnly?false:true
+        width: 13
+        height: 8
+        anchors.horizontalCenter: joystick.horizontalCenter
+        anchors.top: joystick.bottom
+        anchors.topMargin: 8
+    }
+    Image{
+        id: image_joy_left
+        source: "icon/joy_left.png"
+        visible: verticalOnly?false:true
+        width: 8
+        height: 13
+        anchors.verticalCenter: joystick.verticalCenter
+        anchors.right: joystick.left
+        anchors.rightMargin: 8
+    }
+    Image{
+        id: image_joy_right
+        source: "icon/joy_right.png"
+        visible: verticalOnly?false:true
+        width: 8
+        height: 13
+        anchors.verticalCenter: joystick.verticalCenter
+        anchors.left: joystick.right
+        anchors.leftMargin: 8
+    }
+
+
+
+
+
     ParallelAnimation {
         id: returnAnimation
         NumberAnimation { target: thumb.anchors; property: "horizontalCenterOffset";

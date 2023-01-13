@@ -9,10 +9,12 @@
 #include <thread>
 #include <math.h>
 #include <QWebSocket>
+#include <QDir>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include "GlobalHeader.h"
+#include <QGuiApplication>
 
 #define MOVING_TIMER_MS     40
 
@@ -32,11 +34,13 @@ public:
     ////*********************************************  FLAGS   ***************************************************////
     //서버 연결상태
     bool isconnect = false;
-
+    bool acceptCmd = true;
     ////*********************************************  SEND FUNCTIONS   ***************************************************////
     void sendCalllist();
-    void sendMap(QString map_path, QString dir);
+    void sendMap(QString map_name);
     void requestMap();
+
+    QString server_map_name = "test1";
 
 signals:
     void server_pause();
@@ -44,6 +48,7 @@ signals:
     void server_new_target();
     void server_new_call();
     void server_set_ini();
+    void server_get_map();
 public slots:
     void onConnected();
     void onDisconnected();

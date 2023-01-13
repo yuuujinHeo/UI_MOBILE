@@ -37,93 +37,95 @@ void ServerHandler::onTextMessageReceived(QString message){
     QString cmd = json["cmd"].toString();
     plog->write("[SERVER] NEW COMMAND : "+cmd);
 
-    if(cmd == "PAUSE"){
-        emit server_pause();
-    }else if(cmd == "RESUME"){
-        emit server_resume();
-    }else if(cmd == "NEW_TARGET"){
-        float x = json["x"].toDouble();
-        float y = json["y"].toDouble();
-        float th = json["th"].toDouble();
+    if(!acceptCmd){
+        QJsonObject json;
+        if(is_debug){
+            json["name"] = probot->name_debug;
+        }else{
+            json["name"] = probot->name;
+        }
+        json["msg_type"] = cmd;
+        json["accept"] = false;
+        json["error"] = "Ignored";
 
-        probot->targetPose.x = x;
-        probot->targetPose.y = y;
-        probot->targetPose.th = th;
-        emit server_new_target();
-    }else if(cmd == "NEW_CALL"){
-        probot->targetLocation = json["location"].toString();
-        bool check = false;
-        for(int i=0; i<probot->call_list.size(); i++){
-            if(probot->call_list[i] == probot->targetLocation){
-                plog->write("[SERVER] NEW CALL : " + probot->targetLocation + " BUT IGNORE (CALL LIST SIZE = " + QString::number(probot->call_list.size()) + ")");
-                check = true;
-                break;
+        QJsonDocument doc(json);
+        QString str(doc.toJson(QJsonDocument::Indented));
+        socket.sendTextMessage(str);
+        plog->write("[SERVER] Ignored.");
+    }else{
+        if(cmd == "PAUSE"){
+            emit server_pause();
+        }else if(cmd == "RESUME"){
+            emit server_resume();
+        }else if(cmd == "NEW_TARGET"){
+            float x = json["x"].toDouble();
+            float y = json["y"].toDouble();
+            float th = json["th"].toDouble();
+
+            probot->targetPose.x = x;
+            probot->targetPose.y = y;
+            probot->targetPose.th = th;
+            emit server_new_target();
+        }else if(cmd == "NEW_CALL"){
+            probot->targetLocation = json["location"].toString();
+            bool check = false;
+            for(int i=0; i<probot->call_list.size(); i++){
+                if(probot->call_list[i] == probot->targetLocation){
+                    plog->write("[SERVER] NEW CALL : " + probot->targetLocation + " BUT IGNORE (CALL LIST SIZE = " + QString::number(probot->call_list.size()) + ")");
+                    check = true;
+                    break;
+                }
             }
+            if(!check){
+                probot->call_list.push_back(probot->targetLocation);
+                plog->write("[SERVER] NEW CALL : " + probot->targetLocation + " (CALL LIST SIZE = " + QString::number(probot->call_list.size()) + ")");
+                emit server_new_call();
+            }
+        }else if(cmd == "MAP_REQ"){
+            sendMap(pmap->map_name);
+        }else if(cmd == "MAP_PUB"){
+            QFile *file;
+            plog->write("[SERVER] Push Map : ");
+
+            //RAW MAP
+            file = new QFile(QDir::homePath()+"/maps/"+json["map_name"].toString()+"/map_raw.png");
+            file->open(QIODevice::WriteOnly);
+            file->write(QByteArray::fromBase64(json["raw_map"].toString().toLocal8Bit()));
+            file->close();
+            delete file;
+
+            //ANNOTATED MAP
+            server_map_name = json["map_name"].toString();
+            file = new QFile(QDir::homePath()+"/maps/"+json["map_name"].toString()+"/map_edited.png");
+            file->open(QIODevice::WriteOnly);
+            file->write(QByteArray::fromBase64(json["map"].toString().toLocal8Bit()));
+            file->close();
+            delete file;
+
+            //.ini
+            file = new QFile(QDir::homePath()+"/maps/"+json["map_name"].toString()+"/annotation.ini");
+            file->open(QIODevice::WriteOnly);
+            file->write(QByteArray::fromBase64(json["annot"].toString().toLocal8Bit()));
+            file->close();
+
+            file = new QFile(QDir::homePath()+"/maps/"+json["map_name"].toString()+"/map_meta.ini");
+            file->open(QIODevice::WriteOnly);
+            file->write(QByteArray::fromBase64(json["meta"].toString().toLocal8Bit()));
+            file->close();
+
+            emit server_get_map();
+
+        }else if(cmd == "SET_ROBOT"){
+            QString ini_path = QDir::homePath()+"/robot_config.ini";
+            QSettings settings(ini_path, QSettings::IniFormat);
+            settings.setValue("ROBOT/name",json["name"].toString());
+            settings.setValue("ROBOT/type",json["type"].toString());
+            settings.setValue("ROBOT/travelline",json["travel_line"].toInt());
+            emit server_set_ini();
+            plog->write("[SERVER] Set Robot Data : name("+json["name"].toString()+") type("+json["type"].toString()+")");
+        }else if(cmd == "CALL_REQ"){
+            sendCalllist();
         }
-        if(!check){
-            probot->call_list.push_back(probot->targetLocation);
-            plog->write("[SERVER] NEW CALL : " + probot->targetLocation + " (CALL LIST SIZE = " + QString::number(probot->call_list.size()) + ")");
-            emit server_new_call();
-        }
-    }else if(cmd == "MAP_REQ"){
-        if(pmap->use_server){
-            sendMap(QGuiApplication::applicationDirPath()+"/image/map_server.png", QGuiApplication::applicationDirPath()+"/setting/");
-        }else{
-            sendMap(QGuiApplication::applicationDirPath()+"/image/raw_map.png", QGuiApplication::applicationDirPath()+"/setting/");
-        }
-    }else if(cmd == "MAP_PUB"){
-        QFile *file;
-        plog->write("[SERVER] Push Map : ");
-
-        //RAW MAP
-        file = new QFile(QGuiApplication::applicationDirPath()+"/image/raw_map_server.png");
-        file->open(QIODevice::WriteOnly);
-        file->write(QByteArray::fromBase64(json["raw_map"].toString().toLocal8Bit()));
-        file->close();
-        delete file;
-
-        //ANNOTATED MAP
-        file = new QFile(QGuiApplication::applicationDirPath()+"/image/map_server.png");
-        file->open(QIODevice::WriteOnly);
-        file->write(QByteArray::fromBase64(json["annot_map"].toString().toLocal8Bit()));
-        file->close();
-
-        //annot map -> rotate
-        QString map_path = "image/map_server.png";
-        cv::Mat map1 = cv::imread(map_path.toStdString());
-        cv::flip(map1, map1, 0);
-        cv::rotate(map1,map1,cv::ROTATE_90_COUNTERCLOCKWISE);
-
-        QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(map1)).toImage();
-        //Save PNG File
-        if(temp_image.save("image/map_rotated.png","PNG")){
-            plog->write("[SERVER] MAP SUB : SUCCESS TO ROTATE PNG");
-        }else{
-            plog->write("[SERVER] MAP SUB : FAIL TO ROTATE PNG");
-        }
-        delete file;
-
-
-        //.ini
-        file = new QFile(QGuiApplication::applicationDirPath()+"/setting/annotation.ini");
-        file->open(QIODevice::WriteOnly);
-        file->write(QByteArray::fromBase64(json["annot"].toString().toLocal8Bit()));
-        file->close();
-
-        file = new QFile(QGuiApplication::applicationDirPath()+"/setting/map_meta.ini");
-        file->open(QIODevice::WriteOnly);
-        file->write(QByteArray::fromBase64(json["meta"].toString().toLocal8Bit()));
-        file->close();
-    }else if(cmd == "SET_ROBOT"){
-        QString ini_path = "setting/robot.ini";
-        QSettings settings(ini_path, QSettings::IniFormat);
-        settings.setValue("ROBOT/name",json["name"].toString());
-        settings.setValue("ROBOT/type",json["type"].toString());
-        settings.setValue("ROBOT/travelline",json["travel_line"].toInt());
-        emit server_set_ini();
-        plog->write("[SERVER] Set Robot Data : name("+json["name"].toString()+") type("+json["type"].toString()+")");
-    }else if(cmd == "CALL_REQ"){
-        sendCalllist();
     }
 }
 
@@ -243,26 +245,26 @@ void ServerHandler::onTimer(){ // 200ms
     }
 }
 
-void ServerHandler::sendMap(QString map_path, QString dir){
-    QFile* file = new QFile(map_path);
+void ServerHandler::sendMap(QString map_name){
+    QFile* file = new QFile(QDir::homePath()+"/maps/"+map_name+"/map_edited.png");
     file->open(QIODevice::ReadOnly);
     QByteArray ba_map = file->readAll();
     file->close();
     delete file;
 
-    file = new QFile(map_path);
+    file = new QFile(QDir::homePath()+"/maps/"+map_name+"/map_raw.png");
     file->open(QIODevice::ReadOnly);
     QByteArray ba_map2 = file->readAll();
     file->close();
     delete file;
 
-    file = new QFile(dir+"map_meta.ini");
+    file = new QFile(QDir::homePath()+"/maps"+map_name+"/map_meta.ini");
     file->open(QIODevice::ReadOnly);
     QByteArray ba_meta = file->readAll();
     file->close();
     delete file;
 
-    file = new QFile(dir+"annotation.ini");
+    file = new QFile(QDir::homePath()+"/maps"+map_name+"/annotation.ini");
     file->open(QIODevice::ReadOnly);
     QByteArray ba_anot = file->readAll();
     file->close();
@@ -274,6 +276,7 @@ void ServerHandler::sendMap(QString map_path, QString dir){
     }else{
         json["name"] = probot->name;
     }
+    json["map_name"] = map_name;
     json["msg_type"] = "MAP";
     json["raw_map"] = QString(ba_map2.toBase64());
     json["annot_map"] = QString(ba_map.toBase64());

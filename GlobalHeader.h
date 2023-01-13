@@ -3,6 +3,7 @@
 
 #include "Logger.h"
 #include <opencv2/opencv.hpp>
+#include <QDir>
 #include "cv_to_qt.h"
 
 extern Logger *plog;
@@ -50,11 +51,22 @@ typedef struct{
 }ST_LOCATION;
 
 typedef struct{
+    QString serial;
+    int imageSize = 0;
+    QList<int> data;
+}ST_CAMERA;
+
+typedef struct{
     int chunkSize = 0;
     int imageSize = 0;
     QVector<int> data;
 
+    QVector<ST_CAMERA> camera_info;
+    QString left_camera;
+    QString right_camera;
+
     QString map_name = "";
+    QString map_path = "";
     int width = 0;
     int height = 0;
     float gridwidth = 0;
@@ -66,6 +78,7 @@ typedef struct{
 
     float margin;
     bool use_server;
+    bool use_uicmd;
     bool map_loaded;
 
     ST_POSE init_pose;
@@ -144,7 +157,7 @@ enum ROBOT_CMD{
     ROBOT_CMD_MOVE_PAUSE,
     ROBOT_CMD_MOVE_RESUME,
     ROBOT_CMD_SET_VELOCITY,
-    ROBOT_CMD_SET_MAP,
+    ROBOT_CMD_RESTART,
 
     ROBOT_CMD_SET_INIT,//=10
     ROBOT_CMD_SLAM_RUN,
@@ -152,7 +165,8 @@ enum ROBOT_CMD{
     ROBOT_CMD_SLAM_AUTO,
     ROBOT_CMD_MAPPING_START,
 
-    ROBOT_CMD_MAPPING_STOP//=15
+    ROBOT_CMD_MAPPING_STOP,//=15
+    ROBOT_CMD_REQ_CAMERA
 };
 
 
@@ -200,7 +214,8 @@ enum ROBOT_STATE{
 
     ROBOT_STATE_ERROR,//5
     ROBOT_STATE_MANUALMODE,
-    ROBOT_STATE_BUSY
+    ROBOT_STATE_BUSY,
+    ROBOT_STATE_CHARGING
 };
 
 enum ROBOT_ERROR{

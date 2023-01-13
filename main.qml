@@ -41,9 +41,6 @@ Window {
     property string ppickupCall: "qrc:/Page_pickup_calling.qml"
     property string psetting: "qrc:/Page_setting.qml"
 
-    property string map_path: "file://" + applicationDirPath + "/image/map_rotated.png";
-    property string map_name: "map_rotated.png"
-
     property string robot_type: supervisor.getRobotType()
     property string robot_name: supervisor.getRobotName()
     property var robot_battery: 0
@@ -51,11 +48,6 @@ Window {
     property int margin_name: 250
 
     property string cur_location;
-
-    function setMapPath(path,name){
-        map_path = path;
-        map_name = name;
-    }
 
     function movelocation(){
         cur_location = supervisor.getcurLoc();
@@ -138,6 +130,12 @@ Window {
             loadPage(ppickupCall);
         }
     }
+    function loadmap_server_fail(){
+        loader_page.item.loadmap_server(false);
+    }
+    function loadmap_server_success(){
+        loader_page.item.loadmap_server(true);
+    }
 
     function updatepatrol(){
         if(loader_page.item.objectName == "page_map")
@@ -198,7 +196,6 @@ Window {
     Supervisor{
         id:supervisor
     }
-
 
     Timer{
         id: timer_update

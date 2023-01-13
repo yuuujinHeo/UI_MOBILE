@@ -51,13 +51,10 @@
         <file alias="icon/joy_right.png">../icon/joy_right.png</file>
         <file alias="icon/joy_left.png">../icon/joy_left.png</file>
         <file alias="icon/joy_down.png">../icon/joy_down.png</file>
-        <file alias="icon/joy_connect.png">../icon/joy_connect.png</file>
         <file alias="icon/data_green.png">../icon/data_green.png</file>
         <file alias="icon/data_gray.png">../icon/data_gray.png</file>
         <file alias="icon/icon_researching.png">../icon/icon_researching.png</file>
         <file alias="icon/icon_manualmove.png">../icon/icon_manualmove.png</file>
-        <file alias="icon/icon_connect_error.png">../icon/icon_connect_error.png</file>
-        <file alias="icon/icon_connect.png">../icon/icon_connect.png</file>
         <file alias="icon/icon_cancelpath.png">../icon/icon_cancelpath.png</file>
         <file alias="image/robot_head_sleep.png">../image/robot_head_sleep.png</file>
         <file alias="image/robot_clear.png">../image/robot_clear.png</file>
@@ -84,5 +81,19 @@
         <file alias="image/image_slam.png">../image/image_slam.png</file>
         <file alias="image/image_patrol.png">../image/image_patrol.png</file>
         <file alias="image/image_annot.png">../image/image_annot.png</file>
+        <file alias="icon/bat_charge.png">../icon/bat_charge.png</file>
+        <file alias="icon/icon_server_disconnect.png">../icon/icon_server_disconnect.png</file>
+        <file alias="icon/icon_joy_disconnect.png">../icon/icon_joy_disconnect.png</file>
+        <file alias="icon/icon_stop.png">../icon/icon_stop.png</file>
+        <file alias="icon/icon_cur.png">../icon/icon_cur.png</file>
+        <file alias="icon/icon_lidar.png">../icon/icon_lidar.png</file>
+        <file alias="icon/icon_auto_init.png">../icon/icon_auto_init.png</file>
+        <file alias="icon/icon_point.png">../icon/icon_point.png</file>
+        <file alias="icon/icon_run.png">../icon/icon_run.png</file>
+        <file alias="icon/icon_set_init.png">../icon/icon_set_init.png</file>
+        <file alias="image/joy_finger.png">../image/joy_finger.png</file>
+        <file alias="image/joy_background.png">../image/joy_background.png</file>
+        <file alias="image/image_localization.png">../image/image_localization.png</file>
+        <file alias="icon/icon_connect_error.png">../icon/icon_connect_error.png</file>
     </qresource>
 </RCC>

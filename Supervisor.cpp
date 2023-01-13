@@ -6,7 +6,6 @@
 #include <QSslSocket>
 #include <QGuiApplication>
 #include <usb.h>
-
 #include <QDir>
 #include <QFileSystemWatcher>
 #include <QtQuick/qquickimageprovider.h>
@@ -39,8 +38,6 @@ Supervisor::Supervisor(QObject *parent)
     canvas_redo.clear();
     minimap_grid.clear();
 
-
-
     lcm = new LCMHandler();
     server = new ServerHandler();
     joystick = new JoystickHandler();
@@ -63,6 +60,7 @@ Supervisor::Supervisor(QObject *parent)
     connect(server,SIGNAL(server_new_target()),this,SLOT(server_cmd_newtarget()));
     connect(server,SIGNAL(server_new_call()),this,SLOT(server_cmd_newcall()));
     connect(server,SIGNAL(server_set_ini()),this,SLOT(server_cmd_setini()));
+    connect(server,SIGNAL(server_get_map()),this,SLOT(server_get_map()));
     connect(lcm, SIGNAL(pathchanged()),this,SLOT(path_changed()));
     plog->write("[BUILDER] SUPERVISOR constructed");
 }
@@ -99,21 +97,87 @@ void Supervisor::writelog(QString msg){
     plog->write(msg);
 }
 
+QString Supervisor::getRawMapPath(QString name){
+    return QDir::homePath()+"/maps/"+name+"/map_raw.png";
+}
+QString Supervisor::getMapPath(QString name){
+    return QDir::homePath()+"/maps/"+name+"/map_edited.png";
+}
+QString Supervisor::getAnnotPath(QString name){
+    return QDir::homePath()+"/maps/"+name+"/annotation.ini";
+}
+QString Supervisor::getMetaPath(QString name){
+    return QDir::homePath()+"/maps/"+name+"/map_meta.ini";
+}
+QString Supervisor::getIniPath(){
+    return QDir::homePath()+"/robot_config.ini";
+}
+
 ////*********************************************  SETTING 관련   ***************************************************////
 void Supervisor::setSetting(QString name, QString value){
-    QString ini_path = "setting/robot.ini";
+    QString ini_path = getIniPath();
     QSettings setting(ini_path, QSettings::IniFormat);
     setting.setValue(name,value);
     plog->write("[SETTING] SET "+name+" VALUE TO "+value);
     readSetting();
 }
-void Supervisor::readSetting(){
+QString Supervisor::getSetting(QString group, QString name){
+    QString ini_path = getIniPath();
+    QSettings setting_robot(ini_path, QSettings::IniFormat);
+    setting_robot.beginGroup(group);
+    return setting_robot.value(name).toString();
+}
+void Supervisor::readSetting(QString map_name){
+
+    //Robot Setting================================================================
+    QString ini_path = getIniPath();
+    QSettings setting_robot(ini_path, QSettings::IniFormat);
+
+    setting_robot.beginGroup("ROBOT");
+    probot->name = setting_robot.value("name").toString();
+    probot->radius = setting_robot.value("radius").toFloat();
+    probot->type = setting_robot.value("type").toString();
+    probot->velocity = setting_robot.value("velocity").toFloat();
+    setting.tray_num = setting_robot.value("tray_num").toInt();
+    setting.useVoice = setting_robot.value("use_voice").toBool();
+    setting.useBGM = setting_robot.value("use_bgm").toBool();
+    pmap->use_uicmd = setting_robot.value("use_uicmd").toBool();
+    setting_robot.endGroup();
+
+    setting_robot.beginGroup("FLOOR");
+    pmap->margin = setting_robot.value("margin").toFloat();
+    pmap->use_server = setting_robot.value("map_server").toBool();
+    server->acceptCmd = pmap->use_server;
+    pmap->map_loaded = setting_robot.value("map_load").toBool();
+    pmap->map_name = setting_robot.value("map_name").toString();
+    pmap->map_path = setting_robot.value("map_path").toString();
+    setting.table_num = setting_robot.value("table_num").toInt();
+    setting.table_col_num = setting_robot.value("table_col_num").toInt();
+    setting_robot.endGroup();
+
+    setting_robot.beginGroup("SERVER");
+    setting.useServerCMD = setting_robot.value("use_servercmd").toBool();
+    setting.useTravelline = setting_robot.value("use_travelline").toBool();
+    setting.travelline = setting_robot.value("travelline").toInt();
+    setting_robot.endGroup();
+
+    setting_robot.beginGroup("PATROL");
+    patrol.filename = setting_robot.value("curfile").toString();
+    patrol.mode = setting_robot.value("patrol_mode").toInt();
+    setting_robot.endGroup();
+
+    setting_robot.beginGroup("SENSOR");
+    pmap->left_camera = setting_robot.value("left_camera").toString();
+    pmap->right_camera = setting_robot.value("right_camera").toInt();
+    setting_robot.endGroup();
+    if(map_name == ""){
+        map_name = pmap->map_name;
+    }
     //Map Meta Data======================================================================
-    QString ini_path = "setting/map_meta.ini";
+    ini_path = getMetaPath(map_name);
     QSettings setting_meta(ini_path, QSettings::IniFormat);
 
     setting_meta.beginGroup("map_metadata");
-    pmap->map_name = setting_meta.value("name").toString();
     pmap->width = setting_meta.value("map_w").toInt();
     pmap->height = setting_meta.value("map_h").toInt();
     pmap->gridwidth = setting_meta.value("map_grid_width").toFloat();
@@ -122,7 +186,7 @@ void Supervisor::readSetting(){
     setting_meta.endGroup();
 
     //Annotation======================================================================
-    ini_path = "setting/annotation.ini";
+    ini_path = getAnnotPath(map_name);
     QSettings setting_anot(ini_path, QSettings::IniFormat);
 
     setting_anot.beginGroup("charging_locations");
@@ -240,38 +304,6 @@ void Supervisor::readSetting(){
     }
     setting_anot.endGroup();
 
-    //Robot Setting================================================================
-    ini_path = "setting/robot.ini";
-    QSettings setting_robot(ini_path, QSettings::IniFormat);
-
-    setting_robot.beginGroup("ROBOT");
-    probot->name = setting_robot.value("name").toString();
-    probot->radius = setting_robot.value("radius").toFloat();
-    probot->type = setting_robot.value("type").toString();
-    probot->velocity = setting_robot.value("velocity").toFloat();
-    setting.tray_num = setting_robot.value("tray_num").toInt();
-    setting.useVoice = setting_robot.value("use_voice").toBool();
-    setting.useBGM = setting_robot.value("use_bgm").toBool();
-    setting_robot.endGroup();
-
-    setting_robot.beginGroup("FLOOR");
-    pmap->margin = setting_robot.value("margin").toFloat();
-    pmap->use_server = setting_robot.value("map_server").toBool();
-    pmap->map_loaded = setting_robot.value("map_load").toBool();
-    setting.table_num = setting_robot.value("table_num").toInt();
-    setting.table_col_num = setting_robot.value("table_col_num").toInt();
-    setting_robot.endGroup();
-
-    setting_robot.beginGroup("SERVER");
-    setting.useServerCMD = setting_robot.value("use_servercmd").toBool();
-    setting.useTravelline = setting_robot.value("use_travelline").toBool();
-    setting.travelline = setting_robot.value("travelline").toInt();
-    setting_robot.endGroup();
-
-    setting_robot.beginGroup("PATROL");
-    patrol.filename = setting_robot.value("curfile").toString();
-    patrol.mode = setting_robot.value("patrol_mode").toInt();
-    setting_robot.endGroup();
 
     //Set Variable
     probot->trays.clear();
@@ -368,87 +400,133 @@ void Supervisor::setDebugState(bool isdebug){
 }
 
 
+void Supervisor::requestCamera(){
+    command send_msg;
+    send_msg.cmd = ROBOT_CMD_REQ_CAMERA;
+    lcm->sendCommand(send_msg, "REQUEST CAMERA INFO");
+}
+void Supervisor::setCamera(QString left, QString right){
+    setSetting("SENSOR/left_camera",left);
+    setSetting("SENSOR/right_camera",right);
+    readSetting();
+}
+QString Supervisor::getLeftCamera(){
+    return pmap->left_camera;
+}
+QString Supervisor::getRightCamera(){
+    return pmap->right_camera;
+}
+int Supervisor::getCameraNum(){
+    return pmap->camera_info.size();
+}
+QList<int> Supervisor::getCamera(int num){
+    return pmap->camera_info[num].data;
+}
+QString Supervisor::getCameraSerial(int num){
+    return pmap->camera_info[num].serial;
+}
 
 
 ////*********************************************  INIT PAGE 관련   ***************************************************////
 bool Supervisor::isConnectServer(){
     return server->isconnect;
 }
-int Supervisor::isExistMap(){
-//0:no map, 1:map_server, 2: map_edited, 3:raw_map only
-    QString file_rotated = QGuiApplication::applicationDirPath()+"/image/map_rotated.png";
 
+void Supervisor::deleteAnnotation(){
+    plog->write("[USER INPUT] Remove Annotation Data");
 
-    QString map_server = "image/map_server.png";
-    QString map_rotated = "image/map_rotated.png";
-
-    QString map_raw = "image/raw_map.png";
-    QString map_raw_rotated = "image/map_raw.png";
-    QString map_edited = "image/map_edited.png";
-
-    QString file_meta = "setting/map_meta.ini";
-    QString file_annot = "setting/annotation.ini";
-
+    pmap->vecLocation.clear();
+    pmap->vecTline.clear();
+    pmap->vecObject.clear();
+    list_obj_dR.clear();
+    list_obj_uL.clear();
+}
+bool Supervisor::isExistAnnotation(QString name){
+    QString file_meta = getMetaPath(name);
+    QString file_annot = getAnnotPath(name);
 
     //map_meta.ini 파일이 없으면 기본세팅된 값으로 만든다. (필수)
     if(!QFile::exists(file_meta)){
-        QString filename = "setting/map_meta.ini";
-        QSettings settings(filename, QSettings::IniFormat);
+        QSettings settings(file_meta, QSettings::IniFormat);
         settings.clear();
         settings.setValue("map_metadata/map_w",1000);
         settings.setValue("map_metadata/map_h",1000);
         settings.setValue("map_metadata/map_grid_width",QString::number(0.03));
         settings.setValue("map_metadata/map_origin_u",500);
         settings.setValue("map_metadata/map_origin_v",500);
-        qDebug() << QGuiApplication::applicationDirPath()+"/setting/map_meta.ini" << filename;
         plog->write("[SETTING] map_meta.ini not found -> make basic format");
         if(pmap->map_loaded){
             setSetting("FLOOR/map_load","false");
         }
     }
-
-    if(QFile::exists(file_annot)){
-        //서버에서 받아온 맵(회전된 버전)
-        if(QFile::exists(map_rotated)){
-            return 1;
+    return QFile::exists(file_annot);
+}
+int Supervisor::getAvailableMap(){
+    std::string path = QString(QDir::homePath()+"/maps").toStdString();
+    QDir directory(path.c_str());
+    QStringList FileList = directory.entryList();
+    map_list.clear();
+    for(int i=0; i<FileList.size(); i++){
+        QStringList namelist = FileList[i].split(".");
+        if(namelist.size() == 1){
+            map_list.push_back(FileList[i]);
         }
-
-        //서버에서 받아온 원본 맵
-        if(QFile::exists(map_server)){
-            if(rotate_map(map_server,map_rotated,0)){
-                return 1;
-            }
+    }
+    return map_list.size();
+}
+QString Supervisor::getAvailableMapPath(int num){
+    if(num>-1 && num<map_list.size()){
+        return map_list[num];
+    }
+    return "";
+}
+int Supervisor::getMapFileSize(QString name){
+    std::string path = QString(QDir::homePath()+"/maps/"+name).toStdString();
+    QDir directory(path.c_str());
+    QStringList FileList = directory.entryList();
+    map_detail_list.clear();
+    for(int i=0; i<FileList.size(); i++){
+        if(FileList[i] == "." || FileList[i] == ".."){
+            continue;
         }
+        map_detail_list.push_back(FileList[i]);
+    }
+    return map_detail_list.size();
+}
+QString Supervisor::getMapFile(int num){
+    return map_detail_list[num];
+}
+bool Supervisor::isExistMap(QString name){
+    if(QFile::exists(getMapPath(name))){
+        if(QFile::exists(getRawMapPath(name))){
 
-        //로컬에서 만들어진 맵(회전되고 수정된 버전)
-        if(QFile::exists(map_edited)){
-            return 2;
+        }else{
+            //make map_raw.png
+            QFile::copy(getMapPath(name),getRawMapPath(name));
         }
+        return true;
     }else{
-        if(pmap->map_loaded){
+        return false;
+    }
+}
+bool Supervisor::isExistRawMap(QString name){
+    if(QFile::exists(getRawMapPath(name))){
+        return true;
+    }else{
+        return false;
+    }
+}
+bool Supervisor::isExistMap(){
+    //기본 설정된 맵파일 확인
+    if(pmap->map_loaded){
+        if(QFile::exists(getMapPath(getMapname()))){
+            return true;
+        }else{
+            plog->write("[SETTING - ERROR] "+getMapname()+" not found. map unloaded.");
             setSetting("FLOOR/map_load","false");
         }
     }
-
-    //로컬에서 만든 맵(매핑 로우 파일)
-    if(QFile::exists(map_raw)){
-        if(pmap->map_loaded)
-            setSetting("FLOOR/map_load","false");
-        if(!QFile::exists(map_raw_rotated)){
-            rotate_map(map_raw, map_raw_rotated,0);
-        }
-        if(QFile::exists(file_annot)){
-            if(!QFile::exists(map_edited)){
-                rotate_map(map_raw, map_edited,0);
-            }
-            return 2;
-        }
-        return 3;
-    }else{
-        if(pmap->map_loaded)
-            setSetting("FLOOR/map_load","false");
-        return 0;
-    }
+    return false;
 }
 bool Supervisor::loadMaptoServer(){
     if(server->isconnect){
@@ -457,6 +535,7 @@ bool Supervisor::loadMaptoServer(){
         return true;
     }else{
         plog->write("[USER INPUT - ERROR] load map to server : server not connected");
+        QMetaObject::invokeMethod(mMain, "loadmap_server_fail");
         return false;
     }
 }
@@ -473,44 +552,30 @@ bool Supervisor::isuseServerMap(){
     return pmap->use_server;
 }
 void Supervisor::setuseServerMap(bool use){
-    QString ini_path = "setting/robot.ini";
+    QString ini_path = QDir::homePath()+"/robot_config.ini";
     QSettings settings(ini_path, QSettings::IniFormat);
     settings.setValue("FLOOR/map_server",use);
     if(use){
+        settings.setValue("FLOOR/map_load",true);
+        settings.setValue("FLOOR/map_name",server->server_map_name);
+        settings.setValue("FLOOR/map_path",QDir::homePath()+"/maps/"+server->server_map_name);
+        readSetting();
         plog->write("[SETTING] USE SERVER MAP Changed : True");
     }else{
         plog->write("[SETTING] USE SERVER MAP Changed : False");
     }
     readSetting();
 }
-void Supervisor::removeRawMap(){
-    plog->write("[USER INPUT] Remove Map : raw_map.png, map_raw.png");
-    QFile *file_1 = new QFile(QGuiApplication::applicationDirPath()+"/image/raw_map.png");
-    QFile *file_2 = new QFile(QGuiApplication::applicationDirPath()+"/image/map_raw.png");
-    file_1->remove();
-    file_2->remove();
-}
-void Supervisor::removeEditedMap(){
-    plog->write("[USER INPUT] Remove Map : raw_map.png, map_raw.png, map_edited.png");
-    QFile *file_1 = new QFile(QGuiApplication::applicationDirPath()+"/image/raw_map.png");
-    QFile *file_2 = new QFile(QGuiApplication::applicationDirPath()+"/image/map_raw.png");
-    QFile *file_3 = new QFile(QGuiApplication::applicationDirPath()+"/image/map_edited.png");
-    file_1->remove();
-    file_2->remove();
-    file_3->remove();
-}
-void Supervisor::removeServerMap(){
-    plog->write("[USER INPUT] Remove Map : map_server.png, map_rotated.png");
-    QFile *file_1= new QFile(QGuiApplication::applicationDirPath()+"/image/map_server.png");
-    QFile *file_2 = new QFile(QGuiApplication::applicationDirPath()+"/image/map_rotated.png");
-    file_1->remove();
-    file_2->remove();
+void Supervisor::removeMap(QString filename){
+    plog->write("[USER INPUT] Remove Map : "+filename);
+    QFile *file = new QFile(QDir::homePath()+"/maps/"+filename);
+    file->remove();
 }
 bool Supervisor::isloadMap(){
     return pmap->map_loaded;
 }
 void Supervisor::setloadMap(bool load){
-    QString ini_path = "setting/robot.ini";
+    QString ini_path = getIniPath();
     QSettings settings(ini_path, QSettings::IniFormat);
     if(settings.value("FLOOR/map_load").toBool() == load){
 
@@ -525,48 +590,90 @@ void Supervisor::setloadMap(bool load){
     }
 }
 bool Supervisor::isExistRobotINI(){
-    QString file = "setting/robot.ini";
+    QString file = getIniPath();
     return QFile::exists(file);
 }
 void Supervisor::makeRobotINI(){
-    plog->write("[SETTING] Make Robot.ini basic format");
+    plog->write("[SETTING] Make robot_config.ini basic format");
     setSetting("ROBOT/name","test1");
-    setSetting("ROBOT/radius","0.25");
+    setSetting("ROBOT/radius","0.27");
     setSetting("ROBOT/tray_num","3");
     setSetting("ROBOT/type","SERVING");
     setSetting("ROBOT/use_bgm","true");
     setSetting("ROBOT/use_voice","true");
-    setSetting("ROBOT/velocity","1");
+    setSetting("ROBOT/velocity","1.0");
+    setSetting("ROBOT/use_uicmd","true");
+    setSetting("ROBOT/k_curve","0.7");
+    setSetting("ROBOT/k_v","0.7");
+    setSetting("ROBOT/k_w","2.5");
+    setSetting("ROBOT/limit_manual_v","0.3");
+    setSetting("ROBOT/limit_manual_w","15.0");
+    setSetting("ROBOT/limit_pivot","45.0");
+    setSetting("ROBOT/limit_v","1.0");
+    setSetting("ROBOT/limit_w","120.0");
+    setSetting("ROBOT/look_ahead_dist","0.45");
+    setSetting("ROBOT/wheel_base","0.3542");
+    setSetting("ROBOT/wheel_radius","0.0635");
+
     setSetting("SERVER/travelline","0");
     setSetting("SERVER/use_servercmd","true");
     setSetting("SERVER/use_travelline","true");
+
     setSetting("FLOOR/map_load","true");
     setSetting("FLOOR/map_server","false");
-    setSetting("FLOOR/margin","0.25");
+    setSetting("FLOOR/table_col_num","1");
     setSetting("FLOOR/table_num","5");
+    setSetting("FLOOR/map_name","");
+    setSetting("FLOOR/map_path","");
+
     setSetting("PATROL/patrol_mode","0");
     setSetting("PATROL/curfile","");
+
+    setSetting("MOTOR/gear_ratio","1.0");
+    setSetting("MOTOR/k_d","5500.0");
+    setSetting("MOTOR/k_i","0.0");
+    setSetting("MOTOR/k_p","120.0");
+    setSetting("MOTOR/left_id","1");
+    setSetting("MOTOR/right_id","0");
+    setSetting("MOTOR/limit_acc","1.0");
+    setSetting("MOTOR/limit_dec","1.0");
+    setSetting("MOTOR/limit_vel","2.0");
+    setSetting("MOTOR/wheel_dir","-1");
+
+    setSetting("SENSOR/baudrate","256000");
+    setSetting("SENSOR/mask","10.0");
+    setSetting("SENSOR/max_range","40.0");
+    setSetting("SENSOR/offset_x","0.0");
+    setSetting("SENSOR/offset_y","0.0");
+    setSetting("SENSOR/left_camera","");
+    setSetting("SENSOR/right_camera","");
+
     readSetting();
 }
 bool Supervisor::rotate_map(QString _src, QString _dst, int mode){
     cv::Mat map1 = cv::imread(_src.toStdString());
 
-    if(mode == 0){
-        cv::flip(map1, map1, 0);
-        cv::rotate(map1,map1,cv::ROTATE_90_COUNTERCLOCKWISE);
-    }else{
-        cv::rotate(map1,map1,cv::ROTATE_90_CLOCKWISE);
-        cv::flip(map1, map1, 0);
-
-    }
-
+    cv::rotate(map1,map1,cv::ROTATE_90_CLOCKWISE);
+    cv::flip(map1, map1, 0);
     QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(map1)).toImage();
 
     //Save PNG File
-    if(temp_image.save(_dst,"PNG")){
-        return true;
-    }else{
-        return false;
+    if(mode == 1){//edited
+        if(temp_image.save(QDir::homePath()+"/maps/"+_dst+"/map_edited.png","PNG")){
+            QFile *file = new QFile(QGuiApplication::applicationDirPath()+"/"+_src);
+            file->remove();
+            return true;
+        }else{
+            return false;
+        }
+    }else if(mode == 2){//raw
+        if(temp_image.save(QDir::homePath()+"/maps/"+_dst+"/map_raw.png","PNG")){
+            QFile *file = new QFile(QGuiApplication::applicationDirPath()+"/"+_src);
+            file->remove();
+            return true;
+        }else{
+            return false;
+        }
     }
 }
 bool Supervisor::getLCMConnection(){
@@ -601,6 +708,8 @@ void Supervisor::saveMapfromUsb(QString path){
 
     QString orin_path = path1.c_str() + path;
     QStringList kk = path.split('/');
+
+
     QString new_path = QCoreApplication::applicationDirPath() + "/image/" + kk[kk.length()-1];
     if(QFile::exists(orin_path)){
         if(QFile::copy(orin_path, new_path)){
@@ -613,7 +722,11 @@ void Supervisor::saveMapfromUsb(QString path){
     }
 }
 
-
+void Supervisor::setMap(QString name){
+    setSetting("FLOOR/map_path",QDir::homePath()+"/maps/"+name);
+    setSetting("FLOOR/map_name",name);
+    setloadMap(true);
+}
 
 
 
@@ -671,7 +784,6 @@ bool Supervisor::is_slam_running(){
 }
 
 bool Supervisor::getMappingflag(){
-    return true;
     return lcm->flagMapping;
 }
 
@@ -679,9 +791,143 @@ void Supervisor::setMappingflag(bool flag){
     lcm->flagMapping = flag;
 }
 
+QList<int> Supervisor::getMap(QString filename){
+    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_edited.png";
+    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+    cv::flip(map,map,0);
+    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+    uchar* map_data = map.data;
+    QList<int> list;
+
+    for(int i=0; i<map.rows; i++){
+        for(int j=0; j<map.cols; j++){
+            list.push_back(map_data[i*map.cols + j]);
+        }
+    }
+    return list;
+}
+QList<int> Supervisor::getRawMap(QString filename){
+    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_raw.png";
+    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+    cv::flip(map,map,0);
+    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+    uchar* map_data = map.data;
+    QList<int> list;
+
+    for(int i=0; i<map.rows; i++){
+        for(int j=0; j<map.cols; j++){
+            list.push_back(map_data[i*map.cols + j]);
+        }
+    }
+    return list;
+}
+QList<int> Supervisor::getMiniMap(QString filename){
+    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_edited.png";
+    minimap = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+    cv::flip(minimap,minimap,0);
+    cv::rotate(minimap,minimap,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+    plog->write("[MAP] Make Minimap Start : "+filename);
+    int dp = 3;
+    for(int i=0; i<minimap.rows; i=i+dp){
+        for(int j=0; j<minimap.cols; j=j+dp){
+            int pixel = 0;
+            bool outline = false;
+            for(int k=0; k<dp; k++){
+                for(int m=0; m<dp; m++){
+                    if(i+k>minimap.rows-1)
+                        continue;
+                    if(j+m>minimap.cols-1)
+                        continue;
+                    pixel+=minimap.at<cv::Vec3b>(i+k,j+m)[0];
+                    if(minimap.at<cv::Vec3b>(i+k,j+m)[0] == 0)
+                        outline = true;
+                }
+            }
+            float kk = pixel/(dp*dp);
+            if(kk < 10 || outline)
+                pixel = 0;
+            else if(kk > 100)
+                pixel = 255;
+            else
+                pixel = 38;
+
+            for(int k=0; k<dp; k++){
+                for(int m=0; m<dp; m++){
+                    if(i+k>minimap.rows-1)
+                        continue;
+                    if(j+m>minimap.cols-1)
+                        continue;
+                    minimap.data[((i+k)*minimap.cols + (j+m))*3] = pixel;
+                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 1] = pixel;
+                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 2] = pixel;
+                }
+            }
+        }
+    }
+    dp = 15;
+    for(int i=0; i<minimap.rows; i=i+dp){
+        for(int j=0; j<minimap.cols; j=j+dp){
+
+            int pixel = 0;
+            int outline = 0;
+            for(int k=0; k<dp; k++){
+                for(int m=0; m<dp; m++){
+                    if(i+k>minimap.rows-1)
+                        continue;
+                    if(j+m>minimap.cols-1)
+                        continue;
+                    pixel+=minimap.at<cv::Vec3b>(i+k,j+m)[0];
+                    if(minimap.at<cv::Vec3b>(i+k,j+m)[0] == 0)
+                        outline++;
+                }
+            }
+            float kk = pixel/(dp*dp);
+            if(outline > (dp*dp)/3)
+                pixel = 0;
+            else if(kk > 100)
+                pixel = 255;
+            else
+                pixel = 38;
+
+            for(int k=0; k<dp; k++){
+                for(int m=0; m<dp; m++){
+                    if(i+k>minimap.rows-1)
+                        continue;
+                    if(j+m>minimap.cols-1)
+                        continue;
+                    minimap.data[((i+k)*minimap.cols + (j+m))*3] = pixel;
+                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 1] = pixel;
+                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 2] = pixel;
+                }
+            }
+        }
+    }
+
+    cv::cvtColor(minimap, minimap,cv::COLOR_BGR2HSV);
+    cv::GaussianBlur(minimap, minimap,cv::Size(3,3),0);
+    cv::Scalar lower(0,0,37);
+    cv::Scalar upper(0,0,255);
+    cv::inRange(minimap,lower,upper,minimap);
+    cv::Canny(minimap,minimap,600,600);
+    cv::Mat kernel = getStructuringElement(cv::MORPH_RECT, cv::Size(5,5));
+    dilate(minimap, minimap, kernel);
+    QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(minimap)).toImage();
+    uchar* map_data = minimap.data;
+    QList<int> list;
+
+    for(int i=0; i<minimap.rows; i++){
+        for(int j=0; j<minimap.cols; j++){
+            list.push_back(map_data[i*minimap.cols + j]);
+        }
+    }
+    return list;
+}
+
 QList<int> Supervisor::getMapping(){
     return pmap->data.toList();
 }
+
 void Supervisor::pushMapData(QList<int> data){
     pmap->data.clear();
     for(int i=0; i<data.size(); i++){
@@ -1328,22 +1574,10 @@ int Supervisor::getTlineNum(int x, int y){
 
     return -1;
 }
-
-
 bool Supervisor::saveMetaData(QString filename){
-    //파일 유무 확인
-    QStringList filenamelist = filename.split("/");
-    if(filenamelist[filenamelist.size()-1].split(".").size() <2){
-        filename = "setting/"+filenamelist[filenamelist.size()-1]+".ini";
-    }else{
-        filename = "setting/"+filenamelist[filenamelist.size()-1];
-    }
-
     //기존 파일 백업
-    QString backup = QGuiApplication::applicationDirPath()+"/setting/map_meta_backup.ini";
-    QString origin = QGuiApplication::applicationDirPath()+"/setting/map_meta.ini";
-    QFile *file = new QFile(backup);
-    file->remove();
+    QString backup = QDir::homePath()+"/maps/"+filename+"/map_meta_backup.ini";
+    QString origin = getMetaPath(filename);
     if(QFile::exists(origin) == true){
         if(QFile::copy(origin, backup)){
             plog->write("[DEBUG] Copy map_meta.ini to map_meta_backup.ini");
@@ -1357,7 +1591,7 @@ bool Supervisor::saveMetaData(QString filename){
     }
 
     //데이터 입력(맵데이터)
-    QSettings settings(filename, QSettings::IniFormat);
+    QSettings settings(getMetaPath(filename), QSettings::IniFormat);
     settings.clear();
     settings.setValue("map_metadata/map_w",pmap->width);
     settings.setValue("map_metadata/map_h",pmap->height);
@@ -1368,19 +1602,9 @@ bool Supervisor::saveMetaData(QString filename){
 
 }
 bool Supervisor::saveAnnotation(QString filename){
-    //파일 유무 확인
-    QStringList filenamelist = filename.split("/");
-    if(filenamelist[filenamelist.size()-1].split(".").size() <2){
-        filename = "setting/"+filenamelist[filenamelist.size()-1]+".ini";
-    }else{
-        filename = "setting/"+filenamelist[filenamelist.size()-1];
-    }
-
     //기존 파일 백업
-    QString backup = QGuiApplication::applicationDirPath()+"/setting/annotation_backup.ini";
-    QString origin = QGuiApplication::applicationDirPath()+"/setting/annotation.ini";
-    QFile *file = new QFile(backup);
-    file->remove();
+    QString backup = QDir::homePath()+"/maps"+filename+"/annotation_backup.ini";
+    QString origin = getAnnotPath(filename);
     if(QFile::exists(origin) == true){
         if(QFile::copy(origin, backup)){
             plog->write("[DEBUG] Copy annotation.ini to annotation_backup.ini");
@@ -1397,7 +1621,7 @@ bool Supervisor::saveAnnotation(QString filename){
     int charging_num = 0;
     int serving_num = 0;
     QString str_name;
-    QSettings settings(filename, QSettings::IniFormat);
+    QSettings settings(getAnnotPath(filename), QSettings::IniFormat);
     settings.clear();
     for(int i=0; i<pmap->vecLocation.size(); i++){
         if(pmap->vecLocation[i].type == "Resting"){
@@ -1465,9 +1689,7 @@ bool Supervisor::saveAnnotation(QString filename){
     return true;
 }
 void Supervisor::sendMaptoServer(){
-    if(rotate_map("image/map_edited.png","image/map_raw.png",1)){
-        server->sendMap(QGuiApplication::applicationDirPath()+"/image/map_raw.png",QGuiApplication::applicationDirPath()+"/setting/");
-    }
+    server->sendMap(pmap->map_name);
 }
 
 
@@ -1664,7 +1886,13 @@ QString Supervisor::getMapname(){
     return pmap->map_name;
 }
 QString Supervisor::getMappath(){
-    return "file://" + QGuiApplication::applicationDirPath() + "/image/" + pmap->map_name + ".png";
+    return pmap->map_path;
+}
+QString Supervisor::getServerMappath(){
+    return QDir::homePath() + "/maps/"+server->server_map_name;
+}
+QString Supervisor::getServerMapname(){
+    return server->server_map_name;
 }
 int Supervisor::getMapWidth(){
     return pmap->width;
@@ -1681,159 +1909,6 @@ QVector<int> Supervisor::getOrigin(){
     temp.push_back(pmap->origin[1]);
     return temp;
 }
-
-void Supervisor::setGrid(int x, int y, QString name){
-    if(minimap_grid.size() > x){
-        if(minimap_grid[x].size() > y){
-            minimap_grid[x][y] = name;
-        }else{
-            minimap_grid[x].push_back(name);
-        }
-    }else{
-        QVector<QString> temp;
-        temp.push_back(name);
-        minimap_grid.push_back(temp);
-    }
-}
-void Supervisor::editGrid(int x, int y, QString name){
-    if(minimap_grid.size() > x){
-        if(minimap_grid[x].size() > y){
-            minimap_grid[x][y] = name;
-        }
-    }
-}
-QString Supervisor::getGrid(int x, int y){
-    if(minimap_grid.size() > x){
-        if(minimap_grid[x].size() > y){
-
-            return minimap_grid[x][y];
-        }
-    }
-}
-
-void Supervisor::make_minimap(){
-    QString map_path;
-    if(pmap->use_server){
-        map_path = "image/map_rotated.png";
-    }else{
-        map_path = "image/map_edited.png";
-    }
-
-    plog->write("[MAP] Make Minimap Start : "+map_path);
-    minimap = cv::imread(map_path.toStdString());
-    cv::Mat minimap_1, minimap_2;
-
-    int dp = 3;
-    for(int i=0; i<minimap.rows; i=i+dp){
-        for(int j=0; j<minimap.cols; j=j+dp){
-            int pixel = 0;
-            bool outline = false;
-            for(int k=0; k<dp; k++){
-                for(int m=0; m<dp; m++){
-                    if(i+k>minimap.rows-1)
-                        continue;
-                    if(j+m>minimap.cols-1)
-                        continue;
-                    pixel+=minimap.at<cv::Vec3b>(i+k,j+m)[0];
-                    if(minimap.at<cv::Vec3b>(i+k,j+m)[0] == 0)
-                        outline = true;
-                }
-            }
-            float kk = pixel/(dp*dp);
-            if(kk < 10 || outline)
-                pixel = 0;
-            else if(kk > 100)
-                pixel = 255;
-            else
-                pixel = 38;
-
-            for(int k=0; k<dp; k++){
-                for(int m=0; m<dp; m++){
-                    if(i+k>minimap.rows-1)
-                        continue;
-                    if(j+m>minimap.cols-1)
-                        continue;
-                    minimap.data[((i+k)*minimap.cols + (j+m))*3] = pixel;
-                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 1] = pixel;
-                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 2] = pixel;
-                }
-            }
-        }
-    }
-
-    QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(minimap)).toImage();
-    if(temp_image.save("image/map_mini1.png","PNG")){
-        plog->write("[MAP] Make Minimap : 1/3");
-    }else{
-        plog->write("[MAP - ERROR] Make Minimap (Fail to save): 1/3");
-    }
-
-    dp = 15;
-    for(int i=0; i<minimap.rows; i=i+dp){
-        for(int j=0; j<minimap.cols; j=j+dp){
-
-            int pixel = 0;
-            int outline = 0;
-            for(int k=0; k<dp; k++){
-                for(int m=0; m<dp; m++){
-                    if(i+k>minimap.rows-1)
-                        continue;
-                    if(j+m>minimap.cols-1)
-                        continue;
-                    pixel+=minimap.at<cv::Vec3b>(i+k,j+m)[0];
-                    if(minimap.at<cv::Vec3b>(i+k,j+m)[0] == 0)
-                        outline++;
-                }
-            }
-            float kk = pixel/(dp*dp);
-            if(outline > (dp*dp)/3)
-                pixel = 0;
-            else if(kk > 100)
-                pixel = 255;
-            else
-                pixel = 38;
-
-            for(int k=0; k<dp; k++){
-                for(int m=0; m<dp; m++){
-                    if(i+k>minimap.rows-1)
-                        continue;
-                    if(j+m>minimap.cols-1)
-                        continue;
-                    minimap.data[((i+k)*minimap.cols + (j+m))*3] = pixel;
-                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 1] = pixel;
-                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 2] = pixel;
-                }
-            }
-        }
-    }
-    temp_image = QPixmap::fromImage(mat_to_qimage_cpy(minimap)).toImage();
-    if(temp_image.save("image/map_mini2.png","PNG")){
-        plog->write("[MAP] Make Minimap : 2/3");
-    }else{
-        plog->write("[MAP - ERROR] Make Minimap (Fail to save): 2/3");
-    }
-
-    cv::cvtColor(minimap, minimap_1,cv::COLOR_BGR2HSV);
-    cv::GaussianBlur(minimap_1, minimap_2,cv::Size(3,3),0);
-    cv::Scalar lower(0,0,37);
-    cv::Scalar upper(0,0,255);
-    cv::inRange(minimap_2,lower,upper,minimap_1);
-    cv::Canny(minimap_1,minimap_2,600,600);
-
-    cv::Mat kernel = getStructuringElement(cv::MORPH_RECT, cv::Size(5,5));
-    dilate(minimap_2, minimap_1, kernel);
-    temp_image = QPixmap::fromImage(mat_to_qimage_cpy(minimap_1)).toImage();
-    if(temp_image.save("image/map_mini.png","PNG")){
-        plog->write("[MAP] Make Minimap : DONE");
-    }else{
-        plog->write("[MAP - ERROR] Make Minimap (Fail to save): 3/3");
-    }
-}
-
-
-
-
-
 
 ////*********************************************  PATROL 관련   ***************************************************////
 QString Supervisor::getPatrolFileName(){
@@ -1858,9 +1933,9 @@ void Supervisor::loadPatrolFile(QString path){
     QStringList list1 = path.split("/");
     QStringList list = list1[list1.size()-1].split(".");
     if(list.size() == 1){
-        path = "patrol/" + list1[list1.size()-1] + ".ini";
+        path = QDir::homePath()+"/patrol/" + list1[list1.size()-1] + ".ini";
     }else{
-        path = "patrol/" + list1[list1.size()-1];
+        path = QDir::homePath()+"/patrol/" + list1[list1.size()-1];
     }
     plog->write("[USER INPUT] Load Patrol : "+path);
     QSettings patrols(path, QSettings::IniFormat);
@@ -1885,9 +1960,9 @@ void Supervisor::savePatrolFile(QString path){
     QStringList list1 = path.split("/");
     QStringList list = list1[list1.size()-1].split(".");
     if(list.size() == 1){
-        path = "patrol/" + list1[list1.size()-1] + ".ini";
+        path = QDir::homePath()+"/patrol/" + list1[list1.size()-1] + ".ini";
     }else{
-        path = "patrol/" + list1[list1.size()-1];
+        path = QDir::homePath()+"/patrol/" + list1[list1.size()-1];
     }
     plog->write("[USER INPUT] Save Patrol : "+path);
     QSettings patrols(path, QSettings::IniFormat);
@@ -2025,13 +2100,13 @@ void Supervisor::stopRotateTables(){
     ui_cmd = UI_CMD_PATROL_STOP;
 }
 
-
-
-
-
 //// *********************************** SLOTS *********************************** ////
 void Supervisor::server_cmd_setini(){
     readSetting();
+}
+void Supervisor::server_get_map(){
+    readSetting(server->server_map_name);
+    QMetaObject::invokeMethod(mMain, "loadmap_server_success");
 }
 void Supervisor::path_changed(){
     QMetaObject::invokeMethod(mMain, "updatepath");
@@ -2111,11 +2186,11 @@ void Supervisor::onTimer(){
             if(flag_read_ini){
                 if(pmap->use_server){
                     plog->write("[LCM] CONNECT -> INIT START");
-                    lcm->sendMapPath("file://"+QCoreApplication::applicationDirPath()+"/image/map_server.png");
+                    lcm->sendMapPath("");
                     ui_state = UI_STATE_NONE;
                 }else{
                     plog->write("[LCM] CONNECT -> INIT START");
-                    lcm->sendMapPath("file://"+QCoreApplication::applicationDirPath()+"/image/map_raw.png");
+                    lcm->sendMapPath("");
                     ui_state = UI_STATE_NONE;
                 }
             }

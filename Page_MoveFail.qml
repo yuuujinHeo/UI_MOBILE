@@ -1,5 +1,11 @@
 import QtQuick 2.12
+import QtQuick.Shapes 1.12
+import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
+import QtQuick.Dialogs 1.2
+import Qt.labs.platform 1.0 as Platform
+import QtQuick.Shapes 1.12
+import QtGraphicalEffects 1.0
 import "."
 import io.qt.Supervisor 1.0
 
@@ -12,14 +18,20 @@ Item {
     property var joy_axis_left_ud: 0
     property var joy_axis_right_rl: 0
 
+    Component.onCompleted: {
+        init();
+    }
+
     function init(){
         statusbar.visible = true;
         notice.y = 0;
         area_swipe.enabled = true;
-    }
-
-    function loadmap(path){
-//        map.loadmap_mini();
+        map.init_mode();
+        map.robot_following = true;
+        map.show_lidar = true;
+        map.show_path = true;
+        map.show_object = true;
+        map.show_robot = true;
     }
 
     SequentialAnimation{
@@ -47,189 +59,294 @@ Item {
             anchors.fill: parent
             color:"#282828"
         }
+        Rectangle{
+            id: rect_menu
+            width: 400
+            height: parent.height - statusbar.height
+            anchors.top: parent.top
+            anchors.topMargin: statusbar.height
+            color: "#f4f4f4"
+
+            Rectangle{
+                id: rect_box
+                width: parent.width - 60
+                height: 150
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 30
+                color: "#e8e8e8"
+
+                Row{
+                    anchors.centerIn: parent
+                    spacing: 30
+                    Rectangle{
+                        width: 90
+                        height: 120
+                        radius: 5
+                        Rectangle{
+                            id: btn_cancel
+                            width: 90
+                            height: 120
+                            radius: 5
+                            color:"white"
+                            Column{
+                                anchors.centerIn: parent
+                                spacing: 20
+                                Image{
+                                    source: "icon/icon_cancelpath.png"
+                                    sourceSize.width: 40
+                                    sourceSize.height: 40
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                                Text{
+                                    text: "경로 취소"
+                                    font.family: font_noto_r.name
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    supervisor.moveStop();
+                                }
+                            }
+                        }
+                        DropShadow{
+                            anchors.fill: parent
+                            radius: 10
+                            color: "#dfdfdf"
+                            source: btn_cancel
+                        }
+
+                    }
+                    Rectangle{
+                        width: 90
+                        height: 120
+                        radius: 5
+                        Rectangle{
+                            id: btn_research
+                            width: 90
+                            height: 120
+                            radius: 5
+                            Column{
+                                anchors.centerIn: parent
+                                spacing: 20
+                                Image{
+                                    source: "icon/icon_researching.png"
+                                    sourceSize.width: 40
+                                    sourceSize.height: 40
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                                Text{
+                                    text: "경로 재탐색"
+                                    font.family: font_noto_r.name
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    supervisor.moveStop();
+                                }
+                            }
+                        }
+                        DropShadow{
+                            anchors.fill: parent
+                            radius: 10
+                            color: "#dfdfdf"
+                            source: btn_research
+                        }
+                    }
+
+                }
+            }
+            Rectangle{
+                id: rect_annot_box2
+                width: parent.width - 60
+                height: 100
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: rect_box.bottom
+                anchors.topMargin: 30
+                color: "transparent"
+                Row{
+                    anchors.centerIn: parent
+                    spacing: 30
+                    Rectangle{
+                        width: 90
+                        height: 90
+                        radius: 90
+                        Rectangle{
+                            id: btn_manual
+                            width: 90
+                            height: 90
+                            radius: 90
+                            Column{
+                                anchors.centerIn: parent
+                                Image{
+                                    source: "icon/icon_manualmove.png"
+                                    sourceSize.width: 30
+                                    sourceSize.height: 30
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                                Text{
+                                    text: "수동 제어"
+                                    font.family: font_noto_r.name
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    supervisor.moveStop();
+                                }
+                            }
+                        }
+                        DropShadow{
+                            anchors.fill: parent
+                            radius: 10
+                            color: "#dfdfdf"
+                            source: btn_manual
+                        }
+                    }
+                    Rectangle{
+                        width: 90
+                        height: 90
+                        radius: 90
+                        Rectangle{
+                            id: btn_auto
+                            width: 90
+                            height: 90
+                            radius: 90
+                            Column{
+                                anchors.centerIn: parent
+                                Image{
+                                    source: "icon/icon_auto_init.png"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                                Text{
+                                    text: "자동 초기화"
+                                    font.family: font_noto_r.name
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    btn_auto_init.running = true;
+                                    supervisor.slam_autoInit();
+                                }
+                            }
+                        }
+                        DropShadow{
+                            anchors.fill: parent
+                            radius: 10
+                            color: "#dfdfdf"
+                            source: btn_auto
+                        }
+                    }
+                    Rectangle{
+                        width: 90
+                        height: 90
+                        radius: 90
+                        Rectangle{
+                            id: btn_stop
+                            width: 90
+                            height: 90
+                            radius: 90
+                            Column{
+                                anchors.centerIn: parent
+                                Image{
+                                    source: "icon/icon_stop.png"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                                Text{
+                                    text: "정지"
+                                    font.family: font_noto_r.name
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    supervisor.moveStop();
+                                }
+                            }
+                        }
+                        DropShadow{
+                            anchors.fill: parent
+                            radius: 10
+                            color: "#dfdfdf"
+                            source: btn_stop
+                        }
+                    }
+
+                }
+            }
+
+            Rectangle{
+                width: parent.width
+                height: 400
+                anchors.bottom: parent.bottom
+                color: "#d0d0d0"
+
+                Row{
+                    id: fnke
+                    anchors.top: parent.top
+                    anchors.topMargin: 50
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 50
+                    Item_joystick{
+                        id: joy_xy
+                        verticalOnly: true
+                        onUpdate_cntChanged: {
+                            if(update_cnt == 0 && supervisor.getJoyXY() != 0){
+                                supervisor.joyMoveXY(0, 0);
+                            }else{
+                                if(fingerInBounds) {
+                                    supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+                                }else{
+                                    supervisor.joyMoveXY(Math.sin(angle));
+                                }
+                            }
+                        }
+                    }
+                    Item_joystick{
+                        id: joy_th
+                        horizontalOnly: true
+                        onUpdate_cntChanged: {
+                            if(update_cnt == 0 && supervisor.getJoyR() != 0){
+                                supervisor.joyMoveR(0, 0);
+                            }else{
+                                if(fingerInBounds) {
+                                    supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+                                } else {
+                                    supervisor.joyMoveR(-Math.cos(angle));
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                Item_keyboard{
+                    id: keyboard
+                    focus: true
+                    btn_size: 65
+                    btn_dist: 2
+                    anchors.top: fnke.bottom
+                    anchors.topMargin: 40
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+            }
+        }
+
         Map_full{
             id: map
-            width: 500
-            height: 500
+            width: 740
+            height: width
+            anchors.left: rect_menu.right
             anchors.top: parent.top
-            anchors.topMargin: statusbar.height + 30
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        Image{
-            id: image_joy_up
-            source: "icon/joy_up.png"
-            width: 13
-            height: 8
-            anchors.horizontalCenter: joy_xy.horizontalCenter
-            anchors.bottom: joy_xy.top
-            anchors.bottomMargin: 8
-        }
-        Image{
-            id: image_joy_down
-            source: "icon/joy_down.png"
-            width: 13
-            height: 8
-            anchors.horizontalCenter: joy_xy.horizontalCenter
-            anchors.top: joy_xy.bottom
-            anchors.topMargin: 8
-        }
-        Image{
-            id: image_joy_left
-            source: "icon/joy_left.png"
-            width: 8
-            height: 13
-            anchors.verticalCenter: joy_th.verticalCenter
-            anchors.right: joy_th.left
-            anchors.rightMargin: 8
-        }
-        Image{
-            id: image_joy_right
-            source: "icon/joy_right.png"
-            width: 8
-            height: 13
-            anchors.verticalCenter: joy_th.verticalCenter
-            anchors.left: joy_th.right
-            anchors.leftMargin: 8
-        }
-        Item_joystick{
-            id: joy_xy
-            anchors.right: map.left
-            anchors.rightMargin: 80
-            anchors.verticalCenter: parent.verticalCenter
-            verticalOnly: true
-            onUpdate_cntChanged: {
-                if(update_cnt == 0 && angle != 0){
-                    supervisor.joyMoveXY(0, 0);
-                }else{
-                    if(fingerInBounds) {
-                        supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-                    }else{
-                        supervisor.joyMoveXY(Math.sin(angle));
-                    }
-                }
-            }
-        }
-
-        Item_joystick{
-            id: joy_th
-            anchors.left: map.right
-            anchors.leftMargin: 80
-            anchors.verticalCenter: parent.verticalCenter
-            horizontalOnly: true
-            onUpdate_cntChanged: {
-                if(update_cnt == 0 && angle != 0){
-                    supervisor.joyMoveR(0, 0);
-                }else{
-                    if(fingerInBounds) {
-                        supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-                    } else {
-                        supervisor.joyMoveR(-Math.cos(angle));
-                    }
-                }
-            }
-        }
-
-        Row{
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: map.bottom
-            anchors.topMargin: 50
-            spacing: 40
-
-            Rectangle{
-                id: btn_stop
-                width: 250
-                height: 90
-                radius: 10
-                color: "#d0d0d0"
-                Row{
-                    spacing: 10
-                    anchors.centerIn: parent
-                    Image{
-                        source:"icon/icon_cancelpath.png"
-                        width: 46
-                        anchors.verticalCenter: parent.verticalCenter
-                        height: 40
-                    }
-                    Text{
-                        text: "경로 취소"
-                        font.family: font_noto_b.name
-                        font.bold: true
-                        anchors.verticalCenter: parent.verticalCenter
-                        font.pixelSize: 30
-                        color:"#282828"
-                    }
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: {
-                        supervisor.moveStop();
-                    }
-                }
-            }
-            Rectangle{
-                id: btn_resume
-                width: 250
-                height: 90
-                radius: 10
-                color: "#d0d0d0"
-                Row{
-                    spacing: 10
-                    anchors.centerIn: parent
-                    Image{
-                        source:"icon/icon_researching.png"
-                        width: 37
-                        anchors.verticalCenter: parent.verticalCenter
-                        height: 35
-                    }
-                    Text{
-                        text: "경로 재탐색"
-                        anchors.verticalCenter: parent.verticalCenter
-                        font.family: font_noto_b.name
-                        font.pixelSize: 30
-                        font.bold: true
-                        color:"#282828"
-                    }
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: {
-                        timer_check_pause.start();
-                    }
-                }
-            }
-            Rectangle{
-                id: btn_manual
-                width: 250
-                height: 90
-                radius: 10
-                color: "#d0d0d0"
-                Row{
-                    spacing: 10
-                    anchors.centerIn: parent
-                    Image{
-                        anchors.verticalCenter: parent.verticalCenter
-                        source:"icon/icon_manualmove.png"
-                        width: 35
-                        height: 40
-                    }
-                    Text{
-                        text: "수동 제어"
-                        anchors.verticalCenter: parent.verticalCenter
-                        font.family: font_noto_b.name
-                        font.pixelSize: 30
-                        font.bold: true
-                        color:"#282828"
-                    }
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: {
-                        supervisor.moveManual();
-                    }
-                }
-            }
-
+            anchors.topMargin: statusbar.height
         }
 
     }

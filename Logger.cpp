@@ -71,6 +71,6 @@ void Logger::write_space(){
 }
 
 QString Logger::getFileName(){
-    QString tempname = QDateTime::currentDateTime().toString("log/yyyy_MM_dd") + ".txt";
+    QString tempname = QDir::homePath()+QDateTime::currentDateTime().toString("/ui_log/yyyy_MM_dd") + ".txt";
     return tempname;
 }
