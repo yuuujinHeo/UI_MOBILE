@@ -248,49 +248,51 @@ Item {
                 }
             }
 
+
             onPaint:{
                 var ctx = getContext('2d');
+                if(mapping_mode){
+                    //매핑이미지 파일 갱신 확인
+                    if(supervisor.getMappingflag()){
+                        //매핑 이미지 그림
+                        ctx.clearRect(0,0,map_width,map_height);
+                        draw_canvas_mapping();
+                        //플래그 종료
+                        supervisor.setMappingflag(false);
+                    }
+                }else{
+
+                }
+
                 if(map_name != ""){
-                    if(mapping_mode){
-                        //매핑이미지 파일 갱신 확인
-                        if(supervisor.getMappingflag()){
-                            //매핑 이미지 그림
-                            ctx.clearRect(0,0,map_width,map_height);
-                            draw_canvas_mapping();
-//                            draw_canvas_map();
-                            //플래그 종료
-                            supervisor.setMappingflag(false);
-                        }
-                    }else{
-                        if(refreshMap){
-                            refreshMap = false;
+                    if(refreshMap){
+                        refreshMap = false;
 
-                            //캔버스 초기화
-                            ctx.clearRect(0,0,map_width,map_height);
+                        //캔버스 초기화
+                        ctx.clearRect(0,0,map_width,map_height);
 
-                            //map 이미지 불러와서 그림
-                            draw_canvas_map();
+                        //map 이미지 불러와서 그림
+                        draw_canvas_map();
 
-                            //drawing한 line들 다시 그림
-                            if(state_annotation == "DRAWING"){
-                                draw_canvas_lines();
-                            }
+                        //drawing한 line들 다시 그림
+                        if(state_annotation == "DRAWING"){
+                            draw_canvas_lines();
                         }
-                        // 새로 그려지는 line
-                        if(tool == "BRUSH"){
-                            ctx.lineWidth = canvas_map.lineWidth
-                            ctx.strokeStyle = brush_color
-                            ctx.lineCap = "round"
-                            ctx.beginPath()
-                            ctx.moveTo(lastX, lastY)
-                            if(point1.pressed){
-                                lastX = point1.x
-                                lastY = point1.y
-                            }
-                            supervisor.setLine(lastX,lastY);
-                            ctx.lineTo(lastX, lastY)
-                            ctx.stroke()
+                    }
+                    // 새로 그려지는 line
+                    if(tool == "BRUSH"){
+                        ctx.lineWidth = canvas_map.lineWidth
+                        ctx.strokeStyle = brush_color
+                        ctx.lineCap = "round"
+                        ctx.beginPath()
+                        ctx.moveTo(lastX, lastY)
+                        if(point1.pressed){
+                            lastX = point1.x
+                            lastY = point1.y
                         }
+                        supervisor.setLine(lastX,lastY);
+                        ctx.lineTo(lastX, lastY)
+                        ctx.stroke()
                     }
                 }else{
                     ctx.fillStyle = "#000000";
@@ -999,9 +1001,17 @@ Item {
     function draw_canvas_mapping(){
         var ctx = canvas_map.getContext('2d');
 
-        var data = supervisor.getMapping();
+        var map_data = supervisor.getMapping();
+        print(map_data.length);
+        var temp_image = ctx.createImageData(map_width,map_height);
 
-        var temp = createImageData(1000,1000);
+        for(var i=0; i<map_data.length; i++){
+            temp_image.data[4*i+0] = map_data[i];
+            temp_image.data[4*i+1] = map_data[i];
+            temp_image.data[4*i+2] = map_data[i];
+            temp_image.data[4*i+3] = 255;
+        }
+        ctx.drawImage(temp_image,0,0,map_width,map_height);
 
         ctx.lineWidth = 1;
         ctx.strokeStyle = "red";
@@ -1618,8 +1628,11 @@ Item {
             path_y = supervisor.getPathy(i)/grid_size+origin_y;
             path_th = -supervisor.getPathth(i)-Math.PI/2;
 
-            ctx.strokeStyle = "yellow";
-            ctx.fillStyle = "black";
+//            ctx.strokeStyle = "#05C9FF";
+//            ctx.fillStyle = "#FFD9FF";
+            ctx.strokeStyle = "#FFD9FF";
+            ctx.fillStyle = "#05C9FF";
+            ctx.lineWidth = 2;
             ctx.beginPath();
             if(i>0){
                 ctx.moveTo(path_x_before,path_y_before);
@@ -1627,16 +1640,33 @@ Item {
                 ctx.stroke()
             }
         }
+
+
+
+
+
         if(path_num > 0){
-            //target Pos
-            ctx.strokeStyle = "yellow";
+//            //target Pos
             ctx.beginPath();
-            ctx.moveTo(path_x,path_y);
-            ctx.arc(path_x,path_y,robot_radius/grid_size, path_th, path_th+2*Math.PI, true);
+            ctx.arc(path_x,path_y,robot_radius/grid_size, -path_th-Math.PI/2, -path_th-Math.PI/2+2*Math.PI, true);
+            ctx.fill()
             ctx.stroke()
-            ctx.fill("black")
-            ctx.moveTo(path_x,path_y);
-            ctx.lineTo(path_x,path_y)
+
+            var distance = (robot_radius/grid_size)*1.8;
+            var distance2 = distance*0.8;
+            var th_dist = Math.PI/8;
+            var x = path_x+distance*Math.cos(-path_th-Math.PI/2);
+            var y = path_y+distance*Math.sin(-path_th-Math.PI/2);
+            var x1 = path_x+distance2*Math.cos(-path_th-Math.PI/2-th_dist);
+            var y1 = path_y+distance2*Math.sin(-path_th-Math.PI/2-th_dist);
+            var x2 = path_x+distance2*Math.cos(-path_th-Math.PI/2+th_dist);
+            var y2 = path_y+distance2*Math.sin(-path_th-Math.PI/2+th_dist);
+
+            ctx.beginPath();
+            ctx.moveTo(x,y);
+            ctx.lineTo(x1,y1);
+            ctx.moveTo(x,y);
+            ctx.lineTo(x2,y2);
             ctx.stroke()
         }
     }
@@ -1644,8 +1674,8 @@ Item {
     function draw_canvas_local_path(){
         var ctx = canvas_map_cur.getContext('2d');
         ctx.lineWidth = 1;
-        ctx.strokeStyle = "yellow";
-        ctx.fillStyle = "yellow";
+        ctx.strokeStyle = "#05C9FF";
+        ctx.fillStyle = "#05C9FF";
         if(path_num != 0){
             var localpath_num = supervisor.getLocalPathNum();
             for(var i=0; i<localpath_num; i++){

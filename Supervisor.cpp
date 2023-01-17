@@ -41,6 +41,8 @@ Supervisor::Supervisor(QObject *parent)
     lcm = new LCMHandler();
     server = new ServerHandler();
     joystick = new JoystickHandler();
+    git = new HTTPHandler();
+    connect(git, SIGNAL(pullSuccess()),this,SLOT(git_pull_success()));
 
     //Test USB
     QFileSystemWatcher *FSwatcher;
@@ -114,6 +116,32 @@ QString Supervisor::getIniPath(){
 }
 
 ////*********************************************  SETTING 관련   ***************************************************////
+void Supervisor::git_pull_success(){
+    setSetting("ROBOT_SW/version",probot->program_version);
+}
+bool Supervisor::isNewVersion(){
+    git->updateGitArray();
+
+    if(probot->gitList[0].commit == probot->program_version){
+        return true;
+    }else{
+        return false;
+    }
+}
+QString Supervisor::getLocalVersion(){
+    return probot->program_version;
+}
+QString Supervisor::getServerVersion(){
+    if(probot->gitList.size() > 0){
+        return probot->gitList[0].commit;
+    }else{
+        return "";
+    }
+}
+void Supervisor::pullGit(){
+    git->pullGit();
+
+}
 void Supervisor::setSetting(QString name, QString value){
     QString ini_path = getIniPath();
     QSettings setting(ini_path, QSettings::IniFormat);
@@ -143,6 +171,7 @@ void Supervisor::readSetting(QString map_name){
     setting_robot.endGroup();
 
     setting_robot.beginGroup("ROBOT_SW");
+    probot->program_version = setting_robot.value("version").toString();
     probot->velocity = setting_robot.value("velocity").toFloat();
     setting.tray_num = setting_robot.value("tray_num").toInt();
     setting.useVoice = setting_robot.value("use_voice").toBool();
@@ -319,6 +348,8 @@ void Supervisor::readSetting(QString map_name){
 
     lcm->subscribe();
     flag_read_ini = true;
+
+    QMetaObject::invokeMethod(mMain, "update_ini");
 }
 void Supervisor::setVelocity(float vel){
     probot->velocity = vel;
@@ -1810,11 +1841,6 @@ QString Supervisor::getRobotName(){
         return robot.name;
     }
 }
-void Supervisor::setRobotName(QString name){
-    robot.name = name;
-    lcm->subscribe();
-    setSetting("ROBOT/name",robot.name);
-}
 
 float Supervisor::getRobotRadius(){
     return probot->radius;
@@ -1924,7 +1950,10 @@ QString Supervisor::getPatrolFileName(){
     }else{
         QFile *file  = new QFile(patrol.filename);
         if(file->open(QIODevice::ReadOnly)){
-            return patrol.filename;
+
+            QStringList namelist = patrol.filename.split("/");
+            QStringList name = namelist[namelist.size()-1].split(".");
+            return name[0];
         }else{
             return "";
         }
@@ -1940,9 +1969,9 @@ void Supervisor::loadPatrolFile(QString path){
     QStringList list1 = path.split("/");
     QStringList list = list1[list1.size()-1].split(".");
     if(list.size() == 1){
-        path = QDir::homePath()+"/patrol/" + list1[list1.size()-1] + ".ini";
+        path = QDir::homePath()+"/patrols/" + list1[list1.size()-1] + ".ini";
     }else{
-        path = QDir::homePath()+"/patrol/" + list1[list1.size()-1];
+        path = QDir::homePath()+"/patrols/" + list1[list1.size()-1];
     }
     plog->write("[USER INPUT] Load Patrol : "+path);
     QSettings patrols(path, QSettings::IniFormat);
@@ -1967,9 +1996,9 @@ void Supervisor::savePatrolFile(QString path){
     QStringList list1 = path.split("/");
     QStringList list = list1[list1.size()-1].split(".");
     if(list.size() == 1){
-        path = QDir::homePath()+"/patrol/" + list1[list1.size()-1] + ".ini";
+        path = QDir::homePath()+"/patrols/" + list1[list1.size()-1] + ".ini";
     }else{
-        path = QDir::homePath()+"/patrol/" + list1[list1.size()-1];
+        path = QDir::homePath()+"/patrols/" + list1[list1.size()-1];
     }
     plog->write("[USER INPUT] Save Patrol : "+path);
     QSettings patrols(path, QSettings::IniFormat);
@@ -2042,6 +2071,7 @@ void Supervisor::setPatrolMode(int mode){
     QMetaObject::invokeMethod(mMain, "updatepatrol");
 }
 int Supervisor::getPatrolNum(){
+    qDebug() << "Patrol Num : " << patrol.path.size();
     return patrol.path.size();
 }
 QString Supervisor::getPatrolType(int num){

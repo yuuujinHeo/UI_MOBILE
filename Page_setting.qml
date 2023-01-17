@@ -193,12 +193,45 @@ Item {
                             TextField{
                                 id: platform_name
                                 anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT","name");
+                                text:supervisor.getSetting("ROBOT_HW","model");
                             }
                         }
                     }
                 }
-
+                Rectangle{
+                    id: set_robot_1_serial
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"플랫폼 넘버(중복 주의)"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_platform_serial
+                                anchors.fill: parent
+                                model:[0,1,2,3,4,5,6,7,8,9,10]
+                            }
+                        }
+                    }
+                }
                 Rectangle{
                     id: set_robot_2
                     width: 840
@@ -393,6 +426,41 @@ Item {
                 }
 
                 Rectangle{
+                    id: set_map_3
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"트레이 개수"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_tray_num
+                                anchors.fill: parent
+                                model:[1,2,3,4,5]
+                            }
+                        }
+                    }
+
+                }
+                Rectangle{
                     width: 840
                     height: 40
                     Row{
@@ -420,7 +488,41 @@ Item {
                             TextField{
                                 id: radius
                                 anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT","radius");
+                                text:supervisor.getSetting("ROBOT_HW","radius");
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"UI 명령 활성"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_use_uicmd
+                                anchors.fill: parent
+                                model:["비활성화","활성화"]
                             }
                         }
                     }
@@ -518,41 +620,6 @@ Item {
                     }
                 }
                 Rectangle{
-                    id: set_map_3
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"트레이 개수"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_tray_num
-                                anchors.fill: parent
-                                model:[1,2,3,4,5]
-                            }
-                        }
-                    }
-
-                }
-                Rectangle{
                     id: set_map_4
                     width: 840
                     height: 40
@@ -637,10 +704,10 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: baudrate
+                            ComboBox{
+                                id: combo_baudrate
                                 anchors.fill: parent
-                                text: supervisor.getSetting("SENSOR","baudrate");
+                                model:[115200,256000]
                             }
                         }
                     }
@@ -671,10 +738,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: mask
-                                anchors.fill: parent
-                                text:supervisor.getSetting("SENSOR","mask");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_mask
+                                        anchors.centerIn: parent
+                                        text: slider_mask.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_mask
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0
+                                    to: 15.0
+                                    value: 10.0
+                                }
                             }
                         }
                     }
@@ -705,10 +791,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: max_range
-                                anchors.fill: parent
-                                text:supervisor.getSetting("SENSOR","max_range");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_max_range
+                                        anchors.centerIn: parent
+                                        text: slider_max_range.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_max_range
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 10.0
+                                    to: 50.0
+                                    value: 40.0
+                                }
                             }
                         }
                     }
@@ -928,10 +1033,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: k_curve
-                                anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT","k_curve");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_k_curve
+                                        anchors.centerIn: parent
+                                        text: slider_k_curve.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_k_curve
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.1
+                                    to: 5.0
+                                    value: 0.7
+                                }
                             }
                         }
                     }
@@ -961,10 +1085,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: k_v
-                                anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT","k_v");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_k_v
+                                        anchors.centerIn: parent
+                                        text: slider_k_v.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_k_v
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.1
+                                    to: 2.0
+                                    value: 0.7
+                                }
                             }
                         }
                     }
@@ -994,10 +1137,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: k_w
-                                anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT","k_w");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_k_w
+                                        anchors.centerIn: parent
+                                        text: slider_k_w.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_k_w
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 1.0
+                                    to: 3.0
+                                    value: 2.5
+                                }
                             }
                         }
                     }
@@ -1027,10 +1189,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: limit_pivot
-                                anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT","limit_pivot");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_limit_pivot
+                                        anchors.centerIn: parent
+                                        text: slider_limit_pivot.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_limit_pivot
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 5.0
+                                    to: 90.0
+                                    value: 45.0
+                                }
                             }
                         }
                     }
@@ -1060,10 +1241,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: limit_v
-                                anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT","limit_v");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_limit_v
+                                        anchors.centerIn: parent
+                                        text: slider_limit_v.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_limit_v
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.1
+                                    to: 2.0
+                                    value: 1.0
+                                }
                             }
                         }
                     }
@@ -1093,10 +1293,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: limit_w
-                                anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT","limit_w");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_limit_w
+                                        anchors.centerIn: parent
+                                        text: slider_limit_w.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_limit_w
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 5.0
+                                    to: 120.0
+                                    value: 120.0
+                                }
                             }
                         }
                     }
@@ -1126,10 +1345,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: limit_manual_v
-                                anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT","limit_manual_v");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_limit_manual_v
+                                        anchors.centerIn: parent
+                                        text: slider_limit_manual_v.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_limit_manual_v
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.1
+                                    to: 2.0
+                                    value: 0.3
+                                }
                             }
                         }
                     }
@@ -1159,10 +1397,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: limit_manual_w
-                                anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT","limit_manual_w");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_limit_manual_w
+                                        anchors.centerIn: parent
+                                        text: slider_limit_manual_w.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_limit_manual_w
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 5.0
+                                    to: 120.0
+                                    value: 120.0
+                                }
                             }
                         }
                     }
@@ -1192,10 +1449,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: look_ahead_dist
-                                anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT","look_ahead_dist");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_look_ahead_dist
+                                        anchors.centerIn: parent
+                                        text: slider_look_ahead_dist.value.toFixed(2)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_look_ahead_dist
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.3
+                                    to: 1.0
+                                    value: 0.45
+                                }
                             }
                         }
                     }
@@ -1455,10 +1731,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: limit_acc
-                                anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","limit_acc");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_limit_acc
+                                        anchors.centerIn: parent
+                                        text: slider_limit_acc.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_limit_acc
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.5
+                                    to: 1.5
+                                    value: 1.0
+                                }
                             }
                         }
                     }
@@ -1488,10 +1783,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: limit_dec
-                                anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","limit_dec");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_limit_dec
+                                        anchors.centerIn: parent
+                                        text: slider_limit_dec.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_limit_dec
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.5
+                                    to: 1.5
+                                    value: 1.0
+                                }
                             }
                         }
                     }
@@ -1521,10 +1835,29 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: limit_vel
-                                anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","limit_vel");
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_limit_vel
+                                        anchors.centerIn: parent
+                                        text: slider_limit_vel.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_limit_vel
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.1
+                                    to: 2.0
+                                    value: 2.0
+                                }
                             }
                         }
                     }
@@ -1554,10 +1887,10 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: wheel_dir
+                            ComboBox{
+                                id: combo_wheel_dir
                                 anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","wheel_dir");
+                                model: [-1,1]
                             }
                         }
                     }
@@ -1587,10 +1920,10 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: left_id
+                            ComboBox{
+                                id: combo_left_id
                                 anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","left_id");
+                                model:[0,1]
                             }
                         }
                     }
@@ -1620,10 +1953,10 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: right_id
+                            ComboBox{
+                                id: combo_right_id
                                 anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","right_id");
+                                model:[0,1]
                             }
                         }
                     }
@@ -1671,6 +2004,27 @@ Item {
             anchors.rightMargin: (parent.width - area_setting_robot.width - area_setting_robot.x - btn_default.width)/2
             spacing: 30
             Rectangle{
+                id: btn_update
+                width: 180
+                height: 60
+                radius: 10
+                color:"transparent"
+                border.width: 1
+                border.color: "#7e7e7e"
+                Text{
+                    anchors.centerIn: parent
+                    text: "Program Update"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked:{
+                        popup_update.open();
+                    }
+                }
+            }
+            Rectangle{
                 id: btn_default
                 width: 180
                 height: 60
@@ -1709,9 +2063,87 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
-                        supervisor.setRobotName(platform_name.text);
-                        supervisor.setVelocity(slider_vxy.value);
-                        supervisor.setRobotType(combo_platform_type.currentIndex);
+                        supervisor.setSetting("ROBOT_HW/model",platform_name.text);
+                        supervisor.setSetting("ROBOT_HW/serial_num",combo_platform_serial.currentText);
+                        supervisor.setSetting("ROBOT_HW/radius",radius.text);
+                        supervisor.setSetting("ROBOT_HW/tray_num",combo_tray_num.currentText);
+
+                        if(combo_platform_type.currentIndex == 0){
+                            supervisor.setSetting("ROBOT_HW/type","SERVING");
+                        }else if(combo_platform_type.currentIndex == 1){
+                            supervisor.setSetting("ROBOT_HW/type","CALLING");
+                        }
+
+                        supervisor.setSetting("ROBOT_HW/wheel_base",wheel_base.text);
+                        supervisor.setSetting("ROBOT_HW/wheel_radius",wheel_radius.text);
+
+                        supervisor.setSetting("ROBOT_SW/k_curve",text_k_curve.text);
+                        supervisor.setSetting("ROBOT_SW/k_v",text_k_v.text);
+                        supervisor.setSetting("ROBOT_SW/k_w",text_k_w.text);
+                        supervisor.setSetting("ROBOT_SW/limit_pivot",text_limit_pivot.text);
+                        supervisor.setSetting("ROBOT_SW/limit_v",text_limit_v.text);
+                        supervisor.setSetting("ROBOT_SW/limit_w",text_limit_w.text);
+
+                        supervisor.setSetting("ROBOT_SW/limit_manual_v",text_limit_manual_v.text);
+                        supervisor.setSetting("ROBOT_SW/limit_manual_w",text_limit_manual_w.text);
+                        supervisor.setSetting("ROBOT_SW/look_ahead_dist",text_look_ahead_dist.text);
+
+
+                        if(combo_use_voice.currentIndex == 0)
+                            supervisor.setSetting("ROBOT_SW/use_voice","false");
+                        else
+                            supervisor.setSetting("ROBOT_SW/use_voice","true");
+
+                        if(combo_use_bgm.currentIndex == 0)
+                            supervisor.setSetting("ROBOT_SW/use_bgm","false");
+                        else
+                            supervisor.setSetting("ROBOT_SW/use_bgm","true");
+
+                        if(combo_use_uicmd.currentIndex == 0)
+                            supervisor.setSetting("ROBOT_SW/use_uicmd","false");
+                        else
+                            supervisor.setSetting("ROBOT_SW/use_uicmd","true");
+
+                        if(combo_use_servercmd.currentIndex == 0)
+                            supervisor.setSetting("SERVER/use_servercmd","false");
+                        else
+                            supervisor.setSetting("SERVER/use_servercmd","true");
+
+
+                        supervisor.setSetting("ROBOT_SW/velocity",text_velocity.text);
+
+
+                        supervisor.setSetting("SENSOR/baudrate",combo_baudrate.currentText);
+                        supervisor.setSetting("SENSOR/mask",text_mask.text);
+                        supervisor.setSetting("SENSOR/max_range",text_max_range.text);
+                        supervisor.setSetting("SENSOR/offset_x",offset_x.text);
+                        supervisor.setSetting("SENSOR/offset_y",offset_y.text);
+                        supervisor.setSetting("SENSOR/right_camera",right_camera.text);
+                        supervisor.setSetting("SENSOR/left_camera",left_camera.text);
+
+
+                        supervisor.setSetting("MOTOR/gear_ratio",gear_ratio.text);
+                        supervisor.setSetting("MOTOR/k_d",k_d.text);
+                        supervisor.setSetting("MOTOR/k_i",k_i.text);
+                        supervisor.setSetting("MOTOR/k_p",k_p.text);
+
+                        supervisor.setSetting("MOTOR/left_id",combo_left_id.currentText);
+                        supervisor.setSetting("MOTOR/right_id",combo_right_id.currentText);
+
+                        supervisor.setSetting("MOTOR/limit_acc",text_limit_acc.text);
+                        supervisor.setSetting("MOTOR/limit_dec",text_limit_dec.text);
+                        supervisor.setSetting("MOTOR/limit_vel",text_limit_vel.text);
+
+                        supervisor.setSetting("MOTOR/wheel_dir",combo_wheel_dir.currentText);
+
+
+
+
+
+
+
+
+
                         if(combo_use_travelline.currentIndex == 0)
                             supervisor.setuseTravelline(false);
                         else
@@ -1719,68 +2151,12 @@ Item {
 
                         supervisor.setnumTravelline(combo_travelline.currentIndex);
 
-                        supervisor.setTrayNum(combo_tray_num.currentIndex+1);
                         supervisor.setTableNum(combo_table_num.currentIndex);
 
-                        if(combo_use_voice.currentIndex == 0)
-                            supervisor.setuseVoice(false);
-                        else
-                            supervisor.setuseVoice(true);
-
-                        if(combo_use_bgm.currentIndex == 0)
-                            supervisor.setuseBGM(false);
-                        else
-                            supervisor.setuseBGM(true);
-
-                        if(combo_use_servercmd.currentIndex == 0)
-                            supervisor.setserverCMD(false);
-                        else
-                            supervisor.setserverCMD(true);
-
-                        supervisor.setSetting("ROBOT_HW/radius",radius.text);
 
 
-                        supervisor.setSetting("MOTOR/gear_ratio",gear_ratio.text);
-                        supervisor.setSetting("MOTOR/k_d",k_d.text);
-                        supervisor.setSetting("MOTOR/k_i",k_i.text);
-                        supervisor.setSetting("MOTOR/k_p",k_p.text);
-                        supervisor.setSetting("MOTOR/left_id",left_id.text);
-                        supervisor.setSetting("MOTOR/limit_acc",limit_acc.text);
-                        supervisor.setSetting("MOTOR/limit_dec",limit_dec.text);
-                        supervisor.setSetting("MOTOR/limit_vel",limit_vel.text);
-                        supervisor.setSetting("MOTOR/wheel_dir",wheel_dir.text);
-                        supervisor.setSetting("MOTOR/right_id",right_id.text);
-
-                        supervisor.setSetting("ROBOT_SW/k_curve",k_curve.text);
-                        supervisor.setSetting("ROBOT_SW/k_v",k_v.text);
-                        supervisor.setSetting("ROBOT_SW/k_w",k_w.text);
-                        supervisor.setSetting("ROBOT_SW/limit_manual_v",limit_manual_v.text);
-                        supervisor.setSetting("ROBOT_SW/limit_manual_w",limit_manual_w.text);
-                        supervisor.setSetting("ROBOT_SW/limit_pivot",limit_pivot.text);
-                        supervisor.setSetting("ROBOT_SW/limit_v",limit_v.text);
-                        supervisor.setSetting("ROBOT_SW/limit_w",limit_w.text);
-                        supervisor.setSetting("ROBOT_SW/look_ahead_dist",look_ahead_dist.text);
-                        supervisor.setSetting("ROBOT_HW/wheel_base",wheel_base.text);
-                        supervisor.setSetting("ROBOT_HW/wheel_radius",wheel_radius.text);
-
-
-                        supervisor.setSetting("SENSOR/baudrate",baudrate.text);
-                        supervisor.setSetting("SENSOR/mask",mask.text);
-                        supervisor.setSetting("SENSOR/max_range",max_range.text);
-                        supervisor.setSetting("SENSOR/offset_x",offset_x.text);
-                        supervisor.setSetting("SENSOR/offset_y",offset_y.text);
-                        supervisor.setSetting("SENSOR/right_camera",right_camera.text);
-                        supervisor.setSetting("SENSOR/left_camera",left_camera.text);
 
                         supervisor.readSetting();
-
-
-
-
-
-
-
-
                         init();
                     }
                 }
@@ -1793,14 +2169,53 @@ Item {
     }
 
     function init(){
-        platform_name.text = supervisor.getSetting("ROBOT","name");
-        slider_vxy.value = supervisor.getVelocity();
+        platform_name.text = supervisor.getSetting("ROBOT_HW","model");
+        combo_platform_serial.currentIndex = parseInt(supervisor.getSetting("ROBOT_HW","serial_num"))
+        radius.text = supervisor.getSetting("ROBOT_HW","radius");
 
-        if(supervisor.getRobotType() == "SERVING"){
+        combo_tray_num.currentIndex = supervisor.getSetting("ROBOT_HW","tray_num")-1;
+
+        if(supervisor.getSetting("ROBOT_HW","type") === "SERVING"){
             combo_platform_type.currentIndex = 0;
         }else{
             combo_platform_type.currentIndex = 1;
         }
+        wheel_base.text = supervisor.getSetting("ROBOT_HW","wheel_base");
+        wheel_radius.text = supervisor.getSetting("ROBOT_HW","wheel_radius");
+
+        slider_k_curve.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_curve"));
+        slider_k_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_v"));
+        slider_k_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_w"));
+        slider_limit_pivot.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_pivot"));
+        slider_limit_manual_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_manual_v"));
+        slider_limit_manual_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_manual_w"));
+        slider_limit_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_v"));
+        slider_limit_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_w"));
+        slider_look_ahead_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","look_ahead_dist"));
+
+        if(supervisor.getSetting("ROBOT_SW","use_voice") === "true"){
+            combo_use_voice.currentIndex = 1;
+        }else{
+            combo_use_voice.currentIndex = 0;
+        }
+        if(supervisor.getSetting("ROBOT_SW","use_bgm") === "true"){
+            combo_use_bgm.currentIndex = 1;
+        }else{
+            combo_use_bgm.currentIndex = 0;
+        }
+        if(supervisor.getSetting("SERVER","use_servercmd") === "true"){
+            combo_use_servercmd.currentIndex = 1;
+        }else{
+            combo_use_servercmd.currentIndex = 0;
+        }
+        if(supervisor.getSetting("ROBOT_SW","use_uicmd") === "true"){
+            combo_use_uicmd.currentIndex = 1;
+        }else{
+            combo_use_uicmd.currentIndex = 0;
+        }
+
+        slider_vxy.value = parseFloat(supervisor.getSetting("ROBOT_SW","velocity"));
+
         if(supervisor.getuseTravelline()){
             combo_use_travelline.currentIndex = 1;
         }else{
@@ -1814,54 +2229,36 @@ Item {
         }
 
         combo_travelline.currentIndex = supervisor.getnumTravelline();
-        combo_tray_num.currentIndex = supervisor.getTrayNum()-1;
         combo_table_num.currentIndex = supervisor.getTableNum();
 
-        if(supervisor.getuseVoice()){
-            combo_use_voice.currentIndex = 1;
-        }else{
-            combo_use_voice.currentIndex = 0;
-        }
-        if(supervisor.getuseBGM()){
-            combo_use_bgm.currentIndex = 1;
-        }else{
-            combo_use_bgm.currentIndex = 0;
-        }
-        if(supervisor.getserverCMD()){
-            combo_use_servercmd.currentIndex = 1;
-        }else{
-            combo_use_servercmd.currentIndex = 0;
-        }
 
-        radius.text = supervisor.getSetting("ROBOT","radius");
 
         gear_ratio.text = supervisor.getSetting("MOTOR","gear_ratio");
         k_d.text = supervisor.getSetting("MOTOR","k_d");
         k_i.text = supervisor.getSetting("MOTOR","k_i");
         k_p.text = supervisor.getSetting("MOTOR","k_p");
-        left_id.text = supervisor.getSetting("MOTOR","left_id");
-        limit_acc.text = supervisor.getSetting("MOTOR","limit_acc");
-        limit_dec.text = supervisor.getSetting("MOTOR","limit_dec");
-        limit_vel.text = supervisor.getSetting("MOTOR","limit_vel");
-        wheel_dir.text = supervisor.getSetting("MOTOR","wheel_dir");
-        right_id.text = supervisor.getSetting("MOTOR","right_id");
-
-        k_curve.text = supervisor.getSetting("ROBOT","k_curve");
-        k_v.text = supervisor.getSetting("ROBOT","k_v");
-        k_w.text = supervisor.getSetting("ROBOT","k_w");
-        limit_manual_v.text = supervisor.getSetting("ROBOT","limit_manual_v");
-        limit_manual_w.text = supervisor.getSetting("ROBOT","limit_manual_w");
-        limit_pivot.text = supervisor.getSetting("ROBOT","limit_pivot");
-        limit_v.text = supervisor.getSetting("ROBOT","limit_v");
-        limit_w.text = supervisor.getSetting("ROBOT","limit_w");
-        look_ahead_dist.text = supervisor.getSetting("ROBOT","look_ahead_dist");
-        wheel_base.text = supervisor.getSetting("ROBOT","wheel_base");
-        wheel_radius.text = supervisor.getSetting("ROBOT","wheel_radius");
 
 
-        baudrate.text = supervisor.getSetting("SENSOR","baudrate");
-        mask.text = supervisor.getSetting("SENSOR","mask");
-        max_range.text = supervisor.getSetting("SENSOR","max_range");
+        combo_left_id.currentIndex = parseInt(supervisor.getSetting("MOTOR","left_id"));
+        combo_right_id.currentIndex = parseInt(supervisor.getSetting("MOTOR","right_id"));
+
+        slider_limit_acc.value = parseFloat(supervisor.getSetting("MOTOR","limit_acc"));
+        slider_limit_dec.value = parseFloat(supervisor.getSetting("MOTOR","limit_dec"));
+        slider_limit_vel.value = parseFloat(supervisor.getSetting("MOTOR","limit_vel"));
+
+        if(supervisor.getSetting("MOTOR","wheel_dir") === "-1"){
+            combo_wheel_dir.currentIndex = 0;
+        }else{
+            combo_wheel_dir.currentIndex = 1;
+        }
+
+        if(supervisor.getSetting("SENSOR","baudrate") === "115200"){
+            combo_baudrate.currentIndex = 0;
+        }else if(supervisor.getSetting("SENSOR","baudrate") === "256000"){
+            combo_baudrate.currentIndex = 1;
+        }
+        slider_mask.value = parseFloat(supervisor.getSetting("SENSOR","mask"));
+        slider_max_range.value = parseFloat(supervisor.getSetting("SENSOR","max_range"));
         offset_x.text = supervisor.getSetting("SENSOR","offset_x");
         offset_y.text = supervisor.getSetting("SENSOR","offset_y");
         right_camera.text = supervisor.getSetting("SENSOR","right_camera");
@@ -1883,6 +2280,157 @@ Item {
         }
     }
 
+
+    Popup{
+        id: popup_update
+        width: 600
+        height: 400
+        anchors.centerIn: parent
+
+
+        onOpened: {
+            //버전 체크
+            if(supervisor.isNewVersion()){
+                //버전이 이미 최신임
+                rect_lastest.visible = true;
+                rect_need_update.visible = false;
+                text_version.text = supervisor.getLocalVersion()
+            }else{
+                //새로운 버전 확인됨
+                rect_lastest.visible = false;
+                rect_need_update.visible = true;
+                text_version1.text = "현재 : " + supervisor.getLocalVersion()
+                text_version2.text = "최신 : " + supervisor.getServerVersion()
+            }
+        }
+
+        Rectangle{
+            id: rect_lastest
+            anchors.fill: parent
+            radius: 5
+            Text{
+                id: text_1
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 50
+                font.family: font_noto_r.name
+                font.pixelSize: 20
+                text:"프로그램이 이미 최신입니다."
+            }
+            Text{
+                id: text_version
+                anchors.centerIn: parent
+                anchors.topMargin: 50
+                font.family: font_noto_r.name
+                font.pixelSize: 20
+                text:supervisor.getLocalVersion()
+            }
+
+            Rectangle{
+                width: 180
+                height: 60
+                radius: 10
+                color: "#12d27c"
+                border.width: 1
+                border.color: "#12d27c"
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 30
+                Text{
+                    anchors.centerIn: parent
+                    text: "확인"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 25
+                    color: "white"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        popup_update.close();
+                    }
+                }
+            }
+        }
+        Rectangle{
+            id: rect_need_update
+            anchors.fill: parent
+            radius: 5
+            Text{
+                id: text_11
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 50
+                font.family: font_noto_r.name
+                font.pixelSize: 20
+                text:"새로운 버전이 확인되었습니다. 업데이트하시겠습니까?"
+            }
+            Column{
+                anchors.centerIn: parent
+                Text{
+                    id: text_version1
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                    text:"현재 : "+supervisor.getLocalVersion()
+                }
+                Text{
+                    id: text_version2
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                    text:"최신 : "+supervisor.getServerVersion()
+                }
+            }
+            Row{
+                spacing: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 20
+
+                Rectangle{
+                    width: 180
+                    height: 60
+                    radius: 10
+                    color:"transparent"
+                    border.width: 1
+                    border.color: "#7e7e7e"
+                    Text{
+                        anchors.centerIn: parent
+                        text: "취소"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 25
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_update.close();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 180
+                    height: 60
+                    radius: 10
+                    color: "#12d27c"
+                    border.width: 1
+                    border.color: "#12d27c"
+                    Text{
+                        anchors.centerIn: parent
+                        text: "확인"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 25
+                        color: "white"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.pullGit();
+                            popup_update.close();
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 
 
     Popup{

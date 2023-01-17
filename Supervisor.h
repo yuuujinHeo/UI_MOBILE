@@ -9,6 +9,7 @@
 #include "LCMHandler.h"
 #include "JoystickHandler.h"
 #include "ServerHandler.h"
+#include "HTTPHandler.h"
 #include <libusb-1.0/libusb.h>
 
 class Supervisor : public QObject
@@ -48,6 +49,7 @@ public:
     LCMHandler *lcm;
     ServerHandler *server;
     JoystickHandler *joystick;
+    HTTPHandler *git;
 
 
     ////*********************************************  WINDOW 관련   ***************************************************////
@@ -106,6 +108,10 @@ public:
     Q_INVOKABLE QList<int> getCamera(int num);
     Q_INVOKABLE QString getCameraSerial(int num);
 
+    Q_INVOKABLE void pullGit();
+    Q_INVOKABLE bool isNewVersion();
+    Q_INVOKABLE QString getLocalVersion();
+    Q_INVOKABLE QString getServerVersion();
 
     ////*********************************************  INIT PAGE 관련   ***************************************************////
     Q_INVOKABLE bool isConnectServer();
@@ -306,7 +312,6 @@ public:
     Q_INVOKABLE int getState();
     Q_INVOKABLE int getErrcode();
     Q_INVOKABLE QString getRobotName();
-    Q_INVOKABLE void setRobotName(QString name);
 
     Q_INVOKABLE float getRobotRadius();
     Q_INVOKABLE float getRobotx();
@@ -373,6 +378,7 @@ public slots:
     void server_get_map();
     void path_changed();
     void usb_detect();
+    void git_pull_success();
 
 private:
     QTimer *timer;
