@@ -84,9 +84,10 @@ Item {
 
     Image{
         id: image_head
-        anchors.horizontalCenter: rect_tray_box.horizontalCenter
+        anchors.horizontalCenter: robot_type=="SERVING"?rect_tray_box.horizontalCenter:rect_calling_box.horizontalCenter
         anchors.bottom: rect_tray_box.top
         anchors.bottomMargin: 10
+
         width: 90*1.5
         height: 50*1.5
         source:"image/robot_head.png"
@@ -543,8 +544,9 @@ Item {
         color: "#e8e8e8"
         radius: 30
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: rect_table_box.right
-        anchors.leftMargin: traybox_margin
+        anchors.horizontalCenter: parent.horizontalCenter
+//        anchors.left: rect_table_box.right
+//        anchors.leftMargin: traybox_margin
         Text{
             color:"white"
             font.bold: true
@@ -562,8 +564,8 @@ Item {
         visible: robot_type=="CALLING"?true:false
         height: 100
         radius: 100
-        anchors.horizontalCenter: rect_tray_box.horizontalCenter
-        anchors.top: rect_tray_box.bottom
+        anchors.horizontalCenter: rect_calling_box.horizontalCenter
+        anchors.top: rect_calling_box.bottom
         anchors.topMargin: 40
         color: "#24a9f7"
         Text{

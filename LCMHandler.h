@@ -77,7 +77,7 @@ public:
     void robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg);
     void robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
     void robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
-    void robot_mapping_calliback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data_t *msg);
+    void robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data_t *msg);
     void robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const camera_data *msg);
     ////***********************************************   THREADS  ********************************************************////
     void bLoop();

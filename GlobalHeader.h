@@ -57,6 +57,12 @@ typedef struct{
 }ST_CAMERA;
 
 typedef struct{
+    QString commit;
+    QString message;
+    QString date;
+}ST_GIT;
+
+typedef struct{
     int chunkSize = 0;
     int imageSize = 0;
     QVector<int> data;
@@ -120,6 +126,13 @@ typedef struct{
     float joystick[2];
     float lidar_data[360];
     float radius;
+
+
+    QString program_version;
+    QVector<ST_GIT> gitList;
+
+
+
 }ST_ROBOT;
 extern ST_ROBOT *probot;
 

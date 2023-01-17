@@ -178,8 +178,14 @@ Window {
         pbefore = loader_page.source;
         loader_page.source = page;
     }
+
     function backPage(){
         loader_page.source = pbefore;
+    }
+
+    function update_ini(){
+        robot_type = supervisor.getRobotType()
+        robot_name = supervisor.getRobotName()
     }
 
     Loader{

@@ -201,6 +201,7 @@ void LCMHandler::sendMapPath(QString path){
 ////*********************************************  CALLBACK FUNCTIONS   ***************************************************////
 void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg){
     isconnect = true;
+    qDebug() << "read Status";
     flag_rx = true;
     connect_count = 0;
     probot->battery = msg->bat;
@@ -251,7 +252,7 @@ void LCMHandler::robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const
     flagLocalPath = false;
 }
 
-void LCMHandler::robot_mapping_calliback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data_t *msg){
+void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data_t *msg){
     isconnect = true;
     connect_count = 0;
     pmap->map_name = msg->map_name.data();
@@ -262,15 +263,20 @@ void LCMHandler::robot_mapping_calliback(const lcm::ReceiveBuffer *rbuf, const s
     pmap->origin[1] = msg->map_origin[1];
     pmap->imageSize = msg->len;
 
+    qDebug() << "MAPPING CALLBACK!! " << pmap->imageSize << msg->map_h << msg->map_w << msg->data.size();
+
     pmap->data.clear();
 
-    cv::Mat map1(msg->map_h, msg->map_w, CV_32S, cv::Scalar::all(0));
+    cv::Mat map1(msg->map_h, msg->map_w, CV_8U, cv::Scalar::all(0));
     memcpy(map1.data, msg->data.data(), msg->len);
 
     cv::Mat plot_map;
     cv::cvtColor(map1, plot_map, cv::COLOR_GRAY2BGR);
     cv::flip(plot_map, plot_map, 0);
     cv::rotate(plot_map, plot_map, cv::ROTATE_90_COUNTERCLOCKWISE); // image north is +x axis
+
+//    QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(plot_map)).toImage();
+//    temp_image.save("map_temp.png","PNG");
 
     memcpy(plot_map.data, pmap->data.data(), msg->len);
     flagMapping = true;
@@ -315,12 +321,14 @@ void LCMHandler::subscribe(){
     lcm.unsubscribe(sub_localpath);
     lcm.unsubscribe(sub_mapping);
     if(is_debug){
-        sub_mapping = lcm.subscribe("MAP_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_status_callback, this);
+        qDebug() << "Change Subscribe " << probot->name_debug;
+        sub_mapping = lcm.subscribe("MAP_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_mapping_callback, this);
         sub_status = lcm.subscribe("STATUS_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_status_callback, this);
         sub_path = lcm.subscribe("ROBOT_PATH_"+probot->name_debug.toStdString(), &LCMHandler::robot_path_callback, this);
         sub_localpath = lcm.subscribe("ROBOT_LOCAL_PATH_"+probot->name_debug.toStdString(), &LCMHandler::robot_local_path_callback, this);
     }else{
-        sub_mapping = lcm.subscribe("MAP_DATA_"+probot->name.toStdString(), &LCMHandler::robot_status_callback, this);
+        qDebug() << "Change Subscribe " << probot->name;
+        sub_mapping = lcm.subscribe("MAP_DATA_"+probot->name.toStdString(), &LCMHandler::robot_mapping_callback, this);
         sub_status = lcm.subscribe("STATUS_DATA_"+probot->name.toStdString(), &LCMHandler::robot_status_callback, this);
         sub_path = lcm.subscribe("ROBOT_PATH_"+probot->name.toStdString(), &LCMHandler::robot_path_callback, this);
         sub_localpath = lcm.subscribe("ROBOT_LOCAL_PATH_"+probot->name.toStdString(), &LCMHandler::robot_local_path_callback, this);

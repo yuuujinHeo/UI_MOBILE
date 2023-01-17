@@ -19,13 +19,20 @@ unix{
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        JoystickHandler.cpp \
-        LCMHandler.cpp \
-        ServerHandler.cpp \
-        cv_to_qt.cpp \
-        Logger.cpp \
-        Supervisor.cpp \
-        main.cpp
+    JoystickHandler.cpp \
+    LCMHandler.cpp \
+    ServerHandler.cpp \
+    cv_to_qt.cpp \
+    Logger.cpp \
+    Supervisor.cpp \
+    main.cpp \
+    websocket/QtHttpServer.cpp \
+    websocket/QtHttpReply.cpp \
+    websocket/QtHttpRequest.cpp \
+    websocket/QtHttpHeader.cpp \
+    websocket/QtHttpClientWrapper.cpp \
+    HTTPHandler.cpp
+
 
 RESOURCES += qml.qrc
 
@@ -47,7 +54,13 @@ HEADERS += \
     Logger.h \
     ServerHandler.h \
     cv_to_qt.h \
-    Supervisor.h
+    Supervisor.h\
+    websocket/QtHttpServer.h \
+    websocket/QtHttpReply.h \
+    websocket/QtHttpRequest.h \
+    websocket/QtHttpHeader.h \
+    websocket/QtHttpClientWrapper.h \
+    HTTPHandler.h
 
 # Libraries setting (for x86_64)
 contains(QT_ARCH, x86_64){

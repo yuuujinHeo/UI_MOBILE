@@ -45,6 +45,13 @@ Item {
                 anchors.centerIn: parent
                 Image{
                     source: icon
+                    Component.onCompleted: {
+                        if(sourceSize.width > 30)
+                            sourceSize.width = 30
+
+                        if(sourceSize.height > 30)
+                            sourceSize.height = 30
+                    }
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
                 Text{
