@@ -9,11 +9,11 @@
 #include <QDir>
 #include <lcm/lcm-cpp.hpp>
 
-#include "../../lcm_types/command.hpp"
-#include "../../lcm_types/robot_status.hpp"
-#include "../../lcm_types/map_data_t.hpp"
-#include "../../lcm_types/robot_path.hpp"
-#include "../../lcm_types/camera_data.hpp"
+#include "../lcm_types/command.hpp"
+#include "../lcm_types/robot_status.hpp"
+#include "../lcm_types/map_data_t.hpp"
+#include "../lcm_types/robot_path.hpp"
+#include "../lcm_types/camera_data.hpp"
 #include "GlobalHeader.h"
 
 class LCMHandler : public QObject

@@ -201,7 +201,7 @@ void LCMHandler::sendMapPath(QString path){
 ////*********************************************  CALLBACK FUNCTIONS   ***************************************************////
 void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg){
     isconnect = true;
-    qDebug() << "read Status";
+//    qDebug() << "read Status";
     flag_rx = true;
     connect_count = 0;
     probot->battery = msg->bat;
@@ -253,33 +253,50 @@ void LCMHandler::robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const
 }
 
 void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data_t *msg){
-    isconnect = true;
-    connect_count = 0;
-    pmap->map_name = msg->map_name.data();
-    pmap->width = msg->map_w;
-    pmap->height = msg->map_h;
-    pmap->gridwidth = msg->map_grid_w;
-    pmap->origin[0] = msg->map_origin[0];
-    pmap->origin[1] = msg->map_origin[1];
-    pmap->imageSize = msg->len;
 
-    qDebug() << "MAPPING CALLBACK!! " << pmap->imageSize << msg->map_h << msg->map_w << msg->data.size();
+//     qDebug() << "accept\n";
+     isconnect = true;
+//     qDebug() << msg->len;
+     connect_count = 0;
+     pmap->map_name = "map1";//msg->map_name.data();
+     pmap->width = msg->map_w;
+     pmap->height = msg->map_h;
+     pmap->gridwidth = msg->map_grid_w;
+     pmap->origin[0] = msg->map_origin[0];
+     pmap->origin[1] = msg->map_origin[1];
+     pmap->imageSize = msg->len;
 
-    pmap->data.clear();
+     pmap->data.clear();
+     cv::Mat map1(msg->map_h, msg->map_w, CV_8U, cv::Scalar::all(0));
+     memcpy(map1.data, msg->data.data(), msg->len);
 
-    cv::Mat map1(msg->map_h, msg->map_w, CV_8U, cv::Scalar::all(0));
-    memcpy(map1.data, msg->data.data(), msg->len);
+     /*cv::Mat plot_map;
+     cv::cvtColor(map1, plot_map, cv::COLOR_GRAY2BGR);
+     cv::flip(plot_map, plot_map, 0);
+     cv::rotate(plot_map, plot_map, cv::ROTATE_90_COUNTERCLOCKWISE);*/ // image north is +x axis
 
-    cv::Mat plot_map;
-    cv::cvtColor(map1, plot_map, cv::COLOR_GRAY2BGR);
-    cv::flip(plot_map, plot_map, 0);
-    cv::rotate(plot_map, plot_map, cv::ROTATE_90_COUNTERCLOCKWISE); // image north is +x axis
+     pmap->data.resize(map1.cols*map1.rows);
+     for(size_t i =0; i<pmap->data.size(); ++i)
+     {
+        int y = i / map1.cols;
+        int x = i % map1.cols;
+        pmap->data[i] = map1.ptr<uchar>(y)[x];
+     }
 
-//    QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(plot_map)).toImage();
-//    temp_image.save("map_temp.png","PNG");
+     /*pmap->data.resize(3*plot_map.cols*plot_map.rows);
 
-    memcpy(plot_map.data, pmap->data.data(), msg->len);
-    flagMapping = true;
+     for(int y=0; y<plot_map.rows;++y)
+     {
+         for(int x=0; x<plot_map.cols; ++x)
+         {
+             cv::Vec3b c = plot_map.ptr<cv::Vec3b>(y)[x];
+             pmap->data[y * (plot_map.cols*3) + (3*x+0)] = c[0];
+             pmap->data[y * (plot_map.cols*3) + (3*x+1)] = c[1];
+             pmap->data[y * (plot_map.cols*3) + (3*x+2)] = c[2];
+         }
+     }*/
+     //memcpy(pmap->data.data(), plot_map.data, 3*plot_map.cols*plot_map.rows);
+     flagMapping = true;
 }
 
 void LCMHandler::robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const camera_data *msg){
