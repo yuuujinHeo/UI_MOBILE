@@ -1,5 +1,0 @@
-struct command
-{
-    int32_t  cmd;
-    byte params[255];
-}
