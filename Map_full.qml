@@ -262,44 +262,44 @@ Item {
                     }
                 }else{
 
-                }
+                    if(map_name != ""){
+                        if(refreshMap){
+                            refreshMap = false;
 
-                if(map_name != ""){
-                    if(refreshMap){
-                        refreshMap = false;
+                            //캔버스 초기화
+                            ctx.clearRect(0,0,map_width,map_height);
 
-                        //캔버스 초기화
-                        ctx.clearRect(0,0,map_width,map_height);
+                            //map 이미지 불러와서 그림
+                            draw_canvas_map();
 
-                        //map 이미지 불러와서 그림
-                        draw_canvas_map();
-
-                        //drawing한 line들 다시 그림
-                        if(state_annotation == "DRAWING"){
-                            draw_canvas_lines();
+                            //drawing한 line들 다시 그림
+                            if(state_annotation == "DRAWING"){
+                                draw_canvas_lines();
+                            }
                         }
-                    }
-                    // 새로 그려지는 line
-                    if(tool == "BRUSH"){
-                        ctx.lineWidth = canvas_map.lineWidth
-                        ctx.strokeStyle = brush_color
-                        ctx.lineCap = "round"
-                        ctx.beginPath()
-                        ctx.moveTo(lastX, lastY)
-                        if(point1.pressed){
-                            lastX = point1.x
-                            lastY = point1.y
+                        // 새로 그려지는 line
+                        if(tool == "BRUSH"){
+                            ctx.lineWidth = canvas_map.lineWidth
+                            ctx.strokeStyle = brush_color
+                            ctx.lineCap = "round"
+                            ctx.beginPath()
+                            ctx.moveTo(lastX, lastY)
+                            if(point1.pressed){
+                                lastX = point1.x
+                                lastY = point1.y
+                            }
+                            supervisor.setLine(lastX,lastY);
+                            ctx.lineTo(lastX, lastY)
+                            ctx.stroke()
                         }
-                        supervisor.setLine(lastX,lastY);
-                        ctx.lineTo(lastX, lastY)
+                    }else{
+                        ctx.fillStyle = "#000000";
+                        ctx.fillRect(0,0,map_width,map_height);
                         ctx.stroke()
                     }
-                }else{
-                    ctx.fillStyle = "#000000";
-                    ctx.fillRect(0,0,map_width,map_height);
-                    ctx.stroke()
                 }
             }
+
         }
 
         Canvas{
@@ -788,6 +788,7 @@ Item {
         repeat: false
         onTriggered: {
             print("update_checker")
+            canvas_map.requestPaint();
             updatelocationcollision();
             flag_margin = false;
         }
