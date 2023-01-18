@@ -230,7 +230,114 @@ Item {
             anchors.top: parent.bottom
             color: "#f4f4f4"
         }
-   }
+
+        Popup{
+            id: popup_add_patrol
+            width: 350
+            height: 500
+            anchors.centerIn: parent
+            onOpened: {
+                var loc_num = supervisor.getLocationNum();
+                list_location2.model.clear();
+                for(var i=0; i<loc_num; i++){
+                    list_location2.model.append({"type":supervisor.getLocationTypes(i),"name":supervisor.getLocationName(i),"iscol":false});
+                }
+            }
+
+            bottomPadding: 0
+            topPadding: 0
+            leftPadding: 0
+            rightPadding: 0
+
+            background: Rectangle{
+                anchors.fill: parent
+                color: "transparent"
+            }
+
+            Rectangle{
+                id: rect_ba
+                anchors.fill:parent
+                color: "#282828"
+                radius: 5
+
+                Rectangle{
+                    id: rect_title1
+                    width: parent.width*0.9
+                    height: 80
+                    anchors.top: parent.top
+                    anchors.topMargin: 20
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    radius: 5
+                    Text{
+                        id: text_popup_patrol
+                        anchors.centerIn: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        text:"왼쪽 리스트에서 사전 정의된 위치를 선택하거나\n지도에서 직접 위치를 입력해주세요."
+                    }
+                }
+
+
+                ListView {
+                    id: list_location2
+                    width: 250
+                    height: 250
+                    anchors.top: rect_title1.bottom
+                    anchors.topMargin: 30
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    clip: true
+                    model: ListModel{}
+                    delegate: locationCompo1
+                    highlight: Rectangle { color: "#FFD9FF"; radius: 5 }
+                    focus: true
+                }
+                Row{
+                    id: menubar22
+                    spacing: 30
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: list_location2.bottom
+                    anchors.topMargin: 20
+                    Repeater{
+                        model: ["confirm","in map"]
+                        Rectangle{
+                            property int btn_size: 100
+                            width: 100
+                            height: 50
+                            radius: 10
+                            color: "white"
+                            Text{
+                                anchors.verticalCenter : parent.verticalCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                font.family: font_noto_r.name
+                                font.pixelSize: 20
+                                color: "#7e7e7e"
+                                text:modelData
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    if(modelData == "confirm"){
+                                        print(list_location2.model.get(list_location2.currentIndex).name);
+                                        if(list_location2.model.get(list_location2.currentIndex).name != ""){
+                                            supervisor.addPatrol("POINT",list_location2.model.get(list_location2.currentIndex).name,0,0,0);
+                                            popup_add_patrol.close();
+                                            update_patrol_location();
+                                        }
+                                    }else if(modelData == "in map"){
+                                        popup_add_patrol.close();
+                                        map.tool = "ADD_PATROL_LOCATION";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+
+
+    }
 
     ////////************************ITEM :: MAP **********************************************************
     Item{
@@ -261,6 +368,8 @@ Item {
                 show_robot: true
                 show_path: true
                 show_lidar: true
+                show_buttons: true
+                show_connection: true
                 show_object: true
                 anchors.left: parent.left
                 anchors.leftMargin: 200//parent.width/2 - width/2
@@ -605,8 +714,8 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                print(supervisor.getLCMConnection());
                                 if(supervisor.getLCMConnection()){
+                                    map.mapping_mode = true;
                                     supervisor.startMapping();
                                     timer_mapping.start();
                                 }
@@ -623,6 +732,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                map.mapping_mode = false;
                                 supervisor.stopMapping();
                                 timer_mapping.stop();
                             }
@@ -4167,7 +4277,7 @@ Item {
                 font.family: font_noto_r.name
                 font.pixelSize: 20
                 font.bold: iscol
-                color: iscol?"red":"black"
+                color: list_location2.currentIndex==index?"black":"white"
             }
             Rectangle//리스트의 구분선
             {
@@ -4181,90 +4291,13 @@ Item {
                 id:area_compo
                 anchors.fill:parent
                 onClicked: {
-                    map.select_location = supervisor.getLocNum(name);
+                    map.select_location_show = supervisor.getLocNum(name);
                     list_location2.currentIndex = index;
                     map.update_canvas_all();
                 }
             }
         }
     }
-    Popup{
-        id: popup_add_patrol
-        width: 700
-        height: 600
-        anchors.centerIn: parent
-        Rectangle{
-            id: rect_ba
-            anchors.fill:parent
-            Text{
-                id: text_popup_patrol
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: 30
-                text:"왼쪽 리스트에서 사전 정의된 위치를 선택하거나 지도에서 직접 위치를 입력해주세요."
-            }
-
-            ListView {
-                id: list_location2
-                width: 250
-                height: 400
-                anchors.top: text_popup_patrol.bottom
-                anchors.topMargin: 30
-                anchors.left: parent.left
-                anchors.leftMargin: 30
-                clip: true
-                model: ListModel{}
-                delegate: locationCompo1
-                highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
-                focus: true
-            }
-            Column{
-                id: menubar22
-                spacing: 30
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: list_location2.right
-                anchors.leftMargin: 50
-                Repeater{
-                    model: ["confirm","cancel","in map"]
-                    Rectangle{
-                        property int btn_size: 100
-                        width: 50
-                        height: 50
-                        radius: 10
-                        color: "white"
-                        Text{
-                            anchors.verticalCenter : parent.verticalCenter
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            font.family: font_noto_r.name
-                            font.pixelSize: 20
-                            color: "#7e7e7e"
-                            text:modelData
-                        }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                if(modelData == "confirm"){
-                                    print(list_location2.model.get(list_location2.currentIndex).name);
-                                    if(list_location2.model.get(list_location2.currentIndex).name != ""){
-                                        supervisor.addPatrol("POINT",list_location2.model.get(list_location2.currentIndex).name,0,0,0);
-                                        popup_add_patrol.close();
-                                        update_patrol_location();
-                                    }
-                                }else if(modelData == "cancel"){
-                                    popup_add_patrol.close();
-                                }else if(modelData == "in map"){
-                                    popup_add_patrol.close();
-                                    map.tool = "ADD_PATROL_LOCATION";
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
     Popup{
         id: popup_add_object
         width: 500
@@ -4799,13 +4832,25 @@ Item {
         id: popup_add_patrol_1
         width: 300
         height:200
+        bottomPadding: 0
+        topPadding: 0
+        leftPadding: 0
+        rightPadding: 0
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+
         anchors.centerIn: parent
         Rectangle{
-            anchors.fill: parent
+            radius: 5
+            width: parent.width
+            height: parent.height
             color: "white"
             Text{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
+                font.family: font_noto_r.name
                 anchors.topMargin: 30
                 text: "지정한 위치로 포인트를 추가 하시겠습니까?"
             }
@@ -4829,18 +4874,19 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 if(modelData == "yes"){
-                                    if(canvas_location.isnewLoc && canvas_location.new_loc_available){
+                                    print(map.new_location, map.new_loc_available);
+                                    if(map.new_location && map.new_loc_available){
                                         supervisor.addPatrol("POINT","",canvas_location.new_loc_x, canvas_location.new_loc_y, canvas_location.new_loc_th);
                                         update_patrol_location();
                                     }
-                                    canvas_location.isnewLoc = false;
+                                    map.new_location = false;
                                     map.tool = "MOVE";
                                     popup_add_patrol_1.close();
                                 }else if(modelData == "retry"){
                                     popup_add_patrol_1.close();
                                 }else if(modelData == "cancel"){
                                     map.tool = "MOVE";
-                                    canvas_location.isnewLoc = false;
+                                    map.new_location = false;
                                     popup_add_patrol_1.close();
                                 }
                             }
@@ -4866,25 +4912,29 @@ Item {
         map.init_mode();
         timer_get_joy.stop();
         map.state_annotation = "NONE";
+        print("map_mode "+map_mode)
         if(map_mode == 0){
             timer_get_joy.start();
             loader_menu.sourceComponent = menu_main;
             text_menu_title.visible = false;
+            map.show_buttons = true;
             text_menu_title.text = "";
+
         }else if(map_mode == 1){
             text_menu_title.text = "SLAM";
             text_menu_title.visible = true;
             timer_get_joy.start();
-            map.mapping_mode = true;
+            map.fill_canvas_map();
             map.show_lidar = true;
             map.show_robot = true;
             map.just_show_map = true;
-            map.clear_canvas_map();
+            map.show_connection = false;
             loader_menu.sourceComponent = menu_slam;
         }else if(map_mode == 2){
             text_menu_title.text = "Annotation";
             text_menu_title.visible = true;
             map.show_location = true;
+            map.show_connection = false;
             map.show_object = true;
             map.show_travelline = true;
             map.robot_following = false;
@@ -4895,15 +4945,17 @@ Item {
             map.show_patrol = true;
             map.show_robot   = true;
             map.show_object = true;
-            map.show_path = true;
-            map.show_location = true;
-            map.show_travelline = true;
+            map.show_connection = false;
+//            map.show_path = true;
+//            map.show_location = true;
+//            map.show_travelline = true;
             map.robot_following = false;
             loader_menu.sourceComponent = menu_patrol;
         }else if(map_mode == 4){
             text_menu_title.visible = true;
             text_menu_title.text = "Localization";
             map.show_lidar = true;
+            map.show_buttons = true;
             map.show_robot = true;
             map.show_object = true;
             map.robot_following = true;

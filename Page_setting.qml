@@ -2441,14 +2441,14 @@ Item {
             opacity: 0.8
             color: "#282828"
         }
+        property bool is_load: false
 
         Timer{
             id: timer_load
-            interval: 500
+            interval: 1000
             repeat: true
             triggeredOnStart: true
             onTriggered:{
-                var is_load = false;
                 //카메라 정보 요청
                 supervisor.requestCamera();
 
@@ -2456,18 +2456,19 @@ Item {
                 if(supervisor.getCameraNum() > 1){
                     text_camera_1.text = supervisor.getCameraSerial(0);
                     text_camera_2.text = supervisor.getCameraSerial(1);
-                    is_load = true;
+                    popup_camera.is_load = true;
                 }else if(supervisor.getCameraNum() === 1){
                     text_camera_1.text = supervisor.getCameraSerial(0);
-                    is_load = true;
+                    popup_camera.is_load = true;
                 }else{
                     text_camera_1.text = "";
                     text_camera_2.text = "";
                 }
 
-                if(is_load){
+                if(popup_camera.is_load){
+                    print("load done");
                     //지정된 왼쪽카메라 확인
-                    if(supervisor.getLeftCamera() === getCameraSerial(0)){
+                    if(supervisor.getLeftCamera() === supervisor.getCameraSerial(0)){
                         mousearea_1.is_left = true;
                         mousearea_2.is_left = false;
 
@@ -2475,7 +2476,7 @@ Item {
                         ani_2.to = popup_camera.pos_right;
                         ani_camera.restart();
                     }
-                    if(supervisor.getRightCamera() === getCameraSerial(0)){
+                    if(supervisor.getRightCamera() === supervisor.getCameraSerial(0)){
                         mousearea_1.is_left = false;
                         mousearea_2.is_left = true;
                         ani_1.to = popup_camera.pos_right;
@@ -2484,16 +2485,16 @@ Item {
                     }
 
                     if(supervisor.getCameraNum() > 1){
-                        if(mousearea_1.is_left && supervisor.getLeftCamera() === getCameraSerial(0)){
+                        if(mousearea_1.is_left && supervisor.getLeftCamera() === supervisor.getCameraSerial(0)){
                             cam_info_1.set = true;
                         }
-                        if(mousearea_2.is_left && supervisor.getLeftCamera() === getCameraSerial(1)){
+                        if(mousearea_2.is_left && supervisor.getLeftCamera() === supervisor.getCameraSerial(1)){
                             cam_info_2.set = true;
                         }
-                        if(!mousearea_1.is_left && supervisor.getRightCamera() === getCameraSerial(0)){
+                        if(!mousearea_1.is_left && supervisor.getRightCamera() === supervisor.getCameraSerial(0)){
                             cam_info_1.set = true;
                         }
-                        if(!mousearea_2.is_left && supervisor.getRightCamera() === getCameraSerial(1)){
+                        if(!mousearea_2.is_left && supervisor.getRightCamera() === supervisor.getCameraSerial(1)){
                             cam_info_2.set = true;
                         }
                     }
@@ -2822,9 +2823,10 @@ Item {
                             width: 180
                             height: 60
                             radius: 10
-                            color: "#12d27c"
-                            border.width: 1
+                            color: enabled?"#12d27c":"#e9e9e9"
+                            border.width: enabled?1:0
                             border.color: "#12d27c"
+                            enabled: popup_camera.is_load
                             Text{
                                 anchors.centerIn: parent
                                 text: "확인"
@@ -2840,6 +2842,8 @@ Item {
                                     }else{
                                         supervisor.setCamera(text_camera_2.text,text_camera_1.text);
                                     }
+                                    supervisor.readSetting();
+                                    init();
                                     popup_camera.close();
                                 }
                             }
@@ -2868,7 +2872,7 @@ Item {
                             width: 180
                             height: 60
                             radius: 10
-                            color:"transparent"
+                            color:popup_camera.is_load?"transparent":"#12d27c"
                             border.width: 1
                             border.color: "#7e7e7e"
                             Text{

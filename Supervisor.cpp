@@ -166,6 +166,7 @@ void Supervisor::readSetting(QString map_name){
     probot->serial_num = setting_robot.value("serial_num").toInt();
     probot->name = probot->model + QString::number(probot->serial_num);
 
+    setting.tray_num = setting_robot.value("tray_num").toInt();
     probot->radius = setting_robot.value("radius").toFloat();
     probot->type = setting_robot.value("type").toString();
     setting_robot.endGroup();
@@ -173,7 +174,6 @@ void Supervisor::readSetting(QString map_name){
     setting_robot.beginGroup("ROBOT_SW");
     probot->program_version = setting_robot.value("version").toString();
     probot->velocity = setting_robot.value("velocity").toFloat();
-    setting.tray_num = setting_robot.value("tray_num").toInt();
     setting.useVoice = setting_robot.value("use_voice").toBool();
     setting.useBGM = setting_robot.value("use_bgm").toBool();
     pmap->use_uicmd = setting_robot.value("use_uicmd").toBool();
@@ -306,17 +306,26 @@ void Supervisor::readSetting(QString map_name){
         }else{
             temp_obj.type = "Unknown";
         }
+        QStringList templist = strlist[1].split(":");
 
-        if(strlist[1].toInt() == 1){
-            temp_obj.is_rect = true;
-        }else{
+        if(templist.size() > 1){
             temp_obj.is_rect = false;
-        }
-
-        for(int j=2; j<strlist.size(); j++){
-            temp_point.x = strlist[j].split(":")[0].toFloat();
-            temp_point.y = strlist[j].split(":")[1].toFloat();
-            temp_obj.pose.push_back(temp_point);
+            for(int j=1; j<strlist.size(); j++){
+                temp_point.x = strlist[j].split(":")[0].toFloat();
+                temp_point.y = strlist[j].split(":")[1].toFloat();
+                temp_obj.pose.push_back(temp_point);
+            }
+        }else{
+            if(strlist[1].toInt() == 1){
+                temp_obj.is_rect = true;
+            }else{
+                temp_obj.is_rect = false;
+            }
+            for(int j=2; j<strlist.size(); j++){
+                temp_point.x = strlist[j].split(":")[0].toFloat();
+                temp_point.y = strlist[j].split(":")[1].toFloat();
+                temp_obj.pose.push_back(temp_point);
+            }
         }
         pmap->vecObject.push_back(temp_obj);
     }
@@ -460,7 +469,11 @@ QList<int> Supervisor::getCamera(int num){
     return pmap->camera_info[num].data;
 }
 QString Supervisor::getCameraSerial(int num){
-    return pmap->camera_info[num].serial;
+    if(num > -1 && num < pmap->camera_info.size()){
+        return pmap->camera_info[num].serial;
+    }else{
+        return "";
+    }
 }
 
 
@@ -963,6 +976,7 @@ QList<int> Supervisor::getMiniMap(QString filename){
 }
 
 QList<int> Supervisor::getMapping(){
+    qDebug() << pmap->data.size();
     return pmap->data.toList();
 }
 
@@ -2071,7 +2085,6 @@ void Supervisor::setPatrolMode(int mode){
     QMetaObject::invokeMethod(mMain, "updatepatrol");
 }
 int Supervisor::getPatrolNum(){
-    qDebug() << "Patrol Num : " << patrol.path.size();
     return patrol.path.size();
 }
 QString Supervisor::getPatrolType(int num){
