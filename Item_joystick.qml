@@ -139,6 +139,7 @@ Item {
 
             // Fire the signal to indicate the joystick has moved
             angle = Math.atan2(signal_y, signal_x)
+            print(angle, fingerDistance2, distanceBound);
         }
     }
 

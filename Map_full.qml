@@ -17,6 +17,13 @@ Item {
     property bool just_show_map: false
     property bool mapping_mode: false
 
+    property bool show_connection: false
+    property bool show_buttons: false
+
+    onShow_buttonsChanged: {
+        print("showbuttons = "+show_buttons);
+    }
+
     property bool is_slam_running: false
     property bool show_object: false
     property bool show_location: false
@@ -83,6 +90,7 @@ Item {
     property int select_patrol: -1
     property int select_line: -1
     property int select_travel_line: -1
+    property int select_location_show: -1
 
     property bool new_travel_line: false
     property bool new_line_point1: false
@@ -106,6 +114,28 @@ Item {
 
     //////========================================================================================Canvas Tool
     property bool refreshMap: true
+
+    onRobot_followingChanged: {
+        if(robot_following){
+            var newx = -(robot_x-origin_x)*canvas_map.scale - origin_x + rect_map.width/2;
+            if(newx  > canvas_map.width*(canvas_map.scale - 1)/2){
+                canvas_map.x = canvas_map.width*(canvas_map.scale - 1)/2
+            }else if(newx < -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)){
+                canvas_map.x = -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)
+            }else{
+                canvas_map.x = newx;
+            }
+            var newy = -(robot_y-origin_y)*canvas_map.scale - origin_y + rect_map.width/2;
+            if(newy  > canvas_map.height*(canvas_map.scale - 1)/2){
+                canvas_map.y = canvas_map.height*(canvas_map.scale - 1)/2
+            }else if(newy < -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)){
+                canvas_map.y = -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)
+            }else{
+                canvas_map.y = newy;
+            }
+        }
+
+    }
 
     onRobot_xChanged: {
         if(robot_following){
@@ -209,12 +239,12 @@ Item {
             }
             Behavior on x{
                 NumberAnimation{
-                    duration: 100
+                    duration: mapping_mode?0:100
                 }
             }
             Behavior on y{
                 NumberAnimation{
-                    duration: 100
+                    duration: mapping_mode?0:100
                 }
             }
 
@@ -224,7 +254,6 @@ Item {
                 }else if(canvas_map.x < -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)){
                     canvas_map.x = -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)
                 }
-                requestPaint();
             }
             onYChanged: {
                 if(canvas_map.y  > canvas_map.height*(canvas_map.scale - 1)/2){
@@ -232,7 +261,6 @@ Item {
                 }else if(canvas_map.y < -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)){
                     canvas_map.y = -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)
                 }
-                requestPaint();
             }
             onScaleChanged: {
                 if(canvas_map.x  > canvas_map.width*(canvas_map.scale - 1)/2){
@@ -252,20 +280,16 @@ Item {
             onPaint:{
                 var ctx = getContext('2d');
                 if(mapping_mode){
-                    //매핑이미지 파일 갱신 확인
                     if(supervisor.getMappingflag()){
-                        //매핑 이미지 그림
-                        ctx.clearRect(0,0,map_width,map_height);
                         draw_canvas_mapping();
-                        //플래그 종료
                         supervisor.setMappingflag(false);
                     }
                 }else{
-
+                    print("requestpaint but mapping false")
                     if(map_name != ""){
                         if(refreshMap){
+                            print("draw map refresh");
                             refreshMap = false;
-
                             //캔버스 초기화
                             ctx.clearRect(0,0,map_width,map_height);
 
@@ -293,9 +317,7 @@ Item {
                             ctx.stroke()
                         }
                     }else{
-                        ctx.fillStyle = "#000000";
-                        ctx.fillRect(0,0,map_width,map_height);
-                        ctx.stroke()
+                        fill_canvas_map();
                     }
                 }
             }
@@ -355,7 +377,9 @@ Item {
                 }
                 if(show_patrol){
                     draw_canvas_patrol_location();
+                    draw_canvas_location_temp();
                 }
+
             }
         }
 
@@ -655,7 +679,7 @@ Item {
             width: 40
             height: 40
             radius: 40
-            visible: !just_show_map  && state_annotation=="NONE"
+            visible: show_buttons && state_annotation=="NONE"
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.leftMargin: 5
@@ -677,7 +701,7 @@ Item {
             width: 40
             height: 40
             radius: 40
-            visible: !just_show_map  && state_annotation=="NONE"
+            visible: show_buttons   && state_annotation=="NONE"
             anchors.top: btn_robot_following.bottom
             anchors.topMargin: 5
             anchors.left: parent.left
@@ -713,7 +737,7 @@ Item {
         Rectangle{
             anchors.fill: parent
             color: "transparent"
-            visible: !is_slam_running && !just_show_map && tool!="SLAM_INIT" && state_annotation=="NONE"
+            visible: show_connection && !is_slam_running && !just_show_map && tool!="SLAM_INIT" && state_annotation=="NONE"
             border.color: "#E7584D"
             border.width: 5
             Column{
@@ -788,12 +812,21 @@ Item {
         repeat: false
         onTriggered: {
             print("update_checker")
-            canvas_map.requestPaint();
             updatelocationcollision();
             flag_margin = false;
         }
     }
 
+    Timer{
+        id: update_mapping
+        interval: 200
+        running: mapping_mode
+        repeat: true
+        onTriggered: {
+            print("mapping triggerd")
+            canvas_map.requestPaint();
+        }
+    }
 
     //최초 실행 후 맵 파일을 받아올 수 있을 때까지 1회 수행
     Timer{
@@ -843,6 +876,7 @@ Item {
 
     //////========================================================================================Variable update function
     function init_mode(){
+        print("init mode")
         tool = "MOVE";
 
         select_object = -1;
@@ -859,6 +893,8 @@ Item {
 
         supervisor.clearObjectPoints();
 
+        show_buttons = false;
+        show_connection = true;
         show_lidar = false;
         show_location = false;
         show_margin = false;
@@ -998,6 +1034,15 @@ Item {
         var ctx = canvas_map.getContext('2d');
         ctx.clearRect(0,0,map_width,map_height);
     }
+    function fill_canvas_map(){
+        var ctx = canvas_map.getContext('2d');
+        ctx.fillStyle = "black";
+        ctx.fillRect(0,0,map_width,map_height);
+        print("fill canvas map");
+        refreshMap = false;
+        canvas_map.scale = rect_map.width/canvas_map.width;
+        canvas_map.requestPaint();
+    }
 
     function draw_canvas_mapping(){
         var ctx = canvas_map.getContext('2d');
@@ -1013,26 +1058,9 @@ Item {
             temp_image.data[4*i+3] = 255;
         }
         ctx.drawImage(temp_image,0,0,map_width,map_height);
-
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "red";
-        ctx.fillStyle = "red";
-        for(var i=0; i<360; i++){
-            var data = supervisor.getLidar(i)/grid_size;
-            if(data > 0.01){
-                ctx.beginPath();
-                var lidar_x = robot_x + origin_x + data*Math.cos((-Math.PI*i)/180 + robot_th);
-                var lidar_y = robot_y + origin_y + data*Math.sin((-Math.PI*i)/180 + robot_th);
-                ctx.moveTo(lidar_x, lidar_y);
-                ctx.arc(lidar_x,lidar_y,1,0,Math.PI*2);
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-            }
-        }
-
     }
     function draw_canvas_map(){
+        print("draw canvas map")
         var ctx = canvas_map.getContext('2d');
         if(use_rawmap){
             var map_data = supervisor.getRawMap(map_name);
@@ -1122,6 +1150,7 @@ Item {
 
         var patrol_num = supervisor.getPatrolNum();
 
+
         for(var i=0; i<patrol_num; i++){
             var loc_type = supervisor.getPatrolType(i);
             var loc_name = supervisor.getPatrolLocation(i);
@@ -1180,7 +1209,49 @@ Item {
 
 
         }
+
+        if(select_location_show > -1){
+            //새로 추가될 location 보여주기(임시)
+            var loc_type = supervisor.getLocationTypes(select_location_show);
+            var loc_x = supervisor.getLocationx(select_location_show)/grid_size +origin_x;
+            var loc_y = supervisor.getLocationy(select_location_show)/grid_size +origin_y;
+            var loc_th = -supervisor.getLocationth(select_location_show)-Math.PI/2;
+
+            print(select_location_show, loc_x, loc_y, loc_th);
+
+
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 2;
+            ctx.fillStyle = "#FFD9FF";
+            ctx.beginPath();
+            ctx.arc(loc_x,loc_y,robot_radius/grid_size, 0,2*Math.PI, true);
+            ctx.fill()
+            ctx.stroke()
+
+            var distance = (robot_radius/grid_size)*1.8;
+            var distance2 = distance*0.8;
+            var th_dist = Math.PI/8;
+            var x = loc_x+distance*Math.cos(-loc_th-Math.PI/2);
+            var y = loc_y+distance*Math.sin(-loc_th-Math.PI/2);
+            var x1 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2-th_dist);
+            var y1 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2-th_dist);
+            var x2 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2+th_dist);
+            var y2 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2+th_dist);
+
+            if(select_location == i){
+                ctx.strokeStyle = "#FFD9FF";
+            }else{
+                ctx.strokeStyle = "#FFD9FF";
+            }
+            ctx.beginPath();
+            ctx.moveTo(x,y);
+            ctx.lineTo(x1,y1);
+            ctx.moveTo(x,y);
+            ctx.lineTo(x2,y2);
+            ctx.stroke()
+        }
     }
+
     function draw_canvas_location_temp(){
         if(new_location){
             var ctx = canvas_location.getContext('2d');
@@ -1276,6 +1347,8 @@ Item {
             var obj_x0 = obj_x;
             var obj_y0 = obj_y;
 
+//            print("OBJECT "+i+" -> "+obj_type+obj_size);
+
             if(select_object == i){
                 ctx.strokeStyle = "#83B8F9";
                 ctx.fillStyle = "#FFD9FF";
@@ -1300,6 +1373,7 @@ Item {
                 }
 
             }
+
             ctx.beginPath();
             ctx.moveTo(obj_x,obj_y);
             for(var j=1; j<obj_size; j++){
