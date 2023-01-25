@@ -95,5 +95,16 @@
         <file alias="image/joy_background.png">../image/joy_background.png</file>
         <file alias="image/image_localization.png">../image/image_localization.png</file>
         <file alias="icon/icon_connect_error.png">../icon/icon_connect_error.png</file>
+        <file alias="icon/icon_charge_1.png">../icon/icon_charge_1.png</file>
+        <file alias="icon/icon_charge_2.png">../icon/icon_charge_2.png</file>
+        <file alias="icon/icon_home_1.png">../icon/icon_home_1.png</file>
+        <file alias="icon/icon_home_2.png">../icon/icon_home_2.png</file>
+        <file alias="icon/icon_lcm_discon.png">../icon/icon_lcm_discon.png</file>
+        <file alias="icon/icon_point_1.png">../icon/icon_point_1.png</file>
+        <file alias="icon/icon_warning_1.png">../icon/icon_warning_1.png</file>
+        <file alias="icon/keyboard_down.png">../icon/keyboard_down.png</file>
+        <file alias="icon/keyboard_left.png">../icon/keyboard_left.png</file>
+        <file alias="icon/keyboard_right.png">../icon/keyboard_right.png</file>
+        <file alias="icon/keyboard_up.png">../icon/keyboard_up.png</file>
     </qresource>
 </RCC>
