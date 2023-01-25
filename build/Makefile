@@ -476,72 +476,83 @@ compiler_rcc_clean:
 	-$(DEL_FILE) qrc_qml_qmlcache.cpp
 qrc_qml_qmlcache.cpp: qml_qmlcache.qrc \
 		/usr/lib/qt5/bin/rcc \
-		../icon/icon_power.png \
-		../icon/btn_home.png \
-		../icon/icon_joy_disconnect.png \
-		../icon/joystick_thumb.png \
-		../icon/btn_setting.png \
-		../icon/clock.png \
-		../icon/icon_erase.png \
-		../icon/btn_minimize.png \
-		../icon/load_r.png \
-		../icon/joy_left.png \
-		../icon/icon_open.png \
-		../icon/icon_stop.png \
-		../icon/joystick_back.png \
-		../icon/joy_up.png \
-		../icon/icon_server_download.png \
-		../icon/icon_draw.png \
-		../icon/btn_yes.png \
 		../icon/icon_server_disconnect.png \
-		../icon/icon_server_connect.png \
-		../icon/icon_remove.png \
-		../icon/icon_error.png \
-		../icon/icon_edit.png \
-		../icon/data_gray.png \
+		../icon/btn_reset2.png \
+		../icon/clock.png \
+		../icon/joy_left.png \
+		../icon/icon_meta_save.png \
+		../icon/icon_home_2.png \
+		../icon/bat_1.png \
+		../icon/btn_no.png \
+		../icon/save_r.png \
+		../icon/joystick_back.png \
+		../icon/record_r.png \
 		../icon/data_green.png \
+		../icon/load_r.png \
+		../icon/bat_charge.png \
+		../icon/keyboard_down.png \
+		../icon/btn_home.png \
+		../icon/stop_r.png \
+		../icon/btn_minimize.png \
+		../icon/icon_home_1.png \
+		../icon/icon_warning_1.png \
+		../icon/icon_joy_disconnect.png \
+		../icon/icon_undo.png \
+		../icon/joy_right.png \
+		../icon/keyboard_up.png \
+		../icon/btn_wait.png \
+		../icon/image_setting.png \
+		../icon/icon_edit.png \
+		../icon/icon_manualmove.png \
+		../icon/btn_lock.png \
+		../icon/icon_remove.png \
+		../icon/icon_transmit_server.png \
+		../icon/icon_point_1.png \
 		../icon/icon_annot_save.png \
 		../icon/btn_map.png \
-		../icon/icon_connect_error.png \
-		../icon/patrol_down.png \
-		../icon/btn_lock.png \
-		../icon/icon_undo.png \
-		../icon/icon_researching.png \
-		../icon/stop_r.png \
+		../icon/icon_joy_connect.png \
+		../icon/icon_erase.png \
+		../icon/icon_set_init.png \
+		../icon/btn_setting.png \
+		../icon/data_gray.png \
+		../icon/icon_move.png \
+		../icon/icon_charge_2.png \
+		../icon/image_map.png \
+		../icon/btn_confirm.png \
+		../icon/keyboard_left.png \
+		../icon/icon_point.png \
+		../icon/btn_reset.png \
+		../icon/icon_redo.png \
+		../icon/btn_yes.png \
+		../icon/icon_lcm_discon.png \
 		../icon/bat_3.png \
 		../icon/icon_warning.png \
-		../icon/icon_add.png \
-		../icon/play_r.png \
-		../icon/icon_manualmove.png \
-		../icon/btn_no.png \
-		../icon/icon_joy_connect.png \
-		../icon/bat_2.png \
-		../icon/icon_run.png \
-		../icon/record_r.png \
-		../icon/icon_transmit_server.png \
-		../icon/btn_confirm.png \
-		../icon/bat_charge.png \
-		../icon/joy_right.png \
-		../icon/icon_point.png \
-		../icon/bat_1.png \
-		../icon/icon_cur.png \
-		../icon/icon_set_init.png \
-		../icon/save_r.png \
-		../icon/icon_meta_save.png \
-		../icon/btn_wait.png \
-		../icon/image_map.png \
-		../icon/image_setting.png \
-		../icon/joy_down.png \
+		../icon/joystick_thumb.png \
+		../icon/icon_server_download.png \
 		../icon/btn_menu.png \
-		../icon/icon_lidar.png \
 		../icon/icon_auto_init.png \
-		../icon/icon_move.png \
-		../icon/btn_reset2.png \
-		../icon/bat_full.png \
-		../icon/btn_charge.png \
+		../icon/icon_charge_1.png \
+		../icon/joy_down.png \
 		../icon/icon_cancelpath.png \
-		../icon/icon_redo.png \
-		../icon/btn_reset.png \
+		../icon/icon_power.png \
+		../icon/icon_server_connect.png \
+		../icon/icon_error.png \
+		../icon/play_r.png \
+		../icon/icon_connect_error.png \
+		../icon/icon_cur.png \
+		../icon/icon_stop.png \
+		../icon/icon_lidar.png \
+		../icon/icon_draw.png \
+		../icon/bat_2.png \
+		../icon/icon_open.png \
+		../icon/joy_up.png \
+		../icon/btn_charge.png \
+		../icon/keyboard_right.png \
+		../icon/icon_run.png \
+		../icon/icon_add.png \
+		../icon/patrol_down.png \
+		../icon/icon_researching.png \
+		../icon/bat_full.png \
 		../image/rainbow4.png \
 		../image/robot_head_sleep.png \
 		../image/warning.png \
