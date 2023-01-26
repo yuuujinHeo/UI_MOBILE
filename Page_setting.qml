@@ -13,6 +13,11 @@ Item {
     property string platform_name: supervisor.getRobotName()
     property string debug_platform_name: ""
     property bool is_debug: false
+    function update_camera(){
+        if(popup_camera.opened)
+            popup_camera.update();
+    }
+
     Rectangle{
         width: parent.width
         height: parent.height-statusbar.height
@@ -2441,71 +2446,83 @@ Item {
             opacity: 0.8
             color: "#282828"
         }
+
         property bool is_load: false
+
+        onOpened: {
+            timer_load.start();
+        }
+        onClosed: {
+            timer_load.stop();
+        }
+
+        function update(){
+            timer_load.stop();
+            //카메라 대수에 따라 UI 업데이트
+            if(supervisor.getCameraNum() > 1){
+                text_camera_1.text = supervisor.getCameraSerial(0);
+                text_camera_2.text = supervisor.getCameraSerial(1);
+                popup_camera.is_load = true;
+            }else if(supervisor.getCameraNum() === 1){
+                text_camera_1.text = supervisor.getCameraSerial(0);
+                popup_camera.is_load = true;
+            }else{
+                text_camera_1.text = supervisor.getLeftCamera();
+                text_camera_2.text = supervisor.getRightCamera();
+            }
+
+            if(popup_camera.is_load){
+                //지정된 왼쪽카메라 확인
+//                if(supervisor.getLeftCamera() === supervisor.getCameraSerial(0)){
+//                    mousearea_1.is_left = true;
+//                    mousearea_2.is_left = false;
+
+//                    ani_1.to = popup_camera.pos_left;
+//                    ani_2.to = popup_camera.pos_right;
+//                    ani_camera.restart();
+//                }
+//                if(supervisor.getRightCamera() === supervisor.getCameraSerial(0)){
+//                    mousearea_1.is_left = false;
+//                    mousearea_2.is_left = true;
+//                    ani_1.to = popup_camera.pos_right;
+//                    ani_2.to = popup_camera.pos_left;
+//                    ani_camera.restart();
+//                }
+
+                if(supervisor.getCameraNum() > 1){
+                    if(mousearea_1.is_left && supervisor.getLeftCamera() === supervisor.getCameraSerial(0)){
+                        cam_info_1.set = true;
+                    }
+                    if(mousearea_2.is_left && supervisor.getLeftCamera() === supervisor.getCameraSerial(1)){
+                        cam_info_2.set = true;
+                    }
+                    if(!mousearea_1.is_left && supervisor.getRightCamera() === supervisor.getCameraSerial(0)){
+                        cam_info_1.set = true;
+                    }
+                    if(!mousearea_2.is_left && supervisor.getRightCamera() === supervisor.getCameraSerial(1)){
+                        cam_info_2.set = true;
+                    }
+                }
+
+                canvas_camera_1.requestPaint();
+                canvas_camera_2.requestPaint();
+            }else{
+                cam_info_1.set = false;
+                cam_info_2.set = false;
+            }
+
+            timer_load.start();
+        }
 
         Timer{
             id: timer_load
-            interval: 1000
+            interval: 3000
             repeat: true
             triggeredOnStart: true
             onTriggered:{
                 //카메라 정보 요청
                 supervisor.requestCamera();
 
-                //카메라 대수에 따라 UI 업데이트
-                if(supervisor.getCameraNum() > 1){
-                    text_camera_1.text = supervisor.getCameraSerial(0);
-                    text_camera_2.text = supervisor.getCameraSerial(1);
-                    popup_camera.is_load = true;
-                }else if(supervisor.getCameraNum() === 1){
-                    text_camera_1.text = supervisor.getCameraSerial(0);
-                    popup_camera.is_load = true;
-                }else{
-                    text_camera_1.text = "";
-                    text_camera_2.text = "";
-                }
-
-                if(popup_camera.is_load){
-                    print("load done");
-                    //지정된 왼쪽카메라 확인
-                    if(supervisor.getLeftCamera() === supervisor.getCameraSerial(0)){
-                        mousearea_1.is_left = true;
-                        mousearea_2.is_left = false;
-
-                        ani_1.to = popup_camera.pos_left;
-                        ani_2.to = popup_camera.pos_right;
-                        ani_camera.restart();
-                    }
-                    if(supervisor.getRightCamera() === supervisor.getCameraSerial(0)){
-                        mousearea_1.is_left = false;
-                        mousearea_2.is_left = true;
-                        ani_1.to = popup_camera.pos_right;
-                        ani_2.to = popup_camera.pos_left;
-                        ani_camera.restart();
-                    }
-
-                    if(supervisor.getCameraNum() > 1){
-                        if(mousearea_1.is_left && supervisor.getLeftCamera() === supervisor.getCameraSerial(0)){
-                            cam_info_1.set = true;
-                        }
-                        if(mousearea_2.is_left && supervisor.getLeftCamera() === supervisor.getCameraSerial(1)){
-                            cam_info_2.set = true;
-                        }
-                        if(!mousearea_1.is_left && supervisor.getRightCamera() === supervisor.getCameraSerial(0)){
-                            cam_info_1.set = true;
-                        }
-                        if(!mousearea_2.is_left && supervisor.getRightCamera() === supervisor.getCameraSerial(1)){
-                            cam_info_2.set = true;
-                        }
-                    }
-
-                    canvas_camera_1.requestPaint();
-                    canvas_camera_2.requestPaint();
-                    timer_load.stop();
-                }else{
-                    cam_info_1.set = false;
-                    cam_info_2.set = false;
-                }
             }
         }
 
@@ -2606,24 +2623,31 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                         Canvas{
                             id: canvas_camera_1
-                            anchors.fill: parent
+                            width: 212
+                            height: 120
+                            scale: parent.width/212
+                            anchors.centerIn: parent
                             onPaint:{
                                 var ctx = getContext('2d');
-                                ctx.clearRect(0,0,width,height);
 
                                 if(supervisor.getCameraNum() > 0){
                                     var image_data = supervisor.getCamera(0);
-                                    var temp_image = ctx.createImageData(width,height);
 
-                                    for(var i=0; i<image_data.length; i++){
-                                        temp_image.data[4*i+0] = image_data[i];
-                                        temp_image.data[4*i+1] = image_data[i];
-                                        temp_image.data[4*i+2] = image_data[i];
-                                        temp_image.data[4*i+3] = 255;
+                                    if(image_data.length > 0){
+
+                                        ctx.clearRect(0,0,width,height);
+                                        var temp_image = ctx.createImageData(width,height);
+
+                                        for(var i=0; i<image_data.length; i++){
+                                            temp_image.data[4*i+0] = image_data[i];
+                                            temp_image.data[4*i+1] = image_data[i];
+                                            temp_image.data[4*i+2] = image_data[i];
+                                            temp_image.data[4*i+3] = 255;
+                                        }
+                                        ctx.drawImage(temp_image,0,0,width,height);
+
                                     }
-                                    ctx.drawImage(temp_image,0,0,width,height);
                                 }
-
                             }
                         }
 
@@ -2718,24 +2742,27 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                         Canvas{
                             id: canvas_camera_2
-                            anchors.fill: parent
+                            width: 212
+                            height: 120
+                            scale: parent.width/212
+                            anchors.centerIn: parent
                             onPaint:{
                                 var ctx = getContext('2d');
-                                ctx.clearRect(0,0,width,height);
 
                                 if(supervisor.getCameraNum() > 1){
                                     var image_data = supervisor.getCamera(1);
-                                    var temp_image = ctx.createImageData(width,height);
-
-                                    for(var i=0; i<image_data.length; i++){
-                                        temp_image.data[4*i+0] = image_data[i];
-                                        temp_image.data[4*i+1] = image_data[i];
-                                        temp_image.data[4*i+2] = image_data[i];
-                                        temp_image.data[4*i+3] = 255;
+                                    if(image_data.length > 0){
+                                        ctx.clearRect(0,0,width,height);
+                                        var temp_image = ctx.createImageData(width,height);
+                                        for(var i=0; i<image_data.length; i++){
+                                            temp_image.data[4*i+0] = image_data[i];
+                                            temp_image.data[4*i+1] = image_data[i];
+                                            temp_image.data[4*i+2] = image_data[i];
+                                            temp_image.data[4*i+3] = 255;
+                                        }
+                                        ctx.drawImage(temp_image,0,0,width,height);
                                     }
-                                    ctx.drawImage(temp_image,0,0,width,height);
                                 }
-
                             }
                         }
 
@@ -2838,8 +2865,10 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     if(mousearea_1.is_left){
+                                        print("1 : ",text_camera_1.text,text_camera_2.text);
                                         supervisor.setCamera(text_camera_1.text,text_camera_2.text);
                                     }else{
+                                        print("2 : ",text_camera_2.text,text_camera_1.text);
                                         supervisor.setCamera(text_camera_2.text,text_camera_1.text);
                                     }
                                     supervisor.readSetting();
@@ -2884,7 +2913,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    supervisor.requestCamera();
+//                                    supervisor.requestCamera();
                                     timer_load.start();
                                 }
                             }

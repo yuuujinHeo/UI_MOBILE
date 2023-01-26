@@ -53,6 +53,8 @@ typedef struct{
 typedef struct{
     QString serial;
     int imageSize = 0;
+    int width;
+    int height;
     QList<int> data;
 }ST_CAMERA;
 
