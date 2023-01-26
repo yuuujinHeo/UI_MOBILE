@@ -64,6 +64,7 @@ Supervisor::Supervisor(QObject *parent)
     connect(server,SIGNAL(server_set_ini()),this,SLOT(server_cmd_setini()));
     connect(server,SIGNAL(server_get_map()),this,SLOT(server_get_map()));
     connect(lcm, SIGNAL(pathchanged()),this,SLOT(path_changed()));
+    connect(lcm, SIGNAL(cameraupdate()),this,SLOT(camera_update()));
     plog->write("[BUILDER] SUPERVISOR constructed");
 }
 
@@ -449,7 +450,7 @@ void Supervisor::setDebugState(bool isdebug){
 void Supervisor::requestCamera(){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_REQ_CAMERA;
-    lcm->sendCommand(send_msg, "REQUEST CAMERA INFO");
+    lcm->sendCommand(send_msg, "");
 }
 void Supervisor::setCamera(QString left, QString right){
     setSetting("SENSOR/left_camera",left);
@@ -466,7 +467,12 @@ int Supervisor::getCameraNum(){
     return pmap->camera_info.size();
 }
 QList<int> Supervisor::getCamera(int num){
-    return pmap->camera_info[num].data;
+    if(num > -1 && num < pmap->camera_info.size()){
+        return pmap->camera_info[num].data;
+    }else{
+        QList<int> temp;
+        return temp;
+    }
 }
 QString Supervisor::getCameraSerial(int num){
     if(num > -1 && num < pmap->camera_info.size()){
@@ -2160,6 +2166,9 @@ void Supervisor::server_get_map(){
 }
 void Supervisor::path_changed(){
     QMetaObject::invokeMethod(mMain, "updatepath");
+}
+void Supervisor::camera_update(){
+    QMetaObject::invokeMethod(mMain, "updatecamera");
 }
 void Supervisor::server_cmd_pause(){
     plog->write("[SERVER] PAUSE");

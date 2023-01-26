@@ -86,6 +86,12 @@ Window {
         loader_page.pos = "지정장소";
         supervisor.writelog("[QML - MOVING] MOVE TO " + loader_page.pos);
     }
+    function updatecamera(){
+        if(loader_page.item.objectName == "page_setting"){
+            loader_page.item.update_camera();
+        }
+    }
+
     function pausedcheck(){
         supervisor.writelog("[QML - MAIN] Check Robot Paused");
         if(loader_page.item.objectName == "page_moving"){

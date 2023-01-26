@@ -828,8 +828,8 @@ Item {
 
 
                     init_mode = 4;
-//                    update_timer.stop();
-//                    loadPage(pkitchen);
+                    update_timer.stop();
+                    loadPage(pkitchen);
 
                 }
             }
@@ -1508,7 +1508,7 @@ Item {
                             }
                         }
 
-                        height: 250
+                        height: 300
                         clip: true
                         model: ListModel{}
                         delegate: maplistCompo

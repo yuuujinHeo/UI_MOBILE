@@ -82,7 +82,7 @@ Item {
                 visible: !is_con_robot
                 sourceSize.width: 46
                 sourceSize.height: 42
-                source: "icon/icon_connect_error.png"
+                source: "icon/icon_lcm_discon.png"
             }
             Rectangle{
                 color: "transparent"
@@ -241,7 +241,7 @@ Item {
             model_details.append({"detail":"서버에 연결되었습니다.","icon":"icon/icon_server_connect.png","error":false});
         }
         if(!is_con_robot){
-            model_details.append({"detail":"로봇과 연결되지 않았습니다.","icon":"icon/icon_connect_error.png","error":true});
+            model_details.append({"detail":"로봇과 연결되지 않았습니다.","icon":"icon/icon_lcm_discon.png","error":true});
         }
         if(robot_battery < 30 && is_con_robot){
             model_details.append({"detail":"배터리가 부족합니다.","icon":qsTr(image_battery.src),"error":true});

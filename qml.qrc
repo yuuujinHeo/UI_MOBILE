@@ -111,5 +111,16 @@
         <file>image/image_localization.png</file>
         <file>icon/icon_connect_error.png</file>
         <file>Item_button.qml</file>
+        <file>icon/icon_charge_1.png</file>
+        <file>icon/icon_charge_2.png</file>
+        <file>icon/icon_home_1.png</file>
+        <file>icon/icon_home_2.png</file>
+        <file>icon/icon_lcm_discon.png</file>
+        <file>icon/icon_point_1.png</file>
+        <file>icon/icon_warning_1.png</file>
+        <file>icon/keyboard_down.png</file>
+        <file>icon/keyboard_left.png</file>
+        <file>icon/keyboard_right.png</file>
+        <file>icon/keyboard_up.png</file>
     </qresource>
 </RCC>

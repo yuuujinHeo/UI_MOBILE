@@ -11,7 +11,7 @@
 
 #include "../lcm_types/command.hpp"
 #include "../lcm_types/robot_status.hpp"
-#include "../lcm_types/map_data_t.hpp"
+#include "../lcm_types/map_data.hpp"
 #include "../lcm_types/robot_path.hpp"
 #include "../lcm_types/camera_data.hpp"
 #include "GlobalHeader.h"
@@ -77,13 +77,14 @@ public:
     void robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg);
     void robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
     void robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
-    void robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data_t *msg);
+    void robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data *msg);
     void robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const camera_data *msg);
     ////***********************************************   THREADS  ********************************************************////
     void bLoop();
 
 signals:
     void pathchanged();
+    void cameraupdate();
 
 public slots:
     void onTimer();

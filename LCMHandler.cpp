@@ -45,13 +45,19 @@ void LCMHandler::sendCommand(command cmd, QString msg){
             }else{
                 lcm.publish("COMMAND_"+probot->name.toStdString(),&cmd);
             }
-            plog->write("[LCM] SEND COMMAND : " + msg);
+            if(msg != ""){
+                plog->write("[LCM] SEND COMMAND : " + msg);
+            }
             flag_tx = true;
         }else{
-            plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) : " + msg);
+            if(msg != ""){
+                plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) : " + msg);
+            }
         }
     }else{
-        plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) : " + msg);
+        if(msg != ""){
+            plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) : " + msg);
+        }
     }
 }
 
@@ -252,7 +258,7 @@ void LCMHandler::robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const
     flagLocalPath = false;
 }
 
-void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data_t *msg){
+void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data *msg){
      isconnect = true;
      connect_count = 0;
      pmap->width = msg->map_w;
@@ -280,32 +286,27 @@ void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const st
 
 
 void LCMHandler::robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const camera_data *msg){
-    qDebug() << "Camera callback";
-//    pmap->camera_info.clear();
-//    for(int i=0; i<msg->num; i++){
-//        ST_CAMERA temp_info;
-//        temp_info.serial = msg->serial[i].data();
-//        temp_info.imageSize = msg->image_len;
-//        qDebug() << msg->image_len;
+    pmap->camera_info.clear();
+    for(int i=0; i<msg->num; i++){
+        ST_CAMERA temp_info;
+        temp_info.serial = msg->serial[i].data();
 
-//        pmap->camera_info.clear();
-//        cv::Mat map1(msg->height, msg->width, CV_8U, cv::Scalar::all(0));
-//        memcpy(map1.data, msg->image[i].data(), msg->image_len);
-//        cv::flip(map1, map1, 0);
-//        cv::rotate(map1, map1, cv::ROTATE_90_COUNTERCLOCKWISE);
+        temp_info.imageSize = msg->image_len;
+        temp_info.width = msg->width;
+        temp_info.height = msg->height;
+        cv::Mat map1(msg->width, msg->height,  CV_8U, cv::Scalar::all(0));
+        memcpy(map1.data, msg->image[i].data(), msg->image_len);
+        for(size_t k =0; k<msg->image_len; ++k)
+        {
+           int y = k / map1.cols;
+           int x = k % map1.cols;
+           temp_info.data.push_back(map1.ptr<uchar>(y)[x]);
+        }
 
-//        for(size_t k =0; k<msg->image_len; ++k)
-//        {
-//           int y = k / map1.cols;
-//           int x = k % map1.cols;
-//           temp_info.data[k] = map1.ptr<uchar>(y)[x];
-//        }
+        pmap->camera_info.push_back(temp_info);
 
-////        for(int k=0; k<temp_info.imageSize; k++){
-////            temp_info.data.push_back(msg->image[i][k]);
-////        }
-//        pmap->camera_info.push_back(temp_info);
-//    }
+    }
+    emit cameraupdate();
 }
 ////***********************************************   THREADS  ********************************************************////
 void LCMHandler::bLoop()
