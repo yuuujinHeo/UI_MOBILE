@@ -286,6 +286,7 @@ void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const st
 
 
 void LCMHandler::robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const camera_data *msg){
+    qDebug() << "Camera callback";
     pmap->camera_info.clear();
     for(int i=0; i<msg->num; i++){
         ST_CAMERA temp_info;

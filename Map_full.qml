@@ -24,6 +24,7 @@ Item {
         print("showbuttons = "+show_buttons);
     }
 
+
     property bool is_slam_running: false
     property bool show_object: false
     property bool show_location: false
@@ -56,6 +57,7 @@ Item {
     property var robot_radius: supervisor.getRobotRadius()
     property var map_width: 1000
     property var map_height: 1000
+    property var rotate_angle: 0
 
     //////========================================================================================Annotation Tool
     //Tool Num (MOVE, BRUSH, ADD_OBJECT, ADD_POINT, EDIT_POINT, ADD_LOCATION, EDIT_LOCATION, ADD_LINE, SLAM_INIT, ADD_PATROL_LOCATION)
@@ -114,6 +116,7 @@ Item {
 
     //////========================================================================================Canvas Tool
     property bool refreshMap: true
+    property bool rotateMap: false
 
     onRobot_followingChanged: {
         if(robot_following){
@@ -160,6 +163,15 @@ Item {
                 canvas_map.y = newy;
             }
         }
+    }
+
+    onRotate_angleChanged: {
+        print(rotate_angle);
+        rotateMap = true;
+//        var ctx = canvas_map.getContext('2d');
+//        ctx.rotate(rotate_angle);
+        canvas_map.requestPaint();
+//        canvas_map.rotation = rotate_angle;
     }
 
     Behavior on robot_x{
@@ -219,6 +231,7 @@ Item {
         id: rect_map
         anchors.fill: parent
         clip: true
+        color: "black"
         Canvas{
             id: canvas_map
             width: map_width
@@ -231,6 +244,7 @@ Item {
             property real lastY
             property var lineX
             property var lineY
+
 
             Behavior on scale{
                 NumberAnimation{
@@ -301,6 +315,17 @@ Item {
                                 draw_canvas_lines();
                             }
                         }
+                        if(rotateMap){
+                            rotateMap = false;
+                            //캔버스 초기화
+                            ctx.clearRect(0,0,map_width,map_height);
+                            //map 이미지 불러와서 그림
+//                            draw_canvas_map();
+//                            ctx.translate(map_width/2,map_height/2);
+//                            print("rotate angle "+rotation);
+//                            ctx.rotate(rotate_angle*(Math.PI/180));
+                        }
+
                         // 새로 그려지는 line
                         if(tool == "BRUSH"){
                             ctx.lineWidth = canvas_map.lineWidth

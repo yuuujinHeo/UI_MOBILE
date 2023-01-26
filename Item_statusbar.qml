@@ -147,6 +147,7 @@ Item {
                 id: textBattery
                 anchors.verticalCenter: parent.verticalCenter
                 color: "#7e7e7e"
+                font.family: font_noto_r.name
                 font.pixelSize: 20
                 text: robot_battery.toFixed(0)+' %'
             }
