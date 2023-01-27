@@ -5,6 +5,7 @@ import QtQuick.Dialogs 1.2
 import QtGraphicalEffects 1.0
 import "."
 import io.qt.Supervisor 1.0
+import io.qt.MapView 1.0
 
 
 Item {
@@ -51,7 +52,7 @@ Item {
     property string map_name: ""
 
     //////========================================================================================Map Image Variable
-    property var grid_size: 0.02
+    property var grid_size: 0.03
     property int origin_x: 500
     property int origin_y: 500
     property var robot_radius: supervisor.getRobotRadius()
@@ -120,21 +121,21 @@ Item {
 
     onRobot_followingChanged: {
         if(robot_following){
-            var newx = -(robot_x-origin_x)*canvas_map.scale - origin_x + rect_map.width/2;
-            if(newx  > canvas_map.width*(canvas_map.scale - 1)/2){
-                canvas_map.x = canvas_map.width*(canvas_map.scale - 1)/2
-            }else if(newx < -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)){
-                canvas_map.x = -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)
+            var newx = -(robot_x-origin_x)*mapview.scale - origin_x + rect_map.width/2;
+            if(newx  > mapview.width*(mapview.scale - 1)/2){
+                mapview.x = mapview.width*(mapview.scale - 1)/2
+            }else if(newx < -(mapview.width*(mapview.scale - 1)/2 + mapview.width - rect_map.width)){
+                mapview.x = -(mapview.width*(mapview.scale - 1)/2 + mapview.width - rect_map.width)
             }else{
-                canvas_map.x = newx;
+                mapview.x = newx;
             }
-            var newy = -(robot_y-origin_y)*canvas_map.scale - origin_y + rect_map.width/2;
-            if(newy  > canvas_map.height*(canvas_map.scale - 1)/2){
-                canvas_map.y = canvas_map.height*(canvas_map.scale - 1)/2
-            }else if(newy < -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)){
-                canvas_map.y = -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)
+            var newy = -(robot_y-origin_y)*mapview.scale - origin_y + rect_map.width/2;
+            if(newy  > mapview.height*(mapview.scale - 1)/2){
+                mapview.y = mapview.height*(mapview.scale - 1)/2
+            }else if(newy < -(mapview.height*(mapview.scale - 1)/2 + mapview.height - rect_map.height)){
+                mapview.y = -(mapview.height*(mapview.scale - 1)/2 + mapview.height - rect_map.height)
             }else{
-                canvas_map.y = newy;
+                mapview.y = newy;
             }
         }
 
@@ -142,25 +143,25 @@ Item {
 
     onRobot_xChanged: {
         if(robot_following){
-            var newx = -(robot_x-origin_x)*canvas_map.scale - origin_x + rect_map.width/2;
-            if(newx  > canvas_map.width*(canvas_map.scale - 1)/2){
-                canvas_map.x = canvas_map.width*(canvas_map.scale - 1)/2
-            }else if(newx < -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)){
-                canvas_map.x = -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)
+            var newx = -(robot_x-origin_x)*mapview.scale - origin_x + rect_map.width/2;
+            if(newx  > mapview.width*(mapview.scale - 1)/2){
+                mapview.x = mapview.width*(mapview.scale - 1)/2
+            }else if(newx < -(mapview.width*(mapview.scale - 1)/2 + mapview.width - rect_map.width)){
+                mapview.x = -(mapview.width*(mapview.scale - 1)/2 + mapview.width - rect_map.width)
             }else{
-                canvas_map.x = newx;
+                mapview.x = newx;
             }
         }
     }
     onRobot_yChanged: {
         if(robot_following){
-            var newy = -(robot_y-origin_y)*canvas_map.scale - origin_y + rect_map.width/2;
-            if(newy  > canvas_map.height*(canvas_map.scale - 1)/2){
-                canvas_map.y = canvas_map.height*(canvas_map.scale - 1)/2
-            }else if(newy < -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)){
-                canvas_map.y = -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)
+            var newy = -(robot_y-origin_y)*mapview.scale - origin_y + rect_map.width/2;
+            if(newy  > mapview.height*(mapview.scale - 1)/2){
+                mapview.y = mapview.height*(mapview.scale - 1)/2
+            }else if(newy < -(mapview.height*(mapview.scale - 1)/2 + mapview.height - rect_map.height)){
+                mapview.y = -(mapview.height*(mapview.scale - 1)/2 + mapview.height - rect_map.height)
             }else{
-                canvas_map.y = newy;
+                mapview.y = newy;
             }
         }
     }
@@ -227,7 +228,7 @@ Item {
     }
 
     function update_mapping(){
-        canvas_map.requestPaint();
+        mapview.setMap(supervisor.getMapping())
     }
 
     //////========================================================================================Main Canvas
@@ -236,25 +237,17 @@ Item {
         anchors.fill: parent
         clip: true
         color: "black"
-        Canvas{
-            id: canvas_map
+        MapView{
+            id: mapview
             width: map_width
             height: map_height
-            antialiasing: true
-            property var lineWidth: brush_size
-
-            //drawing 용
-            property real lastX
-            property real lastY
-            property var lineX
-            property var lineY
-
 
             Behavior on scale{
                 NumberAnimation{
                     duration: just_show_map?0:300
                 }
             }
+
             Behavior on x{
                 NumberAnimation{
                     duration: mapping_mode?0:100
@@ -265,41 +258,55 @@ Item {
                     duration: mapping_mode?0:100
                 }
             }
-
             onXChanged: {
-                if(canvas_map.x  > canvas_map.width*(canvas_map.scale - 1)/2){
-                    canvas_map.x = canvas_map.width*(canvas_map.scale - 1)/2
-                }else if(canvas_map.x < -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)){
-                    canvas_map.x = -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)
+                if(mapview.x  > mapview.width*(mapview.scale - 1)/2){
+                    mapview.x = mapview.width*(mapview.scale - 1)/2
+                }else if(mapview.x < -(mapview.width*(mapview.scale - 1)/2 + mapview.width - rect_map.width)){
+                    mapview.x = -(mapview.width*(mapview.scale - 1)/2 + mapview.width - rect_map.width)
                 }
             }
             onYChanged: {
-                if(canvas_map.y  > canvas_map.height*(canvas_map.scale - 1)/2){
-                    canvas_map.y = canvas_map.height*(canvas_map.scale - 1)/2
-                }else if(canvas_map.y < -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)){
-                    canvas_map.y = -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)
+                if(mapview.y  > mapview.height*(mapview.scale - 1)/2){
+                    mapview.y = mapview.height*(mapview.scale - 1)/2
+                }else if(mapview.y < -(mapview.height*(mapview.scale - 1)/2 + mapview.height - rect_map.height)){
+                    mapview.y = -(mapview.height*(mapview.scale - 1)/2 + mapview.height - rect_map.height)
                 }
             }
             onScaleChanged: {
-                if(canvas_map.x  > canvas_map.width*(canvas_map.scale - 1)/2){
-                    canvas_map.x = canvas_map.width*(canvas_map.scale - 1)/2
-                }else if(canvas_map.x < -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)){
-                    canvas_map.x = -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)
+//                print("mapview scale : " + scale);
+                if(mapview.x  > mapview.width*(mapview.scale - 1)/2){
+                    mapview.x = mapview.width*(mapview.scale - 1)/2
+                }else if(mapview.x < -(mapview.width*(mapview.scale - 1)/2 + mapview.width - rect_map.width)){
+                    mapview.x = -(mapview.width*(mapview.scale - 1)/2 + mapview.width - rect_map.width)
                 }
 
-                if(canvas_map.y  > canvas_map.height*(canvas_map.scale - 1)/2){
-                    canvas_map.y = canvas_map.height*(canvas_map.scale - 1)/2
-                }else if(canvas_map.y < -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)){
-                    canvas_map.y = -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)
+                if(mapview.y  > mapview.height*(mapview.scale - 1)/2){
+                    mapview.y = mapview.height*(mapview.scale - 1)/2
+                }else if(mapview.y < -(mapview.height*(mapview.scale - 1)/2 + mapview.height - rect_map.height)){
+                    mapview.y = -(mapview.height*(mapview.scale - 1)/2 + mapview.height - rect_map.height)
                 }
             }
+        }
 
+        Canvas{
+            id: canvas_map
+            width: map_width
+            height: map_height
+            antialiasing: true
+            x: mapview.x
+            y: mapview.y
+            scale: mapview.scale
+            property var lineWidth: brush_size
+
+            //drawing 용
+            property real lastX
+            property real lastY
+            property var lineX
+            property var lineY
 
             onPaint:{
                 var ctx = getContext('2d');
-                if(mapping_mode){
-                    draw_canvas_mapping();
-                }else{
+                if(state_annotation == "DRAWING"){
                     if(map_name != ""){
                         if(refreshMap){
                             print("draw map refresh");
@@ -319,11 +326,6 @@ Item {
                             rotateMap = false;
                             //캔버스 초기화
                             ctx.clearRect(0,0,map_width,map_height);
-                            //map 이미지 불러와서 그림
-//                            draw_canvas_map();
-//                            ctx.translate(map_width/2,map_height/2);
-//                            print("rotate angle "+rotation);
-//                            ctx.rotate(rotate_angle*(Math.PI/180));
                         }
 
                         // 새로 그려지는 line
@@ -341,12 +343,13 @@ Item {
                             ctx.lineTo(lastX, lastY)
                             ctx.stroke()
                         }
-                    }else{
-                        fill_canvas_map();
                     }
+                }else{
+                    //캔버스 초기화
+                    ctx.clearRect(0,0,map_width,map_height);
                 }
-            }
 
+            }
         }
 
         Canvas{
@@ -354,9 +357,9 @@ Item {
             width: map_width
             height: map_height
             antialiasing: true
-            x: canvas_map.x
-            y: canvas_map.y
-            scale: canvas_map.scale
+            x: mapview.x
+            y: mapview.y
+            scale: mapview.scale
             onPaint: {
                 var ctx = getContext('2d');
                 ctx.clearRect(0,0,map_width,map_height);
@@ -371,9 +374,9 @@ Item {
             id: canvas_object
             width: map_width
             height: map_height
-            x: canvas_map.x
-            y: canvas_map.y
-            scale: canvas_map.scale
+            x: mapview.x
+            y: mapview.y
+            scale: mapview.scale
             antialiasing: true
             onPaint:{
                 var ctx = getContext("2d");
@@ -389,9 +392,9 @@ Item {
             id: canvas_location
             width: map_width
             height: map_height
-            x: canvas_map.x
-            y: canvas_map.y
-            scale: canvas_map.scale
+            x: mapview.x
+            y: mapview.y
+            scale: mapview.scale
             antialiasing: true
             onPaint:{
                 var ctx = getContext("2d");
@@ -412,9 +415,9 @@ Item {
             id: canvas_travelline
             width: map_width
             height: map_height
-            x: canvas_map.x
-            y: canvas_map.y
-            scale: canvas_map.scale
+            x: mapview.x
+            y: mapview.y
+            scale: mapview.scale
             antialiasing: true
             onPaint:{
                 var ctx = getContext('2d');
@@ -429,13 +432,18 @@ Item {
             id: canvas_map_cur
             width: map_width
             height: map_height
-            x: canvas_map.x
-            y: canvas_map.y
-            scale: canvas_map.scale
+//            anchors.fill: mapview
+//            x: mapview.x
+//            y: mapview.y
+            scale: mapview.scale
+
+            anchors.fill: mapview
             antialiasing: true
             onPaint:{
                 var ctx = getContext("2d");
                 ctx.clearRect(0,0,map_width,map_height);
+//                ctx.fillStyle = "red"
+//                ctx.fillRect(0,0,map_width,map_height);
 
                 if(show_robot){
                     draw_canvas_global_path();
@@ -464,18 +472,19 @@ Item {
                         var new_scale;
                         wheel.accepted = false;
                         if(wheel.angleDelta.y > 0){
-                            new_scale = canvas_map.scale + 0.5;
+                            new_scale = mapview.scale + 0.5;
                             if(new_scale > 5){
-                                canvas_map.scale = 5;
+                                mapview.scale = 5;
                             }else{
-                                canvas_map.scale = new_scale;
+                                mapview.scale = new_scale;
                             }
                         }else{
-                            new_scale = canvas_map.scale - 0.5;
-                            if(rect_map.width > new_scale*canvas_map.width){
-                                canvas_map.scale = rect_map.width/canvas_map.width;
+                            new_scale = mapview.scale - 0.5;
+                            if(rect_map.width > new_scale*mapview.width){
+                                mapview.scale = rect_map.width/mapview.width;
+                                print(mapview.width, rect_map.width, mapview.scale);
                             }else{
-                                canvas_map.scale = new_scale;
+                                mapview.scale = new_scale;
                             }
                         }
                     }
@@ -604,48 +613,48 @@ Item {
                             var my = (point1.y+point2.y)/2;
                             var dist = Math.sqrt(dx*dx + dy*dy);
                             var dscale = (dist)/startDist;
-                            var new_scale = canvas_map.scale*dscale;
+                            var new_scale = mapview.scale*dscale;
 
                             if(new_scale > 5)   new_scale = 5;
                             else if(new_scale < 1) new_scale = 1;
 
-                            print("drag",mx,my,dist,new_scale,canvas_map.scale);
+                            print("drag",mx,my,dist,new_scale,mapview.scale);
                             dmoveX = (mx - startX);
                             dmoveY = (my - startY);
 
-                            if(canvas_map.x + dmoveX > canvas_map.width*(new_scale - 1)/2){
+                            if(mapview.x + dmoveX > mapview.width*(new_scale - 1)/2){
 
-                            }else if(canvas_map.x +dmoveX < -(canvas_map.width*(new_scale - 1)/2 + canvas_map.width - rect_map.width)){
+                            }else if(mapview.x +dmoveX < -(mapview.width*(new_scale - 1)/2 + mapview.width - rect_map.width)){
 
                             }else{
-                                canvas_map.scale = new_scale;
-                                canvas_map.x += dmoveX;
+                                mapview.scale = new_scale;
+                                mapview.x += dmoveX;
                             }
-                            if(canvas_map + dmoveY > canvas_map.height*(new_scale - 1)/2){
+                            if(mapview + dmoveY > mapview.height*(new_scale - 1)/2){
 
-                            }else if(canvas_map.y + dmoveY < -(canvas_map.height*(new_scale - 1)/2 + canvas_map.height - rect_map.height)){
+                            }else if(mapview.y + dmoveY < -(mapview.height*(new_scale - 1)/2 + mapview.height - rect_map.height)){
 
                             }else{
-                                canvas_map.scale = new_scale;
-                                canvas_map.y += dmoveY;
+                                mapview.scale = new_scale;
+                                mapview.y += dmoveY;
                             }
                         }else{
-                            dmoveX = (point1.x - startX)*canvas_map.scale;
-                            dmoveY = (point1.y - startY)*canvas_map.scale;
+                            dmoveX = (point1.x - startX)*mapview.scale;
+                            dmoveY = (point1.y - startY)*mapview.scale;
 
-                            if(canvas_map.x + dmoveX > canvas_map.width*(canvas_map.scale - 1)/2){
+                            if(mapview.x + dmoveX > mapview.width*(mapview.scale - 1)/2){
 
-                            }else if(canvas_map.x +dmoveX < -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)){
+                            }else if(mapview.x +dmoveX < -(mapview.width*(mapview.scale - 1)/2 + mapview.width - rect_map.width)){
 
                             }else{
-                                canvas_map.x += dmoveX;
+                                mapview.x += dmoveX;
                             }
-                            if(canvas_map.y + dmoveY > canvas_map.height*(canvas_map.scale - 1)/2){
+                            if(mapview.y + dmoveY > mapview.height*(mapview.scale - 1)/2){
 
-                            }else if(canvas_map.y + dmoveY < -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)){
+                            }else if(mapview.y + dmoveY < -(mapview.height*(mapview.scale - 1)/2 + mapview.height - rect_map.height)){
 
                             }else{
-                                canvas_map.y += dmoveY;
+                                mapview.y += dmoveY;
                             }
                         }
                     }else if(tool == "BRUSH"){
@@ -751,9 +760,9 @@ Item {
         Rectangle{
             id: brushview
             visible: false
-            width: (brush_size+1)*canvas_map.scale
-            height: (brush_size+1)*canvas_map.scale
-            radius: (brush_size+1)*canvas_map.scale
+            width: (brush_size+1)*mapview.scale
+            height: (brush_size+1)*mapview.scale
+            radius: (brush_size+1)*mapview.scale
             border.width: 1
             border.color: "black"
             anchors.centerIn: rect_map
@@ -783,6 +792,7 @@ Item {
             }
 
         }
+
     }
 
 
@@ -856,7 +866,9 @@ Item {
                 map_name = supervisor.getMapname();
 
                 //캔버스에 맵을 그림
-                refreshMap = true;
+                if(map_name != "")
+                    mapview.setMap(supervisor.getMap(map_name));
+//                refreshMap = true;
                 update_canvas_all();
 
                 //타이머 종료
@@ -864,7 +876,7 @@ Item {
                 supervisor.writelog("[QML] LoadMap(AUTO) : "+map_name);
             }
             if(just_show_map){
-                canvas_map.scale = rect_map.width/canvas_map.width;
+                mapview.scale = rect_map.width/mapview.width;
             }
         }
     }
@@ -930,6 +942,13 @@ Item {
         supervisor.writelog("[QML] LoadMap : "+name);
         if(typeof(name) !== 'undefined'){
             map_name = name;
+            if(use_minimap){
+                mapview.setMap(supervisor.getMinimap(name));
+            }else if(use_rawmap){
+                mapview.setMap(supervisor.getRawMap(name));
+            }else{
+                mapview.setMap(supervisor.getMap(name));
+            }
         }else{
             map_name = "";
         }
@@ -938,7 +957,7 @@ Item {
 //        nn();
 
         if(just_show_map){
-            canvas_map.scale = map_full.width/canvas_map.width;
+            mapview.scale = rect_map.width/mapview.width;
         }
     }
 
@@ -1055,38 +1074,18 @@ Item {
         ctx.fillRect(0,0,map_width,map_height);
         print("fill canvas map");
         refreshMap = false;
-        canvas_map.scale = rect_map.width/canvas_map.width;
+        mapview.scale = rect_map.width/mapview.width;
         canvas_map.requestPaint();
     }
 
     function draw_canvas_mapping(){
-        var ctx = canvas_map.getContext('2d');
-
-        var map_data = supervisor.getMapping();
-//        print(map_data.length);
-        var temp_image = ctx.createImageData(map_width,map_height);
-
-        for(var i=0; i<map_data.length; i++){
-            temp_image.data[4*i+0] = map_data[i];
-            temp_image.data[4*i+1] = map_data[i];
-            temp_image.data[4*i+2] = map_data[i];
-            temp_image.data[4*i+3] = 255;
-        }
-        ctx.drawImage(temp_image,0,0,map_width,map_height);
     }
+
+
     function draw_canvas_map(){
         print("draw canvas map")
         var ctx = canvas_map.getContext('2d');
-        if(use_rawmap){
-            var map_data = supervisor.getRawMap(map_name);
-        }else if(use_minimap){
-            map_data = supervisor.getMiniMap(map_name);
-        }else{
-            map_data = supervisor.getMap(map_name);
-
-        }
-
-        print(map_data.length);
+        var map_data = supervisor.getListMap(map_name);
         var temp_image = ctx.createImageData(map_width,map_height);
 
         for(var i=0; i<map_data.length; i++){
@@ -1803,20 +1802,20 @@ Item {
 
     function nn(){
         var newx = -robot_x;
-        if(newx  > canvas_map.width*(canvas_map.scale - 1)/2){
-            canvas_map.x = canvas_map.width*(canvas_map.scale - 1)/2
-        }else if(newx < -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)){
-            canvas_map.x = -(canvas_map.width*(canvas_map.scale - 1)/2 + canvas_map.width - rect_map.width)
+        if(newx  > mapview.width*(mapview.scale - 1)/2){
+            mapview.x = mapview.width*(mapview.scale - 1)/2
+        }else if(newx < -(mapview.width*(mapview.scale - 1)/2 + mapview.width - rect_map.width)){
+            mapview.x = -(mapview.width*(mapview.scale - 1)/2 + mapview.width - rect_map.width)
         }else{
-            canvas_map.x = newx;
+            mapview.x = newx;
         }
         var newy = -robot_y;
-        if(newy  > canvas_map.height*(canvas_map.scale - 1)/2){
-            canvas_map.y = canvas_map.height*(canvas_map.scale - 1)/2
-        }else if(newy < -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)){
-            canvas_map.y = -(canvas_map.height*(canvas_map.scale - 1)/2 + canvas_map.height - rect_map.height)
+        if(newy  > mapview.height*(mapview.scale - 1)/2){
+            mapview.y = mapview.height*(mapview.scale - 1)/2
+        }else if(newy < -(mapview.height*(mapview.scale - 1)/2 + mapview.height - rect_map.height)){
+            mapview.y = -(mapview.height*(mapview.scale - 1)/2 + mapview.height - rect_map.height)
         }else{
-            canvas_map.y = newy;
+            mapview.y = newy;
         }
     }
 

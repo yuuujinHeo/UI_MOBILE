@@ -4,6 +4,7 @@
 #include "Logger.h"
 #include <opencv2/opencv.hpp>
 #include <QDir>
+#include <QPixmap>
 #include "cv_to_qt.h"
 
 extern Logger *plog;
@@ -68,6 +69,7 @@ typedef struct{
     int chunkSize = 0;
     int imageSize = 0;
     QVector<int> data;
+    QPixmap test_mapping;
 
     QVector<ST_CAMERA> camera_info;
     QString left_camera;
@@ -183,7 +185,8 @@ enum ROBOT_CMD{
     ROBOT_CMD_MAPPING_START,
 
     ROBOT_CMD_MAPPING_STOP,//=15
-    ROBOT_CMD_REQ_CAMERA
+    ROBOT_CMD_REQ_CAMERA,
+    ROBOT_CMD_MAPPING_SAVE
 };
 
 

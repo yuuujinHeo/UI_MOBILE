@@ -668,19 +668,14 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
-
-
-
-
-
             Rectangle{
                 id: btn_save_map
                 width: 100
                 height: 40
                 radius: 5
-                anchors.bottom: rect_annot_box.top
+                anchors.bottom: rect_annot_box444.top
                 anchors.bottomMargin: 10
-                anchors.left: rect_annot_box.left
+                anchors.left: rect_annot_box444.left
                 color: "black"
                 Text{
                     anchors.centerIn: parent
@@ -696,17 +691,41 @@ Item {
                     }
                 }
             }
+            Rectangle{
+                id: rect_annot_box444
+                width: parent.width - 60
+                height: 50
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: rect_annot_state.bottom
+                anchors.topMargin: 80
+                color: "white"
+                Text{
+                    text: "Grid Size"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 50
+                }
+                ComboBox{
+                    id: combobox_gridsize
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.rightMargin: 50
+                    width: 200
+                    height: 40
+                    model:["3cm","5cm"]
+                }
+            }
 
             Rectangle{
                 id: rect_annot_box
                 width: parent.width - 60
                 height: 100
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: rect_annot_state.bottom
-                anchors.topMargin: 100
+                anchors.top: rect_annot_box444.bottom
+                anchors.topMargin: 3
                 color: "#e8e8e8"
-
-
                 Row{
                     anchors.centerIn: parent
                     spacing: 30
@@ -722,17 +741,22 @@ Item {
                             onClicked: {
                                 if(supervisor.getLCMConnection()){
                                     map.mapping_mode = true;
-                                    supervisor.startMapping();
+                                    if(combobox_gridsize.currentText === "3cm"){
+                                        map.grid_size = 0.03;
+                                        supervisor.startMapping(0.03);
+                                    }else if(combobox_gridsize.currentText === "5cm"){
+                                        map.grid_size = 0.05;
+                                        supervisor.startMapping(0.05);
+
+                                    }
                                     timer_mapping.start();
                                 }
                             }
                         }
-
                     }
                     Item_button{
                         id: btn_stop
                         width: 78
-                        highlight: timer_mapping.running
                         icon: "icon/icon_stop.png"
                         name: "Stop"
                         MouseArea{
@@ -4229,16 +4253,16 @@ Item {
                             onClicked:{
                                 if(textfield_name22.text == ""){
                                 }else{
-                                    //save temp Image
-                                    map.save_map("map_temp.png");
+                                    supervisor.saveMapping(textfield_name22.text);
 
-                                    //임시 맵 이미지를 해당 폴더 안에 넣음.
-                                    supervisor.rotate_map("map_temp.png",textfield_name22.text, 2);
+//                                    //save temp Image
+//                                    map.save_map("map_temp.png");
+
+//                                    //임시 맵 이미지를 해당 폴더 안에 넣음.
+//                                    supervisor.rotate_map("map_temp.png",textfield_name22.text, 2);
 
                                     //맵 새로 불러오기.
-
                                     supervisor.setMap(textfield_name22.text);
-
                                     map.use_rawmap = true;
                                     map.loadmap(textfield_name22.text);
 
@@ -5061,6 +5085,7 @@ Item {
             text_menu_title.visible = true;
             timer_get_joy.start();
             map.init_mode();
+            map.loadmap("");
             map.fill_canvas_map();
             map.show_lidar = true;
             map.show_robot = true;

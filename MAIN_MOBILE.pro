@@ -21,6 +21,7 @@ unix{
 SOURCES += \
     JoystickHandler.cpp \
     LCMHandler.cpp \
+    MapView.cpp \
     ServerHandler.cpp \
     cv_to_qt.cpp \
     Logger.cpp \
@@ -52,6 +53,7 @@ HEADERS += \
     JoystickHandler.h \
     LCMHandler.h \
     Logger.h \
+    MapView.h \
     ServerHandler.h \
     cv_to_qt.h \
     Supervisor.h\

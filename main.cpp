@@ -3,6 +3,7 @@
 #include <QQmlApplicationEngine>
 #include <QQuickWindow>
 #include <QQmlContext>
+#include "MapView.h"
 #include "Supervisor.h"
 #include "Logger.h"
 
@@ -12,6 +13,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     qmlRegisterType<Supervisor>("io.qt.Supervisor",1,0, "Supervisor");
+    qmlRegisterType<MapView>("io.qt.MapView",1,0, "MapView");
 
     QApplication app(argc, argv);
     app.setOrganizationName("Mobile");

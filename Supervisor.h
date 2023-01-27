@@ -10,6 +10,7 @@
 #include "JoystickHandler.h"
 #include "ServerHandler.h"
 #include "HTTPHandler.h"
+#include "MapView.h"
 #include <libusb-1.0/libusb.h>
 
 class Supervisor : public QObject
@@ -68,6 +69,7 @@ public:
     Q_INVOKABLE QString getAnnotPath(QString name);
     Q_INVOKABLE QString getMetaPath(QString name);
     Q_INVOKABLE QString getIniPath();
+
 
     ////*********************************************  SETTING 관련   ***************************************************////
     Q_INVOKABLE void setSetting(QString name, QString value);
@@ -150,9 +152,10 @@ public:
     Q_INVOKABLE void setMap(QString name);
 
     ////*********************************************  SLAM(LOCALIZATION) 관련   ***************************************************////
-    Q_INVOKABLE void startMapping();
+    Q_INVOKABLE void startMapping(float grid);
     Q_INVOKABLE void stopMapping();
     Q_INVOKABLE void setSLAMMode(int mode);
+    Q_INVOKABLE void saveMapping(QString name);
 
     Q_INVOKABLE void setInitPos(int x, int y, float th);
     Q_INVOKABLE float getInitPoseX();
@@ -168,10 +171,11 @@ public:
     Q_INVOKABLE bool getMappingflag();
     Q_INVOKABLE void setMappingflag(bool flag);
 
-    Q_INVOKABLE QList<int> getMap(QString filename);
-    Q_INVOKABLE QList<int> getRawMap(QString filename);
-    Q_INVOKABLE QList<int> getMiniMap(QString filename);
-    Q_INVOKABLE QList<int> getMapping();
+    Q_INVOKABLE QPixmap getMappingImage();
+
+    Q_INVOKABLE QList<int> getListMap(QString filename);
+//    Q_INVOKABLE QList<int> getRawMap(QString filename);
+//    Q_INVOKABLE QList<int> getMiniMap(QString filename);
 //    Q_INVOKABLE void pushMapData(QVector<unsigned char> data);
     Q_INVOKABLE void pushMapData(QList<int> data);
 
@@ -342,6 +346,10 @@ public:
     Q_INVOKABLE float getGridWidth();
     Q_INVOKABLE QVector<int> getOrigin();
 
+    Q_INVOKABLE QObject* getMapping() const;
+    Q_INVOKABLE QObject* getMinimap(QString filename) const;
+    Q_INVOKABLE QObject* getMap(QString filename) const;
+    Q_INVOKABLE QObject* getRawMap(QString filename) const;
 
     ////*********************************************  PATROL 관련   ***************************************************////
     Q_INVOKABLE QString getPatrolFileName();

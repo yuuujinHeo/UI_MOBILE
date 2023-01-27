@@ -42,6 +42,27 @@ Item {
             }
         }
         Text{
+            id: test
+            width: 100
+            horizontalAlignment: Text.AlignHCenter
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: textName.right
+            font.family: font_noto_r.name
+            font.pixelSize: 20
+            text: ""
+            Timer{
+                running: true
+                interval: 200
+                repeat: true
+
+                property var count_num: 0
+                onTriggered: {
+                    count_num++;
+                    test.text = count_num;
+                }
+            }
+        }
+        Text{
             id: textTime
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter

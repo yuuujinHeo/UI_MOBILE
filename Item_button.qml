@@ -75,7 +75,7 @@ Item {
             layer.enabled: true
             layer.samples: 4
             ShapePath{
-                strokeColor: "#FFD9FF"
+                strokeColor: "#12d27c"
                 fillColor: "transparent"
                 capStyle: Qt.RoundCap
                 strokeWidth: 5
@@ -125,9 +125,6 @@ Item {
                 duration: 700
                 easing.type: Easing.InOutQuad
             }
-        }
-        onFinished: {
-            print("finish")
         }
     }
     SequentialAnimation{

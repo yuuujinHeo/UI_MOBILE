@@ -118,11 +118,11 @@ void JoystickHandler::updatejoy(){
     }else{
         init_count = 0;
         if(connect_count%100 == 0){
-//            ConnectJoy("/dev/input/js0");
+            ConnectJoy("/dev/input/js0");
         }
     }
 
     if(connect_count++%100 == 0){
-//        CheckJoy();
+        CheckJoy();
     }
 }
