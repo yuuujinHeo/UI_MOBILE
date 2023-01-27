@@ -1443,6 +1443,51 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "transparent"
                 visible: patrol_mode===2
+                Column{
+                    anchors.centerIn: parent
+                    spacing: 50
+                    Rectangle{
+                        width: 200
+                        height: 80
+                        radius: 10
+                        Text{
+                            anchors.centerIn: parent
+                            text: "서빙 포인트 순회"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                // start random patrol (serving)
+                                if(supervisor.getuistate() === 1){//ROBOT READY
+
+                                }
+
+                                supervisor.runRotateTables();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 200
+                        height: 80
+                        radius: 10
+                        Text{
+                            anchors.centerIn: parent
+                            text: "랜덤 서빙"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                // start random patrol (serving)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -5015,6 +5060,7 @@ Item {
             text_menu_title.text = "SLAM";
             text_menu_title.visible = true;
             timer_get_joy.start();
+            map.init_mode();
             map.fill_canvas_map();
             map.show_lidar = true;
             map.show_robot = true;
