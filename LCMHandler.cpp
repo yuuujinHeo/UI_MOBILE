@@ -204,6 +204,25 @@ void LCMHandler::sendMapPath(QString path){
     sendCommand(send_msg,"SEND MAP PATH ("+path+")");
 }
 
+void LCMHandler::startMapping(float grid_size){
+    command send_msg;
+    send_msg.cmd = ROBOT_CMD_MAPPING_START;
+    uint8_t *array;
+    array = reinterpret_cast<uint8_t*>(&grid_size);
+    send_msg.params[0] = array[0];
+    send_msg.params[1] = array[1];
+    send_msg.params[2] = array[2];
+    send_msg.params[3] = array[3];
+    sendCommand(send_msg,"START MAPPING "+QString().sprintf("(grid size = %f)",grid_size));
+}
+
+void LCMHandler::saveMapping(QString name){
+    command send_msg;
+    send_msg.cmd = ROBOT_CMD_MAPPING_SAVE;
+    memcpy(send_msg.params,name.toUtf8(),sizeof(char)*255);
+    sendCommand(send_msg,"SAVE MAPPING ("+name+")");
+
+}
 ////*********************************************  CALLBACK FUNCTIONS   ***************************************************////
 void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg){
     isconnect = true;
@@ -273,14 +292,46 @@ void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const st
      memcpy(map1.data, msg->data.data(), msg->len);
      cv::flip(map1, map1, 0);
      cv::rotate(map1, map1, cv::ROTATE_90_COUNTERCLOCKWISE);
+     cv::cvtColor(map1, map1,cv::COLOR_GRAY2RGBA);
 
-     pmap->data.resize(map1.cols*map1.rows);
-     for(size_t i =0; i<pmap->data.size(); ++i)
-     {
-        int y = i / map1.cols;
-        int x = i % map1.cols;
-        pmap->data[i] = map1.ptr<uchar>(y)[x];
-     }
+     std::vector<int> vec;
+     vec.assign(map1.data, map1.data + map1.cols*map1.rows*map1.channels());
+//     vec.assign(map1.data, map1.data + map1.cols*map1.rows*map1.channels());
+
+     pmap->data = QVector<int>::fromStdVector(vec);
+
+     pmap->test_mapping = QPixmap::fromImage(mat_to_qimage_cpy(map1));
+
+
+//     for(int i=0; i<map1.rows; i++){
+//         uchar* p = map1.ptr<uchar>(i);
+//         for(int j=0; j<map1.cols; j++){
+//             pmap->data[map1.rows*i + map1.cols*j] = p[j*4 + 0];
+//             pmap->data[map1.rows*i + map1.cols*j + 1] = p[j*4 + 1];
+//             pmap->data[map1.rows*i + map1.cols*j + 2] = p[j*4 + 2];
+//             pmap->data[map1.rows*i + map1.cols*j + 3] = p[j*4 + 3];
+//         }
+//     }
+
+
+
+
+//     for(size_t i =0; i<pmap->data.size(); ++i)
+//     {
+//         cv::Vec3b* p = map1.ptr<cv::Vec3b>(y);
+//        int y = (i/4) / map1.cols;
+//        int x = (i/4) % map1.cols;
+//        int ch = i % 4;
+//        qDebug() << map1.ptr(y)[x];
+////        qDebug() << map1.ptr<uchar*>(y)[x];
+//        pmap->data[i] = map1.ptr<uchar>(y)[x];
+//     }
+//     for(size_t i =0; i<pmap->data.size(); ++i)
+//     {
+//        int y = i / map1.cols;
+//        int x = i % map1.cols;
+//        pmap->data[i] = map1.ptr<uchar>(y)[x];
+//     }
      emit mappingin();
 //     flagMapping = true;
 }

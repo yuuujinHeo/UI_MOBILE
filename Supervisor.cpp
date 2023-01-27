@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <QQmlEngine>
 #include <QTextCodec>
 #include <QSslSocket>
 #include <exception>
@@ -826,14 +827,17 @@ void Supervisor::setMap(QString name){
 
 
 ////*******************************************  SLAM(LOCALIZATION) 관련   ************************************************////
-void Supervisor::startMapping(){
+void Supervisor::startMapping(float grid){
     plog->write("[USER INPUT] START MAPPING");
-    lcm->sendCommand(ROBOT_CMD_MAPPING_START, "MAPPING START");
+    lcm->startMapping(grid);
 }
 void Supervisor::stopMapping(){
     plog->write("[USER INPUT] STOP MAPPING");
     lcm->sendCommand(ROBOT_CMD_MAPPING_STOP, "MAPPING STOP");
 
+}
+void Supervisor::saveMapping(QString name){
+    lcm->saveMapping(name);
 }
 void Supervisor::setSLAMMode(int mode){
 
@@ -886,7 +890,7 @@ void Supervisor::setMappingflag(bool flag){
     lcm->flagMapping = flag;
 }
 
-QList<int> Supervisor::getMap(QString filename){
+QList<int> Supervisor::getListMap(QString filename){
     QString file_path = QDir::homePath()+"/maps/"+filename+"/map_edited.png";
     cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
     cv::flip(map,map,0);
@@ -901,26 +905,155 @@ QList<int> Supervisor::getMap(QString filename){
     }
     return list;
 }
-QList<int> Supervisor::getRawMap(QString filename){
-    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_raw.png";
+
+//QList<int> Supervisor::getRawMap(QString filename){
+//    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_raw.png";
+//    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+//    cv::flip(map,map,0);
+//    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+//    uchar* map_data = map.data;
+//    QList<int> list;
+
+//    for(int i=0; i<map.rows; i++){
+//        for(int j=0; j<map.cols; j++){
+//            list.push_back(map_data[i*map.cols + j]);
+//        }
+//    }
+//    return list;
+//}
+
+//QList<int> Supervisor::getMiniMap(QString filename){
+//    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_edited.png";
+//    minimap = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+//    cv::flip(minimap,minimap,0);
+//    cv::rotate(minimap,minimap,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+//    plog->write("[MAP] Make Minimap Start : "+filename);
+//    int dp = 3;
+//    for(int i=0; i<minimap.rows; i=i+dp){
+//        for(int j=0; j<minimap.cols; j=j+dp){
+//            int pixel = 0;
+//            bool outline = false;
+//            for(int k=0; k<dp; k++){
+//                for(int m=0; m<dp; m++){
+//                    if(i+k>minimap.rows-1)
+//                        continue;
+//                    if(j+m>minimap.cols-1)
+//                        continue;
+//                    pixel+=minimap.at<cv::Vec3b>(i+k,j+m)[0];
+//                    if(minimap.at<cv::Vec3b>(i+k,j+m)[0] == 0)
+//                        outline = true;
+//                }
+//            }
+//            float kk = pixel/(dp*dp);
+//            if(kk < 10 || outline)
+//                pixel = 0;
+//            else if(kk > 100)
+//                pixel = 255;
+//            else
+//                pixel = 38;
+
+//            for(int k=0; k<dp; k++){
+//                for(int m=0; m<dp; m++){
+//                    if(i+k>minimap.rows-1)
+//                        continue;
+//                    if(j+m>minimap.cols-1)
+//                        continue;
+//                    minimap.data[((i+k)*minimap.cols + (j+m))*3] = pixel;
+//                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 1] = pixel;
+//                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 2] = pixel;
+//                }
+//            }
+//        }
+//    }
+//    dp = 15;
+//    for(int i=0; i<minimap.rows; i=i+dp){
+//        for(int j=0; j<minimap.cols; j=j+dp){
+
+//            int pixel = 0;
+//            int outline = 0;
+//            for(int k=0; k<dp; k++){
+//                for(int m=0; m<dp; m++){
+//                    if(i+k>minimap.rows-1)
+//                        continue;
+//                    if(j+m>minimap.cols-1)
+//                        continue;
+//                    pixel+=minimap.at<cv::Vec3b>(i+k,j+m)[0];
+//                    if(minimap.at<cv::Vec3b>(i+k,j+m)[0] == 0)
+//                        outline++;
+//                }
+//            }
+//            float kk = pixel/(dp*dp);
+//            if(outline > (dp*dp)/3)
+//                pixel = 0;
+//            else if(kk > 100)
+//                pixel = 255;
+//            else
+//                pixel = 38;
+
+//            for(int k=0; k<dp; k++){
+//                for(int m=0; m<dp; m++){
+//                    if(i+k>minimap.rows-1)
+//                        continue;
+//                    if(j+m>minimap.cols-1)
+//                        continue;
+//                    minimap.data[((i+k)*minimap.cols + (j+m))*3] = pixel;
+//                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 1] = pixel;
+//                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 2] = pixel;
+//                }
+//            }
+//        }
+//    }
+
+//    cv::cvtColor(minimap, minimap,cv::COLOR_BGR2HSV);
+//    cv::GaussianBlur(minimap, minimap,cv::Size(3,3),0);
+//    cv::Scalar lower(0,0,37);
+//    cv::Scalar upper(0,0,255);
+//    cv::inRange(minimap,lower,upper,minimap);
+//    cv::Canny(minimap,minimap,600,600);
+//    cv::Mat kernel = getStructuringElement(cv::MORPH_RECT, cv::Size(5,5));
+//    dilate(minimap, minimap, kernel);
+//    QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(minimap)).toImage();
+//    uchar* map_data = minimap.data;
+//    QList<int> list;
+
+//    for(int i=0; i<minimap.rows; i++){
+//        for(int j=0; j<minimap.cols; j++){
+//            list.push_back(map_data[i*minimap.cols + j]);
+//        }
+//    }
+//    return list;
+//}
+
+QObject *Supervisor::getMapping() const{
+    PixmapContainer *pc = new PixmapContainer();
+    pc->pixmap = pmap->test_mapping;
+    Q_ASSERT(!pc->pixmap.isNull());
+    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+    return pc;
+}
+
+QObject *Supervisor::getMinimap(QString filename) const{
+    PixmapContainer *pc = new PixmapContainer();
+
+    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_edited.png";
+    if(filename == "" || !QFile::exists(file_path)){
+        QPixmap blank(1000,1000);{
+            QPainter painter(&blank);
+            painter.fillRect(blank.rect(),"black");
+        }
+
+        pc->pixmap = blank;
+        Q_ASSERT(!pc->pixmap.isNull());
+        QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+        return pc;
+    }
     cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
     cv::flip(map,map,0);
     cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
-    uchar* map_data = map.data;
-    QList<int> list;
 
-    for(int i=0; i<map.rows; i++){
-        for(int j=0; j<map.cols; j++){
-            list.push_back(map_data[i*map.cols + j]);
-        }
-    }
-    return list;
-}
-QList<int> Supervisor::getMiniMap(QString filename){
-    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_edited.png";
-    minimap = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
-    cv::flip(minimap,minimap,0);
-    cv::rotate(minimap,minimap,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+
 
     plog->write("[MAP] Make Minimap Start : "+filename);
     int dp = 3;
@@ -1007,21 +1140,72 @@ QList<int> Supervisor::getMiniMap(QString filename){
     cv::Canny(minimap,minimap,600,600);
     cv::Mat kernel = getStructuringElement(cv::MORPH_RECT, cv::Size(5,5));
     dilate(minimap, minimap, kernel);
-    QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(minimap)).toImage();
-    uchar* map_data = minimap.data;
-    QList<int> list;
 
-    for(int i=0; i<minimap.rows; i++){
-        for(int j=0; j<minimap.cols; j++){
-            list.push_back(map_data[i*minimap.cols + j]);
-        }
-    }
-    return list;
+
+
+    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(minimap));
+    Q_ASSERT(!pc->pixmap.isNull());
+    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+    return pc;
 }
 
-QList<int> Supervisor::getMapping(){
-//    qDebug() << pmap->data.size();
-    return pmap->data.toList();
+
+
+QObject *Supervisor::getMap(QString filename) const{
+    PixmapContainer *pc = new PixmapContainer();
+    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_edited.png";
+
+    if(filename == "" || !QFile::exists(file_path)){
+        QPixmap blank(1000,1000);{
+            QPainter painter(&blank);
+            painter.fillRect(blank.rect(),"black");
+        }
+
+        pc->pixmap = blank;
+        Q_ASSERT(!pc->pixmap.isNull());
+        QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+        return pc;
+    }
+
+    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+    cv::flip(map,map,0);
+    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
+    Q_ASSERT(!pc->pixmap.isNull());
+    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+    return pc;
+}
+
+QObject *Supervisor::getRawMap(QString filename) const{
+    qDebug() << filename;
+    PixmapContainer *pc = new PixmapContainer();
+    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_raw.png";
+
+    if(filename == "" || !QFile::exists(file_path)){
+        QPixmap blank(1000,1000);{
+            QPainter painter(&blank);
+            painter.fillRect(blank.rect(),"black");
+        }
+
+        pc->pixmap = blank;
+        Q_ASSERT(!pc->pixmap.isNull());
+        QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+        return pc;
+    }
+    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+    cv::flip(map,map,0);
+    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
+
+    Q_ASSERT(!pc->pixmap.isNull());
+    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+    return pc;
+}
+
+QPixmap Supervisor::getMappingImage(){
+    return pmap->test_mapping;
 }
 
 void Supervisor::pushMapData(QList<int> data){
@@ -1992,6 +2176,7 @@ int Supervisor::getMapHeight(){
     return pmap->height;
 }
 float Supervisor::getGridWidth(){
+    qDebug() << pmap->gridwidth;
     return pmap->gridwidth;
 }
 QVector<int> Supervisor::getOrigin(){
@@ -2650,6 +2835,10 @@ void Supervisor::onTimer(){
         break;
     }
     }
+
+
+//    static int count_test = 0;
+//    qDebug() << count_test++;
 }
 
 

@@ -72,6 +72,8 @@ public:
     void setVelocity(float vel, float velth);
     void setVelocity(float vel);
     void sendMapPath(QString path);
+    void saveMapping(QString name);
+    void startMapping(float grid_size);
 
     ////*********************************************  CALLBACK FUNCTIONS   ***************************************************////
     void robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg);
