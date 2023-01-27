@@ -290,10 +290,7 @@ void LCMHandler::robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std
     for(int i=0; i<msg->num; i++){
         ST_CAMERA temp_info;
 
-        std::string temp = msg->serial[i];
-        QString tempstring1 = QString::fromStdString(temp);
-        QString tempstring2 = QString::fromStdString(msg->serial[i]);
-        temp_info.serial = QString(msg->serial[i].data());
+        temp_info.serial = QString::fromStdString(msg->serial[i]);
         temp_info.imageSize = msg->image_len;
         temp_info.width = msg->width;
         temp_info.height = msg->height;

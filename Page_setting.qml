@@ -2516,7 +2516,7 @@ Item {
 
         Timer{
             id: timer_load
-            interval: 1000
+            interval: 500
             repeat: true
             onTriggered:{
                 //카메라 정보 요청

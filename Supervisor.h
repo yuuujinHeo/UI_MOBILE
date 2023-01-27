@@ -24,6 +24,7 @@ public:
     bool flag_read_ini = false;
     bool isaccepted;
     bool flag_clear;
+    bool flag_patrol_serving = false;
     int state_rotate_tables;
 
     ////*********************************************  STRUCT   ***************************************************////
@@ -367,6 +368,8 @@ public:
 
     Q_INVOKABLE void runRotateTables();
     Q_INVOKABLE void stopRotateTables();
+    Q_INVOKABLE void startServingTest();
+    Q_INVOKABLE void stopServingTest();
 
 public slots:
     void onTimer();

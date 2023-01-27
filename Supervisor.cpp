@@ -2193,6 +2193,16 @@ void Supervisor::stopRotateTables(){
     plog->write("[USER INPUT] STOP ROTATE TABLES");
     ui_cmd = UI_CMD_PATROL_STOP;
 }
+void Supervisor::startServingTest(){
+    plog->write("[USER INPUT] START PATROL SERVING");
+    ui_state = UI_STATE_SERVING;
+    flag_patrol_serving = true;
+}
+void Supervisor::stopServingTest(){
+    flag_patrol_serving = false;
+    moveStop();
+    plog->write("[USER INPUT] STOP PATROL SERVING");
+}
 
 //// *********************************** SLOTS *********************************** ////
 void Supervisor::server_cmd_setini(){
@@ -2415,20 +2425,34 @@ void Supervisor::onTimer(){
             }else{
                 // move start
                 static int timer_cnt = 0;
-                bool serveDone = true;
-                if(timer_cnt%5==0){
-                    for(int i=0; i<setting.tray_num; i++){
-                        if(probot->trays[i] != 0){
-                            plog->write("[SCHEDULER] SERVING : MOVE TO (Table"+QString::number(probot->trays[i])+")");
-                            lcm->moveTo("Serving_"+QString().sprintf("%d",probot->trays[i]-1));
-                            serveDone = false;
-                            break;
+                if(flag_patrol_serving){
+                    //시연용 가라모션
+                    static int table_num_last = 0;
+                    if(timer_cnt%5 == 0){
+                        int table_num = qrand()%setting.table_num;
+                        while(table_num_last == table_num){
+                            table_num = qrand()%setting.table_num;
                         }
+                        qDebug() << "Move To " << "Serving_"+QString().sprintf("%d",table_num);
+                        lcm->moveTo("Serving_"+QString().sprintf("%d",table_num));
+                        table_num_last = table_num;
                     }
-                    if(serveDone){
-                        // move done -> move to wait
-                        plog->write("[SCHEDULER] SERVING : SERVE DONE");
-                        ui_state = UI_STATE_GO_HOME;
+                }else{
+                    bool serveDone = true;
+                    if(timer_cnt%5==0){
+                        for(int i=0; i<setting.tray_num; i++){
+                            if(probot->trays[i] != 0){
+                                plog->write("[SCHEDULER] SERVING : MOVE TO (Table"+QString::number(probot->trays[i])+")");
+                                lcm->moveTo("Serving_"+QString().sprintf("%d",probot->trays[i]-1));
+                                serveDone = false;
+                                break;
+                            }
+                        }
+                        if(serveDone){
+                            // move done -> move to wait
+                            plog->write("[SCHEDULER] SERVING : SERVE DONE");
+                            ui_state = UI_STATE_GO_HOME;
+                        }
                     }
                 }
                 timer_cnt++;
@@ -2519,6 +2543,14 @@ void Supervisor::onTimer(){
         cur_state = ui_state;
         if(probot->state == ROBOT_STATE_PAUSED){
             lcm->moveResume();
+        }
+        static int count_pass = 0;
+        if(flag_patrol_serving){
+            count_pass++;
+            if(count_pass > 20){
+                ui_state = UI_STATE_SERVING;
+                ui_cmd = UI_CMD_NONE;
+            }
         }
         if(ui_cmd == UI_CMD_PICKUP_CONFIRM){
             ui_state = UI_STATE_SERVING;
