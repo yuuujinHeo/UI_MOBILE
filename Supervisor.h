@@ -378,6 +378,7 @@ public slots:
     void server_get_map();
     void path_changed();
     void camera_update();
+    void mapping_update();
     void usb_detect();
     void git_pull_success();
 
