@@ -40,6 +40,12 @@ Item {
     property int select_patrol_num: -1
 
 
+    function update_mapping(){
+        if(map_mode == 1 && map.mapping_mode){
+            map.update_mapping();
+        }
+    }
+
     Component.onCompleted: {
         init_map();
     }
@@ -3889,10 +3895,10 @@ Item {
         running: false
         repeat: true
         onTriggered: {
-            if(supervisor.getMappingflag()){
-                //Mapping update
-                supervisor.setMappingflag(false);
-            }
+//            if(supervisor.getMappingflag()){
+//                //Mapping update
+//                supervisor.setMappingflag(false);
+//            }
         }
     }
     Timer{

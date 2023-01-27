@@ -91,6 +91,11 @@ Window {
             loader_page.item.update_camera();
         }
     }
+    function updatemapping(){
+        if(loader_page.item.objectName == "page_map"){
+            loader_page.item.update_mapping();
+        }
+    }
 
     function pausedcheck(){
         supervisor.writelog("[QML - MAIN] Check Robot Paused");
