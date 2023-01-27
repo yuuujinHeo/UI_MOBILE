@@ -2516,9 +2516,8 @@ Item {
 
         Timer{
             id: timer_load
-            interval: 3000
+            interval: 1000
             repeat: true
-            triggeredOnStart: true
             onTriggered:{
                 //카메라 정보 요청
                 supervisor.requestCamera();

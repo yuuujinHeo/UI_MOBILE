@@ -85,6 +85,7 @@ public:
 signals:
     void pathchanged();
     void cameraupdate();
+    void mappingin();
 
 public slots:
     void onTimer();

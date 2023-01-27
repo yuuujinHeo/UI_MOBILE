@@ -281,17 +281,19 @@ void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const st
         int x = i % map1.cols;
         pmap->data[i] = map1.ptr<uchar>(y)[x];
      }
-     flagMapping = true;
+     emit mappingin();
+//     flagMapping = true;
 }
 
 
 void LCMHandler::robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const camera_data *msg){
-    qDebug() << "Camera callback";
-    pmap->camera_info.clear();
     for(int i=0; i<msg->num; i++){
         ST_CAMERA temp_info;
-        temp_info.serial = msg->serial[i].data();
 
+        std::string temp = msg->serial[i];
+        QString tempstring1 = QString::fromStdString(temp);
+        QString tempstring2 = QString::fromStdString(msg->serial[i]);
+        temp_info.serial = QString(msg->serial[i].data());
         temp_info.imageSize = msg->image_len;
         temp_info.width = msg->width;
         temp_info.height = msg->height;
@@ -304,10 +306,18 @@ void LCMHandler::robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std
            temp_info.data.push_back(map1.ptr<uchar>(y)[x]);
         }
 
-        pmap->camera_info.push_back(temp_info);
+        if(pmap->camera_info.count() > i){
+            pmap->camera_info[i] = temp_info;
+        }else{
+            pmap->camera_info.push_back(temp_info);
+        }
 
     }
-    emit cameraupdate();
+    try{
+        emit cameraupdate();
+    }catch(std::bad_alloc){
+        qDebug() << "bad alloc?";
+    }
 }
 ////***********************************************   THREADS  ********************************************************////
 void LCMHandler::bLoop()
