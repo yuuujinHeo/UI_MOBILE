@@ -4,6 +4,7 @@
 #include <iostream>
 #include <QTextCodec>
 #include <QSslSocket>
+#include <exception>
 #include <QGuiApplication>
 #include <usb.h>
 #include <QDir>
@@ -64,6 +65,7 @@ Supervisor::Supervisor(QObject *parent)
     connect(server,SIGNAL(server_set_ini()),this,SLOT(server_cmd_setini()));
     connect(server,SIGNAL(server_get_map()),this,SLOT(server_get_map()));
     connect(lcm, SIGNAL(pathchanged()),this,SLOT(path_changed()));
+    connect(lcm, SIGNAL(mappingin()),this,SLOT(mapping_update()));
     connect(lcm, SIGNAL(cameraupdate()),this,SLOT(camera_update()));
     plog->write("[BUILDER] SUPERVISOR constructed");
 }
@@ -467,19 +469,39 @@ int Supervisor::getCameraNum(){
     return pmap->camera_info.size();
 }
 QList<int> Supervisor::getCamera(int num){
-    if(num > -1 && num < pmap->camera_info.size()){
+//    try{
+//        Q_ASSERT(num >= 0 && num < pmap->camera_info.size());
+//        qDebug() << pmap->camera_info.size();
+//        qDebug() << pmap->camera_info.at(3).serial;
+//    }catch(const std::out_of_range& e){
+//        qDebug() <<"index error";
+//    }catch(...){
+//        qDebug() << "...";
+//    }
+
+    try{
+//        if(num > -1 && num < pmap->camera_info.size()) throw num;
         return pmap->camera_info[num].data;
-    }else{
+    }catch(...){
+        qDebug() << "Something Wrong to get Camera " << num << pmap->camera_info.size();
         QList<int> temp;
         return temp;
     }
 }
 QString Supervisor::getCameraSerial(int num){
-    if(num > -1 && num < pmap->camera_info.size()){
+    try{
+//        if(num > -1 && num < pmap->camera_info.size()) throw num;
         return pmap->camera_info[num].serial;
-    }else{
+    }catch(...){
+        qDebug() << "Something Wrong to get Camera Serial " << num << pmap->camera_info.size();
         return "";
     }
+
+//    if(num > -1 && num < pmap->camera_info.size()){
+//        return pmap->camera_info[num].serial;
+//    }else{
+//        return "";
+//    }
 }
 
 
@@ -982,7 +1004,7 @@ QList<int> Supervisor::getMiniMap(QString filename){
 }
 
 QList<int> Supervisor::getMapping(){
-    qDebug() << pmap->data.size();
+//    qDebug() << pmap->data.size();
     return pmap->data.toList();
 }
 
@@ -2169,6 +2191,9 @@ void Supervisor::path_changed(){
 }
 void Supervisor::camera_update(){
     QMetaObject::invokeMethod(mMain, "updatecamera");
+}
+void Supervisor::mapping_update(){
+    QMetaObject::invokeMethod(mMain, "updatemapping");
 }
 void Supervisor::server_cmd_pause(){
     plog->write("[SERVER] PAUSE");

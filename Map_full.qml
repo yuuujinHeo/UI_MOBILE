@@ -214,6 +214,10 @@ Item {
         brushview.visible = false;
     }
 
+    function update_mapping(){
+        canvas_map.requestPaint();
+    }
+
     //////========================================================================================Main Canvas
     Rectangle{
         id: rect_map
@@ -280,12 +284,8 @@ Item {
             onPaint:{
                 var ctx = getContext('2d');
                 if(mapping_mode){
-                    if(supervisor.getMappingflag()){
-                        draw_canvas_mapping();
-                        supervisor.setMappingflag(false);
-                    }
+                    draw_canvas_mapping();
                 }else{
-                    print("requestpaint but mapping false")
                     if(map_name != ""){
                         if(refreshMap){
                             print("draw map refresh");
@@ -817,16 +817,6 @@ Item {
         }
     }
 
-    Timer{
-        id: update_mapping
-        interval: 200
-        running: mapping_mode
-        repeat: true
-        onTriggered: {
-            print("mapping triggerd")
-            canvas_map.requestPaint();
-        }
-    }
 
     //최초 실행 후 맵 파일을 받아올 수 있을 때까지 1회 수행
     Timer{
@@ -1048,7 +1038,7 @@ Item {
         var ctx = canvas_map.getContext('2d');
 
         var map_data = supervisor.getMapping();
-        print(map_data.length);
+//        print(map_data.length);
         var temp_image = ctx.createImageData(map_width,map_height);
 
         for(var i=0; i<map_data.length; i++){
