@@ -1637,6 +1637,7 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 map.state_annotation = "DRAWING";
+                                map.init_mode();
                                 loader_menu.sourceComponent = menu_annot_draw;
                             }
                         }
@@ -1827,7 +1828,7 @@ Item {
             Rectangle{
                 id: rect_annot_boxs
                 width: parent.width - 60
-                height: 102
+                height: 150
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: rect_annot_box.bottom
                 color: "#e8e8e8"
@@ -1913,8 +1914,65 @@ Item {
                             }
                         }
                     }
+                    Rectangle{
+                        id: rect_annot_box44
+                        width: rect_annot_boxs.width
+                        height: 50
+                        color: "white"
+                        Text{
+                            text: "Rotate Map"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 30
+                        }
+                        Rectangle{
+                            id: rect_rotate_clear
+                            width: 50
+                            height: 30
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: slider_rotate.left
+                            anchors.rightMargin: 10
+                            color: "black"
+                            radius: 5
+                            Text{
+                                anchors.centerIn: parent
+                                text: "초기화"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                color: "white"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    slider_rotate.value = 0;
+                                }
+                            }
+                        }
+
+                        Slider {
+                            id: slider_rotate
+                            x: 300
+                            y: 330
+                            value: 0
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: parent.right
+                            anchors.rightMargin: 30
+                            width: 170
+                            height: 18
+                            from: -360
+                            to : 360
+                            onValueChanged: {
+                                map.rotate_angle = value;
+                            }
+                            onPressedChanged: {
+                            }
+                        }
+                    }
                 }
             }
+
 
             Column{
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -1986,6 +2044,11 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 popup_save_edited.open();
+                                if(slider_rotate.value != 0){
+                                    popup_save_edited.show_rotate();
+                                }else{
+                                    popup_save_edited.unshow_rotate();
+                                }
                             }
                         }
                     }
@@ -4128,11 +4191,17 @@ Item {
                                     supervisor.rotate_map("map_temp.png",textfield_name22.text, 2);
 
                                     //맵 새로 불러오기.
+
+                                    supervisor.setMap(textfield_name22.text);
+
                                     map.use_rawmap = true;
                                     map.loadmap(textfield_name22.text);
 
                                     supervisor.clear_all();
                                     map.state_annotation = "OBJECT";
+
+                                    map.refreshMap = true;
+                                    map.update_canvas_all();
                                     loader_menu.sourceComponent = menu_annot_object;
                                     popup_save_mapping.close();
                                 }
@@ -4161,6 +4230,13 @@ Item {
                 textfield_name.text = map.map_name
             }
         }
+        function show_rotate(){
+            text_rotate.visible = true;
+        }
+        function unshow_rotate(){
+            text_rotate.visible = false;
+        }
+
         Rectangle{
             anchors.centerIn: parent
             width: 400
@@ -4181,6 +4257,15 @@ Item {
                     }
                     Text{
                         text: "동일한 이름의 맵을 덮어씌워집니다."
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        id: text_rotate
+                        visible: false
+                        color: "red"
+                        text: "맵이 회전되었습니다. 기존의 설정값을 모두 초기화합니다."
                         font.family: font_noto_r.name
                         font.pixelSize: 15
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -4250,7 +4335,7 @@ Item {
                                     map.save_map("map_edited_temp.png");
 
                                     //임시 맵 이미지를 해당 폴더 안에 넣음.
-                                    supervisor.rotate_map("map_edited_temp.png",textfield_name.text, 2);
+                                    supervisor.rotate_map("map_edited_temp.png",textfield_name.text, 1);
 
                                     //맵 새로 불러오기.
                                     map.use_rawmap = false;

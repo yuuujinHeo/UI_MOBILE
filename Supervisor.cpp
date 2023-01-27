@@ -2,6 +2,10 @@
 #include <QQmlApplicationEngine>
 #include <QKeyEvent>
 #include <iostream>
+#include <fstream>
+#include <iostream>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <QTextCodec>
 #include <QSslSocket>
 #include <exception>
@@ -294,6 +298,7 @@ void Supervisor::readSetting(QString map_name){
 
     setting_anot.beginGroup("objects");
     int obj_num = setting_anot.value("num").toInt();
+
     pmap->vecObject.clear();
     ST_FPOINT temp_point;
     for(int i=0; i<obj_num; i++){
@@ -735,22 +740,32 @@ bool Supervisor::rotate_map(QString _src, QString _dst, int mode){
     cv::rotate(map1,map1,cv::ROTATE_90_CLOCKWISE);
     cv::flip(map1, map1, 0);
     QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(map1)).toImage();
+    QString path = QDir::homePath()+"/maps/"+_dst;
+    QDir directory(path);
+    if(!directory.exists()){
+        directory.mkpath(".");
 
+    }
     //Save PNG File
     if(mode == 1){//edited
         if(temp_image.save(QDir::homePath()+"/maps/"+_dst+"/map_edited.png","PNG")){
             QFile *file = new QFile(QGuiApplication::applicationDirPath()+"/"+_src);
             file->remove();
+            plog->write("[MAP] Save edited Map : "+_dst);
             return true;
         }else{
+            plog->write("[MAP] Fail to save edited Map : "+_dst);
             return false;
         }
     }else if(mode == 2){//raw
+        qDebug() << QDir::homePath()+"/maps/"+_dst+"/map_raw.png";
         if(temp_image.save(QDir::homePath()+"/maps/"+_dst+"/map_raw.png","PNG")){
             QFile *file = new QFile(QGuiApplication::applicationDirPath()+"/"+_src);
             file->remove();
+            plog->write("[MAP] Save raw Map : "+_dst);
             return true;
         }else{
+            plog->write("[MAP] Fail to save raw Map : "+_dst);
             return false;
         }
     }
@@ -804,6 +819,7 @@ void Supervisor::saveMapfromUsb(QString path){
 void Supervisor::setMap(QString name){
     setSetting("FLOOR/map_path",QDir::homePath()+"/maps/"+name);
     setSetting("FLOOR/map_name",name);
+    readSetting(name);
     setloadMap(true);
 }
 
