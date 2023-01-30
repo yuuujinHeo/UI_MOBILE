@@ -79,47 +79,31 @@ Item {
         enabled: map_mode == 1?true:false
         focus: true
         Keys.onReleased: {
-            if(map_mode == 1){
-                if(event.key === Qt.Key_Up){
-                    loader_menu.item.setKeyUp(false);
-                    if(!loader_menu.item.getKeyDown())
-                        supervisor.joyMoveXY(0);
-                }
-                if(event.key === Qt.Key_Down){
-                    loader_menu.item.setKeyDown(false);
-                    if(!loader_menu.item.getKeyUp())
-                        supervisor.joyMoveXY(0);
-                }
-                if(event.key === Qt.Key_Left){
-                    loader_menu.item.setKeyLeft(false);
-                    if(!loader_menu.item.getKeyRight())
-                        supervisor.joyMoveR(0);
-                }
-                if(event.key === Qt.Key_Right){
-                    loader_menu.item.setKeyRight(false);
-                    if(!loader_menu.item.getKeyLeft())
-                        supervisor.joyMoveR(0);
-                }
+            if(event.key === Qt.Key_Up){
+                loader_menu.item.setKeyUp(false);
+            }
+            if(event.key === Qt.Key_Down){
+                loader_menu.item.setKeyDown(false);
+            }
+            if(event.key === Qt.Key_Left){
+                loader_menu.item.setKeyLeft(false);
+            }
+            if(event.key === Qt.Key_Right){
+                loader_menu.item.setKeyRight(false);
             }
         }
         Keys.onPressed: {
-            if(map_mode == 1){
-                if(event.key === Qt.Key_Up){
-                    loader_menu.item.setKeyUp(true);
-                    supervisor.joyMoveXY(-1);
-                }
-                if(event.key === Qt.Key_Down){
-                    loader_menu.item.setKeyDown(true);
-                    supervisor.joyMoveXY(1);
-                }
-                if(event.key === Qt.Key_Left){
-                    loader_menu.item.setKeyLeft(true);
-                    supervisor.joyMoveR(-1);
-                }
-                if(event.key === Qt.Key_Right){
-                    loader_menu.item.setKeyRight(true);
-                    supervisor.joyMoveR(1);
-                }
+            if(event.key === Qt.Key_Up){
+                loader_menu.item.setKeyUp(true);
+            }
+            if(event.key === Qt.Key_Down){
+                loader_menu.item.setKeyDown(true);
+            }
+            if(event.key === Qt.Key_Left){
+                loader_menu.item.setKeyLeft(true);
+            }
+            if(event.key === Qt.Key_Right){
+                loader_menu.item.setKeyRight(true);
             }
         }
     }
@@ -630,9 +614,11 @@ Item {
                 keyboard.pressed_down = pressed;
             }
             function setKeyLeft(pressed){
+                keyboard.clear();
                 keyboard.pressed_left = pressed;
             }
             function setKeyRight(pressed){
+                keyboard.clear();
                 keyboard.pressed_right = pressed;
             }
             function getKeyUp(){
@@ -778,6 +764,7 @@ Item {
                 anchors.right: parent.horizontalCenter
                 anchors.rightMargin: 30
                 verticalOnly: true
+                bold: true
                 onUpdate_cntChanged: {
                     if(update_cnt == 0 && supervisor.getJoyXY() != 0){
                         supervisor.joyMoveXY(0, 0);
@@ -797,6 +784,7 @@ Item {
                 anchors.left: parent.horizontalCenter
                 anchors.leftMargin: 30
                 horizontalOnly: true
+                bold: true
                 onUpdate_cntChanged: {
                     if(update_cnt == 0 && supervisor.getJoyR() != 0){
                         supervisor.joyMoveR(0, 0);
@@ -812,8 +800,8 @@ Item {
             Item_keyboard{
                 id: keyboard
                 focus: true
-                anchors.top: joy_th.bottom
-                anchors.topMargin: 100
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 20
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }

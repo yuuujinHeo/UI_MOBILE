@@ -1,4 +1,5 @@
-import QtQuick 2.0
+import QtQuick 2.12
+import QtGraphicalEffects 1.0
 
 
 Item {
@@ -6,6 +7,8 @@ Item {
     objectName: "item_jog"
     width: joystick.width
     height: joystick.height
+
+    property bool bold: false
 
     property real angle : 0//mousearea.angle
     property real distance : 0
@@ -44,6 +47,13 @@ Item {
         anchors.bottom: joystick.top
         anchors.bottomMargin: 8
     }
+    ColorOverlay{
+        visible: image_joy_up.visible && bold
+        anchors.fill: image_joy_up
+        source: image_joy_up
+        color: "#585858"
+    }
+
     Image{
         id: image_joy_down
         source: "icon/joy_down.png"
@@ -53,6 +63,12 @@ Item {
         anchors.horizontalCenter: joystick.horizontalCenter
         anchors.top: joystick.bottom
         anchors.topMargin: 8
+    }
+    ColorOverlay{
+        visible: image_joy_down.visible && bold
+        anchors.fill: image_joy_down
+        source: image_joy_down
+        color: "#585858"
     }
     Image{
         id: image_joy_left
@@ -64,6 +80,12 @@ Item {
         anchors.right: joystick.left
         anchors.rightMargin: 8
     }
+    ColorOverlay{
+        visible: image_joy_left.visible && bold
+        anchors.fill: image_joy_left
+        source: image_joy_left
+        color: "#585858"
+    }
     Image{
         id: image_joy_right
         source: "icon/joy_right.png"
@@ -73,6 +95,12 @@ Item {
         anchors.verticalCenter: joystick.verticalCenter
         anchors.left: joystick.right
         anchors.leftMargin: 8
+    }
+    ColorOverlay{
+        visible: image_joy_right.visible && bold
+        anchors.fill: image_joy_right
+        source: image_joy_right
+        color: "#585858"
     }
 
     ParallelAnimation {
