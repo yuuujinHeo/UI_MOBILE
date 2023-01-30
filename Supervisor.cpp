@@ -2048,11 +2048,12 @@ QVector<float> Supervisor::getcurTarget(){
     return temp;
 }
 void Supervisor::joyMoveXY(float x){
-
+//    qDebug() << "JOY MOVE XY : " << x;
     probot->joystick[0] = x;
     lcm->flagJoystick = true;
 }
 void Supervisor::joyMoveR(float r){
+//    qDebug() << "JOY MOVE R : " << r;
     probot->joystick[1] = r;
     lcm->flagJoystick = true;
 }

@@ -3926,6 +3926,7 @@ Item {
             joystick_connection = supervisor.isconnectJoy();
             if(joystick_connection){
                 if(joy_init){
+//                    print(joy_axis_left_ud,joy_axis_right_rl,supervisor.getJoyAxis(1),supervisor.getJoyAxis(2))
                     if(joy_axis_left_ud == supervisor.getJoyAxis(1) && joy_axis_right_rl == supervisor.getJoyAxis(2)){
 
                     }else{
