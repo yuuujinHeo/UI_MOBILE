@@ -16,7 +16,7 @@ JoystickHandler::JoystickHandler(){
     fdJoy = 0;
 
     for(int i=0; i<8; i++){
-        JoyAxis[i] = 0;
+        JoyAxis[i] = 1;
     }
     for(int i=0; i<12; i++){
         JoyButton[i] = 0;
@@ -63,6 +63,9 @@ int JoystickHandler::ConnectJoy(const QString _devName){
 
         plog->write("[JOYSTICK] CONNECTED : "+ QString(nameJoy) + QString().sprintf(" (%d, %d, %d)",version,numAxis,numButton));
 
+        for(int i=0; i<8; i++){
+            JoyAxis[i] = 1;
+        }
         fcntl(fdJoy, F_SETFL, O_NONBLOCK);	// use non-blocking methods
         connection = true;
     }
@@ -100,6 +103,7 @@ void JoystickHandler::updatejoy(){
     if(connection == true){
         // read the joystick
         while((read(fdJoy, &(JoyEvent),sizeof(struct js_event))) > 0){
+//            qDebug() << JoyEvent.number << JoyEvent.value;
             switch(JoyEvent.type & ~JS_EVENT_INIT){
             case JS_EVENT_AXIS:
                 if(JoyEvent.number < 8)

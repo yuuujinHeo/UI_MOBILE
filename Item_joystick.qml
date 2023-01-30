@@ -75,10 +75,6 @@ Item {
         anchors.leftMargin: 8
     }
 
-
-
-
-
     ParallelAnimation {
         id: returnAnimation
         NumberAnimation { target: thumb.anchors; property: "horizontalCenterOffset";
@@ -86,6 +82,9 @@ Item {
         NumberAnimation { target: thumb.anchors; property: "verticalCenterOffset";
             to: 0; duration: 200; easing.type: Easing.OutSine }
     }
+
+
+
     function remote_input(re_x, re_y){
         returnAnimation.stop();
         update_cnt++;
@@ -115,7 +114,6 @@ Item {
     MouseArea {
         id: mousearea
         anchors.fill: parent
-        property var angle: 0
         onPressed: {
             returnAnimation.stop();
         }
@@ -126,8 +124,21 @@ Item {
         }
         onPositionChanged: {
             update_cnt++;
+
+            mouseX2 = verticalOnly ? width * 0.5 : mousearea.mouseX
+            mouseY2 = horizontalOnly ? height * 0.5 : mousearea.mouseY
+            fingerAngle = Math.atan2(mouseX2, mouseY2)
+            fingerInBounds = fingerDistance2 < distanceBound2
             mcx =mouseX2 - width * 0.5
             mcy =mouseY2 - height * 0.5
+
+            fingerDistance2 = mcx * mcx + mcy * mcy
+
+            distanceBound = width * 0.5 - thumb.width * 0.5
+            distanceBound2 = distanceBound * distanceBound
+            signal_x = (mouseX2 - joystick.width/2) / distanceBound
+            signal_y = -(mouseY2 - joystick.height/2) / distanceBound
+
             if (fingerInBounds) {
                 thumb.anchors.horizontalCenterOffset = mcx
                 thumb.anchors.verticalCenterOffset = mcy
@@ -139,7 +150,7 @@ Item {
 
             // Fire the signal to indicate the joystick has moved
             angle = Math.atan2(signal_y, signal_x)
-            print(angle, fingerDistance2, distanceBound);
+//            print(mcx, signal_x, signal_y,  fingerDistance2, distanceBound, angle);
         }
     }
 
