@@ -825,18 +825,32 @@ Item {
     }
 
     Image{
+        id: image_charging_selected
+        visible: false
+        width: 15
+        height: width
+        source: "icon/icon_charge_1.png"
+    }
+    Image{
         id: image_charging
         visible: false
-        width: 20
-        height: 20
-        source: "icon/btn_lock.png"
+        width: 15
+        height: width
+        source: "icon/icon_charge_2.png"
+    }
+    Image{
+        id: image_resting_selected
+        visible: false
+        width: 15
+        height: width
+        source: "icon/icon_home_1.png"
     }
     Image{
         id: image_resting
         visible: false
-        width: 20
-        height: 20
-        source: "icon/btn_home.png"
+        width: 15
+        height: width
+        source: "icon/icon_home_2.png"
     }
 
     //////========================================================================================Timer
@@ -1109,17 +1123,87 @@ Item {
 
             if(loc_type.slice(0,4) == "Char"){
                 if(select_location == i){
-                    ctx.drawImage(image_charging,loc_x,loc_y, image_charging.width, image_charging.height);
-                }else{
-                    ctx.drawImage(image_charging,loc_x,loc_y, image_charging.width, image_charging.height);
-                }
+                    ctx.fillStyle = "#262626";
+                    ctx.strokeStyle = "yellow";
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
+                    ctx.fill()
+                    ctx.stroke()
+                    var distance = (robot_radius/grid_size)*1.8;
+                    var distance2 = distance*0.8;
+                    var th_dist = Math.PI/8;
+                    var x = loc_x+distance*Math.cos(-loc_th-Math.PI/2);
+                    var y = loc_y+distance*Math.sin(-loc_th-Math.PI/2);
+                    var x1 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2-th_dist);
+                    var y1 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2-th_dist);
+                    var x2 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2+th_dist);
+                    var y2 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2+th_dist);
 
+                    if(select_location == i){
+                        ctx.strokeStyle = "yellow";
+                    }else{
+                        ctx.strokeStyle = "#83B8F9";
+                    }
+                    ctx.beginPath();
+                    ctx.moveTo(x,y);
+                    ctx.lineTo(x1,y1);
+                    ctx.moveTo(x,y);
+                    ctx.lineTo(x2,y2);
+                    ctx.stroke()
+                    ctx.drawImage(image_charging_selected,loc_x - image_charging_selected.width/2,loc_y - image_charging_selected.width/2, image_charging_selected.width, image_charging_selected.height);
+                }else{
+                    ctx.fillStyle = "#262626";
+                    ctx.strokeStyle = "white";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
+                    ctx.fill()
+                    ctx.stroke()
+                    ctx.drawImage(image_charging,loc_x - image_charging.width/2,loc_y - image_charging.width/2, image_charging.width, image_charging.height);
+                }
             }else if(loc_type.slice(0,4) == "Rest"){
                 if(select_location == i){
-                    ctx.drawImage(image_resting,loc_x,loc_y, image_resting.width, image_resting.height);
+                    ctx.fillStyle = "#262626";
+                    ctx.strokeStyle = "yellow";
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
+                    ctx.fill()
+                    ctx.stroke()
+                    var distance = (robot_radius/grid_size)*1.8;
+                    var distance2 = distance*0.8;
+                    var th_dist = Math.PI/8;
+                    var x = loc_x+distance*Math.cos(-loc_th-Math.PI/2);
+                    var y = loc_y+distance*Math.sin(-loc_th-Math.PI/2);
+                    var x1 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2-th_dist);
+                    var y1 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2-th_dist);
+                    var x2 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2+th_dist);
+                    var y2 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2+th_dist);
+
+                    if(select_location == i){
+                        ctx.strokeStyle = "yellow";
+                    }else{
+                        ctx.strokeStyle = "#83B8F9";
+                    }
+                    ctx.beginPath();
+                    ctx.moveTo(x,y);
+                    ctx.lineTo(x1,y1);
+                    ctx.moveTo(x,y);
+                    ctx.lineTo(x2,y2);
+                    ctx.stroke()
+                    ctx.drawImage(image_resting_selected,loc_x - image_resting_selected.width/2,loc_y - image_resting_selected.width/2, image_resting_selected.width, image_resting_selected.height);
                 }else{
-                    ctx.drawImage(image_resting,loc_x,loc_y, image_resting.width, image_resting.height);
+                    ctx.fillStyle = "#262626";
+                    ctx.strokeStyle = "white";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
+                    ctx.fill()
+                    ctx.stroke()
+                    ctx.drawImage(image_resting,loc_x - image_resting.width/2,loc_y - image_resting.width/2, image_resting.width, image_resting.height);
                 }
+
             }else{
                 if(select_location == i){
                     ctx.strokeStyle = "#05C9FF";
