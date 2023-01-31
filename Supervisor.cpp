@@ -922,6 +922,26 @@ QList<int> Supervisor::getListMap(QString filename){
     return list;
 }
 
+QList<int> Supervisor::getRawListMap(QString filename){
+    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_raw.png";
+    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+    cv::flip(map,map,0);
+    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
+    cv::warpAffine(map,map,rot,map.size());
+
+    uchar* map_data = map.data;
+    QList<int> list;
+
+    for(int i=0; i<map.rows; i++){
+        for(int j=0; j<map.cols; j++){
+            list.push_back(map_data[i*map.cols + j]);
+        }
+    }
+    return list;
+}
 //QList<int> Supervisor::getRawMap(QString filename){
 //    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_raw.png";
 //    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
@@ -1261,6 +1281,10 @@ void Supervisor::usb_detect(){
 ////*********************************************  ANNOTATION 관련   ***************************************************////
 int Supervisor::getCanvasSize(){
     return canvas.size();
+}
+void Supervisor::setRotateAngle(float angle){
+    qDebug() << "SET ROTATE ANGLE : " << angle;
+    map_rotate_angle = angle;
 }
 int Supervisor::getRedoSize(){
     qDebug() <<canvas_redo.size();

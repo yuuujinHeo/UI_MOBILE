@@ -47,6 +47,7 @@ public:
     QVector<QVector<QString>> minimap_grid;
     cv::Mat minimap;
 
+    float map_rotate_angle;
     ////*********************************************  CLASS   ***************************************************////
     LCMHandler *lcm;
     ServerHandler *server;
@@ -174,7 +175,7 @@ public:
     Q_INVOKABLE QPixmap getMappingImage();
 
     Q_INVOKABLE QList<int> getListMap(QString filename);
-//    Q_INVOKABLE QList<int> getRawMap(QString filename);
+    Q_INVOKABLE QList<int> getRawListMap(QString filename);
 //    Q_INVOKABLE QList<int> getMiniMap(QString filename);
 //    Q_INVOKABLE void pushMapData(QVector<unsigned char> data);
     Q_INVOKABLE void pushMapData(QList<int> data);
@@ -194,6 +195,7 @@ public:
     QVector<ST_FPOINT> list_obj_uL;
     QVector<ST_FPOINT> list_obj_dR;
     QVector<int> list_margin_obj;
+    Q_INVOKABLE void setRotateAngle(float angle);
     Q_INVOKABLE int getCanvasSize();
     Q_INVOKABLE int getRedoSize();
     Q_INVOKABLE QVector<int> getLineX(int index);

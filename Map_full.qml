@@ -120,6 +120,14 @@ Item {
     property bool refreshMap: true
     property bool rotateMap: false
 
+    function rotate_annotation(){
+        rotateMap = true;
+//        supervisor.clear
+        canvas_map.rotation = 0;
+        print("rotate_anno");
+        canvas_map.requestPaint();
+    }
+
     onRobot_followingChanged: {
         if(robot_following){
             var newx = -(robot_x-origin_x)*mapview.scale - origin_x + rect_map.width/2;
@@ -168,11 +176,13 @@ Item {
     }
 
     onRotate_angleChanged: {
-        print(rotate_angle);
-        rotateMap = true;
+//        rotateMap = true;
+//        refreshMap = false;
+        canvas_map.rotation = rotate_angle;
+        print(canvas_map.rotation);
 //        var ctx = canvas_map.getContext('2d');
 //        ctx.rotate(rotate_angle);
-        canvas_map.requestPaint();
+//        canvas_map.requestPaint();
 //        canvas_map.rotation = rotate_angle;
     }
 
@@ -317,6 +327,7 @@ Item {
 
                             //map 이미지 불러와서 그림
                             draw_canvas_map();
+                            print("draw canvas map!!!!");
 
                             //drawing한 line들 다시 그림
                             if(state_annotation == "DRAWING"){
@@ -326,7 +337,11 @@ Item {
                         if(rotateMap){
                             rotateMap = false;
                             //캔버스 초기화
+                            print("rotate map drawing");
                             ctx.clearRect(0,0,map_width,map_height);
+                            draw_canvas_map();
+//                            ctx.clearRect(0,0,map_width,map_height);
+//                            draw_canvas_map();
                         }
 
                         // 새로 그려지는 line
@@ -1109,9 +1124,9 @@ Item {
     function draw_canvas_map(){
         print("draw canvas map")
         var ctx = canvas_map.getContext('2d');
-        var map_data = supervisor.getListMap(map_name);
+        var map_data = supervisor.getRawListMap(map_name);
         var temp_image = ctx.createImageData(map_width,map_height);
-
+        print(map_data.length);
         for(var i=0; i<map_data.length; i++){
             temp_image.data[4*i+0] = map_data[i];
             temp_image.data[4*i+1] = map_data[i];

@@ -83,31 +83,35 @@ Item {
         enabled: map_mode == 1?true:false
         focus: true
         Keys.onReleased: {
-            if(event.key === Qt.Key_Up){
-                loader_menu.item.setKeyUp(false);
-            }
-            if(event.key === Qt.Key_Down){
-                loader_menu.item.setKeyDown(false);
-            }
-            if(event.key === Qt.Key_Left){
-                loader_menu.item.setKeyLeft(false);
-            }
-            if(event.key === Qt.Key_Right){
-                loader_menu.item.setKeyRight(false);
+            if(!event.isAutoRepeat){
+                if(event.key === Qt.Key_Up){
+                    loader_menu.item.setKeyUp(false);
+                }
+                if(event.key === Qt.Key_Down){
+                    loader_menu.item.setKeyDown(false);
+                }
+                if(event.key === Qt.Key_Left){
+                    loader_menu.item.setKeyLeft(false);
+                }
+                if(event.key === Qt.Key_Right){
+                    loader_menu.item.setKeyRight(false);
+                }
             }
         }
         Keys.onPressed: {
-            if(event.key === Qt.Key_Up){
-                loader_menu.item.setKeyUp(true);
-            }
-            if(event.key === Qt.Key_Down){
-                loader_menu.item.setKeyDown(true);
-            }
-            if(event.key === Qt.Key_Left){
-                loader_menu.item.setKeyLeft(true);
-            }
-            if(event.key === Qt.Key_Right){
-                loader_menu.item.setKeyRight(true);
+            if(!event.isAutoRepeat){
+                if(event.key === Qt.Key_Up){
+                    loader_menu.item.setKeyUp(true);
+                }
+                if(event.key === Qt.Key_Down){
+                    loader_menu.item.setKeyDown(true);
+                }
+                if(event.key === Qt.Key_Left){
+                    loader_menu.item.setKeyLeft(true);
+                }
+                if(event.key === Qt.Key_Right){
+                    loader_menu.item.setKeyRight(true);
+                }
             }
         }
     }
@@ -699,7 +703,6 @@ Item {
             }
             Item_keyboard{
                 id: keyboard
-                focus: true
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 20
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -1029,7 +1032,6 @@ Item {
                         anchors.fill: parent
                         onClicked:{
                             if(supervisor.getPatrolFileName() === ""){
-
                                 filesavepatrol.open();
                             }else{
                                 supervisor.savePatrolFile(supervisor.getPatrolFileName());
@@ -1953,6 +1955,9 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     slider_rotate.value = 0;
+                                    map.rotate_angle = 0;
+                                    supervisor.setRotateAngle(0);
+                                    map.rotate_annotation();
                                 }
                             }
                         }
@@ -1969,11 +1974,21 @@ Item {
                             height: 18
                             from: -360
                             to : 360
+                            property var angle_init: 0
                             onValueChanged: {
-                                map.rotate_angle = value;
+                                map.rotate_angle = value - angle_init;
                             }
                             onPressedChanged: {
+                                if(pressed){
+                                    angle_init = value;
+                                }else{
+                                    //released
+                                    map.rotate_angle = 0;
+                                    supervisor.setRotateAngle(value);
+                                    map.rotate_annotation();
+                                }
                             }
+
                         }
                     }
                 }
@@ -2401,7 +2416,6 @@ Item {
                     model: ListModel{}
                     delegate: objectCompo
                     highlight: Rectangle {color: "#83B8F9"}
-                    focus: true
 
                     Rectangle{
                         anchors.fill: parent
@@ -2848,7 +2862,6 @@ Item {
                     model: ListModel{}
                     delegate: locationCompo
                     highlight: Rectangle { color: "#83B8F9"}
-                    focus: true
                     Rectangle{
                         anchors.fill: parent
                         color: parent.enabled?"transparent":"#e8e8e8"
@@ -3973,7 +3986,6 @@ Item {
                 model: ListModel{}
                 delegate: locationCompo1
                 highlight: Rectangle { color: "#FFD9FF"; radius: 5 }
-                focus: true
             }
             Row{
                 id: menubar22
@@ -4126,16 +4138,17 @@ Item {
 //                                    supervisor.rotate_map("map_temp.png",textfield_name22.text, 2);
 
                                     //맵 새로 불러오기.
+                                    print("?????????????????????");
                                     supervisor.setMap(textfield_name22.text);
                                     map.use_rawmap = true;
                                     map.loadmap(textfield_name22.text);
 
                                     supervisor.clear_all();
-                                    map.state_annotation = "OBJECT";
+                                    map.state_annotation = "DRAWING";
 
                                     map.refreshMap = true;
                                     map.update_canvas_all();
-                                    loader_menu.sourceComponent = menu_annot_object;
+                                    loader_menu.sourceComponent = menu_annot_draw;
                                     popup_save_mapping.close();
                                 }
                             }
@@ -4951,6 +4964,7 @@ Item {
             map.loadmap("");
             map.fill_canvas_map();
             map.show_lidar = true;
+            map.show_location_default = false;
             map.show_robot = true;
             map.just_show_map = true;
             map.show_connection = false;
