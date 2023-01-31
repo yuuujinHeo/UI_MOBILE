@@ -74,6 +74,7 @@ public:
     void sendMapPath(QString path);
     void saveMapping(QString name);
     void startMapping(float grid_size);
+    void restartSLAM();
 
     ////*********************************************  CALLBACK FUNCTIONS   ***************************************************////
     void robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg);

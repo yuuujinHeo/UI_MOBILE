@@ -838,6 +838,7 @@ void Supervisor::setMap(QString name){
     setSetting("FLOOR/map_name",name);
     readSetting(name);
     setloadMap(true);
+    lcm->restartSLAM();
 }
 
 
