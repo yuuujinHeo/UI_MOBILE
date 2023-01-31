@@ -2007,6 +2007,7 @@ bool Supervisor::saveAnnotation(QString filename){
     settings.setValue("travel_lines/num",pmap->vecTline.size());
 
     readSetting();
+    lcm->restartSLAM();
     return true;
 }
 void Supervisor::sendMaptoServer(){
