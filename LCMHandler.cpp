@@ -196,6 +196,12 @@ void LCMHandler::setInitPose(float x, float y, float th){
     sendCommand(send_msg, "SET INIT "+QString().sprintf("%f, %f, %f",x,y,th));
 }
 
+void LCMHandler::restartSLAM(){
+    command send_msg;
+    send_msg.cmd = ROBOT_CMD_RESTART;
+    sendCommand(send_msg,"RESTART SLAM");
+}
+
 void LCMHandler::sendMapPath(QString path){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_RESTART;

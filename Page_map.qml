@@ -4140,12 +4140,12 @@ Item {
                                     //맵 새로 불러오기.
                                     print("?????????????????????");
                                     supervisor.setMap(textfield_name22.text);
+                                    map.init_mode();
                                     map.use_rawmap = true;
                                     map.loadmap(textfield_name22.text);
 
                                     supervisor.clear_all();
                                     map.state_annotation = "DRAWING";
-
                                     map.refreshMap = true;
                                     map.update_canvas_all();
                                     loader_menu.sourceComponent = menu_annot_draw;
@@ -4282,6 +4282,7 @@ Item {
 
                                     //임시 맵 이미지를 해당 폴더 안에 넣음.
                                     supervisor.rotate_map("map_edited_temp.png",textfield_name.text, 1);
+                                    supervisor.setMap(textfield_name.text);
 
                                     //맵 새로 불러오기.
                                     map.use_rawmap = false;
