@@ -40,6 +40,10 @@ Item {
     property int select_patrol_num: -1
 
 
+    onSelect_patrol_numChanged: {
+        loader_menu.item.setindex(select_patrol_num);
+    }
+
     function update_mapping(){
         if(map_mode == 1 && map.mapping_mode){
             map.update_mapping();
@@ -219,110 +223,6 @@ Item {
             height: loader_menu.height
             anchors.top: parent.bottom
             color: "#f4f4f4"
-        }
-
-        Popup{
-            id: popup_add_patrol
-            width: 350
-            height: 500
-            anchors.centerIn: parent
-            onOpened: {
-                var loc_num = supervisor.getLocationNum();
-                list_location2.model.clear();
-                for(var i=0; i<loc_num; i++){
-                    list_location2.model.append({"type":supervisor.getLocationTypes(i),"name":supervisor.getLocationName(i),"iscol":false});
-                }
-            }
-
-            bottomPadding: 0
-            topPadding: 0
-            leftPadding: 0
-            rightPadding: 0
-
-            background: Rectangle{
-                anchors.fill: parent
-                color: "transparent"
-            }
-
-            Rectangle{
-                id: rect_ba
-                anchors.fill:parent
-                color: "#282828"
-                radius: 5
-
-                Rectangle{
-                    id: rect_title1
-                    width: parent.width*0.9
-                    height: 80
-                    anchors.top: parent.top
-                    anchors.topMargin: 20
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    radius: 5
-                    Text{
-                        id: text_popup_patrol
-                        anchors.centerIn: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        text:"왼쪽 리스트에서 사전 정의된 위치를 선택하거나\n지도에서 직접 위치를 입력해주세요."
-                    }
-                }
-
-
-                ListView {
-                    id: list_location2
-                    width: 250
-                    height: 250
-                    anchors.top: rect_title1.bottom
-                    anchors.topMargin: 30
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    clip: true
-                    model: ListModel{}
-                    delegate: locationCompo1
-                    highlight: Rectangle { color: "#FFD9FF"; radius: 5 }
-                    focus: true
-                }
-                Row{
-                    id: menubar22
-                    spacing: 30
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: list_location2.bottom
-                    anchors.topMargin: 20
-                    Repeater{
-                        model: ["confirm","in map"]
-                        Rectangle{
-                            property int btn_size: 100
-                            width: 100
-                            height: 50
-                            radius: 10
-                            color: "white"
-                            Text{
-                                anchors.verticalCenter : parent.verticalCenter
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                font.family: font_noto_r.name
-                                font.pixelSize: 20
-                                color: "#7e7e7e"
-                                text:modelData
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    if(modelData == "confirm"){
-                                        print(list_location2.model.get(list_location2.currentIndex).name);
-                                        if(list_location2.model.get(list_location2.currentIndex).name != ""){
-                                            supervisor.addPatrol("POINT",list_location2.model.get(list_location2.currentIndex).name,0,0,0);
-                                            popup_add_patrol.close();
-                                            update_patrol_location();
-                                        }
-                                    }else if(modelData == "in map"){
-                                        popup_add_patrol.close();
-                                        map.tool = "ADD_PATROL_LOCATION";
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
         }
 
 
@@ -972,6 +872,14 @@ Item {
         id: menu_patrol
         Item{
             objectName: "menu_patrol"
+            property var curindex: 0
+            function setindex(index){
+                curindex = index;
+            }
+            function viewlast(){
+
+                area_patrol_list.contentY = area_patrol_list.contentHeight
+            }
             Component.onCompleted: {
                 patrol_location_model.clear();
                 if(supervisor.getPatrolFileName()===""){
@@ -991,14 +899,8 @@ Item {
                     }
 
 
+
                 }
-
-
-
-
-
-
-
             }
             function update(){
                 patrol_location_model.clear();
@@ -1007,6 +909,17 @@ Item {
                     text_patrol_name.text = "설정 된 파일이 없습니다.";
                 }else{
                     text_patrol_name.text = supervisor.getPatrolFileName();
+
+                    for(var i=0; i<supervisor.getPatrolNum(); i++){
+                        if(i===0){
+                            start_point.location_text = supervisor.getPatrolLocation(0);
+                        }else{
+                            patrol_location_model.append({name:supervisor.getPatrolType(i),location:supervisor.getPatrolLocation(i),loc_x:supervisor.getPatrolX(i),loc_y:supervisor.getPatrolY(i),loc_th:supervisor.getPatrolTH(i)});
+
+                        }
+                    }
+
+
                 }
             }
 
@@ -1068,13 +981,13 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked:{
-                            if(supervisor.getPatrolMode() == 0){
-                                stackview_patrol_menu.push(menu_patrol_location);
-                                supervisor.makePatrol();
-                                supervisor.addPatrol("START","Resting_0",0,0,0);
-                            }else{
-                                stackview_patrol_menu.push(menu_patrol_record);
-                            }
+//                            if(supervisor.getPatrolMode() == 0){
+//                                stackview_patrol_menu.push(menu_patrol_location);
+//                                supervisor.makePatrol();
+//                                supervisor.addPatrol("START","Resting_0",0,0,0);
+//                            }else{
+//                                stackview_patrol_menu.push(menu_patrol_record);
+//                            }
                             update_patrol_location();
                         }
                     }
@@ -1126,9 +1039,6 @@ Item {
                     }
                 }
             }
-
-
-
             Rectangle{
                 id: rect_menu_box
                 width: parent.width - 60
@@ -1221,7 +1131,7 @@ Item {
                                 onClicked: {
                                     if(map.tool == "ADD_PATROL_LOCATION"){
                                         if(canvas_location.isnewLoc && canvas_location.new_loc_available){
-                                            supervisor.addPatrol("POINT","",canvas_location.new_loc_x, canvas_location.new_loc_y, canvas_location.new_loc_th);
+                                            supervisor.addPatrol("POINT","MANUAL",canvas_location.new_loc_x, canvas_location.new_loc_y, canvas_location.new_loc_th);
                                             update_patrol_location();
                                         }
                                         canvas_location.isnewLoc = false;
@@ -1256,8 +1166,10 @@ Item {
                                 onClicked: {
                                     supervisor.movePatrolUp(map.select_patrol);
                                     update_patrol_location();
-                                    if(map.select_patrol>1)
-                                        map.select_patrol--;
+                                    if(map.select_patrol>1){
+                                        map.select_patrol = map.select_patrol - 1;
+                                        select_patrol_num--;
+                                    }
                                 }
                             }
                         }
@@ -1271,8 +1183,10 @@ Item {
                                 onClicked: {
                                     supervisor.movePatrolDown(map.select_patrol);
                                     update_patrol_location();
-                                    if(map.select_patrol<supervisor.getPatrolNum()-1 && map.select_patrol > 0)
-                                        map.select_patrol++;
+                                    if(map.select_patrol<supervisor.getPatrolNum()-1 && map.select_patrol > 0){
+                                        map.select_patrol = map.select_patrol+ 1;
+                                        select_patrol_num++;
+                                    }
                                 }
                             }
                         }
@@ -1290,6 +1204,7 @@ Item {
                         id: column_patrol
                         Rectangle{
                             id: start_point
+                            radius: 5
                             property string location_text: ""
                             width: area_patrol_list.width
                             height: 40
@@ -1325,71 +1240,103 @@ Item {
                         Repeater{
                             id: repeat_patrol
                             model: patrol_location_model
-                            Rectangle{
-                                width: area_patrol_list.width
-                                height: 40
-                                color: "transparent"
-                                Rectangle{
-                                    id: line1
-                                    width: 1
-                                    height: parent.height/2
-                                    color: "#7e7e7e"
-                                }
-                                Rectangle{
-                                    id: line2
-                                    width: parent.width/10
-                                    height: 1
-                                    anchors.top: line1.bottom
-                                    color: "#7e7e7e"
-                                }
-                                Rectangle{
-                                    id: rect_line
-                                    width: parent.width*0.9
-                                    height: parent.height
-                                    anchors.right: parent.right
-                                    color: {
-                                        if(select_patrol_num == index+1){
-                                            "#FFD9FF"
-                                        }else{
-                                            "white"
-                                        }
-                                    }
-                                    border.width: 1
-                                    border.color: "#7e7e7e"
 
-                                    Text{
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        anchors.left: parent.left
-                                        anchors.leftMargin: 20
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 20
-                                        text: name
-                                    }
-                                    Text{
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        anchors.right: parent.right
-                                        anchors.rightMargin: 20
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 15
-                                        text: location
-                                    }
-                                    Text {
+                            Rectangle{
+                                width: parent.width
+                                height: 70
+                                color: "transparent"
+
+
+                                Rectangle{
+                                    width: parent.width
+                                    height: 30
+                                    anchors.top: parent.top
+                                    color: "transparent"
+                                    Image{
+                                        id: image_down
                                         anchors.centerIn: parent
-                                        text: name
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 20
+                                        width: 22
+                                        height: 10
+                                        source: "icon/patrol_down.png"
                                     }
-                                    MouseArea{
-                                        anchors.fill:parent
-                                        onClicked: {
-                                            if(map.tool == "ADD_PATROL_LOCATION"){
-                                                map.tool = "MOVE";
-                                            }
-                                            select_patrol_num = index + 1;
-                                            map.select_patrol = index + 1;
-                                            updatecanvas();
+                                    ColorOverlay{
+                                        anchors.fill: image_down
+                                        source: image_down
+                                        color: "#282828"
+                                    }
+                                }
+
+                                Rectangle{
+                                    width: parent.width
+                                    color: "transparent"
+                                    height: 40
+                                    anchors.bottom: parent.bottom
+                                    Rectangle{
+                                        id: num
+                                        height: parent.height
+                                        width: parent.height
+                                        color: "black"
+                                        Text{
+                                            anchors.centerIn: parent
+                                            font.family: font_noto_r.name
+                                            color: "white"
+                                            text: index+1
+                                            font.pixelSize: 20
                                         }
                                     }
+                                    Rectangle{
+                                        width: parent.width-parent.height
+                                        radius: 5
+                                        height: 40
+                                        anchors.left: num.right
+                                        anchors.bottom: parent.bottom
+                                        color: {
+                                            if(select_patrol_num == index+1){
+                                                "#FFD9FF"
+                                            }else{
+                                                "white"
+                                            }
+                                        }
+                                        border.width: 1
+                                        border.color: "#7e7e7e"
+
+
+                                        Rectangle{
+                                            width: (parent.width)*0.3
+                                            height: parent.height
+                                            color: "transparent"
+                                            Text{
+                                                anchors.centerIn: parent
+                                                font.family: font_noto_r.name
+                                                font.pixelSize: 20
+                                                text: name
+                                            }
+                                        }
+                                        Rectangle{
+                                            width: (parent.width)*0.7
+                                            height: parent.height
+                                            color: "transparent"
+                                            anchors.right: parent.right
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: location
+                                                font.family: font_noto_r.name
+                                                font.pixelSize: 15
+                                            }
+                                        }
+                                        MouseArea{
+                                            anchors.fill:parent
+                                            onClicked: {
+                                                if(map.tool == "ADD_PATROL_LOCATION"){
+                                                    map.tool = "MOVE";
+                                                }
+                                                select_patrol_num = index + 1;
+                                                map.select_patrol = index + 1;
+                                                updatecanvas();
+                                            }
+                                        }
+                                    }
+
                                 }
                             }
                         }
@@ -1474,10 +1421,9 @@ Item {
                             onClicked: {
                                 // start random patrol (serving)
                                 if(supervisor.getuistate() === 1){//ROBOT READY
-
+                                    supervisor.runRotateTables();
                                 }
 
-                                supervisor.runRotateTables();
                             }
                         }
                     }
@@ -1496,6 +1442,9 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 // start random patrol (serving)
+                                if(supervisor.getuistate() === 1){//ROBOT READY
+                                    supervisor.startServingTest();
+                                }
                             }
                         }
                     }
@@ -3703,119 +3652,6 @@ Item {
 
 
     //Patrol Menu ITEM========================================================
-    Component{
-        id: menu_patrol_location
-        Item{
-            anchors.fill: parent
-            Rectangle{
-                id: kk
-                anchors.fill: parent
-                color: "red"
-            }
-            ListView{
-                id: listview_patrol_location
-                width: 300
-                height: parent.height - 60
-                clip: true
-                anchors.left: parent.left
-                anchors.leftMargin: 30
-                anchors.top: parent.top
-                anchors.topMargin: 30
-                model: patrol_location_model
-                delegate: compo_patrol_location
-            }
-            Column{
-                id: column_patrol_menus
-                spacing: 20
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.right: parent.right
-                anchors.rightMargin: 20
-                Repeater{
-                    model: ["add","remove","up","down"]
-                    Rectangle{
-                        color: "gray"
-                        width: 50
-                        height: 50
-                        radius: 10
-                        Text{
-                            anchors.centerIn: parent
-                            text: modelData
-                        }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                if(modelData == "add"){
-                                    if(map.tool == "ADD_PATROL_LOCATION"){
-                                        if(canvas_location.isnewLoc && canvas_location.new_loc_available){
-                                            supervisor.addPatrol("POINT","",canvas_location.new_loc_x, canvas_location.new_loc_y, canvas_location.new_loc_th);
-                                            update_patrol_location();
-                                        }
-                                        canvas_location.isnewLoc = false;
-                                        map.tool = "MOVE";
-                                    }else{
-                                        updatelocation();
-                                        popup_add_patrol.open();
-                                    }
-                                    map.select_patrol = -1;
-                                }else if(modelData == "remove"){
-                                    supervisor.removePatrol(map.select_patrol);
-                                    map.select_patrol = -1;
-                                    update_patrol_location();
-                                }else if(modelData == "up"){
-                                }else if(modelData == "down"){
-                                    supervisor.movePatrolDown(map.select_patrol);
-                                    update_patrol_location();
-                                    if(map.select_patrol<supervisor.getPatrolNum()-1 && map.select_patrol > 0)
-                                        map.select_patrol++;
-
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-
-    Component{
-        id: menu_patrol_random
-        Item{
-            anchors.fill: parent
-            Rectangle{
-                anchors.fill: parent
-                color: "blue"
-            }
-            Rectangle{
-                id: btn_patrol_random
-                anchors.centerIn: parent
-                width: 200
-                height: 150
-                radius: 20
-                color: "gray"
-                Text{
-                    anchors.centerIn: parent
-                    text: "테이블 위치 랜덤 패트롤"
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked:{
-                        if(supervisor.getuistate() == 8){
-                            supervisor.runRotateTables();
-                            btn_patrol_random.color = "gray";
-                        }else{
-                            supervisor.runRotateTables();
-                            btn_patrol_random.color = "blue";
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-
     ListModel{
         id: patrol_location_model
         ListElement{
@@ -3831,80 +3667,12 @@ Item {
         loader_menu.item.update();
         map.update_canvas_all();
     }
-
-    Component{
-        id: compo_patrol_location
-        Item{
-            width: parent.width
-            height: 100
-            Rectangle{
-                anchors.fill: parent
-                radius: 30
-                color:{
-                    if(name=="START"){
-                        "yellow"
-                    }else if(name == "END"){
-                        "blue"
-                    }else{
-                        "gray"
-                    }
-                }
-                border.color: "black"
-                border.width:index==map.select_patrol?2:0
-                Text{
-                    text: name
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.leftMargin: 20
-                    font.family: font_noto_b.name
-                    font.bold: true
-                    font.pixelSize: 30
-                    color: "white"
-                }
-                Text{
-                    visible: location==""?false:true
-                    text: location
-                    anchors.verticalCenter: parent.verticalCenter
-                    font.family: font_noto_b.name
-                    anchors.right: parent.right
-                    anchors.rightMargin: 30
-                    font.pixelSize: 20
-                    color: "white"
-                }
-                Text{
-                    visible: location==""?true:false
-                    text:{
-                        "x : " + Number(loc_x).toFixed(1) + "\n" +
-                        "y : " + Number(loc_y).toFixed(1) + "\n" +
-                        "r : " + Number(loc_th).toFixed(1) + "\n"
-                    }
-                    anchors.verticalCenter: parent.verticalCenter
-                    font.family: font_noto_b.name
-                    anchors.right: parent.right
-                    anchors.rightMargin: 30
-                    font.pixelSize: 10
-                    color: "white"
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: {
-                        map.select_patrol = index;
-                        update_patrol_location();
-                    }
-                }
-            }
-
-        }
-    }
-
     function updatemap(){
         map.update_map_variable();
         map.update_canvas_all();
     }
 
     ////////*********************Timer********************************************************
-
-
     Timer{
         id: timer_get_joy
         interval: 100
@@ -4147,6 +3915,113 @@ Item {
 
     }
 
+
+    Popup{
+        id: popup_add_patrol
+        width: 350
+        height: 500
+        anchors.centerIn: parent
+        onOpened: {
+            var loc_num = supervisor.getLocationNum();
+            list_location2.model.clear();
+            for(var i=0; i<loc_num; i++){
+                list_location2.model.append({"type":supervisor.getLocationTypes(i),"name":supervisor.getLocationName(i),"iscol":false});
+            }
+        }
+
+        bottomPadding: 0
+        topPadding: 0
+        leftPadding: 0
+        rightPadding: 0
+
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+
+        Rectangle{
+            id: rect_ba
+            anchors.fill:parent
+            color: "#282828"
+            radius: 5
+
+            Rectangle{
+                id: rect_title1
+                width: parent.width*0.9
+                height: 80
+                anchors.top: parent.top
+                anchors.topMargin: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+                radius: 5
+                Text{
+                    id: text_popup_patrol
+                    anchors.centerIn: parent
+                    horizontalAlignment: Text.AlignHCenter
+                    text:"왼쪽 리스트에서 사전 정의된 위치를 선택하거나\n지도에서 직접 위치를 입력해주세요."
+                }
+            }
+
+
+            ListView {
+                id: list_location2
+                width: 250
+                height: 250
+                anchors.top: rect_title1.bottom
+                anchors.topMargin: 30
+                anchors.horizontalCenter: parent.horizontalCenter
+                clip: true
+                model: ListModel{}
+                delegate: locationCompo1
+                highlight: Rectangle { color: "#FFD9FF"; radius: 5 }
+                focus: true
+            }
+            Row{
+                id: menubar22
+                spacing: 30
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: list_location2.bottom
+                anchors.topMargin: 20
+                Repeater{
+                    model: ["confirm","in map"]
+                    Rectangle{
+                        property int btn_size: 100
+                        width: 100
+                        height: 50
+                        radius: 10
+                        color: "white"
+                        Text{
+                            anchors.verticalCenter : parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.family: font_noto_r.name
+                            font.pixelSize: 20
+                            color: "#7e7e7e"
+                            text:modelData
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                if(modelData == "confirm"){
+                                    print(list_location2.model.get(list_location2.currentIndex).name);
+                                    if(list_location2.model.get(list_location2.currentIndex).name != ""){
+                                        supervisor.addPatrol("LOC",list_location2.model.get(list_location2.currentIndex).name,0,0,0);
+                                        popup_add_patrol.close();
+                                        update_patrol_location();
+                                        map.select_location_show = -1;
+                                        select_patrol_num = supervisor.getPatrolNum()-1;
+                                        loader_menu.item.viewlast();
+                                    }
+                                }else if(modelData == "in map"){
+                                    popup_add_patrol.close();
+                                    map.tool = "ADD_PATROL_LOCATION";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 
     Popup{
         id: popup_save_mapping
@@ -5023,11 +4898,9 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 if(modelData == "yes"){
-                                    print(map.new_location, map.new_loc_available);
-                                    if(map.new_location && map.new_loc_available){
-                                        supervisor.addPatrol("POINT","",canvas_location.new_loc_x, canvas_location.new_loc_y, canvas_location.new_loc_th);
-                                        update_patrol_location();
-                                    }
+                                    supervisor.addPatrol("POINT","MANUAL",map.new_loc_x, map.new_loc_y, map.new_loc_th);
+                                    update_patrol_location();
+
                                     map.new_location = false;
                                     map.tool = "MOVE";
                                     popup_add_patrol_1.close();
@@ -5038,6 +4911,7 @@ Item {
                                     map.new_location = false;
                                     popup_add_patrol_1.close();
                                 }
+                                map.select_location_show = -1;
                             }
                         }
                     }
@@ -5094,13 +4968,12 @@ Item {
             text_menu_title.text = "Patrol";
             text_menu_title.visible = true;
             map.show_patrol = true;
-            map.show_robot   = true;
+            map.show_margin = true;
             map.show_object = true;
             map.show_connection = false;
-//            map.show_path = true;
-//            map.show_location = true;
-//            map.show_travelline = true;
+            map.show_location_default = false;
             map.robot_following = false;
+            map.update_canvas_all();
             loader_menu.sourceComponent = menu_patrol;
         }else if(map_mode == 4){
             text_menu_title.visible = true;

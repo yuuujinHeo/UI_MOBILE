@@ -22,13 +22,14 @@ Item {
     property bool show_buttons: false
 
     onShow_buttonsChanged: {
-        print("showbuttons = "+show_buttons);
+//        print("showbuttons = "+show_buttons);
     }
 
 
     property bool is_slam_running: false
     property bool show_object: false
     property bool show_location: false
+    property bool show_location_default: true
     property bool show_patrol: false
     property bool show_travelline: false
     property bool show_path: false
@@ -384,6 +385,7 @@ Item {
                 if(show_object){
                     draw_canvas_object();
                     draw_canvas_new_object();
+                    find_map_walls();
                 }
             }
         }
@@ -403,6 +405,12 @@ Item {
                     draw_canvas_location();
                     draw_canvas_location_temp();
                 }
+
+                if(show_location_default){
+                    draw_canvas_location_charging();
+                    draw_canvas_location_resting();
+                }
+
                 if(show_patrol){
                     draw_canvas_patrol_location();
                     draw_canvas_location_temp();
@@ -557,7 +565,7 @@ Item {
                             select_object_point = -1;
                             supervisor.setObjPose();
                         }else if(tool == "ADD_PATROL_LOCATION"){
-                            if(new_location){
+                            if(!is_Col_loc(new_loc_x,new_loc_y)){
                                 popup_add_patrol_1.open();
                             }
                         }else if(tool == "EDIT_LOCATION"){
@@ -860,7 +868,6 @@ Item {
         running: flag_margin
         repeat: false
         onTriggered: {
-            print("update_checker")
             updatelocationcollision();
             flag_margin = false;
         }
@@ -936,6 +943,7 @@ Item {
 
         show_buttons = false;
         show_connection = true;
+        show_location_default = true;
         show_lidar = false;
         show_location = false;
         show_margin = false;
@@ -1005,23 +1013,24 @@ Item {
 
     //////========================================================================================Annotation function
     function find_map_walls(){
-        print("find map walls");
         supervisor.clearMarginObj();
 
-        var ctx = canvas_map.getContext('2d');
-        var map_data = ctx.getImageData(0,0,map_width, map_height);
+//        var ctx = canvas_map.getContext('2d');
+//        var map_data = supervisor.getMapData(map_name);//ctx.getImageData(0,0,map_width, map_height);
 
-        for(var x=0; x< map_data.data.length; x=x+4){
-            if(map_data.data[x] > 100){
-                supervisor.setMarginPoint(Math.abs(x/4));
-            }
-        }
+
+//        for(var x=0; x< map_data.length; x++){
+//            if(map_data[x] > 100){
+//                supervisor.setMarginPoint(Math.abs(x));
+//            }
+//        }
 
 
         var ctx1 = canvas_object.getContext('2d');
         var map_data1 = ctx1.getImageData(0,0,map_width, map_height);
+//        print("map object length : " ,map_data1.data.length);
 
-        for(x=0; x< map_data1.data.length; x=x+4){
+        for(var x=0; x< map_data1.data.length; x=x+4){
             if(map_data1.data[x+3] > 0){
                 supervisor.setMarginPoint(Math.abs(x/4));
             }
@@ -1033,18 +1042,19 @@ Item {
     }
     function is_Col_loc(x,y){
         if(map_name != ""){
-            var ctx = canvas_map.getContext('2d');
             var ctx1 = canvas_map_margin.getContext('2d');
             var ctx_robot = canvas_robot.getContext('2d');
-            var map_data = ctx.getImageData(0,0,map_width, map_height)
+
+            var map_data = supervisor.getMapData(map_name);
             var map_data1 = ctx1.getImageData(0,0,map_width,map_height);
             var robot_data = ctx_robot.getImageData(0,0,canvas_robot.width,canvas_robot.height);
+
             for(var i=0; i<robot_data.data.length; i=i+4){
                 if(robot_data.data[i+3] > 0){
                     var robot_x = Math.floor((i/4)%canvas_robot.width + x - canvas_robot.width/2);
                     var robot_y = Math.floor((i/4)/canvas_robot.width + y - canvas_robot.width/2);
                     var pixel_num = robot_y*canvas_map.width + robot_x;
-                    if(map_data.data[pixel_num*4] == 0 || map_data.data[pixel_num*4] > 100){
+                    if(map_data[pixel_num] == 0 || map_data[pixel_num] > 100){
                         //collision walls
                         return true;
                     }else if(map_data1.data[pixel_num*4+3] > 0){
@@ -1110,6 +1120,52 @@ Item {
         }
         ctx.drawImage(temp_image,0,0,map_width,map_height);
     }
+    function draw_canvas_location_charging(){
+        var ctx = canvas_location.getContext('2d');
+        location_num = supervisor.getLocationNum();
+
+        for(var i=0; i<location_num; i++){
+            var loc_type = supervisor.getLocationTypes(i);
+            var loc_x = supervisor.getLocationx(i)/grid_size +origin_x;
+            var loc_y = supervisor.getLocationy(i)/grid_size +origin_y;
+            var loc_th = -supervisor.getLocationth(i)-Math.PI/2;
+            if(loc_type.slice(0,4) == "Char"){
+
+                ctx.fillStyle = "#262626";
+                ctx.strokeStyle = "white";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
+                ctx.fill()
+                ctx.stroke()
+                ctx.drawImage(image_charging_selected,loc_x - image_charging_selected.width/2,loc_y - image_charging_selected.width/2, image_charging_selected.width, image_charging_selected.height);
+
+            }
+        }
+    }
+    function draw_canvas_location_resting(){
+        var ctx = canvas_location.getContext('2d');
+        location_num = supervisor.getLocationNum();
+
+        for(var i=0; i<location_num; i++){
+            var loc_type = supervisor.getLocationTypes(i);
+            var loc_x = supervisor.getLocationx(i)/grid_size +origin_x;
+            var loc_y = supervisor.getLocationy(i)/grid_size +origin_y;
+            var loc_th = -supervisor.getLocationth(i)-Math.PI/2;
+            if(loc_type.slice(0,4) == "Rest"){
+                ctx.fillStyle = "#262626";
+                ctx.strokeStyle = "white";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
+                ctx.fill()
+                ctx.stroke()
+                ctx.drawImage(image_resting_selected,loc_x - image_resting_selected.width/2,loc_y - image_resting_selected.width/2, image_resting_selected.width, image_resting_selected.height);
+
+            }
+        }
+    }
+
     function draw_canvas_location(){
         var ctx = canvas_location.getContext('2d');
 
@@ -1214,6 +1270,8 @@ Item {
                     ctx.lineWidth = 2;
                     ctx.fillStyle = "#83B8F9";
                 }
+
+                print(i,loc_x,loc_y,robot_radius,loc_th);
                 ctx.beginPath();
                 ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
                 ctx.fill()
@@ -1258,8 +1316,12 @@ Item {
 
             if(select_patrol === i){
                 ctx.lineWidth = 3;
-                ctx.strokeStyle = "#05C9FF";
-                ctx.fillStyle = "yellow";
+                if(loc_type == "START"){
+                    ctx.fillStyle = "#12d27c";
+                }else{
+                    ctx.fillStyle = "#83B8F9";
+                }
+                ctx.strokeStyle = "yellow";
             }else{
                 ctx.strokeStyle = "white";
                 ctx.lineWidth = 2;
@@ -1274,11 +1336,18 @@ Item {
             ctx.fill()
             ctx.stroke()
 
-            ctx.font="bold 20px sans-serif";
-            if(i===0){
-                ctx.fillText("START",loc_x,loc_y);
+            if(select_patrol === i){
+                ctx.font="bold 15px sans-serif";
+                ctx.fillStyle = "yellow"
             }else{
-                ctx.fillText(Number(i),loc_x,loc_y);
+                ctx.font="bold 15px sans-serif";
+                ctx.fillStyle = "white"
+            }
+
+            if(i===0){
+                ctx.fillText("S",loc_x - 5,loc_y + 5);
+            }else{
+                ctx.fillText(Number(i),loc_x - 5,loc_y + 5);
             }
 
             if(select_patrol === i){
@@ -1292,11 +1361,7 @@ Item {
                 var x2 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2+th_dist);
                 var y2 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2+th_dist);
 
-                if(select_location == i){
-                    ctx.strokeStyle = "yellow";
-                }else{
-                    ctx.strokeStyle = "#83B8F9";
-                }
+                ctx.strokeStyle = "yellow";
                 ctx.beginPath();
                 ctx.moveTo(x,y);
                 ctx.lineTo(x1,y1);
@@ -1657,7 +1722,7 @@ Item {
     }
     function draw_canvas_margin(){
         var ctx1 = canvas_map.getContext('2d');
-        var map_data = ctx1.getImageData(0,0,map_width, map_height);
+        var map_data = supervisor.getMapData(map_name);//ctx1.getImageData(0,0,map_width, map_height);
 
         var ctx = canvas_map_margin.getContext('2d');
         var margin_obj = supervisor.getMarginObj();
@@ -1671,18 +1736,18 @@ Item {
             var point_y = Math.floor((margin_obj[i])/map_width);
             ctx.beginPath();
             ctx.moveTo(point_x,point_y);
-            ctx.arc(point_x,point_y,loader_menu.item.getslider()/grid_size,0,Math.PI*2);
+            ctx.arc(point_x,point_y,1,0,Math.PI*2);
             ctx.fill();
             ctx.stroke();
         }
 
         ctx.fillStyle = "#d0d0d0";
         ctx.strokeStyle = "#d0d0d0";
-        for(var x=0; x< map_data.data.length; x=x+4){
-            if(map_data.data[x] > 100){
+        for(var x=0; x< map_data.length; x++){
+            if(map_data[x] > 100){
                 ctx.beginPath();
-                ctx.moveTo((x/4)%map_width,Math.floor((x/4)/map_width));
-                ctx.arc((x/4)%map_width,Math.floor((x/4)/map_width),0.5,0,Math.PI*2);
+                ctx.moveTo((x)%map_width,Math.floor((x)/map_width));
+                ctx.arc((x)%map_width,Math.floor((x)/map_width),0.5,0,Math.PI*2);
                 ctx.fill();
                 ctx.stroke();
             }

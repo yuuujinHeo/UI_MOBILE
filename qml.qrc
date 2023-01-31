@@ -122,5 +122,6 @@
         <file>icon/keyboard_left.png</file>
         <file>icon/keyboard_right.png</file>
         <file>icon/keyboard_up.png</file>
+        <file>Popup_map_list.qml</file>
     </qresource>
 </RCC>

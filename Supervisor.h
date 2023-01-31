@@ -346,6 +346,7 @@ public:
     Q_INVOKABLE float getGridWidth();
     Q_INVOKABLE QVector<int> getOrigin();
 
+    Q_INVOKABLE QList<int> getMapData(QString filename);
     Q_INVOKABLE QObject* getMapping() const;
     Q_INVOKABLE QObject* getMinimap(QString filename) const;
     Q_INVOKABLE QObject* getMap(QString filename) const;

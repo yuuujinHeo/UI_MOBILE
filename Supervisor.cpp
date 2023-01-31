@@ -545,6 +545,22 @@ bool Supervisor::isExistAnnotation(QString name){
     }
     return QFile::exists(file_annot);
 }
+
+QList<int> Supervisor::getMapData(QString filename){
+    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_edited.png";
+    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+    cv::flip(map,map,0);
+    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+    uchar* map_data = map.data;
+    QList<int> list;
+
+    for(int i=0; i<map.rows; i++){
+        for(int j=0; j<map.cols; j++){
+            list.push_back(map_data[i*map.cols + j]);
+        }
+    }
+    return list;
+}
 int Supervisor::getAvailableMap(){
     std::string path = QString(QDir::homePath()+"/maps").toStdString();
     QDir directory(path.c_str());
@@ -2261,27 +2277,29 @@ void Supervisor::savePatrolFile(QString path){
 }
 void Supervisor::addPatrol(QString type, QString location, float x, float y, float th){
     ST_PATROL temp;
+
     temp.type = type;
     temp.location = location;
+    qDebug() << type << location;
 
-    if(temp.location != ""){
+    if(temp.location == "MANUAL"){
+        ST_FPOINT temp1 = canvasTomap(x,y);
+        temp.pose.x = temp1.x;
+        temp.pose.y = temp1.y;
+        temp.pose.th = th;
+        patrol.path.push_back(temp);
+        plog->write("[USER INPUT] Add Patrol Pose : "+QString().sprintf("%f, %f, %f",temp.pose.x, temp.pose.y, temp.pose.th));
+    }else{
         for(int i=0; i<pmap->vecLocation.size(); i++){
             if(pmap->vecLocation[i].name == temp.location){
                 temp.pose.x = pmap->vecLocation[i].pose.x;
                 temp.pose.y = pmap->vecLocation[i].pose.y;
                 temp.pose.th = pmap->vecLocation[i].pose.th;
                 patrol.path.push_back(temp);
-                plog->write("[USER INPUT] Add Patrol Pose : "+QString().sprintf("%f, %f, %f",temp.pose.x, temp.pose.y, temp.pose.th));
+                plog->write("[USER INPUT] Add Patrol Location : "+location);
                 break;
             }
         }
-    }else{
-        ST_FPOINT temp1 = canvasTomap(x,y);
-        temp.pose.x = temp1.x;
-        temp.pose.y = temp1.y;
-        temp.pose.th = th;
-        patrol.path.push_back(temp);
-        plog->write("[USER INPUT] Add Patrol Location : "+location);
     }
 }
 void Supervisor::removePatrol(int num){

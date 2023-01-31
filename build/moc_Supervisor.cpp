@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Supervisor_t {
-    QByteArrayData data[290];
-    char stringdata0[3415];
+    QByteArrayData data[291];
+    char stringdata0[3426];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -293,35 +293,36 @@ QT_MOC_LITERAL(257, 2982, 11), // "getMapWidth"
 QT_MOC_LITERAL(258, 2994, 12), // "getMapHeight"
 QT_MOC_LITERAL(259, 3007, 12), // "getGridWidth"
 QT_MOC_LITERAL(260, 3020, 9), // "getOrigin"
-QT_MOC_LITERAL(261, 3030, 10), // "getMapping"
-QT_MOC_LITERAL(262, 3041, 10), // "getMinimap"
-QT_MOC_LITERAL(263, 3052, 6), // "getMap"
-QT_MOC_LITERAL(264, 3059, 9), // "getRawMap"
-QT_MOC_LITERAL(265, 3069, 17), // "getPatrolFileName"
-QT_MOC_LITERAL(266, 3087, 10), // "makePatrol"
-QT_MOC_LITERAL(267, 3098, 14), // "loadPatrolFile"
-QT_MOC_LITERAL(268, 3113, 14), // "savePatrolFile"
-QT_MOC_LITERAL(269, 3128, 9), // "addPatrol"
-QT_MOC_LITERAL(270, 3138, 8), // "location"
-QT_MOC_LITERAL(271, 3147, 12), // "getPatrolNum"
-QT_MOC_LITERAL(272, 3160, 13), // "getPatrolType"
-QT_MOC_LITERAL(273, 3174, 17), // "getPatrolLocation"
-QT_MOC_LITERAL(274, 3192, 10), // "getPatrolX"
-QT_MOC_LITERAL(275, 3203, 10), // "getPatrolY"
-QT_MOC_LITERAL(276, 3214, 11), // "getPatrolTH"
-QT_MOC_LITERAL(277, 3226, 12), // "removePatrol"
-QT_MOC_LITERAL(278, 3239, 12), // "movePatrolUp"
-QT_MOC_LITERAL(279, 3252, 14), // "movePatrolDown"
-QT_MOC_LITERAL(280, 3267, 13), // "getPatrolMode"
-QT_MOC_LITERAL(281, 3281, 13), // "setPatrolMode"
-QT_MOC_LITERAL(282, 3295, 15), // "startRecordPath"
-QT_MOC_LITERAL(283, 3311, 12), // "startcurPath"
-QT_MOC_LITERAL(284, 3324, 11), // "stopcurPath"
-QT_MOC_LITERAL(285, 3336, 12), // "pausecurPath"
-QT_MOC_LITERAL(286, 3349, 15), // "runRotateTables"
-QT_MOC_LITERAL(287, 3365, 16), // "stopRotateTables"
-QT_MOC_LITERAL(288, 3382, 16), // "startServingTest"
-QT_MOC_LITERAL(289, 3399, 15) // "stopServingTest"
+QT_MOC_LITERAL(261, 3030, 10), // "getMapData"
+QT_MOC_LITERAL(262, 3041, 10), // "getMapping"
+QT_MOC_LITERAL(263, 3052, 10), // "getMinimap"
+QT_MOC_LITERAL(264, 3063, 6), // "getMap"
+QT_MOC_LITERAL(265, 3070, 9), // "getRawMap"
+QT_MOC_LITERAL(266, 3080, 17), // "getPatrolFileName"
+QT_MOC_LITERAL(267, 3098, 10), // "makePatrol"
+QT_MOC_LITERAL(268, 3109, 14), // "loadPatrolFile"
+QT_MOC_LITERAL(269, 3124, 14), // "savePatrolFile"
+QT_MOC_LITERAL(270, 3139, 9), // "addPatrol"
+QT_MOC_LITERAL(271, 3149, 8), // "location"
+QT_MOC_LITERAL(272, 3158, 12), // "getPatrolNum"
+QT_MOC_LITERAL(273, 3171, 13), // "getPatrolType"
+QT_MOC_LITERAL(274, 3185, 17), // "getPatrolLocation"
+QT_MOC_LITERAL(275, 3203, 10), // "getPatrolX"
+QT_MOC_LITERAL(276, 3214, 10), // "getPatrolY"
+QT_MOC_LITERAL(277, 3225, 11), // "getPatrolTH"
+QT_MOC_LITERAL(278, 3237, 12), // "removePatrol"
+QT_MOC_LITERAL(279, 3250, 12), // "movePatrolUp"
+QT_MOC_LITERAL(280, 3263, 14), // "movePatrolDown"
+QT_MOC_LITERAL(281, 3278, 13), // "getPatrolMode"
+QT_MOC_LITERAL(282, 3292, 13), // "setPatrolMode"
+QT_MOC_LITERAL(283, 3306, 15), // "startRecordPath"
+QT_MOC_LITERAL(284, 3322, 12), // "startcurPath"
+QT_MOC_LITERAL(285, 3335, 11), // "stopcurPath"
+QT_MOC_LITERAL(286, 3347, 12), // "pausecurPath"
+QT_MOC_LITERAL(287, 3360, 15), // "runRotateTables"
+QT_MOC_LITERAL(288, 3376, 16), // "stopRotateTables"
+QT_MOC_LITERAL(289, 3393, 16), // "startServingTest"
+QT_MOC_LITERAL(290, 3410, 15) // "stopServingTest"
 
     },
     "Supervisor\0onTimer\0\0server_cmd_pause\0"
@@ -407,8 +408,8 @@ QT_MOC_LITERAL(289, 3399, 15) // "stopServingTest"
     "getLocalPathy\0getuistate\0getMapname\0"
     "getMappath\0getServerMapname\0"
     "getServerMappath\0getMapWidth\0getMapHeight\0"
-    "getGridWidth\0getOrigin\0getMapping\0"
-    "getMinimap\0getMap\0getRawMap\0"
+    "getGridWidth\0getOrigin\0getMapData\0"
+    "getMapping\0getMinimap\0getMap\0getRawMap\0"
     "getPatrolFileName\0makePatrol\0"
     "loadPatrolFile\0savePatrolFile\0addPatrol\0"
     "location\0getPatrolNum\0getPatrolType\0"
@@ -428,7 +429,7 @@ static const uint qt_meta_data_Supervisor[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-     248,   14, // methods
+     249,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -436,256 +437,257 @@ static const uint qt_meta_data_Supervisor[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0, 1254,    2, 0x0a /* Public */,
-       3,    0, 1255,    2, 0x0a /* Public */,
-       4,    0, 1256,    2, 0x0a /* Public */,
-       5,    0, 1257,    2, 0x0a /* Public */,
-       6,    0, 1258,    2, 0x0a /* Public */,
-       7,    0, 1259,    2, 0x0a /* Public */,
-       8,    0, 1260,    2, 0x0a /* Public */,
-       9,    0, 1261,    2, 0x0a /* Public */,
-      10,    0, 1262,    2, 0x0a /* Public */,
-      11,    0, 1263,    2, 0x0a /* Public */,
-      12,    0, 1264,    2, 0x0a /* Public */,
-      13,    0, 1265,    2, 0x0a /* Public */,
+       1,    0, 1259,    2, 0x0a /* Public */,
+       3,    0, 1260,    2, 0x0a /* Public */,
+       4,    0, 1261,    2, 0x0a /* Public */,
+       5,    0, 1262,    2, 0x0a /* Public */,
+       6,    0, 1263,    2, 0x0a /* Public */,
+       7,    0, 1264,    2, 0x0a /* Public */,
+       8,    0, 1265,    2, 0x0a /* Public */,
+       9,    0, 1266,    2, 0x0a /* Public */,
+      10,    0, 1267,    2, 0x0a /* Public */,
+      11,    0, 1268,    2, 0x0a /* Public */,
+      12,    0, 1269,    2, 0x0a /* Public */,
+      13,    0, 1270,    2, 0x0a /* Public */,
 
  // methods: name, argc, parameters, tag, flags
-      14,    0, 1266,    2, 0x02 /* Public */,
-      15,    0, 1267,    2, 0x02 /* Public */,
-      16,    1, 1268,    2, 0x02 /* Public */,
-      18,    1, 1271,    2, 0x02 /* Public */,
-      20,    1, 1274,    2, 0x02 /* Public */,
-      21,    1, 1277,    2, 0x02 /* Public */,
-      22,    1, 1280,    2, 0x02 /* Public */,
-      23,    0, 1283,    2, 0x02 /* Public */,
-      24,    2, 1284,    2, 0x02 /* Public */,
-      26,    1, 1289,    2, 0x02 /* Public */,
-      26,    0, 1292,    2, 0x22 /* Public | MethodCloned */,
-      28,    2, 1293,    2, 0x02 /* Public */,
-      30,    1, 1298,    2, 0x02 /* Public */,
-      32,    0, 1301,    2, 0x02 /* Public */,
-      33,    0, 1302,    2, 0x02 /* Public */,
-      34,    1, 1303,    2, 0x02 /* Public */,
-      36,    0, 1306,    2, 0x02 /* Public */,
-      37,    1, 1307,    2, 0x02 /* Public */,
-      39,    0, 1310,    2, 0x02 /* Public */,
-      40,    1, 1311,    2, 0x02 /* Public */,
-      42,    0, 1314,    2, 0x02 /* Public */,
-      43,    1, 1315,    2, 0x02 /* Public */,
-      45,    0, 1318,    2, 0x02 /* Public */,
-      46,    1, 1319,    2, 0x02 /* Public */,
-      48,    0, 1322,    2, 0x02 /* Public */,
-      49,    1, 1323,    2, 0x02 /* Public */,
-      50,    0, 1326,    2, 0x02 /* Public */,
-      51,    1, 1327,    2, 0x02 /* Public */,
-      52,    0, 1330,    2, 0x02 /* Public */,
-      53,    1, 1331,    2, 0x02 /* Public */,
-      54,    0, 1334,    2, 0x02 /* Public */,
-      55,    1, 1335,    2, 0x02 /* Public */,
-      57,    1, 1338,    2, 0x02 /* Public */,
-      58,    0, 1341,    2, 0x02 /* Public */,
-      59,    0, 1342,    2, 0x02 /* Public */,
-      60,    1, 1343,    2, 0x02 /* Public */,
-      62,    0, 1346,    2, 0x02 /* Public */,
-      63,    0, 1347,    2, 0x02 /* Public */,
-      64,    0, 1348,    2, 0x02 /* Public */,
-      65,    2, 1349,    2, 0x02 /* Public */,
-      68,    0, 1354,    2, 0x02 /* Public */,
-      69,    1, 1355,    2, 0x02 /* Public */,
-      71,    1, 1358,    2, 0x02 /* Public */,
-      72,    0, 1361,    2, 0x02 /* Public */,
-      73,    0, 1362,    2, 0x02 /* Public */,
-      74,    0, 1363,    2, 0x02 /* Public */,
-      75,    0, 1364,    2, 0x02 /* Public */,
-      76,    0, 1365,    2, 0x02 /* Public */,
-      77,    1, 1366,    2, 0x02 /* Public */,
-      78,    1, 1369,    2, 0x02 /* Public */,
-      77,    0, 1372,    2, 0x02 /* Public */,
-      79,    0, 1373,    2, 0x02 /* Public */,
-      80,    1, 1374,    2, 0x02 /* Public */,
-      81,    1, 1377,    2, 0x02 /* Public */,
-      82,    1, 1380,    2, 0x02 /* Public */,
-      83,    1, 1383,    2, 0x02 /* Public */,
-      84,    0, 1386,    2, 0x02 /* Public */,
-      85,    0, 1387,    2, 0x02 /* Public */,
-      86,    0, 1388,    2, 0x02 /* Public */,
-      87,    0, 1389,    2, 0x02 /* Public */,
-      88,    0, 1390,    2, 0x02 /* Public */,
-      89,    0, 1391,    2, 0x02 /* Public */,
-      90,    1, 1392,    2, 0x02 /* Public */,
-      91,    1, 1395,    2, 0x02 /* Public */,
-      93,    0, 1398,    2, 0x02 /* Public */,
-      94,    1, 1399,    2, 0x02 /* Public */,
-      96,    0, 1402,    2, 0x02 /* Public */,
-      97,    0, 1403,    2, 0x02 /* Public */,
-      98,    3, 1404,    2, 0x02 /* Public */,
-     102,    0, 1411,    2, 0x02 /* Public */,
-     103,    0, 1412,    2, 0x02 /* Public */,
-     104,    0, 1413,    2, 0x02 /* Public */,
-     105,    0, 1414,    2, 0x02 /* Public */,
-     106,    0, 1415,    2, 0x02 /* Public */,
-     107,    0, 1416,    2, 0x02 /* Public */,
-     108,    1, 1417,    2, 0x02 /* Public */,
-     109,    1, 1420,    2, 0x02 /* Public */,
-     110,    1, 1423,    2, 0x02 /* Public */,
-     112,    1, 1426,    2, 0x02 /* Public */,
-     113,    1, 1429,    2, 0x02 /* Public */,
-     115,    0, 1432,    2, 0x02 /* Public */,
-     116,    1, 1433,    2, 0x02 /* Public */,
-     117,    1, 1436,    2, 0x02 /* Public */,
-     118,    3, 1439,    2, 0x02 /* Public */,
-     122,    0, 1446,    2, 0x02 /* Public */,
-     123,    0, 1447,    2, 0x02 /* Public */,
-     124,    0, 1448,    2, 0x02 /* Public */,
-     125,    0, 1449,    2, 0x02 /* Public */,
-     126,    0, 1450,    2, 0x02 /* Public */,
-     127,    0, 1451,    2, 0x02 /* Public */,
-     128,    0, 1452,    2, 0x02 /* Public */,
-     129,    0, 1453,    2, 0x02 /* Public */,
-     130,    0, 1454,    2, 0x02 /* Public */,
-     131,    1, 1455,    2, 0x02 /* Public */,
-     133,    0, 1458,    2, 0x02 /* Public */,
-     134,    1, 1459,    2, 0x02 /* Public */,
-     135,    1, 1462,    2, 0x02 /* Public */,
-     137,    0, 1465,    2, 0x02 /* Public */,
-     138,    1, 1466,    2, 0x02 /* Public */,
-     139,    1, 1469,    2, 0x02 /* Public */,
-     140,    1, 1472,    2, 0x02 /* Public */,
-     141,    1, 1475,    2, 0x02 /* Public */,
-     142,    0, 1478,    2, 0x02 /* Public */,
-     143,    0, 1479,    2, 0x02 /* Public */,
-     144,    1, 1480,    2, 0x02 /* Public */,
-     147,    1, 1483,    2, 0x02 /* Public */,
-     148,    1, 1486,    2, 0x02 /* Public */,
-     149,    1, 1489,    2, 0x02 /* Public */,
-     150,    2, 1492,    2, 0x02 /* Public */,
-     153,    2, 1497,    2, 0x02 /* Public */,
-     154,    0, 1502,    2, 0x02 /* Public */,
-     155,    0, 1503,    2, 0x02 /* Public */,
-     156,    0, 1504,    2, 0x02 /* Public */,
-     157,    0, 1505,    2, 0x02 /* Public */,
-     158,    0, 1506,    2, 0x02 /* Public */,
-     159,    0, 1507,    2, 0x02 /* Public */,
-     160,    0, 1508,    2, 0x02 /* Public */,
-     161,    1, 1509,    2, 0x02 /* Public */,
-     163,    0, 1512,    2, 0x02 /* Public */,
-     164,    0, 1513,    2, 0x02 /* Public */,
-     165,    0, 1514,    2, 0x02 /* Public */,
-     166,    1, 1515,    2, 0x02 /* Public */,
-     167,    1, 1518,    2, 0x02 /* Public */,
-     168,    1, 1521,    2, 0x02 /* Public */,
-     169,    1, 1524,    2, 0x02 /* Public */,
-     170,    1, 1527,    2, 0x02 /* Public */,
-     171,    1, 1530,    2, 0x02 /* Public */,
-     172,    1, 1533,    2, 0x02 /* Public */,
-     173,    0, 1536,    2, 0x02 /* Public */,
-     174,    1, 1537,    2, 0x02 /* Public */,
-     175,    1, 1540,    2, 0x02 /* Public */,
-     176,    2, 1543,    2, 0x02 /* Public */,
-     178,    2, 1548,    2, 0x02 /* Public */,
-     179,    0, 1553,    2, 0x02 /* Public */,
-     180,    1, 1554,    2, 0x02 /* Public */,
-     181,    1, 1557,    2, 0x02 /* Public */,
-     182,    1, 1560,    2, 0x02 /* Public */,
-     182,    2, 1563,    2, 0x02 /* Public */,
-     183,    3, 1568,    2, 0x02 /* Public */,
-     185,    1, 1575,    2, 0x02 /* Public */,
-     185,    2, 1578,    2, 0x02 /* Public */,
-     186,    2, 1583,    2, 0x02 /* Public */,
-     187,    1, 1588,    2, 0x02 /* Public */,
-     188,    0, 1591,    2, 0x02 /* Public */,
-     189,    0, 1592,    2, 0x02 /* Public */,
-     190,    1, 1593,    2, 0x02 /* Public */,
-     191,    1, 1596,    2, 0x02 /* Public */,
-     192,    1, 1599,    2, 0x02 /* Public */,
-     193,    4, 1602,    2, 0x02 /* Public */,
-     194,    1, 1611,    2, 0x02 /* Public */,
-     195,    1, 1614,    2, 0x02 /* Public */,
-     196,    5, 1617,    2, 0x02 /* Public */,
-     197,    4, 1628,    2, 0x02 /* Public */,
-     199,    0, 1637,    2, 0x02 /* Public */,
-     199,    1, 1638,    2, 0x02 /* Public */,
-     200,    1, 1641,    2, 0x02 /* Public */,
-     201,    2, 1644,    2, 0x02 /* Public */,
-     202,    2, 1649,    2, 0x02 /* Public */,
-     203,    5, 1654,    2, 0x02 /* Public */,
-     208,    2, 1665,    2, 0x02 /* Public */,
-     210,    2, 1670,    2, 0x02 /* Public */,
-     211,    1, 1675,    2, 0x02 /* Public */,
-     212,    1, 1678,    2, 0x02 /* Public */,
-     213,    0, 1681,    2, 0x02 /* Public */,
-     214,    1, 1682,    2, 0x02 /* Public */,
-     216,    2, 1685,    2, 0x02 /* Public */,
-     217,    0, 1690,    2, 0x02 /* Public */,
-     218,    0, 1691,    2, 0x02 /* Public */,
-     219,    1, 1692,    2, 0x02 /* Public */,
-     219,    3, 1695,    2, 0x02 /* Public */,
-     221,    0, 1702,    2, 0x02 /* Public */,
-     222,    0, 1703,    2, 0x02 /* Public */,
-     223,    0, 1704,    2, 0x02 /* Public */,
-     224,    0, 1705,    2, 0x02 /* Public */,
-     225,    0, 1706,    2, 0x02 /* Public */,
-     226,    0, 1707,    2, 0x02 /* Public */,
-     227,    0, 1708,    2, 0x02 /* Public */,
-     228,    0, 1709,    2, 0x02 /* Public */,
-     229,    0, 1710,    2, 0x02 /* Public */,
-     231,    1, 1711,    2, 0x02 /* Public */,
-     232,    1, 1714,    2, 0x02 /* Public */,
-     234,    0, 1717,    2, 0x02 /* Public */,
-     235,    0, 1718,    2, 0x02 /* Public */,
-     236,    0, 1719,    2, 0x02 /* Public */,
-     237,    0, 1720,    2, 0x02 /* Public */,
-     238,    0, 1721,    2, 0x02 /* Public */,
-     239,    0, 1722,    2, 0x02 /* Public */,
-     240,    0, 1723,    2, 0x02 /* Public */,
-     241,    0, 1724,    2, 0x02 /* Public */,
-     242,    0, 1725,    2, 0x02 /* Public */,
-     243,    0, 1726,    2, 0x02 /* Public */,
-     244,    0, 1727,    2, 0x02 /* Public */,
-     245,    0, 1728,    2, 0x02 /* Public */,
-     246,    1, 1729,    2, 0x02 /* Public */,
-     247,    1, 1732,    2, 0x02 /* Public */,
-     248,    1, 1735,    2, 0x02 /* Public */,
-     249,    0, 1738,    2, 0x02 /* Public */,
-     250,    1, 1739,    2, 0x02 /* Public */,
-     251,    1, 1742,    2, 0x02 /* Public */,
-     252,    0, 1745,    2, 0x02 /* Public */,
-     253,    0, 1746,    2, 0x02 /* Public */,
-     254,    0, 1747,    2, 0x02 /* Public */,
-     255,    0, 1748,    2, 0x02 /* Public */,
-     256,    0, 1749,    2, 0x02 /* Public */,
-     257,    0, 1750,    2, 0x02 /* Public */,
-     258,    0, 1751,    2, 0x02 /* Public */,
-     259,    0, 1752,    2, 0x02 /* Public */,
-     260,    0, 1753,    2, 0x02 /* Public */,
-     261,    0, 1754,    2, 0x02 /* Public */,
-     262,    1, 1755,    2, 0x02 /* Public */,
-     263,    1, 1758,    2, 0x02 /* Public */,
-     264,    1, 1761,    2, 0x02 /* Public */,
-     265,    0, 1764,    2, 0x02 /* Public */,
-     266,    0, 1765,    2, 0x02 /* Public */,
-     267,    1, 1766,    2, 0x02 /* Public */,
-     268,    1, 1769,    2, 0x02 /* Public */,
-     269,    5, 1772,    2, 0x02 /* Public */,
-     271,    0, 1783,    2, 0x02 /* Public */,
-     272,    1, 1784,    2, 0x02 /* Public */,
-     273,    1, 1787,    2, 0x02 /* Public */,
-     274,    1, 1790,    2, 0x02 /* Public */,
-     275,    1, 1793,    2, 0x02 /* Public */,
-     276,    1, 1796,    2, 0x02 /* Public */,
-     277,    1, 1799,    2, 0x02 /* Public */,
-     278,    1, 1802,    2, 0x02 /* Public */,
-     279,    1, 1805,    2, 0x02 /* Public */,
-     280,    0, 1808,    2, 0x02 /* Public */,
-     281,    1, 1809,    2, 0x02 /* Public */,
-     282,    0, 1812,    2, 0x02 /* Public */,
-     283,    0, 1813,    2, 0x02 /* Public */,
-     284,    0, 1814,    2, 0x02 /* Public */,
-     285,    0, 1815,    2, 0x02 /* Public */,
-     286,    0, 1816,    2, 0x02 /* Public */,
-     287,    0, 1817,    2, 0x02 /* Public */,
-     288,    0, 1818,    2, 0x02 /* Public */,
-     289,    0, 1819,    2, 0x02 /* Public */,
+      14,    0, 1271,    2, 0x02 /* Public */,
+      15,    0, 1272,    2, 0x02 /* Public */,
+      16,    1, 1273,    2, 0x02 /* Public */,
+      18,    1, 1276,    2, 0x02 /* Public */,
+      20,    1, 1279,    2, 0x02 /* Public */,
+      21,    1, 1282,    2, 0x02 /* Public */,
+      22,    1, 1285,    2, 0x02 /* Public */,
+      23,    0, 1288,    2, 0x02 /* Public */,
+      24,    2, 1289,    2, 0x02 /* Public */,
+      26,    1, 1294,    2, 0x02 /* Public */,
+      26,    0, 1297,    2, 0x22 /* Public | MethodCloned */,
+      28,    2, 1298,    2, 0x02 /* Public */,
+      30,    1, 1303,    2, 0x02 /* Public */,
+      32,    0, 1306,    2, 0x02 /* Public */,
+      33,    0, 1307,    2, 0x02 /* Public */,
+      34,    1, 1308,    2, 0x02 /* Public */,
+      36,    0, 1311,    2, 0x02 /* Public */,
+      37,    1, 1312,    2, 0x02 /* Public */,
+      39,    0, 1315,    2, 0x02 /* Public */,
+      40,    1, 1316,    2, 0x02 /* Public */,
+      42,    0, 1319,    2, 0x02 /* Public */,
+      43,    1, 1320,    2, 0x02 /* Public */,
+      45,    0, 1323,    2, 0x02 /* Public */,
+      46,    1, 1324,    2, 0x02 /* Public */,
+      48,    0, 1327,    2, 0x02 /* Public */,
+      49,    1, 1328,    2, 0x02 /* Public */,
+      50,    0, 1331,    2, 0x02 /* Public */,
+      51,    1, 1332,    2, 0x02 /* Public */,
+      52,    0, 1335,    2, 0x02 /* Public */,
+      53,    1, 1336,    2, 0x02 /* Public */,
+      54,    0, 1339,    2, 0x02 /* Public */,
+      55,    1, 1340,    2, 0x02 /* Public */,
+      57,    1, 1343,    2, 0x02 /* Public */,
+      58,    0, 1346,    2, 0x02 /* Public */,
+      59,    0, 1347,    2, 0x02 /* Public */,
+      60,    1, 1348,    2, 0x02 /* Public */,
+      62,    0, 1351,    2, 0x02 /* Public */,
+      63,    0, 1352,    2, 0x02 /* Public */,
+      64,    0, 1353,    2, 0x02 /* Public */,
+      65,    2, 1354,    2, 0x02 /* Public */,
+      68,    0, 1359,    2, 0x02 /* Public */,
+      69,    1, 1360,    2, 0x02 /* Public */,
+      71,    1, 1363,    2, 0x02 /* Public */,
+      72,    0, 1366,    2, 0x02 /* Public */,
+      73,    0, 1367,    2, 0x02 /* Public */,
+      74,    0, 1368,    2, 0x02 /* Public */,
+      75,    0, 1369,    2, 0x02 /* Public */,
+      76,    0, 1370,    2, 0x02 /* Public */,
+      77,    1, 1371,    2, 0x02 /* Public */,
+      78,    1, 1374,    2, 0x02 /* Public */,
+      77,    0, 1377,    2, 0x02 /* Public */,
+      79,    0, 1378,    2, 0x02 /* Public */,
+      80,    1, 1379,    2, 0x02 /* Public */,
+      81,    1, 1382,    2, 0x02 /* Public */,
+      82,    1, 1385,    2, 0x02 /* Public */,
+      83,    1, 1388,    2, 0x02 /* Public */,
+      84,    0, 1391,    2, 0x02 /* Public */,
+      85,    0, 1392,    2, 0x02 /* Public */,
+      86,    0, 1393,    2, 0x02 /* Public */,
+      87,    0, 1394,    2, 0x02 /* Public */,
+      88,    0, 1395,    2, 0x02 /* Public */,
+      89,    0, 1396,    2, 0x02 /* Public */,
+      90,    1, 1397,    2, 0x02 /* Public */,
+      91,    1, 1400,    2, 0x02 /* Public */,
+      93,    0, 1403,    2, 0x02 /* Public */,
+      94,    1, 1404,    2, 0x02 /* Public */,
+      96,    0, 1407,    2, 0x02 /* Public */,
+      97,    0, 1408,    2, 0x02 /* Public */,
+      98,    3, 1409,    2, 0x02 /* Public */,
+     102,    0, 1416,    2, 0x02 /* Public */,
+     103,    0, 1417,    2, 0x02 /* Public */,
+     104,    0, 1418,    2, 0x02 /* Public */,
+     105,    0, 1419,    2, 0x02 /* Public */,
+     106,    0, 1420,    2, 0x02 /* Public */,
+     107,    0, 1421,    2, 0x02 /* Public */,
+     108,    1, 1422,    2, 0x02 /* Public */,
+     109,    1, 1425,    2, 0x02 /* Public */,
+     110,    1, 1428,    2, 0x02 /* Public */,
+     112,    1, 1431,    2, 0x02 /* Public */,
+     113,    1, 1434,    2, 0x02 /* Public */,
+     115,    0, 1437,    2, 0x02 /* Public */,
+     116,    1, 1438,    2, 0x02 /* Public */,
+     117,    1, 1441,    2, 0x02 /* Public */,
+     118,    3, 1444,    2, 0x02 /* Public */,
+     122,    0, 1451,    2, 0x02 /* Public */,
+     123,    0, 1452,    2, 0x02 /* Public */,
+     124,    0, 1453,    2, 0x02 /* Public */,
+     125,    0, 1454,    2, 0x02 /* Public */,
+     126,    0, 1455,    2, 0x02 /* Public */,
+     127,    0, 1456,    2, 0x02 /* Public */,
+     128,    0, 1457,    2, 0x02 /* Public */,
+     129,    0, 1458,    2, 0x02 /* Public */,
+     130,    0, 1459,    2, 0x02 /* Public */,
+     131,    1, 1460,    2, 0x02 /* Public */,
+     133,    0, 1463,    2, 0x02 /* Public */,
+     134,    1, 1464,    2, 0x02 /* Public */,
+     135,    1, 1467,    2, 0x02 /* Public */,
+     137,    0, 1470,    2, 0x02 /* Public */,
+     138,    1, 1471,    2, 0x02 /* Public */,
+     139,    1, 1474,    2, 0x02 /* Public */,
+     140,    1, 1477,    2, 0x02 /* Public */,
+     141,    1, 1480,    2, 0x02 /* Public */,
+     142,    0, 1483,    2, 0x02 /* Public */,
+     143,    0, 1484,    2, 0x02 /* Public */,
+     144,    1, 1485,    2, 0x02 /* Public */,
+     147,    1, 1488,    2, 0x02 /* Public */,
+     148,    1, 1491,    2, 0x02 /* Public */,
+     149,    1, 1494,    2, 0x02 /* Public */,
+     150,    2, 1497,    2, 0x02 /* Public */,
+     153,    2, 1502,    2, 0x02 /* Public */,
+     154,    0, 1507,    2, 0x02 /* Public */,
+     155,    0, 1508,    2, 0x02 /* Public */,
+     156,    0, 1509,    2, 0x02 /* Public */,
+     157,    0, 1510,    2, 0x02 /* Public */,
+     158,    0, 1511,    2, 0x02 /* Public */,
+     159,    0, 1512,    2, 0x02 /* Public */,
+     160,    0, 1513,    2, 0x02 /* Public */,
+     161,    1, 1514,    2, 0x02 /* Public */,
+     163,    0, 1517,    2, 0x02 /* Public */,
+     164,    0, 1518,    2, 0x02 /* Public */,
+     165,    0, 1519,    2, 0x02 /* Public */,
+     166,    1, 1520,    2, 0x02 /* Public */,
+     167,    1, 1523,    2, 0x02 /* Public */,
+     168,    1, 1526,    2, 0x02 /* Public */,
+     169,    1, 1529,    2, 0x02 /* Public */,
+     170,    1, 1532,    2, 0x02 /* Public */,
+     171,    1, 1535,    2, 0x02 /* Public */,
+     172,    1, 1538,    2, 0x02 /* Public */,
+     173,    0, 1541,    2, 0x02 /* Public */,
+     174,    1, 1542,    2, 0x02 /* Public */,
+     175,    1, 1545,    2, 0x02 /* Public */,
+     176,    2, 1548,    2, 0x02 /* Public */,
+     178,    2, 1553,    2, 0x02 /* Public */,
+     179,    0, 1558,    2, 0x02 /* Public */,
+     180,    1, 1559,    2, 0x02 /* Public */,
+     181,    1, 1562,    2, 0x02 /* Public */,
+     182,    1, 1565,    2, 0x02 /* Public */,
+     182,    2, 1568,    2, 0x02 /* Public */,
+     183,    3, 1573,    2, 0x02 /* Public */,
+     185,    1, 1580,    2, 0x02 /* Public */,
+     185,    2, 1583,    2, 0x02 /* Public */,
+     186,    2, 1588,    2, 0x02 /* Public */,
+     187,    1, 1593,    2, 0x02 /* Public */,
+     188,    0, 1596,    2, 0x02 /* Public */,
+     189,    0, 1597,    2, 0x02 /* Public */,
+     190,    1, 1598,    2, 0x02 /* Public */,
+     191,    1, 1601,    2, 0x02 /* Public */,
+     192,    1, 1604,    2, 0x02 /* Public */,
+     193,    4, 1607,    2, 0x02 /* Public */,
+     194,    1, 1616,    2, 0x02 /* Public */,
+     195,    1, 1619,    2, 0x02 /* Public */,
+     196,    5, 1622,    2, 0x02 /* Public */,
+     197,    4, 1633,    2, 0x02 /* Public */,
+     199,    0, 1642,    2, 0x02 /* Public */,
+     199,    1, 1643,    2, 0x02 /* Public */,
+     200,    1, 1646,    2, 0x02 /* Public */,
+     201,    2, 1649,    2, 0x02 /* Public */,
+     202,    2, 1654,    2, 0x02 /* Public */,
+     203,    5, 1659,    2, 0x02 /* Public */,
+     208,    2, 1670,    2, 0x02 /* Public */,
+     210,    2, 1675,    2, 0x02 /* Public */,
+     211,    1, 1680,    2, 0x02 /* Public */,
+     212,    1, 1683,    2, 0x02 /* Public */,
+     213,    0, 1686,    2, 0x02 /* Public */,
+     214,    1, 1687,    2, 0x02 /* Public */,
+     216,    2, 1690,    2, 0x02 /* Public */,
+     217,    0, 1695,    2, 0x02 /* Public */,
+     218,    0, 1696,    2, 0x02 /* Public */,
+     219,    1, 1697,    2, 0x02 /* Public */,
+     219,    3, 1700,    2, 0x02 /* Public */,
+     221,    0, 1707,    2, 0x02 /* Public */,
+     222,    0, 1708,    2, 0x02 /* Public */,
+     223,    0, 1709,    2, 0x02 /* Public */,
+     224,    0, 1710,    2, 0x02 /* Public */,
+     225,    0, 1711,    2, 0x02 /* Public */,
+     226,    0, 1712,    2, 0x02 /* Public */,
+     227,    0, 1713,    2, 0x02 /* Public */,
+     228,    0, 1714,    2, 0x02 /* Public */,
+     229,    0, 1715,    2, 0x02 /* Public */,
+     231,    1, 1716,    2, 0x02 /* Public */,
+     232,    1, 1719,    2, 0x02 /* Public */,
+     234,    0, 1722,    2, 0x02 /* Public */,
+     235,    0, 1723,    2, 0x02 /* Public */,
+     236,    0, 1724,    2, 0x02 /* Public */,
+     237,    0, 1725,    2, 0x02 /* Public */,
+     238,    0, 1726,    2, 0x02 /* Public */,
+     239,    0, 1727,    2, 0x02 /* Public */,
+     240,    0, 1728,    2, 0x02 /* Public */,
+     241,    0, 1729,    2, 0x02 /* Public */,
+     242,    0, 1730,    2, 0x02 /* Public */,
+     243,    0, 1731,    2, 0x02 /* Public */,
+     244,    0, 1732,    2, 0x02 /* Public */,
+     245,    0, 1733,    2, 0x02 /* Public */,
+     246,    1, 1734,    2, 0x02 /* Public */,
+     247,    1, 1737,    2, 0x02 /* Public */,
+     248,    1, 1740,    2, 0x02 /* Public */,
+     249,    0, 1743,    2, 0x02 /* Public */,
+     250,    1, 1744,    2, 0x02 /* Public */,
+     251,    1, 1747,    2, 0x02 /* Public */,
+     252,    0, 1750,    2, 0x02 /* Public */,
+     253,    0, 1751,    2, 0x02 /* Public */,
+     254,    0, 1752,    2, 0x02 /* Public */,
+     255,    0, 1753,    2, 0x02 /* Public */,
+     256,    0, 1754,    2, 0x02 /* Public */,
+     257,    0, 1755,    2, 0x02 /* Public */,
+     258,    0, 1756,    2, 0x02 /* Public */,
+     259,    0, 1757,    2, 0x02 /* Public */,
+     260,    0, 1758,    2, 0x02 /* Public */,
+     261,    1, 1759,    2, 0x02 /* Public */,
+     262,    0, 1762,    2, 0x02 /* Public */,
+     263,    1, 1763,    2, 0x02 /* Public */,
+     264,    1, 1766,    2, 0x02 /* Public */,
+     265,    1, 1769,    2, 0x02 /* Public */,
+     266,    0, 1772,    2, 0x02 /* Public */,
+     267,    0, 1773,    2, 0x02 /* Public */,
+     268,    1, 1774,    2, 0x02 /* Public */,
+     269,    1, 1777,    2, 0x02 /* Public */,
+     270,    5, 1780,    2, 0x02 /* Public */,
+     272,    0, 1791,    2, 0x02 /* Public */,
+     273,    1, 1792,    2, 0x02 /* Public */,
+     274,    1, 1795,    2, 0x02 /* Public */,
+     275,    1, 1798,    2, 0x02 /* Public */,
+     276,    1, 1801,    2, 0x02 /* Public */,
+     277,    1, 1804,    2, 0x02 /* Public */,
+     278,    1, 1807,    2, 0x02 /* Public */,
+     279,    1, 1810,    2, 0x02 /* Public */,
+     280,    1, 1813,    2, 0x02 /* Public */,
+     281,    0, 1816,    2, 0x02 /* Public */,
+     282,    1, 1817,    2, 0x02 /* Public */,
+     283,    0, 1820,    2, 0x02 /* Public */,
+     284,    0, 1821,    2, 0x02 /* Public */,
+     285,    0, 1822,    2, 0x02 /* Public */,
+     286,    0, 1823,    2, 0x02 /* Public */,
+     287,    0, 1824,    2, 0x02 /* Public */,
+     288,    0, 1825,    2, 0x02 /* Public */,
+     289,    0, 1826,    2, 0x02 /* Public */,
+     290,    0, 1827,    2, 0x02 /* Public */,
 
  // slots: parameters
     QMetaType::Void,
@@ -910,6 +912,7 @@ static const uint qt_meta_data_Supervisor[] = {
     QMetaType::Int,
     QMetaType::Float,
     0x80000000 | 145,
+    0x80000000 | 70, QMetaType::QString,   92,
     QMetaType::QObjectStar,
     QMetaType::QObjectStar, QMetaType::QString,   92,
     QMetaType::QObjectStar, QMetaType::QString,   92,
@@ -918,7 +921,7 @@ static const uint qt_meta_data_Supervisor[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,  111,
     QMetaType::Void, QMetaType::QString,  111,
-    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::Float, QMetaType::Float, QMetaType::Float,   56,  270,  119,  120,  121,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::Float, QMetaType::Float, QMetaType::Float,   56,  271,  119,  120,  121,
     QMetaType::Int,
     QMetaType::QString, QMetaType::Int,   38,
     QMetaType::QString, QMetaType::Int,   38,
@@ -1300,46 +1303,48 @@ void Supervisor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
         case 219: { QVector<int> _r = _t->getOrigin();
             if (_a[0]) *reinterpret_cast< QVector<int>*>(_a[0]) = std::move(_r); }  break;
-        case 220: { QObject* _r = _t->getMapping();
+        case 220: { QList<int> _r = _t->getMapData((*reinterpret_cast< QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QList<int>*>(_a[0]) = std::move(_r); }  break;
+        case 221: { QObject* _r = _t->getMapping();
             if (_a[0]) *reinterpret_cast< QObject**>(_a[0]) = std::move(_r); }  break;
-        case 221: { QObject* _r = _t->getMinimap((*reinterpret_cast< QString(*)>(_a[1])));
+        case 222: { QObject* _r = _t->getMinimap((*reinterpret_cast< QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QObject**>(_a[0]) = std::move(_r); }  break;
-        case 222: { QObject* _r = _t->getMap((*reinterpret_cast< QString(*)>(_a[1])));
+        case 223: { QObject* _r = _t->getMap((*reinterpret_cast< QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QObject**>(_a[0]) = std::move(_r); }  break;
-        case 223: { QObject* _r = _t->getRawMap((*reinterpret_cast< QString(*)>(_a[1])));
+        case 224: { QObject* _r = _t->getRawMap((*reinterpret_cast< QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QObject**>(_a[0]) = std::move(_r); }  break;
-        case 224: { QString _r = _t->getPatrolFileName();
+        case 225: { QString _r = _t->getPatrolFileName();
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 225: _t->makePatrol(); break;
-        case 226: _t->loadPatrolFile((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 227: _t->savePatrolFile((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 228: _t->addPatrol((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< float(*)>(_a[3])),(*reinterpret_cast< float(*)>(_a[4])),(*reinterpret_cast< float(*)>(_a[5]))); break;
-        case 229: { int _r = _t->getPatrolNum();
+        case 226: _t->makePatrol(); break;
+        case 227: _t->loadPatrolFile((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 228: _t->savePatrolFile((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 229: _t->addPatrol((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< float(*)>(_a[3])),(*reinterpret_cast< float(*)>(_a[4])),(*reinterpret_cast< float(*)>(_a[5]))); break;
+        case 230: { int _r = _t->getPatrolNum();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 230: { QString _r = _t->getPatrolType((*reinterpret_cast< int(*)>(_a[1])));
+        case 231: { QString _r = _t->getPatrolType((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 231: { QString _r = _t->getPatrolLocation((*reinterpret_cast< int(*)>(_a[1])));
+        case 232: { QString _r = _t->getPatrolLocation((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 232: { float _r = _t->getPatrolX((*reinterpret_cast< int(*)>(_a[1])));
+        case 233: { float _r = _t->getPatrolX((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 233: { float _r = _t->getPatrolY((*reinterpret_cast< int(*)>(_a[1])));
+        case 234: { float _r = _t->getPatrolY((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 234: { float _r = _t->getPatrolTH((*reinterpret_cast< int(*)>(_a[1])));
+        case 235: { float _r = _t->getPatrolTH((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 235: _t->removePatrol((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 236: _t->movePatrolUp((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 237: _t->movePatrolDown((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 238: { int _r = _t->getPatrolMode();
+        case 236: _t->removePatrol((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 237: _t->movePatrolUp((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 238: _t->movePatrolDown((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 239: { int _r = _t->getPatrolMode();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 239: _t->setPatrolMode((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 240: _t->startRecordPath(); break;
-        case 241: _t->startcurPath(); break;
-        case 242: _t->stopcurPath(); break;
-        case 243: _t->pausecurPath(); break;
-        case 244: _t->runRotateTables(); break;
-        case 245: _t->stopRotateTables(); break;
-        case 246: _t->startServingTest(); break;
-        case 247: _t->stopServingTest(); break;
+        case 240: _t->setPatrolMode((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 241: _t->startRecordPath(); break;
+        case 242: _t->startcurPath(); break;
+        case 243: _t->stopcurPath(); break;
+        case 244: _t->pausecurPath(); break;
+        case 245: _t->runRotateTables(); break;
+        case 246: _t->stopRotateTables(); break;
+        case 247: _t->startServingTest(); break;
+        case 248: _t->stopServingTest(); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -1385,13 +1390,13 @@ int Supervisor::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 248)
+        if (_id < 249)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 248;
+        _id -= 249;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 248)
+        if (_id < 249)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 248;
+        _id -= 249;
     }
     return _id;
 }
