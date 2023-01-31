@@ -71,6 +71,7 @@ SOURCES       = ../JoystickHandler.cpp \
 		Item_button_qml.cpp \
 		Item_statusbar_qml.cpp \
 		Page_pickup_qml.cpp \
+		Popup_map_list_qml.cpp \
 		Page_setting_qml.cpp \
 		Page_moving_qml.cpp \
 		Item_joystick_qml.cpp \
@@ -115,6 +116,7 @@ OBJECTS       = JoystickHandler.o \
 		Item_button_qml.o \
 		Item_statusbar_qml.o \
 		Page_pickup_qml.o \
+		Popup_map_list_qml.o \
 		Page_setting_qml.o \
 		Page_moving_qml.o \
 		Item_joystick_qml.o \
@@ -452,7 +454,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents qml_qmlcache.qrc $(DISTDIR)/
-	$(COPY_FILE) --parents ../Page_init.qml ../Page_menus.qml ../Item_button.qml ../Item_statusbar.qml ../Page_pickup.qml ../Page_setting.qml ../Page_moving.qml ../Item_joystick.qml ../main.qml ../Item_keyboard.qml ../Map_full.qml ../Page_map.qml ../Page_MoveFail.qml ../Page_pickup_calling.qml ../Item_switch.qml ../Page_kitchen.qml ../Page_charge.qml $(DISTDIR)/
+	$(COPY_FILE) --parents ../Page_init.qml ../Page_menus.qml ../Item_button.qml ../Item_statusbar.qml ../Page_pickup.qml ../Popup_map_list.qml ../Page_setting.qml ../Page_moving.qml ../Item_joystick.qml ../main.qml ../Item_keyboard.qml ../Map_full.qml ../Page_map.qml ../Page_MoveFail.qml ../Page_pickup_calling.qml ../Item_switch.qml ../Page_kitchen.qml ../Page_charge.qml $(DISTDIR)/
 	$(COPY_FILE) --parents ../qml.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../GlobalHeader.h ../JoystickHandler.h ../LCMHandler.h ../Logger.h ../MapView.h ../ServerHandler.h ../cv_to_qt.h ../Supervisor.h ../websocket/QtHttpServer.h ../websocket/QtHttpReply.h ../websocket/QtHttpRequest.h ../websocket/QtHttpHeader.h ../websocket/QtHttpClientWrapper.h ../HTTPHandler.h $(DISTDIR)/
@@ -592,9 +594,9 @@ qrc_qml_qmlcache.cpp: qml_qmlcache.qrc \
 		../bgm/voice_avoid.mp3
 	/usr/lib/qt5/bin/rcc -name qml_qmlcache qml_qmlcache.qrc -o qrc_qml_qmlcache.cpp
 
-compiler_qmlcache_make_all: Page_init_qml.cpp Page_menus_qml.cpp Item_button_qml.cpp Item_statusbar_qml.cpp Page_pickup_qml.cpp Page_setting_qml.cpp Page_moving_qml.cpp Item_joystick_qml.cpp main_qml.cpp Item_keyboard_qml.cpp Map_full_qml.cpp Page_map_qml.cpp Page_MoveFail_qml.cpp Page_pickup_calling_qml.cpp Item_switch_qml.cpp Page_kitchen_qml.cpp Page_charge_qml.cpp
+compiler_qmlcache_make_all: Page_init_qml.cpp Page_menus_qml.cpp Item_button_qml.cpp Item_statusbar_qml.cpp Page_pickup_qml.cpp Popup_map_list_qml.cpp Page_setting_qml.cpp Page_moving_qml.cpp Item_joystick_qml.cpp main_qml.cpp Item_keyboard_qml.cpp Map_full_qml.cpp Page_map_qml.cpp Page_MoveFail_qml.cpp Page_pickup_calling_qml.cpp Item_switch_qml.cpp Page_kitchen_qml.cpp Page_charge_qml.cpp
 compiler_qmlcache_clean:
-	-$(DEL_FILE) Page_init_qml.cpp Page_menus_qml.cpp Item_button_qml.cpp Item_statusbar_qml.cpp Page_pickup_qml.cpp Page_setting_qml.cpp Page_moving_qml.cpp Item_joystick_qml.cpp main_qml.cpp Item_keyboard_qml.cpp Map_full_qml.cpp Page_map_qml.cpp Page_MoveFail_qml.cpp Page_pickup_calling_qml.cpp Item_switch_qml.cpp Page_kitchen_qml.cpp Page_charge_qml.cpp
+	-$(DEL_FILE) Page_init_qml.cpp Page_menus_qml.cpp Item_button_qml.cpp Item_statusbar_qml.cpp Page_pickup_qml.cpp Popup_map_list_qml.cpp Page_setting_qml.cpp Page_moving_qml.cpp Item_joystick_qml.cpp main_qml.cpp Item_keyboard_qml.cpp Map_full_qml.cpp Page_map_qml.cpp Page_MoveFail_qml.cpp Page_pickup_calling_qml.cpp Item_switch_qml.cpp Page_kitchen_qml.cpp Page_charge_qml.cpp
 Page_init_qml.cpp: ../Page_init.qml \
 		/usr/lib/qt5/bin/qmlcachegen
 	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/UI_MOBILE/qml.qrc -o Page_init_qml.cpp ../Page_init.qml
@@ -614,6 +616,10 @@ Item_statusbar_qml.cpp: ../Item_statusbar.qml \
 Page_pickup_qml.cpp: ../Page_pickup.qml \
 		/usr/lib/qt5/bin/qmlcachegen
 	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/UI_MOBILE/qml.qrc -o Page_pickup_qml.cpp ../Page_pickup.qml
+
+Popup_map_list_qml.cpp: ../Popup_map_list.qml \
+		/usr/lib/qt5/bin/qmlcachegen
+	/usr/lib/qt5/bin/qmlcachegen --resource=/home/rainbow/UI_MOBILE/qml.qrc -o Popup_map_list_qml.cpp ../Popup_map_list.qml
 
 Page_setting_qml.cpp: ../Page_setting.qml \
 		/usr/lib/qt5/bin/qmlcachegen
@@ -909,6 +915,9 @@ Item_statusbar_qml.o: Item_statusbar_qml.cpp
 
 Page_pickup_qml.o: Page_pickup_qml.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_pickup_qml.o Page_pickup_qml.cpp
+
+Popup_map_list_qml.o: Popup_map_list_qml.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Popup_map_list_qml.o Popup_map_list_qml.cpp
 
 Page_setting_qml.o: Page_setting_qml.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Page_setting_qml.o Page_setting_qml.cpp

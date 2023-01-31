@@ -556,6 +556,64 @@ Item {
                 width: parent.width
                 spacing:25
                 Rectangle{
+                    id: set_map_0
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"맵 이름"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 30
+                                anchors.centerIn: parent
+                                TextField{
+                                    id: map_name
+                                    height: parent.height
+                                    width: 300
+                                    text:supervisor.getMapname();//Setting("ROBOT_HW","model");
+                                }
+                                Rectangle{
+                                    width: 100
+                                    height: 40
+                                    radius: 5
+                                    color: "black"
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    Text{
+                                        font.family: font_noto_r.name
+                                        color: "white"
+                                        anchors.centerIn: parent
+                                        text: "changed"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            popup_maplist.open();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
                     id: set_map_1
                     width: 840
                     height: 40
@@ -2922,5 +2980,9 @@ Item {
 
             }
         }
+    }
+
+    Popup_map_list{
+        id: popup_maplist
     }
 }
