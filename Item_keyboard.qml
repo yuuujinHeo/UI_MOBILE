@@ -29,7 +29,7 @@ Item {
 
     onPressed_upChanged: {
         if(pressed_up){
-            supervisor.joyMoveXY(-1);
+            supervisor.joyMoveXY(1);
             pressed_down = false;
         }else{
             clear();
@@ -37,7 +37,7 @@ Item {
     }
     onPressed_downChanged: {
         if(pressed_down){
-            supervisor.joyMoveXY(1);
+            supervisor.joyMoveXY(-1);
             pressed_up = false;
         }else{
             clear();
@@ -45,7 +45,7 @@ Item {
     }
     onPressed_leftChanged: {
         if(pressed_left){
-            supervisor.joyMoveR(-1);
+            supervisor.joyMoveR(1);
             pressed_right = false;
         }else{
             clear();
@@ -53,7 +53,7 @@ Item {
     }
     onPressed_rightChanged: {
         if(pressed_right){
-            supervisor.joyMoveR(1);
+            supervisor.joyMoveR(-1);
             pressed_left = false;
         }else{
             clear();

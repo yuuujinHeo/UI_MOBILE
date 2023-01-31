@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Supervisor_t {
-    QByteArrayData data[291];
-    char stringdata0[3426];
+    QByteArrayData data[294];
+    char stringdata0[3461];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -167,162 +167,165 @@ QT_MOC_LITERAL(131, 1539, 14), // "setMappingflag"
 QT_MOC_LITERAL(132, 1554, 4), // "flag"
 QT_MOC_LITERAL(133, 1559, 15), // "getMappingImage"
 QT_MOC_LITERAL(134, 1575, 10), // "getListMap"
-QT_MOC_LITERAL(135, 1586, 11), // "pushMapData"
-QT_MOC_LITERAL(136, 1598, 4), // "data"
-QT_MOC_LITERAL(137, 1603, 12), // "isconnectJoy"
-QT_MOC_LITERAL(138, 1616, 10), // "getJoyAxis"
-QT_MOC_LITERAL(139, 1627, 12), // "getJoyButton"
-QT_MOC_LITERAL(140, 1640, 11), // "getKeyboard"
-QT_MOC_LITERAL(141, 1652, 11), // "getJoystick"
-QT_MOC_LITERAL(142, 1664, 13), // "getCanvasSize"
-QT_MOC_LITERAL(143, 1678, 11), // "getRedoSize"
-QT_MOC_LITERAL(144, 1690, 8), // "getLineX"
-QT_MOC_LITERAL(145, 1699, 12), // "QVector<int>"
-QT_MOC_LITERAL(146, 1712, 5), // "index"
-QT_MOC_LITERAL(147, 1718, 8), // "getLineY"
-QT_MOC_LITERAL(148, 1727, 12), // "getLineColor"
-QT_MOC_LITERAL(149, 1740, 12), // "getLineWidth"
-QT_MOC_LITERAL(150, 1753, 9), // "startLine"
-QT_MOC_LITERAL(151, 1763, 5), // "color"
-QT_MOC_LITERAL(152, 1769, 5), // "width"
-QT_MOC_LITERAL(153, 1775, 7), // "setLine"
-QT_MOC_LITERAL(154, 1783, 8), // "stopLine"
-QT_MOC_LITERAL(155, 1792, 4), // "undo"
-QT_MOC_LITERAL(156, 1797, 4), // "redo"
-QT_MOC_LITERAL(157, 1802, 9), // "clear_all"
-QT_MOC_LITERAL(158, 1812, 10), // "setObjPose"
-QT_MOC_LITERAL(159, 1823, 12), // "setMarginObj"
-QT_MOC_LITERAL(160, 1836, 14), // "clearMarginObj"
-QT_MOC_LITERAL(161, 1851, 14), // "setMarginPoint"
-QT_MOC_LITERAL(162, 1866, 9), // "pixel_num"
-QT_MOC_LITERAL(163, 1876, 12), // "getMarginObj"
-QT_MOC_LITERAL(164, 1889, 9), // "getMargin"
-QT_MOC_LITERAL(165, 1899, 14), // "getLocationNum"
-QT_MOC_LITERAL(166, 1914, 15), // "getLocationSize"
-QT_MOC_LITERAL(167, 1930, 15), // "getLocationName"
-QT_MOC_LITERAL(168, 1946, 16), // "getLocationTypes"
-QT_MOC_LITERAL(169, 1963, 12), // "getLocationx"
-QT_MOC_LITERAL(170, 1976, 12), // "getLocationy"
-QT_MOC_LITERAL(171, 1989, 13), // "getLocationth"
-QT_MOC_LITERAL(172, 2003, 8), // "getLidar"
-QT_MOC_LITERAL(173, 2012, 12), // "getObjectNum"
-QT_MOC_LITERAL(174, 2025, 13), // "getObjectName"
-QT_MOC_LITERAL(175, 2039, 18), // "getObjectPointSize"
-QT_MOC_LITERAL(176, 2058, 10), // "getObjectX"
-QT_MOC_LITERAL(177, 2069, 5), // "point"
-QT_MOC_LITERAL(178, 2075, 10), // "getObjectY"
-QT_MOC_LITERAL(179, 2086, 17), // "getTempObjectSize"
-QT_MOC_LITERAL(180, 2104, 14), // "getTempObjectX"
-QT_MOC_LITERAL(181, 2119, 14), // "getTempObjectY"
-QT_MOC_LITERAL(182, 2134, 9), // "getObjNum"
-QT_MOC_LITERAL(183, 2144, 14), // "getObjPointNum"
-QT_MOC_LITERAL(184, 2159, 7), // "obj_num"
-QT_MOC_LITERAL(185, 2167, 9), // "getLocNum"
-QT_MOC_LITERAL(186, 2177, 14), // "addObjectPoint"
-QT_MOC_LITERAL(187, 2192, 17), // "removeObjectPoint"
-QT_MOC_LITERAL(188, 2210, 21), // "removeObjectPointLast"
-QT_MOC_LITERAL(189, 2232, 17), // "clearObjectPoints"
-QT_MOC_LITERAL(190, 2250, 13), // "getObjectSize"
-QT_MOC_LITERAL(191, 2264, 9), // "addObject"
-QT_MOC_LITERAL(192, 2274, 13), // "addObjectRect"
-QT_MOC_LITERAL(193, 2288, 10), // "editObject"
-QT_MOC_LITERAL(194, 2299, 12), // "removeObject"
-QT_MOC_LITERAL(195, 2312, 14), // "removeLocation"
-QT_MOC_LITERAL(196, 2327, 11), // "addLocation"
-QT_MOC_LITERAL(197, 2339, 17), // "moveLocationPoint"
-QT_MOC_LITERAL(198, 2357, 7), // "loc_num"
-QT_MOC_LITERAL(199, 2365, 12), // "getTlineSize"
-QT_MOC_LITERAL(200, 2378, 12), // "getTlineName"
-QT_MOC_LITERAL(201, 2391, 9), // "getTlineX"
-QT_MOC_LITERAL(202, 2401, 9), // "getTlineY"
-QT_MOC_LITERAL(203, 2411, 8), // "addTline"
-QT_MOC_LITERAL(204, 2420, 2), // "x1"
-QT_MOC_LITERAL(205, 2423, 2), // "y1"
-QT_MOC_LITERAL(206, 2426, 2), // "x2"
-QT_MOC_LITERAL(207, 2429, 2), // "y2"
-QT_MOC_LITERAL(208, 2432, 11), // "removeTline"
-QT_MOC_LITERAL(209, 2444, 4), // "line"
-QT_MOC_LITERAL(210, 2449, 11), // "getTlineNum"
-QT_MOC_LITERAL(211, 2461, 14), // "saveAnnotation"
-QT_MOC_LITERAL(212, 2476, 12), // "saveMetaData"
-QT_MOC_LITERAL(213, 2489, 15), // "sendMaptoServer"
-QT_MOC_LITERAL(214, 2505, 10), // "acceptCall"
-QT_MOC_LITERAL(215, 2516, 3), // "yes"
-QT_MOC_LITERAL(216, 2520, 7), // "setTray"
-QT_MOC_LITERAL(217, 2528, 13), // "confirmPickup"
-QT_MOC_LITERAL(218, 2542, 14), // "getPickuptrays"
-QT_MOC_LITERAL(219, 2557, 6), // "moveTo"
-QT_MOC_LITERAL(220, 2564, 10), // "target_num"
-QT_MOC_LITERAL(221, 2575, 9), // "movePause"
-QT_MOC_LITERAL(222, 2585, 10), // "moveResume"
-QT_MOC_LITERAL(223, 2596, 8), // "moveStop"
-QT_MOC_LITERAL(224, 2605, 10), // "moveManual"
-QT_MOC_LITERAL(225, 2616, 12), // "moveToCharge"
-QT_MOC_LITERAL(226, 2629, 10), // "moveToWait"
-QT_MOC_LITERAL(227, 2640, 9), // "getcurLoc"
-QT_MOC_LITERAL(228, 2650, 11), // "getcurTable"
-QT_MOC_LITERAL(229, 2662, 12), // "getcurTarget"
-QT_MOC_LITERAL(230, 2675, 14), // "QVector<float>"
-QT_MOC_LITERAL(231, 2690, 9), // "joyMoveXY"
-QT_MOC_LITERAL(232, 2700, 8), // "joyMoveR"
-QT_MOC_LITERAL(233, 2709, 1), // "r"
-QT_MOC_LITERAL(234, 2711, 8), // "getJoyXY"
-QT_MOC_LITERAL(235, 2720, 7), // "getJoyR"
-QT_MOC_LITERAL(236, 2728, 10), // "getBattery"
-QT_MOC_LITERAL(237, 2739, 8), // "getState"
-QT_MOC_LITERAL(238, 2748, 10), // "getErrcode"
-QT_MOC_LITERAL(239, 2759, 12), // "getRobotName"
-QT_MOC_LITERAL(240, 2772, 14), // "getRobotRadius"
-QT_MOC_LITERAL(241, 2787, 9), // "getRobotx"
-QT_MOC_LITERAL(242, 2797, 9), // "getRoboty"
-QT_MOC_LITERAL(243, 2807, 10), // "getRobotth"
-QT_MOC_LITERAL(244, 2818, 13), // "getRobotState"
-QT_MOC_LITERAL(245, 2832, 10), // "getPathNum"
-QT_MOC_LITERAL(246, 2843, 8), // "getPathx"
-QT_MOC_LITERAL(247, 2852, 8), // "getPathy"
-QT_MOC_LITERAL(248, 2861, 9), // "getPathth"
-QT_MOC_LITERAL(249, 2871, 15), // "getLocalPathNum"
-QT_MOC_LITERAL(250, 2887, 13), // "getLocalPathx"
-QT_MOC_LITERAL(251, 2901, 13), // "getLocalPathy"
-QT_MOC_LITERAL(252, 2915, 10), // "getuistate"
-QT_MOC_LITERAL(253, 2926, 10), // "getMapname"
-QT_MOC_LITERAL(254, 2937, 10), // "getMappath"
-QT_MOC_LITERAL(255, 2948, 16), // "getServerMapname"
-QT_MOC_LITERAL(256, 2965, 16), // "getServerMappath"
-QT_MOC_LITERAL(257, 2982, 11), // "getMapWidth"
-QT_MOC_LITERAL(258, 2994, 12), // "getMapHeight"
-QT_MOC_LITERAL(259, 3007, 12), // "getGridWidth"
-QT_MOC_LITERAL(260, 3020, 9), // "getOrigin"
-QT_MOC_LITERAL(261, 3030, 10), // "getMapData"
-QT_MOC_LITERAL(262, 3041, 10), // "getMapping"
-QT_MOC_LITERAL(263, 3052, 10), // "getMinimap"
-QT_MOC_LITERAL(264, 3063, 6), // "getMap"
-QT_MOC_LITERAL(265, 3070, 9), // "getRawMap"
-QT_MOC_LITERAL(266, 3080, 17), // "getPatrolFileName"
-QT_MOC_LITERAL(267, 3098, 10), // "makePatrol"
-QT_MOC_LITERAL(268, 3109, 14), // "loadPatrolFile"
-QT_MOC_LITERAL(269, 3124, 14), // "savePatrolFile"
-QT_MOC_LITERAL(270, 3139, 9), // "addPatrol"
-QT_MOC_LITERAL(271, 3149, 8), // "location"
-QT_MOC_LITERAL(272, 3158, 12), // "getPatrolNum"
-QT_MOC_LITERAL(273, 3171, 13), // "getPatrolType"
-QT_MOC_LITERAL(274, 3185, 17), // "getPatrolLocation"
-QT_MOC_LITERAL(275, 3203, 10), // "getPatrolX"
-QT_MOC_LITERAL(276, 3214, 10), // "getPatrolY"
-QT_MOC_LITERAL(277, 3225, 11), // "getPatrolTH"
-QT_MOC_LITERAL(278, 3237, 12), // "removePatrol"
-QT_MOC_LITERAL(279, 3250, 12), // "movePatrolUp"
-QT_MOC_LITERAL(280, 3263, 14), // "movePatrolDown"
-QT_MOC_LITERAL(281, 3278, 13), // "getPatrolMode"
-QT_MOC_LITERAL(282, 3292, 13), // "setPatrolMode"
-QT_MOC_LITERAL(283, 3306, 15), // "startRecordPath"
-QT_MOC_LITERAL(284, 3322, 12), // "startcurPath"
-QT_MOC_LITERAL(285, 3335, 11), // "stopcurPath"
-QT_MOC_LITERAL(286, 3347, 12), // "pausecurPath"
-QT_MOC_LITERAL(287, 3360, 15), // "runRotateTables"
-QT_MOC_LITERAL(288, 3376, 16), // "stopRotateTables"
-QT_MOC_LITERAL(289, 3393, 16), // "startServingTest"
-QT_MOC_LITERAL(290, 3410, 15) // "stopServingTest"
+QT_MOC_LITERAL(135, 1586, 13), // "getRawListMap"
+QT_MOC_LITERAL(136, 1600, 11), // "pushMapData"
+QT_MOC_LITERAL(137, 1612, 4), // "data"
+QT_MOC_LITERAL(138, 1617, 12), // "isconnectJoy"
+QT_MOC_LITERAL(139, 1630, 10), // "getJoyAxis"
+QT_MOC_LITERAL(140, 1641, 12), // "getJoyButton"
+QT_MOC_LITERAL(141, 1654, 11), // "getKeyboard"
+QT_MOC_LITERAL(142, 1666, 11), // "getJoystick"
+QT_MOC_LITERAL(143, 1678, 14), // "setRotateAngle"
+QT_MOC_LITERAL(144, 1693, 5), // "angle"
+QT_MOC_LITERAL(145, 1699, 13), // "getCanvasSize"
+QT_MOC_LITERAL(146, 1713, 11), // "getRedoSize"
+QT_MOC_LITERAL(147, 1725, 8), // "getLineX"
+QT_MOC_LITERAL(148, 1734, 12), // "QVector<int>"
+QT_MOC_LITERAL(149, 1747, 5), // "index"
+QT_MOC_LITERAL(150, 1753, 8), // "getLineY"
+QT_MOC_LITERAL(151, 1762, 12), // "getLineColor"
+QT_MOC_LITERAL(152, 1775, 12), // "getLineWidth"
+QT_MOC_LITERAL(153, 1788, 9), // "startLine"
+QT_MOC_LITERAL(154, 1798, 5), // "color"
+QT_MOC_LITERAL(155, 1804, 5), // "width"
+QT_MOC_LITERAL(156, 1810, 7), // "setLine"
+QT_MOC_LITERAL(157, 1818, 8), // "stopLine"
+QT_MOC_LITERAL(158, 1827, 4), // "undo"
+QT_MOC_LITERAL(159, 1832, 4), // "redo"
+QT_MOC_LITERAL(160, 1837, 9), // "clear_all"
+QT_MOC_LITERAL(161, 1847, 10), // "setObjPose"
+QT_MOC_LITERAL(162, 1858, 12), // "setMarginObj"
+QT_MOC_LITERAL(163, 1871, 14), // "clearMarginObj"
+QT_MOC_LITERAL(164, 1886, 14), // "setMarginPoint"
+QT_MOC_LITERAL(165, 1901, 9), // "pixel_num"
+QT_MOC_LITERAL(166, 1911, 12), // "getMarginObj"
+QT_MOC_LITERAL(167, 1924, 9), // "getMargin"
+QT_MOC_LITERAL(168, 1934, 14), // "getLocationNum"
+QT_MOC_LITERAL(169, 1949, 15), // "getLocationSize"
+QT_MOC_LITERAL(170, 1965, 15), // "getLocationName"
+QT_MOC_LITERAL(171, 1981, 16), // "getLocationTypes"
+QT_MOC_LITERAL(172, 1998, 12), // "getLocationx"
+QT_MOC_LITERAL(173, 2011, 12), // "getLocationy"
+QT_MOC_LITERAL(174, 2024, 13), // "getLocationth"
+QT_MOC_LITERAL(175, 2038, 8), // "getLidar"
+QT_MOC_LITERAL(176, 2047, 12), // "getObjectNum"
+QT_MOC_LITERAL(177, 2060, 13), // "getObjectName"
+QT_MOC_LITERAL(178, 2074, 18), // "getObjectPointSize"
+QT_MOC_LITERAL(179, 2093, 10), // "getObjectX"
+QT_MOC_LITERAL(180, 2104, 5), // "point"
+QT_MOC_LITERAL(181, 2110, 10), // "getObjectY"
+QT_MOC_LITERAL(182, 2121, 17), // "getTempObjectSize"
+QT_MOC_LITERAL(183, 2139, 14), // "getTempObjectX"
+QT_MOC_LITERAL(184, 2154, 14), // "getTempObjectY"
+QT_MOC_LITERAL(185, 2169, 9), // "getObjNum"
+QT_MOC_LITERAL(186, 2179, 14), // "getObjPointNum"
+QT_MOC_LITERAL(187, 2194, 7), // "obj_num"
+QT_MOC_LITERAL(188, 2202, 9), // "getLocNum"
+QT_MOC_LITERAL(189, 2212, 14), // "addObjectPoint"
+QT_MOC_LITERAL(190, 2227, 17), // "removeObjectPoint"
+QT_MOC_LITERAL(191, 2245, 21), // "removeObjectPointLast"
+QT_MOC_LITERAL(192, 2267, 17), // "clearObjectPoints"
+QT_MOC_LITERAL(193, 2285, 13), // "getObjectSize"
+QT_MOC_LITERAL(194, 2299, 9), // "addObject"
+QT_MOC_LITERAL(195, 2309, 13), // "addObjectRect"
+QT_MOC_LITERAL(196, 2323, 10), // "editObject"
+QT_MOC_LITERAL(197, 2334, 12), // "removeObject"
+QT_MOC_LITERAL(198, 2347, 14), // "removeLocation"
+QT_MOC_LITERAL(199, 2362, 11), // "addLocation"
+QT_MOC_LITERAL(200, 2374, 17), // "moveLocationPoint"
+QT_MOC_LITERAL(201, 2392, 7), // "loc_num"
+QT_MOC_LITERAL(202, 2400, 12), // "getTlineSize"
+QT_MOC_LITERAL(203, 2413, 12), // "getTlineName"
+QT_MOC_LITERAL(204, 2426, 9), // "getTlineX"
+QT_MOC_LITERAL(205, 2436, 9), // "getTlineY"
+QT_MOC_LITERAL(206, 2446, 8), // "addTline"
+QT_MOC_LITERAL(207, 2455, 2), // "x1"
+QT_MOC_LITERAL(208, 2458, 2), // "y1"
+QT_MOC_LITERAL(209, 2461, 2), // "x2"
+QT_MOC_LITERAL(210, 2464, 2), // "y2"
+QT_MOC_LITERAL(211, 2467, 11), // "removeTline"
+QT_MOC_LITERAL(212, 2479, 4), // "line"
+QT_MOC_LITERAL(213, 2484, 11), // "getTlineNum"
+QT_MOC_LITERAL(214, 2496, 14), // "saveAnnotation"
+QT_MOC_LITERAL(215, 2511, 12), // "saveMetaData"
+QT_MOC_LITERAL(216, 2524, 15), // "sendMaptoServer"
+QT_MOC_LITERAL(217, 2540, 10), // "acceptCall"
+QT_MOC_LITERAL(218, 2551, 3), // "yes"
+QT_MOC_LITERAL(219, 2555, 7), // "setTray"
+QT_MOC_LITERAL(220, 2563, 13), // "confirmPickup"
+QT_MOC_LITERAL(221, 2577, 14), // "getPickuptrays"
+QT_MOC_LITERAL(222, 2592, 6), // "moveTo"
+QT_MOC_LITERAL(223, 2599, 10), // "target_num"
+QT_MOC_LITERAL(224, 2610, 9), // "movePause"
+QT_MOC_LITERAL(225, 2620, 10), // "moveResume"
+QT_MOC_LITERAL(226, 2631, 8), // "moveStop"
+QT_MOC_LITERAL(227, 2640, 10), // "moveManual"
+QT_MOC_LITERAL(228, 2651, 12), // "moveToCharge"
+QT_MOC_LITERAL(229, 2664, 10), // "moveToWait"
+QT_MOC_LITERAL(230, 2675, 9), // "getcurLoc"
+QT_MOC_LITERAL(231, 2685, 11), // "getcurTable"
+QT_MOC_LITERAL(232, 2697, 12), // "getcurTarget"
+QT_MOC_LITERAL(233, 2710, 14), // "QVector<float>"
+QT_MOC_LITERAL(234, 2725, 9), // "joyMoveXY"
+QT_MOC_LITERAL(235, 2735, 8), // "joyMoveR"
+QT_MOC_LITERAL(236, 2744, 1), // "r"
+QT_MOC_LITERAL(237, 2746, 8), // "getJoyXY"
+QT_MOC_LITERAL(238, 2755, 7), // "getJoyR"
+QT_MOC_LITERAL(239, 2763, 10), // "getBattery"
+QT_MOC_LITERAL(240, 2774, 8), // "getState"
+QT_MOC_LITERAL(241, 2783, 10), // "getErrcode"
+QT_MOC_LITERAL(242, 2794, 12), // "getRobotName"
+QT_MOC_LITERAL(243, 2807, 14), // "getRobotRadius"
+QT_MOC_LITERAL(244, 2822, 9), // "getRobotx"
+QT_MOC_LITERAL(245, 2832, 9), // "getRoboty"
+QT_MOC_LITERAL(246, 2842, 10), // "getRobotth"
+QT_MOC_LITERAL(247, 2853, 13), // "getRobotState"
+QT_MOC_LITERAL(248, 2867, 10), // "getPathNum"
+QT_MOC_LITERAL(249, 2878, 8), // "getPathx"
+QT_MOC_LITERAL(250, 2887, 8), // "getPathy"
+QT_MOC_LITERAL(251, 2896, 9), // "getPathth"
+QT_MOC_LITERAL(252, 2906, 15), // "getLocalPathNum"
+QT_MOC_LITERAL(253, 2922, 13), // "getLocalPathx"
+QT_MOC_LITERAL(254, 2936, 13), // "getLocalPathy"
+QT_MOC_LITERAL(255, 2950, 10), // "getuistate"
+QT_MOC_LITERAL(256, 2961, 10), // "getMapname"
+QT_MOC_LITERAL(257, 2972, 10), // "getMappath"
+QT_MOC_LITERAL(258, 2983, 16), // "getServerMapname"
+QT_MOC_LITERAL(259, 3000, 16), // "getServerMappath"
+QT_MOC_LITERAL(260, 3017, 11), // "getMapWidth"
+QT_MOC_LITERAL(261, 3029, 12), // "getMapHeight"
+QT_MOC_LITERAL(262, 3042, 12), // "getGridWidth"
+QT_MOC_LITERAL(263, 3055, 9), // "getOrigin"
+QT_MOC_LITERAL(264, 3065, 10), // "getMapData"
+QT_MOC_LITERAL(265, 3076, 10), // "getMapping"
+QT_MOC_LITERAL(266, 3087, 10), // "getMinimap"
+QT_MOC_LITERAL(267, 3098, 6), // "getMap"
+QT_MOC_LITERAL(268, 3105, 9), // "getRawMap"
+QT_MOC_LITERAL(269, 3115, 17), // "getPatrolFileName"
+QT_MOC_LITERAL(270, 3133, 10), // "makePatrol"
+QT_MOC_LITERAL(271, 3144, 14), // "loadPatrolFile"
+QT_MOC_LITERAL(272, 3159, 14), // "savePatrolFile"
+QT_MOC_LITERAL(273, 3174, 9), // "addPatrol"
+QT_MOC_LITERAL(274, 3184, 8), // "location"
+QT_MOC_LITERAL(275, 3193, 12), // "getPatrolNum"
+QT_MOC_LITERAL(276, 3206, 13), // "getPatrolType"
+QT_MOC_LITERAL(277, 3220, 17), // "getPatrolLocation"
+QT_MOC_LITERAL(278, 3238, 10), // "getPatrolX"
+QT_MOC_LITERAL(279, 3249, 10), // "getPatrolY"
+QT_MOC_LITERAL(280, 3260, 11), // "getPatrolTH"
+QT_MOC_LITERAL(281, 3272, 12), // "removePatrol"
+QT_MOC_LITERAL(282, 3285, 12), // "movePatrolUp"
+QT_MOC_LITERAL(283, 3298, 14), // "movePatrolDown"
+QT_MOC_LITERAL(284, 3313, 13), // "getPatrolMode"
+QT_MOC_LITERAL(285, 3327, 13), // "setPatrolMode"
+QT_MOC_LITERAL(286, 3341, 15), // "startRecordPath"
+QT_MOC_LITERAL(287, 3357, 12), // "startcurPath"
+QT_MOC_LITERAL(288, 3370, 11), // "stopcurPath"
+QT_MOC_LITERAL(289, 3382, 12), // "pausecurPath"
+QT_MOC_LITERAL(290, 3395, 15), // "runRotateTables"
+QT_MOC_LITERAL(291, 3411, 16), // "stopRotateTables"
+QT_MOC_LITERAL(292, 3428, 16), // "startServingTest"
+QT_MOC_LITERAL(293, 3445, 15) // "stopServingTest"
 
     },
     "Supervisor\0onTimer\0\0server_cmd_pause\0"
@@ -368,9 +371,10 @@ QT_MOC_LITERAL(290, 3410, 15) // "stopServingTest"
     "getInitPoseTH\0slam_setInit\0slam_run\0"
     "slam_stop\0slam_autoInit\0is_slam_running\0"
     "getMappingflag\0setMappingflag\0flag\0"
-    "getMappingImage\0getListMap\0pushMapData\0"
-    "data\0isconnectJoy\0getJoyAxis\0getJoyButton\0"
-    "getKeyboard\0getJoystick\0getCanvasSize\0"
+    "getMappingImage\0getListMap\0getRawListMap\0"
+    "pushMapData\0data\0isconnectJoy\0getJoyAxis\0"
+    "getJoyButton\0getKeyboard\0getJoystick\0"
+    "setRotateAngle\0angle\0getCanvasSize\0"
     "getRedoSize\0getLineX\0QVector<int>\0"
     "index\0getLineY\0getLineColor\0getLineWidth\0"
     "startLine\0color\0width\0setLine\0stopLine\0"
@@ -429,7 +433,7 @@ static const uint qt_meta_data_Supervisor[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-     249,   14, // methods
+     251,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -437,257 +441,259 @@ static const uint qt_meta_data_Supervisor[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0, 1259,    2, 0x0a /* Public */,
-       3,    0, 1260,    2, 0x0a /* Public */,
-       4,    0, 1261,    2, 0x0a /* Public */,
-       5,    0, 1262,    2, 0x0a /* Public */,
-       6,    0, 1263,    2, 0x0a /* Public */,
-       7,    0, 1264,    2, 0x0a /* Public */,
-       8,    0, 1265,    2, 0x0a /* Public */,
-       9,    0, 1266,    2, 0x0a /* Public */,
-      10,    0, 1267,    2, 0x0a /* Public */,
-      11,    0, 1268,    2, 0x0a /* Public */,
-      12,    0, 1269,    2, 0x0a /* Public */,
-      13,    0, 1270,    2, 0x0a /* Public */,
+       1,    0, 1269,    2, 0x0a /* Public */,
+       3,    0, 1270,    2, 0x0a /* Public */,
+       4,    0, 1271,    2, 0x0a /* Public */,
+       5,    0, 1272,    2, 0x0a /* Public */,
+       6,    0, 1273,    2, 0x0a /* Public */,
+       7,    0, 1274,    2, 0x0a /* Public */,
+       8,    0, 1275,    2, 0x0a /* Public */,
+       9,    0, 1276,    2, 0x0a /* Public */,
+      10,    0, 1277,    2, 0x0a /* Public */,
+      11,    0, 1278,    2, 0x0a /* Public */,
+      12,    0, 1279,    2, 0x0a /* Public */,
+      13,    0, 1280,    2, 0x0a /* Public */,
 
  // methods: name, argc, parameters, tag, flags
-      14,    0, 1271,    2, 0x02 /* Public */,
-      15,    0, 1272,    2, 0x02 /* Public */,
-      16,    1, 1273,    2, 0x02 /* Public */,
-      18,    1, 1276,    2, 0x02 /* Public */,
-      20,    1, 1279,    2, 0x02 /* Public */,
-      21,    1, 1282,    2, 0x02 /* Public */,
-      22,    1, 1285,    2, 0x02 /* Public */,
-      23,    0, 1288,    2, 0x02 /* Public */,
-      24,    2, 1289,    2, 0x02 /* Public */,
-      26,    1, 1294,    2, 0x02 /* Public */,
-      26,    0, 1297,    2, 0x22 /* Public | MethodCloned */,
-      28,    2, 1298,    2, 0x02 /* Public */,
-      30,    1, 1303,    2, 0x02 /* Public */,
-      32,    0, 1306,    2, 0x02 /* Public */,
-      33,    0, 1307,    2, 0x02 /* Public */,
-      34,    1, 1308,    2, 0x02 /* Public */,
-      36,    0, 1311,    2, 0x02 /* Public */,
-      37,    1, 1312,    2, 0x02 /* Public */,
-      39,    0, 1315,    2, 0x02 /* Public */,
-      40,    1, 1316,    2, 0x02 /* Public */,
-      42,    0, 1319,    2, 0x02 /* Public */,
-      43,    1, 1320,    2, 0x02 /* Public */,
-      45,    0, 1323,    2, 0x02 /* Public */,
-      46,    1, 1324,    2, 0x02 /* Public */,
-      48,    0, 1327,    2, 0x02 /* Public */,
-      49,    1, 1328,    2, 0x02 /* Public */,
-      50,    0, 1331,    2, 0x02 /* Public */,
-      51,    1, 1332,    2, 0x02 /* Public */,
-      52,    0, 1335,    2, 0x02 /* Public */,
-      53,    1, 1336,    2, 0x02 /* Public */,
-      54,    0, 1339,    2, 0x02 /* Public */,
-      55,    1, 1340,    2, 0x02 /* Public */,
-      57,    1, 1343,    2, 0x02 /* Public */,
-      58,    0, 1346,    2, 0x02 /* Public */,
-      59,    0, 1347,    2, 0x02 /* Public */,
-      60,    1, 1348,    2, 0x02 /* Public */,
-      62,    0, 1351,    2, 0x02 /* Public */,
-      63,    0, 1352,    2, 0x02 /* Public */,
-      64,    0, 1353,    2, 0x02 /* Public */,
-      65,    2, 1354,    2, 0x02 /* Public */,
-      68,    0, 1359,    2, 0x02 /* Public */,
-      69,    1, 1360,    2, 0x02 /* Public */,
-      71,    1, 1363,    2, 0x02 /* Public */,
-      72,    0, 1366,    2, 0x02 /* Public */,
-      73,    0, 1367,    2, 0x02 /* Public */,
-      74,    0, 1368,    2, 0x02 /* Public */,
-      75,    0, 1369,    2, 0x02 /* Public */,
-      76,    0, 1370,    2, 0x02 /* Public */,
-      77,    1, 1371,    2, 0x02 /* Public */,
-      78,    1, 1374,    2, 0x02 /* Public */,
-      77,    0, 1377,    2, 0x02 /* Public */,
-      79,    0, 1378,    2, 0x02 /* Public */,
-      80,    1, 1379,    2, 0x02 /* Public */,
-      81,    1, 1382,    2, 0x02 /* Public */,
-      82,    1, 1385,    2, 0x02 /* Public */,
-      83,    1, 1388,    2, 0x02 /* Public */,
-      84,    0, 1391,    2, 0x02 /* Public */,
-      85,    0, 1392,    2, 0x02 /* Public */,
-      86,    0, 1393,    2, 0x02 /* Public */,
-      87,    0, 1394,    2, 0x02 /* Public */,
-      88,    0, 1395,    2, 0x02 /* Public */,
-      89,    0, 1396,    2, 0x02 /* Public */,
-      90,    1, 1397,    2, 0x02 /* Public */,
-      91,    1, 1400,    2, 0x02 /* Public */,
-      93,    0, 1403,    2, 0x02 /* Public */,
-      94,    1, 1404,    2, 0x02 /* Public */,
-      96,    0, 1407,    2, 0x02 /* Public */,
-      97,    0, 1408,    2, 0x02 /* Public */,
-      98,    3, 1409,    2, 0x02 /* Public */,
-     102,    0, 1416,    2, 0x02 /* Public */,
-     103,    0, 1417,    2, 0x02 /* Public */,
-     104,    0, 1418,    2, 0x02 /* Public */,
-     105,    0, 1419,    2, 0x02 /* Public */,
-     106,    0, 1420,    2, 0x02 /* Public */,
-     107,    0, 1421,    2, 0x02 /* Public */,
-     108,    1, 1422,    2, 0x02 /* Public */,
-     109,    1, 1425,    2, 0x02 /* Public */,
-     110,    1, 1428,    2, 0x02 /* Public */,
-     112,    1, 1431,    2, 0x02 /* Public */,
-     113,    1, 1434,    2, 0x02 /* Public */,
-     115,    0, 1437,    2, 0x02 /* Public */,
-     116,    1, 1438,    2, 0x02 /* Public */,
-     117,    1, 1441,    2, 0x02 /* Public */,
-     118,    3, 1444,    2, 0x02 /* Public */,
-     122,    0, 1451,    2, 0x02 /* Public */,
-     123,    0, 1452,    2, 0x02 /* Public */,
-     124,    0, 1453,    2, 0x02 /* Public */,
-     125,    0, 1454,    2, 0x02 /* Public */,
-     126,    0, 1455,    2, 0x02 /* Public */,
-     127,    0, 1456,    2, 0x02 /* Public */,
-     128,    0, 1457,    2, 0x02 /* Public */,
-     129,    0, 1458,    2, 0x02 /* Public */,
-     130,    0, 1459,    2, 0x02 /* Public */,
-     131,    1, 1460,    2, 0x02 /* Public */,
-     133,    0, 1463,    2, 0x02 /* Public */,
-     134,    1, 1464,    2, 0x02 /* Public */,
-     135,    1, 1467,    2, 0x02 /* Public */,
-     137,    0, 1470,    2, 0x02 /* Public */,
-     138,    1, 1471,    2, 0x02 /* Public */,
-     139,    1, 1474,    2, 0x02 /* Public */,
-     140,    1, 1477,    2, 0x02 /* Public */,
-     141,    1, 1480,    2, 0x02 /* Public */,
-     142,    0, 1483,    2, 0x02 /* Public */,
-     143,    0, 1484,    2, 0x02 /* Public */,
-     144,    1, 1485,    2, 0x02 /* Public */,
-     147,    1, 1488,    2, 0x02 /* Public */,
-     148,    1, 1491,    2, 0x02 /* Public */,
-     149,    1, 1494,    2, 0x02 /* Public */,
-     150,    2, 1497,    2, 0x02 /* Public */,
-     153,    2, 1502,    2, 0x02 /* Public */,
-     154,    0, 1507,    2, 0x02 /* Public */,
-     155,    0, 1508,    2, 0x02 /* Public */,
-     156,    0, 1509,    2, 0x02 /* Public */,
-     157,    0, 1510,    2, 0x02 /* Public */,
-     158,    0, 1511,    2, 0x02 /* Public */,
-     159,    0, 1512,    2, 0x02 /* Public */,
-     160,    0, 1513,    2, 0x02 /* Public */,
-     161,    1, 1514,    2, 0x02 /* Public */,
-     163,    0, 1517,    2, 0x02 /* Public */,
-     164,    0, 1518,    2, 0x02 /* Public */,
-     165,    0, 1519,    2, 0x02 /* Public */,
-     166,    1, 1520,    2, 0x02 /* Public */,
-     167,    1, 1523,    2, 0x02 /* Public */,
-     168,    1, 1526,    2, 0x02 /* Public */,
-     169,    1, 1529,    2, 0x02 /* Public */,
-     170,    1, 1532,    2, 0x02 /* Public */,
-     171,    1, 1535,    2, 0x02 /* Public */,
-     172,    1, 1538,    2, 0x02 /* Public */,
-     173,    0, 1541,    2, 0x02 /* Public */,
-     174,    1, 1542,    2, 0x02 /* Public */,
-     175,    1, 1545,    2, 0x02 /* Public */,
-     176,    2, 1548,    2, 0x02 /* Public */,
-     178,    2, 1553,    2, 0x02 /* Public */,
-     179,    0, 1558,    2, 0x02 /* Public */,
-     180,    1, 1559,    2, 0x02 /* Public */,
-     181,    1, 1562,    2, 0x02 /* Public */,
-     182,    1, 1565,    2, 0x02 /* Public */,
-     182,    2, 1568,    2, 0x02 /* Public */,
-     183,    3, 1573,    2, 0x02 /* Public */,
-     185,    1, 1580,    2, 0x02 /* Public */,
-     185,    2, 1583,    2, 0x02 /* Public */,
-     186,    2, 1588,    2, 0x02 /* Public */,
-     187,    1, 1593,    2, 0x02 /* Public */,
-     188,    0, 1596,    2, 0x02 /* Public */,
-     189,    0, 1597,    2, 0x02 /* Public */,
-     190,    1, 1598,    2, 0x02 /* Public */,
-     191,    1, 1601,    2, 0x02 /* Public */,
-     192,    1, 1604,    2, 0x02 /* Public */,
-     193,    4, 1607,    2, 0x02 /* Public */,
-     194,    1, 1616,    2, 0x02 /* Public */,
-     195,    1, 1619,    2, 0x02 /* Public */,
-     196,    5, 1622,    2, 0x02 /* Public */,
-     197,    4, 1633,    2, 0x02 /* Public */,
-     199,    0, 1642,    2, 0x02 /* Public */,
-     199,    1, 1643,    2, 0x02 /* Public */,
-     200,    1, 1646,    2, 0x02 /* Public */,
-     201,    2, 1649,    2, 0x02 /* Public */,
-     202,    2, 1654,    2, 0x02 /* Public */,
-     203,    5, 1659,    2, 0x02 /* Public */,
-     208,    2, 1670,    2, 0x02 /* Public */,
-     210,    2, 1675,    2, 0x02 /* Public */,
-     211,    1, 1680,    2, 0x02 /* Public */,
-     212,    1, 1683,    2, 0x02 /* Public */,
-     213,    0, 1686,    2, 0x02 /* Public */,
-     214,    1, 1687,    2, 0x02 /* Public */,
-     216,    2, 1690,    2, 0x02 /* Public */,
-     217,    0, 1695,    2, 0x02 /* Public */,
-     218,    0, 1696,    2, 0x02 /* Public */,
-     219,    1, 1697,    2, 0x02 /* Public */,
-     219,    3, 1700,    2, 0x02 /* Public */,
-     221,    0, 1707,    2, 0x02 /* Public */,
-     222,    0, 1708,    2, 0x02 /* Public */,
-     223,    0, 1709,    2, 0x02 /* Public */,
-     224,    0, 1710,    2, 0x02 /* Public */,
-     225,    0, 1711,    2, 0x02 /* Public */,
-     226,    0, 1712,    2, 0x02 /* Public */,
-     227,    0, 1713,    2, 0x02 /* Public */,
-     228,    0, 1714,    2, 0x02 /* Public */,
-     229,    0, 1715,    2, 0x02 /* Public */,
-     231,    1, 1716,    2, 0x02 /* Public */,
-     232,    1, 1719,    2, 0x02 /* Public */,
-     234,    0, 1722,    2, 0x02 /* Public */,
-     235,    0, 1723,    2, 0x02 /* Public */,
-     236,    0, 1724,    2, 0x02 /* Public */,
-     237,    0, 1725,    2, 0x02 /* Public */,
-     238,    0, 1726,    2, 0x02 /* Public */,
-     239,    0, 1727,    2, 0x02 /* Public */,
-     240,    0, 1728,    2, 0x02 /* Public */,
-     241,    0, 1729,    2, 0x02 /* Public */,
-     242,    0, 1730,    2, 0x02 /* Public */,
-     243,    0, 1731,    2, 0x02 /* Public */,
-     244,    0, 1732,    2, 0x02 /* Public */,
-     245,    0, 1733,    2, 0x02 /* Public */,
-     246,    1, 1734,    2, 0x02 /* Public */,
-     247,    1, 1737,    2, 0x02 /* Public */,
-     248,    1, 1740,    2, 0x02 /* Public */,
-     249,    0, 1743,    2, 0x02 /* Public */,
-     250,    1, 1744,    2, 0x02 /* Public */,
-     251,    1, 1747,    2, 0x02 /* Public */,
-     252,    0, 1750,    2, 0x02 /* Public */,
-     253,    0, 1751,    2, 0x02 /* Public */,
-     254,    0, 1752,    2, 0x02 /* Public */,
-     255,    0, 1753,    2, 0x02 /* Public */,
-     256,    0, 1754,    2, 0x02 /* Public */,
-     257,    0, 1755,    2, 0x02 /* Public */,
-     258,    0, 1756,    2, 0x02 /* Public */,
-     259,    0, 1757,    2, 0x02 /* Public */,
-     260,    0, 1758,    2, 0x02 /* Public */,
-     261,    1, 1759,    2, 0x02 /* Public */,
-     262,    0, 1762,    2, 0x02 /* Public */,
-     263,    1, 1763,    2, 0x02 /* Public */,
-     264,    1, 1766,    2, 0x02 /* Public */,
-     265,    1, 1769,    2, 0x02 /* Public */,
-     266,    0, 1772,    2, 0x02 /* Public */,
-     267,    0, 1773,    2, 0x02 /* Public */,
-     268,    1, 1774,    2, 0x02 /* Public */,
-     269,    1, 1777,    2, 0x02 /* Public */,
-     270,    5, 1780,    2, 0x02 /* Public */,
-     272,    0, 1791,    2, 0x02 /* Public */,
-     273,    1, 1792,    2, 0x02 /* Public */,
-     274,    1, 1795,    2, 0x02 /* Public */,
-     275,    1, 1798,    2, 0x02 /* Public */,
-     276,    1, 1801,    2, 0x02 /* Public */,
-     277,    1, 1804,    2, 0x02 /* Public */,
-     278,    1, 1807,    2, 0x02 /* Public */,
-     279,    1, 1810,    2, 0x02 /* Public */,
-     280,    1, 1813,    2, 0x02 /* Public */,
-     281,    0, 1816,    2, 0x02 /* Public */,
-     282,    1, 1817,    2, 0x02 /* Public */,
-     283,    0, 1820,    2, 0x02 /* Public */,
-     284,    0, 1821,    2, 0x02 /* Public */,
-     285,    0, 1822,    2, 0x02 /* Public */,
-     286,    0, 1823,    2, 0x02 /* Public */,
-     287,    0, 1824,    2, 0x02 /* Public */,
-     288,    0, 1825,    2, 0x02 /* Public */,
-     289,    0, 1826,    2, 0x02 /* Public */,
-     290,    0, 1827,    2, 0x02 /* Public */,
+      14,    0, 1281,    2, 0x02 /* Public */,
+      15,    0, 1282,    2, 0x02 /* Public */,
+      16,    1, 1283,    2, 0x02 /* Public */,
+      18,    1, 1286,    2, 0x02 /* Public */,
+      20,    1, 1289,    2, 0x02 /* Public */,
+      21,    1, 1292,    2, 0x02 /* Public */,
+      22,    1, 1295,    2, 0x02 /* Public */,
+      23,    0, 1298,    2, 0x02 /* Public */,
+      24,    2, 1299,    2, 0x02 /* Public */,
+      26,    1, 1304,    2, 0x02 /* Public */,
+      26,    0, 1307,    2, 0x22 /* Public | MethodCloned */,
+      28,    2, 1308,    2, 0x02 /* Public */,
+      30,    1, 1313,    2, 0x02 /* Public */,
+      32,    0, 1316,    2, 0x02 /* Public */,
+      33,    0, 1317,    2, 0x02 /* Public */,
+      34,    1, 1318,    2, 0x02 /* Public */,
+      36,    0, 1321,    2, 0x02 /* Public */,
+      37,    1, 1322,    2, 0x02 /* Public */,
+      39,    0, 1325,    2, 0x02 /* Public */,
+      40,    1, 1326,    2, 0x02 /* Public */,
+      42,    0, 1329,    2, 0x02 /* Public */,
+      43,    1, 1330,    2, 0x02 /* Public */,
+      45,    0, 1333,    2, 0x02 /* Public */,
+      46,    1, 1334,    2, 0x02 /* Public */,
+      48,    0, 1337,    2, 0x02 /* Public */,
+      49,    1, 1338,    2, 0x02 /* Public */,
+      50,    0, 1341,    2, 0x02 /* Public */,
+      51,    1, 1342,    2, 0x02 /* Public */,
+      52,    0, 1345,    2, 0x02 /* Public */,
+      53,    1, 1346,    2, 0x02 /* Public */,
+      54,    0, 1349,    2, 0x02 /* Public */,
+      55,    1, 1350,    2, 0x02 /* Public */,
+      57,    1, 1353,    2, 0x02 /* Public */,
+      58,    0, 1356,    2, 0x02 /* Public */,
+      59,    0, 1357,    2, 0x02 /* Public */,
+      60,    1, 1358,    2, 0x02 /* Public */,
+      62,    0, 1361,    2, 0x02 /* Public */,
+      63,    0, 1362,    2, 0x02 /* Public */,
+      64,    0, 1363,    2, 0x02 /* Public */,
+      65,    2, 1364,    2, 0x02 /* Public */,
+      68,    0, 1369,    2, 0x02 /* Public */,
+      69,    1, 1370,    2, 0x02 /* Public */,
+      71,    1, 1373,    2, 0x02 /* Public */,
+      72,    0, 1376,    2, 0x02 /* Public */,
+      73,    0, 1377,    2, 0x02 /* Public */,
+      74,    0, 1378,    2, 0x02 /* Public */,
+      75,    0, 1379,    2, 0x02 /* Public */,
+      76,    0, 1380,    2, 0x02 /* Public */,
+      77,    1, 1381,    2, 0x02 /* Public */,
+      78,    1, 1384,    2, 0x02 /* Public */,
+      77,    0, 1387,    2, 0x02 /* Public */,
+      79,    0, 1388,    2, 0x02 /* Public */,
+      80,    1, 1389,    2, 0x02 /* Public */,
+      81,    1, 1392,    2, 0x02 /* Public */,
+      82,    1, 1395,    2, 0x02 /* Public */,
+      83,    1, 1398,    2, 0x02 /* Public */,
+      84,    0, 1401,    2, 0x02 /* Public */,
+      85,    0, 1402,    2, 0x02 /* Public */,
+      86,    0, 1403,    2, 0x02 /* Public */,
+      87,    0, 1404,    2, 0x02 /* Public */,
+      88,    0, 1405,    2, 0x02 /* Public */,
+      89,    0, 1406,    2, 0x02 /* Public */,
+      90,    1, 1407,    2, 0x02 /* Public */,
+      91,    1, 1410,    2, 0x02 /* Public */,
+      93,    0, 1413,    2, 0x02 /* Public */,
+      94,    1, 1414,    2, 0x02 /* Public */,
+      96,    0, 1417,    2, 0x02 /* Public */,
+      97,    0, 1418,    2, 0x02 /* Public */,
+      98,    3, 1419,    2, 0x02 /* Public */,
+     102,    0, 1426,    2, 0x02 /* Public */,
+     103,    0, 1427,    2, 0x02 /* Public */,
+     104,    0, 1428,    2, 0x02 /* Public */,
+     105,    0, 1429,    2, 0x02 /* Public */,
+     106,    0, 1430,    2, 0x02 /* Public */,
+     107,    0, 1431,    2, 0x02 /* Public */,
+     108,    1, 1432,    2, 0x02 /* Public */,
+     109,    1, 1435,    2, 0x02 /* Public */,
+     110,    1, 1438,    2, 0x02 /* Public */,
+     112,    1, 1441,    2, 0x02 /* Public */,
+     113,    1, 1444,    2, 0x02 /* Public */,
+     115,    0, 1447,    2, 0x02 /* Public */,
+     116,    1, 1448,    2, 0x02 /* Public */,
+     117,    1, 1451,    2, 0x02 /* Public */,
+     118,    3, 1454,    2, 0x02 /* Public */,
+     122,    0, 1461,    2, 0x02 /* Public */,
+     123,    0, 1462,    2, 0x02 /* Public */,
+     124,    0, 1463,    2, 0x02 /* Public */,
+     125,    0, 1464,    2, 0x02 /* Public */,
+     126,    0, 1465,    2, 0x02 /* Public */,
+     127,    0, 1466,    2, 0x02 /* Public */,
+     128,    0, 1467,    2, 0x02 /* Public */,
+     129,    0, 1468,    2, 0x02 /* Public */,
+     130,    0, 1469,    2, 0x02 /* Public */,
+     131,    1, 1470,    2, 0x02 /* Public */,
+     133,    0, 1473,    2, 0x02 /* Public */,
+     134,    1, 1474,    2, 0x02 /* Public */,
+     135,    1, 1477,    2, 0x02 /* Public */,
+     136,    1, 1480,    2, 0x02 /* Public */,
+     138,    0, 1483,    2, 0x02 /* Public */,
+     139,    1, 1484,    2, 0x02 /* Public */,
+     140,    1, 1487,    2, 0x02 /* Public */,
+     141,    1, 1490,    2, 0x02 /* Public */,
+     142,    1, 1493,    2, 0x02 /* Public */,
+     143,    1, 1496,    2, 0x02 /* Public */,
+     145,    0, 1499,    2, 0x02 /* Public */,
+     146,    0, 1500,    2, 0x02 /* Public */,
+     147,    1, 1501,    2, 0x02 /* Public */,
+     150,    1, 1504,    2, 0x02 /* Public */,
+     151,    1, 1507,    2, 0x02 /* Public */,
+     152,    1, 1510,    2, 0x02 /* Public */,
+     153,    2, 1513,    2, 0x02 /* Public */,
+     156,    2, 1518,    2, 0x02 /* Public */,
+     157,    0, 1523,    2, 0x02 /* Public */,
+     158,    0, 1524,    2, 0x02 /* Public */,
+     159,    0, 1525,    2, 0x02 /* Public */,
+     160,    0, 1526,    2, 0x02 /* Public */,
+     161,    0, 1527,    2, 0x02 /* Public */,
+     162,    0, 1528,    2, 0x02 /* Public */,
+     163,    0, 1529,    2, 0x02 /* Public */,
+     164,    1, 1530,    2, 0x02 /* Public */,
+     166,    0, 1533,    2, 0x02 /* Public */,
+     167,    0, 1534,    2, 0x02 /* Public */,
+     168,    0, 1535,    2, 0x02 /* Public */,
+     169,    1, 1536,    2, 0x02 /* Public */,
+     170,    1, 1539,    2, 0x02 /* Public */,
+     171,    1, 1542,    2, 0x02 /* Public */,
+     172,    1, 1545,    2, 0x02 /* Public */,
+     173,    1, 1548,    2, 0x02 /* Public */,
+     174,    1, 1551,    2, 0x02 /* Public */,
+     175,    1, 1554,    2, 0x02 /* Public */,
+     176,    0, 1557,    2, 0x02 /* Public */,
+     177,    1, 1558,    2, 0x02 /* Public */,
+     178,    1, 1561,    2, 0x02 /* Public */,
+     179,    2, 1564,    2, 0x02 /* Public */,
+     181,    2, 1569,    2, 0x02 /* Public */,
+     182,    0, 1574,    2, 0x02 /* Public */,
+     183,    1, 1575,    2, 0x02 /* Public */,
+     184,    1, 1578,    2, 0x02 /* Public */,
+     185,    1, 1581,    2, 0x02 /* Public */,
+     185,    2, 1584,    2, 0x02 /* Public */,
+     186,    3, 1589,    2, 0x02 /* Public */,
+     188,    1, 1596,    2, 0x02 /* Public */,
+     188,    2, 1599,    2, 0x02 /* Public */,
+     189,    2, 1604,    2, 0x02 /* Public */,
+     190,    1, 1609,    2, 0x02 /* Public */,
+     191,    0, 1612,    2, 0x02 /* Public */,
+     192,    0, 1613,    2, 0x02 /* Public */,
+     193,    1, 1614,    2, 0x02 /* Public */,
+     194,    1, 1617,    2, 0x02 /* Public */,
+     195,    1, 1620,    2, 0x02 /* Public */,
+     196,    4, 1623,    2, 0x02 /* Public */,
+     197,    1, 1632,    2, 0x02 /* Public */,
+     198,    1, 1635,    2, 0x02 /* Public */,
+     199,    5, 1638,    2, 0x02 /* Public */,
+     200,    4, 1649,    2, 0x02 /* Public */,
+     202,    0, 1658,    2, 0x02 /* Public */,
+     202,    1, 1659,    2, 0x02 /* Public */,
+     203,    1, 1662,    2, 0x02 /* Public */,
+     204,    2, 1665,    2, 0x02 /* Public */,
+     205,    2, 1670,    2, 0x02 /* Public */,
+     206,    5, 1675,    2, 0x02 /* Public */,
+     211,    2, 1686,    2, 0x02 /* Public */,
+     213,    2, 1691,    2, 0x02 /* Public */,
+     214,    1, 1696,    2, 0x02 /* Public */,
+     215,    1, 1699,    2, 0x02 /* Public */,
+     216,    0, 1702,    2, 0x02 /* Public */,
+     217,    1, 1703,    2, 0x02 /* Public */,
+     219,    2, 1706,    2, 0x02 /* Public */,
+     220,    0, 1711,    2, 0x02 /* Public */,
+     221,    0, 1712,    2, 0x02 /* Public */,
+     222,    1, 1713,    2, 0x02 /* Public */,
+     222,    3, 1716,    2, 0x02 /* Public */,
+     224,    0, 1723,    2, 0x02 /* Public */,
+     225,    0, 1724,    2, 0x02 /* Public */,
+     226,    0, 1725,    2, 0x02 /* Public */,
+     227,    0, 1726,    2, 0x02 /* Public */,
+     228,    0, 1727,    2, 0x02 /* Public */,
+     229,    0, 1728,    2, 0x02 /* Public */,
+     230,    0, 1729,    2, 0x02 /* Public */,
+     231,    0, 1730,    2, 0x02 /* Public */,
+     232,    0, 1731,    2, 0x02 /* Public */,
+     234,    1, 1732,    2, 0x02 /* Public */,
+     235,    1, 1735,    2, 0x02 /* Public */,
+     237,    0, 1738,    2, 0x02 /* Public */,
+     238,    0, 1739,    2, 0x02 /* Public */,
+     239,    0, 1740,    2, 0x02 /* Public */,
+     240,    0, 1741,    2, 0x02 /* Public */,
+     241,    0, 1742,    2, 0x02 /* Public */,
+     242,    0, 1743,    2, 0x02 /* Public */,
+     243,    0, 1744,    2, 0x02 /* Public */,
+     244,    0, 1745,    2, 0x02 /* Public */,
+     245,    0, 1746,    2, 0x02 /* Public */,
+     246,    0, 1747,    2, 0x02 /* Public */,
+     247,    0, 1748,    2, 0x02 /* Public */,
+     248,    0, 1749,    2, 0x02 /* Public */,
+     249,    1, 1750,    2, 0x02 /* Public */,
+     250,    1, 1753,    2, 0x02 /* Public */,
+     251,    1, 1756,    2, 0x02 /* Public */,
+     252,    0, 1759,    2, 0x02 /* Public */,
+     253,    1, 1760,    2, 0x02 /* Public */,
+     254,    1, 1763,    2, 0x02 /* Public */,
+     255,    0, 1766,    2, 0x02 /* Public */,
+     256,    0, 1767,    2, 0x02 /* Public */,
+     257,    0, 1768,    2, 0x02 /* Public */,
+     258,    0, 1769,    2, 0x02 /* Public */,
+     259,    0, 1770,    2, 0x02 /* Public */,
+     260,    0, 1771,    2, 0x02 /* Public */,
+     261,    0, 1772,    2, 0x02 /* Public */,
+     262,    0, 1773,    2, 0x02 /* Public */,
+     263,    0, 1774,    2, 0x02 /* Public */,
+     264,    1, 1775,    2, 0x02 /* Public */,
+     265,    0, 1778,    2, 0x02 /* Public */,
+     266,    1, 1779,    2, 0x02 /* Public */,
+     267,    1, 1782,    2, 0x02 /* Public */,
+     268,    1, 1785,    2, 0x02 /* Public */,
+     269,    0, 1788,    2, 0x02 /* Public */,
+     270,    0, 1789,    2, 0x02 /* Public */,
+     271,    1, 1790,    2, 0x02 /* Public */,
+     272,    1, 1793,    2, 0x02 /* Public */,
+     273,    5, 1796,    2, 0x02 /* Public */,
+     275,    0, 1807,    2, 0x02 /* Public */,
+     276,    1, 1808,    2, 0x02 /* Public */,
+     277,    1, 1811,    2, 0x02 /* Public */,
+     278,    1, 1814,    2, 0x02 /* Public */,
+     279,    1, 1817,    2, 0x02 /* Public */,
+     280,    1, 1820,    2, 0x02 /* Public */,
+     281,    1, 1823,    2, 0x02 /* Public */,
+     282,    1, 1826,    2, 0x02 /* Public */,
+     283,    1, 1829,    2, 0x02 /* Public */,
+     284,    0, 1832,    2, 0x02 /* Public */,
+     285,    1, 1833,    2, 0x02 /* Public */,
+     286,    0, 1836,    2, 0x02 /* Public */,
+     287,    0, 1837,    2, 0x02 /* Public */,
+     288,    0, 1838,    2, 0x02 /* Public */,
+     289,    0, 1839,    2, 0x02 /* Public */,
+     290,    0, 1840,    2, 0x02 /* Public */,
+     291,    0, 1841,    2, 0x02 /* Public */,
+     292,    0, 1842,    2, 0x02 /* Public */,
+     293,    0, 1843,    2, 0x02 /* Public */,
 
  // slots: parameters
     QMetaType::Void,
@@ -800,19 +806,21 @@ static const uint qt_meta_data_Supervisor[] = {
     QMetaType::Void, QMetaType::Bool,  132,
     QMetaType::QPixmap,
     0x80000000 | 70, QMetaType::QString,   92,
-    QMetaType::Void, 0x80000000 | 70,  136,
+    0x80000000 | 70, QMetaType::QString,   92,
+    QMetaType::Void, 0x80000000 | 70,  137,
     QMetaType::Bool,
     QMetaType::Float, QMetaType::Int,   38,
     QMetaType::Int, QMetaType::Int,   38,
     QMetaType::QString, QMetaType::Int,  101,
     QMetaType::QString, QMetaType::Int,  101,
+    QMetaType::Void, QMetaType::Float,  144,
     QMetaType::Int,
     QMetaType::Int,
-    0x80000000 | 145, QMetaType::Int,  146,
-    0x80000000 | 145, QMetaType::Int,  146,
-    QMetaType::QString, QMetaType::Int,  146,
-    QMetaType::Float, QMetaType::Int,  146,
-    QMetaType::Void, QMetaType::QString, QMetaType::Float,  151,  152,
+    0x80000000 | 148, QMetaType::Int,  149,
+    0x80000000 | 148, QMetaType::Int,  149,
+    QMetaType::QString, QMetaType::Int,  149,
+    QMetaType::Float, QMetaType::Int,  149,
+    QMetaType::Void, QMetaType::QString, QMetaType::Float,  154,  155,
     QMetaType::Void, QMetaType::Int, QMetaType::Int,  119,  120,
     QMetaType::Void,
     QMetaType::Void,
@@ -821,8 +829,8 @@ static const uint qt_meta_data_Supervisor[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,  162,
-    0x80000000 | 145,
+    QMetaType::Void, QMetaType::Int,  165,
+    0x80000000 | 148,
     QMetaType::Float,
     QMetaType::Int,
     QMetaType::Int, QMetaType::QString,   56,
@@ -835,14 +843,14 @@ static const uint qt_meta_data_Supervisor[] = {
     QMetaType::Int,
     QMetaType::QString, QMetaType::Int,   38,
     QMetaType::Int, QMetaType::Int,   38,
-    QMetaType::Float, QMetaType::Int, QMetaType::Int,   38,  177,
-    QMetaType::Float, QMetaType::Int, QMetaType::Int,   38,  177,
+    QMetaType::Float, QMetaType::Int, QMetaType::Int,   38,  180,
+    QMetaType::Float, QMetaType::Int, QMetaType::Int,   38,  180,
     QMetaType::Int,
     QMetaType::Float, QMetaType::Int,   38,
     QMetaType::Float, QMetaType::Int,   38,
     QMetaType::Int, QMetaType::QString,   19,
     QMetaType::Int, QMetaType::Int, QMetaType::Int,  119,  120,
-    QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,  184,  119,  120,
+    QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,  187,  119,  120,
     QMetaType::Int, QMetaType::QString,   19,
     QMetaType::Int, QMetaType::Int, QMetaType::Int,  119,  120,
     QMetaType::Void, QMetaType::Int, QMetaType::Int,  119,  120,
@@ -852,27 +860,27 @@ static const uint qt_meta_data_Supervisor[] = {
     QMetaType::Int, QMetaType::QString,   56,
     QMetaType::Void, QMetaType::QString,   56,
     QMetaType::Void, QMetaType::QString,   56,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   38,  177,  119,  120,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   38,  180,  119,  120,
     QMetaType::Void, QMetaType::Int,   38,
     QMetaType::Void, QMetaType::QString,   19,
     QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::Int, QMetaType::Int, QMetaType::Float,   56,   19,  119,  120,  121,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Float,  198,  119,  120,  121,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Float,  201,  119,  120,  121,
     QMetaType::Int,
     QMetaType::Int, QMetaType::Int,   38,
     QMetaType::QString, QMetaType::Int,   38,
-    QMetaType::Float, QMetaType::Int, QMetaType::Int,   38,  177,
-    QMetaType::Float, QMetaType::Int, QMetaType::Int,   38,  177,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   38,  204,  205,  206,  207,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int,   38,  209,
+    QMetaType::Float, QMetaType::Int, QMetaType::Int,   38,  180,
+    QMetaType::Float, QMetaType::Int, QMetaType::Int,   38,  180,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   38,  207,  208,  209,  210,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int,   38,  212,
     QMetaType::Int, QMetaType::Int, QMetaType::Int,  119,  120,
     QMetaType::Bool, QMetaType::QString,   92,
     QMetaType::Bool, QMetaType::QString,   92,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Bool,  215,
+    QMetaType::Void, QMetaType::Bool,  218,
     QMetaType::Void, QMetaType::Int, QMetaType::Int,   41,   44,
     QMetaType::Void,
-    0x80000000 | 145,
-    QMetaType::Void, QMetaType::QString,  220,
+    0x80000000 | 148,
+    QMetaType::Void, QMetaType::QString,  223,
     QMetaType::Void, QMetaType::Float, QMetaType::Float, QMetaType::Float,  119,  120,  121,
     QMetaType::Void,
     QMetaType::Void,
@@ -882,9 +890,9 @@ static const uint qt_meta_data_Supervisor[] = {
     QMetaType::Void,
     QMetaType::QString,
     QMetaType::QString,
-    0x80000000 | 230,
+    0x80000000 | 233,
     QMetaType::Void, QMetaType::Float,  119,
-    QMetaType::Void, QMetaType::Float,  233,
+    QMetaType::Void, QMetaType::Float,  236,
     QMetaType::Float,
     QMetaType::Float,
     QMetaType::Float,
@@ -911,7 +919,7 @@ static const uint qt_meta_data_Supervisor[] = {
     QMetaType::Int,
     QMetaType::Int,
     QMetaType::Float,
-    0x80000000 | 145,
+    0x80000000 | 148,
     0x80000000 | 70, QMetaType::QString,   92,
     QMetaType::QObjectStar,
     QMetaType::QObjectStar, QMetaType::QString,   92,
@@ -921,7 +929,7 @@ static const uint qt_meta_data_Supervisor[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,  111,
     QMetaType::Void, QMetaType::QString,  111,
-    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::Float, QMetaType::Float, QMetaType::Float,   56,  271,  119,  120,  121,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::Float, QMetaType::Float, QMetaType::Float,   56,  274,  119,  120,  121,
     QMetaType::Int,
     QMetaType::QString, QMetaType::Int,   38,
     QMetaType::QString, QMetaType::Int,   38,
@@ -1117,240 +1125,243 @@ void Supervisor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             if (_a[0]) *reinterpret_cast< QPixmap*>(_a[0]) = std::move(_r); }  break;
         case 107: { QList<int> _r = _t->getListMap((*reinterpret_cast< QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QList<int>*>(_a[0]) = std::move(_r); }  break;
-        case 108: _t->pushMapData((*reinterpret_cast< QList<int>(*)>(_a[1]))); break;
-        case 109: { bool _r = _t->isconnectJoy();
-            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 110: { float _r = _t->getJoyAxis((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 111: { int _r = _t->getJoyButton((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 112: { QString _r = _t->getKeyboard((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 113: { QString _r = _t->getJoystick((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 114: { int _r = _t->getCanvasSize();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 115: { int _r = _t->getRedoSize();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 116: { QVector<int> _r = _t->getLineX((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< QVector<int>*>(_a[0]) = std::move(_r); }  break;
-        case 117: { QVector<int> _r = _t->getLineY((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< QVector<int>*>(_a[0]) = std::move(_r); }  break;
-        case 118: { QString _r = _t->getLineColor((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 119: { float _r = _t->getLineWidth((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 120: _t->startLine((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< float(*)>(_a[2]))); break;
-        case 121: _t->setLine((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 122: _t->stopLine(); break;
-        case 123: _t->undo(); break;
-        case 124: _t->redo(); break;
-        case 125: _t->clear_all(); break;
-        case 126: _t->setObjPose(); break;
-        case 127: _t->setMarginObj(); break;
-        case 128: _t->clearMarginObj(); break;
-        case 129: _t->setMarginPoint((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 130: { QVector<int> _r = _t->getMarginObj();
-            if (_a[0]) *reinterpret_cast< QVector<int>*>(_a[0]) = std::move(_r); }  break;
-        case 131: { float _r = _t->getMargin();
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 132: { int _r = _t->getLocationNum();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 133: { int _r = _t->getLocationSize((*reinterpret_cast< QString(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 134: { QString _r = _t->getLocationName((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 135: { QString _r = _t->getLocationTypes((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 136: { float _r = _t->getLocationx((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 137: { float _r = _t->getLocationy((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 138: { float _r = _t->getLocationth((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 139: { float _r = _t->getLidar((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 140: { int _r = _t->getObjectNum();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 141: { QString _r = _t->getObjectName((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 142: { int _r = _t->getObjectPointSize((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 143: { float _r = _t->getObjectX((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 144: { float _r = _t->getObjectY((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 145: { int _r = _t->getTempObjectSize();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 146: { float _r = _t->getTempObjectX((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 147: { float _r = _t->getTempObjectY((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 148: { int _r = _t->getObjNum((*reinterpret_cast< QString(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 149: { int _r = _t->getObjNum((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 150: { int _r = _t->getObjPointNum((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])));
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 151: { int _r = _t->getLocNum((*reinterpret_cast< QString(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 152: { int _r = _t->getLocNum((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 153: _t->addObjectPoint((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 154: _t->removeObjectPoint((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 155: _t->removeObjectPointLast(); break;
-        case 156: _t->clearObjectPoints(); break;
-        case 157: { int _r = _t->getObjectSize((*reinterpret_cast< QString(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 158: _t->addObject((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 159: _t->addObjectRect((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 160: _t->editObject((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4]))); break;
-        case 161: _t->removeObject((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 162: _t->removeLocation((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 163: _t->addLocation((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< float(*)>(_a[5]))); break;
-        case 164: _t->moveLocationPoint((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< float(*)>(_a[4]))); break;
-        case 165: { int _r = _t->getTlineSize();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 166: { int _r = _t->getTlineSize((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 167: { QString _r = _t->getTlineName((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 168: { float _r = _t->getTlineX((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 169: { float _r = _t->getTlineY((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 170: _t->addTline((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
-        case 171: _t->removeTline((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 172: { int _r = _t->getTlineNum((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 173: { bool _r = _t->saveAnnotation((*reinterpret_cast< QString(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 174: { bool _r = _t->saveMetaData((*reinterpret_cast< QString(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 175: _t->sendMaptoServer(); break;
-        case 176: _t->acceptCall((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 177: _t->setTray((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 178: _t->confirmPickup(); break;
-        case 179: { QVector<int> _r = _t->getPickuptrays();
-            if (_a[0]) *reinterpret_cast< QVector<int>*>(_a[0]) = std::move(_r); }  break;
-        case 180: _t->moveTo((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 181: _t->moveTo((*reinterpret_cast< float(*)>(_a[1])),(*reinterpret_cast< float(*)>(_a[2])),(*reinterpret_cast< float(*)>(_a[3]))); break;
-        case 182: _t->movePause(); break;
-        case 183: _t->moveResume(); break;
-        case 184: _t->moveStop(); break;
-        case 185: _t->moveManual(); break;
-        case 186: _t->moveToCharge(); break;
-        case 187: _t->moveToWait(); break;
-        case 188: { QString _r = _t->getcurLoc();
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 189: { QString _r = _t->getcurTable();
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 190: { QVector<float> _r = _t->getcurTarget();
-            if (_a[0]) *reinterpret_cast< QVector<float>*>(_a[0]) = std::move(_r); }  break;
-        case 191: _t->joyMoveXY((*reinterpret_cast< float(*)>(_a[1]))); break;
-        case 192: _t->joyMoveR((*reinterpret_cast< float(*)>(_a[1]))); break;
-        case 193: { float _r = _t->getJoyXY();
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 194: { float _r = _t->getJoyR();
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 195: { float _r = _t->getBattery();
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 196: { int _r = _t->getState();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 197: { int _r = _t->getErrcode();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 198: { QString _r = _t->getRobotName();
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 199: { float _r = _t->getRobotRadius();
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 200: { float _r = _t->getRobotx();
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 201: { float _r = _t->getRoboty();
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 202: { float _r = _t->getRobotth();
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 203: { int _r = _t->getRobotState();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 204: { int _r = _t->getPathNum();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 205: { float _r = _t->getPathx((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 206: { float _r = _t->getPathy((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 207: { float _r = _t->getPathth((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 208: { int _r = _t->getLocalPathNum();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 209: { float _r = _t->getLocalPathx((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 210: { float _r = _t->getLocalPathy((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 211: { int _r = _t->getuistate();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 212: { QString _r = _t->getMapname();
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 213: { QString _r = _t->getMappath();
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 214: { QString _r = _t->getServerMapname();
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 215: { QString _r = _t->getServerMappath();
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 216: { int _r = _t->getMapWidth();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 217: { int _r = _t->getMapHeight();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 218: { float _r = _t->getGridWidth();
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 219: { QVector<int> _r = _t->getOrigin();
-            if (_a[0]) *reinterpret_cast< QVector<int>*>(_a[0]) = std::move(_r); }  break;
-        case 220: { QList<int> _r = _t->getMapData((*reinterpret_cast< QString(*)>(_a[1])));
+        case 108: { QList<int> _r = _t->getRawListMap((*reinterpret_cast< QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QList<int>*>(_a[0]) = std::move(_r); }  break;
-        case 221: { QObject* _r = _t->getMapping();
-            if (_a[0]) *reinterpret_cast< QObject**>(_a[0]) = std::move(_r); }  break;
-        case 222: { QObject* _r = _t->getMinimap((*reinterpret_cast< QString(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< QObject**>(_a[0]) = std::move(_r); }  break;
-        case 223: { QObject* _r = _t->getMap((*reinterpret_cast< QString(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< QObject**>(_a[0]) = std::move(_r); }  break;
-        case 224: { QObject* _r = _t->getRawMap((*reinterpret_cast< QString(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< QObject**>(_a[0]) = std::move(_r); }  break;
-        case 225: { QString _r = _t->getPatrolFileName();
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 226: _t->makePatrol(); break;
-        case 227: _t->loadPatrolFile((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 228: _t->savePatrolFile((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 229: _t->addPatrol((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< float(*)>(_a[3])),(*reinterpret_cast< float(*)>(_a[4])),(*reinterpret_cast< float(*)>(_a[5]))); break;
-        case 230: { int _r = _t->getPatrolNum();
+        case 109: _t->pushMapData((*reinterpret_cast< QList<int>(*)>(_a[1]))); break;
+        case 110: { bool _r = _t->isconnectJoy();
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 111: { float _r = _t->getJoyAxis((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 112: { int _r = _t->getJoyButton((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 231: { QString _r = _t->getPatrolType((*reinterpret_cast< int(*)>(_a[1])));
+        case 113: { QString _r = _t->getKeyboard((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 232: { QString _r = _t->getPatrolLocation((*reinterpret_cast< int(*)>(_a[1])));
+        case 114: { QString _r = _t->getJoystick((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 233: { float _r = _t->getPatrolX((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 234: { float _r = _t->getPatrolY((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 235: { float _r = _t->getPatrolTH((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 236: _t->removePatrol((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 237: _t->movePatrolUp((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 238: _t->movePatrolDown((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 239: { int _r = _t->getPatrolMode();
+        case 115: _t->setRotateAngle((*reinterpret_cast< float(*)>(_a[1]))); break;
+        case 116: { int _r = _t->getCanvasSize();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 240: _t->setPatrolMode((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 241: _t->startRecordPath(); break;
-        case 242: _t->startcurPath(); break;
-        case 243: _t->stopcurPath(); break;
-        case 244: _t->pausecurPath(); break;
-        case 245: _t->runRotateTables(); break;
-        case 246: _t->stopRotateTables(); break;
-        case 247: _t->startServingTest(); break;
-        case 248: _t->stopServingTest(); break;
+        case 117: { int _r = _t->getRedoSize();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 118: { QVector<int> _r = _t->getLineX((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QVector<int>*>(_a[0]) = std::move(_r); }  break;
+        case 119: { QVector<int> _r = _t->getLineY((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QVector<int>*>(_a[0]) = std::move(_r); }  break;
+        case 120: { QString _r = _t->getLineColor((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 121: { float _r = _t->getLineWidth((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 122: _t->startLine((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< float(*)>(_a[2]))); break;
+        case 123: _t->setLine((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 124: _t->stopLine(); break;
+        case 125: _t->undo(); break;
+        case 126: _t->redo(); break;
+        case 127: _t->clear_all(); break;
+        case 128: _t->setObjPose(); break;
+        case 129: _t->setMarginObj(); break;
+        case 130: _t->clearMarginObj(); break;
+        case 131: _t->setMarginPoint((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 132: { QVector<int> _r = _t->getMarginObj();
+            if (_a[0]) *reinterpret_cast< QVector<int>*>(_a[0]) = std::move(_r); }  break;
+        case 133: { float _r = _t->getMargin();
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 134: { int _r = _t->getLocationNum();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 135: { int _r = _t->getLocationSize((*reinterpret_cast< QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 136: { QString _r = _t->getLocationName((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 137: { QString _r = _t->getLocationTypes((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 138: { float _r = _t->getLocationx((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 139: { float _r = _t->getLocationy((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 140: { float _r = _t->getLocationth((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 141: { float _r = _t->getLidar((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 142: { int _r = _t->getObjectNum();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 143: { QString _r = _t->getObjectName((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 144: { int _r = _t->getObjectPointSize((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 145: { float _r = _t->getObjectX((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 146: { float _r = _t->getObjectY((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 147: { int _r = _t->getTempObjectSize();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 148: { float _r = _t->getTempObjectX((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 149: { float _r = _t->getTempObjectY((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 150: { int _r = _t->getObjNum((*reinterpret_cast< QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 151: { int _r = _t->getObjNum((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 152: { int _r = _t->getObjPointNum((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])));
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 153: { int _r = _t->getLocNum((*reinterpret_cast< QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 154: { int _r = _t->getLocNum((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 155: _t->addObjectPoint((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 156: _t->removeObjectPoint((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 157: _t->removeObjectPointLast(); break;
+        case 158: _t->clearObjectPoints(); break;
+        case 159: { int _r = _t->getObjectSize((*reinterpret_cast< QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 160: _t->addObject((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 161: _t->addObjectRect((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 162: _t->editObject((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4]))); break;
+        case 163: _t->removeObject((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 164: _t->removeLocation((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 165: _t->addLocation((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< float(*)>(_a[5]))); break;
+        case 166: _t->moveLocationPoint((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< float(*)>(_a[4]))); break;
+        case 167: { int _r = _t->getTlineSize();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 168: { int _r = _t->getTlineSize((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 169: { QString _r = _t->getTlineName((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 170: { float _r = _t->getTlineX((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 171: { float _r = _t->getTlineY((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 172: _t->addTline((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
+        case 173: _t->removeTline((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 174: { int _r = _t->getTlineNum((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 175: { bool _r = _t->saveAnnotation((*reinterpret_cast< QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 176: { bool _r = _t->saveMetaData((*reinterpret_cast< QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 177: _t->sendMaptoServer(); break;
+        case 178: _t->acceptCall((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 179: _t->setTray((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 180: _t->confirmPickup(); break;
+        case 181: { QVector<int> _r = _t->getPickuptrays();
+            if (_a[0]) *reinterpret_cast< QVector<int>*>(_a[0]) = std::move(_r); }  break;
+        case 182: _t->moveTo((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 183: _t->moveTo((*reinterpret_cast< float(*)>(_a[1])),(*reinterpret_cast< float(*)>(_a[2])),(*reinterpret_cast< float(*)>(_a[3]))); break;
+        case 184: _t->movePause(); break;
+        case 185: _t->moveResume(); break;
+        case 186: _t->moveStop(); break;
+        case 187: _t->moveManual(); break;
+        case 188: _t->moveToCharge(); break;
+        case 189: _t->moveToWait(); break;
+        case 190: { QString _r = _t->getcurLoc();
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 191: { QString _r = _t->getcurTable();
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 192: { QVector<float> _r = _t->getcurTarget();
+            if (_a[0]) *reinterpret_cast< QVector<float>*>(_a[0]) = std::move(_r); }  break;
+        case 193: _t->joyMoveXY((*reinterpret_cast< float(*)>(_a[1]))); break;
+        case 194: _t->joyMoveR((*reinterpret_cast< float(*)>(_a[1]))); break;
+        case 195: { float _r = _t->getJoyXY();
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 196: { float _r = _t->getJoyR();
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 197: { float _r = _t->getBattery();
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 198: { int _r = _t->getState();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 199: { int _r = _t->getErrcode();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 200: { QString _r = _t->getRobotName();
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 201: { float _r = _t->getRobotRadius();
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 202: { float _r = _t->getRobotx();
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 203: { float _r = _t->getRoboty();
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 204: { float _r = _t->getRobotth();
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 205: { int _r = _t->getRobotState();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 206: { int _r = _t->getPathNum();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 207: { float _r = _t->getPathx((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 208: { float _r = _t->getPathy((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 209: { float _r = _t->getPathth((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 210: { int _r = _t->getLocalPathNum();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 211: { float _r = _t->getLocalPathx((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 212: { float _r = _t->getLocalPathy((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 213: { int _r = _t->getuistate();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 214: { QString _r = _t->getMapname();
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 215: { QString _r = _t->getMappath();
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 216: { QString _r = _t->getServerMapname();
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 217: { QString _r = _t->getServerMappath();
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 218: { int _r = _t->getMapWidth();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 219: { int _r = _t->getMapHeight();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 220: { float _r = _t->getGridWidth();
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 221: { QVector<int> _r = _t->getOrigin();
+            if (_a[0]) *reinterpret_cast< QVector<int>*>(_a[0]) = std::move(_r); }  break;
+        case 222: { QList<int> _r = _t->getMapData((*reinterpret_cast< QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QList<int>*>(_a[0]) = std::move(_r); }  break;
+        case 223: { QObject* _r = _t->getMapping();
+            if (_a[0]) *reinterpret_cast< QObject**>(_a[0]) = std::move(_r); }  break;
+        case 224: { QObject* _r = _t->getMinimap((*reinterpret_cast< QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QObject**>(_a[0]) = std::move(_r); }  break;
+        case 225: { QObject* _r = _t->getMap((*reinterpret_cast< QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QObject**>(_a[0]) = std::move(_r); }  break;
+        case 226: { QObject* _r = _t->getRawMap((*reinterpret_cast< QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QObject**>(_a[0]) = std::move(_r); }  break;
+        case 227: { QString _r = _t->getPatrolFileName();
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 228: _t->makePatrol(); break;
+        case 229: _t->loadPatrolFile((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 230: _t->savePatrolFile((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 231: _t->addPatrol((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< float(*)>(_a[3])),(*reinterpret_cast< float(*)>(_a[4])),(*reinterpret_cast< float(*)>(_a[5]))); break;
+        case 232: { int _r = _t->getPatrolNum();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 233: { QString _r = _t->getPatrolType((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 234: { QString _r = _t->getPatrolLocation((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 235: { float _r = _t->getPatrolX((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 236: { float _r = _t->getPatrolY((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 237: { float _r = _t->getPatrolTH((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
+        case 238: _t->removePatrol((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 239: _t->movePatrolUp((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 240: _t->movePatrolDown((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 241: { int _r = _t->getPatrolMode();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 242: _t->setPatrolMode((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 243: _t->startRecordPath(); break;
+        case 244: _t->startcurPath(); break;
+        case 245: _t->stopcurPath(); break;
+        case 246: _t->pausecurPath(); break;
+        case 247: _t->runRotateTables(); break;
+        case 248: _t->stopRotateTables(); break;
+        case 249: _t->startServingTest(); break;
+        case 250: _t->stopServingTest(); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
         switch (_id) {
         default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-        case 108:
+        case 109:
             switch (*reinterpret_cast<int*>(_a[1])) {
             default: *reinterpret_cast<int*>(_a[0]) = -1; break;
             case 0:
@@ -1390,13 +1401,13 @@ int Supervisor::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 249)
+        if (_id < 251)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 249;
+        _id -= 251;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 249)
+        if (_id < 251)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 249;
+        _id -= 251;
     }
     return _id;
 }
