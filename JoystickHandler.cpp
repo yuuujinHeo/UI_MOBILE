@@ -49,12 +49,10 @@ int JoystickHandler::ConnectJoy(const QString _devName){
     for(int i=0; i<12; i++){
         JoyButton[i] = 0;
     }
-
     devName = _devName;
     if((fdJoy = open(devName.toStdString().c_str(), O_RDONLY)) == -1){
         connection = false;
     }else if(!connection){
-
         int version;
         ioctl(fdJoy, JSIOCGVERSION, &version);
         ioctl(fdJoy, JSIOCGAXES, &numAxis);
@@ -122,11 +120,11 @@ void JoystickHandler::updatejoy(){
     }else{
         init_count = 0;
         if(connect_count%100 == 0){
-            ConnectJoy("/dev/input/js0");
+//            ConnectJoy("/dev/input/js0");
         }
     }
 
     if(connect_count++%100 == 0){
-        CheckJoy();
+//        CheckJoy();
     }
 }

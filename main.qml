@@ -237,6 +237,7 @@ Window {
     Audio{
         id: voice_movewait
         autoPlay: false
+
         source: "bgm/voice_move_wait.mpga"
     }
     Audio{
