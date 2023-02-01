@@ -100,6 +100,7 @@ Item {
         }
         Keys.onPressed: {
             if(!event.isAutoRepeat){
+                print(event.key);
                 if(event.key === Qt.Key_Up){
                     loader_menu.item.setKeyUp(true);
                 }
