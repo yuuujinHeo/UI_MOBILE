@@ -125,6 +125,8 @@ QString Supervisor::getIniPath(){
 
 ////*********************************************  SETTING 관련   ***************************************************////
 void Supervisor::git_pull_success(){
+    setSetting("ROBOT_SW/version_msg",probot->program_message);
+    setSetting("ROBOT_SW/version_date",probot->program_date);
     setSetting("ROBOT_SW/version",probot->program_version);
 }
 bool Supervisor::isNewVersion(){
@@ -146,10 +148,31 @@ QString Supervisor::getServerVersion(){
         return "";
     }
 }
+QString Supervisor::getLocalVersionDate(){
+    return probot->program_date;
+}
+QString Supervisor::getServerVersionDate(){
+    if(probot->gitList.size() > 0){
+        return probot->gitList[0].date;
+    }else{
+        return "";
+    }
+}
+QString Supervisor::getLocalVersionMessage(){
+    return probot->program_message;
+}
+QString Supervisor::getServerVersionMessage(){
+    if(probot->gitList.size() > 0){
+        return probot->gitList[0].message;
+    }else{
+        return "";
+    }
+}
 void Supervisor::pullGit(){
     git->pullGit();
 
 }
+
 void Supervisor::setSetting(QString name, QString value){
     QString ini_path = getIniPath();
     QSettings setting(ini_path, QSettings::IniFormat);
@@ -181,6 +204,8 @@ void Supervisor::readSetting(QString map_name){
 
     setting_robot.beginGroup("ROBOT_SW");
     probot->program_version = setting_robot.value("version").toString();
+    probot->program_message = setting_robot.value("version_msg").toString();
+    probot->program_date = setting_robot.value("version_date").toString();
     probot->velocity = setting_robot.value("velocity").toFloat();
     setting.useVoice = setting_robot.value("use_voice").toBool();
     setting.useBGM = setting_robot.value("use_bgm").toBool();
@@ -700,9 +725,14 @@ void Supervisor::makeRobotINI(){
     setSetting("ROBOT_HW/radius","0.27");
     setSetting("ROBOT_HW/tray_num","3");
     setSetting("ROBOT_HW/type","SERVING");
+    setSetting("ROBOT_SW/version","");
+    setSetting("ROBOT_SW/version_msg","");
+    setSetting("ROBOT_SW/version_date","");
     setSetting("ROBOT_SW/use_bgm","true");
     setSetting("ROBOT_SW/use_voice","true");
     setSetting("ROBOT_SW/velocity","1.0");
+    setSetting("ROBOT_SW/volume_bgm","50");
+    setSetting("ROBOT_SW/volume_voice","50");
     setSetting("ROBOT_SW/use_uicmd","true");
     setSetting("ROBOT_SW/k_curve","0.7");
     setSetting("ROBOT_SW/k_v","0.7");
@@ -912,6 +942,10 @@ QList<int> Supervisor::getListMap(QString filename){
     cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
     cv::flip(map,map,0);
     cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
+    cv::warpAffine(map,map,rot,map.size());
+
     uchar* map_data = map.data;
     QList<int> list;
 

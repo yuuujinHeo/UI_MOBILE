@@ -1,4 +1,4 @@
-QT += core gui quick widgets network websockets sql quickcontrols2
+QT += core gui quick widgets network websockets sql quickcontrols2 multimedia
 
 CONFIG += c++11 qtquickcompiler
 
@@ -23,6 +23,7 @@ SOURCES += \
     LCMHandler.cpp \
     MapView.cpp \
     ServerHandler.cpp \
+    SoundHandler.cpp \
     cv_to_qt.cpp \
     Logger.cpp \
     Supervisor.cpp \
@@ -55,6 +56,7 @@ HEADERS += \
     Logger.h \
     MapView.h \
     ServerHandler.h \
+    SoundHandler.h \
     cv_to_qt.h \
     Supervisor.h\
     websocket/QtHttpServer.h \

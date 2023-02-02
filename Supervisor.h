@@ -116,6 +116,10 @@ public:
     Q_INVOKABLE bool isNewVersion();
     Q_INVOKABLE QString getLocalVersion();
     Q_INVOKABLE QString getServerVersion();
+    Q_INVOKABLE QString getLocalVersionDate();
+    Q_INVOKABLE QString getServerVersionDate();
+    Q_INVOKABLE QString getLocalVersionMessage();
+    Q_INVOKABLE QString getServerVersionMessage();
 
     ////*********************************************  INIT PAGE 관련   ***************************************************////
     Q_INVOKABLE bool isConnectServer();

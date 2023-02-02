@@ -122,9 +122,7 @@ Item {
 
     function rotate_annotation(){
         rotateMap = true;
-//        supervisor.clear
         canvas_map.rotation = 0;
-        print("rotate_anno");
         canvas_map.requestPaint();
     }
 
@@ -176,14 +174,7 @@ Item {
     }
 
     onRotate_angleChanged: {
-//        rotateMap = true;
-//        refreshMap = false;
         canvas_map.rotation = rotate_angle;
-        print(canvas_map.rotation);
-//        var ctx = canvas_map.getContext('2d');
-//        ctx.rotate(rotate_angle);
-//        canvas_map.requestPaint();
-//        canvas_map.rotation = rotate_angle;
     }
 
     Behavior on robot_x{
@@ -240,6 +231,9 @@ Item {
 
     function update_mapping(){
         mapview.setMap(supervisor.getMapping())
+    }
+    function update_map(){
+        mapview.setMap(supervisor.getMap(map_name));
     }
 
     //////========================================================================================Main Canvas
@@ -303,7 +297,6 @@ Item {
             id: canvas_map
             width: map_width
             height: map_height
-            antialiasing: true
             x: mapview.x
             y: mapview.y
             scale: mapview.scale
@@ -334,14 +327,13 @@ Item {
                                 draw_canvas_lines();
                             }
                         }
+
                         if(rotateMap){
                             rotateMap = false;
                             //캔버스 초기화
                             print("rotate map drawing");
                             ctx.clearRect(0,0,map_width,map_height);
                             draw_canvas_map();
-//                            ctx.clearRect(0,0,map_width,map_height);
-//                            draw_canvas_map();
                         }
 
                         // 새로 그려지는 line
@@ -372,7 +364,6 @@ Item {
             id: canvas_map_margin
             width: map_width
             height: map_height
-            antialiasing: true
             x: mapview.x
             y: mapview.y
             scale: mapview.scale
@@ -1124,7 +1115,14 @@ Item {
     function draw_canvas_map(){
         print("draw canvas map")
         var ctx = canvas_map.getContext('2d');
-        var map_data = supervisor.getRawListMap(map_name);
+        if(use_rawmap){
+            print("mappingmode");
+            var map_data = supervisor.getRawListMap(map_name);
+        }else{
+            print("none mappingmode");
+            var map_data = supervisor.getListMap(map_name);
+        }
+
         var temp_image = ctx.createImageData(map_width,map_height);
         print(map_data.length);
         for(var i=0; i<map_data.length; i++){

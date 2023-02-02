@@ -1973,8 +1973,8 @@ Item {
                             anchors.rightMargin: 30
                             width: 170
                             height: 18
-                            from: -360
-                            to : 360
+                            from: -180
+                            to : 180
                             property var angle_init: 0
                             onValueChanged: {
                                 map.rotate_angle = value - angle_init;
@@ -3653,6 +3653,10 @@ Item {
                                 }else{
                                     map_mode = 0;
                                 }
+                                
+                                //맵 다시 불러오기
+                                map_current.update_map();
+                                map_current.update_canvas_all();
                             }
                         }
                     }
@@ -4139,7 +4143,6 @@ Item {
 //                                    supervisor.rotate_map("map_temp.png",textfield_name22.text, 2);
 
                                     //맵 새로 불러오기.
-                                    print("?????????????????????");
                                     supervisor.setMap(textfield_name22.text);
                                     map.init_mode();
                                     map.use_rawmap = true;
@@ -4148,6 +4151,7 @@ Item {
                                     supervisor.clear_all();
                                     map.state_annotation = "DRAWING";
                                     map.refreshMap = true;
+                                    map.use_rawmap = true;
                                     map.update_canvas_all();
                                     loader_menu.sourceComponent = menu_annot_draw;
                                     popup_save_mapping.close();

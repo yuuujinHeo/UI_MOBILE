@@ -42,6 +42,7 @@ Item {
     Audio{
         id: playMusic
         autoPlay: false
+        volume: Number(supervisor.getSetting("ROBOT_SW","volume_bgm"))/100
         source: "bgm/song.mp3"
         loops: 99
     }
