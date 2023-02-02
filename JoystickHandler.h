@@ -25,8 +25,8 @@ public:
     JoystickHandler();
     ~JoystickHandler();
 
-    int		ConnectJoy(const QString _devName = "/dev/input/js0");
-    int     CheckJoy();
+    void    ConnectJoy(const QString _devName = "/dev/input/js0");
+    void    CheckJoy();
     int     DisconnectJoy();
 
     int*    GetAxis()               {return JoyAxis;}
