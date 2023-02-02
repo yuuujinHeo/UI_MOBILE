@@ -116,7 +116,7 @@ void HTTPHandler::updateGitArray(){
     }
 
     for(int i=0; i<probot->gitList.size(); i++){
-        qDebug() << probot->gitList[i].commit;
+        qDebug() << probot->gitList[i].commit << probot->gitList[i].date << probot->gitList[i].message;
     }
 
 }
@@ -124,6 +124,8 @@ void HTTPHandler::processPullError(){
     QString error = QString(process->readAllStandardError());
     plog->write("[GIT] Program Update Failed : "+error);
     probot->program_version = probot->gitList[0].commit;
+    probot->program_date = probot->gitList[0].date;
+    probot->program_message = probot->gitList[0].message;
     resetGit();
 }
 
@@ -142,6 +144,8 @@ void HTTPHandler::processPullOutput(){
     QString output = QString(process->readAllStandardOutput());
     plog->write("[GIT] Program Update Success : "+output);
     probot->program_version = probot->gitList[0].commit;
+    probot->program_date = probot->gitList[0].date;
+    probot->program_message = probot->gitList[0].message;
     emit pullSuccess();
 }
 void HTTPHandler::processLogOutput(){

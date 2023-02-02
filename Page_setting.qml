@@ -1,8 +1,10 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
+import QtGraphicalEffects 1.0
 import "."
 import io.qt.Supervisor 1.0
 
+import QtMultimedia 5.12
 Item {
     id: page_setting
     objectName: "page_setting"
@@ -324,6 +326,159 @@ Item {
                                 }
                             }
 
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"음악 볼륨"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 20
+                                anchors.centerIn: parent
+                                Slider{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    id: slider_volume_bgm
+//                                    anchors.centerIn: parent
+                                    width: parent.width*0.8
+                                    height: 40
+                                    from: 0
+                                    to: 100
+                                    value: supervisor.getSetting("ROBOT_SW","volume_bgm")
+                                }
+                                Rectangle{
+                                    width: 30
+                                    height: width
+                                    color: "black"
+                                    Image{
+                                        id: ttet
+                                        source: "icon/keyboard_right.png"
+                                        width: 20
+                                        height: 20
+                                        anchors.centerIn: parent
+                                    }
+                                    ColorOverlay{
+                                        source: ttet
+                                        anchors.fill: ttet
+                                        color: "white"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            if(bgm_test.isplaying){
+                                                bgm_test.stop();
+                                            }else{
+                                                bgm_test.play();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Audio{
+                    id: voice_test
+                    autoPlay: false
+                    volume: slider_volume_voice.value/100
+                    source: "bgm/voice_start_serving1.mp3"
+                }
+                Audio{
+                    id: bgm_test
+                    property bool isplaying: false
+                    autoPlay: false
+                    volume: slider_volume_bgm.value/100
+                    source: "bgm/song.mp3"
+                    onPlaying: {
+                        isplaying = true;
+                    }
+                    onStopped: {
+                        isplaying = false;
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"음성 볼륨"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 20
+                                anchors.centerIn: parent
+                                Slider{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    id: slider_volume_voice
+                                    width: parent.width*0.8
+                                    height: 40
+                                    from: 0
+                                    to: 100
+                                    value: supervisor.getSetting("ROBOT_SW","volume_voice")
+                                }
+                                Rectangle{
+                                    width: 30
+                                    height: width
+                                    color: "black"
+                                    Image{
+                                        id: ttet1
+                                        source: "icon/keyboard_right.png"
+                                        width: 20
+                                        height: 20
+                                        anchors.centerIn: parent
+                                    }
+                                    ColorOverlay{
+                                        source: ttet1
+                                        anchors.fill: ttet1
+                                        color: "white"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            voice_test.play();
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -2152,6 +2307,9 @@ Item {
                         supervisor.setSetting("ROBOT_SW/look_ahead_dist",text_look_ahead_dist.text);
 
 
+                        supervisor.setSetting("ROBOT_SW/volume_bgm",slider_volume_bgm.value.toFixed(0));
+                        supervisor.setSetting("ROBOT_SW/volume_voice",slider_volume_voice.value.toFixed(0));
+
                         if(combo_use_voice.currentIndex == 0)
                             supervisor.setSetting("ROBOT_SW/use_voice","false");
                         else
@@ -2357,13 +2515,13 @@ Item {
                 //버전이 이미 최신임
                 rect_lastest.visible = true;
                 rect_need_update.visible = false;
-                text_version.text = supervisor.getLocalVersion()
+                text_version.text = supervisor.getLocalVersionDate()
             }else{
                 //새로운 버전 확인됨
                 rect_lastest.visible = false;
                 rect_need_update.visible = true;
-                text_version1.text = "현재 : " + supervisor.getLocalVersion()
-                text_version2.text = "최신 : " + supervisor.getServerVersion()
+                text_version1.text = "현재 : " + supervisor.getLocalVersionDate()
+                text_version2.text = "최신 : " + supervisor.getServerVersionDate()
             }
         }
 

@@ -133,6 +133,8 @@ typedef struct{
 
 
     QString program_version;
+    QString program_date;
+    QString program_message;
     QVector<ST_GIT> gitList;
 
 
@@ -157,6 +159,9 @@ typedef struct{
     int travelline;
     int table_num;
     int table_col_num;
+
+    int volumeBGM;
+    int volumeVoice;
 
     bool useVoice;
     bool useBGM;

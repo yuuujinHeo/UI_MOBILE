@@ -237,21 +237,25 @@ Window {
     Audio{
         id: voice_movewait
         autoPlay: false
+        volume: Number(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_move_wait.mpga"
     }
     Audio{
         id: voice_movecharge
         autoPlay: false
+        volume: Number(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_move_charge.mp3"
     }
     Audio{
         id: voice_serving
         autoPlay: false
+        volume: Number(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_start_serving1.mp3"
     }
     Audio{
         id: voice_avoid
         autoPlay: false
+        volume: Number(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_avoid.mp3"
     }
 
