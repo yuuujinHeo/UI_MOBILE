@@ -605,6 +605,7 @@ Item {
                     anchors.rightMargin: 50
                     width: 200
                     height: 40
+                    currentIndex: 1
                     model:["3cm","5cm"]
                 }
             }
