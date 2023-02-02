@@ -330,7 +330,7 @@ Item {
 
                 Item_keyboard{
                     id: keyboard
-                    focus: true
+                    //focus: true
                     btn_size: 65
                     btn_dist: 2
                     anchors.top: fnke.bottom

@@ -100,7 +100,6 @@ Item {
         }
         Keys.onPressed: {
             if(!event.isAutoRepeat){
-                print(event.key);
                 if(event.key === Qt.Key_Up){
                     loader_menu.item.setKeyUp(true);
                 }
@@ -512,20 +511,76 @@ Item {
                     joy_th.remote_input(value1,value2);
                 }
             }
+
+
+            property var count_u : 0
+            property var count_d : 0
+            property var count_l : 0
+            property var count_r : 0
+            property var prev_u : 0
+            property var prev_d : 0
+            property var prev_l : 0
+            property var prev_r : 0
+
+
             function setKeyUp(pressed){
-                keyboard.pressed_up = pressed;
+                if(pressed){
+                    keyboard.pressed_up = pressed;
+                    count_u = 0;
+                }else{
+                    count_u++;
+                }
+
             }
             function setKeyDown(pressed){
-                keyboard.pressed_down = pressed;
+                if(pressed){
+                    keyboard.pressed_down= pressed;
+                    count_d = 0;
+                }else{
+                    count_d++;
+                }
             }
             function setKeyLeft(pressed){
-                keyboard.clear();
-                keyboard.pressed_left = pressed;
+                if(pressed){
+                    keyboard.pressed_left = pressed;
+                    count_l = 0;
+                }else{
+                    count_l++;
+                }
             }
             function setKeyRight(pressed){
-                keyboard.clear();
-                keyboard.pressed_right = pressed;
+                if(pressed){
+                    keyboard.pressed_right = pressed;
+                    count_r = 0;
+                }else{
+                    count_r++;
+                }
             }
+            Timer{
+                id: timer_check_keyboard
+                running: true
+                repeat: true
+                interval: 200
+                onTriggered: {
+                    if(prev_u == count_u && count_u > 0){
+                        keyboard.pressed_up = false;
+                    }
+                    if(prev_d == count_d && count_d > 0){
+                        keyboard.pressed_down = false;
+                    }
+                    if(prev_r == count_r && count_r > 0){
+                        keyboard.pressed_right = false;
+                    }
+                    if(prev_l == count_l && count_l > 0){
+                        keyboard.pressed_left = false;
+                    }
+                    prev_u = count_u;
+                    prev_d = count_d;
+                    prev_r = count_r;
+                    prev_l = count_l;
+                }
+            }
+
             function getKeyUp(){
                 return keyboard.pressed_up
             }

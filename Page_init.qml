@@ -890,7 +890,7 @@ Item {
                 clip: true
                 model: ListModel{}
                 delegate: usbCompo
-                focus: true
+                //focus: true
             }
             Row{
                 spacing: 50
