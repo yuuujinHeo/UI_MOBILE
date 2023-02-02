@@ -31,7 +31,7 @@ JoystickHandler::~JoystickHandler(){
     close(fdJoy);
 }
 
-int JoystickHandler::CheckJoy(){
+void JoystickHandler::CheckJoy(){
     if(connection){
         struct stat buf;
         if(stat(devName.toStdString().c_str(),&buf) == -1){
@@ -42,7 +42,7 @@ int JoystickHandler::CheckJoy(){
     }
 }
 
-int JoystickHandler::ConnectJoy(const QString _devName){
+void JoystickHandler::ConnectJoy(const QString _devName){
     for(int i=0; i<8; i++){
         JoyAxis[i] = 0;
     }
@@ -120,11 +120,11 @@ void JoystickHandler::updatejoy(){
     }else{
         init_count = 0;
         if(connect_count%100 == 0){
-//            ConnectJoy("/dev/input/js0");
+            ConnectJoy("/dev/input/js0");
         }
     }
 
     if(connect_count++%100 == 0){
-//        CheckJoy();
+        CheckJoy();
     }
 }
