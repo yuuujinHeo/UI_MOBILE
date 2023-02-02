@@ -352,28 +352,59 @@ Item {
                             color: "#d0d0d0"
                         }
                         Rectangle{
+                            id: tt
                             width: parent.width - 351
                             height: parent.height
                             Row{
                                 spacing: 20
                                 anchors.centerIn: parent
+                                Rectangle{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: 30
+                                    height: width
+                                    color: "black"
+                                    Image{
+                                        id: ttet1
+                                        source: "icon/icon_remove.png"
+                                        width: 20
+                                        height: 20
+                                        anchors.centerIn: parent
+                                    }
+                                    ColorOverlay{
+                                        source: ttet1
+                                        anchors.fill: ttet1
+                                        color: "white"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            if(slider_volume_bgm.value == 0){
+                                                slider_volume_bgm.value  = Number(supervisor.getSetting("ROBOT_SW","volume_bgm"));
+                                            }else{
+                                                slider_volume_bgm.value  = 0;
+                                            }
+
+                                        }
+                                    }
+                                }
                                 Slider{
                                     anchors.verticalCenter: parent.verticalCenter
                                     id: slider_volume_bgm
 //                                    anchors.centerIn: parent
-                                    width: parent.width*0.8
+                                    width: tt.width*0.8
                                     height: 40
                                     from: 0
                                     to: 100
                                     value: supervisor.getSetting("ROBOT_SW","volume_bgm")
                                 }
                                 Rectangle{
+                                    anchors.verticalCenter: parent.verticalCenter
                                     width: 30
                                     height: width
                                     color: "black"
                                     Image{
                                         id: ttet
-                                        source: "icon/keyboard_right.png"
+                                        source: "icon/play_r.png"
                                         width: 20
                                         height: 20
                                         anchors.centerIn: parent
@@ -388,8 +419,10 @@ Item {
                                         onClicked: {
                                             if(bgm_test.isplaying){
                                                 bgm_test.stop();
+                                                ttet.source = "icon/play_r.png";
                                             }else{
                                                 bgm_test.play();
+                                                ttet.source = "icon/stop_r.png";
                                             }
                                         }
                                     }
@@ -441,34 +474,64 @@ Item {
                         }
 
                         Rectangle{
+                            id: te
                             width: parent.width - 351
                             height: parent.height
                             Row{
                                 spacing: 20
                                 anchors.centerIn: parent
+                                Rectangle{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: 30
+                                    height: width
+                                    color: "black"
+                                    Image{
+                                        id: ttet12
+                                        source: "icon/icon_remove.png"
+                                        width: 20
+                                        height: 20
+                                        anchors.centerIn: parent
+                                    }
+                                    ColorOverlay{
+                                        source: ttet12
+                                        anchors.fill: ttet12
+                                        color: "white"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            if(slider_volume_voice.value == 0){
+                                                slider_volume_voice.value  = Number(supervisor.getSetting("ROBOT_SW","volume_voice"));
+                                            }else{
+                                                slider_volume_voice.value  = 0;
+                                            }
+                                        }
+                                    }
+                                }
                                 Slider{
                                     anchors.verticalCenter: parent.verticalCenter
                                     id: slider_volume_voice
-                                    width: parent.width*0.8
+                                    width: te.width*0.8
                                     height: 40
                                     from: 0
                                     to: 100
                                     value: supervisor.getSetting("ROBOT_SW","volume_voice")
                                 }
                                 Rectangle{
+                                    anchors.verticalCenter: parent.verticalCenter
                                     width: 30
                                     height: width
                                     color: "black"
                                     Image{
-                                        id: ttet1
-                                        source: "icon/keyboard_right.png"
+                                        id: ttet14
+                                        source: "icon/play_r.png"
                                         width: 20
                                         height: 20
                                         anchors.centerIn: parent
                                     }
                                     ColorOverlay{
-                                        source: ttet1
-                                        anchors.fill: ttet1
+                                        source: ttet14
+                                        anchors.fill: ttet14
                                         color: "white"
                                     }
                                     MouseArea{
@@ -482,74 +545,74 @@ Item {
                         }
                     }
                 }
-                Rectangle{
-                    id: set_robot_4
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"음성 안내"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_use_voice
-                                anchors.fill: parent
-                                model:["사용 안함","사용"]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_robot_5
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"이동 시 음악 재생"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_use_bgm
-                                anchors.fill: parent
-                                model:["사용 안함","사용"]
-                            }
-                        }
-                    }
-                }
+//                Rectangle{
+//                    id: set_robot_4
+//                    width: 840
+//                    height: 40
+//                    Row{
+//                        anchors.fill: parent
+//                        Rectangle{
+//                            width: 350
+//                            height: parent.height
+//                            Text{
+//                                anchors.verticalCenter: parent.verticalCenter
+//                                anchors.left: parent.left
+//                                anchors.leftMargin: 50
+//                                font.family: font_noto_r.name
+//                                text:"음성 안내"
+//                                font.pixelSize: 20
+//                            }
+//                        }
+//                        Rectangle{
+//                            width: 1
+//                            height: parent.height
+//                            color: "#d0d0d0"
+//                        }
+//                        Rectangle{
+//                            width: parent.width - 351
+//                            height: parent.height
+//                            ComboBox{
+//                                id: combo_use_voice
+//                                anchors.fill: parent
+//                                model:["사용 안함","사용"]
+//                            }
+//                        }
+//                    }
+//                }
+//                Rectangle{
+//                    id: set_robot_5
+//                    width: 840
+//                    height: 40
+//                    Row{
+//                        anchors.fill: parent
+//                        Rectangle{
+//                            width: 350
+//                            height: parent.height
+//                            Text{
+//                                anchors.verticalCenter: parent.verticalCenter
+//                                anchors.left: parent.left
+//                                anchors.leftMargin: 50
+//                                font.family: font_noto_r.name
+//                                text:"이동 시 음악 재생"
+//                                font.pixelSize: 20
+//                            }
+//                        }
+//                        Rectangle{
+//                            width: 1
+//                            height: parent.height
+//                            color: "#d0d0d0"
+//                        }
+//                        Rectangle{
+//                            width: parent.width - 351
+//                            height: parent.height
+//                            ComboBox{
+//                                id: combo_use_bgm
+//                                anchors.fill: parent
+//                                model:["사용 안함","사용"]
+//                            }
+//                        }
+//                    }
+//                }
                 Rectangle{
                     id: set_robot_6
                     width: 840
@@ -2310,15 +2373,15 @@ Item {
                         supervisor.setSetting("ROBOT_SW/volume_bgm",slider_volume_bgm.value.toFixed(0));
                         supervisor.setSetting("ROBOT_SW/volume_voice",slider_volume_voice.value.toFixed(0));
 
-                        if(combo_use_voice.currentIndex == 0)
-                            supervisor.setSetting("ROBOT_SW/use_voice","false");
-                        else
-                            supervisor.setSetting("ROBOT_SW/use_voice","true");
+//                        if(combo_use_voice.currentIndex == 0)
+//                            supervisor.setSetting("ROBOT_SW/use_voice","false");
+//                        else
+//                            supervisor.setSetting("ROBOT_SW/use_voice","true");
 
-                        if(combo_use_bgm.currentIndex == 0)
-                            supervisor.setSetting("ROBOT_SW/use_bgm","false");
-                        else
-                            supervisor.setSetting("ROBOT_SW/use_bgm","true");
+//                        if(combo_use_bgm.currentIndex == 0)
+//                            supervisor.setSetting("ROBOT_SW/use_bgm","false");
+//                        else
+//                            supervisor.setSetting("ROBOT_SW/use_bgm","true");
 
                         if(combo_use_uicmd.currentIndex == 0)
                             supervisor.setSetting("ROBOT_SW/use_uicmd","false");
@@ -2414,16 +2477,18 @@ Item {
         slider_limit_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_w"));
         slider_look_ahead_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","look_ahead_dist"));
 
-        if(supervisor.getSetting("ROBOT_SW","use_voice") === "true"){
-            combo_use_voice.currentIndex = 1;
-        }else{
-            combo_use_voice.currentIndex = 0;
-        }
-        if(supervisor.getSetting("ROBOT_SW","use_bgm") === "true"){
-            combo_use_bgm.currentIndex = 1;
-        }else{
-            combo_use_bgm.currentIndex = 0;
-        }
+        slider_volume_bgm.value = Number(supervisor.getSetting("ROBOT_SW","volume_bgm"));
+        slider_volume_voice.value = Number(supervisor.getSetting("ROBOT_SW","volume_voice"));
+//        if(supervisor.getSetting("ROBOT_SW","use_voice") === "true"){
+//            combo_use_voice.currentIndex = 1;
+//        }else{
+//            combo_use_voice.currentIndex = 0;
+//        }
+//        if(supervisor.getSetting("ROBOT_SW","use_bgm") === "true"){
+//            combo_use_bgm.currentIndex = 1;
+//        }else{
+//            combo_use_bgm.currentIndex = 0;
+//        }
         if(supervisor.getSetting("SERVER","use_servercmd") === "true"){
             combo_use_servercmd.currentIndex = 1;
         }else{
