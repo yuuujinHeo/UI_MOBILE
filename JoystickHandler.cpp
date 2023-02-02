@@ -101,7 +101,7 @@ void JoystickHandler::updatejoy(){
     if(connection == true){
         // read the joystick
         while((read(fdJoy, &(JoyEvent),sizeof(struct js_event))) > 0){
-//            qDebug() << JoyEvent.number << JoyEvent.value;
+            qDebug() << JoyEvent.number << JoyEvent.value;
             switch(JoyEvent.type & ~JS_EVENT_INIT){
             case JS_EVENT_AXIS:
                 if(JoyEvent.number < 8)
