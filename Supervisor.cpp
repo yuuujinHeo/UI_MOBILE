@@ -2623,6 +2623,10 @@ void Supervisor::onTimer(){
     }
     case UI_STATE_CHARGING:{
         cur_state = ui_state;
+        if(ui_cmd == UI_CMD_MOVE_WAIT){
+            ui_state = UI_STATE_GO_HOME;
+            ui_cmd = UI_CMD_NONE;
+        }
         break;
     }
     case UI_STATE_GO_HOME:{
