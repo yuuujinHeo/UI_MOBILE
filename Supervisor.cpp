@@ -2481,6 +2481,7 @@ void Supervisor::onTimer(){
         setWindow(qobject_cast<QQuickWindow*>(object));
     }
 
+    static int count_pass = 0;
     // usb 파일 확인
     if(usb_check){
         if(usb_check_count++ > 15){
@@ -2635,6 +2636,7 @@ void Supervisor::onTimer(){
         if(probot->state == ROBOT_STATE_READY){
             //Check Done Signal
             if(isaccepted){
+                count_pass = 0;
                 ui_state = UI_STATE_PICKUP;
                 int curNum = 0;
                 probot->pickupTrays.clear();
@@ -2659,12 +2661,12 @@ void Supervisor::onTimer(){
                     //시연용 가라모션
                     static int table_num_last = 0;
                     if(timer_cnt%5 == 0){
-                        int table_num = qrand()%setting.table_num;
+                        int table_num = qrand()%(setting.table_num-1);
                         while(table_num_last == table_num){
-                            table_num = qrand()%setting.table_num;
+                            table_num = qrand()%(setting.table_num-1);
                         }
-                        qDebug() << "Move To " << "Serving_"+QString().sprintf("%d",table_num);
-                        lcm->moveTo("Serving_"+QString().sprintf("%d",table_num));
+                        qDebug() << "Move To " << "Serving_"+QString().sprintf("%d",table_num+1);
+                        lcm->moveTo("Serving_"+QString().sprintf("%d",table_num+1));
                         table_num_last = table_num;
                     }
                 }else{
@@ -2774,10 +2776,9 @@ void Supervisor::onTimer(){
         if(probot->state == ROBOT_STATE_PAUSED){
             lcm->moveResume();
         }
-        static int count_pass = 0;
         if(flag_patrol_serving){
             count_pass++;
-            if(count_pass > 20){
+            if(count_pass > 30){
                 ui_state = UI_STATE_SERVING;
                 ui_cmd = UI_CMD_NONE;
             }

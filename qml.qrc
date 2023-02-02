@@ -123,5 +123,7 @@
         <file>icon/keyboard_right.png</file>
         <file>icon/keyboard_up.png</file>
         <file>Popup_map_list.qml</file>
+        <file>bgm/voice_pickup1.mp3</file>
+        <file>bgm/voice_start_serving1.mp3</file>
     </qresource>
 </RCC>

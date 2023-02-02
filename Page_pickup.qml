@@ -164,7 +164,7 @@ Item {
     Audio{
         id: voice_pickup
         autoPlay: false
-        source: "bgm/voice_pickup.mp3"
+        source: "bgm/voice_pickup1.mp3"
     }
 
     Timer{

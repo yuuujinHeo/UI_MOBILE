@@ -237,7 +237,6 @@ Window {
     Audio{
         id: voice_movewait
         autoPlay: false
-
         source: "bgm/voice_move_wait.mpga"
     }
     Audio{
@@ -248,7 +247,7 @@ Window {
     Audio{
         id: voice_serving
         autoPlay: false
-        source: "bgm/voice_start_serving.mp3"
+        source: "bgm/voice_start_serving1.mp3"
     }
     Audio{
         id: voice_avoid
