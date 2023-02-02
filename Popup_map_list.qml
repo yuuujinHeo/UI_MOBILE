@@ -400,7 +400,7 @@ Popup{
                     clip: true
                     model: ListModel{}
                     delegate: maplistCompo
-                    focus: true
+                    //focus: true
                 }
                 ListView {
                     id: list_map_detail
