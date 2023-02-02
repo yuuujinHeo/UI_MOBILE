@@ -20,6 +20,10 @@ Item {
         }
     }
 
+    Component.onCompleted: {
+        init();
+    }
+
     function init(){
         text_mention.text = "충전 중 입니다."
         image_battery.source = "qrc:/icon/bat_1.png";
@@ -63,7 +67,7 @@ Item {
     }
     Timer{
         id: timer_bat
-        running: false
+        running: true
         interval: 1000
         repeat: true
         onTriggered: {

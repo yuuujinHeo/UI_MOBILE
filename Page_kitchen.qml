@@ -247,6 +247,7 @@ Item {
             Repeater{
                 id: page_table
                 model: Math.ceil((table_num/(table_col_num*5)))
+
                 onModelChanged: {
                     swipeview_tables.currentIndex = 0;
                 }
@@ -262,7 +263,7 @@ Item {
                         flow: Grid.TopToBottom
                         Repeater{
                             id: column_table
-                            model: table_num-(table_col_num*5*pageNum)>table_col_num*5 + 1?table_col_num*5:table_num-(table_col_num*5*pageNum)
+                            model: table_num-(table_col_num*5*pageNum)>(table_col_num*5)?table_col_num*5:table_num-(table_col_num*5*pageNum)
                             Rectangle{
                                 id: rect_table
                                 width:80
