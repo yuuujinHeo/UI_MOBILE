@@ -134,6 +134,7 @@ Item {
             map_name = "";
         }
         //캔버스에 맵을 그림
+        clear_canvas();
         update_canvas();
     }
 
@@ -160,6 +161,30 @@ Item {
         draw_canvas_patrol_location();
     }
 
+    function clear_canvas(){
+        if(canvas_map.available){
+            var ctx = canvas_map.getContext('2d');
+            ctx.clearRect(0,0,canvas_map.width,canvas_map.height);
+            canvas_map.requestPaint();
+        }
+
+        clear_canvas_location();
+        clear_canvas_object();
+
+        if(canvas_map_margin.available){
+            ctx = canvas_map_margin.getContext('2d');
+            ctx.clearRect(0,0,canvas_map_margin.width,canvas_map_margin.height);
+            canvas_map_margin.requestPaint();
+        }
+
+        if(canvas_map_cur.available){
+            ctx = canvas_map_cur.getContext('2d');
+            ctx.clearRect(0,0,canvas_map_cur.width,canvas_map_cur.height);
+            canvas_map_cur.requestPaint();
+        }
+
+    }
+
     function update_annotation(){
         supervisor.clear_all();
         location_num = supervisor.getLocationNum();
@@ -184,7 +209,7 @@ Item {
     property var grid_size: 0.05
     property int origin_x: 500
     property int origin_y: 500
-    property var robot_radius: supervisor.getRobotRadius()
+    property var robot_radius: supervisor.getRobotRadius() + 0.02
     property var map_width: 1000
     property var map_height: 1000
 
@@ -262,7 +287,7 @@ Item {
         }else if(state_annotation == "LOCATION"){
             show_object = true;
             show_location = true;
-            show_margin = true;
+//            show_margin = true;
             find_map_walls();
         }else if(state_annotation == "TRAVELLINE"){
             show_travelline = true;
@@ -635,24 +660,35 @@ Item {
                     if(select_object_point != -1){
                         supervisor.editObject(select_object,select_object_point,point_x1, point_y1);
                     }
+                    clear_canvas_object();
+                    draw_canvas_object();
                 }else if(tool == "EDIT_OBJECT"){
                     if(select_object_point != -1){
                         supervisor.editObject(select_object, select_object_point, point_x1, point_y1);
                     }
+                    clear_canvas_object();
+                    draw_canvas_object();
                 }else if(tool == "ADD_LOCATION"){
                     if(point_y1-new_loc_y == 0){
                         new_loc_th = 0;
                     }else{
                         new_loc_th = Math.atan2(-(point_x1-new_loc_x),-(point_y1-new_loc_y));
                     }
-                    canvas_location.requestPaint();
+                    print("update : "+new_loc_th);
+                    clear_canvas_location();
+                    draw_canvas_location();
+                    draw_canvas_location_icon();
+                    draw_canvas_location_temp();
                 }else if(tool == "ADD_PATROL_LOCATION"){
                     if(point_y1-new_loc_y == 0){
                         new_loc_th = 0;
                     }else{
                         new_loc_th = Math.atan2(-(point_x1-new_loc_x),-(point_y1-new_loc_y));
                     }
-                    canvas_location.requestPaint();
+                    clear_canvas_location();
+                    draw_canvas_location();
+                    draw_canvas_location_icon();
+                    draw_canvas_location_temp();
                 }else if(tool == "EDIT_LOCATION"){
                     var new_th;
                     var cur_x = supervisor.getLocationx(select_location)/grid_size + origin_x;
@@ -663,18 +699,26 @@ Item {
                         new_th = Math.atan2(-(point_x1-cur_x),-(point_y1-cur_y));
                     }
                     supervisor.moveLocationPoint(select_location, cur_x,cur_y, new_th);
-                    canvas_location.requestPaint();
+                    clear_canvas_location();
+                    draw_canvas_location();
+                    draw_canvas_location_icon();
+                    draw_canvas_location_temp();
                 }else if(tool == "SLAM_INIT"){
                     if(point_y1-init_y == 0){
                         init_th = 0;
                     }else{
                         init_th = Math.atan2(-(point_x1-init_x),-(point_y1-init_y));
                     }
-                    canvas_map_cur.requestPaint();
+                    clear_canvas_location();
+                    draw_canvas_location();
+                    draw_canvas_location_icon();
+                    draw_canvas_location_temp();
                 }else if(tool == "ADD_OBJECT"){
                     new_obj_x2 = point_x1
                     new_obj_y2 = point_y1
-                    canvas_object.requestPaint();
+                    clear_canvas_object();
+                    draw_canvas_object();
+                    draw_canvas_new_object();
                 }
             }
         }
@@ -728,6 +772,32 @@ Item {
             }
         }
 
+        Rectangle{
+            id: btn_show_object
+            width: 40
+            height: 40
+            radius: 40
+            visible: show_buttons
+            anchors.top: btn_show_lidar.bottom
+            anchors.topMargin: 5
+            anchors.left: parent.left
+            anchors.leftMargin: 5
+            color: show_object?"#12d27c":"#e8e8e8"
+            Image{
+                anchors.centerIn: parent
+                source: "icon/icon_lidar.png"
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    if(show_object){
+                        show_object = false;
+                    }else{
+                        show_object = true;
+                    }
+                }
+            }
+        }
         //브러시 사이즈 조절할 때 보여주는 원
         Rectangle{
             id: brushview
@@ -789,28 +859,28 @@ Item {
     Image{
         id: image_charging_selected
         visible: false
-        width: 15
+        width: 13
         height: width
         source: "icon/icon_charge_1.png"
     }
     Image{
         id: image_charging
         visible: false
-        width: 15
+        width: 13
         height: width
         source: "icon/icon_charge_2.png"
     }
     Image{
         id: image_resting_selected
         visible: false
-        width: 15
+        width: 13
         height: width
         source: "icon/icon_home_1.png"
     }
     Image{
         id: image_resting
         visible: false
-        width: 15
+        width: 13
         height: width
         source: "icon/icon_home_2.png"
     }
@@ -853,7 +923,7 @@ Item {
         onTriggered: {
             if(supervisor.getLCMConnection()){
                 is_slam_running = supervisor.is_slam_running();
-                canvas_map_cur.requestPaint();
+                draw_canvas_current();
                 robot_x = supervisor.getRobotx()/grid_size + origin_x;
                 robot_y = supervisor.getRoboty()/grid_size + origin_y;
                 robot_th = -supervisor.getRobotth()-Math.PI/2;
@@ -876,14 +946,16 @@ Item {
 
         supervisor.clearObjectPoints();
 
+//        show_connection = true;
+
         show_buttons = false;
-        show_connection = true;
         show_lidar = false;
         show_location = false;
         show_object = false;
         show_path = false;
         show_robot = false;
         clear_margin();
+        clear_canvas();
         update_canvas();
     }
 
@@ -954,7 +1026,7 @@ Item {
             array.push(data.data[i]);
             array_alpha.push(data.data[i+3]);
         }
-        supervisor.saveMap(map_name,name,array,array_alpha);
+        supervisor.saveMap(map_mode,map_name,name,array,array_alpha);
     }
 
     //////========================================================================================Canvas drawing function
@@ -1003,25 +1075,30 @@ Item {
             ctx.clearRect(0,0,canvas_location.width, canvas_location.height);
             canvas_location.requestPaint();
         }
+    }
 
+    function clear_canvas_object(){
+        if(canvas_object.available){
+            var ctx = canvas_object.getContext('2d');
+            ctx.clearRect(0,0,canvas_object.width, canvas_object.height);
+            canvas_object.requestPaint();
+        }
     }
 
     function draw_canvas_location_icon(){
         if(canvas_location.available){
-
             var ctx = canvas_location.getContext('2d');
             location_num = supervisor.getLocationNum();
-
             for(var i=0; i<location_num; i++){
                 var loc_type = supervisor.getLocationTypes(i);
                 var loc_x = supervisor.getLocationx(i)/grid_size +origin_x;
                 var loc_y = supervisor.getLocationy(i)/grid_size +origin_y;
-                var loc_th = -supervisor.getLocationth(i)-Math.PI/2;
+                var loc_th = supervisor.getLocationth(i);
                 if(loc_type.slice(0,4) == "Char"){
                     if(select_location == i){
                         ctx.fillStyle = "#262626";
                         ctx.strokeStyle = "yellow";
-                        ctx.lineWidth = 3;
+                        ctx.lineWidth = 2;
                         ctx.beginPath();
                         ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
                         ctx.fill()
@@ -1030,12 +1107,12 @@ Item {
                         var distance = (robot_radius/grid_size)*1.8;
                         var distance2 = distance*0.8;
                         var th_dist = Math.PI/8;
-                        var x = loc_x+distance*Math.cos(-loc_th-Math.PI/2);
-                        var y = loc_y+distance*Math.sin(-loc_th-Math.PI/2);
-                        var x1 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2-th_dist);
-                        var y1 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2-th_dist);
-                        var x2 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2+th_dist);
-                        var y2 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2+th_dist);
+                        var x = loc_x-distance*Math.sin(loc_th);
+                        var y = loc_y-distance*Math.cos(loc_th);
+                        var x1 = loc_x-distance2*Math.sin(loc_th-th_dist);
+                        var y1 = loc_y-distance2*Math.cos(loc_th-th_dist);
+                        var x2 = loc_x-distance2*Math.sin(loc_th+th_dist);
+                        var y2 = loc_y-distance2*Math.cos(loc_th+th_dist);
 
                         ctx.beginPath();
                         ctx.moveTo(x,y);
@@ -1048,7 +1125,7 @@ Item {
                     }else{
                         ctx.fillStyle = "#262626";
                         ctx.strokeStyle = "white";
-                        ctx.lineWidth = 2;
+                        ctx.lineWidth = 1;
                         ctx.beginPath();
                         ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
                         ctx.fill()
@@ -1059,7 +1136,7 @@ Item {
                     if(select_location == i){
                         ctx.fillStyle = "#262626";
                         ctx.strokeStyle = "yellow";
-                        ctx.lineWidth = 3;
+                        ctx.lineWidth = 2;
                         ctx.beginPath();
                         ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
                         ctx.fill()
@@ -1067,12 +1144,12 @@ Item {
                         var distance = (robot_radius/grid_size)*1.8;
                         var distance2 = distance*0.8;
                         var th_dist = Math.PI/8;
-                        var x = loc_x+distance*Math.cos(-loc_th-Math.PI/2);
-                        var y = loc_y+distance*Math.sin(-loc_th-Math.PI/2);
-                        var x1 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2-th_dist);
-                        var y1 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2-th_dist);
-                        var x2 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2+th_dist);
-                        var y2 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2+th_dist);
+                        var x = loc_x-distance*Math.sin(loc_th);
+                        var y = loc_y-distance*Math.cos(loc_th);
+                        var x1 = loc_x-distance2*Math.sin(loc_th-th_dist);
+                        var y1 = loc_y-distance2*Math.cos(loc_th-th_dist);
+                        var x2 = loc_x-distance2*Math.sin(loc_th+th_dist);
+                        var y2 = loc_y-distance2*Math.cos(loc_th+th_dist);
 
                         if(select_location == i){
                             ctx.strokeStyle = "yellow";
@@ -1089,7 +1166,7 @@ Item {
                     }else{
                         ctx.fillStyle = "#262626";
                         ctx.strokeStyle = "white";
-                        ctx.lineWidth = 2;
+                        ctx.lineWidth = 1;
                         ctx.beginPath();
                         ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
                         ctx.fill()
@@ -1112,7 +1189,7 @@ Item {
                 var loc_type = supervisor.getLocationTypes(i);
                 var loc_x = supervisor.getLocationx(i)/grid_size +origin_x;
                 var loc_y = supervisor.getLocationy(i)/grid_size +origin_y;
-                var loc_th = -supervisor.getLocationth(i)-Math.PI/2;
+                var loc_th = supervisor.getLocationth(i);//+Math.PI/2;
 
                 if(select_location == i){
                     ctx.strokeStyle = "#05C9FF";
@@ -1132,12 +1209,12 @@ Item {
                 var distance = (robot_radius/grid_size)*1.8;
                 var distance2 = distance*0.8;
                 var th_dist = Math.PI/8;
-                var x = loc_x+distance*Math.cos(-loc_th-Math.PI/2);
-                var y = loc_y+distance*Math.sin(-loc_th-Math.PI/2);
-                var x1 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2-th_dist);
-                var y1 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2-th_dist);
-                var x2 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2+th_dist);
-                var y2 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2+th_dist);
+                var x = loc_x-distance*Math.sin(loc_th);
+                var y = loc_y-distance*Math.cos(loc_th);
+                var x1 = loc_x-distance2*Math.sin(loc_th-th_dist);
+                var y1 = loc_y-distance2*Math.cos(loc_th-th_dist);
+                var x2 = loc_x-distance2*Math.sin(loc_th+th_dist);
+                var y2 = loc_y-distance2*Math.cos(loc_th+th_dist);
 
                 if(select_location == i){
                     ctx.strokeStyle = "yellow";
@@ -1209,12 +1286,12 @@ Item {
                     var distance = (robot_radius/grid_size)*1.8;
                     var distance2 = distance*0.8;
                     var th_dist = Math.PI/8;
-                    var x = loc_x+distance*Math.cos(-loc_th-Math.PI/2);
-                    var y = loc_y+distance*Math.sin(-loc_th-Math.PI/2);
-                    var x1 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2-th_dist);
-                    var y1 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2-th_dist);
-                    var x2 = loc_x+distance2*Math.cos(-loc_th-Math.PI/2+th_dist);
-                    var y2 = loc_y+distance2*Math.sin(-loc_th-Math.PI/2+th_dist);
+                    var x = loc_x-distance*Math.sin(loc_th);
+                    var y = loc_y-distance*Math.cos(loc_th);
+                    var x1 = loc_x-distance2*Math.sin(loc_th-th_dist);
+                    var y1 = loc_y-distance2*Math.cos(loc_th-th_dist);
+                    var x2 = loc_x-distance2*Math.sin(loc_th+th_dist);
+                    var y2 = loc_y-distance2*Math.cos(loc_th+th_dist);
 
                     ctx.strokeStyle = "yellow";
                     ctx.beginPath();
@@ -1284,12 +1361,12 @@ Item {
                 var distance = (robot_radius/grid_size)*2.2;
                 var distance2 = distance*0.7;
                 var th_dist = Math.PI/6;
-                var x = new_loc_x+distance*Math.cos(-new_loc_th-Math.PI/2);
-                var y = new_loc_y+distance*Math.sin(-new_loc_th-Math.PI/2);
-                var x1 = new_loc_x+distance2*Math.cos(-new_loc_th-Math.PI/2-th_dist);
-                var y1 = new_loc_y+distance2*Math.sin(-new_loc_th-Math.PI/2-th_dist);
-                var x2 = new_loc_x+distance2*Math.cos(-new_loc_th-Math.PI/2+th_dist);
-                var y2 = new_loc_y+distance2*Math.sin(-new_loc_th-Math.PI/2+th_dist);
+                var x = new_loc_x-distance*Math.sin(new_loc_th);
+                var y = new_loc_y-distance*Math.cos(new_loc_th);
+                var x1 = new_loc_x-distance2*Math.sin(new_loc_th-th_dist);
+                var y1 = new_loc_y-distance2*Math.cos(new_loc_th-th_dist);
+                var x2 = new_loc_x-distance2*Math.sin(new_loc_th+th_dist);
+                var y2 = new_loc_y-distance2*Math.cos(new_loc_th+th_dist);
 
                 ctx.beginPath();
                 ctx.moveTo(x,y);
@@ -1308,12 +1385,12 @@ Item {
                 var distance = (robot_radius/grid_size)*2.2;
                 var distance2 = distance*0.7;
                 var th_dist = Math.PI/6;
-                var x = init_x+distance*Math.cos(-init_th-Math.PI/2);
-                var y = init_y+distance*Math.sin(-init_th-Math.PI/2);
-                var x1 = init_x+distance2*Math.cos(-init_th-Math.PI/2-th_dist);
-                var y1 = init_y+distance2*Math.sin(-init_th-Math.PI/2-th_dist);
-                var x2 = init_x+distance2*Math.cos(-init_th-Math.PI/2+th_dist);
-                var y2 = init_y+distance2*Math.sin(-init_th-Math.PI/2+th_dist);
+                var x = init_x-distance*Math.sin(init_th);
+                var y = init_y-distance*Math.cos(init_th);
+                var x1 = init_x-distance2*Math.sin(init_th-th_dist);
+                var y1 = init_y-distance2*Math.cos(init_th-th_dist);
+                var x2 = init_x-distance2*Math.sin(init_th+th_dist);
+                var y2 = init_y-distance2*Math.cos(init_th+th_dist);
 
                 ctx.beginPath();
                 ctx.moveTo(x,y);
@@ -1528,12 +1605,12 @@ Item {
         if(canvas_map_cur.available){
             var ctx = canvas_map_cur.getContext('2d');
             ctx.clearRect(0,0,canvas_map_cur.width,canvas_map_cur.height);
-
             if(show_robot){
                 robot_x = supervisor.getRobotx()/grid_size + origin_x;
                 robot_y = supervisor.getRoboty()/grid_size + origin_y;
                 robot_th = -supervisor.getRobotth()-Math.PI/2;
 
+//                print(robot_th);
                 ctx.strokeStyle = "white";
                 ctx.lineWidth = 2;
                 ctx.beginPath();

@@ -80,18 +80,24 @@ Popup{
                         select_map_list = -1;
                         map_list_view.loadmap("");
                         map_list_view.init_mode();
+                        map_list_view.show_connection= false
+                        map_list_view.show_location= true
+                        map_list_view.show_object=  true
+                        map_list_view.show_lidar= false
                         btn_use.enabled = false;
                         btn_draw.enabled = false;
                         btn_draw_new.enabled = false;
                         btn_erase.enabled = false;
                     }else{
                         select_map_list = index;
-
                         btn_erase.enabled = true;
 
 
+
                         if(supervisor.isExistMap(name)){
+                            map_list_view.loadmap(name,"EDITED");
                             if(supervisor.isExistAnnotation(name)){
+
                                 btn_use.enabled = true;
                                 btn_draw.enabled = true;
                                 btn_draw_new.enabled = true;
@@ -99,6 +105,7 @@ Popup{
                                 btn_draw_new.enabled = true;
                             }
                         }else{
+                            map_list_view.loadmap(name,"RAW");
                             if(supervisor.isExistRawMap(name)){
                                 btn_draw_new.enabled = true;
                                 if(supervisor.isExistAnnotation(name)){
@@ -109,17 +116,16 @@ Popup{
                             }
 
                         }
+
+
+
                         list_map_detail.model.clear();
                         var num = supervisor.getMapFileSize(name);
                         for(var i=0; i<num; i++){
                             list_map_detail.model.append({"name":supervisor.getMapFile(i)});
                         }
+
                         supervisor.readSetting(name);
-                        map_list_view.loadmap(name);
-                        map_list_view.init_mode();
-                        map_list_view.show_location = true;
-                        map_list_view.show_object = true;
-                        map_list_view.show_travelline = true;
                     }
                 }
             }
@@ -363,15 +369,14 @@ Popup{
                                         }else{
                                             popup_map_list.close();
                                             loadPage(pmap);
-                                            loader_page.item.loadmap(name);
+                                            loader_page.item.loadmap(name,"RAW");
                                             loader_page.item.is_init_state = true;
                                             loader_page.item.map_mode = 2;
-                                            loader_page.item.init();
+//                                            loader_page.item.modeinit();
                                         }
                                     }
                                 }
                             }
-
                         }
                     }
                 }
@@ -431,13 +436,22 @@ Popup{
             anchors.top: rect_list_left.top
             anchors.left: rect_list_left.right
 
-//            Map_full{
-//                id: map_list_view
-//                width: parent.width
-//                height: width
-//                anchors.centerIn: parent
-//                just_show_map: true
-//            }
+            Map_full{
+                id: map_list_view
+                width: parent.width
+                height: width
+                anchors.centerIn: parent
+                show_connection: false
+                show_location: true
+                show_object:  true
+                show_lidar: false
+//                show_robot: false
+//                show_path: false
+                show_buttons: false
+                Component.onCompleted: {
+                    setfullscreen();
+                }
+            }
         }
     }
 }
