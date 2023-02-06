@@ -83,12 +83,10 @@ void Supervisor::setWindow(QQuickWindow *Window){
 }
 QQuickWindow *Supervisor::getWindow()
 {
-    std::cout << "getWindow called "<<std::endl;
     return mMain;
 }
 void Supervisor::setObject(QObject *object)
 {
-    //invokemethod의 매개변수에는 rootobject값이 필요하기 때문에 set으로 설정 해준다.
     mObject = object;
 }
 QObject *Supervisor::getObject()
@@ -128,8 +126,8 @@ void Supervisor::git_pull_success(){
     setSetting("ROBOT_SW/version_msg",probot->program_message);
     setSetting("ROBOT_SW/version_date",probot->program_date);
     setSetting("ROBOT_SW/version",probot->program_version);
-    qDebug() << "save git success";
 }
+
 bool Supervisor::isNewVersion(){
     git->updateGitArray();
 
@@ -665,6 +663,7 @@ bool Supervisor::loadMaptoServer(){
         return false;
     }
 }
+
 bool Supervisor::isUSBFile(){
     return false;
 }
@@ -694,8 +693,15 @@ void Supervisor::setuseServerMap(bool use){
 }
 void Supervisor::removeMap(QString filename){
     plog->write("[USER INPUT] Remove Map : "+filename);
-    QFile *file = new QFile(QDir::homePath()+"/maps/"+filename);
-    file->remove();
+//    QFile *file = new QFile(QDir::homePath()+"/maps/"+filename);
+    QDir dir(QDir::homePath()+"/maps/" + filename);
+
+    if(dir.removeRecursively()){
+        qDebug() << "true";
+    }else{
+        qDebug() << "false";
+    }
+//    file->remove();
 }
 bool Supervisor::isloadMap(){
     return pmap->map_loaded;
@@ -872,6 +878,9 @@ void Supervisor::setMap(QString name){
     lcm->restartSLAM();
 }
 
+void Supervisor::loadMap(QString name){
+//    readSetting()
+}
 
 
 ////*******************************************  SLAM(LOCALIZATION) 관련   ************************************************////
@@ -881,6 +890,7 @@ void Supervisor::startMapping(float grid){
 }
 void Supervisor::stopMapping(){
     plog->write("[USER INPUT] STOP MAPPING");
+    lcm->flagMapping = false;
     lcm->sendCommand(ROBOT_CMD_MAPPING_STOP, "MAPPING STOP");
 
 }
@@ -1324,7 +1334,7 @@ int Supervisor::getCanvasSize(){
     return canvas.size();
 }
 void Supervisor::setRotateAngle(float angle){
-//    qDebug() << "SET ROTATE ANGLE : " << angle;
+    qDebug() << "SET ROTATE ANGLE : " << angle;
     map_rotate_angle = angle;
 }
 int Supervisor::getRedoSize(){
@@ -1351,14 +1361,21 @@ QString Supervisor::getLineColor(int index){
     }
     return "";
 }
-void Supervisor::saveMap(QString src, QString dst, QList<int> data, QList<int> alpha){
-    QString file_path = QDir::homePath()+"/maps/"+src+"/map_edited.png";
+void Supervisor::saveMap(QString mode, QString src, QString dst, QList<int> data, QList<int> alpha){
+    QString file_path;
+    if(mode == "EDITED"){
+        file_path = QDir::homePath()+"/maps/"+src+"/map_edited.png";
+    }else if(mode == "RAW"){
+        file_path = QDir::homePath()+"/maps/"+src+"/map_raw.png";
+    }else{
+        return;
+    }
     cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
     cv::flip(map,map,0);
     cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
 
-    cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
-    cv::warpAffine(map,map,rot,map.size());
+//    cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
+//    cv::warpAffine(map,map,rot,map.size());
 
     for(int i=0; i<alpha.size(); i++){
         if(alpha[i] > 0){
@@ -1709,6 +1726,7 @@ void Supervisor::addLocation(QString type, QString name, int x, int y, float th)
     temp_pose.y = temp.y;
     temp_pose.th = th;
     temp_loc.pose = temp_pose;
+    plog->write("[ANNOTATION] ADD LOCATION : " +type+", "+name+", "+QString().sprintf("%d, %d, %f",x,y,th));
     pmap->vecLocation.push_back(temp_loc);
     QMetaObject::invokeMethod(mMain, "updatecanvas");
     QMetaObject::invokeMethod(mMain, "updatelocation");

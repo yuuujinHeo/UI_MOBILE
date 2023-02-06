@@ -106,5 +106,7 @@
         <file alias="icon/keyboard_left.png">../icon/keyboard_left.png</file>
         <file alias="icon/keyboard_right.png">../icon/keyboard_right.png</file>
         <file alias="icon/keyboard_up.png">../icon/keyboard_up.png</file>
+        <file alias="bgm/voice_pickup1.mp3">../bgm/voice_pickup1.mp3</file>
+        <file alias="bgm/voice_start_serving1.mp3">../bgm/voice_start_serving1.mp3</file>
     </qresource>
 </RCC>

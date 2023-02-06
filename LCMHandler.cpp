@@ -302,44 +302,12 @@ void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const st
 
      std::vector<int> vec;
      vec.assign(map1.data, map1.data + map1.cols*map1.rows*map1.channels());
-//     vec.assign(map1.data, map1.data + map1.cols*map1.rows*map1.channels());
 
      pmap->data = QVector<int>::fromStdVector(vec);
-
      pmap->test_mapping = QPixmap::fromImage(mat_to_qimage_cpy(map1));
 
-
-//     for(int i=0; i<map1.rows; i++){
-//         uchar* p = map1.ptr<uchar>(i);
-//         for(int j=0; j<map1.cols; j++){
-//             pmap->data[map1.rows*i + map1.cols*j] = p[j*4 + 0];
-//             pmap->data[map1.rows*i + map1.cols*j + 1] = p[j*4 + 1];
-//             pmap->data[map1.rows*i + map1.cols*j + 2] = p[j*4 + 2];
-//             pmap->data[map1.rows*i + map1.cols*j + 3] = p[j*4 + 3];
-//         }
-//     }
-
-
-
-
-//     for(size_t i =0; i<pmap->data.size(); ++i)
-//     {
-//         cv::Vec3b* p = map1.ptr<cv::Vec3b>(y);
-//        int y = (i/4) / map1.cols;
-//        int x = (i/4) % map1.cols;
-//        int ch = i % 4;
-//        qDebug() << map1.ptr(y)[x];
-////        qDebug() << map1.ptr<uchar*>(y)[x];
-//        pmap->data[i] = map1.ptr<uchar>(y)[x];
-//     }
-//     for(size_t i =0; i<pmap->data.size(); ++i)
-//     {
-//        int y = i / map1.cols;
-//        int x = i % map1.cols;
-//        pmap->data[i] = map1.ptr<uchar>(y)[x];
-//     }
+     flagMapping = true;
      emit mappingin();
-//     flagMapping = true;
 }
 
 

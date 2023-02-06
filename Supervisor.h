@@ -154,6 +154,7 @@ public:
     Q_INVOKABLE QString getUsbMapPath(int num);
     Q_INVOKABLE QString getUsbMapPathFull(int num);
     Q_INVOKABLE void saveMapfromUsb(QString path);
+    Q_INVOKABLE void loadMap(QString name);
     Q_INVOKABLE void setMap(QString name);
 
     ////*********************************************  SLAM(LOCALIZATION) 관련   ***************************************************////
@@ -207,7 +208,7 @@ public:
     Q_INVOKABLE QString getLineColor(int index);
     Q_INVOKABLE float getLineWidth(int index);
 
-    Q_INVOKABLE void saveMap(QString src, QString dst, QList<int> data, QList<int> alpha);
+    Q_INVOKABLE void saveMap(QString mode, QString src, QString dst, QList<int> data, QList<int> alpha);
 
     Q_INVOKABLE void startLine(QString color, float width);
     Q_INVOKABLE void setLine(int x, int y);

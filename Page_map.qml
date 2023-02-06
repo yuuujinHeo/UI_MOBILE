@@ -24,6 +24,8 @@ Item {
     //mode : 0(mapview) 1:(slam-mapping) 2:(annotation) 3:(patrol) 4: (slam-localization)
     property int map_mode: 0
 
+    property bool is_mapping: false
+
     //0: location 1: record 2: random
     property int patrol_mode: 0
     property bool recording: false
@@ -44,8 +46,8 @@ Item {
     }
 
     function update_mapping(){
-        if(map_mode == 1 && map.mapping_mode){
-            map.update_mapping();
+        if(map_mode == 1){
+            map.loadmapping();
         }
     }
 
@@ -678,24 +680,21 @@ Item {
                     Item_button{
                         id: btn_start
                         width: 78
-                        running: timer_mapping.running
+                        running: is_mapping
                         icon: "icon/icon_run.png"
                         name: "Start"
-
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
                                 if(supervisor.getLCMConnection()){
-                                    map.mapping_mode = true;
+                                    map.map_mode = "MAPPING";
                                     if(combobox_gridsize.currentText === "3cm"){
                                         map.grid_size = 0.03;
                                         supervisor.startMapping(0.03);
                                     }else if(combobox_gridsize.currentText === "5cm"){
                                         map.grid_size = 0.05;
                                         supervisor.startMapping(0.05);
-
                                     }
-                                    timer_mapping.start();
                                 }
                             }
                         }
@@ -708,11 +707,22 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                map.mapping_mode = false;
                                 supervisor.stopMapping();
-                                timer_mapping.stop();
                             }
                         }
+                    }
+                }
+            }
+            Timer{
+                id: update_timer
+                interval: 500
+                running: true
+                repeat: true
+                onTriggered:{
+                    if(supervisor.getMappingflag()){
+                        is_mapping = true;
+                    }else{
+                        is_mapping = false;
                     }
                 }
             }
@@ -1189,7 +1199,7 @@ Item {
                                 onClicked: {
                                     if(map.tool == "ADD_PATROL_LOCATION"){
                                         if(canvas_location.isnewLoc && canvas_location.new_loc_available){
-                                            supervisor.addPatrol("POINT","MANUAL",canvas_location.new_loc_x, canvas_location.new_loc_y, canvas_location.new_loc_th);
+                                            supervisor.addPatrol("POINT","MANUAL",canvas_location.new_loc_x, canvas_location.new_loc_y, canvas_location.new_loc_th+Math.PI/2);
                                             update_patrol_location();
                                         }
                                         canvas_location.isnewLoc = false;
@@ -2038,6 +2048,7 @@ Item {
                                     angle_init = value;
                                 }else{
                                     //released
+                                    print(value, angle_init);
                                     map.rotate_map(value - angle_init);
                                 }
                             }
@@ -2625,36 +2636,36 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
-            Rectangle{
-                id: rect_location_box
-                width: parent.width - 60
-                height: 50
-                radius: 5
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: rect_annot_state.bottom
-                anchors.topMargin: 20
-                Text{
-                    font.family: font_noto_r.name
-                    font.pixelSize: 20
-                    text: "Margin : " + slider_margin.value.toFixed(3) + " [m]"
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.leftMargin: 30
-                }
-                Slider{
-                    id: slider_margin
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: parent.right
-                    anchors.rightMargin: 30
-                    width: 150
-                    from: 0
-                    to: 0.5
-                    value: supervisor.getMargin()
-                    onValueChanged: {
-                        map.update_margin();
-                    }
-                }
-            }
+//            Rectangle{
+//                id: rect_location_box
+//                width: parent.width - 60
+//                height: 50
+//                radius: 5
+//                anchors.horizontalCenter: parent.horizontalCenter
+//                anchors.top: rect_annot_state.bottom
+//                anchors.topMargin: 20
+//                Text{
+//                    font.family: font_noto_r.name
+//                    font.pixelSize: 20
+//                    text: "Margin : " + slider_margin.value.toFixed(3) + " [m]"
+//                    anchors.verticalCenter: parent.verticalCenter
+//                    anchors.left: parent.left
+//                    anchors.leftMargin: 30
+//                }
+//                Slider{
+//                    id: slider_margin
+//                    anchors.verticalCenter: parent.verticalCenter
+//                    anchors.right: parent.right
+//                    anchors.rightMargin: 30
+//                    width: 150
+//                    from: 0
+//                    to: 0.5
+//                    value: supervisor.getMargin()
+//                    onValueChanged: {
+//                        map.update_margin();
+//                    }
+//                }
+//            }
 
             Component {
                 id: locationCompo
@@ -2708,8 +2719,8 @@ Item {
             Column{
                 width: parent.width - 60
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: rect_location_box.bottom
-                anchors.topMargin: 20
+                anchors.top: rect_annot_state.bottom
+                anchors.topMargin: 50
                 spacing: 10
                 Rectangle{
                     id: rect_annot_box
@@ -3743,7 +3754,7 @@ Item {
         map.update_canvas();
     }
     function updatemap(){
-        map.update_map_variable();
+        map.clear_canvas();
         map.update_canvas();
     }
 
@@ -3788,18 +3799,6 @@ Item {
                 joy_xy.remote_stop();
                 joy_th.remote_stop();
             }
-        }
-    }
-    Timer{
-        id: timer_mapping
-        interval: 500
-        running: false
-        repeat: true
-        onTriggered: {
-//            if(supervisor.getMappingflag()){
-//                //Mapping update
-//                supervisor.setMappingflag(false);
-//            }
         }
     }
     Timer{
@@ -4206,8 +4205,7 @@ Item {
 
                                     supervisor.clear_all();
                                     map.state_annotation = "DRAWING";
-                                    map.refreshMap = true;
-                                    map.use_rawmap = true;
+                                    map.map_mode = "RAW";
                                     map.update_canvas();
                                     loader_menu.sourceComponent = menu_annot_draw;
                                     popup_save_mapping.close();
@@ -4971,7 +4969,7 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 if(modelData == "yes"){
-                                    supervisor.addPatrol("POINT","MANUAL",map.new_loc_x, map.new_loc_y, map.new_loc_th);
+                                    supervisor.addPatrol("POINT","MANUAL",map.new_loc_x, map.new_loc_y, map.new_loc_th+Math.PI/2);
                                     update_patrol_location();
 
                                     map.new_location = false;
@@ -4997,11 +4995,10 @@ Item {
         patrol_mode = supervisor.getPatrolMode();
     }
 
-    function loadmap(name){
+    function loadmap(name,type){
         check_slam_init_timer.stop();
-        map.loadmap(name);
+        map.loadmap(name,type);
         updatemap();
-        map.update_canvas();
     }
 
     function init_map(){
@@ -5009,26 +5006,26 @@ Item {
         timer_get_joy.stop();
         map.state_annotation = "NONE";
         print("map_mode "+map_mode)
+
         if(map_mode == 0){
             timer_get_joy.start();
             loader_menu.sourceComponent = menu_main;
             text_menu_title.visible = false;
             map.show_buttons = true;
             text_menu_title.text = "";
-
         }else if(map_mode == 1){
             text_menu_title.text = "SLAM";
             text_menu_title.visible = true;
             timer_get_joy.start();
             map.init_mode();
-            map.loadmap("");
-            map.fill_canvas_map();
+//            map.loadmap("");
             map.show_lidar = true;
-            map.show_location_default = false;
             map.show_robot = true;
-            map.just_show_map = true;
             map.show_connection = false;
+            map.setfullscreen();
             loader_menu.sourceComponent = menu_slam;
+//            map.show_location_default = false;
+//            map.just_show_map = true;
         }else if(map_mode == 2){
             text_menu_title.text = "Annotation";
             text_menu_title.visible = true;
@@ -5036,6 +5033,7 @@ Item {
             map.show_connection = false;
             map.show_object = true;
             map.robot_following = false;
+            map.setfullscreen();
             loader_menu.sourceComponent = menu_annot_state;
         }else if(map_mode == 3){
             text_menu_title.text = "Patrol";
@@ -5044,7 +5042,7 @@ Item {
             map.show_margin = true;
             map.show_object = true;
             map.show_connection = false;
-            map.show_location_default = false;
+//            map.show_location_default = false;
             map.robot_following = false;
             map.update_canvas();
             loader_menu.sourceComponent = menu_patrol;
