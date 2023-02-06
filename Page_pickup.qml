@@ -27,6 +27,14 @@ Item {
         text_hello.visible = false;
         timer_hello.stop();
     }
+    Timer{
+        repeat: true
+        interval: 500
+        running: true
+        onTriggered: {
+            print("pickup timer");
+        }
+    }
 
     Rectangle{
         id: rect_background

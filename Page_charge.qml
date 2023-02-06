@@ -38,8 +38,6 @@ Item {
     Image{
         id: image_battery
         source: "icon/bat_1.png"
-        width: 200
-        height: 100
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: 250
@@ -55,6 +53,14 @@ Item {
         anchors.topMargin: 20
     }
 
+    Timer{
+        repeat: true
+        interval: 500
+        running: true
+        onTriggered: {
+            print("charge timer");
+        }
+    }
     Text{
         id: text_mention
         text: "충전 중 입니다."

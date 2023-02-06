@@ -351,6 +351,14 @@ Item {
 
     }
 
+    Timer{
+        repeat: true
+        interval: 500
+        running: true
+        onTriggered: {
+            print("movefail timer");
+        }
+    }
     Item{
         id: notice
         width: 1280

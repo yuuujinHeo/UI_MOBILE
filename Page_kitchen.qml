@@ -12,6 +12,15 @@ Item {
         init();
     }
 
+    Timer{
+        repeat: true
+        interval: 500
+        running: true
+        onTriggered: {
+            print("kitchen timer");
+        }
+    }
+
     function init(){
         table_num = supervisor.getTableNum();
         tray_num = supervisor.getTrayNum();

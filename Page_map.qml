@@ -14,7 +14,6 @@ Item {
     width: 1280
     height: 800
     property int width_menu: 400
-
     //slam
     property bool slam_initializing: false
     property bool joystick_connection: false
@@ -162,7 +161,7 @@ Item {
     }
 
     function updatecanvas(){
-        map.update_canvas_all();
+        map.update_canvas();
     }
 
     Rectangle{
@@ -261,6 +260,7 @@ Item {
                 height: 450
                 show_robot: true
                 show_path: true
+                robot_following: true
                 show_lidar: true
                 show_buttons: true
                 show_connection: true
@@ -349,7 +349,6 @@ Item {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 clip: true
-//                just_show_map: true
             }
             Rectangle{
                 id: rect_init_notice
@@ -1778,7 +1777,7 @@ Item {
                         anchors.fill: parent
                         onClicked: {
                             supervisor.undo();
-                            map.update_canvas_all();
+                            map.update_canvas();
                         }
                     }
                 }
@@ -1792,7 +1791,7 @@ Item {
                         anchors.fill: parent
                         onClicked: {
                             supervisor.redo();
-                            map.update_canvas_all();
+                            map.update_canvas();
                         }
                     }
                 }
@@ -1883,7 +1882,7 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 supervisor.clear_all();
-                                map.update_canvas_all();
+                                map.update_canvas();
                             }
                         }
                     }
@@ -2012,9 +2011,7 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     slider_rotate.value = 0;
-                                    map.rotate_angle = 0;
-                                    supervisor.setRotateAngle(0);
-                                    map.rotate_annotation();
+                                    map.rotate_map(0);
                                 }
                             }
                         }
@@ -2033,16 +2030,15 @@ Item {
                             to : 180
                             property var angle_init: 0
                             onValueChanged: {
-                                map.rotate_angle = value - angle_init;
+                                map.rotate_map(value - angle_init);
+//                                map.rotate_map_temp(value - angle_init);
                             }
                             onPressedChanged: {
                                 if(pressed){
                                     angle_init = value;
                                 }else{
                                     //released
-                                    map.rotate_angle = 0;
-                                    supervisor.setRotateAngle(value);
-                                    map.rotate_annotation();
+                                    map.rotate_map(value - angle_init);
                                 }
                             }
 
@@ -2154,7 +2150,7 @@ Item {
                 for(var i=0; i<ob_num; i++){
                     list_object.model.append({"name":supervisor.getObjectName(i)});
                 }
-                map.update_canvas_all();
+                map.update_canvas();
             }
             function update(){
                 var ob_num = supervisor.getObjectNum();
@@ -2163,7 +2159,7 @@ Item {
                     list_object.model.append({"name":supervisor.getObjectName(i)});
                 }
                 list_object.currentIndex = ob_num-1;
-                map.update_canvas_all();
+                map.update_canvas();
             }
             function getcur(){
                 return list_object.currentIndex;
@@ -2221,7 +2217,7 @@ Item {
                             map.select_object = supervisor.getObjNum(name);
                             list_object.currentIndex = index;
                             map.tool = "MOVE";
-                            map.update_canvas_all();
+                            map.update_canvas();
                         }
                     }
                 }
@@ -2350,7 +2346,7 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     supervisor.removeObject(list_object.currentIndex);
-                                    map.update_canvas_all();
+                                    map.update_canvas();
                                 }
                             }
                         }
@@ -2458,7 +2454,7 @@ Item {
                                 }else if(map.tool == "ADD_POINT"){
                                     supervisor.removeObjectPointLast();
                                 }
-                                map.update_canvas_all();
+                                map.update_canvas();
                             }
                         }
                     }
@@ -2533,7 +2529,7 @@ Item {
                                 supervisor.clearObjectPoints();
                                 map.state_annotation = "DRAWING";
                                 loader_menu.sourceComponent = menu_annot_draw;
-                                map.update_canvas_all();
+                                map.update_canvas();
                             }
                         }
                     }
@@ -2559,7 +2555,7 @@ Item {
                                 map.init_mode();
                                 supervisor.clearObjectPoints();
                                 map.state_annotation = "LOCATION";
-                                map.update_canvas_all();
+                                map.update_canvas();
                                 loader_menu.sourceComponent = menu_annot_location;
                             }
                         }
@@ -2589,7 +2585,7 @@ Item {
                 for(var i=0; i<loc_num; i++){
                     list_location.model.append({"type":supervisor.getLocationTypes(i),"name":supervisor.getLocationName(i),"iscol":false});
                 }
-                map.update_canvas_all();
+                map.update_canvas();
             }
             function getcur(){
                 return list_location.currentIndex;
@@ -2704,7 +2700,7 @@ Item {
                         onClicked: {
                             map.select_location = supervisor.getLocNum(name);
                             list_location.currentIndex = index;
-                            map.update_canvas_all();
+                            map.update_canvas();
                         }
                     }
                 }
@@ -2835,7 +2831,7 @@ Item {
                                     if(list_location.currentIndex > 0){
                                         map.select_location = list_location.currentIndex-1;
                                         supervisor.removeLocation(list_location.model.get(list_location.currentIndex).name);
-                                        map.update_canvas_all();
+                                        map.update_canvas();
                                     }
                                 }
                             }
@@ -3001,471 +2997,11 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 map.init_mode();
-                                map.state_annotation = "TRAVELLINE";
-                                loader_menu.sourceComponent = menu_annot_tline;
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-
-    }
-    Component{
-        id: menu_annot_tline
-        Item{
-            id: menu_travelline
-            objectName: "menu_travelline"
-            width: rect_menus.width
-            height: rect_menus.height
-
-            Rectangle{
-                anchors.fill: parent
-                color: "#f4f4f4"
-            }
-
-            Component.onCompleted: {
-                var travel_num = supervisor.getTlineSize();
-                tline_model.clear();
-                for(var i=0; i<travel_num; i++){
-                    tline_model.append({category:i,show:false});
-                    print(i);
-                }
-                map.update_canvas_all();
-            }
-            function update_line(category){
-                var line_num = supervisor.getTlineSize(category);
-                tline_line_model.clear();
-                for(var i=0; i<line_num; i=i+2){
-                    tline_line_model.append({name:"line_" + Number(i/2)});
-                }
-            }
-
-            function getcur(){
-                return list_line.currentIndex;
-            }
-            function setcur(index){
-                select_tline_num = index;
-            }
-            function update(){
-                var travel_num = supervisor.getTlineSize();
-                tline_model.clear();
-                for(var i=0; i<travel_num; i++){
-                    tline_model.append({category:i,show:false});
-                    print(i);
-                }
-                tline_line_model.clear();
-            }
-            function update2(){
-                var travel_num = supervisor.getTlineSize();
-                tline_model.clear();
-                for(var i=0; i<travel_num; i++){
-                    tline_model.append({category:i,show:false});
-                    print(i);
-                }
-                tline_line_model.clear();
-                select_tline_category = -1;
-                select_tline_num = -1;
-            }
-
-            Rectangle{
-                id: rect_annot_state
-                width: parent.width
-                height: 50
-                anchors.top: parent.top
-                anchors.topMargin: 2
-                color: "#4F5666"
-                Text{
-                    anchors.centerIn: parent
-                    color: "white"
-                    font.family: font_noto_b.name
-                    font.pixelSize: 20
-                    text: "STEP 4. Add/Edit Travel Line"
-                    horizontalAlignment: Text.AlignHCenter
-                }
-            }
-
-            Column{
-                spacing: 20
-                width: parent.width
-                anchors.top: rect_annot_state.bottom
-                anchors.topMargin: 30
-                anchors.horizontalCenter: parent.horizontalCenter
-                Rectangle{
-                    id: rect_annot_box6
-                    width: parent.width - 60
-                    height: 100
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: "#e8e8e8"
-                    Row{
-                        anchors.centerIn: parent
-                        spacing: 30
-                        Rectangle{
-                            id: btn_move
-                            width: 78
-                            height: width
-                            radius: width
-                            border.width: map.tool=="MOVE"?3:0
-                            border.color: "#12d27c"
-                            Column{
-                                anchors.centerIn: parent
-                                Image{
-                                    source: "icon/icon_move.png"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                                Text{
-                                    text: "Move"
-                                    font.family: font_noto_r.name
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    map.tool = "MOVE";
-                                }
-                            }
-                        }
-                        Rectangle{
-                            id: btn_add1
-                            width: 78
-                            height: width
-                            radius: width
-                            border.width: map.tool=="ADD_LINE"?3:0
-                            border.color: "#12d27c"
-                            Column{
-                                anchors.centerIn: parent
-                                Image{
-                                    source: "icon/icon_add.png"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                                Text{
-                                    text: "Add"
-                                    font.family: font_noto_r.name
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    map.tool = "ADD_LINE";
-                                }
-                            }
-                        }
-                        Rectangle{
-                            id: btn_erase
-                            width: 78
-                            height: width
-                            radius: width
-                            color: enabled?"white":"#f4f4f4"
-                            enabled: map.tool=="ADD_LINE"?false:true
-                            Column{
-                                anchors.centerIn: parent
-                                Image{
-                                    source: "icon/icon_erase.png"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                                Text{
-                                    text: "Remove"
-                                    color: btn_erase.enabled?"black":"#e8e8e8"
-                                    font.family: font_noto_r.name
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    supervisor.removeTline(select_tline_category,select_tline_num);
-                                    map.update_canvas_all();
-                                    update_line(select_tline_category);
-
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: rect_annot_box7
-                    width: parent.width
-                    visible: map.tool=="ADD_LINE"?true:false
-                    onVisibleChanged: {
-                        if(visible){
-                            height = 50
-                        }else{
-                            height = 0
-                        }
-                    }
-                    Behavior on height {
-                        NumberAnimation{
-                            duration:300;
-                        }
-                    }
-                    color: "#e8e8e8"
-                    Row{
-                        anchors.centerIn: parent
-                        spacing: 30
-                        Rectangle{
-                            id: btn_11
-                            width: 80
-                            height: 40
-                            radius: 5
-                            Text{
-                                text: "Cancel"
-                                anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    map.tool = "MOVE";
-                                    map.new_travel_line = false;
-                                    map.new_line_point1 = false;
-                                    map.new_line_point2 = false;
-                                }
-                            }
-                        }
-                        Rectangle{
-                            id: btn_22
-                            width: 78
-                            height: 40
-                            radius: 5
-                            color: enabled?"white":"#f4f4f4"
-                            enabled: map.new_line_point1&&map.new_line_point2?true:false
-                            Text{
-                                text: "Save"
-                                anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                                color: parent.enabled?"black":"white"
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    if(map.new_line_point1&&map.new_line_point2){
-                                        print("??????????! : "+select_tline_category)
-                                        if(select_tline_category > 0){
-                                            supervisor.addTline(select_tline_category,map.new_line_x1,map.new_line_y1,map.new_line_x2,map.new_line_y2);
-                                        }else{
-                                            supervisor.addTline(supervisor.getTlineSize(),map.new_line_x1,map.new_line_y1,map.new_line_x2,map.new_line_y2);
-                                            update();
-                                            select_tline_category = supervisor.getTlineSize()-1;
-                                            map.select_travel_line = select_tline_category;
-                                        }
-                                        print("?! : "+select_tline_category)
-                                        update_line(select_tline_category);
-                                        map.tool = "MOVE";
-                                        map.new_travel_line = false;
-                                        map.new_line_point1 = false;
-                                        map.new_line_point2 = false;
-                                        updatecanvas();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Flickable{
-                    width: rect_annot_box6.width
-                    height: rect_annot_box7.visible?310-60:310
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    contentHeight: column_tline.height
-                    clip: true
-                    Column{
-                        id: column_tline
-                        spacing: 5
-                        Repeater{
-                            id: repeat_tline
-                            model: tline_model
-                            Column{
-                                spacing: 5
-                                Rectangle{
-                                    id: rect_category
-                                    width: rect_annot_box6.width
-                                    height: 40
-                                    color: "#83B8F9"
-                                    //Image (+,-)
-                                    Text{
-                                        anchors.centerIn: parent
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 20
-                                        text: "Travel Line "+ Number(category)
-                                    }
-                                    MouseArea{
-                                        id:area_compo
-                                        anchors.fill:parent
-                                        onClicked: {
-                                            if(map.tool == "ADD_LINE"){
-                                                map.tool = "MOVE";
-                                                map.new_line_point1 = false;
-                                                map.new_line_point2 = false;
-                                            }
-
-                                            if(select_tline_category == category){
-                                                select_tline_category = -1;
-                                                map.select_travel_line = -1;
-                                            }else{
-                                                map.select_travel_line = category;
-                                                select_tline_category = category;
-                                                update_line(category);
-                                            }
-                                            select_tline_num = -1;
-                                            map.select_line = -1;
-                                            updatecanvas();
-                //                            map.select_object = supervisor.getObjNum(name);
-                //                            list_object.currentIndex = index;
-                //                            map.tool = "MOVE";
-                //                            map.update_canvas_all();
-                                        }
-                                    }
-
-                                }
-
-                                Repeater{
-                                    model:tline_line_model
-                                    visible: select_tline_category == category?true:false
-                                    Rectangle{
-                                        visible: select_tline_category == category?true:false
-                                        width: rect_annot_box6.width
-                                        height: 40
-                                        color: "transparent"
-                                        Rectangle{
-                                            id: line1
-                                            width: 1
-                                            height: parent.height/2
-                                            color: "#7e7e7e"
-                                        }
-                                        Rectangle{
-                                            id: line2
-                                            width: parent.width/10
-                                            height: 1
-                                            anchors.top: line1.bottom
-                                            color: "#7e7e7e"
-                                        }
-                                        Rectangle{
-                                            id: rect_line
-                                            width: parent.width*0.9
-                                            height: parent.height
-                                            anchors.right: parent.right
-                                            color: {
-                                                if(select_tline_num == index){
-                                                    "#FFD9FF"
-                                                }else{
-                                                    "white"
-                                                }
-                                            }
-                                            border.width: 1
-                                            border.color: "#7e7e7e"
-                                            Text {
-                                                anchors.centerIn: parent
-                                                text: name
-                                                font.family: font_noto_r.name
-                                                font.pixelSize: 20
-                                            }
-                                            MouseArea{
-                                                anchors.fill:parent
-                                                onClicked: {
-                                                    if(map.tool == "ADD_LINE"){
-                                                        map.tool = "MOVE";
-                                                        map.new_line_point1 = false;
-                                                        map.new_line_point2 = false;
-                                                    }
-                                                    select_tline_num = index;
-                                                    map.select_line = index;
-                                                    updatecanvas();
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                }
-                            }
-                        }
-                    }
-
-                }
-
-
-            }
-
-
-            ListModel{
-                id: tline_model
-            }
-            ListModel{
-                id: tline_line_model
-            }
-            Column{
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 30
-                spacing: 30
-                PageIndicator{
-                    id: indicator_annot
-                    count: 6
-                    currentIndex: 4
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 10
-                    delegate: Rectangle{
-                        implicitWidth: index===indicator_annot.currentIndex?10:8
-                        implicitHeight: implicitWidth
-                        anchors.verticalCenter: parent.verticalCenter
-                        radius: width
-                        color: index===indicator_annot.currentIndex?"black":"#d0d0d0"
-                        Behavior on color{
-                            ColorAnimation {
-                                duration: 200
-                            }
-                        }
-                    }
-                }
-                Row{
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 20
-                    Rectangle{
-                        id: btn_prev_0
-                        width: 180
-                        height: 60
-                        radius: 10
-                        color:"transparent"
-                        border.width: 1
-                        border.color: "#7e7e7e"
-                        Text{
-                            anchors.centerIn: parent
-                            text: "Previous"
-                            font.family: font_noto_r.name
-                            font.pixelSize: 25
-
-                        }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked:{
-                                map.init_mode();
-                                map.state_annotation = "LOCATION";
-                                loader_menu.sourceComponent = menu_annot_location;
-                            }
-                        }
-                    }
-                    Rectangle{
-                        id: btn_next_0
-                        width: 180
-                        height: 60
-                        radius: 10
-                        color: "black"
-                        border.width: 1
-                        border.color: "#7e7e7e"
-                        Text{
-                            anchors.centerIn: parent
-                            text: "Next"
-                            font.family: font_noto_r.name
-                            font.pixelSize: 25
-                            color: "white"
-                        }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked:{
-                                map.init_mode();
                                 map.state_annotation = "SAVE";
                                 loader_menu.sourceComponent = menu_annot_save;
+//                                map.init_mode();
+//                                map.state_annotation = "TRAVELLINE";
+//                                loader_menu.sourceComponent = menu_annot_tline;
                             }
                         }
                     }
@@ -3475,6 +3011,469 @@ Item {
         }
 
     }
+//    Component{
+//        id: menu_annot_tline
+//        Item{
+//            id: menu_travelline
+//            objectName: "menu_travelline"
+//            width: rect_menus.width
+//            height: rect_menus.height
+
+//            Rectangle{
+//                anchors.fill: parent
+//                color: "#f4f4f4"
+//            }
+
+//            Component.onCompleted: {
+//                var travel_num = supervisor.getTlineSize();
+//                tline_model.clear();
+//                for(var i=0; i<travel_num; i++){
+//                    tline_model.append({category:i,show:false});
+//                    print(i);
+//                }
+//                map.update_canvas();
+//            }
+//            function update_line(category){
+//                var line_num = supervisor.getTlineSize(category);
+//                tline_line_model.clear();
+//                for(var i=0; i<line_num; i=i+2){
+//                    tline_line_model.append({name:"line_" + Number(i/2)});
+//                }
+//            }
+
+//            function getcur(){
+//                return list_line.currentIndex;
+//            }
+//            function setcur(index){
+//                select_tline_num = index;
+//            }
+//            function update(){
+//                var travel_num = supervisor.getTlineSize();
+//                tline_model.clear();
+//                for(var i=0; i<travel_num; i++){
+//                    tline_model.append({category:i,show:false});
+//                    print(i);
+//                }
+//                tline_line_model.clear();
+//            }
+//            function update2(){
+//                var travel_num = supervisor.getTlineSize();
+//                tline_model.clear();
+//                for(var i=0; i<travel_num; i++){
+//                    tline_model.append({category:i,show:false});
+//                    print(i);
+//                }
+//                tline_line_model.clear();
+//                select_tline_category = -1;
+//                select_tline_num = -1;
+//            }
+
+//            Rectangle{
+//                id: rect_annot_state
+//                width: parent.width
+//                height: 50
+//                anchors.top: parent.top
+//                anchors.topMargin: 2
+//                color: "#4F5666"
+//                Text{
+//                    anchors.centerIn: parent
+//                    color: "white"
+//                    font.family: font_noto_b.name
+//                    font.pixelSize: 20
+//                    text: "STEP 4. Add/Edit Travel Line"
+//                    horizontalAlignment: Text.AlignHCenter
+//                }
+//            }
+
+//            Column{
+//                spacing: 20
+//                width: parent.width
+//                anchors.top: rect_annot_state.bottom
+//                anchors.topMargin: 30
+//                anchors.horizontalCenter: parent.horizontalCenter
+//                Rectangle{
+//                    id: rect_annot_box6
+//                    width: parent.width - 60
+//                    height: 100
+//                    anchors.horizontalCenter: parent.horizontalCenter
+//                    color: "#e8e8e8"
+//                    Row{
+//                        anchors.centerIn: parent
+//                        spacing: 30
+//                        Rectangle{
+//                            id: btn_move
+//                            width: 78
+//                            height: width
+//                            radius: width
+//                            border.width: map.tool=="MOVE"?3:0
+//                            border.color: "#12d27c"
+//                            Column{
+//                                anchors.centerIn: parent
+//                                Image{
+//                                    source: "icon/icon_move.png"
+//                                    anchors.horizontalCenter: parent.horizontalCenter
+//                                }
+//                                Text{
+//                                    text: "Move"
+//                                    font.family: font_noto_r.name
+//                                    anchors.horizontalCenter: parent.horizontalCenter
+//                                }
+//                            }
+//                            MouseArea{
+//                                anchors.fill: parent
+//                                onClicked: {
+//                                    map.tool = "MOVE";
+//                                }
+//                            }
+//                        }
+//                        Rectangle{
+//                            id: btn_add1
+//                            width: 78
+//                            height: width
+//                            radius: width
+//                            border.width: map.tool=="ADD_LINE"?3:0
+//                            border.color: "#12d27c"
+//                            Column{
+//                                anchors.centerIn: parent
+//                                Image{
+//                                    source: "icon/icon_add.png"
+//                                    anchors.horizontalCenter: parent.horizontalCenter
+//                                }
+//                                Text{
+//                                    text: "Add"
+//                                    font.family: font_noto_r.name
+//                                    anchors.horizontalCenter: parent.horizontalCenter
+//                                }
+//                            }
+//                            MouseArea{
+//                                anchors.fill: parent
+//                                onClicked: {
+//                                    map.tool = "ADD_LINE";
+//                                }
+//                            }
+//                        }
+//                        Rectangle{
+//                            id: btn_erase
+//                            width: 78
+//                            height: width
+//                            radius: width
+//                            color: enabled?"white":"#f4f4f4"
+//                            enabled: map.tool=="ADD_LINE"?false:true
+//                            Column{
+//                                anchors.centerIn: parent
+//                                Image{
+//                                    source: "icon/icon_erase.png"
+//                                    anchors.horizontalCenter: parent.horizontalCenter
+//                                }
+//                                Text{
+//                                    text: "Remove"
+//                                    color: btn_erase.enabled?"black":"#e8e8e8"
+//                                    font.family: font_noto_r.name
+//                                    anchors.horizontalCenter: parent.horizontalCenter
+//                                }
+//                            }
+//                            MouseArea{
+//                                anchors.fill: parent
+//                                onClicked: {
+//                                    supervisor.removeTline(select_tline_category,select_tline_num);
+//                                    map.update_canvas();
+//                                    update_line(select_tline_category);
+
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                Rectangle{
+//                    id: rect_annot_box7
+//                    width: parent.width
+//                    visible: map.tool=="ADD_LINE"?true:false
+//                    onVisibleChanged: {
+//                        if(visible){
+//                            height = 50
+//                        }else{
+//                            height = 0
+//                        }
+//                    }
+//                    Behavior on height {
+//                        NumberAnimation{
+//                            duration:300;
+//                        }
+//                    }
+//                    color: "#e8e8e8"
+//                    Row{
+//                        anchors.centerIn: parent
+//                        spacing: 30
+//                        Rectangle{
+//                            id: btn_11
+//                            width: 80
+//                            height: 40
+//                            radius: 5
+//                            Text{
+//                                text: "Cancel"
+//                                anchors.centerIn: parent
+//                                font.family: font_noto_r.name
+//                            }
+//                            MouseArea{
+//                                anchors.fill: parent
+//                                onClicked: {
+//                                    map.tool = "MOVE";
+//                                    map.new_travel_line = false;
+//                                    map.new_line_point1 = false;
+//                                    map.new_line_point2 = false;
+//                                }
+//                            }
+//                        }
+//                        Rectangle{
+//                            id: btn_22
+//                            width: 78
+//                            height: 40
+//                            radius: 5
+//                            color: enabled?"white":"#f4f4f4"
+//                            enabled: map.new_line_point1&&map.new_line_point2?true:false
+//                            Text{
+//                                text: "Save"
+//                                anchors.centerIn: parent
+//                                font.family: font_noto_r.name
+//                                color: parent.enabled?"black":"white"
+//                            }
+//                            MouseArea{
+//                                anchors.fill: parent
+//                                onClicked: {
+//                                    if(map.new_line_point1&&map.new_line_point2){
+//                                        print("??????????! : "+select_tline_category)
+//                                        if(select_tline_category > 0){
+//                                            supervisor.addTline(select_tline_category,map.new_line_x1,map.new_line_y1,map.new_line_x2,map.new_line_y2);
+//                                        }else{
+//                                            supervisor.addTline(supervisor.getTlineSize(),map.new_line_x1,map.new_line_y1,map.new_line_x2,map.new_line_y2);
+//                                            update();
+//                                            select_tline_category = supervisor.getTlineSize()-1;
+//                                            map.select_travel_line = select_tline_category;
+//                                        }
+//                                        print("?! : "+select_tline_category)
+//                                        update_line(select_tline_category);
+//                                        map.tool = "MOVE";
+//                                        map.new_travel_line = false;
+//                                        map.new_line_point1 = false;
+//                                        map.new_line_point2 = false;
+//                                        updatecanvas();
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                Flickable{
+//                    width: rect_annot_box6.width
+//                    height: rect_annot_box7.visible?310-60:310
+//                    anchors.horizontalCenter: parent.horizontalCenter
+//                    contentHeight: column_tline.height
+//                    clip: true
+//                    Column{
+//                        id: column_tline
+//                        spacing: 5
+//                        Repeater{
+//                            id: repeat_tline
+//                            model: tline_model
+//                            Column{
+//                                spacing: 5
+//                                Rectangle{
+//                                    id: rect_category
+//                                    width: rect_annot_box6.width
+//                                    height: 40
+//                                    color: "#83B8F9"
+//                                    //Image (+,-)
+//                                    Text{
+//                                        anchors.centerIn: parent
+//                                        font.family: font_noto_r.name
+//                                        font.pixelSize: 20
+//                                        text: "Travel Line "+ Number(category)
+//                                    }
+//                                    MouseArea{
+//                                        id:area_compo
+//                                        anchors.fill:parent
+//                                        onClicked: {
+//                                            if(map.tool == "ADD_LINE"){
+//                                                map.tool = "MOVE";
+//                                                map.new_line_point1 = false;
+//                                                map.new_line_point2 = false;
+//                                            }
+
+//                                            if(select_tline_category == category){
+//                                                select_tline_category = -1;
+//                                                map.select_travel_line = -1;
+//                                            }else{
+//                                                map.select_travel_line = category;
+//                                                select_tline_category = category;
+//                                                update_line(category);
+//                                            }
+//                                            select_tline_num = -1;
+//                                            map.select_line = -1;
+//                                            updatecanvas();
+//                //                            map.select_object = supervisor.getObjNum(name);
+//                //                            list_object.currentIndex = index;
+//                //                            map.tool = "MOVE";
+//                //                            map.update_canvas();
+//                                        }
+//                                    }
+
+//                                }
+
+//                                Repeater{
+//                                    model:tline_line_model
+//                                    visible: select_tline_category == category?true:false
+//                                    Rectangle{
+//                                        visible: select_tline_category == category?true:false
+//                                        width: rect_annot_box6.width
+//                                        height: 40
+//                                        color: "transparent"
+//                                        Rectangle{
+//                                            id: line1
+//                                            width: 1
+//                                            height: parent.height/2
+//                                            color: "#7e7e7e"
+//                                        }
+//                                        Rectangle{
+//                                            id: line2
+//                                            width: parent.width/10
+//                                            height: 1
+//                                            anchors.top: line1.bottom
+//                                            color: "#7e7e7e"
+//                                        }
+//                                        Rectangle{
+//                                            id: rect_line
+//                                            width: parent.width*0.9
+//                                            height: parent.height
+//                                            anchors.right: parent.right
+//                                            color: {
+//                                                if(select_tline_num == index){
+//                                                    "#FFD9FF"
+//                                                }else{
+//                                                    "white"
+//                                                }
+//                                            }
+//                                            border.width: 1
+//                                            border.color: "#7e7e7e"
+//                                            Text {
+//                                                anchors.centerIn: parent
+//                                                text: name
+//                                                font.family: font_noto_r.name
+//                                                font.pixelSize: 20
+//                                            }
+//                                            MouseArea{
+//                                                anchors.fill:parent
+//                                                onClicked: {
+//                                                    if(map.tool == "ADD_LINE"){
+//                                                        map.tool = "MOVE";
+//                                                        map.new_line_point1 = false;
+//                                                        map.new_line_point2 = false;
+//                                                    }
+//                                                    select_tline_num = index;
+//                                                    map.select_line = index;
+//                                                    updatecanvas();
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+
+//                                }
+//                            }
+//                        }
+//                    }
+
+//                }
+
+
+//            }
+
+
+//            ListModel{
+//                id: tline_model
+//            }
+//            ListModel{
+//                id: tline_line_model
+//            }
+//            Column{
+//                anchors.horizontalCenter: parent.horizontalCenter
+//                anchors.bottom: parent.bottom
+//                anchors.bottomMargin: 30
+//                spacing: 30
+//                PageIndicator{
+//                    id: indicator_annot
+//                    count: 6
+//                    currentIndex: 4
+//                    anchors.horizontalCenter: parent.horizontalCenter
+//                    spacing: 10
+//                    delegate: Rectangle{
+//                        implicitWidth: index===indicator_annot.currentIndex?10:8
+//                        implicitHeight: implicitWidth
+//                        anchors.verticalCenter: parent.verticalCenter
+//                        radius: width
+//                        color: index===indicator_annot.currentIndex?"black":"#d0d0d0"
+//                        Behavior on color{
+//                            ColorAnimation {
+//                                duration: 200
+//                            }
+//                        }
+//                    }
+//                }
+//                Row{
+//                    anchors.horizontalCenter: parent.horizontalCenter
+//                    spacing: 20
+//                    Rectangle{
+//                        id: btn_prev_0
+//                        width: 180
+//                        height: 60
+//                        radius: 10
+//                        color:"transparent"
+//                        border.width: 1
+//                        border.color: "#7e7e7e"
+//                        Text{
+//                            anchors.centerIn: parent
+//                            text: "Previous"
+//                            font.family: font_noto_r.name
+//                            font.pixelSize: 25
+
+//                        }
+//                        MouseArea{
+//                            anchors.fill: parent
+//                            onClicked:{
+//                                map.init_mode();
+//                                map.state_annotation = "LOCATION";
+//                                loader_menu.sourceComponent = menu_annot_location;
+//                            }
+//                        }
+//                    }
+//                    Rectangle{
+//                        id: btn_next_0
+//                        width: 180
+//                        height: 60
+//                        radius: 10
+//                        color: "black"
+//                        border.width: 1
+//                        border.color: "#7e7e7e"
+//                        Text{
+//                            anchors.centerIn: parent
+//                            text: "Next"
+//                            font.family: font_noto_r.name
+//                            font.pixelSize: 25
+//                            color: "white"
+//                        }
+//                        MouseArea{
+//                            anchors.fill: parent
+//                            onClicked:{
+//                                map.init_mode();
+//                                map.state_annotation = "SAVE";
+//                                loader_menu.sourceComponent = menu_annot_save;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+
     Component{
         id: menu_annot_save
         Item{
@@ -3711,8 +3710,10 @@ Item {
                                 }
                                 
                                 //맵 다시 불러오기
+                                map_current.map_mode = "EDITED";
+                                map_current.loadmap(supervisor.getMapname(),"EDITED");
                                 map_current.update_map();
-                                map_current.update_canvas_all();
+                                map_current.update_canvas();
                             }
                         }
                     }
@@ -3739,11 +3740,11 @@ Item {
 
     function update_patrol_location(){
         loader_menu.item.update();
-        map.update_canvas_all();
+        map.update_canvas();
     }
     function updatemap(){
         map.update_map_variable();
-        map.update_canvas_all();
+        map.update_canvas();
     }
 
     ////////*********************Timer********************************************************
@@ -4201,14 +4202,13 @@ Item {
                                     //맵 새로 불러오기.
                                     supervisor.setMap(textfield_name22.text);
                                     map.init_mode();
-                                    map.use_rawmap = true;
-                                    map.loadmap(textfield_name22.text);
+                                    map.loadmap(textfield_name22.text,"RAW");
 
                                     supervisor.clear_all();
                                     map.state_annotation = "DRAWING";
                                     map.refreshMap = true;
                                     map.use_rawmap = true;
-                                    map.update_canvas_all();
+                                    map.update_canvas();
                                     loader_menu.sourceComponent = menu_annot_draw;
                                     popup_save_mapping.close();
                                 }
@@ -4339,16 +4339,14 @@ Item {
                                 if(textfield_name.text == ""){
                                 }else{
                                     //save temp Image
-                                    map.save_map("map_edited_temp.png");
+                                    map.save_map(textfield_name.text);
 
                                     //임시 맵 이미지를 해당 폴더 안에 넣음.
-                                    supervisor.rotate_map("map_edited_temp.png",textfield_name.text, 1);
-                                    supervisor.setMap(textfield_name.text);
+//                                    supervisor.rotate_map("map_edited_temp.png",textfield_name.text, 1);
+//                                    supervisor.setMap(textfield_name.text);
 
                                     //맵 새로 불러오기.
-                                    map.use_rawmap = false;
-                                    map.use_minimap = false;
-                                    map.loadmap(textfield_name.text);
+                                    map.loadmap(textfield_name.text,"EDITED");
 
                                     supervisor.clear_all();
                                     map.state_annotation = "OBJECT";
@@ -4392,7 +4390,7 @@ Item {
                 onClicked: {
                     map.select_location_show = supervisor.getLocNum(name);
                     list_location2.currentIndex = index;
-                    map.update_canvas_all();
+                    map.update_canvas();
                 }
             }
         }
@@ -4595,7 +4593,7 @@ Item {
                         }else{
                             supervisor.addObject(select_object_type);
                         }
-                        map.update_canvas_all();
+                        map.update_canvas();
                         map.tool = "MOVE";
                         popup_add_object.close();
                     }
@@ -4830,7 +4828,7 @@ Item {
                             map.new_loc_th = 0;
                             map.new_loc_available = false;
                             popup_add_location.close();
-                            map.update_canvas_all();
+                            map.update_canvas();
                         }
                     }
                 }
@@ -4898,7 +4896,7 @@ Item {
                         map.new_line_y2 = 0;
                         map.tool = "MOVE";
                         popup_add_travelline.close();
-                        map.update_canvas_all();
+                        map.update_canvas();
                     }else{
                         popup_add_travelline.close();
                     }
@@ -5003,7 +5001,7 @@ Item {
         check_slam_init_timer.stop();
         map.loadmap(name);
         updatemap();
-        map.update_canvas_all();
+        map.update_canvas();
     }
 
     function init_map(){
@@ -5037,7 +5035,6 @@ Item {
             map.show_location = true;
             map.show_connection = false;
             map.show_object = true;
-            map.show_travelline = true;
             map.robot_following = false;
             loader_menu.sourceComponent = menu_annot_state;
         }else if(map_mode == 3){
@@ -5049,7 +5046,7 @@ Item {
             map.show_connection = false;
             map.show_location_default = false;
             map.robot_following = false;
-            map.update_canvas_all();
+            map.update_canvas();
             loader_menu.sourceComponent = menu_patrol;
         }else if(map_mode == 4){
             text_menu_title.visible = true;

@@ -431,13 +431,13 @@ Popup{
             anchors.top: rect_list_left.top
             anchors.left: rect_list_left.right
 
-            Map_full{
-                id: map_list_view
-                width: parent.width
-                height: width
-                anchors.centerIn: parent
-                just_show_map: true
-            }
+//            Map_full{
+//                id: map_list_view
+//                width: parent.width
+//                height: width
+//                anchors.centerIn: parent
+//                just_show_map: true
+//            }
         }
     }
 }

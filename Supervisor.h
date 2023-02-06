@@ -207,6 +207,8 @@ public:
     Q_INVOKABLE QString getLineColor(int index);
     Q_INVOKABLE float getLineWidth(int index);
 
+    Q_INVOKABLE void saveMap(QString src, QString dst, QList<int> data, QList<int> alpha);
+
     Q_INVOKABLE void startLine(QString color, float width);
     Q_INVOKABLE void setLine(int x, int y);
     Q_INVOKABLE void stopLine();

@@ -128,6 +128,7 @@ void Supervisor::git_pull_success(){
     setSetting("ROBOT_SW/version_msg",probot->program_message);
     setSetting("ROBOT_SW/version_date",probot->program_date);
     setSetting("ROBOT_SW/version",probot->program_version);
+    qDebug() << "save git success";
 }
 bool Supervisor::isNewVersion(){
     git->updateGitArray();
@@ -1242,6 +1243,9 @@ QObject *Supervisor::getMap(QString filename) const{
     cv::flip(map,map,0);
     cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
 
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
+    cv::warpAffine(map,map,rot,map.size());
+
     pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
     Q_ASSERT(!pc->pixmap.isNull());
     QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
@@ -1249,7 +1253,6 @@ QObject *Supervisor::getMap(QString filename) const{
 }
 
 QObject *Supervisor::getRawMap(QString filename) const{
-    qDebug() << filename;
     PixmapContainer *pc = new PixmapContainer();
     QString file_path = QDir::homePath()+"/maps/"+filename+"/map_raw.png";
 
@@ -1267,6 +1270,9 @@ QObject *Supervisor::getRawMap(QString filename) const{
     cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
     cv::flip(map,map,0);
     cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
+    cv::warpAffine(map,map,rot,map.size());
 
     pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
 
@@ -1318,7 +1324,7 @@ int Supervisor::getCanvasSize(){
     return canvas.size();
 }
 void Supervisor::setRotateAngle(float angle){
-    qDebug() << "SET ROTATE ANGLE : " << angle;
+//    qDebug() << "SET ROTATE ANGLE : " << angle;
     map_rotate_angle = angle;
 }
 int Supervisor::getRedoSize(){
@@ -1344,6 +1350,34 @@ QString Supervisor::getLineColor(int index){
         return canvas[index].color;
     }
     return "";
+}
+void Supervisor::saveMap(QString src, QString dst, QList<int> data, QList<int> alpha){
+    QString file_path = QDir::homePath()+"/maps/"+src+"/map_edited.png";
+    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+    cv::flip(map,map,0);
+    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
+    cv::warpAffine(map,map,rot,map.size());
+
+    for(int i=0; i<alpha.size(); i++){
+        if(alpha[i] > 0){
+            map.data[i] = data[i];
+        }
+    }
+    cv::rotate(map,map,cv::ROTATE_90_CLOCKWISE);
+    cv::flip(map,map,0);
+    QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(map)).toImage();
+    QString path = QDir::homePath()+"/maps/"+dst;
+    QDir directory(path);
+    if(!directory.exists()){
+        directory.mkpath(".");
+    }
+    if(temp_image.save(QDir::homePath()+"/maps/"+dst+"/map_edited.png","PNG")){
+        plog->write("[MAP] Save edited Map : "+dst);
+    }else{
+        plog->write("[MAP] Fail to save edited Map : "+dst);
+    }
 }
 float Supervisor::getLineWidth(int index){
     if(index < canvas.size()){

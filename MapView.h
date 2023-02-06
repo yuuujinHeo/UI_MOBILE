@@ -14,10 +14,6 @@ public:
     QPixmap pixmap;
 };
 
-
-
-
-
 class MapView : public QQuickPaintedItem
 {
     Q_OBJECT
