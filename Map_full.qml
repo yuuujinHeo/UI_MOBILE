@@ -814,7 +814,7 @@ Item {
         Rectangle{
             anchors.fill: parent
             color: "transparent"
-            visible: show_connection
+            visible: show_connection && !is_slam_running
             border.color: "#E7584D"
             border.width: 5
             Column{

@@ -1234,13 +1234,12 @@ Item {
         }
         property bool is_server: false
         onOpened: {
-            map_load.just_show_map = true;
             if(is_server){
                 text_show_popup.text = "서버로부터 맵을 로드했습니다.\n 매장의 환경과 일치하는 맵인지 확인해주세요."
-                map_load.loadmap(supervisor.getServerMapname());
+//                map_load.loadmap(supervisor.getServerMapname());
             }else{
                 text_show_popup.text = "매장의 환경과 일치하는 맵인지 확인해주세요."
-                map_load.loadmap(supervisor.getMapname());
+                map_load.loadmap(supervisor.getMapname(),"EDITED");
             }
             map_load.show_object = true;
             map_load.show_location = true;
