@@ -153,6 +153,7 @@ Window {
             loader_page.item.updatepatrol();
     }
     function updatecanvas(){
+        print(loader_page.item.objectName);
         if(loader_page.item.objectName == "page_map")
             loader_page.item.updatecanvas();
     }

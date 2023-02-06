@@ -10,21 +10,33 @@ Item {
     height: 800
 
     property int init_mode: 0 //0:inifile, 1:mapfile, 2:connection, 3:slam, 4:done
-    property bool ui_slam_init: false
 
-    onUi_slam_initChanged: {
-        if(ui_slam_init){
-            loader_init.item.startinit();
-        }else{
-            loader_init.item.startreturn();
-        }
-    }
+//    property bool ui_slam_init: false
+//    onUi_slam_initChanged: {
+//        if(ui_slam_init){
+//            loader_init.item.startinit();
+//        }else{
+//            loader_init.item.startreturn();
+//        }
+//    }
 
     Component.onCompleted: {
         init_mode = 0;
         update_timer.start();
         statusbar.visible = false;
     }
+
+    function loadmap_server(result){
+        if(result){
+            update_timer.stop();
+            popup_show_map.is_server = true;
+            popup_show_map.open();
+        }else{
+            loader_init.item.enable_failload();
+            failload_timer.start();
+        }
+    }
+
 
     //init page main window
     Loader{
@@ -731,17 +743,11 @@ Item {
 
     }
 
-    function loadmap_server(result){
-        if(result){
-            update_timer.stop();
-            popup_show_map.is_server = true;
-            popup_show_map.open();
-        }else{
-            loader_init.item.enable_failload();
-            failload_timer.start();
-        }
-    }
 
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     Timer{
         id: failload_timer
         interval: 2000
@@ -835,6 +841,17 @@ Item {
             }
         }
     }
+
+
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Popup_map_list{
+        id: popup_map_list
+    }
+
 
     //USB 맵 목록 보여주기
     Popup{
@@ -940,10 +957,6 @@ Item {
             }
         }
     }
-
-    Popup_map_list{
-        id: popup_map_list
-    }
     Component {
         id: usbCompo
         Item {
@@ -1004,7 +1017,6 @@ Item {
             }
         }
     }
-
 
     //맵 보여주기
     Popup{
@@ -1251,7 +1263,6 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: rect_map_name.bottom
             anchors.topMargin: 10
-            just_show_map: true
         }
         Rectangle{
             id: rect_map_name
@@ -1412,7 +1423,5 @@ Item {
             }
         }
     }
-
-
 
 }

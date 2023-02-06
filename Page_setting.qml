@@ -2609,7 +2609,7 @@ Item {
                 anchors.topMargin: 50
                 font.family: font_noto_r.name
                 font.pixelSize: 20
-                text:supervisor.getLocalVersion()
+                text:supervisor.getLocalVersionDate()
             }
 
             Rectangle{
@@ -2656,13 +2656,13 @@ Item {
                     id: text_version1
                     font.family: font_noto_r.name
                     font.pixelSize: 20
-                    text:"현재 : "+supervisor.getLocalVersion()
+                    text:"현재 : "+supervisor.getLocalVersionDate()
                 }
                 Text{
                     id: text_version2
                     font.family: font_noto_r.name
                     font.pixelSize: 20
-                    text:"최신 : "+supervisor.getServerVersion()
+                    text:"최신 : "+supervisor.getServerVersionDate()
                 }
             }
             Row{
@@ -2716,6 +2716,14 @@ Item {
             }
         }
 
+    }
+    Timer{
+        repeat: true
+        interval: 500
+        running: true
+        onTriggered: {
+            print("setting timer");
+        }
     }
 
 
