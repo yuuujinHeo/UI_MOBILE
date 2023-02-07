@@ -132,8 +132,7 @@ void Supervisor::git_pull_success(){
 
 bool Supervisor::isNewVersion(){
     git->updateGitArray();
-
-    if(probot->gitList[0].commit == probot->program_version){
+    if(probot->gitList[0].date == probot->program_version){
         return true;
     }else{
         return false;
@@ -178,6 +177,7 @@ void Supervisor::setSetting(QString name, QString value){
     QString ini_path = getIniPath();
     QSettings setting(ini_path, QSettings::IniFormat);
     setting.setValue(name,value);
+    qDebug() << value;
     plog->write("[SETTING] SET "+name+" VALUE TO "+value);
     readSetting();
 }
