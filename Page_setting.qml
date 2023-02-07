@@ -20,6 +20,9 @@ Item {
             popup_camera.update();
     }
 
+    Tool_Keyboard{
+        id: keyboard
+    }
     Rectangle{
         width: parent.width
         height: parent.height-statusbar.height
@@ -201,6 +204,14 @@ Item {
                                 id: platform_name
                                 anchors.fill: parent
                                 text:supervisor.getSetting("ROBOT_HW","model");
+                                onFocusChanged: {
+                                    keyboard.owner = platform_name;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
                             }
                         }
                     }
@@ -712,6 +723,14 @@ Item {
                                 id: radius
                                 anchors.fill: parent
                                 text:supervisor.getSetting("ROBOT_HW","radius");
+                                onFocusChanged: {
+                                    keyboard.owner = radius;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
                             }
                         }
                     }
@@ -807,6 +826,14 @@ Item {
                                     height: parent.height
                                     width: 300
                                     text:supervisor.getMapname();//Setting("ROBOT_HW","model");
+                                    onFocusChanged: {
+                                        keyboard.owner = map_name;
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            keyboard.close();
+                                        }
+                                    }
                                 }
                                 Rectangle{
                                     width: 100
@@ -1129,6 +1156,14 @@ Item {
                                 id: offset_x
                                 anchors.fill: parent
                                 text:supervisor.getSetting("SENSOR","offset_x");
+                                onFocusChanged: {
+                                    keyboard.owner = offset_x;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
                             }
                         }
                     }
@@ -1163,6 +1198,14 @@ Item {
                                 id: offset_y
                                 anchors.fill: parent
                                 text:supervisor.getSetting("SENSOR","offset_y");
+                                onFocusChanged: {
+                                    keyboard.owner = offset_y;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
                             }
                         }
                     }
@@ -1199,6 +1242,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.right: btn_view_cam.left
                                 text:supervisor.getSetting("SENSOR","left_camera");
+                                readOnly: true
                             }
                             Rectangle{
                                 id: btn_view_cam
@@ -1263,6 +1307,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.right: btn_view_camr.left
                                 text:supervisor.getSetting("SENSOR","right_camera");
+                                readOnly: true
                             }
                             Rectangle{
                                 id: btn_view_camr
@@ -1786,6 +1831,14 @@ Item {
                                 id: wheel_base
                                 anchors.fill: parent
                                 text:supervisor.getSetting("ROBOT","wheel_base");
+                                onFocusChanged: {
+                                    keyboard.owner = wheel_base;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
                             }
                         }
                     }
@@ -1819,6 +1872,14 @@ Item {
                                 id: wheel_radius
                                 anchors.fill: parent
                                 text:supervisor.getSetting("ROBOT","wheel_radius");
+                                onFocusChanged: {
+                                    keyboard.owner = wheel_radius;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
                             }
                         }
                     }
@@ -1881,6 +1942,14 @@ Item {
                                 id: gear_ratio
                                 anchors.fill: parent
                                 text: supervisor.getSetting("MOTOR","gear_ratio");
+                                onFocusChanged: {
+                                    keyboard.owner = gear_ratio;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
                             }
                         }
                     }
@@ -1915,6 +1984,14 @@ Item {
                                 id: k_p
                                 anchors.fill: parent
                                 text: supervisor.getSetting("MOTOR","k_p");
+                                onFocusChanged: {
+                                    keyboard.owner = k_p;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
                             }
                         }
                     }
@@ -1949,6 +2026,14 @@ Item {
                                 id: k_i
                                 anchors.fill: parent
                                 text: supervisor.getSetting("MOTOR","k_i");
+                                onFocusChanged: {
+                                    keyboard.owner = k_i;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
                             }
                         }
                     }
@@ -1983,6 +2068,14 @@ Item {
                                 id: k_d
                                 anchors.fill: parent
                                 text: supervisor.getSetting("MOTOR","k_d");
+                                onFocusChanged: {
+                                    keyboard.owner = k_d;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
                             }
                         }
                     }
@@ -2717,16 +2810,6 @@ Item {
         }
 
     }
-    Timer{
-        repeat: true
-        interval: 500
-        running: true
-        onTriggered: {
-            print("setting timer");
-        }
-    }
-
-
     Popup{
         id: popup_camera
         width: parent.width

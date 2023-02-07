@@ -5,6 +5,7 @@
 #include <QQmlContext>
 #include "MapView.h"
 #include "Supervisor.h"
+#include "Keyemitter.h"
 #include "Logger.h"
 
 Logger *plog;
@@ -14,6 +15,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     qmlRegisterType<Supervisor>("io.qt.Supervisor",1,0, "Supervisor");
     qmlRegisterType<MapView>("io.qt.MapView",1,0, "MapView");
+    qmlRegisterType<KeyEmitter>("io.qt.Keyemitter",1,0, "Keyemitter");
 
     QApplication app(argc, argv);
     app.setOrganizationName("Mobile");

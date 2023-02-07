@@ -17,7 +17,6 @@ Item {
         interval: 500
         running: true
         onTriggered: {
-            print("kitchen timer");
         }
     }
 

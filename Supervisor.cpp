@@ -123,6 +123,7 @@ QString Supervisor::getIniPath(){
 
 ////*********************************************  SETTING 관련   ***************************************************////
 void Supervisor::git_pull_success(){
+    plog->write("[SUPERVISOR] GIT PULL SUCCESS : "+probot->program_date);
     setSetting("ROBOT_SW/version_msg",probot->program_message);
     setSetting("ROBOT_SW/version_date",probot->program_date);
     setSetting("ROBOT_SW/version",probot->program_version);
@@ -2010,7 +2011,7 @@ bool Supervisor::saveMetaData(QString filename){
 }
 bool Supervisor::saveAnnotation(QString filename){
     //기존 파일 백업
-    QString backup = QDir::homePath()+"/maps"+filename+"/annotation_backup.ini";
+    QString backup = QDir::homePath()+"/maps/"+filename+"/annotation_backup.ini";
     QString origin = getAnnotPath(filename);
     if(QFile::exists(origin) == true){
         if(QFile::copy(origin, backup)){

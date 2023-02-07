@@ -142,7 +142,7 @@ void HTTPHandler::processResetOutput(){
 }
 void HTTPHandler::processPullOutput(){
     QString output = QString(process->readAllStandardOutput());
-    plog->write("[GIT] Program Update Success : "+output);
+    plog->write("[GIT] Program Update Success : "+output+probot->gitList[0].date);
     probot->program_version = probot->gitList[0].commit;
     probot->program_date = probot->gitList[0].date;
     probot->program_message = probot->gitList[0].message;

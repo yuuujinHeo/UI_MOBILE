@@ -289,13 +289,11 @@ Item {
             show_location = true;
 //            show_margin = true;
             find_map_walls();
-        }else if(state_annotation == "TRAVELLINE"){
-            show_travelline = true;
         }else if(state_annotation == "SAVE"){
             show_location = true;
             show_object = true;
             show_robot = true;
-            show_travelline = true;
+//            show_travelline = true;
         }
         update_canvas();
     }

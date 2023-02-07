@@ -52,6 +52,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     GlobalHeader.h \
     JoystickHandler.h \
+    Keyemitter.h \
     LCMHandler.h \
     Logger.h \
     MapView.h \
