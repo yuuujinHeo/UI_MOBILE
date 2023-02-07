@@ -6,6 +6,7 @@ import Qt.labs.platform 1.0
 import QtGraphicalEffects 1.0
 import "."
 import io.qt.Supervisor 1.0
+import io.qt.Keyemitter 1.0
 import QtMultimedia 5.12
 
 Window {
@@ -198,6 +199,10 @@ Window {
     function update_ini(){
         robot_type = supervisor.getRobotType()
         robot_name = supervisor.getRobotName()
+    }
+
+    Keyemitter{
+        id: emitter
     }
 
     Loader{

@@ -21,6 +21,10 @@ Item {
     property var joy_axis_left_ud: 0
     property var joy_axis_right_rl: 0
 
+    property int state_meta: 0
+    property int state_annot: 0
+    property int state_map: 0
+
     //mode : 0(mapview) 1:(slam-mapping) 2:(annotation) 3:(patrol) 4: (slam-localization)
     property int map_mode: 0
 
@@ -40,6 +44,9 @@ Item {
     property int select_tline_category: -1
     property int select_patrol_num: -1
 
+    Tool_Keyboard{
+        id: keyboard
+    }
 
     onSelect_patrol_numChanged: {
         loader_menu.item.setindex(select_patrol_num);
@@ -53,6 +60,20 @@ Item {
 
     Component.onCompleted: {
         init_map();
+
+        if(supervisor.isExistAnnotation(supervisor.getMapname())){
+            state_annot = 1;
+        }else{
+            state_annot = 0;
+        }
+
+        if(supervisor.isExistMap(supervisor.getMapname())){
+            state_map = 1;
+            state_meta = 1;
+        }else{
+            state_map = 0;
+            state_meta = 0;
+        }
     }
 
     Component.onDestruction:  {
@@ -526,7 +547,7 @@ Item {
 
             function setKeyUp(pressed){
                 if(pressed){
-                    keyboard.pressed_up = pressed;
+                    keyboard_arrow.pressed_up = pressed;
                     count_u = 0;
                 }else{
                     count_u++;
@@ -535,7 +556,7 @@ Item {
             }
             function setKeyDown(pressed){
                 if(pressed){
-                    keyboard.pressed_down= pressed;
+                    keyboard_arrow.pressed_down= pressed;
                     count_d = 0;
                 }else{
                     count_d++;
@@ -543,7 +564,7 @@ Item {
             }
             function setKeyLeft(pressed){
                 if(pressed){
-                    keyboard.pressed_left = pressed;
+                    keyboard_arrow.pressed_left = pressed;
                     count_l = 0;
                 }else{
                     count_l++;
@@ -551,7 +572,7 @@ Item {
             }
             function setKeyRight(pressed){
                 if(pressed){
-                    keyboard.pressed_right = pressed;
+                    keyboard_arrow.pressed_right = pressed;
                     count_r = 0;
                 }else{
                     count_r++;
@@ -564,16 +585,16 @@ Item {
                 interval: 200
                 onTriggered: {
                     if(prev_u == count_u && count_u > 0){
-                        keyboard.pressed_up = false;
+                        keyboard_arrow.pressed_up = false;
                     }
                     if(prev_d == count_d && count_d > 0){
-                        keyboard.pressed_down = false;
+                        keyboard_arrow.pressed_down = false;
                     }
                     if(prev_r == count_r && count_r > 0){
-                        keyboard.pressed_right = false;
+                        keyboard_arrow.pressed_right = false;
                     }
                     if(prev_l == count_l && count_l > 0){
-                        keyboard.pressed_left = false;
+                        keyboard_arrow.pressed_left = false;
                     }
                     prev_u = count_u;
                     prev_d = count_d;
@@ -583,16 +604,16 @@ Item {
             }
 
             function getKeyUp(){
-                return keyboard.pressed_up
+                return keyboard_arrow.pressed_up
             }
             function getKeyDown(){
-                return keyboard.pressed_down
+                return keyboard_arrow.pressed_down
             }
             function getKeyLeft(){
-                return keyboard.pressed_left
+                return keyboard_arrow.pressed_left
             }
             function getKeyRight(){
-                return keyboard.pressed_right
+                return keyboard_arrow.pressed_right
             }
 
             Rectangle{
@@ -768,7 +789,7 @@ Item {
                 }
             }
             Item_keyboard{
-                id: keyboard
+                id: keyboard_arrow
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 20
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -1650,7 +1671,7 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 6
+                    count: 5
                     currentIndex: 0
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
@@ -2066,7 +2087,7 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 6
+                    count: 5
                     currentIndex: 1
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
@@ -2128,12 +2149,35 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
-                                popup_save_edited.open();
                                 if(slider_rotate.value != 0){
                                     popup_save_edited.show_rotate();
                                 }else{
                                     popup_save_edited.unshow_rotate();
                                 }
+
+                                //변경한게 있으면(drawing or rotate)
+                                if(slider_rotate.value != 0){
+                                    state_annot = 2;
+                                    print("rotate")
+                                    popup_save_edited.open();
+                                }else if(supervisor.getCanvasSize() > 0){
+                                    state_annot = 2;
+                                    print("drawing")
+                                    popup_save_edited.open();
+                                }else if(state_map == 0){
+                                    //raw파일이었으면
+                                    print("raw")
+                                    popup_save_edited.open();
+                                }else{
+                                    //아무 변경이 없으면
+                                    print("pass")
+                                    supervisor.clear_all();
+                                    map.state_annotation = "OBJECT";
+                                    loader_menu.sourceComponent = menu_annot_object;
+
+                                }
+
+
                             }
                         }
                     }
@@ -2498,7 +2542,7 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 6
+                    count: 5
                     currentIndex: 2
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
@@ -2945,7 +2989,7 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 6
+                    count: 5
                     currentIndex: 3
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
@@ -3493,6 +3537,39 @@ Item {
             width: rect_menus.width
             height: rect_menus.height
 
+            Component.onCompleted: {
+                print(state_meta, state_annot, state_map);
+
+                if(state_meta === 0){
+                    rect_state_meta.color = "#4F5666"
+                    state_text_annot.text = "저장이 필요합니다."
+                    btn_move.border.width = 0
+                }else{
+                    rect_state_meta.color = "#12d27c"
+                    state_text_meta.text = "Confirm"
+                    btn_move.border.width = 3
+                }
+                if(state_annot === 0){
+                    rect_state_annot.color = "#4F5666"
+                    state_text_annot.text = "저장이 필요합니다."
+                    state_text_annot.anchors.rightMargin = 20
+                    btn_add1.border.width = 0
+                }else if(state_annot === 1){
+                    rect_state_annot.color = "#12d27c"
+                    state_text_annot.text = "Confirm"
+                    state_text_annot.anchors.rightMargin = 50
+                    btn_add1.border.width = 3
+                }else if(state_annot === 2){
+                    rect_state_annot.color = "#EE9D44"
+                    state_text_annot.anchors.rightMargin = 20
+                    state_text_annot.text = "저장이 필요합니다."
+                    btn_add1.border.width = 0
+                }
+                if(state_annot === 1 && state_meta === 1){
+                    btn_next_0.enabled = true;
+                }
+            }
+
             Rectangle{
                 anchors.fill: parent
                 color: "#f4f4f4"
@@ -3514,22 +3591,60 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
-
             Rectangle{
-                id: rect_annot_box8
-                width: parent.width - 60
-                height: 120
-                anchors.top: rect_annot_state.bottom
-                anchors.topMargin: 60
+                id: rect_annot_map_name
+                radius: 5
+                width: parent.width*0.9
+                height: 50
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: "#e8e8e8"
-                Row{
+                anchors.top: rect_annot_state.bottom
+                anchors.topMargin: 40
+                color: "white"
+                Text{
                     anchors.centerIn: parent
-                    spacing: 30
+                    color: "#282828"
+                    font.family: font_noto_b.name
+                    font.pixelSize: 20
+                    text: is_init_state?"MAP : " + map.map_name:"MAP : " + supervisor.getMapname();
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+
+            Column{
+                anchors.top: rect_annot_map_name.bottom
+                anchors.topMargin: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 20
+                Rectangle{
+                    id: rect_meta_box
+                    width: menu_save.width*0.7
+                    height: 85
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: "transparent"
+                    Rectangle{
+                        id: rect_state_meta
+                        height: 60
+                        width: parent.width*0.8
+                        radius: 10
+                        color: "#12d27c"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                        Text{
+                            id: state_text_meta
+                            text: "Confirm"
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: "white"
+                            anchors.right: parent.right
+                            anchors.rightMargin: 50
+                            font.family: font_noto_b.name
+                            font.pixelSize: 25
+                        }
+                    }
                     Rectangle{
                         id: btn_move
                         width: 85
                         height: width
+                        anchors.verticalCenter: parent.verticalCenter
                         radius: width
                         border.width: 0
                         border.color: "#12d27c"
@@ -3557,6 +3672,33 @@ Item {
                             }
                         }
                     }
+                }
+
+                Rectangle{
+                    id: rect_annot_box
+                    width: menu_save.width*0.7
+                    height: 85
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: "transparent"
+                    Rectangle{
+                        id: rect_state_annot
+                        height: 60
+                        width: parent.width*0.8
+                        radius: 10
+                        color: "#12d27c"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                        Text{
+                            id: state_text_annot
+                            text: "Confirm"
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: "white"
+                            anchors.right: parent.right
+                            anchors.rightMargin: 50
+                            font.family: font_noto_b.name
+                            font.pixelSize: 25
+                        }
+                    }
                     Rectangle{
                         id: btn_add1
                         width: 85
@@ -3582,11 +3724,40 @@ Item {
                             onClicked: {
                                 if(supervisor.saveAnnotation(map.map_name)){
                                     btn_add1.border.width = 3;
+                                    rect_state_annot.color = "#12d27c"
+                                    state_text_annot.text = "Confirm"
+                                    state_text_annot.anchors.rightMargin = 50
                                     is_save_annot = true;
                                 }else{
                                     btn_add1.border.width = 0;
                                 }
+                                btn_next_0.enabled = true;
                             }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: menu_save.width*0.7
+                    height: 85
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: "transparent"
+                    Rectangle{
+                        id: rect_server
+                        height: 60
+                        width: parent.width*0.8
+                        radius: 10
+                        color: "#12d27c"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                        Text{
+                            id: rect_server_text
+                            text: "Confirm"
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: "white"
+                            anchors.right: parent.right
+                            anchors.rightMargin: 50
+                            font.family: font_noto_b.name
+                            font.pixelSize: 25
                         }
                     }
                     Rectangle{
@@ -3619,31 +3790,6 @@ Item {
                     }
                 }
             }
-
-            Column{
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: rect_annot_box8.bottom
-                anchors.topMargin: 20
-                width: parent.width*0.9
-                spacing:20
-                Rectangle{
-                    id: rect_annot_map_name
-                    radius: 5
-                    width: parent.width
-                    height: 50
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: "white"
-                    Text{
-                        anchors.centerIn: parent
-                        color: "#282828"
-                        font.family: font_noto_b.name
-                        font.pixelSize: 20
-                        text: is_init_state?"MAP : " + map.map_name:"MAP : " + supervisor.getMapname();
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                }
-            }
-
             Column{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
@@ -3651,8 +3797,8 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 6
-                    currentIndex: 5
+                    count: 5
+                    currentIndex: 4
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
                     delegate: Rectangle{
@@ -3668,7 +3814,6 @@ Item {
                         }
                     }
                 }
-
                 Row{
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 20
@@ -3691,8 +3836,8 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 map.init_mode();
-                                map.state_annotation = "TRAVELLINE";
-                                loader_menu.sourceComponent = menu_annot_tline;
+                                map.state_annotation = "LOCATION";
+                                loader_menu.sourceComponent = menu_annot_location;
                             }
                         }
                     }
@@ -3701,9 +3846,10 @@ Item {
                         width: 180
                         height: 60
                         radius: 10
-                        color: "#12d27c"
+                        color: enabled?"#12d27c":"#A9A9A9"
+                        enabled: false
                         border.width: 1
-                        border.color: "#12d27c"
+                        border.color: enabled?"#12d27c":"#A9A9A9"
                         Text{
                             anchors.centerIn: parent
                             text: "Confirm"
@@ -4145,6 +4291,14 @@ Item {
                         width: 250
                         height: 50
                         placeholderText: qsTr("(영문과 숫자로만 입력해주세요.)")
+                        onFocusChanged: {
+                            keyboard.owner = textfield_name22;
+                            if(focus){
+                                keyboard.open();
+                            }else{
+                                keyboard.close();
+                            }
+                        }
                     }
                 }
                 Row{
@@ -4291,6 +4445,14 @@ Item {
                         width: 250
                         height: 50
                         placeholderText: qsTr(map.map_name)
+                        onFocusChanged: {
+                            keyboard.owner = textfield_name;
+                            if(focus){
+                                keyboard.open();
+                            }else{
+                                keyboard.close();
+                            }
+                        }
                     }
                 }
                 Row{
@@ -4770,6 +4932,14 @@ Item {
             font.family: font_noto_r.name
             horizontalAlignment: Text.AlignHCenter
             font.pointSize: 20
+            onFocusChanged: {
+                keyboard.owner = tfield_location;
+                if(focus){
+                    keyboard.open();
+                }else{
+                    keyboard.close();
+                }
+            }
         }
         Row{
             anchors.top: tfield_location.bottom
@@ -4866,6 +5036,14 @@ Item {
             height: 60
             placeholderText: "(line_name)"
             font.pointSize: 20
+            onFocusChanged: {
+                keyboard.owner = textfield_name3;
+                if(focus){
+                    keyboard.open();
+                }else{
+                    keyboard.close();
+                }
+            }
         }
         Rectangle{
             id: btn_add_line_confirm
@@ -5056,6 +5234,9 @@ Item {
             map.robot_following = true;
             loader_menu.sourceComponent = menu_localization;
         }
+
+
+
     }
 
     function updateobject(){

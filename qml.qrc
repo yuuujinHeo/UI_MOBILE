@@ -125,5 +125,6 @@
         <file>Popup_map_list.qml</file>
         <file>bgm/voice_pickup1.mp3</file>
         <file>bgm/voice_start_serving1.mp3</file>
+        <file>Tool_Keyboard.qml</file>
     </qresource>
 </RCC>
