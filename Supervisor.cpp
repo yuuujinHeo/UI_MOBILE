@@ -132,7 +132,7 @@ void Supervisor::git_pull_success(){
 
 bool Supervisor::isNewVersion(){
     git->updateGitArray();
-    if(probot->gitList[0].date == probot->program_version){
+    if(probot->gitList[0].date == probot->program_date){
         return true;
     }else{
         return false;
