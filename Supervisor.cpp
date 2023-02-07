@@ -124,6 +124,7 @@ QString Supervisor::getIniPath(){
 ////*********************************************  SETTING 관련   ***************************************************////
 void Supervisor::git_pull_success(){
     plog->write("[SUPERVISOR] GIT PULL SUCCESS : "+probot->program_date);
+    plog->write("[SUPERVISOR] GIT PULL SUCCESS : "+probot->program_message);
     setSetting("ROBOT_SW/version_msg",probot->program_message);
     setSetting("ROBOT_SW/version_date",probot->program_date);
     setSetting("ROBOT_SW/version",probot->program_version);
