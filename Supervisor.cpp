@@ -957,7 +957,7 @@ QList<int> Supervisor::getListMap(QString filename){
     cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
 
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
-    cv::warpAffine(map,map,rot,map.size());
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_LANCZOS4);
 
     uchar* map_data = map.data;
     QList<int> list;
@@ -978,7 +978,9 @@ QList<int> Supervisor::getRawListMap(QString filename){
 
 
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
-    cv::warpAffine(map,map,rot,map.size());
+
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_LANCZOS4);
+
 
     uchar* map_data = map.data;
     QList<int> list;
@@ -1256,7 +1258,9 @@ QObject *Supervisor::getMap(QString filename) const{
     cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
 
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
-    cv::warpAffine(map,map,rot,map.size());
+
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_LANCZOS4);
+
 
     pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
     Q_ASSERT(!pc->pixmap.isNull());
@@ -1284,7 +1288,9 @@ QObject *Supervisor::getRawMap(QString filename) const{
     cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
 
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
-    cv::warpAffine(map,map,rot,map.size());
+
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_LANCZOS4);
+
 
     pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
 
@@ -1376,14 +1382,15 @@ void Supervisor::saveMap(QString mode, QString src, QString dst, QList<int> data
     cv::flip(map,map,0);
     cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
 
-//    cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
-//    cv::warpAffine(map,map,rot,map.size());
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_LANCZOS4);
 
     for(int i=0; i<alpha.size(); i++){
         if(alpha[i] > 0){
             map.data[i] = data[i];
         }
     }
+    map_rotate_angle = 0;
     cv::rotate(map,map,cv::ROTATE_90_CLOCKWISE);
     cv::flip(map,map,0);
     QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(map)).toImage();

@@ -160,14 +160,6 @@ Item {
     }
 
     Timer{
-        repeat: true
-        interval: 500
-        running: true
-        onTriggered: {
-            print("moving timer");
-        }
-    }
-    Timer{
         id: timer_check_pause
         interval: 500
         running: false
