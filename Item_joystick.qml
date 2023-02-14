@@ -133,6 +133,7 @@ Item {
         }
     }
     function remote_stop(){
+        print("remote stop");
         mcx = 0
         mcy = 0
         update_cnt = 0;
@@ -143,9 +144,11 @@ Item {
         id: mousearea
         anchors.fill: parent
         onPressed: {
+            print("pressed")
             returnAnimation.stop();
         }
         onReleased: {
+            print("release")
             update_cnt = 0;
             parent.pressed = false;
             returnAnimation.restart()

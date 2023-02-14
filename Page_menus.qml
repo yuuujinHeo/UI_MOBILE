@@ -25,7 +25,6 @@ Item {
         height: parent.height - status_bar.height
         anchors.top: status_bar.bottom
         color: "#282828"
-
         Text{
             id: text_menu
             text: "MENU"
@@ -36,7 +35,6 @@ Item {
             font.pixelSize: 40
             color:"white"
         }
-
         Image{
             id: rect_map
             width: 301
@@ -53,7 +51,6 @@ Item {
                 }
             }
         }
-
         Image{
             id: rect_setting
             width: 301
@@ -91,8 +88,6 @@ Item {
 //                }
 //            }
 //        }
-
-
     }
 
 

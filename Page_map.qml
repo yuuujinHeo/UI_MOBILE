@@ -3942,8 +3942,8 @@ Item {
                 joy_init = false;
                 joy_axis_left_ud = 0;
                 joy_axis_right_rl = 0;
-                joy_xy.remote_stop();
-                joy_th.remote_stop();
+//                joy_xy.remote_stop();
+//                joy_th.remote_stop();
             }
         }
     }
@@ -5216,8 +5216,6 @@ Item {
         }else if(map_mode == 3){
             text_menu_title.text = "Patrol";
             text_menu_title.visible = true;
-            map.show_patrol = true;
-            map.show_margin = true;
             map.show_object = true;
             map.show_connection = false;
 //            map.show_location_default = false;

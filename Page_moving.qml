@@ -146,8 +146,8 @@ Item {
         width: 100
         height: 100
         enabled: robot_paused
-        anchors.top: parent.top
-        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
         z: 99
         onClicked: {
             password++;
