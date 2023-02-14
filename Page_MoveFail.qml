@@ -27,6 +27,8 @@ Item {
         notice.y = 0;
         area_swipe.enabled = true;
         map.init_mode();
+        map.show_buttons = true;
+        map.show_connection = true;
         map.robot_following = true;
         map.show_lidar = true;
         map.show_path = true;
@@ -146,7 +148,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    supervisor.moveStop();
+                                    supervisor.moveToLast();
                                 }
                             }
                         }
@@ -232,7 +234,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    btn_auto_init.running = true;
+                                    btn_auto.running = true;
                                     supervisor.slam_autoInit();
                                 }
                             }
@@ -349,15 +351,6 @@ Item {
             anchors.topMargin: statusbar.height
         }
 
-    }
-
-    Timer{
-        repeat: true
-        interval: 500
-        running: true
-        onTriggered: {
-            print("movefail timer");
-        }
     }
     Item{
         id: notice
@@ -485,8 +478,8 @@ Item {
             }else{
                 joy_axis_left_ud = 0;
                 joy_axis_right_rl = 0;
-                joy_xy.remote_stop();
-                joy_th.remote_stop();
+//                joy_xy.remote_stop();
+//                joy_th.remote_stop();
             }
         }
     }

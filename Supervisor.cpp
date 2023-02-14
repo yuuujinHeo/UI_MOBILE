@@ -2141,6 +2141,9 @@ QVector<int> Supervisor::getPickuptrays(){
 void Supervisor::moveTo(QString target_num){
     lcm->moveTo(target_num);
 }
+void Supervisor::moveToLast(){
+    lcm->moveToLast();
+}
 void Supervisor::moveTo(float x, float y, float th){
     lcm->moveTo(x,y,th);
 }

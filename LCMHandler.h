@@ -60,6 +60,7 @@ public:
     void sendCommand(command cmd, QString msg);
     void sendCommand(int cmd, QString msg);
     void programStart();
+    void moveToLast();
     void moveTo(QString target_loc);
     void moveTo(float x, float y, float th);
     void movePause();

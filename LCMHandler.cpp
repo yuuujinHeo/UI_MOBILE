@@ -84,6 +84,13 @@ void LCMHandler::sendCommand(int cmd, QString msg){
     }
 }
 
+void LCMHandler::moveToLast(){
+    command send_msg;
+    send_msg.cmd = ROBOT_CMD_MOVE_LOCATION;
+    memcpy(send_msg.params,probot->curLocation.toUtf8(),sizeof(char)*255);
+
+    sendCommand(send_msg, "MOVE LOCATION TO"+probot->curLocation);
+}
 void LCMHandler::moveTo(QString target_loc){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_MOVE_LOCATION;
@@ -268,6 +275,7 @@ void LCMHandler::robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::
 }
 
 void LCMHandler::robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg){
+    qDebug() << "PATH CALLBACK " << msg->num;
     isconnect = true;
     flag_rx = true;
     connect_count = 0;

@@ -1638,7 +1638,7 @@ Item {
             }
             //lidar
             if(show_lidar){
-                ctx.lineWidth = 1;
+                ctx.lineWidth = 0.5;
                 ctx.strokeStyle = "red";
                 ctx.fillStyle = "red";
                 for(var i=0; i<360; i++){
@@ -1659,6 +1659,7 @@ Item {
             if(show_path){
                 //Global path!
                 path_num = supervisor.getPathNum();
+                print("show path"+path_num);
                 path_x = robot_x;
                 path_y = robot_y;
                 path_th = robot_th;

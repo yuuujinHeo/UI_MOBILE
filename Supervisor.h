@@ -305,6 +305,7 @@ public:
     ////*********************************************  ROBOT MOVE 관련   ***************************************************////
     Q_INVOKABLE void moveTo(QString target_num);
     Q_INVOKABLE void moveTo(float x, float y, float th);
+    Q_INVOKABLE void moveToLast();
     Q_INVOKABLE void movePause();
     Q_INVOKABLE void moveResume();
     Q_INVOKABLE void moveStop();
