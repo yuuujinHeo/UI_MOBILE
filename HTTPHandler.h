@@ -58,6 +58,7 @@ public:
     void ClearJson(QJsonObject &json);
 signals:
     void pullSuccess();
+    void pullFailed();
 public slots:
     void processLogOutput();
     void processPullOutput();

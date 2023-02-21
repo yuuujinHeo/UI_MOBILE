@@ -402,6 +402,7 @@ public slots:
     void camera_update();
     void mapping_update();
     void usb_detect();
+    void git_pull_failed();
     void git_pull_success();
 
 private:

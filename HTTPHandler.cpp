@@ -126,7 +126,7 @@ void HTTPHandler::processPullError(){
     probot->program_version = probot->gitList[0].commit;
     probot->program_date = probot->gitList[0].date;
     probot->program_message = probot->gitList[0].message;
-    resetGit();
+    emit pullFailed();
 }
 
 void HTTPHandler::processResetError(){
