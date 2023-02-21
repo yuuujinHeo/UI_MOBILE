@@ -468,22 +468,12 @@ Item {
             property var point_y2: 0;
             touchPoints: [TouchPoint{id:point1},TouchPoint{id:point2}]
             onPressed: {
-//                if(point1.pressed && point2.pressed){
-//                    point_x1 = (point1.x+point2.x)*(map_width/width)/2;
-//                    point_y1 = (point1.y+point2.y)*(map_height/height)/2;
-//                }else if(point1.pressed){
-//                    point_x1 = point1.x*(map_width/width);
-//                    point_y1 = point1.y*(map_height/height);
-//                }else if(point2.pressed){
-//                    point_x1 = point2.x*(map_width/width);
-//                    point_y1 = point2.y*(map_height/height);
-//                }
-
                 if(point1.pressed){
                     point_x1 = point1.x*(map_width/width);
                     point_y1 = point1.y*(map_height/height);
                 }
-                if(point2.pressed){
+
+                if(point1.pressed && point2.pressed){
                     point_x2 = point2.x*(map_width/width);
                     point_y2 = point2.y*(map_height/height);
                 }
@@ -495,6 +485,7 @@ Item {
                         area_map.startX = (point_x1+point_x2)/2;
                         area_map.startY = (point_y1+point_y2)/2;
                         area_map.startDist = dist;
+                        print("PRESS : ",area_map.startX, area_map.startY,area_map.startDist);
                     }else if(point1.pressed){
                         area_map.startX = point_x1;
                         area_map.startY = point_y1;
@@ -632,9 +623,10 @@ Item {
                         else if(new_scale < 1) new_scale = 1;
 
                         print("drag",mx,my,dist,new_scale,mapview.newscale);
-                        dmoveX = (mx - startX);
-                        dmoveY = (my - startY);
+                        dmoveX = (mx - area_map.startX);
+                        dmoveY = (my - area_map.startY);
 
+                        print("PRESS : ",area_map.startX, area_map.startY,area_map.startDist);
                         var newx = mapview.x + dmoveX;
                         var newy = mapview.y + dmoveY;
                         if(newx > 0){
@@ -654,8 +646,8 @@ Item {
                             mapview.y = newy;
                         }
                     }else{
-                        dmoveX = point_x1 - startX;
-                        dmoveY = point_y1 - startY;
+                        dmoveX = point_x1 - area_map.startX;
+                        dmoveY = point_y1 - area_map.startY;
 
                         var newx = mapview.x + dmoveX;
                         var newy = mapview.y + dmoveY;
