@@ -1594,6 +1594,59 @@ Item {
                         }
                     }
                 }
+
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_v_acc"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_limit_v_acc
+                                        anchors.centerIn: parent
+                                        text: slider_limit_v_acc.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_limit_v_acc
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.1
+                                    to: 2.0
+                                    value: 1.0
+                                }
+                            }
+                        }
+                    }
+                }
                 Rectangle{
                     width: 840
                     height: 40
@@ -1635,6 +1688,58 @@ Item {
                                 }
                                 Slider{
                                     id: slider_limit_w
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 5.0
+                                    to: 120.0
+                                    value: 120.0
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_w_acc"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_limit_w_acc
+                                        anchors.centerIn: parent
+                                        text: slider_limit_w_acc.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_limit_w_acc
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.8
                                     height: 40
@@ -2093,6 +2198,170 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
+                                text:"limit_v"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: limit_v
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","limit_v");
+                                onFocusChanged: {
+                                    keyboard.owner = limit_v;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_v_acc"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: limit_v_acc
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","limit_v_acc");
+                                onFocusChanged: {
+                                    keyboard.owner = limit_v_acc;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_w"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: limit_w
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","limit_w");
+                                onFocusChanged: {
+                                    keyboard.owner = limit_w;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_w_acc"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: limit_w_acc
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","limit_w_acc");
+                                onFocusChanged: {
+                                    keyboard.owner = limit_w_acc;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
                                 text:"limit_acc"
                                 font.pixelSize: 20
                             }
@@ -2457,6 +2726,8 @@ Item {
                         supervisor.setSetting("ROBOT_SW/limit_pivot",text_limit_pivot.text);
                         supervisor.setSetting("ROBOT_SW/limit_v",text_limit_v.text);
                         supervisor.setSetting("ROBOT_SW/limit_w",text_limit_w.text);
+                        supervisor.setSetting("ROBOT_SW/limit_v_acc",text_limit_v_acc.text);
+                        supervisor.setSetting("ROBOT_SW/limit_w_acc",text_limit_w_acc.text);
 
                         supervisor.setSetting("ROBOT_SW/limit_manual_v",text_limit_manual_v.text);
                         supervisor.setSetting("ROBOT_SW/limit_manual_w",text_limit_manual_w.text);
@@ -2503,6 +2774,11 @@ Item {
                         supervisor.setSetting("MOTOR/k_d",k_d.text);
                         supervisor.setSetting("MOTOR/k_i",k_i.text);
                         supervisor.setSetting("MOTOR/k_p",k_p.text);
+
+                        supervisor.setSetting("MOTOR/limit_v",limit_v.text);
+                        supervisor.setSetting("MOTOR/limit_v_acc",limit_v_acc.text);
+                        supervisor.setSetting("MOTOR/limit_w",limit_w.text);
+                        supervisor.setSetting("MOTOR/limit_w_acc",limit_w_acc.text);
 
                         supervisor.setSetting("MOTOR/left_id",combo_left_id.currentText);
                         supervisor.setSetting("MOTOR/right_id",combo_right_id.currentText);
@@ -2568,6 +2844,8 @@ Item {
         slider_limit_manual_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_manual_w"));
         slider_limit_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_v"));
         slider_limit_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_w"));
+        slider_limit_v_acc.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_v_acc"));
+        slider_limit_w_acc.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_w_acc"));
         slider_look_ahead_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","look_ahead_dist"));
 
         slider_volume_bgm.value = Number(supervisor.getSetting("ROBOT_SW","volume_bgm"));
@@ -2617,6 +2895,10 @@ Item {
         k_i.text = supervisor.getSetting("MOTOR","k_i");
         k_p.text = supervisor.getSetting("MOTOR","k_p");
 
+        limit_v.text = supervisor.getSetting("MOTOR","limit_v");
+        limit_v_acc.text = supervisor.getSetting("MOTOR","limit_v_acc");
+        limit_w.text = supervisor.getSetting("MOTOR","limit_w");
+        limit_w_acc.text = supervisor.getSetting("MOTOR","limit_w_acc");
 
         combo_left_id.currentIndex = parseInt(supervisor.getSetting("MOTOR","left_id"));
         combo_right_id.currentIndex = parseInt(supervisor.getSetting("MOTOR","right_id"));

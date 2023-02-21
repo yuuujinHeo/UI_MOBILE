@@ -1671,7 +1671,7 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 5
+                    count: 6
                     currentIndex: 0
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
@@ -1733,7 +1733,236 @@ Item {
                             onClicked:{
                                 map.state_annotation = "DRAWING";
                                 map.init_mode();
-                                loader_menu.sourceComponent = menu_annot_draw;
+                                loader_menu.sourceComponent = menu_annot_rotate;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Component{
+        id: menu_annot_rotate
+        Item{
+            id: menu_load_rotate
+            objectName: "menu_load_rotate"
+            width: rect_menus.width
+            height: rect_menus.height
+
+            Rectangle{
+                anchors.fill: parent
+                color: "#f4f4f4"
+            }
+            Rectangle{
+                id: rect_annot_state
+                width: parent.width
+                height: 50
+                anchors.top: parent.top
+                anchors.topMargin: 2
+                color: "#4F5666"
+                Text{
+                    anchors.centerIn: parent
+                    color: "white"
+                    font.family: font_noto_b.name
+                    font.pixelSize: 20
+                    text: "STEP 1. Map Load and Rotate"
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+            Rectangle{
+                id: btn_load_map
+                width: 100
+                height: 40
+                radius: 5
+                anchors.top: rect_annot_state.bottom
+                anchors.topMargin: 30
+                anchors.left: parent.left
+                anchors.leftMargin: 30
+                color: "black"
+                Text{
+                    anchors.centerIn: parent
+                    text: "Load"
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked:{
+                        fileload.open();
+                    }
+                }
+            }
+            Rectangle{
+                id: rect_annot_map_name
+                width: parent.width*0.9
+                radius: 5
+                height: 50
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: btn_load_map.bottom
+                anchors.topMargin: 20
+                color: "white"
+                Text{
+                    anchors.centerIn: parent
+                    color: "#282828"
+                    font.family: font_noto_b.name
+                    font.pixelSize: 20
+                    text: is_init_state?"MAP : " + map.map_name:"MAP : " + supervisor.getMapname();
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+            Rectangle{
+                id: rect_annot_box44
+                width: parent.width*0.9
+                height: 50
+                color: "white"
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: rect_annot_map_name.bottom
+                anchors.topMargin: 10
+                Text{
+                    text: "Rotate Map"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 30
+                }
+                Rectangle{
+                    id: rect_rotate_clear
+                    width: 50
+                    height: 30
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: slider_rotate.left
+                    anchors.rightMargin: 10
+                    color: "black"
+                    radius: 5
+                    Text{
+                        anchors.centerIn: parent
+                        text: "초기화"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: "white"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            slider_rotate.value = 0;
+                            map.rotate_map(0);
+                        }
+                    }
+                }
+
+                Slider {
+                    id: slider_rotate
+                    x: 300
+                    y: 330
+                    value: 0
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.rightMargin: 30
+                    width: 170
+                    height: 18
+                    from: -180
+                    to : 180
+                    property var angle_init: 0
+                    onValueChanged: {
+                        map.rotate_map(value - angle_init);
+                    }
+                    onPressedChanged: {
+                        if(pressed){
+                            angle_init = value;
+                        }else{
+                            //released
+                            map.rotate_map(value - angle_init);
+//                                    print(value, angle_init);
+                        }
+                    }
+
+                }
+            }
+            Column{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 30
+                spacing: 30
+                PageIndicator{
+                    id: indicator_annot
+                    count: 6
+                    currentIndex: 1
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 10
+                    delegate: Rectangle{
+                        implicitWidth: index===indicator_annot.currentIndex?10:8
+                        implicitHeight: implicitWidth
+                        anchors.verticalCenter: parent.verticalCenter
+                        radius: width
+                        color: index===indicator_annot.currentIndex?"black":"#d0d0d0"
+                        Behavior on color{
+                            ColorAnimation {
+                                duration: 200
+                            }
+                        }
+                    }
+                }
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 20
+                    Rectangle{
+                        id: btn_prev_0
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color:"transparent"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "Previous"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                map.init_mode();
+                                map.state_annotation = "NONE";
+                                loader_menu.sourceComponent = menu_annot_state;
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: btn_next_0
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color: "black"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "Next"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                //변경한게 있으면(drawing or rotate)
+                                if(slider_rotate.value != 0){
+                                    state_annot = 2;
+                                    popup_save_rotated.open();
+                                }else if(state_map == 0){
+                                    //raw파일이었으면
+                                    popup_save_rotated.open();
+                                }else{
+                                    //아무 변경이 없으면
+                                    supervisor.clear_all();
+                                    map.state_annotation = "DRAWING";
+                                    loader_menu.sourceComponent = menu_annot_draw;
+                                }
                             }
                         }
                     }
@@ -1800,10 +2029,16 @@ Item {
                 anchors.top: btn_load_map.top
                 anchors.right: parent.right
                 anchors.rightMargin: 30
-                Image{
+                Rectangle{
+                    id: btn_undo
                     width: 40
                     height: 40
-                    source: "icon/icon_undo.png"
+                    radius: 40
+                    color: enabled?"#282828":"#D0D0D0"
+                    Image{
+                        anchors.centerIn: parent
+                        source: "icon/icon_undo.png"
+                    }
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
@@ -1812,12 +2047,16 @@ Item {
                         }
                     }
                 }
-
-                Image{
-                    id: redo
+                Rectangle{
+                    id: btn_redo
                     width: 40
                     height: 40
-                    source: "icon/icon_redo.png"
+                    radius: 40
+                    color: enabled?"#282828":"#D0D0D0"
+                    Image{
+                        anchors.centerIn: parent
+                        source: "icon/icon_redo.png"
+                    }
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
@@ -1923,7 +2162,7 @@ Item {
             Rectangle{
                 id: rect_annot_boxs
                 width: parent.width - 60
-                height: 150
+                height: 100
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: rect_annot_box.bottom
                 color: "#e8e8e8"
@@ -2009,73 +2248,6 @@ Item {
                             }
                         }
                     }
-                    Rectangle{
-                        id: rect_annot_box44
-                        width: rect_annot_boxs.width
-                        height: 50
-                        color: "white"
-                        Text{
-                            text: "Rotate Map"
-                            font.family: font_noto_r.name
-                            font.pixelSize: 15
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.left
-                            anchors.leftMargin: 30
-                        }
-                        Rectangle{
-                            id: rect_rotate_clear
-                            width: 50
-                            height: 30
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.right: slider_rotate.left
-                            anchors.rightMargin: 10
-                            color: "black"
-                            radius: 5
-                            Text{
-                                anchors.centerIn: parent
-                                text: "초기화"
-                                font.family: font_noto_r.name
-                                font.pixelSize: 15
-                                color: "white"
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    slider_rotate.value = 0;
-                                    map.rotate_map(0);
-                                }
-                            }
-                        }
-
-                        Slider {
-                            id: slider_rotate
-                            x: 300
-                            y: 330
-                            value: 0
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.right: parent.right
-                            anchors.rightMargin: 30
-                            width: 170
-                            height: 18
-                            from: -180
-                            to : 180
-                            property var angle_init: 0
-                            onValueChanged: {
-                                map.rotate_map(value - angle_init);
-//                                map.rotate_map_temp(value - angle_init);
-                            }
-                            onPressedChanged: {
-                                if(pressed){
-                                    angle_init = value;
-                                }else{
-                                    //released
-                                    print(value, angle_init);
-                                    map.rotate_map(value - angle_init);
-                                }
-                            }
-
-                        }
-                    }
                 }
             }
 
@@ -2087,8 +2259,8 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 5
-                    currentIndex: 1
+                    count: 6
+                    currentIndex: 2
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
                     delegate: Rectangle{
@@ -2126,8 +2298,8 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 map.init_mode();
-                                map.state_annotation = "NONE";
-                                loader_menu.sourceComponent = menu_annot_state;
+                                map.state_annotation = "DRAWING";
+                                loader_menu.sourceComponent = menu_annot_rotate;
                             }
                         }
                     }
@@ -2149,28 +2321,16 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
-                                if(slider_rotate.value != 0){
-                                    popup_save_edited.show_rotate();
-                                }else{
-                                    popup_save_edited.unshow_rotate();
-                                }
-
+                                popup_save_edited.unshow_rotate();
                                 //변경한게 있으면(drawing or rotate)
-                                if(slider_rotate.value != 0){
+                                if(supervisor.getCanvasSize() > 0){
                                     state_annot = 2;
-                                    print("rotate")
-                                    popup_save_edited.open();
-                                }else if(supervisor.getCanvasSize() > 0){
-                                    state_annot = 2;
-                                    print("drawing")
                                     popup_save_edited.open();
                                 }else if(state_map == 0){
                                     //raw파일이었으면
-                                    print("raw")
                                     popup_save_edited.open();
                                 }else{
                                     //아무 변경이 없으면
-                                    print("pass")
                                     supervisor.clear_all();
                                     map.state_annotation = "OBJECT";
                                     loader_menu.sourceComponent = menu_annot_object;
@@ -2206,6 +2366,7 @@ Item {
                     list_object.model.append({"name":supervisor.getObjectName(i)});
                 }
                 map.update_canvas();
+                map.setfullscreen();
             }
             function update(){
                 var ob_num = supervisor.getObjectNum();
@@ -2542,8 +2703,8 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 5
-                    currentIndex: 2
+                    count: 6
+                    currentIndex: 3
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
                     delegate: Rectangle{
@@ -2989,8 +3150,8 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 5
-                    currentIndex: 3
+                    count: 6
+                    currentIndex: 4
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
                     delegate: Rectangle{
@@ -3066,467 +3227,6 @@ Item {
         }
 
     }
-//    Component{
-//        id: menu_annot_tline
-//        Item{
-//            id: menu_travelline
-//            objectName: "menu_travelline"
-//            width: rect_menus.width
-//            height: rect_menus.height
-
-//            Rectangle{
-//                anchors.fill: parent
-//                color: "#f4f4f4"
-//            }
-
-//            Component.onCompleted: {
-//                var travel_num = supervisor.getTlineSize();
-//                tline_model.clear();
-//                for(var i=0; i<travel_num; i++){
-//                    tline_model.append({category:i,show:false});
-//                    print(i);
-//                }
-//                map.update_canvas();
-//            }
-//            function update_line(category){
-//                var line_num = supervisor.getTlineSize(category);
-//                tline_line_model.clear();
-//                for(var i=0; i<line_num; i=i+2){
-//                    tline_line_model.append({name:"line_" + Number(i/2)});
-//                }
-//            }
-
-//            function getcur(){
-//                return list_line.currentIndex;
-//            }
-//            function setcur(index){
-//                select_tline_num = index;
-//            }
-//            function update(){
-//                var travel_num = supervisor.getTlineSize();
-//                tline_model.clear();
-//                for(var i=0; i<travel_num; i++){
-//                    tline_model.append({category:i,show:false});
-//                    print(i);
-//                }
-//                tline_line_model.clear();
-//            }
-//            function update2(){
-//                var travel_num = supervisor.getTlineSize();
-//                tline_model.clear();
-//                for(var i=0; i<travel_num; i++){
-//                    tline_model.append({category:i,show:false});
-//                    print(i);
-//                }
-//                tline_line_model.clear();
-//                select_tline_category = -1;
-//                select_tline_num = -1;
-//            }
-
-//            Rectangle{
-//                id: rect_annot_state
-//                width: parent.width
-//                height: 50
-//                anchors.top: parent.top
-//                anchors.topMargin: 2
-//                color: "#4F5666"
-//                Text{
-//                    anchors.centerIn: parent
-//                    color: "white"
-//                    font.family: font_noto_b.name
-//                    font.pixelSize: 20
-//                    text: "STEP 4. Add/Edit Travel Line"
-//                    horizontalAlignment: Text.AlignHCenter
-//                }
-//            }
-
-//            Column{
-//                spacing: 20
-//                width: parent.width
-//                anchors.top: rect_annot_state.bottom
-//                anchors.topMargin: 30
-//                anchors.horizontalCenter: parent.horizontalCenter
-//                Rectangle{
-//                    id: rect_annot_box6
-//                    width: parent.width - 60
-//                    height: 100
-//                    anchors.horizontalCenter: parent.horizontalCenter
-//                    color: "#e8e8e8"
-//                    Row{
-//                        anchors.centerIn: parent
-//                        spacing: 30
-//                        Rectangle{
-//                            id: btn_move
-//                            width: 78
-//                            height: width
-//                            radius: width
-//                            border.width: map.tool=="MOVE"?3:0
-//                            border.color: "#12d27c"
-//                            Column{
-//                                anchors.centerIn: parent
-//                                Image{
-//                                    source: "icon/icon_move.png"
-//                                    anchors.horizontalCenter: parent.horizontalCenter
-//                                }
-//                                Text{
-//                                    text: "Move"
-//                                    font.family: font_noto_r.name
-//                                    anchors.horizontalCenter: parent.horizontalCenter
-//                                }
-//                            }
-//                            MouseArea{
-//                                anchors.fill: parent
-//                                onClicked: {
-//                                    map.tool = "MOVE";
-//                                }
-//                            }
-//                        }
-//                        Rectangle{
-//                            id: btn_add1
-//                            width: 78
-//                            height: width
-//                            radius: width
-//                            border.width: map.tool=="ADD_LINE"?3:0
-//                            border.color: "#12d27c"
-//                            Column{
-//                                anchors.centerIn: parent
-//                                Image{
-//                                    source: "icon/icon_add.png"
-//                                    anchors.horizontalCenter: parent.horizontalCenter
-//                                }
-//                                Text{
-//                                    text: "Add"
-//                                    font.family: font_noto_r.name
-//                                    anchors.horizontalCenter: parent.horizontalCenter
-//                                }
-//                            }
-//                            MouseArea{
-//                                anchors.fill: parent
-//                                onClicked: {
-//                                    map.tool = "ADD_LINE";
-//                                }
-//                            }
-//                        }
-//                        Rectangle{
-//                            id: btn_erase
-//                            width: 78
-//                            height: width
-//                            radius: width
-//                            color: enabled?"white":"#f4f4f4"
-//                            enabled: map.tool=="ADD_LINE"?false:true
-//                            Column{
-//                                anchors.centerIn: parent
-//                                Image{
-//                                    source: "icon/icon_erase.png"
-//                                    anchors.horizontalCenter: parent.horizontalCenter
-//                                }
-//                                Text{
-//                                    text: "Remove"
-//                                    color: btn_erase.enabled?"black":"#e8e8e8"
-//                                    font.family: font_noto_r.name
-//                                    anchors.horizontalCenter: parent.horizontalCenter
-//                                }
-//                            }
-//                            MouseArea{
-//                                anchors.fill: parent
-//                                onClicked: {
-//                                    supervisor.removeTline(select_tline_category,select_tline_num);
-//                                    map.update_canvas();
-//                                    update_line(select_tline_category);
-
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//                Rectangle{
-//                    id: rect_annot_box7
-//                    width: parent.width
-//                    visible: map.tool=="ADD_LINE"?true:false
-//                    onVisibleChanged: {
-//                        if(visible){
-//                            height = 50
-//                        }else{
-//                            height = 0
-//                        }
-//                    }
-//                    Behavior on height {
-//                        NumberAnimation{
-//                            duration:300;
-//                        }
-//                    }
-//                    color: "#e8e8e8"
-//                    Row{
-//                        anchors.centerIn: parent
-//                        spacing: 30
-//                        Rectangle{
-//                            id: btn_11
-//                            width: 80
-//                            height: 40
-//                            radius: 5
-//                            Text{
-//                                text: "Cancel"
-//                                anchors.centerIn: parent
-//                                font.family: font_noto_r.name
-//                            }
-//                            MouseArea{
-//                                anchors.fill: parent
-//                                onClicked: {
-//                                    map.tool = "MOVE";
-//                                    map.new_travel_line = false;
-//                                    map.new_line_point1 = false;
-//                                    map.new_line_point2 = false;
-//                                }
-//                            }
-//                        }
-//                        Rectangle{
-//                            id: btn_22
-//                            width: 78
-//                            height: 40
-//                            radius: 5
-//                            color: enabled?"white":"#f4f4f4"
-//                            enabled: map.new_line_point1&&map.new_line_point2?true:false
-//                            Text{
-//                                text: "Save"
-//                                anchors.centerIn: parent
-//                                font.family: font_noto_r.name
-//                                color: parent.enabled?"black":"white"
-//                            }
-//                            MouseArea{
-//                                anchors.fill: parent
-//                                onClicked: {
-//                                    if(map.new_line_point1&&map.new_line_point2){
-//                                        print("??????????! : "+select_tline_category)
-//                                        if(select_tline_category > 0){
-//                                            supervisor.addTline(select_tline_category,map.new_line_x1,map.new_line_y1,map.new_line_x2,map.new_line_y2);
-//                                        }else{
-//                                            supervisor.addTline(supervisor.getTlineSize(),map.new_line_x1,map.new_line_y1,map.new_line_x2,map.new_line_y2);
-//                                            update();
-//                                            select_tline_category = supervisor.getTlineSize()-1;
-//                                            map.select_travel_line = select_tline_category;
-//                                        }
-//                                        print("?! : "+select_tline_category)
-//                                        update_line(select_tline_category);
-//                                        map.tool = "MOVE";
-//                                        map.new_travel_line = false;
-//                                        map.new_line_point1 = false;
-//                                        map.new_line_point2 = false;
-//                                        updatecanvas();
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//                Flickable{
-//                    width: rect_annot_box6.width
-//                    height: rect_annot_box7.visible?310-60:310
-//                    anchors.horizontalCenter: parent.horizontalCenter
-//                    contentHeight: column_tline.height
-//                    clip: true
-//                    Column{
-//                        id: column_tline
-//                        spacing: 5
-//                        Repeater{
-//                            id: repeat_tline
-//                            model: tline_model
-//                            Column{
-//                                spacing: 5
-//                                Rectangle{
-//                                    id: rect_category
-//                                    width: rect_annot_box6.width
-//                                    height: 40
-//                                    color: "#83B8F9"
-//                                    //Image (+,-)
-//                                    Text{
-//                                        anchors.centerIn: parent
-//                                        font.family: font_noto_r.name
-//                                        font.pixelSize: 20
-//                                        text: "Travel Line "+ Number(category)
-//                                    }
-//                                    MouseArea{
-//                                        id:area_compo
-//                                        anchors.fill:parent
-//                                        onClicked: {
-//                                            if(map.tool == "ADD_LINE"){
-//                                                map.tool = "MOVE";
-//                                                map.new_line_point1 = false;
-//                                                map.new_line_point2 = false;
-//                                            }
-
-//                                            if(select_tline_category == category){
-//                                                select_tline_category = -1;
-//                                                map.select_travel_line = -1;
-//                                            }else{
-//                                                map.select_travel_line = category;
-//                                                select_tline_category = category;
-//                                                update_line(category);
-//                                            }
-//                                            select_tline_num = -1;
-//                                            map.select_line = -1;
-//                                            updatecanvas();
-//                //                            map.select_object = supervisor.getObjNum(name);
-//                //                            list_object.currentIndex = index;
-//                //                            map.tool = "MOVE";
-//                //                            map.update_canvas();
-//                                        }
-//                                    }
-
-//                                }
-
-//                                Repeater{
-//                                    model:tline_line_model
-//                                    visible: select_tline_category == category?true:false
-//                                    Rectangle{
-//                                        visible: select_tline_category == category?true:false
-//                                        width: rect_annot_box6.width
-//                                        height: 40
-//                                        color: "transparent"
-//                                        Rectangle{
-//                                            id: line1
-//                                            width: 1
-//                                            height: parent.height/2
-//                                            color: "#7e7e7e"
-//                                        }
-//                                        Rectangle{
-//                                            id: line2
-//                                            width: parent.width/10
-//                                            height: 1
-//                                            anchors.top: line1.bottom
-//                                            color: "#7e7e7e"
-//                                        }
-//                                        Rectangle{
-//                                            id: rect_line
-//                                            width: parent.width*0.9
-//                                            height: parent.height
-//                                            anchors.right: parent.right
-//                                            color: {
-//                                                if(select_tline_num == index){
-//                                                    "#FFD9FF"
-//                                                }else{
-//                                                    "white"
-//                                                }
-//                                            }
-//                                            border.width: 1
-//                                            border.color: "#7e7e7e"
-//                                            Text {
-//                                                anchors.centerIn: parent
-//                                                text: name
-//                                                font.family: font_noto_r.name
-//                                                font.pixelSize: 20
-//                                            }
-//                                            MouseArea{
-//                                                anchors.fill:parent
-//                                                onClicked: {
-//                                                    if(map.tool == "ADD_LINE"){
-//                                                        map.tool = "MOVE";
-//                                                        map.new_line_point1 = false;
-//                                                        map.new_line_point2 = false;
-//                                                    }
-//                                                    select_tline_num = index;
-//                                                    map.select_line = index;
-//                                                    updatecanvas();
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-
-//                                }
-//                            }
-//                        }
-//                    }
-
-//                }
-
-
-//            }
-
-
-//            ListModel{
-//                id: tline_model
-//            }
-//            ListModel{
-//                id: tline_line_model
-//            }
-//            Column{
-//                anchors.horizontalCenter: parent.horizontalCenter
-//                anchors.bottom: parent.bottom
-//                anchors.bottomMargin: 30
-//                spacing: 30
-//                PageIndicator{
-//                    id: indicator_annot
-//                    count: 6
-//                    currentIndex: 4
-//                    anchors.horizontalCenter: parent.horizontalCenter
-//                    spacing: 10
-//                    delegate: Rectangle{
-//                        implicitWidth: index===indicator_annot.currentIndex?10:8
-//                        implicitHeight: implicitWidth
-//                        anchors.verticalCenter: parent.verticalCenter
-//                        radius: width
-//                        color: index===indicator_annot.currentIndex?"black":"#d0d0d0"
-//                        Behavior on color{
-//                            ColorAnimation {
-//                                duration: 200
-//                            }
-//                        }
-//                    }
-//                }
-//                Row{
-//                    anchors.horizontalCenter: parent.horizontalCenter
-//                    spacing: 20
-//                    Rectangle{
-//                        id: btn_prev_0
-//                        width: 180
-//                        height: 60
-//                        radius: 10
-//                        color:"transparent"
-//                        border.width: 1
-//                        border.color: "#7e7e7e"
-//                        Text{
-//                            anchors.centerIn: parent
-//                            text: "Previous"
-//                            font.family: font_noto_r.name
-//                            font.pixelSize: 25
-
-//                        }
-//                        MouseArea{
-//                            anchors.fill: parent
-//                            onClicked:{
-//                                map.init_mode();
-//                                map.state_annotation = "LOCATION";
-//                                loader_menu.sourceComponent = menu_annot_location;
-//                            }
-//                        }
-//                    }
-//                    Rectangle{
-//                        id: btn_next_0
-//                        width: 180
-//                        height: 60
-//                        radius: 10
-//                        color: "black"
-//                        border.width: 1
-//                        border.color: "#7e7e7e"
-//                        Text{
-//                            anchors.centerIn: parent
-//                            text: "Next"
-//                            font.family: font_noto_r.name
-//                            font.pixelSize: 25
-//                            color: "white"
-//                        }
-//                        MouseArea{
-//                            anchors.fill: parent
-//                            onClicked:{
-//                                map.init_mode();
-//                                map.state_annotation = "SAVE";
-//                                loader_menu.sourceComponent = menu_annot_save;
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
 
 
     Component{
@@ -3797,8 +3497,8 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 5
-                    currentIndex: 4
+                    count: 6
+                    currentIndex: 5
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
                     delegate: Rectangle{
@@ -4361,9 +4061,117 @@ Item {
                                     map.state_annotation = "DRAWING";
                                     map.map_mode = "RAW";
                                     map.update_canvas();
-                                    loader_menu.sourceComponent = menu_annot_draw;
+                                    loader_menu.sourceComponent = menu_annot_rotate;
                                     popup_save_mapping.close();
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    Popup{
+        id: popup_save_rotated
+        width: parent.width
+        height: parent.height
+        background:Rectangle{
+            anchors.fill: parent
+            color: "#282828"
+            opacity: 0.7
+        }
+        Rectangle{
+            anchors.centerIn: parent
+            width: 400
+            height: 250
+            color: "white"
+            radius: 10
+
+            Column{
+                anchors.centerIn: parent
+                spacing: 20
+                Column{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        text: "맵을 <font color=\"#12d27c\">저장</font>하시겠습니까?"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        color: "red"
+                        text: "맵이 회전되었습니다. 기존의 설정값을 모두 초기화합니다."
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 20
+                    Rectangle{
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color:"transparent"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "취소"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                slider_rotate.value = 0;
+                                map.rotate_map(0);
+                                popup_save_rotated.close();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color: "#12d27c"
+                        border.width: 1
+                        border.color: "#12d27c"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "확인"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                if(map.map_name == "map_raw.png"){
+                                    var text = "map_edited.png"
+                                }else{
+                                    text = map.map_name
+                                }
+
+                                //save temp Image
+                                map.save_map(text);
+                                map.rotate_map(0);
+
+                                //맵 새로 불러오기.
+                                map.loadmap(text,"EDITED");
+                                map.setfullscreen();
+                                supervisor.clear_all();
+                                supervisor.deleteAnnotation();
+                                map.state_annotation = "DRAWING";
+                                loader_menu.sourceComponent = menu_annot_draw;
+
+                                popup_save_rotated.close();
+
                             }
                         }
                     }
@@ -4390,10 +4198,8 @@ Item {
             }
         }
         function show_rotate(){
-            text_rotate.visible = true;
         }
         function unshow_rotate(){
-            text_rotate.visible = false;
         }
 
         Rectangle{
@@ -4416,15 +4222,6 @@ Item {
                     }
                     Text{
                         text: "동일한 이름의 맵을 덮어씌워집니다."
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                    Text{
-                        id: text_rotate
-                        visible: false
-                        color: "red"
-                        text: "맵이 회전되었습니다. 기존의 설정값을 모두 초기화합니다."
                         font.family: font_noto_r.name
                         font.pixelSize: 15
                         anchors.horizontalCenter: parent.horizontalCenter

@@ -2,5 +2,5 @@
 
 SoundHandler::SoundHandler()
 {
-    player = new QMediaPlayer;
+//    player = new QMediaPlayer;
 }

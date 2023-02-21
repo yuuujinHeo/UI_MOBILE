@@ -5,7 +5,7 @@
 #include <QtNetwork>
 #include <QTimer>
 #include <QDebug>
-#include <QtMultimedia>
+//#include <QtMultimedia>
 #include "GlobalHeader.h"
 
 class SoundHandler : public QObject
@@ -14,7 +14,7 @@ class SoundHandler : public QObject
 public:
     SoundHandler();
 
-    QMediaPlayer *player;
+//    QMediaPlayer *player;
 };
 
 #endif // SOUNDHANDLER_H
