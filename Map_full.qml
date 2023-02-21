@@ -624,24 +624,24 @@ Item {
                         dmoveX = (mx - startX);
                         dmoveY = (my - startY);
 
-                        var newx = mapview.x + dmoveX;
-                        var newy = mapview.y + dmoveY;
-                        if(newx > 0){
-                            mapview.x = 0;
-                        }else if(newx < - map_width*mapview.newscale + rect_map.width){
-                            mapview.x = - map_width*mapview.newscale + rect_map.width
-                        }else{
-                            mapview.newscale = new_scale;
-                            mapview.x = newx;
-                        }
-                        if(newy  > 0){
-                            mapview.y = 0;
-                        }else if(newy < - map_height*mapview.newscale + rect_map.height){
-                            mapview.y = - map_height*mapview.newscale + rect_map.height
-                        }else{
-                            mapview.newscale = new_scale;
-                            mapview.y = newy;
-                        }
+//                        var newx = mapview.x + dmoveX;
+//                        var newy = mapview.y + dmoveY;
+//                        if(newx > 0){
+//                            mapview.x = 0;
+//                        }else if(newx < - map_width*mapview.newscale + rect_map.width){
+//                            mapview.x = - map_width*mapview.newscale + rect_map.width
+//                        }else{
+//                            mapview.newscale = new_scale;
+//                            mapview.x = newx;
+//                        }
+//                        if(newy  > 0){
+//                            mapview.y = 0;
+//                        }else if(newy < - map_height*mapview.newscale + rect_map.height){
+//                            mapview.y = - map_height*mapview.newscale + rect_map.height
+//                        }else{
+//                            mapview.newscale = new_scale;
+//                            mapview.y = newy;
+//                        }
                     }else{
                         dmoveX = point_x1 - startX;
                         dmoveY = point_y1 - startY;

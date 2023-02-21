@@ -49,6 +49,7 @@ Supervisor::Supervisor(QObject *parent)
     joystick = new JoystickHandler();
     git = new HTTPHandler();
     connect(git, SIGNAL(pullSuccess()),this,SLOT(git_pull_success()));
+    connect(git, SIGNAL(pullFailed()),this,SLOT(git_pull_failed()));
 
     //Test USB
     QFileSystemWatcher *FSwatcher;
@@ -72,6 +73,10 @@ Supervisor::Supervisor(QObject *parent)
     connect(lcm, SIGNAL(pathchanged()),this,SLOT(path_changed()));
     connect(lcm, SIGNAL(mappingin()),this,SLOT(mapping_update()));
     connect(lcm, SIGNAL(cameraupdate()),this,SLOT(camera_update()));
+    plog->write("");
+    plog->write("");
+    plog->write("");
+    plog->write("");
     plog->write("[BUILDER] SUPERVISOR constructed");
 }
 
@@ -129,7 +134,14 @@ void Supervisor::git_pull_success(){
     setSetting("ROBOT_SW/version_date",date);//probot->program_date);
     setSetting("ROBOT_SW/version",probot->program_version);
 }
-
+void Supervisor::git_pull_failed(){
+    QString date = probot->program_date;
+    plog->write("[SUPERVISOR] GIT PULL FAILED : "+probot->program_date+", "+date);
+    setSetting("ROBOT_SW/version_msg",probot->program_message);
+    setSetting("ROBOT_SW/version_date",date);//probot->program_date);
+    setSetting("ROBOT_SW/version",probot->program_version);
+    git->resetGit();
+}
 bool Supervisor::isNewVersion(){
     git->updateGitArray();
     if(probot->gitList[0].date == probot->program_date){
@@ -2809,13 +2821,16 @@ void Supervisor::onTimer(){
             if(cur_error != probot->err_code){
                 cur_error = probot->err_code;
                 if(cur_error == ROBOT_ERROR_NO_PATH){
-                    isaccepted = false;
-                    ui_state = UI_STATE_MOVEFAIL;
-                    plog->write("[SCHEDULER] ROBOT ERROR : NO PATH");
-                    QMetaObject::invokeMethod(mMain, "nopathfound");
-                }else if(cur_error == ROBOT_ERROR_WAIT){
+
                     plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");
                     QMetaObject::invokeMethod(mMain, "excuseme");
+//                    isaccepted = false;
+//                    ui_state = UI_STATE_MOVEFAIL;
+//                    plog->write("[SCHEDULER] ROBOT ERROR : NO PATH");
+//                    QMetaObject::invokeMethod(mMain, "nopathfound");
+                }else if(cur_error == ROBOT_ERROR_WAIT){
+                    plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME OLD");
+//                    QMetaObject::invokeMethod(mMain, "excuseme");
                 }else{
                     plog->write("[SCHEDULER] ROBOT ERROR : " + QString::number(probot->err_code));
                 }

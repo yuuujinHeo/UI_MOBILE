@@ -246,7 +246,6 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
     connect_count = 0;
     probot->battery = msg->bat;
     probot->state = msg->state;
-    qDebug() << "STATE IS " << probot->state;
     probot->err_code = msg->err_code;
     probot->curPose.x = msg->robot_pose[0];
     probot->curPose.y = msg->robot_pose[1];
