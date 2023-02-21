@@ -987,6 +987,40 @@ Item {
                 width: parent.width
                 spacing:25
                 Rectangle{
+                    id: set_slam_0
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"AutoInit"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_autoinit
+                                anchors.fill: parent
+                                model:["사용안함","사용"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
                     id: set_slam_1
                     width: 840
                     height: 40
@@ -2760,6 +2794,10 @@ Item {
 
                         supervisor.setSetting("ROBOT_SW/velocity",text_velocity.text);
 
+                        if(combo_autoinit.currentIndex == 0)
+                            supervisor.setSetting("ROBOT_SW/use_autoinit","false");
+                        else
+                            supervisor.setSetting("ROBOT_SW/use_autoinit","true");
 
                         supervisor.setSetting("SENSOR/baudrate",combo_baudrate.currentText);
                         supervisor.setSetting("SENSOR/mask",text_mask.text);
@@ -2911,6 +2949,12 @@ Item {
             combo_wheel_dir.currentIndex = 0;
         }else{
             combo_wheel_dir.currentIndex = 1;
+        }
+
+        if(supervisor.getSetting("ROBOT_SW","use_autoinit") === "true"){
+            combo_autoinit.currentIndex = 1;
+        }else{
+            combo_autoinit.currentIndex = 0;
         }
 
         if(supervisor.getSetting("SENSOR","baudrate") === "115200"){

@@ -32,6 +32,7 @@ public:
     lcm::Subscription *sub_localpath;
     lcm::Subscription *sub_mapping;
     lcm::Subscription *sub_camera;
+    lcm::Subscription *sub_test_cmd;
 
     ////*********************************************  FLAGS   ***************************************************////
     //LCM 연결상태
@@ -83,6 +84,7 @@ public:
     void robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
     void robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data *msg);
     void robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const camera_data *msg);
+    void robot_command_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const command*msg);
     ////***********************************************   THREADS  ********************************************************////
     void bLoop();
 

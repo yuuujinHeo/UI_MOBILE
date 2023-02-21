@@ -107,6 +107,7 @@ Item {
         Keys.onReleased: {
             if(!event.isAutoRepeat){
                 if(event.key === Qt.Key_Up){
+                    print("release2 key_up")
                     loader_menu.item.setKeyUp(false);
                 }
                 if(event.key === Qt.Key_Down){
@@ -123,6 +124,7 @@ Item {
         Keys.onPressed: {
             if(!event.isAutoRepeat){
                 if(event.key === Qt.Key_Up){
+                    print("press2 key_up")
                     loader_menu.item.setKeyUp(true);
                 }
                 if(event.key === Qt.Key_Down){
@@ -908,8 +910,11 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                btn_auto_init.running = true;
-                                supervisor.slam_autoInit();
+                                if(supervisor.getState() !== 7){
+                                    btn_auto_init.running = true;
+                                    supervisor.slam_autoInit();
+                                }
+
                             }
                         }
                     }
@@ -938,7 +943,8 @@ Item {
                 running: true
                 repeat: true
                 onTriggered:{
-                    if(supervisor.is_slam_running()){
+                    if(supervisor.is_slam_running() && btn_auto_init.running){
+                        print("slam run!");
                         btn_auto_init.running = false;
                     }
                 }
@@ -2769,8 +2775,9 @@ Item {
                             onClicked:{
                                 //save temp Image
                                 map.init_mode();
-                                supervisor.clearObjectPoints();
                                 map.state_annotation = "LOCATION";
+                                supervisor.clearObjectPoints();
+                                map.clear_canvas();
                                 map.update_canvas();
                                 loader_menu.sourceComponent = menu_annot_location;
                             }
@@ -2841,36 +2848,6 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
-//            Rectangle{
-//                id: rect_location_box
-//                width: parent.width - 60
-//                height: 50
-//                radius: 5
-//                anchors.horizontalCenter: parent.horizontalCenter
-//                anchors.top: rect_annot_state.bottom
-//                anchors.topMargin: 20
-//                Text{
-//                    font.family: font_noto_r.name
-//                    font.pixelSize: 20
-//                    text: "Margin : " + slider_margin.value.toFixed(3) + " [m]"
-//                    anchors.verticalCenter: parent.verticalCenter
-//                    anchors.left: parent.left
-//                    anchors.leftMargin: 30
-//                }
-//                Slider{
-//                    id: slider_margin
-//                    anchors.verticalCenter: parent.verticalCenter
-//                    anchors.right: parent.right
-//                    anchors.rightMargin: 30
-//                    width: 150
-//                    from: 0
-//                    to: 0.5
-//                    value: supervisor.getMargin()
-//                    onValueChanged: {
-//                        map.update_margin();
-//                    }
-//                }
-//            }
 
             Component {
                 id: locationCompo
@@ -2925,7 +2902,7 @@ Item {
                 width: parent.width - 60
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: rect_annot_state.bottom
-                anchors.topMargin: 50
+                anchors.topMargin: 20
                 spacing: 10
                 Rectangle{
                     id: rect_annot_box
@@ -3119,14 +3096,118 @@ Item {
                                 }
                             }
                         }
+                        Rectangle{
+                            id: btn_3
+                            width: 78
+                            height: 40
+                            radius: 5
+                            color: enabled?"white":"#f4f4f4"
+                            enabled: supervisor.is_slam_running()?true:false
+                            Text{
+                                text: "현재위치로"
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                color: parent.enabled?"black":"white"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    popup_add_location.open();
+                                    popup_add_location.curpose_mode = true;
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+                Rectangle{
+                    id: rect_annot_box66
+                    width: parent.width
+                    visible: map.tool=="EDIT_LOCATION"?true:false
+                    onVisibleChanged: {
+                        if(visible){
+                            height = 50
+                        }else{
+                            height = 0
+                        }
+                    }
+                    Behavior on height {
+                        NumberAnimation{
+                            duration:300;
+                        }
+                    }
+                    color: "#e8e8e8"
+                    Row{
+                        anchors.centerIn: parent
+                        spacing: 30
+                        Rectangle{
+                            width: 80
+                            height: 40
+                            radius: 5
+                            Text{
+                                text: "Cancel"
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    map.tool = "MOVE";
+                                    map.select_location = -1;
+                                    map.select_location_show = -1;
+                                    list_location.currentIndex = -1;
+                                    map.new_location = false;
+                                    map.new_loc_x = 0;
+                                    map.new_loc_y = 0;
+                                    map.new_loc_th = 0;
+                                    map.new_loc_available = false;
+                                    map.update_canvas();
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 78
+                            height: 40
+                            radius: 5
+                            color: enabled?"white":"#f4f4f4"
+                            enabled: supervisor.is_slam_running()?true:false
+                            Text{
+                                text: "현재위치로"
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                color: parent.enabled?"black":"white"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    supervisor.moveLocationPoint(map.select_location, map.robot_x, map.robot_y, supervisor.getRobotth());
+                                    map.select_location = -1;
+                                    map.select_location_show = -1;
+                                    map.new_location = false;
+                                    map.new_loc_x = 0;
+                                    map.new_loc_y = 0;
+                                    map.new_loc_th = 0;
+                                    map.new_loc_available = false;
+                                    map.tool = "MOVE";
+                                    map.update_canvas();
+                                }
+                            }
+                        }
+
                     }
                 }
 
                 ListView {
                     id: list_location
                     width: parent.width
-                    height: rect_annot_box5.visible?210:270
-                    enabled: map.tool=="ADD_LOCATION"?false:true
+                    height: rect_annot_box5.visible||rect_annot_box66.visible?160:220
+                    Behavior on height {
+                        NumberAnimation{
+                            duration:300;
+                        }
+                    }
+                    enabled: map.tool=="ADD_LOCATION"||map.tool=="EDIT_LOCATION"?false:true
                     clip: true
                     model: ListModel{}
                     delegate: locationCompo
@@ -3140,6 +3221,43 @@ Item {
                     }
                 }
 
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 60
+                    Item_joystick{
+                        id: joy_xy
+                        show_arrow: false
+                        verticalOnly: true
+                        onUpdate_cntChanged: {
+                            if(update_cnt == 0 && supervisor.getJoyXY() != 0){
+                                supervisor.joyMoveXY(0, 0);
+                            }else{
+                                if(fingerInBounds) {
+                                    supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+                                }else{
+                                    supervisor.joyMoveXY(Math.sin(angle));
+                                }
+                            }
+                        }
+                    }
+                    Item_joystick{
+                        id: joy_th
+                        show_arrow: false
+                        horizontalOnly: true
+                        onUpdate_cntChanged: {
+                            if(update_cnt == 0 && supervisor.getJoyR() != 0){
+                                supervisor.joyMoveR(0, 0);
+                            }else{
+                                if(fingerInBounds) {
+                                    supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+                                } else {
+                                    supervisor.joyMoveR(-Math.cos(angle));
+                                }
+                            }
+                        }
+                    }
+
+                }
 
             }
 
@@ -4576,11 +4694,13 @@ Item {
         topPadding: 0
         leftPadding: 0
         rightPadding: 0
+        property bool curpose_mode: false
         background: Rectangle{
             anchors.fill:parent
             color: "#f4f4f4"
         }
-        onOpened: {
+        onOpened:{
+            curpose_mode = false;
             tfield_location.text = select_location_type + "_" + Number(supervisor.getLocationSize(select_location_type))
         }
 
@@ -4785,7 +4905,13 @@ Item {
                     onClicked:{
                         if(tfield_location.text == ""){
                         }else{
-                            supervisor.addLocation(select_location_type,tfield_location.text, map.new_loc_x, map.new_loc_y, map.new_loc_th);
+                            if(popup_add_location.curpose_mode){
+                                print(map.robot_th);
+                                supervisor.addLocation(select_location_type,tfield_location.text, map.robot_x, map.robot_y,supervisor.getRobotth());
+                            }else{
+                                print(map.new_loc_th);
+                                supervisor.addLocation(select_location_type,tfield_location.text, map.new_loc_x, map.new_loc_y, map.new_loc_th);
+                            }
                             map.tool = "MOVE";
                             map.new_location = false;
                             map.new_loc_x = 0;
@@ -5026,6 +5152,7 @@ Item {
             map.show_buttons = true;
             map.show_robot = true;
             map.show_object = true;
+            map.show_location = true;
             map.robot_following = true;
             loader_menu.sourceComponent = menu_localization;
         }

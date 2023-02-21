@@ -208,6 +208,7 @@ void Supervisor::readSetting(QString map_name){
     probot->program_date = setting_robot.value("version_date").toString();
     probot->velocity = setting_robot.value("velocity").toFloat();
     setting.useVoice = setting_robot.value("use_voice").toBool();
+    setting.useAutoInit = setting_robot.value("use_autoinit").toBool();
     setting.useBGM = setting_robot.value("use_bgm").toBool();
     pmap->use_uicmd = setting_robot.value("use_uicmd").toBool();
     setting_robot.endGroup();
@@ -935,8 +936,9 @@ void Supervisor::slam_stop(){
 void Supervisor::slam_autoInit(){
     lcm->sendCommand(ROBOT_CMD_SLAM_AUTO, "LOCALIZATION AUTO INIT");
 }
+
 bool Supervisor::is_slam_running(){
-    if(probot->state == ROBOT_STATE_NOT_READY){
+    if(probot->state == ROBOT_STATE_NOT_READY || probot->state == ROBOT_STATE_BUSY){
         return false;
     }else{
         return true;
@@ -2627,7 +2629,7 @@ void Supervisor::onTimer(){
     if(lcm->isconnect){
         // 로봇연결되고 로봇의 상태가 초기화 전이면 초기화 진행
         if(probot->state == ROBOT_STATE_NOT_READY && !lcm->map_updated){
-            if(flag_read_ini){
+            if(flag_read_ini && setting.useAutoInit){
                 if(pmap->use_server){
                     plog->write("[LCM] CONNECT -> INIT START");
                     lcm->sendMapPath("");
@@ -2808,10 +2810,12 @@ void Supervisor::onTimer(){
                 cur_error = probot->err_code;
                 if(cur_error == ROBOT_ERROR_NO_PATH){
                     isaccepted = false;
-                    cur_error = probot->err_code;
                     ui_state = UI_STATE_MOVEFAIL;
                     plog->write("[SCHEDULER] ROBOT ERROR : NO PATH");
                     QMetaObject::invokeMethod(mMain, "nopathfound");
+                }else if(cur_error == ROBOT_ERROR_WAIT){
+                    plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");
+                    QMetaObject::invokeMethod(mMain, "excuseme");
                 }else{
                     plog->write("[SCHEDULER] ROBOT ERROR : " + QString::number(probot->err_code));
                 }

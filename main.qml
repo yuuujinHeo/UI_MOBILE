@@ -14,20 +14,20 @@ Window {
     visible: true
     width: 1280
     height: 800
-    title: qsTr("Hello World")
-    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint
-    visibility: Window.FullScreen
+//    title: qsTr("Hello World")
+//    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint
+//    visibility: Window.FullScreen
 
-    onVisibilityChanged: {
-        if(mainwindow.visibility == Window.Minimized){
-            print("minimized");
-        }else if(mainwindow.visibility == Window.FullScreen){
-            print("fullscren");
-        }else{
-            supervisor.writelog("[QML - MAIN] Window show fullscreen");
-            mainwindow.visibility = Window.FullScreen;
-        }
-    }
+//    onVisibilityChanged: {
+//        if(mainwindow.visibility == Window.Minimized){
+//            print("minimized");
+//        }else if(mainwindow.visibility == Window.FullScreen){
+//            print("fullscren");
+//        }else{
+//            supervisor.writelog("[QML - MAIN] Window show fullscreen");
+//            mainwindow.visibility = Window.FullScreen;
+//        }
+//    }
 
     property string pbefore: pinit
     property string ploading: "qrc:/Page_loading.qml"
@@ -72,6 +72,7 @@ Window {
         loader_page.item.pos = str_target;
     }
     function play_avoidmsg(){
+        print("play excuseme");
         voice_avoid.play();
     }
     function docharge(){
@@ -178,6 +179,10 @@ Window {
             loader_page.item.updatepath();
     }
 
+    function excuseme(){
+        play_avoidmsg();
+    }
+
     function newcall(){
         if(loader_page.item.objectName == "page_kitchen"){
 
@@ -230,6 +235,23 @@ Window {
         }
     }
 
+    Item{
+        focus: true
+        Keys.onReleased: {
+            if(!event.isAutoRepeat){
+                if(event.key === Qt.Key_Up){
+                    print("release key_up")
+                }
+            }
+        }
+        Keys.onPressed: {
+            if(!event.isAutoRepeat){
+                if(event.key === Qt.Key_Up){
+                    print("press key_up")
+                }
+            }
+        }
+    }
     FontLoader{
         id: font_noto_b
         source: "font/NotoSansKR-Medium.otf"
