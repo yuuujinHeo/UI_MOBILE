@@ -468,6 +468,17 @@ Item {
             property var point_y2: 0;
             touchPoints: [TouchPoint{id:point1},TouchPoint{id:point2}]
             onPressed: {
+//                if(point1.pressed && point2.pressed){
+//                    point_x1 = (point1.x+point2.x)*(map_width/width)/2;
+//                    point_y1 = (point1.y+point2.y)*(map_height/height)/2;
+//                }else if(point1.pressed){
+//                    point_x1 = point1.x*(map_width/width);
+//                    point_y1 = point1.y*(map_height/height);
+//                }else if(point2.pressed){
+//                    point_x1 = point2.x*(map_width/width);
+//                    point_y1 = point2.y*(map_height/height);
+//                }
+
                 if(point1.pressed){
                     point_x1 = point1.x*(map_width/width);
                     point_y1 = point1.y*(map_height/height);
@@ -624,24 +635,24 @@ Item {
                         dmoveX = (mx - startX);
                         dmoveY = (my - startY);
 
-//                        var newx = mapview.x + dmoveX;
-//                        var newy = mapview.y + dmoveY;
-//                        if(newx > 0){
-//                            mapview.x = 0;
-//                        }else if(newx < - map_width*mapview.newscale + rect_map.width){
-//                            mapview.x = - map_width*mapview.newscale + rect_map.width
-//                        }else{
-//                            mapview.newscale = new_scale;
-//                            mapview.x = newx;
-//                        }
-//                        if(newy  > 0){
-//                            mapview.y = 0;
-//                        }else if(newy < - map_height*mapview.newscale + rect_map.height){
-//                            mapview.y = - map_height*mapview.newscale + rect_map.height
-//                        }else{
-//                            mapview.newscale = new_scale;
-//                            mapview.y = newy;
-//                        }
+                        var newx = mapview.x + dmoveX;
+                        var newy = mapview.y + dmoveY;
+                        if(newx > 0){
+                            mapview.x = 0;
+                        }else if(newx < - map_width*mapview.newscale + rect_map.width){
+                            mapview.x = - map_width*mapview.newscale + rect_map.width
+                        }else{
+                            mapview.newscale = new_scale;
+                            mapview.x = newx;
+                        }
+                        if(newy  > 0){
+                            mapview.y = 0;
+                        }else if(newy < - map_height*mapview.newscale + rect_map.height){
+                            mapview.y = - map_height*mapview.newscale + rect_map.height
+                        }else{
+                            mapview.newscale = new_scale;
+                            mapview.y = newy;
+                        }
                     }else{
                         dmoveX = point_x1 - startX;
                         dmoveY = point_y1 - startY;
