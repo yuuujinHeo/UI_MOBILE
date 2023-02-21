@@ -785,6 +785,16 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
+                    if(go_wait){
+                        supervisor.moveToWait();
+                    }else if(go_charge){
+                        supervisor.moveToCharge();
+                    }else if(go_patrol){
+
+                    }else{
+
+                    }
+
                     go_wait = false;
                     go_charge = false;
                     go_patrol = false;

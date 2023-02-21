@@ -188,7 +188,6 @@ QString Supervisor::getSetting(QString group, QString name){
     return setting_robot.value(name).toString();
 }
 void Supervisor::readSetting(QString map_name){
-
     //Robot Setting================================================================
     QString ini_path = getIniPath();
     QSettings setting_robot(ini_path, QSettings::IniFormat);
@@ -252,6 +251,7 @@ void Supervisor::readSetting(QString map_name){
     pmap->gridwidth = setting_meta.value("map_grid_width").toFloat();
     pmap->origin[0] = setting_meta.value("map_origin_u").toInt();
     pmap->origin[1] = setting_meta.value("map_origin_v").toInt();
+    qDebug() << "Read Setting " << pmap->gridwidth;
     setting_meta.endGroup();
 
     //Annotation======================================================================
@@ -550,6 +550,7 @@ void Supervisor::deleteAnnotation(){
     pmap->vecObject.clear();
     list_obj_dR.clear();
     list_obj_uL.clear();
+    readSetting();
 }
 bool Supervisor::isExistAnnotation(QString name){
     QString file_meta = getMetaPath(name);
@@ -1715,6 +1716,7 @@ int Supervisor::getLocNum(int x, int y){
 
 
 void Supervisor::removeLocation(QString name){
+    clear_all();
     for(int i=0; i<pmap->vecLocation.size(); i++){
         if(pmap->vecLocation[i].name == name){
             plog->write("[UI-MAP] REMOVE LOCATION "+ name);
@@ -1754,6 +1756,7 @@ void Supervisor::moveLocationPoint(int loc_num, int x, int y, float th){
 }
 
 void Supervisor::addObjectPoint(int x, int y){
+    qDebug() << "addObjetPoint " << x << y << pmap->gridwidth;
     ST_FPOINT temp = canvasTomap(x,y);
     plog->write("[ANNOTATION] addObjectPoint " + QString().sprintf("[%d] %f, %f",temp_object.size(),temp.x,temp.y));
     temp_object.push_back(temp);
@@ -1875,6 +1878,7 @@ void Supervisor::editObject(int num, int point, int x, int y){
 }
 
 void Supervisor::removeObject(int num){
+    clear_all();
     if(num > -1 && num < pmap->vecObject.size()){
         pmap->vecObject.remove(num);
         setObjPose();
@@ -2427,6 +2431,7 @@ void Supervisor::addPatrol(QString type, QString location, float x, float y, flo
     }
 }
 void Supervisor::removePatrol(int num){
+    clear_all();
     if(num > -1 && num < patrol.path.size()){
         patrol.path.remove(num);
         plog->write("[USER INPUT] Remove Patrol : "+QString::number(num));

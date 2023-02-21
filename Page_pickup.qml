@@ -172,6 +172,7 @@ Item {
     Audio{
         id: voice_pickup
         autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_pickup1.mp3"
     }
 

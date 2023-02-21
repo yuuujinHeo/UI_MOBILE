@@ -15,19 +15,19 @@ Window {
     width: 1280
     height: 800
     title: qsTr("Hello World")
-//    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint
-//    visibility: Window.FullScreen
+    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint
+    visibility: Window.FullScreen
 
-//    onVisibilityChanged: {
-//        if(mainwindow.visibility == Window.Minimized){
-//            print("minimized");
-//        }else if(mainwindow.visibility == Window.FullScreen){
-//            print("fullscren");
-//        }else{
-//            supervisor.writelog("[QML - MAIN] Window show fullscreen");
-//            mainwindow.visibility = Window.FullScreen;
-//        }
-//    }
+    onVisibilityChanged: {
+        if(mainwindow.visibility == Window.Minimized){
+            print("minimized");
+        }else if(mainwindow.visibility == Window.FullScreen){
+            print("fullscren");
+        }else{
+            supervisor.writelog("[QML - MAIN] Window show fullscreen");
+            mainwindow.visibility = Window.FullScreen;
+        }
+    }
 
     property string pbefore: pinit
     property string ploading: "qrc:/Page_loading.qml"
@@ -242,25 +242,25 @@ Window {
     Audio{
         id: voice_movewait
         autoPlay: false
-        volume: Number(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_move_wait.mpga"
     }
     Audio{
         id: voice_movecharge
         autoPlay: false
-        volume: Number(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_move_charge.mp3"
     }
     Audio{
         id: voice_serving
         autoPlay: false
-        volume: Number(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_start_serving1.mp3"
     }
     Audio{
         id: voice_avoid
         autoPlay: false
-        volume: Number(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_avoid.mp3"
     }
 

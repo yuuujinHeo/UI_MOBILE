@@ -561,6 +561,7 @@ Item {
                             tool = "NONE";
                         }
                     }else if(tool == "ADD_OBJECT"){
+                        print("addObjectPoint"+new_obj_x1,new_obj_x2);
                         supervisor.addObjectPoint(new_obj_x1,new_obj_y1);
                         supervisor.addObjectPoint(new_obj_x1,new_obj_y2);
                         supervisor.addObjectPoint(new_obj_x2,new_obj_y2);
@@ -1659,7 +1660,7 @@ Item {
             if(show_path){
                 //Global path!
                 path_num = supervisor.getPathNum();
-                print("show path"+path_num);
+//                print("show path"+path_num);
                 path_x = robot_x;
                 path_y = robot_y;
                 path_th = robot_th;
