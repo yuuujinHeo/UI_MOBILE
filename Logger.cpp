@@ -15,7 +15,7 @@ Logger::Logger()
     file = new QFile;
     file->setFileName(filename);
     file->open(QIODevice::Append | QIODevice::Text);
-
+    prev_str = "";
 }
 
 void Logger::write(const QString str, bool print){

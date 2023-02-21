@@ -20,6 +20,7 @@ public:
 
 private:
     QFile *file;
+    QString prev_str;
 
     QString filename;
 

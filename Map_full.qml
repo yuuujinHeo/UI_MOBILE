@@ -149,6 +149,7 @@ Item {
     }
 
     function update_canvas(){
+        clear_canvas();
         if(state_annotation == "DRAWING"){
             draw_canvas_lines(true);
         }
@@ -286,8 +287,9 @@ Item {
             show_object = true;
         }else if(state_annotation == "LOCATION"){
             show_object = true;
+            show_robot = true;
             show_location = true;
-//            show_margin = true;
+            show_lidar = true;
             find_map_walls();
         }else if(state_annotation == "SAVE"){
             show_location = true;
@@ -321,6 +323,17 @@ Item {
                     duration: 100
                 }
             }
+            Behavior on x{
+                NumberAnimation{
+                    duration: 100
+                }
+            }
+            Behavior on y{
+                NumberAnimation{
+                    duration: 100
+                }
+            }
+
             onXChanged: {
                 if(x > 0){
                     x = 0;
@@ -571,11 +584,11 @@ Item {
                         if(state_annotation == "OBJECT"){
                             select_object = supervisor.getObjNum(point_x1,point_y1);
                             loader_menu.item.setcur(select_object);
-                            draw_canvas_object();
+                            update_canvas();
                         }else if(state_annotation == "LOCATION"){
                             select_location = supervisor.getLocNum(point_x1,point_y1);
                             loader_menu.item.setcur(select_location);
-                            canvas_location.requestPaint();
+                            update_canvas();
                         }else if(state_annotation == "TRAVELLINE"){
 //                            select_line = supervisor.getTlineNum(point_x1, point_y1)/2;
 //                            loader_menu.item.setcur(select_line);
@@ -782,9 +795,11 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: 5
             color: show_object?"#12d27c":"#e8e8e8"
-            Image{
+            Text{
+                text: "obj"
+                color: "white"
                 anchors.centerIn: parent
-                source: "icon/icon_lidar.png"
+                font.family: font_noto_r.name
             }
             MouseArea{
                 anchors.fill: parent
@@ -861,6 +876,11 @@ Item {
         width: 13
         height: width
         source: "icon/icon_charge_1.png"
+        ColorOverlay{
+            source: parent
+            anchors.fill: parent
+            color: "#83B8F9"
+        }
     }
     Image{
         id: image_charging
@@ -875,6 +895,11 @@ Item {
         width: 13
         height: width
         source: "icon/icon_home_1.png"
+        ColorOverlay{
+            source: parent
+            anchors.fill: parent
+            color: "#83B8F9"
+        }
     }
     Image{
         id: image_resting
@@ -1096,7 +1121,7 @@ Item {
                 if(loc_type.slice(0,4) == "Char"){
                     if(select_location == i){
                         ctx.fillStyle = "#262626";
-                        ctx.strokeStyle = "yellow";
+                        ctx.strokeStyle = "#83B8F9";
                         ctx.lineWidth = 2;
                         ctx.beginPath();
                         ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
@@ -1132,9 +1157,9 @@ Item {
                         ctx.drawImage(image_charging,loc_x - image_charging.width/2,loc_y - image_charging.width/2, image_charging.width, image_charging.height);
                     }
                 }else if(loc_type.slice(0,4) == "Rest"){
-                    if(select_location == i){
+                    if(select_location === i){
                         ctx.fillStyle = "#262626";
-                        ctx.strokeStyle = "yellow";
+                        ctx.strokeStyle = "#83B8F9";
                         ctx.lineWidth = 2;
                         ctx.beginPath();
                         ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
@@ -1150,11 +1175,6 @@ Item {
                         var x2 = loc_x-distance2*Math.sin(loc_th+th_dist);
                         var y2 = loc_y-distance2*Math.cos(loc_th+th_dist);
 
-                        if(select_location == i){
-                            ctx.strokeStyle = "yellow";
-                        }else{
-                            ctx.strokeStyle = "#83B8F9";
-                        }
                         ctx.beginPath();
                         ctx.moveTo(x,y);
                         ctx.lineTo(x1,y1);
@@ -1191,9 +1211,9 @@ Item {
                 var loc_th = supervisor.getLocationth(i);//+Math.PI/2;
 
                 if(select_location == i){
-                    ctx.strokeStyle = "#05C9FF";
-                    ctx.lineWidth = 3;
-                    ctx.fillStyle = "yellow";
+                    ctx.strokeStyle = "#83B8F9";
+                    ctx.fillStyle = "#FFD9FF";
+                    ctx.lineWidth = 2;
                 }else{
                     ctx.strokeStyle = "white";
                     ctx.lineWidth = 2;
@@ -1216,7 +1236,7 @@ Item {
                 var y2 = loc_y-distance2*Math.cos(loc_th+th_dist);
 
                 if(select_location == i){
-                    ctx.strokeStyle = "yellow";
+                    ctx.strokeStyle = "#83B8F9";
                 }else{
                     ctx.strokeStyle = "#83B8F9";
                 }
@@ -1247,16 +1267,16 @@ Item {
 
                 if(select_patrol === i){
                     ctx.lineWidth = 3;
-                    if(loc_type == "START"){
+                    if(loc_type === "START"){
                         ctx.fillStyle = "#12d27c";
                     }else{
-                        ctx.fillStyle = "#83B8F9";
+                        ctx.fillStyle = "#FFD9FF";
                     }
-                    ctx.strokeStyle = "yellow";
+                    ctx.strokeStyle = "#83B8F9";
                 }else{
                     ctx.strokeStyle = "white";
                     ctx.lineWidth = 2;
-                    if(loc_type == "START"){
+                    if(loc_type === "START"){
                         ctx.fillStyle = "#12d27c";
                     }else{
                         ctx.fillStyle = "#83B8F9";
@@ -1604,7 +1624,7 @@ Item {
         if(canvas_map_cur.available){
             var ctx = canvas_map_cur.getContext('2d');
             ctx.clearRect(0,0,canvas_map_cur.width,canvas_map_cur.height);
-            if(show_robot){
+            if(show_robot && supervisor.is_slam_running()){
                 robot_x = supervisor.getRobotx()/grid_size + origin_x;
                 robot_y = supervisor.getRoboty()/grid_size + origin_y;
                 robot_th = -supervisor.getRobotth()-Math.PI/2;

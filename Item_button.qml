@@ -101,6 +101,10 @@ Item {
             path_radial.startAngle = -90;
             path_radial.sweepAngle = 0;
         }
+        onStopped: {
+            shape_radial.visible = false;
+        }
+
         PropertyAnimation{
             target: path_radial
             property: "sweepAngle"

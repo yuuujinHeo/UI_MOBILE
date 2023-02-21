@@ -163,6 +163,7 @@ typedef struct{
     int volumeBGM;
     int volumeVoice;
 
+    bool useAutoInit;
     bool useVoice;
     bool useBGM;
     bool useTravelline;
@@ -245,7 +246,7 @@ enum ROBOT_STATE{
 
 enum ROBOT_ERROR{
     ROBOT_ERROR_NONE = 0,
-    ROBOT_ERROR_COL,
+    ROBOT_ERROR_WAIT,
     ROBOT_ERROR_NO_PATH,
     ROBOT_ERROR_MOTOR_COMM,
     ROBOT_ERROR_MOTOR,

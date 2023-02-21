@@ -13,6 +13,8 @@ Item {
     property real angle : 0//mousearea.angle
     property real distance : 0
 
+    property bool show_arrow: true
+
     property bool pressed: mousearea.pressed
     property int update_cnt: 0
 
@@ -40,7 +42,7 @@ Item {
     Image{
         id: image_joy_up
         source: "icon/joy_up.png"
-        visible: horizontalOnly?false:true
+        visible: show_arrow&&verticalOnly?true:false
         width: 13
         height: 8
         anchors.horizontalCenter: joystick.horizontalCenter
@@ -57,7 +59,7 @@ Item {
     Image{
         id: image_joy_down
         source: "icon/joy_down.png"
-        visible: horizontalOnly?false:true
+        visible: show_arrow&&verticalOnly?true:false
         width: 13
         height: 8
         anchors.horizontalCenter: joystick.horizontalCenter
@@ -73,7 +75,7 @@ Item {
     Image{
         id: image_joy_left
         source: "icon/joy_left.png"
-        visible: verticalOnly?false:true
+        visible: show_arrow&&horizontalOnly?true:false
         width: 8
         height: 13
         anchors.verticalCenter: joystick.verticalCenter
@@ -89,7 +91,7 @@ Item {
     Image{
         id: image_joy_right
         source: "icon/joy_right.png"
-        visible: verticalOnly?false:true
+        visible: show_arrow&&horizontalOnly?true:false
         width: 8
         height: 13
         anchors.verticalCenter: joystick.verticalCenter

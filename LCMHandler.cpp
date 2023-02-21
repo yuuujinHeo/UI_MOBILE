@@ -42,21 +42,21 @@ void LCMHandler::sendCommand(command cmd, QString msg){
         if(probot->state != ROBOT_STATE_BUSY){
             if(is_debug){
                 lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&cmd);
+                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
             }else{
                 lcm.publish("COMMAND_"+probot->name.toStdString(),&cmd);
-            }
-            if(msg != ""){
-                plog->write("[LCM] SEND COMMAND : " + msg);
+                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
             }
             flag_tx = true;
         }else{
             if(msg != ""){
-                plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) : " + msg);
+                plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) TO COMMAND_" + probot->name + ": " + msg);
             }
         }
     }else{
         if(msg != ""){
-            plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) : " + msg);
+            plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) TO COMMAND_" + probot->name + ": " + msg);
+            lcm.publish("COMMAND_"+probot->name.toStdString(),&cmd);
         }
     }
 }
@@ -71,16 +71,18 @@ void LCMHandler::sendCommand(int cmd, QString msg){
         if(probot->state != ROBOT_STATE_BUSY){
             if(is_debug){
                 lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&send_msg);
+                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
             }else{
                 lcm.publish("COMMAND_"+probot->name.toStdString(),&send_msg);
+                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
             }
-            plog->write("[LCM] SEND COMMAND : " + msg);
             flag_tx = true;
         }else{
-            plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) : " + msg);
+            plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) TO COMMAND_" + probot->name + ": " + msg);
         }
     }else{
-        plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) : " + msg);
+        plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) TO COMMAND_" + probot->name + ": " + msg);
+        lcm.publish("COMMAND_"+probot->name.toStdString(),&send_msg);
     }
 }
 
@@ -244,6 +246,7 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
     connect_count = 0;
     probot->battery = msg->bat;
     probot->state = msg->state;
+    qDebug() << "STATE IS " << probot->state;
     probot->err_code = msg->err_code;
     probot->curPose.x = msg->robot_pose[0];
     probot->curPose.y = msg->robot_pose[1];
@@ -318,6 +321,9 @@ void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const st
      emit mappingin();
 }
 
+void LCMHandler::robot_command_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const command *msg){
+    qDebug() << "COMMAND CALLBACK" << msg->cmd;
+}
 
 void LCMHandler::robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const camera_data *msg){
     for(int i=0; i<msg->num; i++){
@@ -376,6 +382,7 @@ void LCMHandler::subscribe(){
     lcm.unsubscribe(sub_localpath);
     lcm.unsubscribe(sub_mapping);
     lcm.unsubscribe(sub_camera);
+    lcm.unsubscribe(sub_test_cmd);
     if(is_debug){
         qDebug() << "Change Subscribe " << probot->name_debug;
         sub_mapping = lcm.subscribe("MAP_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_mapping_callback, this);
@@ -390,6 +397,7 @@ void LCMHandler::subscribe(){
         sub_path = lcm.subscribe("ROBOT_PATH_"+probot->name.toStdString(), &LCMHandler::robot_path_callback, this);
         sub_localpath = lcm.subscribe("ROBOT_LOCAL_PATH_"+probot->name.toStdString(), &LCMHandler::robot_local_path_callback, this);
         sub_camera = lcm.subscribe("CAMERA_DATA_"+probot->name.toStdString(), &LCMHandler::robot_camera_callback, this);
+        sub_test_cmd = lcm.subscribe("COMMAND_"+probot->name.toStdString(), &LCMHandler::robot_command_callback, this);
     }
 }
 void LCMHandler::onTimer(){
@@ -409,7 +417,7 @@ void LCMHandler::onTimer(){
         flag_tx = false;
     }
     //LCM 통신 연결상태 확인(3초)
-    if(connect_count++ > 300){
+    if(connect_count++ > 15){
         isconnect = false;
     }
 }
