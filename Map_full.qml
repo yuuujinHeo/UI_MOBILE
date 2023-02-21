@@ -353,24 +353,24 @@ Item {
                 width = map_width*newscale
                 height = map_height*newscale
 
-                var newx = rect_map.width/2 - (robot_x)*mapview.newscale;
-                var newy = rect_map.width/2 - (robot_y)*mapview.newscale;
+//                var newx = rect_map.width/2 - (robot_x)*mapview.newscale;
+//                var newy = rect_map.width/2 - (robot_y)*mapview.newscale;
 
-                if(x > 0){
-                    mapview.x = 0;
-                }else if(x < - map_width*newscale + rect_map.width){
-                    mapview.x = - map_width*newscale + rect_map.width
-                }else if(robot_following){
-                    mapview.x = newx;
-                }
+//                if(x > 0){
+//                    mapview.x = 0;
+//                }else if(x < - map_width*newscale + rect_map.width){
+//                    mapview.x = - map_width*newscale + rect_map.width
+//                }else if(robot_following){
+//                    mapview.x = newx;
+//                }
 
-                if(y  > 0){
-                    mapview.y = 0;
-                }else if(y < - map_height*mapview.newscale + rect_map.height){
-                    mapview.y = - map_height*mapview.newscale + rect_map.height
-                }else if(robot_following){
-                    mapview.y = newy;
-                }
+//                if(y  > 0){
+//                    mapview.y = 0;
+//                }else if(y < - map_height*mapview.newscale + rect_map.height){
+//                    mapview.y = - map_height*mapview.newscale + rect_map.height
+//                }else if(robot_following){
+//                    mapview.y = newy;
+//                }
             }
         }
 
