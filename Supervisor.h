@@ -328,6 +328,20 @@ public:
     Q_INVOKABLE int getErrcode();
     Q_INVOKABLE QString getRobotName();
 
+    Q_INVOKABLE bool getMotorConnection(int id);
+    Q_INVOKABLE int getMotorStatus(int id);
+    Q_INVOKABLE int getMotorTemperature(int id);
+    Q_INVOKABLE int getPowerStatus();
+    Q_INVOKABLE int getRemoteStatus();
+    Q_INVOKABLE int getEmoStatus();
+    Q_INVOKABLE float getBatteryIn();
+    Q_INVOKABLE float getBatteryOut();
+    Q_INVOKABLE float getBatteryCurrent();
+    Q_INVOKABLE float getPower();
+    Q_INVOKABLE float getPowerTotal();
+
+
+
     Q_INVOKABLE float getRobotRadius();
     Q_INVOKABLE float getRobotx();
     Q_INVOKABLE float getRoboty();

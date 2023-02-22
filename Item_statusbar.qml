@@ -323,6 +323,7 @@ Item {
         repeat: true
         running: true
         onTriggered: {
+            robot_battery = supervisor.getBatteryOut();
             curTime = Qt.formatTime(new Date(), "hh:mm");
             robot_rx = supervisor.getLCMRX();
             robot_tx = supervisor.getLCMTX();

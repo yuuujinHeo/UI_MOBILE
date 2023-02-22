@@ -2065,6 +2065,309 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
+                                text:"Motor Connection"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            id: rect_connection_0
+                            width: (parent.width - 351)/2
+                            height: parent.height
+                            color: supervisor.getMotorConnection(0)?color_green:color_red
+                            Text{
+                                id: text_connection_0
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:supervisor.getMotorConnection(0)?"모터 0번 연결됨":"모터 0번 연결안됨"
+                                font.pixelSize: 15
+                            }
+                        }
+                        Rectangle{
+                            id: rect_connection_1
+                            width: (parent.width - 351)/2
+                            height: parent.height
+                            color: supervisor.getMotorConnection(1)?color_green:color_red
+                            Text{
+                                id: text_connection_1
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:supervisor.getMotorConnection(1)?"모터 1번 연결됨":"모터 1번 연결안됨"
+                                font.pixelSize: 15
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"Motor Status"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/2
+                            height: parent.height
+                            Text{
+                                id: text_status_0
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"모터 0 : "+supervisor.getMotorStatus(0).toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/2
+                            height: parent.height
+                            Text{
+                                id: text_status_1
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"모터 1 : "+supervisor.getMotorStatus(1).toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"Motor Temperature"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/2
+                            height: parent.height
+                            Text{
+                                id: text_temp_0
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"모터 0 : "+supervisor.getMotorTemperature(0).toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/2
+                            height: parent.height
+                            Text{
+                                id: text_temp_1
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"모터 1 : "+supervisor.getMotorTemperature(1).toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"Status"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/3
+                            height: parent.height
+                            Text{
+                                id: text_status_power
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"Power : "+supervisor.getPowerStatus().toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/3
+                            height: parent.height
+                            Text{
+                                id: text_status_emo
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"Emo : "+supervisor.getEmoStatus().toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/3
+                            height: parent.height
+                            Text{
+                                id: text_status_remote
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"Remote : "+supervisor.getRemoteStatus().toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"Battery"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/3
+                            height: parent.height
+                            Text{
+                                id: text_battery_in
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"In : "+supervisor.getBatteryIn().toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/3
+                            height: parent.height
+                            Text{
+                                id: text_battery_out
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"Out : "+supervisor.getBatteryOut().toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/3
+                            height: parent.height
+                            Text{
+                                id: text_battery_current
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"Current : "+supervisor.getBatteryCurrent().toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"Power"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/2
+                            height: parent.height
+                            Text{
+                                id: text_power
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"Power : "+supervisor.getPower().toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/2
+                            height: parent.height
+                            Text{
+                                id: text_power_total
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"Total : "+supervisor.getPowerTotal().toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
                                 text:"gear_ratio"
                                 font.pixelSize: 20
                             }
@@ -2853,7 +3156,6 @@ Item {
                 }
             }
         }
-
     }
     Component.onCompleted: {
         init();
@@ -2970,28 +3272,51 @@ Item {
         left_camera.text = supervisor.getSetting("SENSOR","left_camera");
     }
 
-
     Timer{
         running: true
-        interval: 1000
+        interval: 500
         repeat: true
+        triggeredOnStart: true
         onTriggered: {
-//            if(is_debug != supervisor.getDebugState()){
-//                supervisor.setDebugState(is_debug);
-//            }
-//            if(debug_platform_name != supervisor.getDebugName()){
-//                supervisor.setDebugName(debug_platform_name);
-//            }
+            if(supervisor.getMotorConnection(0)){
+                rect_connection_0.color = color_green;
+                text_connection_0.text = "모터 0번 연결됨"
+            }else{
+                rect_connection_0.color = color_red;
+                text_connection_0.text = "모터 0번 연결안됨"
+            }
+            if(supervisor.getMotorConnection(1)){
+                rect_connection_1.color = color_green;
+                text_connection_1.text = "모터 1번 연결됨"
+            }else{
+                rect_connection_1.color = color_red;
+                text_connection_1.text = "모터 1번 연결안됨"
+            }
+            text_status_0.text = "모터 0 : " + supervisor.getMotorStatus(0).toString();
+            text_status_1.text = "모터 1 : " + supervisor.getMotorStatus(1).toString();
+
+            text_temp_0.text = "모터 0 : " + supervisor.getMotorTemperature(0).toString();
+            text_temp_1.text = "모터 1 : " + supervisor.getMotorTemperature(1).toString();
+
+            text_status_power.text = "Power : " + supervisor.getPowerStatus().toString();
+            text_status_emo.text = "Emo : " + supervisor.getEmoStatus().toString();
+            text_status_remote.text = "Remote : " + supervisor.getRemoteStatus().toString();
+
+            text_battery_in.text = "In : " + supervisor.getBatteryIn().toString();
+            text_battery_out.text = "Out : " + supervisor.getBatteryOut().toString();
+            text_battery_current.text = "Current : " + supervisor.getBatteryCurrent().toString();
+
+            text_power.text = "Power : " + supervisor.getPower().toString();
+            text_power_total.text = "Total : " + supervisor.getPowerTotal().toString();
+
         }
     }
-
 
     Popup{
         id: popup_update
         width: 600
         height: 400
         anchors.centerIn: parent
-
 
         onOpened: {
             //버전 체크

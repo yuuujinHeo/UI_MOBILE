@@ -31,6 +31,8 @@ Window {
         }
     }
 
+    property color color_green: "#12d27c"
+    property color color_red: "red"
     property string pbefore: pinit
     property string ploading: "qrc:/Page_loading.qml"
     property string pkitchen: "qrc:/Page_kitchen.qml"
