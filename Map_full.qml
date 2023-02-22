@@ -318,21 +318,26 @@ Item {
             width: map_width
             height: map_height
             property var newscale: 1
+            property var centerx: 0
+            property var centery: 0
+            property var startx: 0
+            property var starty: 0
+            property var startScale: 0
             Behavior on newscale{
                 NumberAnimation{
                     duration: 100
                 }
             }
-            Behavior on x{
-                NumberAnimation{
-                    duration: 100
-                }
-            }
-            Behavior on y{
-                NumberAnimation{
-                    duration: 100
-                }
-            }
+//            Behavior on x{
+//                NumberAnimation{
+//                    duration: 100
+//                }
+//            }
+//            Behavior on y{
+//                NumberAnimation{
+//                    duration: 100
+//                }
+//            }
 
             onXChanged: {
                 if(x > 0){
@@ -353,24 +358,14 @@ Item {
                 width = map_width*newscale
                 height = map_height*newscale
 
-//                var newx = rect_map.width/2 - (robot_x)*mapview.newscale;
-//                var newy = rect_map.width/2 - (robot_y)*mapview.newscale;
+                var xscale = centerx/map_width;
+                var yscale = centery/map_height;
 
-//                if(x > 0){
-//                    mapview.x = 0;
-//                }else if(x < - map_width*newscale + rect_map.width){
-//                    mapview.x = - map_width*newscale + rect_map.width
-//                }else if(robot_following){
-//                    mapview.x = newx;
-//                }
+                var newx = (width - rect_map.width)*xscale;
+                var newy = (height - rect_map.height)*yscale;
 
-//                if(y  > 0){
-//                    mapview.y = 0;
-//                }else if(y < - map_height*mapview.newscale + rect_map.height){
-//                    mapview.y = - map_height*mapview.newscale + rect_map.height
-//                }else if(robot_following){
-//                    mapview.y = newy;
-//                }
+                x = -newx;
+                y = -newy;
             }
         }
 
@@ -445,6 +440,7 @@ Item {
                     new_scale = mapview.newscale - 0.1;
                     if(rect_map.width > new_scale*map_width){
                         mapview.newscale = rect_map.width/map_width;
+                        print(rect_map.width, map_width)
                     }else{
                         mapview.newscale = new_scale;
                     }
@@ -457,6 +453,8 @@ Item {
             anchors.fill: mapview
             minimumTouchPoints: 1
             maximumTouchPoints: 2
+            property var startViewX: 0
+            property var startViewY: 0
             property var dmoveX : 0;
             property var dmoveY : 0;
             property var startX : 0;
@@ -466,6 +464,8 @@ Item {
             property var point_x2: 0;
             property var point_y1: 0;
             property var point_y2: 0;
+            property bool is_update: false
+            property bool double_touch: false
             touchPoints: [TouchPoint{id:point1},TouchPoint{id:point2}]
             onPressed: {
                 if(point1.pressed){
@@ -476,19 +476,26 @@ Item {
                 if(point1.pressed && point2.pressed){
                     point_x2 = point2.x*(map_width/width);
                     point_y2 = point2.y*(map_height/height);
+                    double_touch = true;
                 }
                 if(tool == "MOVE"){//move
                     if(point1.pressed && point2.pressed){
+                        mapview.centerx = (point_x1+point_x2)/2;
+                        mapview.centery = (point_y1+point_y2)/2;
+                        mapview.startx = mapview.x;
+                        mapview.starty = mapview.y;
+                        mapview.startScale = mapview.newscale;
                         var dx = Math.abs(point_x1-point_x2);
                         var dy = Math.abs(point_y1-point_y2);
                         var dist = Math.sqrt(dx*dx + dy*dy);
-                        area_map.startX = (point_x1+point_x2)/2;
-                        area_map.startY = (point_y1+point_y2)/2;
                         area_map.startDist = dist;
-                        print("PRESS : ",area_map.startX, area_map.startY,area_map.startDist);
+                        print("PRESS : ",mapview.centerx, mapview.centery, mapview.newscale);
                     }else if(point1.pressed){
-                        area_map.startX = point_x1;
-                        area_map.startY = point_y1;
+                        area_map.startX = point1.x;
+                        area_map.startY = point1.y;
+                    }else if(point2.pressed){
+                        area_map.startX = point2.x;
+                        area_map.startY = point2.y;
                     }
                 }else if(tool == "BRUSH"){//draw
                     canvas_map.lastX = point_x1;
@@ -540,6 +547,7 @@ Item {
                     point_y2 = point2.y*(map_height/height);
                 }
                 if(!point1.pressed&&!point2.pressed){
+                    double_touch = false;
                     if(tool == "BRUSH"){
                         supervisor.stopLine();
                     }else if(tool == "ADD_POINT"){//add point
@@ -611,62 +619,44 @@ Item {
                 if(tool == "MOVE"){
                     robot_following = false;
                     if(point1.pressed&&point2.pressed){
-                        var dx = Math.abs(point_x1-point_x2);
-                        var dy = Math.abs(point_y1-point_y2);
-                        var mx = (point_x1+point_x2)/2;
-                        var my = (point_y1+point_y2)/2;
-                        var dist = Math.sqrt(dx*dx + dy*dy);
+
+                        var dx = Math.abs(point1.x - point2.x)
+                        var dy = Math.abs(point1.y - point2.y)
+                        var dist = Math.sqrt(dx*dx + dy*dy);//*width/map_width;
                         var dscale = (dist)/startDist;
-                        var new_scale = mapview.newscale*dscale;
 
-                        if(new_scale > 5)   new_scale = 5;
-                        else if(new_scale < 1) new_scale = 1;
-
-                        print("drag",mx,my,dist,new_scale,mapview.newscale);
-                        dmoveX = (mx - area_map.startX);
-                        dmoveY = (my - area_map.startY);
-
-                        print("PRESS : ",area_map.startX, area_map.startY,area_map.startDist);
-                        var newx = mapview.x + dmoveX;
-                        var newy = mapview.y + dmoveY;
-                        if(newx > 0){
-                            mapview.x = 0;
-                        }else if(newx < - map_width*mapview.newscale + rect_map.width){
-                            mapview.x = - map_width*mapview.newscale + rect_map.width
+                        if(dscale > 5){
+                            mapview.newscale = 5;
+                        }else if(rect_map.width > dscale*map_width){
+                            mapview.newscale = rect_map.width/map_width;
                         }else{
-                            mapview.newscale = new_scale;
-                            mapview.x = newx;
+                            mapview.newscale = dscale;
                         }
-                        if(newy  > 0){
-                            mapview.y = 0;
-                        }else if(newy < - map_height*mapview.newscale + rect_map.height){
-                            mapview.y = - map_height*mapview.newscale + rect_map.height
-                        }else{
-                            mapview.newscale = new_scale;
-                            mapview.y = newy;
-                        }
-                    }else{
-                        dmoveX = point_x1 - area_map.startX;
-                        dmoveY = point_y1 - area_map.startY;
 
-                        var newx = mapview.x + dmoveX;
-                        var newy = mapview.y + dmoveY;
+                    }else if(!double_touch){
+                        if(point1.pressed || point2.pressed){
+                            dmoveX = point1.x - area_map.startX;
+                            dmoveY = point1.y - area_map.startY;
 
-                        if(newx > 0){
-                            mapview.x = 0;
-                        }else if(newx < - map_width*mapview.newscale + rect_map.width){
-                            mapview.x = - map_width*mapview.newscale + rect_map.width
-                        }else{
-                            mapview.x = newx;
+                            var newx = mapview.x + dmoveX;
+                            var newy = mapview.y + dmoveY;
+
+                            if(newx > 0){
+                                mapview.x = 0;
+                            }else if(newx < - map_width*mapview.newscale + rect_map.width){
+                                mapview.x = - map_width*mapview.newscale + rect_map.width
+                            }else{
+                                mapview.x = newx;
+                            }
+                            if(newy  > 0){
+                                mapview.y = 0;
+                            }else if(newy < - map_height*mapview.newscale + rect_map.height){
+                                mapview.y = - map_height*mapview.newscale + rect_map.height
+                            }else{
+                                mapview.y = newy;
+                            }
                         }
-                        if(newy  > 0){
-                            mapview.y = 0;
-                        }else if(newy < - map_height*mapview.newscale + rect_map.height){
-                            mapview.y = - map_height*mapview.newscale + rect_map.height
-                        }else{
-                            mapview.y = newy;
-                        }
-//                        print(newx,newy,mapview.x,mapview.y)
+
 
                     }
                 }else if(tool == "BRUSH"){

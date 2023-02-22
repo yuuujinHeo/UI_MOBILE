@@ -20,8 +20,8 @@ Item {
 
     property bool verticalOnly : false
     property bool horizontalOnly : false
-    property real mouseX2 : verticalOnly ? width * 0.5 : mousearea.mouseX
-    property real mouseY2 : horizontalOnly ? height * 0.5 : mousearea.mouseY
+    property real mouseX2 : verticalOnly ? width * 0.5 : point.x
+    property real mouseY2 : horizontalOnly ? height * 0.5 : point.y
     property real fingerAngle : Math.atan2(mouseX2, mouseY2)
     property int mcx : mouseX2 - width * 0.5
     property int mcy : mouseY2 - height * 0.5
@@ -142,9 +142,12 @@ Item {
         returnAnimation.restart();
     }
 
-    MouseArea {
+    MultiPointTouchArea {
         id: mousearea
         anchors.fill: parent
+        minimumTouchPoints: 1
+        maximumTouchPoints: 1
+        touchPoints: TouchPoint{id: point}
         onPressed: {
             print("pressed")
             returnAnimation.stop();
@@ -155,35 +158,40 @@ Item {
             parent.pressed = false;
             returnAnimation.restart()
         }
-        onPositionChanged: {
-            update_cnt++;
+        onTouchUpdated: {
+            if(pressed){
 
-            mouseX2 = verticalOnly ? width * 0.5 : mousearea.mouseX
-            mouseY2 = horizontalOnly ? height * 0.5 : mousearea.mouseY
-            fingerAngle = Math.atan2(mouseX2, mouseY2)
-            fingerInBounds = fingerDistance2 < distanceBound2
-            mcx =mouseX2 - width * 0.5
-            mcy =mouseY2 - height * 0.5
+                update_cnt++;
+                print(point.x,point.y)
 
-            fingerDistance2 = mcx * mcx + mcy * mcy
+                mouseX2 = verticalOnly ? width * 0.5 : point.x
+                mouseY2 = horizontalOnly ? height * 0.5 : point.y
+                fingerAngle = Math.atan2(mouseX2, mouseY2)
+                fingerInBounds = fingerDistance2 < distanceBound2
+                mcx =mouseX2 - width * 0.5
+                mcy =mouseY2 - height * 0.5
 
-            distanceBound = width * 0.5 - thumb.width * 0.5
-            distanceBound2 = distanceBound * distanceBound
-            signal_x = (mouseX2 - joystick.width/2) / distanceBound
-            signal_y = -(mouseY2 - joystick.height/2) / distanceBound
+                fingerDistance2 = mcx * mcx + mcy * mcy
 
-            if (fingerInBounds) {
-                thumb.anchors.horizontalCenterOffset = mcx
-                thumb.anchors.verticalCenterOffset = mcy
-            } else {
-                angle = Math.atan2(mcy, mcx)
-                thumb.anchors.horizontalCenterOffset = Math.cos(angle) * distanceBound
-                thumb.anchors.verticalCenterOffset = Math.sin(angle) * distanceBound
+                distanceBound = width * 0.5 - thumb.width * 0.5
+                distanceBound2 = distanceBound * distanceBound
+                signal_x = (mouseX2 - joystick.width/2) / distanceBound
+                signal_y = -(mouseY2 - joystick.height/2) / distanceBound
+
+                if (fingerInBounds) {
+                    thumb.anchors.horizontalCenterOffset = mcx
+                    thumb.anchors.verticalCenterOffset = mcy
+                } else {
+                    angle = Math.atan2(mcy, mcx)
+                    thumb.anchors.horizontalCenterOffset = Math.cos(angle) * distanceBound
+                    thumb.anchors.verticalCenterOffset = Math.sin(angle) * distanceBound
+                }
+
+                // Fire the signal to indicate the joystick has moved
+                angle = Math.atan2(signal_y, signal_x)
+    //            print(mcx, signal_x, signal_y,  fingerDistance2, distanceBound, angle);
+
             }
-
-            // Fire the signal to indicate the joystick has moved
-            angle = Math.atan2(signal_y, signal_x)
-//            print(mcx, signal_x, signal_y,  fingerDistance2, distanceBound, angle);
         }
     }
 
