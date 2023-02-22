@@ -1,10 +1,7 @@
 <?xml version="1.0"?>
 <RCC>
     <qresource prefix="/">
-        <file alias="image/rainbow1.png">../image/rainbow1.png</file>
-        <file alias="image/rainbow2.png">../image/rainbow2.png</file>
         <file alias="image/rainbow3.png">../image/rainbow3.png</file>
-        <file alias="image/rainbow4.png">../image/rainbow4.png</file>
         <file alias="bgm/song.mp3">../bgm/song.mp3</file>
         <file alias="bgm/voice_start_serving.mp3">../bgm/voice_start_serving.mp3</file>
         <file alias="bgm/voice_pickup.mp3">../bgm/voice_pickup.mp3</file>

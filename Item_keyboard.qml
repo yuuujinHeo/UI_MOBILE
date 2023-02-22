@@ -76,7 +76,7 @@ Item {
             source: "icon/keyboard_up.png"
             anchors.centerIn: parent
         }
-        MouseArea{
+        MultiPointTouchArea{
             anchors.fill: parent
             onPressed: {
                 pressed_up = true;
@@ -101,7 +101,7 @@ Item {
             source: "icon/keyboard_down.png"
             anchors.centerIn: parent
         }
-        MouseArea{
+        MultiPointTouchArea{
             anchors.fill: parent
             onPressed: {
                 pressed_down = true;
@@ -127,7 +127,7 @@ Item {
             source: "icon/keyboard_left.png"
             anchors.centerIn: parent
         }
-        MouseArea{
+        MultiPointTouchArea{
             anchors.fill: parent
             onPressed: {
                 pressed_left = true;
@@ -153,7 +153,7 @@ Item {
             source: "icon/keyboard_right.png"
             anchors.centerIn: parent
         }
-        MouseArea{
+        MultiPointTouchArea{
             anchors.fill: parent
             onPressed: {
                 pressed_right = true;
