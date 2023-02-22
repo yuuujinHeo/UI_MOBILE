@@ -769,6 +769,53 @@ Item {
                         }
                     }
                 }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"초기화"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Rectangle{
+                                anchors.centerIn: parent
+                                width: 300
+                                height: 40
+                                color: "black"
+                                Text{
+                                    anchors.centerIn: parent
+                                    color: "white"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                    text: "공용폴더 덮어씌우기"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        popup_reset.open();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -3309,6 +3356,48 @@ Item {
             text_power.text = "Power : " + supervisor.getPower().toString();
             text_power_total.text = "Total : " + supervisor.getPowerTotal().toString();
 
+        }
+    }
+
+    Popup{
+        id: popup_reset
+        width: 400
+        height: 300
+        anchors.centerIn: parent
+        leftPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        rightPadding: 0
+        Rectangle{
+            anchors.fill: parent
+            Column{
+                anchors.centerIn: parent
+                spacing: 20
+                Text{
+                    text: "정말 덮어씌우시겠습니까?"
+                    font.family: font_noto_b.name
+                    font.pixelSize: 20
+
+                }
+                Rectangle{
+                    width: 100
+                    height: 50
+                    border.width: 1
+                    radius: 5
+                    Text{
+                        anchors.centerIn: parent
+                        text: "확인"
+                        font.family: font_noto_r.name
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            supervisor.resetHomeFolders();
+                            popup_reset.close();
+                        }
+                    }
+                }
+            }
         }
     }
 

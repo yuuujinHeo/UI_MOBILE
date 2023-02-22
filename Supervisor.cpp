@@ -2222,7 +2222,31 @@ float Supervisor::getJoyR(){
     return probot->joystick[1];
 }
 
+void Supervisor::resetHomeFolders(){
+    plog->write("[USER INPUT] RESET HOME FOLDERS");
 
+    QDir lcm_orin(QGuiApplication::applicationDirPath() + "/lcm_types");
+    QDir lcm_target(QDir::homePath() + "/lcm_types");
+
+    qDebug() <<QGuiApplication::applicationDirPath() + "/lcm_types";
+    qDebug() <<QDir::homePath() + "/lcm_types";
+    if(lcm_orin.exists()){
+        if(!lcm_target.exists()){
+            plog->write("[SUPERVISOR] MAKE LCM_TYPES FOLDER INTO HOME");
+            lcm_target.mkpath(".");
+        }
+
+        QStringList files = lcm_orin.entryList(QDir::Files);
+        for(int i=0; i<files.count(); i++){
+            qDebug() << QGuiApplication::applicationDirPath() + "/lcm_types/" + files[i];
+            qDebug() << QDir::homePath() + "/lcm_types/" + files[i];
+            QFile::copy(QGuiApplication::applicationDirPath() + "/lcm_types/" + files[i],
+                        QDir::homePath() + "/lcm_types/" + files[i]);
+            plog->write("[SUPERVISOR] COPY LCM_TYPES : " + files[i]);
+        }
+        files.clear();
+    }
+}
 
 
 ////*********************************************  ROBOT STATUS 관련   ***************************************************////

@@ -321,7 +321,7 @@ public:
     Q_INVOKABLE float getJoyR();
 
 
-
+    Q_INVOKABLE void resetHomeFolders();
     ////*********************************************  ROBOT STATUS 관련   ***************************************************////
     Q_INVOKABLE float getBattery();
     Q_INVOKABLE int getState();
