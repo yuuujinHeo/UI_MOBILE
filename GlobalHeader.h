@@ -96,8 +96,22 @@ typedef struct{
 extern ST_MAP *pmap;
 
 typedef struct{
+    bool connection = false;
+    int status = 0;
+    int temperature = 0;
+}ST_MOTOR;
+typedef struct{
     //from Robot
-    float battery = 0;
+    ST_MOTOR motor[2];
+    int status_power = 0;
+    int status_emo = 0;
+    int status_remote = 0;
+    float battery_in = 0;
+    float battery_out = 0;
+    float battery_cur = 0;
+    float power = 0;
+    float total_power = 0;
+
     int state = 0;
     int err_code = 0;
 

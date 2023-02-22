@@ -2227,7 +2227,40 @@ float Supervisor::getJoyR(){
 
 ////*********************************************  ROBOT STATUS 관련   ***************************************************////
 float Supervisor::getBattery(){
-    return probot->battery;
+    return probot->battery_out;
+}
+bool Supervisor::getMotorConnection(int id){
+    return probot->motor[id].connection;
+}
+int Supervisor::getMotorStatus(int id){
+    return probot->motor[id].status;
+}
+int Supervisor::getMotorTemperature(int id){
+    return probot->motor[id].temperature;
+}
+int Supervisor::getPowerStatus(){
+    return probot->status_power;
+}
+int Supervisor::getRemoteStatus(){
+    return probot->status_remote;
+}
+int Supervisor::getEmoStatus(){
+    return probot->status_emo;
+}
+float Supervisor::getBatteryIn(){
+    return probot->battery_in;
+}
+float Supervisor::getBatteryOut(){
+    return probot->battery_out;
+}
+float Supervisor::getBatteryCurrent(){
+    return probot->battery_cur;
+}
+float Supervisor::getPower(){
+    return probot->power;
+}
+float Supervisor::getPowerTotal(){
+    return probot->total_power;
 }
 int Supervisor::getState(){
     return probot->state;
