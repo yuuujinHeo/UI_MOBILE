@@ -31,8 +31,17 @@ Window {
         }
     }
 
+    property color color_red: "#E7584D"
+    property color color_mid_gray: "#BEBEBE"
     property color color_green: "#12d27c"
-    property color color_red: "red"
+    property color color_yellow: "#F7DB0D"
+    property color color_dark_black: "#282828"
+    property color color_gray: "#d8d8d8"
+    property color color_light_gray: "#F4F4F4"
+    property color color_navy: "#4f5666"
+    property color color_dark_navy: "#323744"
+
+
     property string pbefore: pinit
     property string ploading: "qrc:/Page_loading.qml"
     property string pkitchen: "qrc:/Page_kitchen.qml"

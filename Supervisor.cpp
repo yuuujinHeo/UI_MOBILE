@@ -898,6 +898,10 @@ void Supervisor::loadMap(QString name){
 //    readSetting()
 }
 
+void Supervisor::restartSLAM(){
+    plog->write("[USER INPUT] Restart SLAM");
+    lcm->restartSLAM();
+}
 
 ////*******************************************  SLAM(LOCALIZATION) 관련   ************************************************////
 void Supervisor::startMapping(float grid){
@@ -1357,6 +1361,7 @@ int Supervisor::getCanvasSize(){
     return canvas.size();
 }
 void Supervisor::setRotateAngle(float angle){
+    annotation_edit = true;
     qDebug() << "SET ROTATE ANGLE : " << angle;
     map_rotate_angle = angle;
 }
@@ -1385,6 +1390,7 @@ QString Supervisor::getLineColor(int index){
     return "";
 }
 void Supervisor::saveMap(QString mode, QString src, QString dst, QList<int> data, QList<int> alpha){
+    annotation_edit = true;
     QString file_path;
     if(mode == "EDITED"){
         file_path = QDir::homePath()+"/maps/"+src+"/map_edited.png";
@@ -1433,6 +1439,7 @@ void Supervisor::setLine(int x, int y){
     temp_line.line.push_back(temp_point);
 }
 void Supervisor::startLine(QString color, float width){
+    annotation_edit = true;
     temp_line.line.clear();
     temp_line.color = color;
     temp_line.width = width;
@@ -1444,6 +1451,7 @@ void Supervisor::stopLine(){
 }
 
 void Supervisor::undo(){
+    annotation_edit = true;
     ST_LINE temp;
     if(canvas.size() > 0){
         temp = canvas.back();
@@ -1453,6 +1461,7 @@ void Supervisor::undo(){
     }
 }
 void Supervisor::redo(){
+    annotation_edit = true;
     if(canvas_redo.size() > 0){
         if(flag_clear){
             flag_clear = false;
@@ -1650,6 +1659,13 @@ float Supervisor::getObjectY(int num, int point){
     return 0;
 }
 
+bool Supervisor::getAnnotEditFlag(){
+    return annotation_edit;
+}
+void Supervisor::setAnnotEditFlag(bool flag){
+    annotation_edit = flag;
+}
+
 int Supervisor::getTempObjectSize(){
     return temp_object.size();
 }
@@ -1730,6 +1746,7 @@ int Supervisor::getLocNum(int x, int y){
 
 
 void Supervisor::removeLocation(QString name){
+    annotation_edit = true;
     clear_all();
     for(int i=0; i<pmap->vecLocation.size(); i++){
         if(pmap->vecLocation[i].name == name){
@@ -1742,6 +1759,7 @@ void Supervisor::removeLocation(QString name){
     plog->write("[UI-MAP] REMOVE OBJECT BUT FAILED "+ name);
 }
 void Supervisor::addLocation(QString type, QString name, int x, int y, float th){
+    annotation_edit = true;
     ST_LOCATION temp_loc;
     temp_loc.type = type;
     temp_loc.name = name;
@@ -1760,6 +1778,7 @@ void Supervisor::addLocation(QString type, QString name, int x, int y, float th)
 }
 void Supervisor::moveLocationPoint(int loc_num, int x, int y, float th){
     if(loc_num > -1 && loc_num < pmap->vecLocation.size()){
+        annotation_edit = true;
         ST_FPOINT temp = canvasTomap(x,y);
         pmap->vecLocation[loc_num].pose.x = temp.x;
         pmap->vecLocation[loc_num].pose.y = temp.y;
@@ -1770,6 +1789,7 @@ void Supervisor::moveLocationPoint(int loc_num, int x, int y, float th){
 }
 
 void Supervisor::addObjectPoint(int x, int y){
+    annotation_edit = true;
     qDebug() << "addObjetPoint " << x << y << pmap->gridwidth;
     ST_FPOINT temp = canvasTomap(x,y);
     plog->write("[ANNOTATION] addObjectPoint " + QString().sprintf("[%d] %f, %f",temp_object.size(),temp.x,temp.y));
@@ -1778,6 +1798,7 @@ void Supervisor::addObjectPoint(int x, int y){
     QMetaObject::invokeMethod(mMain, "updatecanvas");
 }
 void Supervisor::removeObjectPoint(int num){
+    annotation_edit = true;
     if(num < temp_object.size()){
         temp_object.remove(num);
         QMetaObject::invokeMethod(mMain, "updatecanvas");
@@ -1786,6 +1807,7 @@ void Supervisor::removeObjectPoint(int num){
     }
 }
 void Supervisor::removeObjectPointLast(){
+    annotation_edit = true;
     if(temp_object.size() > 0){
         temp_object.pop_back();
         plog->write("[ANNOTATION] Remove Object Point Last");
@@ -1807,6 +1829,7 @@ int Supervisor::getObjectSize(QString type){
 }
 void Supervisor::addObject(QString type){
     QString num;
+    annotation_edit = true;
     if(temp_object.size() > 0){
         ST_OBJECT temp;
         temp.pose = temp_object;
@@ -1824,6 +1847,7 @@ void Supervisor::addObject(QString type){
 }
 void Supervisor::addObjectRect(QString type){
     QString num;
+    annotation_edit = true;
     if(temp_object.size() > 4){
         plog->write("[DEBUG] addObjectRect " + type + " but size > 4");
     }else if(temp_object.size() > 0){
@@ -1843,6 +1867,7 @@ void Supervisor::addObjectRect(QString type){
 }
 
 void Supervisor::editObject(int num, int point, int x, int y){
+    annotation_edit = true;
     if(num > -1 && num < pmap->vecObject.size()){
         if(pmap->vecObject[num].is_rect){
             if(point == 0){
@@ -1892,6 +1917,7 @@ void Supervisor::editObject(int num, int point, int x, int y){
 }
 
 void Supervisor::removeObject(int num){
+    annotation_edit = true;
     clear_all();
     if(num > -1 && num < pmap->vecObject.size()){
         pmap->vecObject.remove(num);
@@ -2121,6 +2147,7 @@ bool Supervisor::saveAnnotation(QString filename){
 
     readSetting();
     lcm->restartSLAM();
+    annotation_edit = false;
     return true;
 }
 void Supervisor::sendMaptoServer(){
