@@ -2740,9 +2740,7 @@ void Supervisor::onTimer(){
                     QMetaObject::invokeMethod(mMain, "nopathfound");
 
                 }else if(cur_error == ROBOT_ERROR_LOCALIZATION_FAILED){
-
                     QMetaObject::invokeMethod(mMain, "fail_localization");
-
                     if(!lcm->map_updated && flag_read_ini && setting.useAutoInit){
                         if(pmap->use_server){
                             plog->write("[LCM] CONNECT -> INIT START");

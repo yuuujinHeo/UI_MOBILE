@@ -752,7 +752,7 @@ Item {
                         is_mapping = false;
                     }
 
-                    if(supervisor.getState() === 6){
+                    if(supervisor.getEmoStatus()){
                         col_manual.visible = true;
                         switch_joy.onoff = true;
                         row_joysticks.visible = false;
@@ -941,7 +941,7 @@ Item {
                     Item_switch{
                         id: switch_joy
                         enabled: supervisor.getLCMConnection()
-                        onoff: supervisor.getState() === 6?true:false
+                        onoff: supervisor.getEmoStatus()?true:false
                         touchEnabled: false
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
