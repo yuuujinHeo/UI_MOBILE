@@ -164,11 +164,15 @@ Window {
     }
 
     function fail_localization(){
-        print("main: fail_localization");
-        loadPage(pmap);
-        loader_page.item.is_init_state = true;
-        loader_page.item.map_mode = 4;
-        loader_page.item.init();
+        if(loader_page.item.objectName !== "page_init"){
+            print("main: fail_localization");
+            timer_update.start();
+            loadPage(pmap);
+            loader_page.item.is_init_state = true;
+            loader_page.item.map_mode = 4;
+            loader_page.item.init();
+        }
+
     }
 
     function updatepatrol(){
