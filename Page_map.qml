@@ -57,6 +57,9 @@ Item {
             map.loadmapping();
         }
     }
+    function fail_localization(){
+        print("fail local map");
+    }
 
     Component.onCompleted: {
         init_map();
@@ -1259,7 +1262,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked:{
-                            fileopenpatrol.open();
+//                            fileopenpatrol.open();
                         }
                     }
                 }
@@ -1280,9 +1283,9 @@ Item {
                         anchors.fill: parent
                         onClicked:{
                             if(supervisor.getPatrolFileName() === ""){
-                                filesavepatrol.open();
+//                                filesavepatrol.open();
                             }else{
-                                supervisor.savePatrolFile(supervisor.getPatrolFileName());
+//                                supervisor.savePatrolFile(supervisor.getPatrolFileName());
                             }
 
                         }

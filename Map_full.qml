@@ -854,25 +854,76 @@ Item {
 
         //슬램 활성화 안될 때 보여주는 안내창
         Rectangle{
-            anchors.fill: parent
-            color: "transparent"
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 300
+            height: 60
+            y: -10
+            radius: 5
+//            anchors.fill: parent
+            color: color_red
+            function show_connect(){
+                show_ani.start();
+            }
+            function unshow_connect(){
+                unshow_ani.start();
+            }
+
+            NumberAnimation{
+                id: show_ani
+                target: parent
+                property: "y"
+                from: -height
+                to: 0
+                duration: 500
+                onStarted: {
+                    parent.visible = true;
+                }
+                onFinished: {
+
+                }
+            }
+            NumberAnimation{
+                id: unshow_ani
+                target: parent
+                property: "y"
+                from: 0
+                to: -height
+                duration: 500
+                onStarted: {
+                }
+                onFinished: {
+                    parent.visible = false;
+                }
+            }
+
             visible: show_connection && !is_slam_running
-            border.color: "#E7584D"
-            border.width: 5
-            Column{
-                anchors.centerIn: parent
+            onVisibleChanged: {
+                if(visible){
+                    show_ani.start();
+                }
+            }
+            Row{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: 5
                 spacing: 10
                 Image{
-                    width: 100
-                    height: 100
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: 30
+                    height: 30
+                    anchors.verticalCenter: parent.verticalCenter
                     source: "icon/icon_warning.png"
+                    ColorOverlay{
+                        source: parent
+                        anchors.fill: parent
+                        color: "white"
+                    }
                 }
                 Text{
                     text: "SLAM 활성화 안됨"
+                    anchors.verticalCenter: parent.verticalCenter
                     font.family: font_noto_b.name
-                    font.pixelSize: 40
-                    color: "#E7584D"
+                    font.pixelSize: 20
+                    color: "white"
                 }
             }
         }
@@ -998,7 +1049,7 @@ Item {
 
         supervisor.clearObjectPoints();
 
-//        show_connection = true;
+        show_connection = true;
 
         show_buttons = false;
         show_lidar = false;

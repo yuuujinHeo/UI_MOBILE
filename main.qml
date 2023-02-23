@@ -163,6 +163,14 @@ Window {
         loader_page.item.loadmap_server(true);
     }
 
+    function fail_localization(){
+        print("main: fail_localization");
+        loadPage(pmap);
+        loader_page.item.is_init_state = true;
+        loader_page.item.map_mode = 4;
+        loader_page.item.init();
+    }
+
     function updatepatrol(){
         if(loader_page.item.objectName == "page_map")
             loader_page.item.updatepatrol();
