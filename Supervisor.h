@@ -48,6 +48,7 @@ public:
     cv::Mat minimap;
 
     float map_rotate_angle;
+    bool annotation_edit = false;
     ////*********************************************  CLASS   ***************************************************////
     LCMHandler *lcm;
     ServerHandler *server;
@@ -156,6 +157,7 @@ public:
     Q_INVOKABLE void saveMapfromUsb(QString path);
     Q_INVOKABLE void loadMap(QString name);
     Q_INVOKABLE void setMap(QString name);
+    Q_INVOKABLE void restartSLAM();
 
     ////*********************************************  SLAM(LOCALIZATION) 관련   ***************************************************////
     Q_INVOKABLE void startMapping(float grid);
@@ -238,6 +240,9 @@ public:
     ST_FPOINT setAxis(ST_FPOINT _point);
     ST_FPOINT canvasTomap(int x, int y);
     ST_POINT mapTocanvas(float x, float y);
+
+    Q_INVOKABLE bool getAnnotEditFlag();
+    Q_INVOKABLE void setAnnotEditFlag(bool flag);
     //***********************************************************************Object(INI)..
     Q_INVOKABLE int getObjectNum();
     Q_INVOKABLE QString getObjectName(int num);

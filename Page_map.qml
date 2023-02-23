@@ -469,6 +469,7 @@ Item {
                                     map_mode = 1;
                                 }else if(modelData == "annotation"){
                                     map_mode = 2;
+                                    supervisor.setAnnotEditFlag(true);
                                 }else if(modelData == "localization"){
                                     map_mode = 4;
                                 }else if(modelData == "patrol"){
@@ -747,55 +748,211 @@ Item {
                     }else{
                         is_mapping = false;
                     }
+
+                    if(supervisor.getState() === 6){
+                        col_manual.visible = true;
+                        switch_joy.onoff = true;
+                        row_joysticks.visible = false;
+                        keyboard_arrow.visible = false;
+                    }else{
+                        if(row_joysticks.visible || keyboard_arrow.visible){
+                            col_manual.visible = false;
+                        }else{
+                            col_manual.visible = true;
+                        }
+                        switch_joy.onoff = false;
+                    }
                 }
+            }
+            Column{
+                anchors.top: rect_annot_box.bottom
+                anchors.topMargin: 10
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 20
+                Rectangle{
+                    width: 400
+                    height: 200
+                    radius: 10
+
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 10
+                        Text{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: "* 안 내 사 항 *"
+                            font.pixelSize: 18
+                            font.bold: true
+                            font.family: font_noto_b.name
+                            color: color_red
+                        }
+                        Grid{
+                            rows: 4
+                            columns: 2
+                            Text{
+                                text: "1."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "로봇 상단의 Emergency 버튼을 눌러 수동모드로 전환하세요."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "2."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "로봇을 매장의 중심에 최대한 가깝게 이동시켜주세요."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "3."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "Start 버튼을 누르고 로봇을 끌면서 맵을 생성합니다."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "4."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "끝나면 Stop 버튼을 누르고 Save를 해주세요."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                        }
+                        Row{
+                            spacing: 30
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            Rectangle{
+                                width: 100
+                                height: 40
+                                radius: 5
+                                color: "black"
+                                Text{
+                                    anchors.centerIn: parent
+                                    color: "white"
+                                    text: "가상 조이스틱"
+                                    font.pixelSize: 15
+                                    font.family: font_noto_r.name
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        row_joysticks.visible = true;
+                                        col_manual.visible = false;
+                                        keyboard_arrow.visible = false;
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 100
+                                height: 40
+                                radius: 5
+                                color: "black"
+                                Text{
+                                    anchors.centerIn: parent
+                                    color: "white"
+                                    text: "가상 키보드"
+                                    font.pixelSize: 15
+                                    font.family: font_noto_r.name
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        row_joysticks.visible = false;
+                                        col_manual.visible = false;
+                                        keyboard_arrow.visible = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Row{
+                    id: row_joysticks
+                    visible: false
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 60
+                    Item_joystick{
+                        id: joy_xy
+                        verticalOnly: true
+                        bold: true
+                        onUpdate_cntChanged: {
+                            if(update_cnt == 0 && supervisor.getJoyXY() != 0){
+                                supervisor.joyMoveXY(0, 0);
+                            }else{
+                                if(fingerInBounds) {
+                                    supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+                                }else{
+                                    supervisor.joyMoveXY(Math.sin(angle));
+                                }
+                            }
+                        }
+                    }
+                    Item_joystick{
+                        id: joy_th
+                        horizontalOnly: true
+                        bold: true
+                        onUpdate_cntChanged: {
+                            if(update_cnt == 0 && supervisor.getJoyR() != 0){
+                                supervisor.joyMoveR(0, 0);
+                            }else{
+                                if(fingerInBounds) {
+                                    supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+                                } else {
+                                    supervisor.joyMoveR(-Math.cos(angle));
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Item_keyboard{
+                    id: keyboard_arrow
+                    visible : false
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                Column{
+                    id: col_manual
+                    visible: true
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 5
+                    Item_switch{
+                        id: switch_joy
+                        enabled: supervisor.getLCMConnection()
+                        onoff: supervisor.getState() === 6?true:false
+                        touchEnabled: false
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "수동 조작"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 10
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                }
+
             }
 
-            Item_joystick{
-                id: joy_xy
-                anchors.top: rect_annot_box.bottom
-                anchors.topMargin: 50
-                anchors.right: parent.horizontalCenter
-                anchors.rightMargin: 30
-                verticalOnly: true
-                bold: true
-                onUpdate_cntChanged: {
-                    if(update_cnt == 0 && supervisor.getJoyXY() != 0){
-                        supervisor.joyMoveXY(0, 0);
-                    }else{
-                        if(fingerInBounds) {
-                            supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-                        }else{
-                            supervisor.joyMoveXY(Math.sin(angle));
-                        }
-                    }
-                }
-            }
-            Item_joystick{
-                id: joy_th
-                anchors.top: rect_annot_box.bottom
-                anchors.topMargin: 50
-                anchors.left: parent.horizontalCenter
-                anchors.leftMargin: 30
-                horizontalOnly: true
-                bold: true
-                onUpdate_cntChanged: {
-                    if(update_cnt == 0 && supervisor.getJoyR() != 0){
-                        supervisor.joyMoveR(0, 0);
-                    }else{
-                        if(fingerInBounds) {
-                            supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-                        } else {
-                            supervisor.joyMoveR(-Math.cos(angle));
-                        }
-                    }
-                }
-            }
-            Item_keyboard{
-                id: keyboard_arrow
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 20
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
         }
     }
 
@@ -804,7 +961,6 @@ Item {
         Item{
             width: rect_menus.width
             height: rect_menus.height
-
             Rectangle{
                 anchors.fill: parent
                 color: "#f4f4f4"
@@ -817,7 +973,6 @@ Item {
                 anchors.top: parent.top
                 anchors.topMargin: 50
                 color: "#e8e8e8"
-
                 Row{
                     anchors.centerIn: parent
                     spacing: 30
@@ -1164,6 +1319,7 @@ Item {
                         highlight: patrol_mode  === 1
                         icon: "icon/record_r.png"
                         name: "Record"
+                        enabled: false
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
@@ -1556,7 +1712,6 @@ Item {
             objectName: "menu_init"
             width: rect_menus.width
             height: rect_menus.height
-
             Rectangle{
                 anchors.fill: parent
                 color: "#f4f4f4"
@@ -1598,76 +1753,167 @@ Item {
             Column{
                 anchors.top: rect_annot_map_name.bottom
                 anchors.topMargin: 20
-                anchors.left: parent.left
-                anchors.leftMargin: 50
-                spacing: 5
-                Row{
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 10
+                Grid{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    rows: 4
+                    columns: 3
+                    spacing: 10
+                    horizontalItemAlignment: Grid.AlignHCenter
+                    verticalItemAlignment: Grid.AlignVCenter
                     Text{
                         font.family: font_noto_r.name
                         font.pixelSize: 15
-                        text: "Map : "
+                        text: "Map"
+                        width: 150
+                        horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
-                        id: text_name
                         font.family: font_noto_r.name
                         font.pixelSize: 15
-                        text: "-"
+                        text: ":"
+                    }
+                    Text{
+                        id: text_map_name
+                        width: 150
+                        horizontalAlignment: Text.AlignHCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: is_init_state?map.map_name:supervisor.getMapname();
+                    }
+                    Text{
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "Width"
+                    }
+                    Text{
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: ":"
+                    }
+                    Text{
+                        id: text_map_width
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: supervisor.getMapWidth();
+                    }
+                    Text{
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "Height"
+                    }
+                    Text{
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: ":"
+                    }
+                    Text{
+                        id: text_map_height
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: supervisor.getMapHeight();
+                    }
+                    Text{
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "Grid Width"
+                    }
+                    Text{
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: ":"
+                    }
+                    Text{
+                        id: text_map_gridwidth
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: supervisor.getGridWidth().toFixed(2);
                     }
                 }
-                Row{
+                Rectangle{
+                    width: parent.width
+                    height: 1
+                    color: color_gray
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                Grid{
+                    rows: 6
+                    columns: 3
+                    spacing: 10
+                    horizontalItemAlignment: Grid.AlignHCenter
+                    verticalItemAlignment: Grid.AlignVCenter
                     Text{
-                        text: "Size : "
                         font.family: font_noto_r.name
                         font.pixelSize: 15
+                        text: "Serving Location"
+                        width: 150
+                        horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
-                        id: text_size
                         font.family: font_noto_r.name
                         font.pixelSize: 15
-                        text: "1000x1000 [pixel]"
+                        text: ":"
+                    }
+                    Text{
+                        id: text_serving_num
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        width: 150
+                        horizontalAlignment: Text.AlignHCenter
+                        text: supervisor.getLocationSize("Serving");
+                    }
+                    Text{
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "Resting Location"
+                    }
+                    Text{
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: ":"
+                    }
+                    Text{
+                        id: text_resting_num
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: supervisor.getLocationSize("Resting");
+                    }
+                    Text{
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "Charging Location"
+                    }
+                    Text{
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: ":"
+                    }
+                    Text{
+                        id: text_charging_num
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: supervisor.getLocationSize("Charging");
+                    }
+                    Text{
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "Object Num"
+                    }
+                    Text{
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: ":"
+                    }
+                    Text{
+                        id: text_object_num
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: supervisor.getObjectNum();
                     }
                 }
-                Row{
-                    Text{
-                        text: "Object : "
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                    }
-                    Text{
-                        id: text_object
-                        text: "-"
-                        font.pixelSize: 15
-                        font.family: font_noto_r.name
-                    }
-                }
-                Row{
-                    Text{
-                        text: "Location : "
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                    }
-                    Text{
-                        id: text_location
-                        text: "-"
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                    }
-                }
-                Row{
-                    Text{
-                        text: "Predefined routes : "
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                    }
-                    Text{
-                        id: text_routes
-                        text: "-"
-                        font.pixelSize: 15
-                        font.family: font_noto_r.name
-                    }
-                }
-            }
 
+            }
 
             //prev, next button
             Column{
@@ -2070,6 +2316,22 @@ Item {
                             map.update_canvas();
                         }
                     }
+                }
+            }
+            Timer{
+                running: true
+                repeat: true
+                interval: 200
+                triggeredOnStart: true
+                onTriggered: {
+                    if(supervisor.getCanvasSize() > 0)
+                        btn_undo.enabled = true;
+                    else
+                        btn_undo.enabled = false;
+                    if(supervisor.getRedoSize() > 0)
+                        btn_redo.enabled = true;
+                    else
+                        btn_redo.enabled = false;
                 }
             }
 
@@ -3373,10 +3635,17 @@ Item {
                     state_text_annot.anchors.rightMargin = 20
                     btn_add1.border.width = 0
                 }else if(state_annot === 1){
-                    rect_state_annot.color = "#12d27c"
-                    state_text_annot.text = "Confirm"
-                    state_text_annot.anchors.rightMargin = 50
-                    btn_add1.border.width = 3
+                    if(supervisor.getAnnotEditFlag()){
+                        rect_state_annot.color = "#12d27c"
+                        state_text_annot.text = "Confirm"
+                        state_text_annot.anchors.rightMargin = 50
+                        btn_add1.border.width = 3
+                    }else{
+                        rect_state_annot.color = "#4F5666"
+                        state_text_annot.text = "저장이 필요합니다."
+                        state_text_annot.anchors.rightMargin = 20
+                        btn_add1.border.width = 0
+                    }
                 }else if(state_annot === 2){
                     rect_state_annot.color = "#EE9D44"
                     state_text_annot.anchors.rightMargin = 20

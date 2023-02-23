@@ -658,42 +658,6 @@ Item {
                         }
                     }
                 }
-
-                Rectangle{
-                    id: set_map_3
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"트레이 개수"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_tray_num
-                                anchors.fill: parent
-                                model:[1,2,3,4,5]
-                            }
-                        }
-                    }
-
-                }
                 Rectangle{
                     width: 840
                     height: 40
@@ -906,75 +870,6 @@ Item {
                     }
                 }
                 Rectangle{
-                    id: set_map_1
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"트래블 라인"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_use_travelline
-                                anchors.fill: parent
-                                model:["사용 안함","사용"]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_map_2
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"트래블 라인 지정"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                enabled: combo_use_travelline.currentIndex==1
-                                id: combo_travelline
-                                anchors.fill: parent
-                                model:ListModel{}
-                            }
-                        }
-                    }
-                }
-                Rectangle{
                     id: set_map_4
                     width: 840
                     height: 40
@@ -1009,6 +904,43 @@ Item {
                             }
                         }
                     }
+                }
+
+
+                Rectangle{
+                    id: set_map_3
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"트레이 개수"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_tray_num
+                                anchors.fill: parent
+                                model:[1,2,3,4,5]
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -3052,6 +2984,27 @@ Item {
                 }
             }
             Rectangle{
+                id: btn_reset_slam
+                width: 180
+                height: 60
+                radius: 10
+                color:"transparent"
+                border.width: 1
+                border.color: "#7e7e7e"
+                Text{
+                    anchors.centerIn: parent
+                    text: "SLAM restart"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked:{
+                        supervisor.restartSLAM();
+                    }
+                }
+            }
+            Rectangle{
                 id: btn_default
                 width: 180
                 height: 60
@@ -3260,19 +3213,19 @@ Item {
 
         slider_vxy.value = parseFloat(supervisor.getSetting("ROBOT_SW","velocity"));
 
-        if(supervisor.getuseTravelline()){
-            combo_use_travelline.currentIndex = 1;
-        }else{
-            combo_use_travelline.currentIndex = 0;
-        }
+//        if(supervisor.getuseTravelline()){
+//            combo_use_travelline.currentIndex = 1;
+//        }else{
+//            combo_use_travelline.currentIndex = 0;
+//        }
 
-        var num_tline = supervisor.getTlineSize();
-        print(num_tline);
-        for(var i=0; i<num_tline; i++){
-            combo_travelline.model.append({i});
-        }
+//        var num_tline = supervisor.getTlineSize();
+//        print(num_tline);
+//        for(var i=0; i<num_tline; i++){
+//            combo_travelline.model.append({i});
+//        }
 
-        combo_travelline.currentIndex = supervisor.getnumTravelline();
+//        combo_travelline.currentIndex = supervisor.getnumTravelline();
         combo_table_num.currentIndex = supervisor.getTableNum();
 
 

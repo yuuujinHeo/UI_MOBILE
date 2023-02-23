@@ -11,6 +11,33 @@ Item {
     objectName: "map_full"
     width: 1000
     height: 1000
+    onWidthChanged: {
+        print("width : ",width, robot_following)
+        if(robot_following){
+            var newx = width/2 - robot_x*mapview.newscale;
+            var newy = height/2 - robot_y*mapview.newscale;
+
+            if(newx > 0){
+                mapview.x = 0;
+            }else if(newx < - map_width*mapview.newscale + width){
+                mapview.x = - map_width*mapview.newscale + width
+            }else{
+                print("width change x 1")
+//                mapview.newx = newx;
+                mapview.x = newx;
+                print("width change x 2")
+            }
+
+            if(newy  > 0){
+                mapview.y = 0;
+            }else if(newy < - map_height*mapview.newscale + height){
+                mapview.y = - map_height*mapview.newscale + height
+            }else{
+                mapview.y = newy;
+            }
+            print(newx, newy, mapview.x, mapview.y)
+        }
+    }
 
     //불러올 맵 폴더 이름
     property string map_name: ""
@@ -49,52 +76,59 @@ Item {
 
     onRobot_followingChanged: {
         if(robot_following){
-            var newx = rect_map.width/2 - robot_x*mapview.newscale;
-            var newy = rect_map.width/2 - robot_y*mapview.newscale;
+            var newx = width/2 - robot_x*mapview.newscale;
+            var newy = height/2 - robot_y*mapview.newscale;
 
             if(newx > 0){
                 mapview.x = 0;
-            }else if(newx < - map_width*mapview.newscale + rect_map.width){
-                mapview.x = - map_width*mapview.newscale + rect_map.width
+                print("?"," 0")
+            }else if(newx < - map_width*mapview.newscale + width){
+                mapview.x = - map_width*mapview.newscale + width
+                print("?",map_width*mapview.newscale + width)
             }else{
                 mapview.x = newx;
+                print("?",newx)
             }
 
             if(newy  > 0){
                 mapview.y = 0;
-            }else if(newy < - map_height*mapview.newscale + rect_map.height){
-                mapview.y = - map_height*mapview.newscale + rect_map.height
+            }else if(newy < - map_height*mapview.newscale + height){
+                mapview.y = - map_height*mapview.newscale + height
             }else{
                 mapview.y = newy;
             }
+            print(newx, newy)
         }
     }
     onRobot_xChanged: {
         if(robot_following){
-            var newx = rect_map.width/2 - (robot_x)*mapview.newscale;
+            var newx = width/2 - (robot_x)*mapview.newscale;
             if(newx > 0){
-                mapview.x = 0;
-            }else if(newx < - map_width*mapview.newscale + rect_map.width){
-                mapview.x = - map_width*mapview.newscale + rect_map.width
+                print("??",0)
+//                mapview.x = 0;
+            }else if(newx < - map_width*mapview.newscale + width){
+                print("??",map_width*mapview.newscale + width)
+//                mapview.x = - map_width*mapview.newscale + width
             }else{
-                mapview.x = newx;
+                print("??",newx)
+//                mapview.x = newx;
             }
         }
     }
     onRobot_yChanged: {
         if(robot_following){
-            var newy = rect_map.width/2 - (robot_y)*mapview.newscale;
+            var newy = height/2 - (robot_y)*mapview.newscale;
             if(newy  > 0){
                 mapview.y = 0;
-            }else if(newy < - map_height*mapview.newscale + rect_map.height){
-                mapview.y = - map_height*mapview.newscale + rect_map.height
+            }else if(newy < - map_height*mapview.newscale + height){
+                mapview.y = - map_height*mapview.newscale + height
             }else{
                 mapview.y = newy;
             }
         }
     }
 
-    //굳이 필요?
+    //굳이 필요?/*
 //    Behavior on robot_x{
 //        NumberAnimation{
 //            duration: 200
@@ -109,7 +143,7 @@ Item {
 //        NumberAnimation{
 //            duration: 200
 //        }
-//    }
+//    }*/
 
     //맵 불러오기
     function loadmap(name,type){
@@ -311,6 +345,8 @@ Item {
     Rectangle{
         id: rect_map
         anchors.fill: parent
+        width: parent.width
+        height: parent.height
         clip: true
         color: "black"
         MapView{
@@ -323,22 +359,16 @@ Item {
             property var startx: 0
             property var starty: 0
             property var startScale: 0
+            property var newx: 0
+            onNewxChanged: {
+                x = newx;
+            }
+
             Behavior on newscale{
                 NumberAnimation{
                     duration: 100
                 }
             }
-//            Behavior on x{
-//                NumberAnimation{
-//                    duration: 100
-//                }
-//            }
-//            Behavior on y{
-//                NumberAnimation{
-//                    duration: 100
-//                }
-//            }
-
             onXChanged: {
                 if(x > 0){
                     x = 0;
@@ -366,6 +396,7 @@ Item {
 
                 x = -newx;
                 y = -newy;
+                print(centerx, centery, xscale, yscale, newx, newy)
             }
         }
 
@@ -424,11 +455,15 @@ Item {
 
         MouseArea{
             id: area_wheel
-            anchors.fill: parent
+            anchors.fill: mapview
+            hoverEnabled: true
             onWheel: {
                 var ctx = canvas_map.getContext('2d');
                 var new_scale;
                 wheel.accepted = false;
+                 mapview.centerx = mouseX*(map_width/width);
+                 mapview.centery = mouseY*(map_height/height);
+
                 if(wheel.angleDelta.y > 0){
                     new_scale = mapview.newscale + 0.1;
                     if(new_scale > 5){
@@ -1585,26 +1620,26 @@ Item {
                     if(select_object == i){
                         ctx.strokeStyle = "#83B8F9";
                         ctx.fillStyle = "#83B8F9";
-                    }else{
-                        ctx.strokeStyle = "white";
-                        ctx.fillStyle = "white";
-                    }
+                        for(j=0; j<obj_size; j++){
+                            ctx.beginPath();
+                            obj_x = supervisor.getObjectX(i,j)/grid_size +origin_x;
+                            obj_y = supervisor.getObjectY(i,j)/grid_size +origin_y;
+                            ctx.moveTo(obj_x,obj_y);
+                            if(select_object == i){
+                                ctx.arc(obj_x,obj_y,4,0, Math.PI*2);
+                            }else{
+                                ctx.arc(obj_x,obj_y,2,0, Math.PI*2);
+                            }
 
-                    for(j=0; j<obj_size; j++){
-                        ctx.beginPath();
-                        obj_x = supervisor.getObjectX(i,j)/grid_size +origin_x;
-                        obj_y = supervisor.getObjectY(i,j)/grid_size +origin_y;
-                        ctx.moveTo(obj_x,obj_y);
-                        if(select_object == i){
-                            ctx.arc(obj_x,obj_y,4,0, Math.PI*2);
-                        }else{
-                            ctx.arc(obj_x,obj_y,2,0, Math.PI*2);
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.stroke();
                         }
-
-                        ctx.closePath();
-                        ctx.fill();
-                        ctx.stroke();
+                    }else{
+//                        ctx.strokeStyle = "white";
+//                        ctx.fillStyle = "white";
                     }
+
                 }
             }
             canvas_object.requestPaint();
