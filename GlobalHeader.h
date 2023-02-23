@@ -103,9 +103,12 @@ typedef struct{
 typedef struct{
     //from Robot
     ST_MOTOR motor[2];
+
     int status_power = 0;
     int status_emo = 0;
     int status_remote = 0;
+    int status_charge = 0;
+
     float battery_in = 0;
     float battery_out = 0;
     float battery_cur = 0;
@@ -262,11 +265,7 @@ enum ROBOT_ERROR{
     ROBOT_ERROR_NONE = 0,
     ROBOT_ERROR_WAIT,
     ROBOT_ERROR_NO_PATH,
-    ROBOT_ERROR_MOTOR_COMM,
-    ROBOT_ERROR_MOTOR,
-
-    ROBOT_ERROR_VOLTAGE,//5
-    ROBOT_ERROR_SENSOR
+    ROBOT_ERROR_LOCALIZATION_FAILED
 };
 
 #endif // GLOBALHEADER_H

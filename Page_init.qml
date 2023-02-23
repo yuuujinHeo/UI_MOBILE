@@ -20,6 +20,10 @@ Item {
 //        }
 //    }
 
+    function fail_localization(){
+        print("fail local init");
+    }
+
     Component.onCompleted: {
         init_mode = 0;
         update_timer.start();
@@ -822,17 +826,15 @@ Item {
                         loader_init.sourceComponent = item_lcm
                 }
             }else if(init_mode == 3){
-                if(supervisor.getRobotState() == 0){
-                    if(loader_init.item.objectName != "init_slam")
-                        loader_init.sourceComponent = item_slam_init
+                if(loader_init.item.objectName != "init_slam")
+                    loader_init.sourceComponent = item_slam_init
+
+
+                if(supervisor.getRobotState() === 0){
+
+                }else if(supervisor.getRobotState() === 5){
+
                 }else{
-                    if(loader_init.item.objectName != "init_slam")
-                        loader_init.sourceComponent = item_slam_init
-
-
-
-
-
                     init_mode = 4;
                     update_timer.stop();
                     loadPage(pkitchen);
