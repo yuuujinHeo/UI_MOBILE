@@ -132,6 +132,8 @@ void HTTPHandler::processPullError(){
 void HTTPHandler::processResetError(){
     QString error = QString(process->readAllStandardError());
     plog->write("[GIT] Program Reset Failed : "+error);
+    QProcess::startDetached(QApplication::applicationFilePath());
+    QApplication::exit(12);
 }
 
 void HTTPHandler::processResetOutput(){
