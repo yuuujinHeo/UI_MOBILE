@@ -339,6 +339,7 @@ public:
     Q_INVOKABLE int getMotorTemperature(int id);
     Q_INVOKABLE int getPowerStatus();
     Q_INVOKABLE int getRemoteStatus();
+    Q_INVOKABLE int getChargeStatus();
     Q_INVOKABLE int getEmoStatus();
     Q_INVOKABLE float getBatteryIn();
     Q_INVOKABLE float getBatteryOut();

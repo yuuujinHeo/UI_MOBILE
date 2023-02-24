@@ -181,6 +181,7 @@ typedef struct{
     int volumeBGM;
     int volumeVoice;
 
+    bool useAvoid;
     bool useAutoInit;
     bool useVoice;
     bool useBGM;
@@ -232,7 +233,8 @@ enum UI_CMD{
     UI_CMD_TABLE_PATROL,
     UI_CMD_PATROL_STOP,
 
-    UI_CMD_MOVE_CALLING//10
+    UI_CMD_MOVE_CALLING,//10
+    UI_CMD_DO_CHARGE
 };
 
 enum UI_STATE{

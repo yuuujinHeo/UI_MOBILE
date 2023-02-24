@@ -17,12 +17,15 @@ Item {
     property bool joystick_connection: false
     property var joy_axis_left_ud: 0
     property var joy_axis_right_rl: 0
+    //0: no path /1: local fail /2: emergency /3:
+    property int notice_num: 0
 
     Component.onCompleted: {
         init();
     }
 
     function init(){
+        notice_num = 0;
         statusbar.visible = true;
         notice.y = 0;
         area_swipe.enabled = true;
@@ -62,293 +65,416 @@ Item {
             color:"#282828"
         }
         Rectangle{
-            id: rect_menu
-            width: 400
-            height: parent.height - statusbar.height
+            id: rect_state
+            width: parent.width
+            height: 100
             anchors.top: parent.top
             anchors.topMargin: statusbar.height
-            color: "#f4f4f4"
+            color: color_dark_navy
+            Row{
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: 15
+                spacing: 30
+                Rectangle{
+                    width: 90
+                    height: 80
+                    radius: 5
+                    color:"white"
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 5
+                        Image{
+                            source: "icon/icon_cancelpath.png"
+                            sourceSize.width: 40
+                            sourceSize.height: 40
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        Text{
+                            text: "다시 시작"
+                            font.family: font_noto_r.name
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+                    DropShadow{
+                        anchors.fill: parent
+                        radius: 5
+                        color: color_navy
+                        source: parent
+                        z: -1
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.moveStop();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 90
+                    height: 80
+                    radius: 5
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 5
+                        Image{
+                            source: "image/image_localization.png"
+                            sourceSize.width: 40
+                            sourceSize.height: 40
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        Text{
+                            text: "Localization"
+                            font.family: font_noto_r.name
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+                    DropShadow{
+                        anchors.fill: parent
+                        radius: 5
+                        color: color_navy
+                        source: parent
+                        z: -1
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+//                                    supervisor.moveToLast();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 90
+                    height: 80
+                    radius: 5
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 5
+                        Image{
+                            source: "icon/icon_power.png"
+                            sourceSize.width: 40
+                            sourceSize.height: 40
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        Text{
+                            text: "SLAM 재부팅"
+                            font.family: font_noto_r.name
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+                    DropShadow{
+                        anchors.fill: parent
+                        z: -1
+                        radius: 5
+                        color: color_navy
+                        source: parent
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.restartSLAM();
+                        }
+                    }
+                }
+            }
 
-            Rectangle{
-                id: rect_box
-                width: parent.width - 60
-                height: 150
+            Text{
+                id: text_reason
+                anchors.centerIn: parent
+                font.family: font_noto_b.name
+                font.pixelSize: 40
+                color: "white"
+                text:"수동모드로 전환됨"
+            }
+            Row{
+                id: rect_leds
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: 18
+                property var led_size: 18
+                spacing: 18
+                Rectangle{
+                    id: rect_charging
+                    width: rect_leds.led_size
+                    height: width
+                    radius: width
+                    color: color_light_gray
+                    border.width:1
+                }
+                Rectangle{
+                    id: rect_emo
+                    width: rect_leds.led_size
+                    height: width
+                    radius: width
+                    color: color_light_gray
+                    border.width:1
+                }
+                Rectangle{
+                    id: rect_power
+                    width: rect_leds.led_size
+                    height: width
+                    radius: width
+                    color: color_light_gray
+                    border.width:1
+                }
+                Rectangle{
+                    id: rect_remote
+                    width: rect_leds.led_size
+                    height: width
+                    radius: width
+                    color: color_light_gray
+                    border.width:1
+                }
+                Rectangle{
+                    id: rect_motor_con1
+                    width: rect_leds.led_size
+                    height: width
+                    radius: width
+                    color: color_light_gray
+                    border.width:1
+                }
+                Rectangle{
+                    id: rect_motor_con2
+                    width: rect_leds.led_size
+                    height: width
+                    radius: width
+                    color: color_light_gray
+                    border.width:1
+                }
+                Rectangle{
+                    id: rect_motor_stat1
+                    width: rect_leds.led_size
+                    height: width
+                    radius: width
+                    color: color_light_gray
+                    border.width:1
+                    Text{
+                        id: text_motor_stat1
+                        anchors.centerIn: parent
+                        color: "white"
+                        font.pixelSize: 10
+                        font.family: font_noto_r.name
+                    }
+                }
+                Rectangle{
+                    id: rect_motor_stat2
+                    width: rect_leds.led_size
+                    height: width
+                    radius: width
+                    color: color_light_gray
+                    border.width:1
+                    Text{
+                        id: text_motor_stat2
+                        anchors.centerIn: parent
+                        color: "white"
+                        font.pixelSize: 10
+                        font.family: font_noto_r.name
+                    }
+                }
+            }
+        }
+        Rectangle{
+            id: rect_menu
+            width: 450
+            height: parent.height - statusbar.height - rect_state.height
+            anchors.top: rect_state.bottom
+            color: "#f4f4f4"
+            Column{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
-                anchors.topMargin: 30
-                color: "#e8e8e8"
-
-                Row{
-                    anchors.centerIn: parent
-                    spacing: 30
-                    Rectangle{
-                        width: 90
-                        height: 120
-                        radius: 5
-                        Rectangle{
-                            id: btn_cancel
+                anchors.topMargin: 50
+                spacing: 30
+                Rectangle{
+                    id: rect_annot_box
+                    width: rect_menu.width
+                    height: 120
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: "#e8e8e8"
+                    Row{
+                        anchors.centerIn: parent
+                        spacing: 40
+                        Item_button{
+                            id: btn_move
                             width: 90
-                            height: 120
-                            radius: 5
-                            color:"white"
-                            Column{
-                                anchors.centerIn: parent
-                                spacing: 20
-                                Image{
-                                    source: "icon/icon_cancelpath.png"
-                                    sourceSize.width: 40
-                                    sourceSize.height: 40
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                                Text{
-                                    text: "경로 취소"
-                                    font.family: font_noto_r.name
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                            }
+                            highlight: map.tool=="MOVE"
+                            icon: "icon/icon_move.png"
+                            name: "Move"
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    supervisor.moveStop();
+                                    map.tool = "MOVE";
                                 }
                             }
                         }
-                        DropShadow{
-                            anchors.fill: parent
-                            radius: 10
-                            color: "#dfdfdf"
-                            source: btn_cancel
-                        }
-
-                    }
-                    Rectangle{
-                        width: 90
-                        height: 120
-                        radius: 5
-                        Rectangle{
-                            id: btn_research
+                        Item_button{
                             width: 90
-                            height: 120
-                            radius: 5
-                            Column{
-                                anchors.centerIn: parent
-                                spacing: 20
-                                Image{
-                                    source: "icon/icon_researching.png"
-                                    sourceSize.width: 40
-                                    sourceSize.height: 40
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                                Text{
-                                    text: "경로 재탐색"
-                                    font.family: font_noto_r.name
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                            }
+                            highlight: map.tool=="SLAM_INIT"
+                            icon: "icon/icon_point.png"
+                            name: "Point"
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    supervisor.moveToLast();
+                                    map.tool = "SLAM_INIT";
                                 }
                             }
                         }
-                        DropShadow{
-                            anchors.fill: parent
-                            radius: 10
-                            color: "#dfdfdf"
-                            source: btn_research
-                        }
-                    }
-
-                }
-            }
-            Rectangle{
-                id: rect_annot_box2
-                width: parent.width - 60
-                height: 100
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: rect_box.bottom
-                anchors.topMargin: 30
-                color: "transparent"
-                Row{
-                    anchors.centerIn: parent
-                    spacing: 30
-                    Rectangle{
-                        width: 90
-                        height: 90
-                        radius: 90
-                        Rectangle{
+                        Item_button{
                             id: btn_manual
                             width: 90
-                            height: 90
-                            radius: 90
-                            Column{
-                                anchors.centerIn: parent
-                                Image{
-                                    source: "icon/icon_manualmove.png"
-                                    sourceSize.width: 30
-                                    sourceSize.height: 30
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                                Text{
-                                    text: "수동 제어"
-                                    font.family: font_noto_r.name
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                            }
+                            icon: "icon/icon_manualmove.png"
+                            name: "수동조작 중"
+                            running: supervisor.getEmoStatus()
+                        }
+                    }
+                }
+                Rectangle{
+                    width: rect_menu.width - 60
+                    height: 100
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: "transparent"
+                    Row{
+                        anchors.centerIn: parent
+                        spacing: 30
+                        Item_button{
+                            id: btn_run
+                            width: 78
+                            icon:"icon/icon_run.png"
+                            name:"Run"
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    supervisor.moveStop();
+                                    btn_run.show_ani();
+                                    map.tool = "MOVE";
+                                    supervisor.slam_run();
                                 }
                             }
                         }
-                        DropShadow{
-                            anchors.fill: parent
-                            radius: 10
-                            color: "#dfdfdf"
-                            source: btn_manual
-                        }
-                    }
-                    Rectangle{
-                        width: 90
-                        height: 90
-                        radius: 90
-                        Rectangle{
-                            id: btn_auto
-                            width: 90
-                            height: 90
-                            radius: 90
-                            Column{
-                                anchors.centerIn: parent
-                                Image{
-                                    source: "icon/icon_auto_init.png"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                                Text{
-                                    text: "자동 초기화"
-                                    font.family: font_noto_r.name
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    btn_auto.running = true;
-                                    supervisor.slam_autoInit();
-                                }
-                            }
-                        }
-                        DropShadow{
-                            anchors.fill: parent
-                            radius: 10
-                            color: "#dfdfdf"
-                            source: btn_auto
-                        }
-                    }
-                    Rectangle{
-                        width: 90
-                        height: 90
-                        radius: 90
-                        Rectangle{
+                        Item_button{
                             id: btn_stop
-                            width: 90
-                            height: 90
-                            radius: 90
-                            Column{
-                                anchors.centerIn: parent
-                                Image{
-                                    source: "icon/icon_stop.png"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                                Text{
-                                    text: "정지"
-                                    font.family: font_noto_r.name
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                            }
+                            width: 78
+                            icon:"icon/icon_stop.png"
+                            name:"Stop"
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    supervisor.moveStop();
+                                    map.tool = "MOVE";
+                                    btn_stop.show_ani();
+                                    supervisor.slam_stop();
                                 }
                             }
                         }
-                        DropShadow{
-                            anchors.fill: parent
-                            radius: 10
-                            color: "#dfdfdf"
-                            source: btn_stop
-                        }
-                    }
-
-                }
-            }
-
-            Rectangle{
-                width: parent.width
-                height: 400
-                anchors.bottom: parent.bottom
-                color: "#d0d0d0"
-
-                Row{
-                    id: fnke
-                    anchors.top: parent.top
-                    anchors.topMargin: 50
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 50
-                    Item_joystick{
-                        id: joy_xy
-                        verticalOnly: true
-                        onUpdate_cntChanged: {
-                            if(update_cnt == 0 && supervisor.getJoyXY() != 0){
-                                supervisor.joyMoveXY(0, 0);
-                            }else{
-                                if(fingerInBounds) {
-                                    supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-                                }else{
-                                    supervisor.joyMoveXY(Math.sin(angle));
+                        Item_button{
+                            id: btn_init
+                            width: 78
+                            icon:"icon/icon_set_init.png"
+                            name:"Set Init"
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    if(map.new_slam_init){
+                                        btn_init.show_ani();
+                                        supervisor.slam_setInit();
+                                    }
                                 }
                             }
                         }
-                    }
-                    Item_joystick{
-                        id: joy_th
-                        horizontalOnly: true
-                        onUpdate_cntChanged: {
-                            if(update_cnt == 0 && supervisor.getJoyR() != 0){
-                                supervisor.joyMoveR(0, 0);
-                            }else{
-                                if(fingerInBounds) {
-                                    supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-                                } else {
-                                    supervisor.joyMoveR(-Math.cos(angle));
+                        Item_button{
+                            id: btn_auto_init
+                            width: 78
+                            icon:"icon/icon_auto_init.png"
+                            name:"Auto Init"
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    if(supervisor.getStateInit() !== 2){
+                                        btn_auto_init.running = true;
+                                        supervisor.slam_autoInit();
+                                    }
+
                                 }
                             }
                         }
                     }
                 }
-
-
-                Item_keyboard{
-                    id: keyboard
-                    //focus: true
-                    btn_size: 65
-                    btn_dist: 2
-                    anchors.top: fnke.bottom
-                    anchors.topMargin: 40
+                Rectangle{
+                    width: 400
+                    height: 200
+                    radius: 10
                     anchors.horizontalCenter: parent.horizontalCenter
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 10
+                        Text{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: "* 안 내 사 항 *"
+                            font.pixelSize: 18
+                            font.bold: true
+                            font.family: font_noto_b.name
+                            color: color_red
+                        }
+                        Grid{
+                            rows: 4
+                            columns: 2
+                            Text{
+                                text: "1."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "로봇 상단의 Emergency 버튼을 눌러 수동모드로 전환하세요."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "2."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "로봇을 매장의 중심에 최대한 가깝게 이동시켜주세요."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "3."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "Start 버튼을 누르고 로봇을 끌면서 맵을 생성합니다."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "4."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                            Text{
+                                text: "끝나면 Stop 버튼을 누르고 Save를 해주세요."
+                                font.pixelSize: 13
+                                font.family: font_noto_r.name
+                                color: color_red
+                            }
+                        }
+                    }
                 }
             }
         }
 
         Map_full{
             id: map
-            width: 740
+            width: 640
             height: width
             anchors.left: rect_menu.right
-            anchors.top: parent.top
-            anchors.topMargin: statusbar.height
+            anchors.top: rect_state.bottom
         }
 
     }
@@ -420,7 +546,7 @@ Item {
             if(firstY - mouseY > 100){
                 notice.y = -800;
                 area_swipe.enabled = false;
-                timer_get_joy.start();
+//                timer_get_joy.start();
             }else{
                 notice.y = 0;
             }
@@ -450,36 +576,62 @@ Item {
     }
 
     Timer{
-        id: timer_get_joy
+        id: timer_update
         interval: 100
-        running: false
+        running: true
         repeat: true
         onTriggered: {
-            joystick_connection = supervisor.isconnectJoy();
-            if(joystick_connection){
-                print(supervisor.getJoyAxis(1),supervisor.getJoyAxis(2))
-                if(joy_axis_left_ud == supervisor.getJoyAxis(1) && joy_axis_right_rl == supervisor.getJoyAxis(2)){
-
-                }else{
-                    joy_axis_left_ud = supervisor.getJoyAxis(1);
-                    joy_axis_right_rl = supervisor.getJoyAxis(2);
-                    if(joy_axis_left_ud != 0){
-                        joy_xy.remote_input(joy_axis_left_ud,0);
-                    }else{
-                        joy_xy.remote_stop();
-                    }
-
-                    if(joy_axis_right_rl != 0){
-                        joy_th.remote_input(0,joy_axis_right_rl);
-                    }else{
-                        joy_th.remote_stop();
-                    }
-                }
+            if(supervisor.getEmoStatus()){
+                text_reason.text = "Emergency 눌림(수동모드)"
+                rect_emo.color = color_green;
             }else{
-                joy_axis_left_ud = 0;
-                joy_axis_right_rl = 0;
-//                joy_xy.remote_stop();
-//                joy_th.remote_stop();
+                rect_emo.color = color_light_gray;
+            }
+            if(supervisor.getRemoteStatus()){
+                rect_remote.color = color_green;
+            }else{
+                rect_remote.color = color_light_gray;
+            }
+            if(supervisor.getPowerStatus()){
+                rect_power.color = color_green;
+            }else{
+                rect_power.color = color_light_gray;
+            }
+            if(supervisor.getChargeStatus()){
+                rect_charging.color = color_green;
+            }else{
+                rect_charging.color = color_light_gray;
+            }
+            if(supervisor.getMotorConnection(0)){
+                rect_motor_con1.color = color_green;
+            }else{
+                rect_motor_con1.color = color_red;
+            }
+
+            if(supervisor.getMotorConnection(1)){
+                rect_motor_con2.color = color_green;
+            }else{
+                rect_motor_con2.color = color_red;
+            }
+            if(supervisor.getMotorStatus(0)===0){
+                rect_motor_stat1.color = color_light_gray;
+                text_motor_stat1.text = "";
+            }else if(supervisor.getMotorStatus(0)===1){
+                rect_motor_stat1.color = color_green;
+                text_motor_stat1.text = "";
+            }else{
+                rect_motor_stat1.color = color_red;
+                text_motor_stat1.text = supervisor.getMotorStatus(0).toString();
+            }
+            if(supervisor.getMotorStatus(1)===0){
+                rect_motor_stat2.color = color_light_gray;
+                text_motor_stat2.text = "";
+            }else if(supervisor.getMotorStatus(1)===1){
+                rect_motor_stat2.color = color_green;
+                text_motor_stat2.text = "";
+            }else{
+                rect_motor_stat2.color = color_red;
+                text_motor_stat2.text = supervisor.getMotorStatus(1).toString();
             }
         }
     }

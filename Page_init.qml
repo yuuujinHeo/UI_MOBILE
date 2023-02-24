@@ -20,9 +20,6 @@ Item {
 //        }
 //    }
 
-    function fail_localization(){
-        print("fail local init");
-    }
 
     Component.onCompleted: {
         init_mode = 0;
