@@ -1381,7 +1381,7 @@ Item {
                                     Text{
                                         id: text_k_curve
                                         anchors.centerIn: parent
-                                        text: slider_k_curve.value.toFixed(1)
+                                        text: slider_k_curve.value.toFixed(3)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -1391,9 +1391,9 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.8
                                     height: 40
-                                    from: 0.1
-                                    to: 5.0
-                                    value: 0.7
+                                    from: 0.001
+                                    to: 0.01
+                                    value: 0.005
                                 }
                             }
                         }

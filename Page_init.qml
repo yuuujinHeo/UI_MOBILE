@@ -828,17 +828,10 @@ Item {
             }else if(init_mode == 3){
                 if(loader_init.item.objectName != "init_slam")
                     loader_init.sourceComponent = item_slam_init
-
-
-                if(supervisor.getRobotState() === 0){
-
-                }else if(supervisor.getRobotState() === 5){
-
-                }else{
+                if(supervisor.getStateInit() === 4){
                     init_mode = 4;
                     update_timer.stop();
                     loadPage(pkitchen);
-
                 }
             }
         }
