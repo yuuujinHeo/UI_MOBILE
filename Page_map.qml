@@ -1068,7 +1068,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                if(supervisor.getState() !== 7){
+                                if(supervisor.getStateInit() !== 2){
                                     btn_auto_init.running = true;
                                     supervisor.slam_autoInit();
                                 }
@@ -4045,7 +4045,7 @@ Item {
         repeat: true
         property int trigger_cnt: 0
         onTriggered: {
-            if(supervisor.getRobotState() == 7){
+            if(supervisor.getStateInit() === 2){
                 if(slam_initializing == false){
                     slam_initializing = true;
                 }

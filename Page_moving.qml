@@ -165,12 +165,12 @@ Item {
         running: false
         repeat: true
         onTriggered: {
-            if(supervisor.getRobotState() == 4){
+            if(supervisor.getStateMoving() === 4){
                 robot_paused = true;
                 popup_pause.visible = true;
                 print("robot_paused = true");
                 timer_check_pause.stop();
-            }else if(supervisor.getRobotState() == 5){
+            }else if(supervisor.getStateMoving() === 0){
                 robot_paused = true;
                 popup_pause.visible = true;
                 print("robot_paused = true, move fail");

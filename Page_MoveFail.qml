@@ -439,7 +439,7 @@ Item {
         running: false
         repeat: true
         onTriggered: {
-            if(supervisor.getRobotState() == 4){
+            if(supervisor.getStateMoving() === 4){
                 supervisor.moveResume();
             }else{
                 backPage();
