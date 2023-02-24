@@ -39,7 +39,7 @@ void LCMHandler::sendCommand(command cmd, QString msg){
     if(!pmap->use_uicmd){
         plog->write("[LCM ERROR] SEND COMMAND (BLOCKED) : " + msg);
     }else if(isconnect){
-        if(probot->state != ROBOT_STATE_BUSY){
+        if(probot->init_state != ROBOT_INIT_NOT_READY){
             if(is_debug){
                 lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&cmd);
                 plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
@@ -68,7 +68,7 @@ void LCMHandler::sendCommand(int cmd, QString msg){
     if(!pmap->use_uicmd){
         plog->write("[LCM ERROR] SEND COMMAND (BLOCKED) : " + msg);
     }else if(isconnect){
-        if(probot->state != ROBOT_STATE_BUSY){
+        if(probot->init_state != ROBOT_INIT_NOT_READY){
             if(is_debug){
                 lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&send_msg);
                 plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
@@ -257,7 +257,8 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
     probot->status_emo = msg->status_emo;
     probot->status_remote = msg->status_remote;
     probot->status_charge = msg->status_charge;
-    probot->state = msg->state;
+    probot->init_state = msg->init_state;
+    probot->running_state = msg->running_state;
     probot->err_code = msg->err_code;
     probot->curPose.x = msg->robot_pose[0];
     probot->curPose.y = msg->robot_pose[1];

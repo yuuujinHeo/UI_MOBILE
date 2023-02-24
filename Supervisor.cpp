@@ -954,10 +954,10 @@ void Supervisor::slam_autoInit(){
 }
 
 bool Supervisor::is_slam_running(){
-    if(probot->state == ROBOT_STATE_NOT_READY || probot->state == ROBOT_STATE_BUSY){
-        return false;
-    }else{
+    if(probot->init_state == ROBOT_INIT_DONE){
         return true;
+    }else{
+        return false;
     }
 }
 
@@ -2313,8 +2313,11 @@ float Supervisor::getPower(){
 float Supervisor::getPowerTotal(){
     return probot->total_power;
 }
-int Supervisor::getState(){
-    return probot->state;
+int Supervisor::getStateInit(){
+    return probot->init_state;
+}
+int Supervisor::getStateMoving(){
+    return probot->running_state;
 }
 int Supervisor::getErrcode(){
     return probot->err_code;
@@ -2342,10 +2345,6 @@ float Supervisor::getRobotth(){
     ST_POSE temp = setAxis(probot->curPose);
     return temp.th;
 }
-int Supervisor::getRobotState(){
-    return probot->state;
-}
-
 int Supervisor::getPathNum(){
     if(lcm->flagPath){
         return 0;
@@ -2715,72 +2714,56 @@ void Supervisor::onTimer(){
         }
     }
     // 스케줄러 변수 초기화
-    static int cur_error = ROBOT_ERROR_NONE;
-    static int cur_state = UI_STATE_NONE;
+    static int prev_error = ROBOT_ERROR_NONE;
+    static int prev_state = UI_STATE_NONE;
+    static int prev_running_state = ROBOT_MOVING_NOT_READY;
 
-    // 로봇 상태가 에러가 아니면 에러 초기화
-    if(probot->state != ROBOT_STATE_ERROR)
-        cur_error = ROBOT_ERROR_NONE;
 
     if(lcm->isconnect){
-        // 로봇연결되고 로봇의 상태가 초기화 전이면 초기화 진행
-        if(probot->state == ROBOT_STATE_ERROR){
-            if(cur_error != probot->err_code){
-                cur_error = probot->err_code;
-                if(cur_error == ROBOT_ERROR_WAIT){
-
-                    plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");
-                    QMetaObject::invokeMethod(mMain, "excuseme");
-
-                }else if(cur_error == ROBOT_ERROR_NO_PATH){
-
-                    isaccepted = false;
-                    ui_state = UI_STATE_MOVEFAIL;
-                    plog->write("[SCHEDULER] ROBOT ERROR : NO PATH");
-                    QMetaObject::invokeMethod(mMain, "nopathfound");
-
-                }else if(cur_error == ROBOT_ERROR_LOCALIZATION_FAILED){
-                    QMetaObject::invokeMethod(mMain, "fail_localization");
-                    if(!lcm->map_updated && flag_read_ini && setting.useAutoInit){
-                        if(pmap->use_server){
-                            plog->write("[LCM] CONNECT -> INIT START");
-                            lcm->sendMapPath("");
-                            ui_state = UI_STATE_NONE;
-                        }else{
-                            plog->write("[LCM] CONNECT -> INIT START");
-                            lcm->sendMapPath("");
-                            ui_state = UI_STATE_NONE;
-                        }
-                    }
-                    lcm->map_updated = true;
-                }
+        //init_state 확인
+        if(probot->init_state == ROBOT_INIT_DONE && probot->running_state == ROBOT_MOVING_READY){
+            // 로봇연결되면 READY로 상태 변경
+            if(ui_state == UI_INIT_STATE_DONE){
+                plog->write("[LCM] INIT ALL DONE -> UI_STATE = READY");
+                ui_state = UI_STATE_READY;
             }
         }else{
-            if(!lcm->map_updated){
-                lcm->map_updated = true;
-            }
-            // 로봇연결되면 READY로 상태 변경
-            if(ui_state == UI_STATE_NONE){
-                plog->write("[LCM] CONNECT -> UI_STATE = READY");
-                ui_state = UI_STATE_READY;
+            if(probot->init_state != ROBOT_INIT_DONE){
+                if(ui_state == UI_INIT_STATE_DONE){
+
+                }else{
+                    //move fail
+                    ui_state = UI_STATE_MOVEFAIL;
+                }
+            }else{
+                if(prev_running_state != probot->running_state){
+                    if(probot->running_state == ROBOT_MOVING_WAIT){
+                        plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");
+                        QMetaObject::invokeMethod(mMain, "excuseme");
+                    }
+                }
             }
         }
     }else{
-        lcm->map_updated = false;
-        // 로봇연결이 끊어졌는데 ui_state가 NONE이 아니
+        // 로봇연결이 끊어졌는데 ui_state가 NONE이 아니면
         if(ui_state != UI_STATE_NONE){
             ui_state = UI_STATE_NONE;
             plog->write("[LCM] DISCONNECT -> UI_STATE = NONE");
         }
     }
 
+
     switch(ui_state){
-    case UI_STATE_READY:{
-        cur_state = ui_state;
-        if(probot->state == ROBOT_STATE_PAUSED){
+    case UI_STATE_NONE:{
+        if(probot->running_state == ROBOT_MOVING_PAUSED){
             lcm->moveStop();
         }
-
+        break;
+    }
+    case UI_INIT_STATE_DONE:{
+        break;
+    }
+    case UI_STATE_READY:{
         if(ui_cmd == UI_CMD_MOVE_TABLE){
             ui_state = UI_STATE_SERVING;
             ui_cmd = UI_CMD_NONE;
@@ -2800,7 +2783,6 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_STATE_CHARGING:{
-        cur_state = ui_state;
         if(ui_cmd == UI_CMD_MOVE_WAIT){
             ui_state = UI_STATE_GO_HOME;
             ui_cmd = UI_CMD_NONE;
@@ -2808,8 +2790,7 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_STATE_GO_HOME:{
-        cur_state = ui_state;
-        if(probot->state == ROBOT_STATE_READY){
+        if(probot->running_state == ROBOT_MOVING_READY){
             if(isaccepted){
                 ui_cmd = UI_CMD_NONE;
                 QMetaObject::invokeMethod(mMain, "waitkitchen");
@@ -2818,7 +2799,7 @@ void Supervisor::onTimer(){
             }else{
                 lcm->moveTo("Resting_0");
             }
-        }else if(probot->state == ROBOT_STATE_MOVING){
+        }else if(probot->running_state == ROBOT_MOVING_MOVING){
             // moving
             if(!isaccepted){
                 isaccepted = true;
@@ -2828,8 +2809,7 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_STATE_GO_CHARGE:{
-        cur_state = ui_state;
-        if(probot->state == ROBOT_STATE_READY){
+        if(probot->running_state == ROBOT_MOVING_READY){
             if(isaccepted){
                 ui_cmd = UI_CMD_NONE;
                 isaccepted = false;
@@ -2838,7 +2818,7 @@ void Supervisor::onTimer(){
             }else{
                 lcm->moveTo("Charging_0");
             }
-        }else if(probot->state == ROBOT_STATE_MOVING){
+        }else if(probot->running_state == ROBOT_MOVING_MOVING){
             // moving
             if(!isaccepted){
                 isaccepted = true;
@@ -2848,8 +2828,7 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_STATE_SERVING:{
-        cur_state = ui_state;
-        if(probot->state == ROBOT_STATE_READY){
+        if(probot->running_state == ROBOT_MOVING_READY){
             //Check Done Signal
             if(isaccepted){
                 count_pass = 0;
@@ -2905,37 +2884,18 @@ void Supervisor::onTimer(){
                 }
                 timer_cnt++;
             }
-        }else if(probot->state == ROBOT_STATE_MOVING){
+        }else if(probot->running_state == ROBOT_MOVING_MOVING){
             // moving
             if(!isaccepted){
                 isaccepted = true;
                 plog->write("[SCHEDULER] SERVING : MOVE START");
                 QMetaObject::invokeMethod(mMain, "movelocation");
             }
-        }else if(probot->state == ROBOT_STATE_ERROR){
-//            if(cur_error != probot->err_code){
-//                cur_error = probot->err_code;
-//                if(cur_error == ROBOT_ERROR_NO_PATH){
-
-//                    plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");
-//                    QMetaObject::invokeMethod(mMain, "excuseme");
-////                    isaccepted = false;
-////                    ui_state = UI_STATE_MOVEFAIL;
-////                    plog->write("[SCHEDULER] ROBOT ERROR : NO PATH");
-////                    QMetaObject::invokeMethod(mMain, "nopathfound");
-//                }else if(cur_error == ROBOT_ERROR_WAIT){
-//                    plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME OLD");
-////                    QMetaObject::invokeMethod(mMain, "excuseme");
-//                }else{
-//                    plog->write("[SCHEDULER] ROBOT ERROR : " + QString::number(probot->err_code));
-//                }
-//            }
         }
         break;
     }
     case UI_STATE_CALLING:{
-        cur_state = ui_state;
-        if(probot->state == ROBOT_STATE_READY){
+        if(probot->running_state == ROBOT_MOVING_READY){
             if(isaccepted){//도착
                 plog->write("[SCHEDULER] CALLING MOVE ARRIVED "+probot->call_list[0]);
                 probot->call_list.pop_front();
@@ -2969,32 +2929,18 @@ void Supervisor::onTimer(){
                 }
                 timer_cnt++;
             }
-        }else if(probot->state == ROBOT_STATE_MOVING){
+        }else if(probot->running_state == ROBOT_MOVING_MOVING){
             // moving
             if(!isaccepted){
                 isaccepted = true;
                 plog->write("[SCHEDULER] CALLING : MOVE START");
                 QMetaObject::invokeMethod(mMain, "movelocation");
             }
-        }else if(probot->state == ROBOT_STATE_ERROR){
-//            if(cur_error != probot->err_code){
-//                cur_error = probot->err_code;
-//                if(cur_error == ROBOT_ERROR_NO_PATH){
-//                    isaccepted = false;
-//                    cur_error = probot->err_code;
-//                    ui_state = UI_STATE_MOVEFAIL;
-//                    plog->write("[SCHEDULER] ROBOT ERROR : NO PATH");
-//                    QMetaObject::invokeMethod(mMain, "nopathfound");
-//                }else{
-//                    plog->write("[SCHEDULER] ROBOT ERROR : " + QString::number(probot->err_code));
-//                }
-//            }
         }
         break;
     }
     case UI_STATE_PICKUP:{
-        cur_state = ui_state;
-        if(probot->state == ROBOT_STATE_PAUSED){
+        if(probot->running_state == ROBOT_MOVING_PAUSED){
             lcm->moveResume();
         }
         if(flag_patrol_serving){
@@ -3011,10 +2957,7 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_STATE_PATROLLING:{
-        cur_state = ui_state;
         // 테스트용 테이블 로테이션
-        if(probot->state != ROBOT_STATE_ERROR){
-
             if(ui_cmd == UI_CMD_TABLE_PATROL){
                 state_rotate_tables = 1;
                 ui_cmd = UI_CMD_NONE;
@@ -3026,12 +2969,11 @@ void Supervisor::onTimer(){
                     state_rotate_tables = 0;
                 }
             }
-
             static int table_num_last = 0;
             switch(state_rotate_tables){
             case 1:
             {//Start
-                if(probot->state == ROBOT_STATE_READY){
+                if(probot->running_state == ROBOT_MOVING_READY){
                     ui_state = UI_STATE_PATROLLING;
                     int table_num = qrand()%5;
                     while(table_num_last == table_num){
@@ -3047,7 +2989,7 @@ void Supervisor::onTimer(){
             case 2:
             {//Wait State Change
                 static int timer_cnt = 0;
-                if(probot->state == ROBOT_STATE_MOVING){
+                if(probot->running_state == ROBOT_MOVING_MOVING){
                     qDebug() << "Moving Start";
                     state_rotate_tables = 3;
                 }else{
@@ -3059,7 +3001,7 @@ void Supervisor::onTimer(){
             }
             case 3:
             {
-                if(probot->state == ROBOT_STATE_READY){
+                if(probot->running_state == ROBOT_MOVING_READY){
                     //move done
                     qDebug() << "Move Done!!";
                     state_rotate_tables = 1;
@@ -3068,48 +3010,62 @@ void Supervisor::onTimer(){
             }
             case 4:
             {//server new target
-                if(probot->state == ROBOT_STATE_READY){
+                if(probot->running_state == ROBOT_MOVING_READY){
                     state_rotate_tables = 5;
                 }//confirm
 
                 break;
             }
             case 5:{
-                if(probot->state == ROBOT_STATE_MOVING){
+                if(probot->running_state == ROBOT_MOVING_MOVING){
                     qDebug() << "Moving Start";
                     state_rotate_tables = 3;
                 }
                 break;
             }
-            }
         }
         break;
     }
     case UI_STATE_MOVEFAIL:{
-//        if(cur_error != probot->err_code){
-//            cur_error = probot->err_code;
-//            if(cur_error == ROBOT_ERROR_WAIT){
+        if(probot->init_state == ROBOT_INIT_NOT_READY){
 
+        }else if(probot->init_state == ROBOT_INIT_MOTOR_DONE){
 
-//            }if(cur_error == ROBOT_ERROR_NO_PATH){
-//                cur_error = probot->err_code;
-//                plog->write("[SCHEDULER] ROBOT ERROR : NO PATH");
-//                QMetaObject::invokeMethod(mMain, "nopathfound");
-//            }else{
-//                plog->write("[SCHEDULER] ROBOT ERROR : " + QString::number(probot->err_code));
-//            }
-//        }
-//        if(probot->state == ROBOT_STATE_MOVING){
-//            ui_state = cur_state;
-//        }
+        }else if(probot->init_state == ROBOT_INIT_LOCAL_FAILED){
+            QMetaObject::invokeMethod(mMain, "fail_localization");
+            if(!lcm->map_updated && flag_read_ini && setting.useAutoInit){
+                if(pmap->use_server){
+                    plog->write("[LCM] CONNECT -> INIT START");
+                    lcm->sendMapPath("");
+                    ui_state = UI_STATE_NONE;
+                }else{
+                    plog->write("[LCM] CONNECT -> INIT START");
+                    lcm->sendMapPath("");
+                    ui_state = UI_STATE_NONE;
+                }
+            }
+        }else if(probot->init_state == ROBOT_INIT_DONE){
+            isaccepted = false;
+            ui_state = UI_STATE_MOVEFAIL;
+            plog->write("[SCHEDULER] ROBOT ERROR : NO PATH");
+            QMetaObject::invokeMethod(mMain, "nopathfound");
+        }
         break;
     }
-    case UI_STATE_NONE:{
-        break;
-    }
     }
 
 
+
+
+    prev_state = ui_state;
+    prev_running_state = probot->running_state;
+
+
+
+
+//    // 로봇 상태가 에러가 아니면 에러 초기화
+//    if(probot->state != ROBOT_STATE_ERROR)
+//        cur_error = ROBOT_ERROR_NONE;
 //    static int count_test = 0;
 //    qDebug() << count_test++;
 }

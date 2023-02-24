@@ -329,7 +329,8 @@ public:
     Q_INVOKABLE void resetHomeFolders();
     ////*********************************************  ROBOT STATUS 관련   ***************************************************////
     Q_INVOKABLE float getBattery();
-    Q_INVOKABLE int getState();
+    Q_INVOKABLE int getStateInit();
+    Q_INVOKABLE int getStateMoving();
     Q_INVOKABLE int getErrcode();
     Q_INVOKABLE QString getRobotName();
 
@@ -352,7 +353,6 @@ public:
     Q_INVOKABLE float getRoboty();
     Q_INVOKABLE float getRobotth();
 
-    Q_INVOKABLE int getRobotState();
     Q_INVOKABLE int getPathNum();
     Q_INVOKABLE float getPathx(int num);
     Q_INVOKABLE float getPathy(int num);
