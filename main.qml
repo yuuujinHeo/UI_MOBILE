@@ -62,6 +62,13 @@ Window {
 
     property string cur_location;
 
+    function movefail(){
+        if(loader_page.item.objectName != "page_movefail"){
+            play_movefailmsg();
+            loadPage(pmovefail);
+        }
+    }
+
     function movelocation(){
         cur_location = supervisor.getcurLoc();
         var str_target;
@@ -85,6 +92,10 @@ Window {
     }
     function play_avoidmsg(){
         print("play excuseme");
+        voice_avoid.play();
+    }
+    function play_movefailmsg(){
+        print("play movefail");
         voice_avoid.play();
     }
     function docharge(){
@@ -146,6 +157,7 @@ Window {
                     loader_page.item.pickup_3 = true;
                 }
             }
+//            loader_page.item.play_voice();
             loader_page.item.pos = tempstr;
             supervisor.writelog("[QML - MAIN] Show Pickup Page : " + loader_page.item.pos);
         }else if(robot_type == "CALLING"){
@@ -233,7 +245,7 @@ Window {
             supervisor.writelog("[QML] Load Page : "+source);
             timer_update.start();
         }
-        source: pinit
+        source: pmovefail//pinit
     }
 
     Supervisor{
@@ -281,7 +293,7 @@ Window {
         id: voice_movewait
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
-        source: "bgm/voice_move_wait.mpga"
+        source: "bgm/voice_move_wait.mp3"
     }
     Audio{
         id: voice_movecharge
@@ -293,15 +305,25 @@ Window {
         id: voice_serving
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
-        source: "bgm/voice_start_serving1.mp3"
+        source: "bgm/voice_start_serving.mp3"
     }
+
     Audio{
         id: voice_avoid
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_avoid.mp3"
         onStatusChanged: {
-            print("Audio Status : ",status);
+            print("Audio Status Avoid: ",status);
+        }
+    }
+    Audio{
+        id: voice_movefail
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_movefail.mp3"
+        onStatusChanged: {
+            print("Audio Status MoveFail: ",status);
         }
     }
 

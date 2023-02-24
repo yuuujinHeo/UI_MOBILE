@@ -23,10 +23,16 @@ Item {
         text_mention3.visible = true;
         target_pos.visible = true;
         btn_confirm.visible = true;
-        voice_pickup.play();
         text_hello.visible = false;
         timer_hello.stop();
+        voice_pickup.play();
     }
+
+    function play_voice(){
+//        if(pickup_1)
+    }
+
+
     Timer{
         repeat: true
         interval: 500
@@ -41,6 +47,7 @@ Item {
         anchors.fill: parent
         color: "#282828"
     }
+
     Image{
         id: image_robot
         source: "image/robot_pickup.png"
@@ -146,6 +153,7 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     console.log("UI : CONFIRM");
+                    voice_thanks.play();
                     text_mention.visible = false;
                     text_mention3.visible = false;
                     target_pos.visible = false;
@@ -173,7 +181,25 @@ Item {
         id: voice_pickup
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
-        source: "bgm/voice_pickup1.mp3"
+        source: "bgm/voice_pickup.mp3"
+    }
+    Audio{
+        id: voice_tray_1
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_tray_1.mp3"
+    }
+    Audio{
+        id: voice_tray_2
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_tray_2.mp3"
+    }
+    Audio{
+        id: voice_thanks
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_thanks.mp3"
     }
 
     Timer{

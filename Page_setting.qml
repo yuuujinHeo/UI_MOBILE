@@ -1000,6 +1000,39 @@ Item {
                     }
                 }
                 Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"대기 후 경로재탐색"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_avoid
+                                anchors.fill: parent
+                                model:["사용안함","사용"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
                     id: set_slam_1
                     width: 840
                     height: 40
@@ -3102,6 +3135,11 @@ Item {
                         else
                             supervisor.setSetting("ROBOT_SW/use_autoinit","true");
 
+                        if(combo_avoid.currentIndex == 0)
+                            supervisor.setSetting("ROBOT_SW/use_avoid","false");
+                        else
+                            supervisor.setSetting("ROBOT_SW/use_avoid","true");
+
                         supervisor.setSetting("SENSOR/baudrate",combo_baudrate.currentText);
                         supervisor.setSetting("SENSOR/mask",text_mask.text);
                         supervisor.setSetting("SENSOR/max_range",text_max_range.text);
@@ -3257,6 +3295,12 @@ Item {
             combo_autoinit.currentIndex = 1;
         }else{
             combo_autoinit.currentIndex = 0;
+        }
+
+        if(supervisor.getSetting("ROBOT_SW","use_avoid") === "true"){
+            combo_avoid.currentIndex = 1;
+        }else{
+            combo_avoid.currentIndex = 0;
         }
 
         if(supervisor.getSetting("SENSOR","baudrate") === "115200"){

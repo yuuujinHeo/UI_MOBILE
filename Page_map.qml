@@ -57,9 +57,6 @@ Item {
             map.loadmapping();
         }
     }
-    function fail_localization(){
-        print("fail local map");
-    }
 
     Component.onCompleted: {
         init_map();

@@ -2,12 +2,14 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import "."
 import io.qt.Supervisor 1.0
+import QtMultimedia 5.12
 Item {
     id: page_charge
     objectName: "page_charge"
     width: 1280
     height: 800
 
+    property bool is_charging: false
     property double battery: 0
     property string robotName: "test"
     property date curDate: new Date()
@@ -22,12 +24,23 @@ Item {
 
     Component.onCompleted: {
         init();
+
     }
 
     function init(){
-        text_mention.text = "충전 중 입니다."
-        image_battery.source = "qrc:/icon/bat_1.png";
-        timer_bat.start();
+        is_charging = false;
+        battery = supervisor.getBatteryOut();
+        if(robot_battery > 90){
+            image_battery.source = "icon/bat_full.png"
+        }else if(robot_battery > 60){
+            image_battery.source = "icon/bat_3.png"
+        }else if(robot_battery > 30){
+            image_battery.source = "icon/bat_2.png"
+        }else{
+            image_battery.source = "icon/bat_1.png"
+        }
+        timer_bat.stop();
+        text_mention.text = "충전 케이블을 연결해 주세요."
     }
 
     Rectangle{
@@ -58,7 +71,19 @@ Item {
         interval: 500
         running: true
         onTriggered: {
-            print("charge timer");
+            if(supervisor.getChargeStatus()){
+                if(!is_charging){
+                    timer_bat.start();
+                    voice_start_charge.play();
+                    is_charging = true;
+                    text_mention.text = "충전 중입니다."
+                }
+            }else{
+                if(is_charging){
+                    init();
+                    voice_stop_charge.play();
+                }
+            }
         }
     }
     Text{
@@ -204,5 +229,16 @@ Item {
             }
         }
     }
-
+    Audio{
+        id: voice_start_charge
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_start_charge.mp3"
+    }
+    Audio{
+        id: voice_stop_charge
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_stop_charge.mp3"
+    }
 }

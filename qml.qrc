@@ -12,7 +12,6 @@
         <file>Page_charge.qml</file>
         <file>bgm/voice_start_serving.mp3</file>
         <file>bgm/voice_pickup.mp3</file>
-        <file>bgm/voice_move_wait.mpga</file>
         <file>bgm/voice_move_charge.mp3</file>
         <file>bgm/voice_avoid.mp3</file>
         <file>Page_init.qml</file>
@@ -120,8 +119,11 @@
         <file>icon/keyboard_right.png</file>
         <file>icon/keyboard_up.png</file>
         <file>Popup_map_list.qml</file>
-        <file>bgm/voice_pickup1.mp3</file>
-        <file>bgm/voice_start_serving1.mp3</file>
         <file>Tool_Keyboard.qml</file>
+        <file>bgm/voice_movefail.mp3</file>
+        <file>bgm/voice_move_wait.mp3</file>
+        <file>bgm/voice_start_charge.mp3</file>
+        <file>bgm/voice_stop_charge.mp3</file>
+        <file>bgm/voice_thanks.mp3</file>
     </qresource>
 </RCC>
