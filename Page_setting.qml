@@ -3138,12 +3138,12 @@ Item {
 
 
 
-                        if(combo_use_travelline.currentIndex == 0)
-                            supervisor.setuseTravelline(false);
-                        else
-                            supervisor.setuseTravelline(true);
+//                        if(combo_use_travelline.currentIndex == 0)
+//                            supervisor.setuseTravelline(false);
+//                        else
+//                            supervisor.setuseTravelline(true);
 
-                        supervisor.setnumTravelline(combo_travelline.currentIndex);
+//                        supervisor.setnumTravelline(combo_travelline.currentIndex);
 
                         supervisor.setTableNum(combo_table_num.currentIndex);
 

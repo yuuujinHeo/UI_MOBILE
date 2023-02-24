@@ -1696,6 +1696,7 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 // start random patrol (serving)
+                                print(supervisor.getuistate())
                                 if(supervisor.getuistate() === 1){//ROBOT READY
                                     supervisor.startServingTest();
                                 }

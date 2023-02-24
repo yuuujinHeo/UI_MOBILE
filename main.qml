@@ -121,9 +121,7 @@ Window {
     function nopathfound(){
         supervisor.writelog("[QML - MAIN] No path found -> movefail");
         play_avoidmsg();
-        if(loader_page.item.objectName == "page_moving"){
-            loader_page.item.movefail();
-        }
+        loadPage(pmovefail);
     }
     function movestopped(){
         supervisor.writelog("[QML - MAIN] Move Stopped");
