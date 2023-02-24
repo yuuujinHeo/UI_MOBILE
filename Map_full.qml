@@ -104,14 +104,14 @@ Item {
         if(robot_following){
             var newx = width/2 - (robot_x)*mapview.newscale;
             if(newx > 0){
-                print("??",0)
-//                mapview.x = 0;
+//                print("??",0)
+                mapview.x = 0;
             }else if(newx < - map_width*mapview.newscale + width){
-                print("??",map_width*mapview.newscale + width)
-//                mapview.x = - map_width*mapview.newscale + width
+//                print("??",map_width*mapview.newscale + width)
+                mapview.x = - map_width*mapview.newscale + width
             }else{
-                print("??",newx)
-//                mapview.x = newx;
+//                print("??",newx)
+                mapview.x = newx;
             }
         }
     }

@@ -2753,16 +2753,16 @@ void Supervisor::onTimer(){
                         }
                     }
                     lcm->map_updated = true;
-                }else{
-                    if(!lcm->map_updated){
-                        lcm->map_updated = true;
-                    }
-                    // 로봇연결되면 READY로 상태 변경
-                    if(ui_state == UI_STATE_NONE){
-                        plog->write("[LCM] CONNECT -> UI_STATE = READY");
-                        ui_state = UI_STATE_READY;
-                    }
                 }
+            }
+        }else{
+            if(!lcm->map_updated){
+                lcm->map_updated = true;
+            }
+            // 로봇연결되면 READY로 상태 변경
+            if(ui_state == UI_STATE_NONE){
+                plog->write("[LCM] CONNECT -> UI_STATE = READY");
+                ui_state = UI_STATE_READY;
             }
         }
     }else{
