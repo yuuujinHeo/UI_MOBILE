@@ -41,7 +41,6 @@ Window {
     property color color_navy: "#4f5666"
     property color color_dark_navy: "#323744"
 
-
     property string pbefore: pinit
     property string ploading: "qrc:/Page_loading.qml"
     property string pkitchen: "qrc:/Page_kitchen.qml"
@@ -111,7 +110,6 @@ Window {
             loader_page.item.update_mapping();
         }
     }
-
     function pausedcheck(){
         supervisor.writelog("[QML - MAIN] Check Robot Paused");
         if(loader_page.item.objectName == "page_moving"){
@@ -160,7 +158,6 @@ Window {
     function loadmap_server_success(){
         loader_page.item.loadmap_server(true);
     }
-
     function fail_localization(){
         if(loader_page.item.objectName !== "page_init"){
             print("main: fail_localization");
@@ -170,9 +167,7 @@ Window {
             loader_page.item.map_mode = 4;
             loader_page.item.init();
         }
-
     }
-
     function updatepatrol(){
         if(loader_page.item.objectName == "page_map")
             loader_page.item.updatepatrol();
@@ -201,11 +196,9 @@ Window {
         if(loader_page.item.objectName == "page_map")
             loader_page.item.updatepath();
     }
-
     function excuseme(){
         play_avoidmsg();
     }
-
     function newcall(){
         if(loader_page.item.objectName == "page_kitchen"){
 
@@ -307,6 +300,9 @@ Window {
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_avoid.mp3"
+        onStatusChanged: {
+            print("Audio Status : ",status);
+        }
     }
 
     Item_statusbar{

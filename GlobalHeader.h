@@ -115,7 +115,8 @@ typedef struct{
     float power = 0;
     float total_power = 0;
 
-    int state = 0;
+    int init_state = 0;
+    int running_state = 0;
     int err_code = 0;
 
     ST_POSE curPose;
@@ -236,6 +237,7 @@ enum UI_CMD{
 
 enum UI_STATE{
     UI_STATE_NONE = 0,
+    UI_INIT_STATE_DONE,
     UI_STATE_READY,
     UI_STATE_CHARGING,
     UI_STATE_GO_HOME,
@@ -248,19 +250,21 @@ enum UI_STATE{
     UI_STATE_MOVEFAIL
 };
 
-enum ROBOT_STATE{
-    ROBOT_STATE_NOT_READY = 0,
-    ROBOT_STATE_READY,
-    ROBOT_STATE_MOVING,
-    ROBOT_STATE_AVOID,
-    ROBOT_STATE_PAUSED,
-
-    ROBOT_STATE_ERROR,//5
-    ROBOT_STATE_MANUALMODE,
-    ROBOT_STATE_BUSY,
-    ROBOT_STATE_CHARGING
+enum ROBOT_INIT_STATE{
+    ROBOT_INIT_NOT_READY = 0,
+    ROBOT_INIT_MOTOR_DONE,
+    ROBOT_INIT_LOCAL_START,
+    ROBOT_INIT_LOCAL_FAILED,
+    ROBOT_INIT_DONE
 };
 
+enum ROBOT_MOVING_STATE{
+    ROBOT_MOVING_NOT_READY = 0,
+    ROBOT_MOVING_READY,
+    ROBOT_MOVING_MOVING,
+    ROBOT_MOVING_WAIT,
+    ROBOT_MOVING_PAUSED
+};
 enum ROBOT_ERROR{
     ROBOT_ERROR_NONE = 0,
     ROBOT_ERROR_WAIT,
