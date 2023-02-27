@@ -829,6 +829,7 @@ Item {
                     init_mode = 4;
                     update_timer.stop();
                     loadPage(pkitchen);
+                    supervisor.initdone();
                 }
             }
         }

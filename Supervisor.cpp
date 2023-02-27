@@ -2201,7 +2201,7 @@ void Supervisor::moveResume(){
 void Supervisor::moveStop(){
     lcm->moveStop();
     ui_cmd = UI_CMD_NONE;
-    ui_state = UI_INIT_STATE_DONE;
+    ui_state = UI_STATE_INIT_DONE;
     isaccepted = false;
     QMetaObject::invokeMethod(mMain, "movestopped");
 }
@@ -2397,8 +2397,10 @@ int Supervisor::getuistate(){
     return ui_state;
 }
 
-
-
+void Supervisor::initdone(){
+    plog->write("[INIT] INIT DONE : UI_STATE -> INIT DONE");
+    ui_state = UI_STATE_INIT_DONE;
+}
 
 
 ////*********************************************  MAP IMAGE 관련   ***************************************************////
@@ -2731,7 +2733,7 @@ void Supervisor::onTimer(){
                     ui_state = UI_STATE_CHARGING;
                 }
             }else{
-                if(ui_state == UI_INIT_STATE_DONE){
+                if(ui_state == UI_STATE_INIT_DONE){
                     plog->write("[LCM] INIT ALL DONE -> UI_STATE = UI_STATE_READY");
                     ui_state = UI_STATE_READY;
                 }
@@ -2747,7 +2749,7 @@ void Supervisor::onTimer(){
                             QMetaObject::invokeMethod(mMain, "docharge");
                         }
                     }else{
-                        if(ui_state != UI_STATE_MOVEFAIL){
+                        if(ui_state != UI_STATE_NONE && ui_state != UI_STATE_MOVEFAIL){
                             plog->write("[LCM] Charging Start -> UI_STATE = UI_STATE_MOVEFAIL");
                             ui_state = UI_STATE_MOVEFAIL;
                         }
@@ -2774,7 +2776,8 @@ void Supervisor::onTimer(){
         }
         break;
     }
-    case UI_INIT_STATE_DONE:{
+    case UI_STATE_INIT_DONE:{
+        ui_cmd = UI_CMD_NONE;
         break;
     }
     case UI_STATE_READY:{

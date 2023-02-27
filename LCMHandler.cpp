@@ -208,7 +208,19 @@ void LCMHandler::setInitPose(float x, float y, float th){
 void LCMHandler::restartSLAM(){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_RESTART;
-    sendCommand(send_msg,"RESTART SLAM");
+    QString msg = "RESTART SLAM";
+    if(!pmap->use_uicmd){
+        plog->write("[LCM ERROR] SEND COMMAND (BLOCKED) : " + msg);
+    }else if(isconnect){
+        lcm.publish("COMMAND_"+probot->name.toStdString(),&send_msg);
+        plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
+        flag_tx = true;
+    }else{
+        if(msg != ""){
+            plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) TO COMMAND_" + probot->name + ": " + msg);
+            lcm.publish("COMMAND_"+probot->name.toStdString(),&send_msg);
+        }
+    }
 }
 
 void LCMHandler::sendMapPath(QString path){
@@ -254,7 +266,7 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
     probot->motor[0].temperature = msg->temp_m0;
     probot->motor[1].temperature = msg->temp_m1;
     probot->status_power = msg->status_power;
-    probot->status_emo = msg->status_emo;
+    probot->status_emo = !msg->status_emo;
     probot->status_remote = msg->status_remote;
     probot->status_charge = msg->status_charge;
     probot->init_state = msg->init_state;

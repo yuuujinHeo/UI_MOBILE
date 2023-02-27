@@ -245,7 +245,7 @@ Window {
             supervisor.writelog("[QML] Load Page : "+source);
             timer_update.start();
         }
-        source: pmovefail//pinit
+        source: pinit
     }
 
     Supervisor{

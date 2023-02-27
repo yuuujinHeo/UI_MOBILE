@@ -606,14 +606,16 @@ qrc_qml_qmlcache.cpp: qml_qmlcache.qrc \
 		../image/robot_head.png \
 		../font/NotoSansKR-Medium.otf \
 		../font/NotoSansKR-Light.otf \
+		../bgm/voice_move_wait.mp3 \
 		../bgm/song.mp3 \
+		../bgm/voice_stop_charge.mp3 \
 		../bgm/voice_move_charge.mp3 \
-		../bgm/voice_move_wait.mpga \
-		../bgm/voice_pickup1.mp3 \
+		../bgm/voice_start_charge.mp3 \
+		../bgm/voice_thanks.mp3 \
 		../bgm/voice_pickup.mp3 \
 		../bgm/voice_start_serving.mp3 \
 		../bgm/voice_avoid.mp3 \
-		../bgm/voice_start_serving1.mp3
+		../bgm/voice_movefail.mp3
 	/usr/lib/qt5/bin/rcc -name qml_qmlcache qml_qmlcache.qrc -o qrc_qml_qmlcache.cpp
 
 compiler_qmlcache_make_all: Page_init_qml.cpp Page_menus_qml.cpp Item_button_qml.cpp Item_statusbar_qml.cpp Page_pickup_qml.cpp Popup_map_list_qml.cpp Page_setting_qml.cpp Page_moving_qml.cpp Item_joystick_qml.cpp main_qml.cpp Item_keyboard_qml.cpp Map_full_qml.cpp Page_map_qml.cpp Page_MoveFail_qml.cpp Page_pickup_calling_qml.cpp Item_switch_qml.cpp Page_kitchen_qml.cpp Page_charge_qml.cpp Tool_Keyboard_qml.cpp
