@@ -15,6 +15,7 @@ Item {
     property string name: ""
     property bool highlight: false
     height: width
+    property color shadow_color: color_light_gray
 
     function show_ani(){
         ani_radial_shape_once.start();
@@ -65,7 +66,7 @@ Item {
         DropShadow{
             anchors.fill: parent
             radius: 10
-            color: "#dfdfdf"
+            color: shadow_color
             source: btn_rect
         }
         Shape{

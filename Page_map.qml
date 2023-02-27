@@ -275,14 +275,15 @@ Item {
                 text: "Map Viewer"
                 font.pixelSize: 25
                 font.family: font_noto_b.name
-                anchors.horizontalCenter: map_current.horizontalCenter
+                anchors.horizontalCenterOffset: -70
+                anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
-                anchors.topMargin: 30
+                anchors.topMargin: 20
             }
             Map_full{
                 id: map_current
-                width: 450
-                height: 450
+                width: 500
+                height: 500
                 show_robot: true
                 show_path: true
                 robot_following: true
@@ -290,68 +291,67 @@ Item {
                 show_buttons: true
                 show_connection: true
                 show_object: true
-                anchors.left: parent.left
-                anchors.leftMargin: 200//parent.width/2 - width/2
+                anchors.horizontalCenter: text_curmap.horizontalCenter
+//                anchors.leftMargin: parent.width/2 - width/2
                 anchors.top: text_curmap.bottom
-                anchors.topMargin: 20
+                anchors.topMargin: 10
             }
-          Text{
-              text: "수동 조작\n(lock on-off)"
-              anchors.horizontalCenter: switch_joy.horizontalCenter
-              anchors.bottom: switch_joy.top
-              anchors.bottomMargin: 20
-              font.family: font_noto_r.name
-              color: "white"
-              font.pixelSize: 15
-              horizontalAlignment: Text.AlignHCenter
-          }
-          Item_switch{
-              id: switch_joy
-              enabled: false
-              anchors.left: map_current.right
-              anchors.leftMargin: 50
-              anchors.bottom: map_current.bottom
-              onoff: false
-              touchEnabled: false
-          }
+//          Text{
+//              text: "수동 조작\n(lock on-off)"
+//              anchors.horizontalCenter: switch_joy.horizontalCenter
+//              anchors.bottom: switch_joy.top
+//              anchors.bottomMargin: 20
+//              font.family: font_noto_r.name
+//              color: "white"
+//              font.pixelSize: 15
+//              horizontalAlignment: Text.AlignHCenter
+//          }
+//          Item_switch{
+//              id: switch_joy
+//              enabled: false
+//              anchors.left: map_current.right
+//              anchors.leftMargin: 50
+//              anchors.bottom: map_current.bottom
+//              onoff: false
+//              touchEnabled: false
+//          }
 
-            Item_joystick{
-                id: joy_xy
+            Row{
                 anchors.top: map_current.bottom
                 anchors.topMargin: 30
-                anchors.right: map_current.horizontalCenter
-                anchors.rightMargin: 30
-                verticalOnly: true
-                onUpdate_cntChanged: {
-                    if(update_cnt == 0 && supervisor.getJoyXY() != 0){
-                        supervisor.joyMoveXY(0, 0);
-                    }else{
-                        if(fingerInBounds) {
-                            supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+                anchors.horizontalCenter: map_current.horizontalCenter
+                spacing: 100
+                Item_joystick{
+                    id: joy_xy
+                    verticalOnly: true
+                    onUpdate_cntChanged: {
+                        if(update_cnt == 0 && supervisor.getJoyXY() != 0){
+                            supervisor.joyMoveXY(0, 0);
                         }else{
-                            supervisor.joyMoveXY(Math.sin(angle));
+                            if(fingerInBounds) {
+                                supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+                            }else{
+                                supervisor.joyMoveXY(Math.sin(angle));
+                            }
                         }
                     }
                 }
-            }
-            Item_joystick{
-                id: joy_th
-                anchors.top: map_current.bottom
-                anchors.topMargin: 30
-                anchors.left: map_current.horizontalCenter
-                anchors.leftMargin: 30
-                horizontalOnly: true
-                onUpdate_cntChanged: {
-                    if(update_cnt == 0 && supervisor.getJoyR() != 0){
-                        supervisor.joyMoveR(0, 0);
-                    }else{
-                        if(fingerInBounds) {
-                            supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-                        } else {
-                            supervisor.joyMoveR(-Math.cos(angle));
+                Item_joystick{
+                    id: joy_th
+                    horizontalOnly: true
+                    onUpdate_cntChanged: {
+                        if(update_cnt == 0 && supervisor.getJoyR() != 0){
+                            supervisor.joyMoveR(0, 0);
+                        }else{
+                            if(fingerInBounds) {
+                                supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+                            } else {
+                                supervisor.joyMoveR(-Math.cos(angle));
+                            }
                         }
                     }
                 }
+
             }
 
         }
@@ -978,7 +978,8 @@ Item {
                     spacing: 30
                     Item_button{
                         id: btn_move
-                        width: 78
+                        width: 80
+                        shadow_color: color_gray
                         highlight: map.tool=="MOVE"
                         icon: "icon/icon_move.png"
                         name: "Move"
@@ -990,10 +991,11 @@ Item {
                         }
                     }
                     Item_button{
-                        width: 78
+                        width: 80
+                        shadow_color: color_gray
                         highlight: map.tool=="SLAM_INIT"
                         icon: "icon/icon_point.png"
-                        name: "Point"
+                        name: "수동 초기화"
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
@@ -1001,24 +1003,42 @@ Item {
                             }
                         }
                     }
+                    Item_button{
+                        id: btn_auto_init
+                        width: 78
+                        shadow_color: color_gray
+                        icon:"icon/icon_auto_init.png"
+                        name:"자동 초기화"
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                if(supervisor.getStateInit() !== 2){
+                                    btn_auto_init.running = true;
+                                    supervisor.slam_autoInit();
+                                }
+
+                            }
+                        }
+                    }
                 }
             }
             Rectangle{
-                id: rect_annot_box2
-                width: parent.width - 60
+                width: rect_menu1.width - 60
                 height: 100
-                anchors.horizontalCenter: parent.horizontalCenter
+                visible: map.tool==="SLAM_INIT"?true:false
                 anchors.top: rect_annot_box.bottom
                 anchors.topMargin: 50
+                anchors.horizontalCenter: parent.horizontalCenter
                 color: "transparent"
                 Row{
                     anchors.centerIn: parent
-                    spacing: 30
+                    spacing: 20
                     Item_button{
                         id: btn_run
                         width: 78
                         icon:"icon/icon_run.png"
                         name:"Run"
+                        shadow_color: color_gray
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
@@ -1033,6 +1053,7 @@ Item {
                         width: 78
                         icon:"icon/icon_stop.png"
                         name:"Stop"
+                        shadow_color: color_gray
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
@@ -1047,6 +1068,7 @@ Item {
                         width: 78
                         icon:"icon/icon_set_init.png"
                         name:"Set Init"
+                        shadow_color: color_gray
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
@@ -1057,41 +1079,106 @@ Item {
                             }
                         }
                     }
-                    Item_button{
-                        id: btn_auto_init
-                        width: 78
-                        icon:"icon/icon_auto_init.png"
-                        name:"Auto Init"
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                if(supervisor.getStateInit() !== 2){
-                                    btn_auto_init.running = true;
-                                    supervisor.slam_autoInit();
-                                }
-
-                            }
-                        }
-                    }
                 }
             }
 
             Rectangle{
-                id: rect_localization_help
-                width: parent.width - 60
+                width: parent.width*0.9
                 height: 200
                 radius: 10
+//                anchors.bottom: parent.bottom
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 50
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: rect_annot_box2.bottom
-                anchors.topMargin: 30
-                color: "white"
-                Text{
-                    text: "1. 로봇의 현재 위치와 방향대로 Point를 새로 찍어주세요.\n2. Set Init 버튼을 눌러 새로운 Point에 맞게 초기화를 시킵니다.\n3. lidar 데이터가 맵과 일치하는 지 확인하고 위 과정을 반복해주세요.\n4. Run 버튼을 눌러 Localization을 실행합니다."
-                    font.family: font_noto_r.name
+                Column{
                     anchors.centerIn: parent
+                    spacing: 10
+                    Text{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "* 안 내 사 항 *"
+                        font.pixelSize: 18
+                        font.bold: true
+                        font.family: font_noto_b.name
+                        color: color_red
+                    }
+                    Grid{
+                        rows: 6
+                        columns: 2
+                        Text{
+                            text: "1."
+                            font.pixelSize: 13
+                            font.family: font_noto_r.name
+                            color: color_red
+                        }
+                        Text{
+                            text: "Emergency가 눌려있다면 풀어주세요."
+                            font.pixelSize: 13
+                            font.family: font_noto_r.name
+                            color: color_red
+                        }
+                        Text{
+                            text: "2."
+                            font.pixelSize: 13
+                            font.family: font_noto_r.name
+                            color: color_red
+                        }
+                        Text{
+                            text: "자동 초기화 버튼을 눌러 초기화를 시작합니다. (약 3-5초 소요)"
+                            font.pixelSize: 13
+                            font.family: font_noto_r.name
+                            color: color_red
+                        }
+                        Text{
+                            text: "3."
+                            font.pixelSize: 13
+                            font.family: font_noto_r.name
+                            color: color_red
+                        }
+                        Text{
+                            text: "라이다 데이터가 맵과 일치하는 지 확인해주세요."
+                            font.pixelSize: 13
+                            font.family: font_noto_r.name
+                            color: color_red
+                        }
+                        Text{
+                            text: "4."
+                            font.pixelSize: 13
+                            font.family: font_noto_r.name
+                            color: color_red
+                        }
+                        Text{
+                            text: "일치하지 않는다면 수동 초기화 버튼을 누르세요."
+                            font.pixelSize: 13
+                            font.family: font_noto_r.name
+                            color: color_red
+                        }
+                        Text{
+                            text: "5."
+                            font.pixelSize: 13
+                            font.family: font_noto_r.name
+                            color: color_red
+                        }
+                        Text{
+                            text: "맵 상에서 로봇의 현재 위치와 방향대로 표시해주세요."
+                            font.pixelSize: 13
+                            font.family: font_noto_r.name
+                            color: color_red
+                        }
+                        Text{
+                            text: "6."
+                            font.pixelSize: 13
+                            font.family: font_noto_r.name
+                            color: color_red
+                        }
+                        Text{
+                            text: "Set Init 버튼을 누르고 라이다가 맵과 일치하는 지 확인해주세요."
+                            font.pixelSize: 13
+                            font.family: font_noto_r.name
+                            color: color_red
+                        }
+                    }
                 }
             }
-
             Timer{
                 id: update_timer
                 interval: 500

@@ -39,7 +39,7 @@ Supervisor::Supervisor(QObject *parent)
     usb_map_list.clear();
     usb_check = false;
     usb_check_count = 0;
-
+    map_rotate_angle = 0;
     canvas.clear();
     canvas_redo.clear();
     minimap_grid.clear();
@@ -2286,8 +2286,43 @@ bool Supervisor::getMotorConnection(int id){
 int Supervisor::getMotorStatus(int id){
     return probot->motor[id].status;
 }
+QString Supervisor::getMotorStatusStr(int id){
+    if(probot->motor[id].status == 0){
+        return " ";
+    }else{
+        QString str = "";
+        if(MOTOR_RUN(probot->motor[id].status) == 1)
+            str += "RUN";
+
+        if(MOTOR_MOD_ERROR(probot->motor[id].status) == 1)
+            str += " MOD";
+
+        if(MOTOR_JAM_ERROR(probot->motor[id].status) == 1)
+            str += " JAM";
+
+        if(MOTOR_CUR_ERROR(probot->motor[id].status) == 1)
+            str += " CUR";
+
+        if(MOTOR_BIG_ERROR(probot->motor[id].status) == 1)
+            str += " BIG";
+
+        if(MOTOR_INP_ERROR(probot->motor[id].status) == 1)
+            str += " INP";
+
+        if(MOTOR_PS_ERROR(probot->motor[id].status) == 1)
+            str += " PS";
+
+        if(MOTOR_COL_ERROR(probot->motor[id].status) == 1)
+            str += " COL";
+
+        return str;
+    }
+}
 int Supervisor::getMotorTemperature(int id){
     return probot->motor[id].temperature;
+}
+int Supervisor::getMotorWarningTemperature(){
+    return 40;
 }
 int Supervisor::getPowerStatus(){
     return probot->status_power;
