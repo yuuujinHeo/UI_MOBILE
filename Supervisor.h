@@ -363,6 +363,7 @@ public:
     Q_INVOKABLE float getLocalPathy(int num);
 
     Q_INVOKABLE int getuistate();
+    Q_INVOKABLE void initdone();
 
 
 

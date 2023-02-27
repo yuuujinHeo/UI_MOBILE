@@ -5,7 +5,6 @@
         <file alias="bgm/song.mp3">../bgm/song.mp3</file>
         <file alias="bgm/voice_start_serving.mp3">../bgm/voice_start_serving.mp3</file>
         <file alias="bgm/voice_pickup.mp3">../bgm/voice_pickup.mp3</file>
-        <file alias="bgm/voice_move_wait.mpga">../bgm/voice_move_wait.mpga</file>
         <file alias="bgm/voice_move_charge.mp3">../bgm/voice_move_charge.mp3</file>
         <file alias="bgm/voice_avoid.mp3">../bgm/voice_avoid.mp3</file>
         <file alias="image/warning.png">../image/warning.png</file>
@@ -103,7 +102,10 @@
         <file alias="icon/keyboard_left.png">../icon/keyboard_left.png</file>
         <file alias="icon/keyboard_right.png">../icon/keyboard_right.png</file>
         <file alias="icon/keyboard_up.png">../icon/keyboard_up.png</file>
-        <file alias="bgm/voice_pickup1.mp3">../bgm/voice_pickup1.mp3</file>
-        <file alias="bgm/voice_start_serving1.mp3">../bgm/voice_start_serving1.mp3</file>
+        <file alias="bgm/voice_movefail.mp3">../bgm/voice_movefail.mp3</file>
+        <file alias="bgm/voice_move_wait.mp3">../bgm/voice_move_wait.mp3</file>
+        <file alias="bgm/voice_start_charge.mp3">../bgm/voice_start_charge.mp3</file>
+        <file alias="bgm/voice_stop_charge.mp3">../bgm/voice_stop_charge.mp3</file>
+        <file alias="bgm/voice_thanks.mp3">../bgm/voice_thanks.mp3</file>
     </qresource>
 </RCC>

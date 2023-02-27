@@ -1671,7 +1671,7 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 // start random patrol (serving)
-                                if(supervisor.getuistate() === 1){//ROBOT READY
+                                if(supervisor.getuistate() === 2){//ROBOT READY
                                     supervisor.runRotateTables();
                                 }
 
@@ -1694,7 +1694,7 @@ Item {
                             onClicked: {
                                 // start random patrol (serving)
                                 print(supervisor.getuistate())
-                                if(supervisor.getuistate() === 1){//ROBOT READY
+                                if(supervisor.getuistate() === 2){//ROBOT READY
                                     supervisor.startServingTest();
                                 }
                             }
