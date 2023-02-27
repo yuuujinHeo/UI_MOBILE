@@ -143,20 +143,15 @@ Item {
 
             Image{
                 id: image_battery
-                property string src:""
                 source: {
                     if(robot_battery > 90){
-                        src = "icon/bat_full.png"
-                        src
+                        "icon/bat_full.png"
                     }else if(robot_battery > 60){
-                        src = "icon/bat_3.png"
-                        src
+                        "icon/bat_3.png"
                     }else if(robot_battery > 30){
-                        src = "icon/bat_2.png"
-                        src
+                        "icon/bat_2.png"
                     }else{
-                        src = "icon/bat_1.png"
-                        src
+                        "icon/bat_1.png"
                     }
                 }
                 sourceSize.width: 46
@@ -266,7 +261,7 @@ Item {
             model_details.append({"detail":"로봇과 연결되지 않았습니다.","icon":"icon/icon_lcm_discon.png","error":true});
         }
         if(robot_battery < 30 && is_con_robot){
-            model_details.append({"detail":"배터리가 부족합니다.","icon":qsTr(image_battery.src),"error":true});
+            model_details.append({"detail":"배터리가 부족합니다.","icon":qsTr(image_battery.source),"error":true});
         }
     }
 

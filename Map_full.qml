@@ -12,7 +12,6 @@ Item {
     width: 1000
     height: 1000
     onWidthChanged: {
-        print("width : ",width, robot_following)
         if(robot_following){
             var newx = width/2 - robot_x*mapview.newscale;
             var newy = height/2 - robot_y*mapview.newscale;
@@ -22,10 +21,7 @@ Item {
             }else if(newx < - map_width*mapview.newscale + width){
                 mapview.x = - map_width*mapview.newscale + width
             }else{
-                print("width change x 1")
-//                mapview.newx = newx;
                 mapview.x = newx;
-                print("width change x 2")
             }
 
             if(newy  > 0){
@@ -35,7 +31,7 @@ Item {
             }else{
                 mapview.y = newy;
             }
-            print(newx, newy, mapview.x, mapview.y)
+//            print(newx, newy, mapview.x, mapview.y)
         }
     }
 
@@ -81,13 +77,10 @@ Item {
 
             if(newx > 0){
                 mapview.x = 0;
-                print("?"," 0")
             }else if(newx < - map_width*mapview.newscale + width){
                 mapview.x = - map_width*mapview.newscale + width
-                print("?",map_width*mapview.newscale + width)
             }else{
                 mapview.x = newx;
-                print("?",newx)
             }
 
             if(newy  > 0){
@@ -97,20 +90,16 @@ Item {
             }else{
                 mapview.y = newy;
             }
-            print(newx, newy)
         }
     }
     onRobot_xChanged: {
         if(robot_following){
             var newx = width/2 - (robot_x)*mapview.newscale;
             if(newx > 0){
-//                print("??",0)
                 mapview.x = 0;
             }else if(newx < - map_width*mapview.newscale + width){
-//                print("??",map_width*mapview.newscale + width)
                 mapview.x = - map_width*mapview.newscale + width
             }else{
-//                print("??",newx)
                 mapview.x = newx;
             }
         }
@@ -232,6 +221,7 @@ Item {
     function rotate_map(angle){
         supervisor.setRotateAngle(angle);
         canvas_map.rotation = angle;
+        print("ROTATE MAP : " ,angle);
         if(map_mode == "RAW"){
             mapview.setMap(supervisor.getRawMap(map_name));
         }else if(map_mode == "EDITED"){
@@ -253,6 +243,24 @@ Item {
     property string tool: "MOVE"
     property var brush_size: 10
     property color brush_color: "black"
+
+    onToolChanged: {
+        if(tool === "MOVE"){
+            supervisor.clear_all();
+            new_slam_init = false;
+            select_object= -1
+            select_object_point= -1
+            select_location= -1
+            select_patrol= -1
+            select_line= -1
+            select_travel_line= -1
+            select_location_show= -1
+            new_location= false
+            new_loc_available= false
+            new_object= false
+            update_canvas();
+        }
+    }
 
     property int location_num: supervisor.getLocationNum();
     property var location_types
@@ -396,7 +404,7 @@ Item {
 
                 x = -newx;
                 y = -newy;
-                print(centerx, centery, xscale, yscale, newx, newy)
+//                print(centerx, centery, xscale, yscale, newx, newy)
             }
         }
 
@@ -475,7 +483,7 @@ Item {
                     new_scale = mapview.newscale - 0.1;
                     if(rect_map.width > new_scale*map_width){
                         mapview.newscale = rect_map.width/map_width;
-                        print(rect_map.width, map_width)
+//                        /*print*/(rect_map.width, map_width)
                     }else{
                         mapview.newscale = new_scale;
                     }
@@ -524,7 +532,7 @@ Item {
                         var dy = Math.abs(point_y1-point_y2);
                         var dist = Math.sqrt(dx*dx + dy*dy);
                         area_map.startDist = dist;
-                        print("PRESS : ",mapview.centerx, mapview.centery, mapview.newscale);
+//                        /*print*/("PRESS : ",mapview.centerx, mapview.centery, mapview.newscale);
                     }else if(point1.pressed){
                         area_map.startX = point1.x;
                         area_map.startY = point1.y;
@@ -619,7 +627,7 @@ Item {
                             tool = "NONE";
                         }
                     }else if(tool == "ADD_OBJECT"){
-                        print("addObjectPoint"+new_obj_x1,new_obj_x2);
+//                        print("addObjectPoint"+new_obj_x1,new_obj_x2);
                         supervisor.addObjectPoint(new_obj_x1,new_obj_y1);
                         supervisor.addObjectPoint(new_obj_x1,new_obj_y2);
                         supervisor.addObjectPoint(new_obj_x2,new_obj_y2);
@@ -714,7 +722,7 @@ Item {
                     }else{
                         new_loc_th = Math.atan2(-(point_x1-new_loc_x),-(point_y1-new_loc_y));
                     }
-                    print("update : "+new_loc_th);
+//                    print("update : "+new_loc_th);
                     clear_canvas_location();
                     draw_canvas_location();
                     draw_canvas_location_icon();
@@ -1137,7 +1145,7 @@ Item {
         if(canvas_map.available){
             var ctx = canvas_map.getContext('2d');
             if(refresh){
-                print("Refresh Canvas Map Lines");
+//                print("Refresh Canvas Map Lines");
                 ctx.clearRect(0,0,canvas_map.width,canvas_map.height);
                 for(var i=0; i<supervisor.getCanvasSize(); i++){
                     ctx.lineWidth = supervisor.getLineWidth(i);
@@ -1813,6 +1821,7 @@ Item {
                 ctx.fillStyle = "#05C9FF";
                 if(path_num != 0){
                     var localpath_num = supervisor.getLocalPathNum();
+//                    print("local num : ",localpath_num);
                     for(var i=0; i<localpath_num; i++){
                         ctx.beginPath();
                         var local_x = supervisor.getLocalPathx(i)/grid_size +origin_x;

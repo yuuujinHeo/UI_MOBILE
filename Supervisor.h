@@ -13,6 +13,16 @@
 #include "MapView.h"
 #include <libusb-1.0/libusb.h>
 
+
+#define MOTOR_RUN(x)            ((x)&0x01)
+#define MOTOR_MOD_ERROR(x)      ((x>>1)&0x01)
+#define MOTOR_JAM_ERROR(x)      ((x>>2)&0x01)
+#define MOTOR_CUR_ERROR(x)      ((x>>3)&0x01)
+#define MOTOR_BIG_ERROR(x)      ((x>>4)&0x01)
+#define MOTOR_INP_ERROR(x)      ((x>>5)&0x01)
+#define MOTOR_PS_ERROR(x)       ((x>>6)&0x01)
+#define MOTOR_COL_ERROR(x)      ((x>>7)&0x01)
+
 class Supervisor : public QObject
 {
     Q_OBJECT
@@ -336,7 +346,9 @@ public:
 
     Q_INVOKABLE bool getMotorConnection(int id);
     Q_INVOKABLE int getMotorStatus(int id);
+    Q_INVOKABLE QString getMotorStatusStr(int id);
     Q_INVOKABLE int getMotorTemperature(int id);
+    Q_INVOKABLE int getMotorWarningTemperature();
     Q_INVOKABLE int getPowerStatus();
     Q_INVOKABLE int getRemoteStatus();
     Q_INVOKABLE int getChargeStatus();

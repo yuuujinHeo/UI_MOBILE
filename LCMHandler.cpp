@@ -286,6 +286,7 @@ void LCMHandler::robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::
     connect_count = 0;
     flagPath = true;
     probot->pathSize = msg->num;
+    qDebug() <<"ROBOT PATH CALL BACK " << probot->pathSize;
     for(int i=0; i<probot->pathSize; i++){
         ST_POSE temp;
         temp.x = msg->path[i][0];
