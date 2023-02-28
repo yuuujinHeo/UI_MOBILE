@@ -58,7 +58,7 @@ public:
     void subscribe();
 
     ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
-    void sendCommand(command cmd, QString msg);
+    void sendCommand(command cmd, QString msg, bool force=false);
     void sendCommand(int cmd, QString msg);
     void programStart();
     void moveToLast();

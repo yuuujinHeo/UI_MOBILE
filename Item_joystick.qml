@@ -150,6 +150,7 @@ Item {
         touchPoints: TouchPoint{id: point}
         onPressed: {
             print("pressed")
+            update_cnt = 0;
             returnAnimation.stop();
         }
         onReleased: {
@@ -160,7 +161,6 @@ Item {
         }
         onTouchUpdated: {
             if(pressed){
-
                 update_cnt++;
                 print(point.x,point.y)
 

@@ -325,9 +325,10 @@ Item {
                     id: joy_xy
                     verticalOnly: true
                     onUpdate_cntChanged: {
+                        print("XY : ",update_cnt,supervisor.getJoyXY())
                         if(update_cnt == 0 && supervisor.getJoyXY() != 0){
                             supervisor.joyMoveXY(0, 0);
-                        }else{
+                        }else if(update_cnt > 2){
                             if(fingerInBounds) {
                                 supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
                             }else{
@@ -340,9 +341,10 @@ Item {
                     id: joy_th
                     horizontalOnly: true
                     onUpdate_cntChanged: {
+                        print("R : ",update_cnt,supervisor.getJoyR())
                         if(update_cnt == 0 && supervisor.getJoyR() != 0){
                             supervisor.joyMoveR(0, 0);
-                        }else{
+                        }else if(update_cnt > 2){
                             if(fingerInBounds) {
                                 supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
                             } else {
@@ -898,7 +900,7 @@ Item {
                         onUpdate_cntChanged: {
                             if(update_cnt == 0 && supervisor.getJoyXY() != 0){
                                 supervisor.joyMoveXY(0, 0);
-                            }else{
+                            }else if(update_cnt > 2){
                                 if(fingerInBounds) {
                                     supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
                                 }else{
@@ -914,7 +916,7 @@ Item {
                         onUpdate_cntChanged: {
                             if(update_cnt == 0 && supervisor.getJoyR() != 0){
                                 supervisor.joyMoveR(0, 0);
-                            }else{
+                            }else if(update_cnt > 2){
                                 if(fingerInBounds) {
                                     supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
                                 } else {
@@ -3581,7 +3583,7 @@ Item {
                         onUpdate_cntChanged: {
                             if(update_cnt == 0 && supervisor.getJoyXY() != 0){
                                 supervisor.joyMoveXY(0, 0);
-                            }else{
+                            }else if(update_cnt > 2){
                                 if(fingerInBounds) {
                                     supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
                                 }else{
@@ -3597,7 +3599,7 @@ Item {
                         onUpdate_cntChanged: {
                             if(update_cnt == 0 && supervisor.getJoyR() != 0){
                                 supervisor.joyMoveR(0, 0);
-                            }else{
+                            }else if(update_cnt > 2){
                                 if(fingerInBounds) {
                                     supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
                                 } else {

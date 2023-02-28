@@ -569,20 +569,20 @@ bool Supervisor::isExistAnnotation(QString name){
     QString file_meta = getMetaPath(name);
     QString file_annot = getAnnotPath(name);
 
-    //map_meta.ini 파일이 없으면 기본세팅된 값으로 만든다. (필수)
-    if(!QFile::exists(file_meta)){
-        QSettings settings(file_meta, QSettings::IniFormat);
-        settings.clear();
-        settings.setValue("map_metadata/map_w",1000);
-        settings.setValue("map_metadata/map_h",1000);
-        settings.setValue("map_metadata/map_grid_width",QString::number(0.03));
-        settings.setValue("map_metadata/map_origin_u",500);
-        settings.setValue("map_metadata/map_origin_v",500);
-        plog->write("[SETTING] map_meta.ini not found -> make basic format");
-        if(pmap->map_loaded){
-            setSetting("FLOOR/map_load","false");
-        }
-    }
+    //map_meta.ini 파일이 없으면 기본세팅된 값으로 만든다.
+//    if(!QFile::exists(file_meta)){
+//        QSettings settings(file_meta, QSettings::IniFormat);
+//        settings.clear();
+//        settings.setValue("map_metadata/map_w",1000);
+//        settings.setValue("map_metadata/map_h",1000);
+//        settings.setValue("map_metadata/map_grid_width",QString::number(0.03));
+//        settings.setValue("map_metadata/map_origin_u",500);
+//        settings.setValue("map_metadata/map_origin_v",500);
+//        plog->write("[SETTING] map_meta.ini not found -> make basic format");
+//        if(pmap->map_loaded){
+//            setSetting("FLOOR/map_load","false");
+//        }
+//    }
     return QFile::exists(file_annot);
 }
 
