@@ -11,7 +11,6 @@ MapView::MapView(QQuickItem *parent):
 void MapView::setMap(QObject *pixmapContainer){
     PixmapContainer *pc = qobject_cast<PixmapContainer*>(pixmapContainer);
     Q_ASSERT(pc);
-    qDebug() << "SetMap ";
     m_pixmapContainer.pixmap = pc->pixmap;
     update();
 }
