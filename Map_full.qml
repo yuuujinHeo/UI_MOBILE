@@ -41,7 +41,7 @@ Item {
     //불러올 맵 파일 모드(RAW, EDITED, MINIMAP, MAPPING)
     property string map_mode: "EDITED"
     onMap_modeChanged: {
-        print(map_mode);
+        print("MAP_MODE : "+map_mode);
     }
 
     //그리기 기능
@@ -1030,15 +1030,15 @@ Item {
         id: update_map
         running: show_robot
         repeat: true
-        interval: 200
+        interval: 500
         onTriggered: {
             if(supervisor.getLCMConnection()){
                 is_slam_running = supervisor.is_slam_running();
-                draw_canvas_current();
                 robot_x = supervisor.getRobotx()/grid_size + origin_x;
                 robot_y = supervisor.getRoboty()/grid_size + origin_y;
                 robot_th = -supervisor.getRobotth()-Math.PI/2;
                 path_num = supervisor.getPathNum();
+                draw_canvas_current();
             }
         }
     }

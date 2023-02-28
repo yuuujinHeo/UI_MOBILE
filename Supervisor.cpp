@@ -561,9 +561,11 @@ void Supervisor::deleteAnnotation(){
     pmap->vecLocation.clear();
     pmap->vecTline.clear();
     pmap->vecObject.clear();
+
     list_obj_dR.clear();
     list_obj_uL.clear();
-    readSetting();
+
+//    readSetting();
 }
 bool Supervisor::isExistAnnotation(QString name){
     QString file_meta = getMetaPath(name);
@@ -1366,7 +1368,6 @@ void Supervisor::setRotateAngle(float angle){
     map_rotate_angle = angle;
 }
 int Supervisor::getRedoSize(){
-    qDebug() <<canvas_redo.size();
     return canvas_redo.size();
 }
 QVector<int> Supervisor::getLineX(int index){

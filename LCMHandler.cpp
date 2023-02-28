@@ -336,7 +336,7 @@ void LCMHandler::robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const
 }
 
 void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data *msg){
-     isconnect = true;
+    isconnect = true;
      connect_count = 0;
      pmap->width = msg->map_w;
      pmap->height = msg->map_h;

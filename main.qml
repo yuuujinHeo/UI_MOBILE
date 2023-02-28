@@ -8,6 +8,7 @@ import "."
 import io.qt.Supervisor 1.0
 import io.qt.Keyemitter 1.0
 import QtMultimedia 5.12
+import io.qt.MapView 1.0
 
 Window {
     id: mainwindow
@@ -117,6 +118,7 @@ Window {
         }
     }
     function updatemapping(){
+//        mapview.setMap(supervisor.getMapping())
         if(loader_page.item.objectName == "page_map"){
             loader_page.item.update_mapping();
         }

@@ -585,9 +585,9 @@ Item {
             }
             Timer{
                 id: timer_check_keyboard
-                running: true
+                running: supervisor.getEmoStatus()?false:true
                 repeat: true
-                interval: 200
+                interval: 500
                 onTriggered: {
                     if(prev_u == count_u && count_u > 0){
                         keyboard_arrow.pressed_up = false;
@@ -745,6 +745,9 @@ Item {
                 running: true
                 repeat: true
                 onTriggered:{
+                    if(supervisor.is_slam_running() && btn_auto_init.running){
+                        btn_auto_init.running = false;
+                    }
                     if(supervisor.getMappingflag()){
                         is_mapping = true;
                     }else{
@@ -752,6 +755,8 @@ Item {
                     }
 
                     if(supervisor.getEmoStatus()){
+                        timer_check_keyboard.stop();
+                        timer_get_joy.stop();
                         col_manual.visible = true;
                         switch_joy.onoff = true;
                         row_joysticks.visible = false;
@@ -1181,18 +1186,6 @@ Item {
                     }
                 }
             }
-            Timer{
-                id: update_timer
-                interval: 500
-                running: true
-                repeat: true
-                onTriggered:{
-                    if(supervisor.is_slam_running() && btn_auto_init.running){
-                        print("slam run!");
-                        btn_auto_init.running = false;
-                    }
-                }
-            }
         }
     }
 
@@ -1217,7 +1210,6 @@ Item {
                 curindex = index;
             }
             function viewlast(){
-
                 area_patrol_list.contentY = area_patrol_list.contentHeight
             }
             Component.onCompleted: {
@@ -1237,9 +1229,6 @@ Item {
 
                         }
                     }
-
-
-
                 }
             }
             function update(){
@@ -2075,6 +2064,7 @@ Item {
                             onClicked:{
                                 map.state_annotation = "DRAWING";
                                 map.init_mode();
+                                map.show_connection = false;
                                 loader_menu.sourceComponent = menu_annot_rotate;
                             }
                         }
@@ -2270,6 +2260,7 @@ Item {
                             onClicked:{
                                 map.init_mode();
                                 map.state_annotation = "NONE";
+                                map.show_connection = false;
                                 loader_menu.sourceComponent = menu_annot_state;
                             }
                         }
@@ -2411,7 +2402,7 @@ Item {
             Timer{
                 running: true
                 repeat: true
-                interval: 200
+                interval: 500
                 triggeredOnStart: true
                 onTriggered: {
                     if(supervisor.getCanvasSize() > 0)
@@ -2657,6 +2648,7 @@ Item {
                             onClicked:{
                                 map.init_mode();
                                 map.state_annotation = "DRAWING";
+                                map.show_connection = false;
                                 loader_menu.sourceComponent = menu_annot_rotate;
                             }
                         }
@@ -3025,6 +3017,7 @@ Item {
                             onClicked: {
                                 if(map.tool == "ADD_OBJECT"){
                                     supervisor.clearObjectPoints();
+                                    map.new_object = false;
                                 }else if(map.tool == "ADD_POINT"){
                                     supervisor.removeObjectPointLast();
                                 }
@@ -3100,6 +3093,7 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 map.init_mode();
+                                map.show_connection = false;
                                 supervisor.clearObjectPoints();
                                 map.state_annotation = "DRAWING";
                                 loader_menu.sourceComponent = menu_annot_draw;
@@ -3659,6 +3653,7 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 map.init_mode();
+                                map.show_connection = false;
                                 map.state_annotation = "OBJECT";
                                 loader_menu.sourceComponent = menu_annot_object;
                             }
@@ -3683,6 +3678,7 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 map.init_mode();
+                                map.show_connection = false;
                                 map.state_annotation = "SAVE";
                                 loader_menu.sourceComponent = menu_annot_save;
 //                                map.init_mode();
@@ -4046,7 +4042,6 @@ Item {
                                 //맵 다시 불러오기
                                 map_current.map_mode = "EDITED";
                                 map_current.loadmap(supervisor.getMapname(),"EDITED");
-                                map_current.update_map();
                                 map_current.update_canvas();
                             }
                         }
@@ -4532,6 +4527,7 @@ Item {
                                     //맵 새로 불러오기.
                                     supervisor.setMap(textfield_name22.text);
                                     map.init_mode();
+                                    map.show_connection = false;
                                     map.loadmap(textfield_name22.text,"RAW");
 
                                     supervisor.clear_all();
