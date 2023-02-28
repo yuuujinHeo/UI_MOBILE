@@ -929,7 +929,9 @@ Item {
             if(supervisor.getEmoStatus()){
                 text_reason.text = "Emergency 눌림(수동모드)"
                 rect_emo.color = color_green;
+                btn_manual.running = true;
             }else{
+                btn_manual.running = false;
                 rect_emo.color = color_light_gray;
             }
             if(supervisor.getRemoteStatus()){

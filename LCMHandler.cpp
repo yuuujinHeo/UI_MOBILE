@@ -35,24 +35,32 @@ LCMHandler::~LCMHandler(){
 
 
 ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
-void LCMHandler::sendCommand(command cmd, QString msg){
+void LCMHandler::sendCommand(command cmd, QString msg, bool force){
     if(!pmap->use_uicmd){
         plog->write("[LCM ERROR] SEND COMMAND (BLOCKED) : " + msg);
     }else if(isconnect){
-        if(probot->init_state != ROBOT_INIT_NOT_READY){
-            if(is_debug){
-                lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&cmd);
-                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
-            }else{
-                lcm.publish("COMMAND_"+probot->name.toStdString(),&cmd);
-                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
-            }
-            flag_tx = true;
+        if(is_debug){
+            lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&cmd);
+            plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
         }else{
-            if(msg != ""){
-                plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) TO COMMAND_" + probot->name + ": " + msg);
-            }
+            lcm.publish("COMMAND_"+probot->name.toStdString(),&cmd);
+            plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
         }
+        flag_tx = true;
+//        if(probot->init_state != ROBOT_INIT_NOT_READY || force){
+//            if(is_debug){
+//                lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&cmd);
+//                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
+//            }else{
+//                lcm.publish("COMMAND_"+probot->name.toStdString(),&cmd);
+//                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
+//            }
+//            flag_tx = true;
+//        }else{
+//            if(msg != ""){
+//                plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) TO COMMAND_" + probot->name + ": " + msg);
+//            }
+//        }
     }else{
         if(msg != ""){
             plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) TO COMMAND_" + probot->name + ": " + msg);
@@ -68,18 +76,26 @@ void LCMHandler::sendCommand(int cmd, QString msg){
     if(!pmap->use_uicmd){
         plog->write("[LCM ERROR] SEND COMMAND (BLOCKED) : " + msg);
     }else if(isconnect){
-        if(probot->init_state != ROBOT_INIT_NOT_READY){
-            if(is_debug){
-                lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&send_msg);
-                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
-            }else{
-                lcm.publish("COMMAND_"+probot->name.toStdString(),&send_msg);
-                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
-            }
-            flag_tx = true;
+        if(is_debug){
+            lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&send_msg);
+            plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
         }else{
-            plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) TO COMMAND_" + probot->name + ": " + msg);
+            lcm.publish("COMMAND_"+probot->name.toStdString(),&send_msg);
+            plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
         }
+        flag_tx = true;
+//        if(probot->init_state != ROBOT_INIT_NOT_READY){
+//            if(is_debug){
+//                lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&send_msg);
+//                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
+//            }else{
+//                lcm.publish("COMMAND_"+probot->name.toStdString(),&send_msg);
+//                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
+//            }
+//            flag_tx = true;
+//        }else{
+//            plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) TO COMMAND_" + probot->name + ": " + msg);
+//        }
     }else{
         plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) TO COMMAND_" + probot->name + ": " + msg);
         lcm.publish("COMMAND_"+probot->name.toStdString(),&send_msg);
