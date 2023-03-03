@@ -1137,6 +1137,7 @@ Item {
             color: "#282828"
             opacity: 0.7
         }
+        property string name: ""
         Rectangle{
             anchors.centerIn: parent
             width: 400
@@ -1199,15 +1200,13 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
-                                popup_annotation_delete.close();
-                                popup_map_list.close();
                                 supervisor.deleteAnnotation();
                                 loadPage(pmap);
-//                                loader_page.item.loadmap(temp_name);
+                                loader_page.item.loadmap(popup_annotation_delete.name,"RAW");
                                 loader_page.item.is_init_state = true;
                                 loader_page.item.map_mode = 2;
-                                loader_page.item.set_map_raw();
-                                loader_page.item.init_map();
+                                popup_annotation_delete.close();
+                                popup_map_list.close();
                             }
                         }
                     }

@@ -325,6 +325,7 @@ Item {
 
         }else if(state_annotation == "OBJECT"){
             show_object = true;
+            show_location = true;
         }else if(state_annotation == "LOCATION"){
             show_object = true;
             show_robot = true;

@@ -69,6 +69,9 @@ Window {
             loadPage(pmovefail);
         }
     }
+    function stateinit(){
+        loadPage(pinit);
+    }
 
     function movelocation(){
         cur_location = supervisor.getcurLoc();

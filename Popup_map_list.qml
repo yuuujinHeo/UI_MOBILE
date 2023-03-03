@@ -27,6 +27,34 @@ Popup{
             list_map.model.append({"name":supervisor.getAvailableMapPath(i),"selected":false});
             if(mapname === supervisor.getAvailableMapPath(i)){
                 select_map_list = i;
+
+                if(supervisor.isExistMap(mapname)){
+                    map_list_view.loadmap(mapname,"EDITED");
+                    if(supervisor.isExistAnnotation(mapname)){
+                        btn_use.enabled = true;
+                        btn_draw.enabled = true;
+                        btn_draw_new.enabled = true;
+                    }else{
+                        btn_draw_new.enabled = true;
+                    }
+                }else{
+                    map_list_view.loadmap(mapname,"RAW");
+                    if(supervisor.isExistRawMap(mapname)){
+                        btn_draw_new.enabled = true;
+                        if(supervisor.isExistAnnotation(mapname)){
+                            btn_draw.enabled = true;
+                        }
+                    }else{
+
+                    }
+                }
+                list_map_detail.model.clear();
+                var num = supervisor.getMapFileSize(mapname);
+                for(var i=0; i<num; i++){
+                    list_map_detail.model.append({"name":supervisor.getMapFile(i)});
+                }
+
+                supervisor.readSetting(mapname);
             }
         }
         btn_use.enabled = false;
@@ -365,6 +393,7 @@ Popup{
                                         var name = list_map.model.get(select_map_list).name;
                                         if(supervisor.isExistAnnotation(name)){
                                             temp_name = list_map.model.get(select_map_list).name;
+                                            popup_annotation_delete.name = name;
                                             popup_annotation_delete.open();
                                         }else{
                                             popup_map_list.close();

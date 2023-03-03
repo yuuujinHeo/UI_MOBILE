@@ -1407,8 +1407,10 @@ void Supervisor::saveMap(QString mode, QString src, QString dst, QList<int> data
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
     cv::warpAffine(map,map,rot,map.size(),cv::INTER_LANCZOS4);
 
+
+
     for(int i=0; i<alpha.size(); i++){
-        if(alpha[i] > 0){
+        if(alpha[i] > 200){
             map.data[i] = data[i];
         }
     }
@@ -2805,6 +2807,7 @@ void Supervisor::onTimer(){
         // 로봇연결이 끊어졌는데 ui_state가 NONE이 아니면
         if(ui_state != UI_STATE_NONE){
             ui_state = UI_STATE_NONE;
+            QMetaObject::invokeMethod(mMain, "stateinit");
             plog->write("[LCM] DISCONNECT -> UI_STATE = NONE");
         }
     }
