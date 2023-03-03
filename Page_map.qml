@@ -52,6 +52,10 @@ Item {
         loader_menu.item.setindex(select_patrol_num);
     }
 
+    function set_map_raw(){
+        map.map_mode = "RAW";
+    }
+
     function update_mapping(){
         if(map_mode == 1){
             map.loadmapping();
@@ -1116,7 +1120,7 @@ Item {
                 radius: 10
 //                anchors.bottom: parent.bottom
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: 50
+                anchors.bottomMargin: 100
                 anchors.horizontalCenter: parent.horizontalCenter
                 Column{
                     anchors.centerIn: parent
