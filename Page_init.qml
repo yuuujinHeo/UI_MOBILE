@@ -1203,10 +1203,11 @@ Item {
                                 popup_map_list.close();
                                 supervisor.deleteAnnotation();
                                 loadPage(pmap);
-                                loader_page.item.loadmap(temp_name);
+//                                loader_page.item.loadmap(temp_name);
                                 loader_page.item.is_init_state = true;
                                 loader_page.item.map_mode = 2;
-                                loader_page.item.init();
+                                loader_page.item.set_map_raw();
+                                loader_page.item.init_map();
                             }
                         }
                     }
