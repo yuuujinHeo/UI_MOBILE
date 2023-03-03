@@ -825,7 +825,7 @@ Item {
             }else if(init_mode == 3){
                 if(loader_init.item.objectName != "init_slam")
                     loader_init.sourceComponent = item_slam_init
-                if(supervisor.getStateInit() === 4){
+                if(supervisor.getLocalizationState() === 2 && supervisor.getMotorState() == 1){
                     init_mode = 4;
                     update_timer.stop();
                     loadPage(pkitchen);

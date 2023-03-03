@@ -339,7 +339,8 @@ public:
     Q_INVOKABLE void resetHomeFolders();
     ////*********************************************  ROBOT STATUS 관련   ***************************************************////
     Q_INVOKABLE float getBattery();
-    Q_INVOKABLE int getStateInit();
+    Q_INVOKABLE int getMotorState();
+    Q_INVOKABLE int getLocalizationState();
     Q_INVOKABLE int getStateMoving();
     Q_INVOKABLE int getErrcode();
     Q_INVOKABLE QString getRobotName();

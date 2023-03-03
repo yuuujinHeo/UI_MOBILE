@@ -982,7 +982,7 @@ Item {
                     if(supervisor.is_slam_running()){
                         btn_auto_init.running = false;
                         timer_check_localization.stop();
-                    }else if(supervisor.getStateInit() === 0 || supervisor.getStateInit() === 3){
+                    }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
                         timer_check_localization.stop();
                         btn_auto_init.running = false;
                     }
@@ -1011,6 +1011,7 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 map.tool = "MOVE";
+                                map.reset_canvas();
                             }
                         }
                     }
@@ -1036,7 +1037,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                if(supervisor.getStateInit() !== 2){
+                                if(supervisor.getLocalizationState() !== 1){
                                     btn_auto_init.running = true;
                                     supervisor.slam_autoInit();
                                     timer_check_localization.start();
@@ -1069,6 +1070,7 @@ Item {
                             onClicked: {
                                 btn_run.show_ani();
                                 map.tool = "MOVE";
+                                map.reset_canvas();
                                 supervisor.slam_run();
                             }
                         }
@@ -1083,6 +1085,7 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 map.tool = "MOVE";
+                                map.reset_canvas();
                                 btn_stop.show_ani();
                                 supervisor.slam_stop();
                             }
@@ -1467,6 +1470,7 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     map.tool = "MOVE";
+                                    map.reset_canvas();
                                 }
                             }
                         }
@@ -1484,6 +1488,7 @@ Item {
                                         }
                                         canvas_location.isnewLoc = false;
                                         map.tool = "MOVE";
+                                        map.reset_canvas();
                                     }else{
                                         updatelocation();
                                         popup_add_patrol.open();
@@ -1677,6 +1682,7 @@ Item {
                                             onClicked: {
                                                 if(map.tool == "ADD_PATROL_LOCATION"){
                                                     map.tool = "MOVE";
+                                                    map.reset_canvas();
                                                 }
                                                 select_patrol_num = index + 1;
                                                 map.select_patrol = index + 1;
@@ -2558,7 +2564,7 @@ Item {
                             spacing: 25
                             property color paintColor: "black"
                             Repeater{
-                                model: ["#000000", "#262626", "#ffffff"]
+                                model: ["#000000", "#7f7f7f", "#ffffff"]
                                 Rectangle {
                                     id: red
                                     width: map.tool=="BRUSH"?(map.brush_color==modelData?26:23):23
@@ -2802,6 +2808,7 @@ Item {
                             map.select_object = supervisor.getObjNum(name);
                             list_object.currentIndex = index;
                             map.tool = "MOVE";
+                            map.reset_canvas();
                             map.update_canvas();
                         }
                     }
@@ -2846,6 +2853,7 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     map.tool = "MOVE";
+                                    map.reset_canvas();
                                     supervisor.clearObjectPoints();
                                 }
                             }
@@ -3300,6 +3308,7 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     map.tool = "MOVE";
+                                    map.reset_canvas();
                                     map.new_location = false;
                                     map.new_loc_x = 0;
                                     map.new_loc_y = 0;
@@ -3431,6 +3440,7 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     map.tool = "MOVE";
+                                    map.reset_canvas();
                                     map.new_location = false;
                                     map.new_loc_x = 0;
                                     map.new_loc_y = 0;
@@ -3519,6 +3529,7 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     map.tool = "MOVE";
+                                    map.reset_canvas();
                                     map.select_location = -1;
                                     map.select_location_show = -1;
                                     list_location.currentIndex = -1;
@@ -3555,6 +3566,7 @@ Item {
                                     map.new_loc_th = 0;
                                     map.new_loc_available = false;
                                     map.tool = "MOVE";
+                                    map.reset_canvas();
                                     map.update_canvas();
                                 }
                             }
@@ -4134,7 +4146,7 @@ Item {
         repeat: true
         property int trigger_cnt: 0
         onTriggered: {
-            if(supervisor.getStateInit() === 2){
+            if(supervisor.getLocalizationState() === 2){
                 if(slam_initializing == false){
                     slam_initializing = true;
                 }
@@ -5048,6 +5060,7 @@ Item {
                         }
                         map.update_canvas();
                         map.tool = "MOVE";
+                        map.reset_canvas();
                         popup_add_object.close();
                     }
                 }
@@ -5291,6 +5304,7 @@ Item {
                                 supervisor.addLocation(select_location_type,tfield_location.text, map.new_loc_x, map.new_loc_y, map.new_loc_th);
                             }
                             map.tool = "MOVE";
+                            map.reset_canvas();
                             map.new_location = false;
                             map.new_loc_x = 0;
                             map.new_loc_y = 0;
@@ -5372,6 +5386,7 @@ Item {
                         map.new_line_y1 = 0;
                         map.new_line_y2 = 0;
                         map.tool = "MOVE";
+                        map.reset_canvas();
                         popup_add_travelline.close();
                         map.update_canvas();
                     }else{
@@ -5453,6 +5468,7 @@ Item {
 
                                     map.new_location = false;
                                     map.tool = "MOVE";
+                                    map.reset_canvas();
                                     popup_add_patrol_1.close();
                                 }else if(modelData == "retry"){
                                     popup_add_patrol_1.close();

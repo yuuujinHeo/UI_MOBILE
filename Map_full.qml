@@ -152,7 +152,6 @@ Item {
             }else{
                 supervisor.writelog("[QML MAP] LoadMap Failed : Map mode is "+map_mode);
             }
-
         }else{
             supervisor.writelog("[QML MAP] LoadMap Failed : Map name is undefined");
             map_name = "";
@@ -245,22 +244,20 @@ Item {
     property var brush_size: 10
     property color brush_color: "black"
 
-    onToolChanged: {
-        if(tool === "MOVE"){
-            supervisor.clear_all();
-            new_slam_init = false;
-            select_object= -1
-            select_object_point= -1
-            select_location= -1
-            select_patrol= -1
-            select_line= -1
-            select_travel_line= -1
-            select_location_show= -1
-            new_location= false
-            new_loc_available= false
-            new_object= false
-            update_canvas();
-        }
+    function reset_canvas(){
+        supervisor.clear_all();
+        new_slam_init = false;
+        select_object= -1
+        select_object_point= -1
+        select_location= -1
+        select_patrol= -1
+        select_line= -1
+        select_travel_line= -1
+        select_location_show= -1
+        new_location= false
+        new_loc_available= false
+        new_object= false
+        update_canvas();
     }
 
     property int location_num: supervisor.getLocationNum();
@@ -1111,7 +1108,7 @@ Item {
                         rect_notice.msg =  "MAPPING";
                         rect_notice.color = color_navy;
                         rect_notice.show_icon = false;
-                    }else if(supervisor.getStateInit()===2){
+                    }else if(supervisor.getLocalizationState()===1){
                         rect_notice.visible = true;
                         rect_notice.msg =  "Localization";
                         rect_notice.color = color_navy;
@@ -1301,7 +1298,7 @@ Item {
                 var loc_th = supervisor.getLocationth(i);
                 if(loc_type.slice(0,4) == "Char"){
                     if(select_location == i){
-                        ctx.fillStyle = "#262626";
+                        ctx.fillStyle = "#7f7f7f";
                         ctx.strokeStyle = "#83B8F9";
                         ctx.lineWidth = 2;
                         ctx.beginPath();
@@ -1328,7 +1325,7 @@ Item {
                         ctx.drawImage(image_charging_selected,loc_x - image_charging_selected.width/2,loc_y - image_charging_selected.width/2, image_charging_selected.width, image_charging_selected.height);
 
                     }else{
-                        ctx.fillStyle = "#262626";
+                        ctx.fillStyle = "#7f7f7f";
                         ctx.strokeStyle = "white";
                         ctx.lineWidth = 1;
                         ctx.beginPath();
@@ -1339,7 +1336,7 @@ Item {
                     }
                 }else if(loc_type.slice(0,4) == "Rest"){
                     if(select_location === i){
-                        ctx.fillStyle = "#262626";
+                        ctx.fillStyle = "#7f7f7f";
                         ctx.strokeStyle = "#83B8F9";
                         ctx.lineWidth = 2;
                         ctx.beginPath();
@@ -1364,7 +1361,7 @@ Item {
                         ctx.stroke()
                         ctx.drawImage(image_resting_selected,loc_x - image_resting_selected.width/2,loc_y - image_resting_selected.width/2, image_resting_selected.width, image_resting_selected.height);
                     }else{
-                        ctx.fillStyle = "#262626";
+                        ctx.fillStyle = "#7f7f7f";
                         ctx.strokeStyle = "white";
                         ctx.lineWidth = 1;
                         ctx.beginPath();

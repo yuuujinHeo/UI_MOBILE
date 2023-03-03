@@ -115,7 +115,8 @@ typedef struct{
     float power = 0;
     float total_power = 0;
 
-    int init_state = 0;
+    int motor_state = 0;
+    int localization_state = 0;
     int running_state = 0;
     int err_code = 0;
 
@@ -252,13 +253,25 @@ enum UI_STATE{
     UI_STATE_MOVEFAIL
 };
 
-enum ROBOT_INIT_STATE{
-    ROBOT_INIT_NOT_READY = 0,
-    ROBOT_INIT_MOTOR_DONE,
-    ROBOT_INIT_LOCAL_START,
-    ROBOT_INIT_LOCAL_FAILED,
-    ROBOT_INIT_DONE
+enum ROBOT_MOTOR_STATE{
+    MOTOR_NOT_READY = 0,
+    MOTOR_READY
 };
+
+enum LOCALIZATION_STATE{
+    LOCAL_NOT_READY = 0,
+    LOCAL_START,
+    LOCAL_READY,
+    LOCAL_FAILED
+};
+
+//enum ROBOT_INIT_STATE{
+//    ROBOT_INIT_NOT_READY = 0,
+//    ROBOT_INIT_MOTOR_DONE,
+//    ROBOT_INIT_LOCAL_START,
+//    ROBOT_INIT_LOCAL_FAILED,
+//    ROBOT_INIT_DONE
+//};
 
 enum ROBOT_MOVING_STATE{
     ROBOT_MOVING_NOT_READY = 0,

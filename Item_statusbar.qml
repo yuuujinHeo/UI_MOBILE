@@ -15,6 +15,7 @@ Item {
     property bool is_con_server: false
     property bool is_con_robot: false
     property bool is_motor_error: false
+    property bool is_local_not_ready: false
     property bool is_motor_power: false
     property bool is_emergency: false
     property bool is_motor_hot: false
@@ -136,6 +137,15 @@ Item {
             Image{
                 id: image_motor_error
                 visible: is_motor_error
+                sourceSize.width: 46
+                sourceSize.height: 42
+                width: 46
+                height: 42
+                source: "icon/icon_motor_error.png"
+            }
+            Image{
+                id: image_local_error
+                visible: is_local_not_ready
                 sourceSize.width: 46
                 sourceSize.height: 42
                 width: 46
@@ -388,10 +398,16 @@ Item {
                 is_motor_hot = false;
             }
 
-            if(supervisor.getStateInit() === 0){
+            if(supervisor.getMotorState() === 0){
                 is_motor_error = true;
             }else{
                 is_motor_error = false;
+            }
+
+            if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
+                is_local_not_ready = true;
+            }else{
+                is_local_not_ready = false;
             }
         }
 
