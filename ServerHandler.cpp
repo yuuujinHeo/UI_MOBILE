@@ -108,10 +108,10 @@ void ServerHandler::onTextMessageReceived(QString message){
             file->write(QByteArray::fromBase64(json["annot"].toString().toLocal8Bit()));
             file->close();
 
-            file = new QFile(QDir::homePath()+"/maps/"+json["map_name"].toString()+"/map_meta.ini");
-            file->open(QIODevice::WriteOnly);
-            file->write(QByteArray::fromBase64(json["meta"].toString().toLocal8Bit()));
-            file->close();
+//            file = new QFile(QDir::homePath()+"/maps/"+json["map_name"].toString()+"/map_meta.ini");
+//            file->open(QIODevice::WriteOnly);
+//            file->write(QByteArray::fromBase64(json["meta"].toString().toLocal8Bit()));
+//            file->close();
 
             emit server_get_map();
 

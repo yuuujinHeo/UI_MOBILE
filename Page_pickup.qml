@@ -33,14 +33,14 @@ Item {
     }
 
 
-    Timer{
-        repeat: true
-        interval: 500
-        running: true
-        onTriggered: {
-            print("pickup timer");
-        }
-    }
+//    Timer{
+//        repeat: true
+//        interval: 500
+//        running: true
+//        onTriggered: {
+//            print("pickup timer");
+//        }
+//    }
 
     Rectangle{
         id: rect_background
@@ -153,6 +153,7 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     console.log("UI : CONFIRM");
+                    voice_pickup.stop();
                     voice_thanks.play();
                     text_mention.visible = false;
                     text_mention3.visible = false;

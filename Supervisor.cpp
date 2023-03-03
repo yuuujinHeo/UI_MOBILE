@@ -264,7 +264,7 @@ void Supervisor::readSetting(QString map_name){
     pmap->gridwidth = setting_meta.value("map_grid_width").toFloat();
     pmap->origin[0] = setting_meta.value("map_origin_u").toInt();
     pmap->origin[1] = setting_meta.value("map_origin_v").toInt();
-    qDebug() << "Read Setting " << pmap->gridwidth;
+//    qDebug() << "Read Setting " << pmap->gridwidth;
     setting_meta.endGroup();
 
     //Annotation======================================================================
@@ -2052,13 +2052,13 @@ bool Supervisor::saveMetaData(QString filename){
     }
 
     //데이터 입력(맵데이터)
-    QSettings settings(getMetaPath(filename), QSettings::IniFormat);
-    settings.clear();
-    settings.setValue("map_metadata/map_w",pmap->width);
-    settings.setValue("map_metadata/map_h",pmap->height);
-    settings.setValue("map_metadata/map_grid_width",QString::number(pmap->gridwidth));
-    settings.setValue("map_metadata/map_origin_u",pmap->origin[0]);
-    settings.setValue("map_metadata/map_origin_v",pmap->origin[1]);
+//    QSettings settings(getMetaPath(filename), QSettings::IniFormat);
+//    settings.clear();
+//    settings.setValue("map_metadata/map_w",pmap->width);
+//    settings.setValue("map_metadata/map_h",pmap->height);
+//    settings.setValue("map_metadata/map_grid_width",QString::number(pmap->gridwidth));
+//    settings.setValue("map_metadata/map_origin_u",pmap->origin[0]);
+//    settings.setValue("map_metadata/map_origin_v",pmap->origin[1]);
     return true;
 
 }
@@ -2754,10 +2754,10 @@ void Supervisor::onTimer(){
         }
     }
     // 스케줄러 변수 초기화
-    static int prev_error = ROBOT_ERROR_NONE;
-    static int prev_state = UI_STATE_NONE;
-    static int prev_running_state = ROBOT_MOVING_NOT_READY;
-    static int prev_init_state = ROBOT_INIT_NOT_READY;
+    static int prev_error = -1;
+    static int prev_state = -1;
+    static int prev_running_state = -1;
+    static int prev_init_state = -1;
 
     if(lcm->isconnect){
         //init_state 확인
@@ -2774,9 +2774,10 @@ void Supervisor::onTimer(){
                     ui_state = UI_STATE_READY;
                 }
             }
-        }else{
+        }else if(probot->init_state != ROBOT_INIT_LOCAL_START){
             //MoveFail이 우선!! State Check
             if(prev_running_state != probot->running_state){
+                qDebug() << probot->status_charge;
                 if(probot->running_state == ROBOT_MOVING_NOT_READY){
                     if(probot->status_charge == 1){
                         if(ui_state != UI_STATE_CHARGING && ui_state != UI_STATE_MOVEFAIL){
@@ -2786,7 +2787,7 @@ void Supervisor::onTimer(){
                         }
                     }else{
                         if(ui_state != UI_STATE_NONE && ui_state != UI_STATE_MOVEFAIL){
-                            plog->write("[LCM] Charging Start -> UI_STATE = UI_STATE_MOVEFAIL");
+                            plog->write("[LCM] NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
                             ui_state = UI_STATE_MOVEFAIL;
                         }
                     }
@@ -2914,12 +2915,15 @@ void Supervisor::onTimer(){
                     //시연용 가라모션
                     static int table_num_last = 0;
                     if(timer_cnt%5 == 0){
-                        int table_num = qrand()%(setting.table_num-1);
-                        while(table_num_last == table_num){
-                            table_num = qrand()%(setting.table_num-1);
+                        int temp = qrand();
+                        qDebug() << "First temp = " << temp << setting.table_num << temp%(setting.table_num);
+                        while(table_num_last == temp%(setting.table_num)){
+                            temp = qrand();
+                            qDebug() << "Next temp = " << temp << temp%(setting.table_num);
                         }
-                        qDebug() << "Move To " << "Serving_"+QString().sprintf("%d",table_num+1);
-                        lcm->moveTo("Serving_"+QString().sprintf("%d",table_num+1));
+                        int table_num = temp%(setting.table_num);
+                        qDebug() << "Move To " << "Serving_"+QString().sprintf("%d",table_num);
+                        lcm->moveTo("Serving_"+QString().sprintf("%d",table_num));
                         table_num_last = table_num;
                     }
                 }else{

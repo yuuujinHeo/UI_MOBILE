@@ -50,6 +50,7 @@ Item {
     property bool show_lidar: false
     property bool show_robot: false
     property bool show_path: false
+    property bool show_icon_only: false
 
     property bool show_connection: false
     property bool show_buttons: false
@@ -136,7 +137,7 @@ Item {
 
     //맵 불러오기
     function loadmap(name,type){
-        supervisor.writelog("[QML MAP] LoadMap : "+name+" (mode = "+type+")");
+        supervisor.writelog("[QML MAP] LoadMap "+objectName+": "+name+" (mode = "+type+")");
         if(typeof(name) !== 'undefined'){
             map_name = name;
             if(typeof(type) !== 'undefined'){
@@ -859,7 +860,6 @@ Item {
             border.color: "black"
             anchors.centerIn: parent
         }
-
         //슬램 활성화 안될 때 보여주는 안내창
         Rectangle{
             anchors.horizontalCenter: parent.horizontalCenter
@@ -867,7 +867,68 @@ Item {
             height: 60
             y: -10
             radius: 5
-//            anchors.fill: parent
+            property var mode: 0
+            color: color_red
+            visible: map_mode ==="MAPPING" && supervisor.getMappingflag()
+            onVisibleChanged: {
+                if(visible){
+                    show_ani1.start();
+                }
+            }
+            function show_connect(){
+                show_ani1.start();
+            }
+            function unshow_connect(){
+                unshow_ani1.start();
+            }
+
+            NumberAnimation{
+                id: show_ani1
+                target: parent
+                property: "y"
+                from: -height
+                to: 0
+                duration: 500
+                onStarted: {
+                    parent.visible = true;
+                }
+                onFinished: {
+
+                }
+            }
+            NumberAnimation{
+                id: unshow_ani1
+                target: parent
+                property: "y"
+                from: 0
+                to: -height
+                duration: 500
+                onStarted: {
+                }
+                onFinished: {
+                    parent.visible = false;
+                }
+            }
+
+            Text{
+                text: "Mapping 중"
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: 5
+                font.family: font_noto_b.name
+                font.pixelSize: 20
+                color: "white"
+            }
+        }
+
+        //슬램 활성화 안될 때 보여주는 안내창
+        Rectangle{
+            id: rect_notice
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 300
+            height: 60
+            y: -10
+            radius: 5
             color: color_red
             function show_connect(){
                 show_ani.start();
@@ -875,7 +936,6 @@ Item {
             function unshow_connect(){
                 unshow_ani.start();
             }
-
             NumberAnimation{
                 id: show_ani
                 target: parent
@@ -903,13 +963,14 @@ Item {
                     parent.visible = false;
                 }
             }
-
-            visible: show_connection && !is_slam_running
+            visible: false
             onVisibleChanged: {
                 if(visible){
                     show_ani.start();
                 }
             }
+            property string msg: ""
+            property bool show_icon: false
             Row{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
@@ -918,6 +979,7 @@ Item {
                 Image{
                     width: 30
                     height: 30
+                    visible: rect_notice.show_icon
                     anchors.verticalCenter: parent.verticalCenter
                     source: "icon/icon_warning.png"
                     ColorOverlay{
@@ -927,7 +989,7 @@ Item {
                     }
                 }
                 Text{
-                    text: "SLAM 활성화 안됨"
+                    text: rect_notice.msg
                     anchors.verticalCenter: parent.verticalCenter
                     font.family: font_noto_b.name
                     font.pixelSize: 20
@@ -1015,9 +1077,11 @@ Item {
         onTriggered: {
             //맵을 로딩할 수 있을 때
             if(supervisor.isloadMap()){
+
                 //맵 정보 받아옴(경로, 이름)
                 map_name = supervisor.getMapname();
                 loadmap(map_name);
+
                 //타이머 종료
                 timer_loadmap.stop();
                 supervisor.writelog("[QML] Load Map(AUTO) : "+map_name);
@@ -1039,7 +1103,36 @@ Item {
                 robot_th = -supervisor.getRobotth()-Math.PI/2;
                 path_num = supervisor.getPathNum();
                 draw_canvas_current();
+
+                if(show_connection){
+                    if(supervisor.getMappingflag()){
+                        rect_notice.visible = true;
+                        rect_notice.msg =  "MAPPING";
+                        rect_notice.color = color_navy;
+                        rect_notice.show_icon = false;
+                    }else if(supervisor.getStateInit()===2){
+                        rect_notice.visible = true;
+                        rect_notice.msg =  "Localization";
+                        rect_notice.color = color_navy;
+                        rect_notice.show_icon = false;
+                    }else if(!is_slam_running && map_mode != "MAPPING"){
+                        rect_notice.visible = true;
+                        rect_notice.msg =  "SLAM 활성화 안됨";
+                        rect_notice.color = color_red;
+                        rect_notice.show_icon = true;
+                    }else{
+                        rect_notice.visible = false;
+                    }
+                }else{
+                    rect_notice.visible = false;
+                }
+            }else{
+                rect_notice.visible = true;
+                rect_notice.msg =  "SLAM 연결 안됨";
+                rect_notice.color = color_red;
+                rect_notice.show_icon = true;
             }
+
         }
     }
 
@@ -1287,7 +1380,7 @@ Item {
     }
 
     function draw_canvas_location(){
-        if(canvas_location.available){
+        if(canvas_location.available && !show_icon_only){
             var ctx = canvas_location.getContext('2d');
             location_num = supervisor.getLocationNum();
 
@@ -1341,7 +1434,7 @@ Item {
     }
 
     function draw_canvas_patrol_location(){
-        if(canvas_location.available){
+        if(canvas_location.available && !show_icon_only){
             var ctx = canvas_location.getContext('2d');
             var patrol_num = supervisor.getPatrolNum();
 

@@ -97,7 +97,7 @@ Window {
     }
     function play_movefailmsg(){
         print("play movefail");
-        voice_avoid.play();
+        voice_movefail.play();
     }
     function docharge(){
         loadPage(pcharging)

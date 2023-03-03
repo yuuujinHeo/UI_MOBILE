@@ -14,10 +14,16 @@ Item {
     property bool is_con_joystick: false
     property bool is_con_server: false
     property bool is_con_robot: false
+    property bool is_motor_error: false
+    property bool is_motor_power: false
+    property bool is_emergency: false
+    property bool is_motor_hot: false
     property bool robot_tx: false
     property bool robot_rx: false
 
-
+    Component.onCompleted: {
+        statusbar.visible = true;
+    }
 
     Rectangle{
         id: status_bar
@@ -99,8 +105,45 @@ Item {
                 source: "icon/icon_server_connect.png"
             }
             Image{
+                id: image_motor_power
+                sourceSize.width: 46
+                sourceSize.height: 42
+                width: 46
+                height: 42
+                source: is_motor_power?"icon/motor_power_on.png":"icon/motor_power_off.png"
+            }
+            Image{
+                id: image_motor_temperror
+                visible: is_motor_hot
+                sourceSize.width: 46
+                sourceSize.height: 42
+                width: 46
+                height: 42
+                source: "icon/motor_power_off.png"
+            }
+            Image{
+                id: image_emergency
+                visible: is_emergency
+                sourceSize.width: 46
+                sourceSize.height: 42
+                width: 46
+                height: 42
+                source: "icon/icon_emergency.png"
+            }
+            Image{
+                id: image_motor_error
+                visible: is_motor_error
+                sourceSize.width: 46
+                sourceSize.height: 42
+                width: 46
+                height: 42
+                source: "icon/icon_motor_error.png"
+            }
+            Image{
                 id: image_robot_discon
                 visible: !is_con_robot
+                width: 46
+                height: 42
                 sourceSize.width: 46
                 sourceSize.height: 42
                 source: "icon/icon_lcm_discon.png"
@@ -314,7 +357,7 @@ Item {
 
     Timer{
         id: timer_status_update
-        interval: 10
+        interval: 100
         repeat: true
         running: true
         onTriggered: {
@@ -325,6 +368,28 @@ Item {
             is_con_joystick = supervisor.isconnectJoy();
             is_con_server = supervisor.isConnectServer();
             is_con_robot = supervisor.getLCMConnection();
+
+            is_motor_power = supervisor.getPowerStatus();
+            is_emergency = supervisor.getEmoStatus();
+
+            if(is_motor_power && !is_emergency){
+
+                if(supervisor.getMotorTemperature(0) > supervisor.getMotorWarningTemperature()){
+                    is_motor_hot = true;
+                }else if(supervisor.getMotorTemperature(0) > supervisor.getMotorWarningTemperature()){
+                    is_motor_hot = true;
+                }else{
+                    is_motor_hot = false;
+                }
+            }else{
+                is_motor_hot = false;
+            }
+
+            if(supervisor.getStateInit() === 0){
+                is_motor_error = true;
+            }else{
+                is_motor_error = false;
+            }
         }
 
     }

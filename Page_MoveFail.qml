@@ -566,6 +566,22 @@ Item {
                 }
             }
         }
+        Timer{
+            id: timer_check_localization
+            running: false
+            repeat: true
+            interval: 500
+            onTriggered:{
+                if(supervisor.is_slam_running()){
+                    btn_auto_init.running = false;
+                    timer_check_localization.stop();
+                }else if(supervisor.getStateInit() === 0 || supervisor.getStateInit() === 3){
+                    timer_check_localization.stop();
+                    btn_auto_init.running = false;
+                }
+            }
+        }
+
         Rectangle{
             id: rect_menu2
             width: 400
@@ -639,6 +655,7 @@ Item {
                                     if(supervisor.getStateInit() !== 2){
                                         btn_auto_init.running = true;
                                         supervisor.slam_autoInit();
+                                        timer_check_localization.start();
                                     }
 
                                 }
@@ -807,6 +824,7 @@ Item {
 
         Map_full{
             id: map
+            objectName: "MOVEFAIL"
             width: 740
             height: width
             show_robot: true

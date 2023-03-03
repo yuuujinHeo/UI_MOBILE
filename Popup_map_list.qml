@@ -438,6 +438,7 @@ Popup{
 
             Map_full{
                 id: map_list_view
+                objectName: "POPUP"
                 width: parent.width
                 height: width
                 anchors.centerIn: parent

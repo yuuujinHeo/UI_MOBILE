@@ -31,7 +31,7 @@ Item {
     property bool is_mapping: false
 
     //0: location 1: record 2: random
-    property int patrol_mode: 0
+    property int patrol_mode: 2
     property bool recording: false
 
     property bool is_init_state: false
@@ -282,6 +282,7 @@ Item {
             }
             Map_full{
                 id: map_current
+                objectName: "CURRENT"
                 width: 500
                 height: 500
                 show_robot: true
@@ -291,6 +292,8 @@ Item {
                 show_buttons: true
                 show_connection: true
                 show_object: true
+                show_icon_only: true
+                show_location: true
                 anchors.horizontalCenter: text_curmap.horizontalCenter
 //                anchors.leftMargin: parent.width/2 - width/2
                 anchors.top: text_curmap.bottom
@@ -371,6 +374,7 @@ Item {
             color: "#282828"
             Map_full{
                 id: map
+                objectName: "ANNOT"
                 height: parent.height
                 width: height
                 anchors.left: parent.left
@@ -745,9 +749,6 @@ Item {
                 running: true
                 repeat: true
                 onTriggered:{
-                    if(supervisor.is_slam_running() && btn_auto_init.running){
-                        btn_auto_init.running = false;
-                    }
                     if(supervisor.getMappingflag()){
                         is_mapping = true;
                     }else{
@@ -972,6 +973,22 @@ Item {
                 anchors.fill: parent
                 color: "#f4f4f4"
             }
+            Timer{
+                id: timer_check_localization
+                running: false
+                repeat: true
+                interval: 500
+                onTriggered:{
+                    if(supervisor.is_slam_running()){
+                        btn_auto_init.running = false;
+                        timer_check_localization.stop();
+                    }else if(supervisor.getStateInit() === 0 || supervisor.getStateInit() === 3){
+                        timer_check_localization.stop();
+                        btn_auto_init.running = false;
+                    }
+                }
+            }
+
             Rectangle{
                 id: rect_annot_box
                 width: parent.width - 60
@@ -1022,6 +1039,7 @@ Item {
                                 if(supervisor.getStateInit() !== 2){
                                     btn_auto_init.running = true;
                                     supervisor.slam_autoInit();
+                                    timer_check_localization.start();
                                 }
 
                             }
@@ -1030,7 +1048,7 @@ Item {
                 }
             }
             Rectangle{
-                width: rect_menu1.width - 60
+                width: rect_menus.width - 60
                 height: 100
                 visible: map.tool==="SLAM_INIT"?true:false
                 anchors.top: rect_annot_box.bottom
@@ -1232,6 +1250,7 @@ Item {
                 }
             }
             function update(){
+                supervisor.setPatrolMode(2);
                 patrol_location_model.clear();
                 patrol_mode = supervisor.getPatrolMode();
                 if(supervisor.getPatrolFileName()===""){
@@ -1737,6 +1756,7 @@ Item {
                     Rectangle{
                         width: 200
                         height: 80
+                        visible: false
                         radius: 10
                         Text{
                             anchors.centerIn: parent
@@ -1771,7 +1791,6 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 // start random patrol (serving)
-                                print(supervisor.getuistate())
                                 if(supervisor.getuistate() === 2){//ROBOT READY
                                     supervisor.startServingTest();
                                 }
@@ -2285,7 +2304,7 @@ Item {
                             onClicked:{
                                 //변경한게 있으면(drawing or rotate)
                                 if(slider_rotate.value != 0){
-                                    state_annot = 2;
+                                    supervisor.setAnnotEditFlag(true);
                                     popup_save_rotated.open();
                                 }else if(state_map == 0){
                                     //raw파일이었으면
@@ -2674,7 +2693,7 @@ Item {
                                 popup_save_edited.unshow_rotate();
                                 //변경한게 있으면(drawing or rotate)
                                 if(supervisor.getCanvasSize() > 0){
-                                    state_annot = 2;
+                                    supervisor.setAnnotEditFlag(true);
                                     popup_save_edited.open();
                                 }else if(state_map == 0){
                                     //raw파일이었으면
@@ -3704,17 +3723,6 @@ Item {
             height: rect_menus.height
 
             Component.onCompleted: {
-                print(state_meta, state_annot, state_map);
-
-                if(state_meta === 0){
-                    rect_state_meta.color = "#4F5666"
-                    state_text_annot.text = "저장이 필요합니다."
-                    btn_move.border.width = 0
-                }else{
-                    rect_state_meta.color = "#12d27c"
-                    state_text_meta.text = "Confirm"
-                    btn_move.border.width = 3
-                }
                 if(state_annot === 0){
                     rect_state_annot.color = "#4F5666"
                     state_text_annot.text = "저장이 필요합니다."
@@ -3722,23 +3730,21 @@ Item {
                     btn_add1.border.width = 0
                 }else if(state_annot === 1){
                     if(supervisor.getAnnotEditFlag()){
+                        rect_state_annot.color = "#EE9D44"
+                        state_text_annot.text = "저장이 필요합니다."
+                        state_text_annot.anchors.rightMargin = 20
+                        btn_add1.border.width = 0
+                    }else{
                         rect_state_annot.color = "#12d27c"
                         state_text_annot.text = "Confirm"
                         state_text_annot.anchors.rightMargin = 50
                         btn_add1.border.width = 3
-                    }else{
-                        rect_state_annot.color = "#4F5666"
-                        state_text_annot.text = "저장이 필요합니다."
-                        state_text_annot.anchors.rightMargin = 20
-                        btn_add1.border.width = 0
+                        state_annot = 2;
                     }
-                }else if(state_annot === 2){
-                    rect_state_annot.color = "#EE9D44"
-                    state_text_annot.anchors.rightMargin = 20
-                    state_text_annot.text = "저장이 필요합니다."
-                    btn_add1.border.width = 0
                 }
-                if(state_annot === 1 && state_meta === 1){
+
+
+                if(state_annot === 2 && !supervisor.getAnnotEditFlag()){
                     btn_next_0.enabled = true;
                 }
             }
@@ -3790,6 +3796,7 @@ Item {
                 spacing: 20
                 Rectangle{
                     id: rect_meta_box
+                    visible: false
                     width: menu_save.width*0.7
                     height: 85
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -3897,6 +3904,7 @@ Item {
                             onClicked: {
                                 if(supervisor.saveAnnotation(map.map_name)){
                                     btn_add1.border.width = 3;
+                                    state_annot = 2;
                                     rect_state_annot.color = "#12d27c"
                                     state_text_annot.text = "Confirm"
                                     state_text_annot.anchors.rightMargin = 50
@@ -4423,6 +4431,32 @@ Item {
             color: "#282828"
             opacity: 0.7
         }
+        Timer{
+            id: timer_check_slam
+            running: false
+            repeat: true
+            interval: 500
+            onTriggered:{
+                if(!supervisor.getLCMConnection()){
+
+                    //맵 새로 불러오기.
+                    map.init_mode();
+                    map.show_connection = false;
+                    map.loadmap(textfield_name22.text,"RAW");
+
+                    supervisor.clear_all();
+                    map.state_annotation = "DRAWING";
+                    map.map_mode = "RAW";
+                    map.update_canvas();
+                    loader_menu.sourceComponent = menu_annot_rotate;
+                    popup_save_mapping.close();
+                    timer_check_slam.stop();
+
+                }
+
+            }
+        }
+
         Rectangle{
             anchors.centerIn: parent
             width: 400
@@ -4517,25 +4551,14 @@ Item {
                                 if(textfield_name22.text == ""){
                                 }else{
                                     supervisor.saveMapping(textfield_name22.text);
+                                    supervisor.setMap(textfield_name22.text);
 
+                                    timer_check_slam.start();
 //                                    //save temp Image
 //                                    map.save_map("map_temp.png");
 
 //                                    //임시 맵 이미지를 해당 폴더 안에 넣음.
 //                                    supervisor.rotate_map("map_temp.png",textfield_name22.text, 2);
-
-                                    //맵 새로 불러오기.
-                                    supervisor.setMap(textfield_name22.text);
-                                    map.init_mode();
-                                    map.show_connection = false;
-                                    map.loadmap(textfield_name22.text,"RAW");
-
-                                    supervisor.clear_all();
-                                    map.state_annotation = "DRAWING";
-                                    map.map_mode = "RAW";
-                                    map.update_canvas();
-                                    loader_menu.sourceComponent = menu_annot_rotate;
-                                    popup_save_mapping.close();
                                 }
                             }
                         }
@@ -5461,10 +5484,9 @@ Item {
         map.init_mode();
         timer_get_joy.stop();
         map.state_annotation = "NONE";
-        print("map_mode "+map_mode)
 
         if(map_mode == 0){
-            timer_get_joy.start();
+//            timer_get_joy.start();
             loader_menu.sourceComponent = menu_main;
             text_menu_title.visible = false;
             map.show_buttons = true;
@@ -5472,16 +5494,13 @@ Item {
         }else if(map_mode == 1){
             text_menu_title.text = "SLAM";
             text_menu_title.visible = true;
-            timer_get_joy.start();
+//            timer_get_joy.start();
             map.init_mode();
-//            map.loadmap("");
             map.show_lidar = true;
             map.show_robot = true;
-            map.show_connection = false;
             map.setfullscreen();
             loader_menu.sourceComponent = menu_slam;
-//            map.show_location_default = false;
-//            map.just_show_map = true;
+            map.map_mode = "MAPPING";
         }else if(map_mode == 2){
             text_menu_title.text = "Annotation";
             text_menu_title.visible = true;
