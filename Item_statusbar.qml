@@ -45,6 +45,9 @@ Item {
                 onPressAndHold: {
                     popup_menu.open();
                 }
+                onDoubleClicked: {
+                    popup_menu.open();
+                }
             }
         }
         Text{
