@@ -1824,201 +1824,255 @@ Item {
                 anchors.fill: parent
                 color: "#f4f4f4"
             }
-            Rectangle{
-                id: rect_annot_state
-                width: parent.width
-                height: 50
+            Column{
+                anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
                 anchors.topMargin: 2
-                color: "#4F5666"
-                Text{
-                    anchors.centerIn: parent
-                    color: "white"
-                    font.family: font_noto_b.name
-                    font.pixelSize: 20
-                    text: "Map Meta Data"
-                    horizontalAlignment: Text.AlignHCenter
-                }
-            }
-            Rectangle{
-                id: rect_annot_map_name
-                width: parent.width*0.9
-                radius: 5
-                height: 50
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: rect_annot_state.bottom
-                anchors.topMargin: 20
-                color: "white"
-                Text{
-                    anchors.centerIn: parent
-                    color: "#282828"
-                    font.family: font_noto_b.name
-                    font.pixelSize: 20
-                    text: is_init_state?"MAP : " + map.map_name:"MAP : " + supervisor.getMapname();
-                    horizontalAlignment: Text.AlignHCenter
-                }
-            }
-            Column{
-                anchors.top: rect_annot_map_name.bottom
-                anchors.topMargin: 20
-                anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 10
-                Grid{
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    rows: 4
-                    columns: 3
-                    spacing: 10
-                    horizontalItemAlignment: Grid.AlignHCenter
-                    verticalItemAlignment: Grid.AlignVCenter
+                spacing: 20
+                Rectangle{
+                    id: rect_annot_state
+                    width: menu_state.width
+                    height: 50
+                    color: "#4F5666"
                     Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: "Map"
-                        width: 150
+                        anchors.centerIn: parent
+                        color: "white"
+                        font.family: font_noto_b.name
+                        font.pixelSize: 20
+                        text: "Map Meta Data"
                         horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: ":"
-                    }
-                    Text{
-                        id: text_map_name
-                        width: 150
-                        horizontalAlignment: Text.AlignHCenter
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: is_init_state?map.map_name:supervisor.getMapname();
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: "Width"
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: ":"
-                    }
-                    Text{
-                        id: text_map_width
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: supervisor.getMapWidth();
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: "Height"
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: ":"
-                    }
-                    Text{
-                        id: text_map_height
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: supervisor.getMapHeight();
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: "Grid Width"
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: ":"
-                    }
-                    Text{
-                        id: text_map_gridwidth
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: supervisor.getGridWidth().toFixed(2);
                     }
                 }
                 Rectangle{
-                    width: parent.width
-                    height: 1
-                    color: color_gray
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: menu_state.width
+                    height: 100
+                    color: "#e8e8e8"
+                    Row{
+                        anchors.centerIn: parent
+                        spacing: 30
+                        Item_button{
+                            width: 80
+                            shadow_color: color_gray
+                            icon: "icon/icon_move.png"
+                            name: "DRAWING"
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    supervisor.clear_all();
+                                    map.state_annotation = "DRAWING";
+                                    loader_menu.sourceComponent = menu_annot_draw;
+                                }
+                            }
+                        }
+                        Item_button{
+                            width: 80
+                            shadow_color: color_gray
+                            highlight: map.tool=="SLAM_INIT"
+                            icon: "icon/icon_point.png"
+                            name: "OBJECT"
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    supervisor.clear_all();
+                                    map.state_annotation = "OBJECT";
+                                    loader_menu.sourceComponent = menu_annot_object;
+                                }
+                            }
+                        }
+                        Item_button{
+                            id: btn_auto_init
+                            width: 78
+                            shadow_color: color_gray
+                            icon:"icon/icon_auto_init.png"
+                            name:"LOCATION"
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    map.init_mode();
+                                    map.state_annotation = "LOCATION";
+                                    loader_menu.sourceComponent = menu_annot_location;
+                                }
+                            }
+                        }
+                    }
                 }
-                Grid{
-                    rows: 6
-                    columns: 3
+                Rectangle{
+                    id: rect_annot_map_name
+                    width: menu_state.width*0.9
+                    radius: 5
+                    height: 50
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: "white"
+                    Text{
+                        anchors.centerIn: parent
+                        color: "#282828"
+                        font.family: font_noto_b.name
+                        font.pixelSize: 20
+                        text: is_init_state?"MAP : " + map.map_name:"MAP : " + supervisor.getMapname();
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                }
+                Column{
+                    anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
-                    horizontalItemAlignment: Grid.AlignHCenter
-                    verticalItemAlignment: Grid.AlignVCenter
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: "Serving Location"
-                        width: 150
-                        horizontalAlignment: Text.AlignHCenter
+                    Grid{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        rows: 4
+                        columns: 3
+                        spacing: 10
+                        horizontalItemAlignment: Grid.AlignHCenter
+                        verticalItemAlignment: Grid.AlignVCenter
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: "Map"
+                            width: 150
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: ":"
+                        }
+                        Text{
+                            id: text_map_name
+                            width: 150
+                            horizontalAlignment: Text.AlignHCenter
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: is_init_state?map.map_name:supervisor.getMapname();
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: "Width"
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: ":"
+                        }
+                        Text{
+                            id: text_map_width
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: supervisor.getMapWidth();
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: "Height"
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: ":"
+                        }
+                        Text{
+                            id: text_map_height
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: supervisor.getMapHeight();
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: "Grid Width"
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: ":"
+                        }
+                        Text{
+                            id: text_map_gridwidth
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: supervisor.getGridWidth().toFixed(2);
+                        }
                     }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: ":"
+                    Rectangle{
+                        width: parent.width
+                        height: 1
+                        color: color_gray
+                        anchors.horizontalCenter: parent.horizontalCenter
                     }
-                    Text{
-                        id: text_serving_num
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        width: 150
-                        horizontalAlignment: Text.AlignHCenter
-                        text: supervisor.getLocationSize("Serving");
+                    Grid{
+                        rows: 6
+                        columns: 3
+                        spacing: 10
+                        horizontalItemAlignment: Grid.AlignHCenter
+                        verticalItemAlignment: Grid.AlignVCenter
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: "Serving Location"
+                            width: 150
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: ":"
+                        }
+                        Text{
+                            id: text_serving_num
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            width: 150
+                            horizontalAlignment: Text.AlignHCenter
+                            text: supervisor.getLocationSize("Serving");
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: "Resting Location"
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: ":"
+                        }
+                        Text{
+                            id: text_resting_num
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: supervisor.getLocationSize("Resting");
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: "Charging Location"
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: ":"
+                        }
+                        Text{
+                            id: text_charging_num
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: supervisor.getLocationSize("Charging");
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: "Object Num"
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: ":"
+                        }
+                        Text{
+                            id: text_object_num
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: supervisor.getObjectNum();
+                        }
                     }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: "Resting Location"
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: ":"
-                    }
-                    Text{
-                        id: text_resting_num
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: supervisor.getLocationSize("Resting");
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: "Charging Location"
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: ":"
-                    }
-                    Text{
-                        id: text_charging_num
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: supervisor.getLocationSize("Charging");
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: "Object Num"
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: ":"
-                    }
-                    Text{
-                        id: text_object_num
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: supervisor.getObjectNum();
-                    }
+
                 }
 
             }
@@ -2110,6 +2164,10 @@ Item {
             objectName: "menu_load_rotate"
             width: rect_menus.width
             height: rect_menus.height
+
+            function valuezero(){
+                slider_rotate.value = 0;
+            }
 
             Rectangle{
                 anchors.fill: parent
@@ -2241,6 +2299,69 @@ Item {
                     }
 
                 }
+            }
+
+            Rectangle{
+                id: rect_annot_box55
+                width: parent.width*0.9
+                height: 50
+                color: "white"
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: rect_annot_box44.bottom
+                anchors.topMargin: 10
+                Text{
+                    text: "Rotate Map (1도단위)"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 30
+                }
+                Row{
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.rightMargin: 60
+                    spacing: 20
+                    Rectangle{
+                        width: 50
+                        height: 30
+                        color: "black"
+                        radius: 5
+                        Text{
+                            anchors.centerIn: parent
+                            text: "<-"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                slider_rotate.value--;
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 50
+                        height: 30
+                        color: "black"
+                        radius: 5
+                        Text{
+                            anchors.centerIn: parent
+                            text: "->"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                slider_rotate.value++;
+                            }
+                        }
+                    }
+                }
+
             }
             Column{
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -3153,9 +3274,9 @@ Item {
                                 //save temp Image
                                 map.init_mode();
                                 map.state_annotation = "LOCATION";
-                                supervisor.clearObjectPoints();
-                                map.clear_canvas();
-                                map.update_canvas();
+//                                supervisor.clearObjectPoints();
+//                                map.clear_canvas();
+//                                map.update_canvas();
                                 loader_menu.sourceComponent = menu_annot_location;
                             }
                         }
@@ -3197,7 +3318,6 @@ Item {
                 return slider_margin.value;
             }
             function update(){
-                print("update")
                 var loc_num = supervisor.getLocationNum();
                 list_location.model.clear();
                 for(var i=0; i<loc_num; i++){
@@ -3209,6 +3329,21 @@ Item {
                 }
             }
 
+            Timer{
+                id: timer_check_localization
+                running: false
+                repeat: true
+                interval: 500
+                onTriggered:{
+                    if(supervisor.is_slam_running()){
+                        btn_auto_init.running = false;
+                        timer_check_localization.stop();
+                    }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
+                        timer_check_localization.stop();
+                        btn_auto_init.running = false;
+                    }
+                }
+            }
             Rectangle{
                 id: rect_annot_state
                 width: parent.width
@@ -3282,45 +3417,152 @@ Item {
                 anchors.topMargin: 20
                 spacing: 10
                 Rectangle{
-                    id: rect_annot_box
+                    id: rect_annot_localization
                     width: parent.width
                     height: 100
                     color: "#e8e8e8"
                     Row{
                         anchors.centerIn: parent
-                        spacing: 15
-                        Rectangle{
+                        spacing: 30
+                        Item_button{
                             id: btn_move
+                            width: 80
+                            shadow_color: color_gray
+                            highlight: map.tool=="MOVE"
+                            icon: "icon/icon_move.png"
+                            name: "Move"
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    map.tool = "MOVE";
+                                    map.reset_canvas();
+                                }
+                            }
+                        }
+                        Item_button{
+                            width: 80
+                            shadow_color: color_gray
+                            highlight: map.tool=="SLAM_INIT"
+                            icon: "icon/icon_point.png"
+                            name: "수동 초기화"
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    map.tool = "SLAM_INIT";
+                                }
+                            }
+                        }
+                        Item_button{
+                            id: btn_auto_init
                             width: 78
-                            height: width
-                            radius: width
-                            border.width: map.tool=="MOVE"?3:0
-                            border.color: "#12d27c"
-                            Column{
+                            shadow_color: color_gray
+                            icon:"icon/icon_auto_init.png"
+                            name:"자동 초기화"
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    if(supervisor.getLocalizationState() !== 1){
+                                        btn_auto_init.running = true;
+                                        supervisor.slam_autoInit();
+                                        timer_check_localization.start();
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: rect_menus.width - 60
+                    height: 0
+                    visible: map.tool==="SLAM_INIT"?true:false
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    onVisibleChanged: {
+                        if(visible){
+                            height = 50
+                        }else{
+                            height = 0
+                        }
+                    }
+                    Behavior on height {
+                        NumberAnimation{
+                            duration:300;
+                        }
+                    }
+                    color: "transparent"
+                    Row{
+                        anchors.centerIn: parent
+                        spacing: 20
+                        Rectangle{
+                            width: 80
+                            height: 40
+                            radius: 5
+                            Text{
+                                text: "Run"
                                 anchors.centerIn: parent
-                                Image{
-                                    source: "icon/icon_move.png"
-                                    anchors.horizontalCenter: parent.horizontalCenter
+                                font.family: font_noto_r.name
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    btn_run.show_ani();
+                                    map.tool = "MOVE";
+                                    map.reset_canvas();
+                                    supervisor.slam_run();
                                 }
-                                Text{
-                                    text: "Move"
-                                    font.family: font_noto_r.name
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 80
+                            height: 40
+                            radius: 5
+                            Text{
+                                text: "Stop"
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
                             }
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
                                     map.tool = "MOVE";
                                     map.reset_canvas();
-                                    map.new_location = false;
-                                    map.new_loc_x = 0;
-                                    map.new_loc_y = 0;
-                                    map.new_loc_th = 0;
-                                    map.new_loc_available = false;
+                                    btn_stop.show_ani();
+                                    supervisor.slam_stop();
                                 }
                             }
                         }
+                        Rectangle{
+                            width: 80
+                            height: 40
+                            radius: 5
+                            Text{
+                                text: "Set Init"
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    if(map.new_slam_init){
+                                        btn_init.show_ani();
+                                        supervisor.slam_setInit();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                Rectangle{
+                    id: rect_annot_box
+                    width: parent.width
+                    height: 100
+                    color: "#e8e8e8"
+                    Row{
+                        anchors.centerIn: parent
+                        spacing: 20
+
                         Rectangle{
                             id: btn_add_location
                             width: 78
@@ -3602,43 +3844,43 @@ Item {
                     }
                 }
 
-                Row{
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 60
-                    Item_joystick{
-                        id: joy_xy
-                        show_arrow: false
-                        verticalOnly: true
-                        onUpdate_cntChanged: {
-                            if(update_cnt == 0 && supervisor.getJoyXY() != 0){
-                                supervisor.joyMoveXY(0, 0);
-                            }else if(update_cnt > 2){
-                                if(fingerInBounds) {
-                                    supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-                                }else{
-                                    supervisor.joyMoveXY(Math.sin(angle));
-                                }
-                            }
-                        }
-                    }
-                    Item_joystick{
-                        id: joy_th
-                        show_arrow: false
-                        horizontalOnly: true
-                        onUpdate_cntChanged: {
-                            if(update_cnt == 0 && supervisor.getJoyR() != 0){
-                                supervisor.joyMoveR(0, 0);
-                            }else if(update_cnt > 2){
-                                if(fingerInBounds) {
-                                    supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-                                } else {
-                                    supervisor.joyMoveR(-Math.cos(angle));
-                                }
-                            }
-                        }
-                    }
+//                Row{
+//                    anchors.horizontalCenter: parent.horizontalCenter
+//                    spacing: 60
+//                    Item_joystick{
+//                        id: joy_xy
+//                        show_arrow: false
+//                        verticalOnly: true
+//                        onUpdate_cntChanged: {
+//                            if(update_cnt == 0 && supervisor.getJoyXY() != 0){
+//                                supervisor.joyMoveXY(0, 0);
+//                            }else if(update_cnt > 2){
+//                                if(fingerInBounds) {
+//                                    supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+//                                }else{
+//                                    supervisor.joyMoveXY(Math.sin(angle));
+//                                }
+//                            }
+//                        }
+//                    }
+//                    Item_joystick{
+//                        id: joy_th
+//                        show_arrow: false
+//                        horizontalOnly: true
+//                        onUpdate_cntChanged: {
+//                            if(update_cnt == 0 && supervisor.getJoyR() != 0){
+//                                supervisor.joyMoveR(0, 0);
+//                            }else if(update_cnt > 2){
+//                                if(fingerInBounds) {
+//                                    supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+//                                } else {
+//                                    supervisor.joyMoveR(-Math.cos(angle));
+//                                }
+//                            }
+//                        }
+//                    }
 
-                }
+//                }
 
             }
 
@@ -3915,21 +4157,22 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                         }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                if(supervisor.saveAnnotation(map.map_name)){
-                                    btn_add1.border.width = 3;
-                                    state_annot = 2;
-                                    rect_state_annot.color = "#12d27c"
-                                    state_text_annot.text = "Confirm"
-                                    state_text_annot.anchors.rightMargin = 50
-                                    is_save_annot = true;
-                                }else{
-                                    btn_add1.border.width = 0;
-                                }
-                                btn_next_0.enabled = true;
+                    }
+
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            if(supervisor.saveAnnotation(map.map_name)){
+                                btn_add1.border.width = 3;
+                                state_annot = 2;
+                                rect_state_annot.color = "#12d27c"
+                                state_text_annot.text = "Confirm"
+                                state_text_annot.anchors.rightMargin = 50
+                                is_save_annot = true;
+                            }else{
+                                btn_add1.border.width = 0;
                             }
+                            btn_next_0.enabled = true;
                         }
                     }
                 }
@@ -3978,11 +4221,12 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                         }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                supervisor.sendMaptoServer();
-                            }
+                    }
+
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.sendMaptoServer();
                         }
                     }
                 }
@@ -4641,7 +4885,8 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
-                                slider_rotate.value = 0;
+                                loader_menu.item.valuezero();
+//                                slider_rotate.value = 0;
                                 map.rotate_map(0);
                                 popup_save_rotated.close();
                             }
