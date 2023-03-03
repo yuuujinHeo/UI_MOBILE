@@ -125,5 +125,15 @@
         <file>bgm/voice_start_charge.mp3</file>
         <file>bgm/voice_stop_charge.mp3</file>
         <file>bgm/voice_thanks.mp3</file>
+        <file>icon/bat_large_1.png</file>
+        <file>icon/bat_large_2.png</file>
+        <file>icon/bat_large_3.png</file>
+        <file>icon/bat_large_charge.png</file>
+        <file>icon/bat_large_full.png</file>
+        <file>icon/icon_emergency.png</file>
+        <file>icon/icon_motor_error.png</file>
+        <file>icon/icon_motor_hot.png</file>
+        <file>icon/motor_power_off.png</file>
+        <file>icon/motor_power_on.png</file>
     </qresource>
 </RCC>

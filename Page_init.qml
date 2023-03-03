@@ -1027,6 +1027,7 @@ Item {
             map_load2.loadmap(map);
         }
         Map_full{
+            objectName: "INITSHOW"
             id: map_load2
             anchors.fill: parent
         }
@@ -1250,6 +1251,7 @@ Item {
         }
         Map_full{
             id: map_load
+            objectName: "SHOWSERVER"
             width: 500
             height: 500
             anchors.horizontalCenter: parent.horizontalCenter

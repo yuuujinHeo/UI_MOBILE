@@ -23,12 +23,15 @@ Item {
 
     property bool running: false
     onRunningChanged: {
-        if(running){
-            ani_radial_shape.start();
-        }else{
-            ani_radial_shape.stop();
+//        if(running){
+//            highlight = true;
+////            ani_radial_shape_once.start();
+////            ani_radial_shape.start();
+//        }else{
+//            highlight = false;
+////            ani_radial_shape.stop();
 
-        }
+//        }
     }
 
     Rectangle{
@@ -40,7 +43,7 @@ Item {
             width: parent.width
             height: width
             radius: width
-            border.width: highlight?3:0
+            border.width: running||highlight?3:0
             border.color: "#12d27c"
             Column{
                 anchors.centerIn: parent
@@ -111,7 +114,7 @@ Item {
             property: "sweepAngle"
             from: 0
             to: 360
-            duration: 800
+            duration: 5000
         }
         ParallelAnimation{
             PropertyAnimation{
@@ -119,7 +122,7 @@ Item {
                 property: "startAngle"
                 from: -90
                 to: 270
-                duration: 700
+                duration: 5000
                 easing.type: Easing.InOutQuad
             }
             PropertyAnimation{
@@ -127,7 +130,7 @@ Item {
                 property: "sweepAngle"
                 from: 360
                 to: 0
-                duration: 700
+                duration: 5000
                 easing.type: Easing.InOutQuad
             }
         }

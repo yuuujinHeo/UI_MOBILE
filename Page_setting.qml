@@ -2229,7 +2229,18 @@ Item {
                             color: "#d0d0d0"
                         }
                         Rectangle{
-                            width: (parent.width - 351)/3
+                            width: (parent.width - 351)/4
+                            height: parent.height
+                            Text{
+                                id: text_status_charging
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"Charging : "+supervisor.getChargeStatus().toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/4
                             height: parent.height
                             Text{
                                 id: text_status_power
@@ -2240,7 +2251,7 @@ Item {
                             }
                         }
                         Rectangle{
-                            width: (parent.width - 351)/3
+                            width: (parent.width - 351)/4
                             height: parent.height
                             Text{
                                 id: text_status_emo
@@ -2251,7 +2262,7 @@ Item {
                             }
                         }
                         Rectangle{
-                            width: (parent.width - 351)/3
+                            width: (parent.width - 351)/4
                             height: parent.height
                             Text{
                                 id: text_status_remote
@@ -3342,13 +3353,14 @@ Item {
             text_temp_0.text = "모터 0 : " + supervisor.getMotorTemperature(0).toString();
             text_temp_1.text = "모터 1 : " + supervisor.getMotorTemperature(1).toString();
 
+            text_status_charging.text = "Charge : " + supervisor.getChargeStatus().toString();
             text_status_power.text = "Power : " + supervisor.getPowerStatus().toString();
             text_status_emo.text = "Emo : " + supervisor.getEmoStatus().toString();
             text_status_remote.text = "Remote : " + supervisor.getRemoteStatus().toString();
 
-            text_battery_in.text = "In : " + supervisor.getBatteryIn().toString();
-            text_battery_out.text = "Out : " + supervisor.getBatteryOut().toString();
-            text_battery_current.text = "Current : " + supervisor.getBatteryCurrent().toString();
+            text_battery_in.text = "In : " + supervisor.getBatteryIn().toFixed(1).toString();
+            text_battery_out.text = "Out : " + supervisor.getBatteryOut().toFixed(1).toString();
+            text_battery_current.text = "Current : " + supervisor.getBatteryCurrent().toFixed(1).toString();
 
             text_power.text = "Power : " + supervisor.getPower().toString();
             text_power_total.text = "Total : " + supervisor.getPowerTotal().toString();
