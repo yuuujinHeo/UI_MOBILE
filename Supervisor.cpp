@@ -2769,7 +2769,7 @@ void Supervisor::onTimer(){
                     ui_state = UI_STATE_CHARGING;
                 }
             }else{
-                if(ui_state == UI_STATE_INIT_DONE){
+                if(ui_state == UI_STATE_INIT_DONE || ui_state == UI_STATE_NONE){
                     plog->write("[LCM] INIT ALL DONE -> UI_STATE = UI_STATE_READY");
                     ui_state = UI_STATE_READY;
                 }

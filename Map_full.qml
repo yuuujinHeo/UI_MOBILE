@@ -438,6 +438,7 @@ Item {
             visible: show_object
             width: map_width
             height: map_height
+            opacity: 0.7
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
             scale: mapview.newscale
