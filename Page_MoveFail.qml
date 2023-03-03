@@ -575,7 +575,7 @@ Item {
                 if(supervisor.is_slam_running()){
                     btn_auto_init.running = false;
                     timer_check_localization.stop();
-                }else if(supervisor.getStateInit() === 0 || supervisor.getStateInit() === 3){
+                }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
                     timer_check_localization.stop();
                     btn_auto_init.running = false;
                 }
@@ -652,7 +652,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    if(supervisor.getStateInit() !== 2){
+                                    if(supervisor.getLocalizationState() !== 1){
                                         btn_auto_init.running = true;
                                         supervisor.slam_autoInit();
                                         timer_check_localization.start();

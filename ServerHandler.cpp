@@ -193,7 +193,8 @@ void ServerHandler::onTimer(){ // 200ms
         json["msg_type"] = "DATA";
 
         // status
-        json["init_state"] = probot->init_state;
+        json["motor_state"] = probot->motor_state;
+        json["local_state"] = probot->localization_state;
         json["moving_state"] = probot->running_state;
         json["ui_state"] = ui_state;
 

@@ -956,7 +956,7 @@ void Supervisor::slam_autoInit(){
 }
 
 bool Supervisor::is_slam_running(){
-    if(probot->init_state == ROBOT_INIT_DONE){
+    if(probot->localization_state == LOCAL_READY){
         return true;
     }else{
         return false;
@@ -1182,10 +1182,10 @@ QObject *Supervisor::getMinimap(QString filename) const{
             float kk = pixel/(dp*dp);
             if(kk < 10 || outline)
                 pixel = 0;
-            else if(kk > 100)
+            else if(kk > 200)
                 pixel = 255;
             else
-                pixel = 38;
+                pixel = 127;
 
             for(int k=0; k<dp; k++){
                 for(int m=0; m<dp; m++){
@@ -1220,10 +1220,10 @@ QObject *Supervisor::getMinimap(QString filename) const{
             float kk = pixel/(dp*dp);
             if(outline > (dp*dp)/3)
                 pixel = 0;
-            else if(kk > 100)
+            else if(kk > 200)
                 pixel = 255;
             else
-                pixel = 38;
+                pixel = 127;
 
             for(int k=0; k<dp; k++){
                 for(int m=0; m<dp; m++){
@@ -2352,8 +2352,11 @@ float Supervisor::getPower(){
 float Supervisor::getPowerTotal(){
     return probot->total_power;
 }
-int Supervisor::getStateInit(){
-    return probot->init_state;
+int Supervisor::getMotorState(){
+    return probot->motor_state;
+}
+int Supervisor::getLocalizationState(){
+    return probot->localization_state;
 }
 int Supervisor::getStateMoving(){
     return probot->running_state;
@@ -2757,11 +2760,12 @@ void Supervisor::onTimer(){
     static int prev_error = -1;
     static int prev_state = -1;
     static int prev_running_state = -1;
-    static int prev_init_state = -1;
+    static int prev_motor_state = -1;
+    static int prev_local_state = -1;
 
     if(lcm->isconnect){
         //init_state 확인
-        if(probot->init_state == ROBOT_INIT_DONE && probot->running_state == ROBOT_MOVING_READY){
+        if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY && probot->running_state == ROBOT_MOVING_READY){
             // 로봇연결되면 Charging 상태 확인
             if(probot->status_charge == 1){
                 if(ui_state != UI_STATE_CHARGING){
@@ -2774,7 +2778,7 @@ void Supervisor::onTimer(){
                     ui_state = UI_STATE_READY;
                 }
             }
-        }else if(probot->init_state != ROBOT_INIT_LOCAL_START){
+        }else if(probot->localization_state != LOCAL_START){
             //MoveFail이 우선!! State Check
             if(prev_running_state != probot->running_state){
                 qDebug() << probot->status_charge;
@@ -3089,20 +3093,23 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_STATE_MOVEFAIL:{
-        if(prev_init_state != probot->init_state){
+        if(prev_motor_state != probot->motor_state){
             //UI에 movefail 페이지 표시
             QMetaObject::invokeMethod(mMain, "movefail");
 
-            if(probot->init_state == ROBOT_INIT_NOT_READY){
+            if(probot->motor_state == MOTOR_NOT_READY){
                 plog->write("[SCHEDULER] ROBOT ERROR :ROBOT_INIT_NOT_READY");
+            }
+        }else if(prev_local_state != probot->localization_state){
+            if(probot->localization_state == LOCAL_NOT_READY){
+                plog->write("[SCHEDULER] ROBOT ERROR : LOCAL NOT READY");
 
-            }else if(probot->init_state == ROBOT_INIT_MOTOR_DONE){
-                plog->write("[SCHEDULER] ROBOT ERROR : ROBOT_INIT_MOTOR_DONE");
-
-            }else if(probot->init_state == ROBOT_INIT_LOCAL_FAILED){
+            }else if(probot->localization_state == LOCAL_FAILED){
                 plog->write("[SCHEDULER] ROBOT ERROR : ROBOT_INIT_LOCAL_FAILED");
 
-            }else if(probot->init_state == ROBOT_INIT_DONE){
+            }
+        }else{
+            if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY && isaccepted){
                 plog->write("[SCHEDULER] ROBOT ERROR : NO PATH");
                 isaccepted = false;
             }
@@ -3116,8 +3123,8 @@ void Supervisor::onTimer(){
 
     prev_state = ui_state;
     prev_running_state = probot->running_state;
-    prev_init_state = probot->init_state;
-
+    prev_motor_state = probot->motor_state;
+    prev_local_state = probot->localization_state;
 
 
 //    // 로봇 상태가 에러가 아니면 에러 초기화

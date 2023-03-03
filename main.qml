@@ -187,8 +187,9 @@ Window {
             loader_page.item.updatepatrol();
     }
     function updatecanvas(){
-        if(loader_page.item.objectName == "page_map")
-            loader_page.item.updatecanvas();
+        if(loader_page.item !== "undefined" && loader_page.item !== null)
+            if(loader_page.item.objectName == "page_map")
+                loader_page.item.updatecanvas();
     }
     function updateobject(){
         if(loader_page.item.objectName == "page_map")
