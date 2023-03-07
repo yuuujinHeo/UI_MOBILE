@@ -64,7 +64,7 @@ public:
     ServerHandler *server;
     JoystickHandler *joystick;
     HTTPHandler *git;
-
+    QProcess *slam_process;
 
     ////*********************************************  WINDOW 관련   ***************************************************////
     void setWindow(QQuickWindow* Window);
@@ -168,6 +168,8 @@ public:
     Q_INVOKABLE void loadMap(QString name);
     Q_INVOKABLE void setMap(QString name);
     Q_INVOKABLE void restartSLAM();
+
+    Q_INVOKABLE void startSLAM();
 
     ////*********************************************  SLAM(LOCALIZATION) 관련   ***************************************************////
     Q_INVOKABLE void startMapping(float grid);
