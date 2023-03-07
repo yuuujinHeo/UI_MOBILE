@@ -264,7 +264,7 @@ void Supervisor::readSetting(QString map_name){
     pmap->gridwidth = setting_meta.value("map_grid_width").toFloat();
     pmap->origin[0] = setting_meta.value("map_origin_u").toInt();
     pmap->origin[1] = setting_meta.value("map_origin_v").toInt();
-//    qDebug() << "Read Setting " << pmap->gridwidth;
+    qDebug() << "Read Setting " << pmap->gridwidth;
     setting_meta.endGroup();
 
     //Annotation======================================================================
@@ -893,7 +893,8 @@ void Supervisor::setMap(QString name){
     setSetting("FLOOR/map_name",name);
     readSetting(name);
     setloadMap(true);
-    lcm->restartSLAM();
+    restartSLAM();
+//    lcm->restartSLAM();
 }
 
 void Supervisor::loadMap(QString name){
@@ -902,7 +903,23 @@ void Supervisor::loadMap(QString name){
 
 void Supervisor::restartSLAM(){
     plog->write("[USER INPUT] Restart SLAM");
-    lcm->restartSLAM();
+
+    if(slam_process != nullptr){
+        slam_process->kill();
+        slam_process->close();
+
+    }else{
+        slam_process = new QProcess(this);
+    }
+    QString file = QDir::homePath() + "/code/build-SLAMNAV-Desktop-Release/SLAMNAV";
+    slam_process->start(file);
+}
+
+void Supervisor::startSLAM(){
+    plog->write("[SUPERVISOR] START SLAM");
+    slam_process = new QProcess(this);
+    QString file = QDir::homePath() + "/code/build-SLAMNAV-Desktop-Release/SLAMNAV";
+    slam_process->start(file);
 }
 
 ////*******************************************  SLAM(LOCALIZATION) 관련   ************************************************////
@@ -2149,7 +2166,8 @@ bool Supervisor::saveAnnotation(QString filename){
     settings.setValue("travel_lines/num",pmap->vecTline.size());
 
     readSetting();
-    lcm->restartSLAM();
+    restartSLAM();
+//    lcm->restartSLAM();
     annotation_edit = false;
     return true;
 }

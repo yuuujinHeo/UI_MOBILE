@@ -3299,6 +3299,7 @@ Item {
                 anchors.fill: parent
                 color: "#f4f4f4"
             }
+            property bool checkInit:false
 
             Component.onCompleted: {
                 var loc_num = supervisor.getLocationNum();
@@ -3328,22 +3329,31 @@ Item {
                     }
                 }
             }
-
             Timer{
-                id: timer_check_localization
-                running: false
-                repeat: true
+                id: update_timer
                 interval: 500
+                running: true
+                repeat: true
                 onTriggered:{
                     if(supervisor.is_slam_running()){
+                        btn_3.enabled = true;
+                        btn_33.enabled = true;
                         btn_auto_init.running = false;
-                        timer_check_localization.stop();
+                        if(menu_location.checkInit){
+                            map.tool = "MOVE";
+                            menu_location.checkInit = false;
+                        }
                     }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
-                        timer_check_localization.stop();
                         btn_auto_init.running = false;
+                        btn_3.enabled = false;
+                        btn_33.enabled = false;
+                    }else{
+                        btn_3.enabled = false;
+                        btn_33.enabled = false;
                     }
                 }
             }
+
             Rectangle{
                 id: rect_annot_state
                 width: parent.width
@@ -3464,7 +3474,8 @@ Item {
                                     if(supervisor.getLocalizationState() !== 1){
                                         btn_auto_init.running = true;
                                         supervisor.slam_autoInit();
-                                        timer_check_localization.start();
+                                        menu_location.checkInit = true;
+//                                        timer_check_localization.start();
                                     }
 
                                 }
@@ -3544,8 +3555,8 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     if(map.new_slam_init){
-                                        btn_init.show_ani();
                                         supervisor.slam_setInit();
+                                        menu_location.checkInit = true;
                                     }
                                 }
                             }
@@ -3789,6 +3800,7 @@ Item {
                             }
                         }
                         Rectangle{
+                            id: btn_33
                             width: 78
                             height: 40
                             radius: 5
@@ -3884,7 +3896,7 @@ Item {
 
             }
 
-            Column{
+           Column{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 30
@@ -4698,16 +4710,17 @@ Item {
             interval: 500
             onTriggered:{
                 if(!supervisor.getLCMConnection()){
-
+                    print("LCMCONNECTION FALSE");
                     //맵 새로 불러오기.
                     map.init_mode();
                     map.show_connection = false;
                     map.loadmap(textfield_name22.text,"RAW");
-
                     supervisor.clear_all();
                     map.state_annotation = "DRAWING";
                     map.map_mode = "RAW";
                     map.update_canvas();
+                    supervisor.readSetting(textfield_name22.text);
+
                     loader_menu.sourceComponent = menu_annot_rotate;
                     popup_save_mapping.close();
                     timer_check_slam.stop();
