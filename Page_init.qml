@@ -25,6 +25,7 @@ Item {
         init_mode = 0;
         update_timer.start();
         statusbar.visible = false;
+//        supervisor.startSLAM();
     }
 
     function loadmap_server(result){
@@ -559,6 +560,38 @@ Item {
                             onClicked: {
                                 supervisor.programHide();
                                 mainwindow.showMinimized()
+                            }
+                        }
+                    }
+
+                    Rectangle{
+                        id: btn_start_slam
+                        width: 188
+                        height: 100
+                        radius: 60
+                        color: "transparent"
+                        border.width: 3
+                        border.color: "#e5e5e5"
+                        Column{
+                            spacing: 5
+                            anchors.centerIn: parent
+                            Image{
+                                width: 30
+                                height: 30
+                                source:"icon/btn_minimize.png"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "START SLAM"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                supervisor.startSLAM();
                             }
                         }
                     }
@@ -1376,7 +1409,7 @@ Item {
                         loader_page.item.loadmap(name);
                         loader_page.item.is_init_state = true;
                         loader_page.item.map_mode = 2;
-                        loader_page.item.init();
+                        loader_page.item.init_mode();
                         update_timer.start();
                     }
                 }
