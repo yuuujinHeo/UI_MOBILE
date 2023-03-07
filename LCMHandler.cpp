@@ -284,7 +284,8 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
     probot->status_power = msg->status_power;
     probot->status_emo = !msg->status_emo;
     probot->status_remote = msg->status_remote;
-    probot->status_charge = msg->status_charge;
+    //DEBUG
+    probot->status_charge = 0;//msg->status_charge;
     probot->motor_state = msg->ui_motor_state;
     probot->localization_state = msg->ui_loc_state;
     probot->running_state = msg->ui_auto_state;
