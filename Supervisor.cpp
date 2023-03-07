@@ -978,7 +978,7 @@ QList<int> Supervisor::getListMap(QString filename){
     cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
 
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
-    cv::warpAffine(map,map,rot,map.size(),cv::INTER_LANCZOS4);
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_NEAREST);
 
     uchar* map_data = map.data;
     QList<int> list;
@@ -1000,7 +1000,7 @@ QList<int> Supervisor::getRawListMap(QString filename){
 
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
 
-    cv::warpAffine(map,map,rot,map.size(),cv::INTER_LANCZOS4);
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_NEAREST);
 
 
     uchar* map_data = map.data;
@@ -1280,7 +1280,7 @@ QObject *Supervisor::getMap(QString filename) const{
 
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
 
-    cv::warpAffine(map,map,rot,map.size(),cv::INTER_LANCZOS4);
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_NEAREST);
 
 
     pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
@@ -1309,9 +1309,7 @@ QObject *Supervisor::getRawMap(QString filename) const{
     cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
 
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
-
-    cv::warpAffine(map,map,rot,map.size(),cv::INTER_LANCZOS4);
-
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_NEAREST);
 
     pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
 
@@ -1405,7 +1403,7 @@ void Supervisor::saveMap(QString mode, QString src, QString dst, QList<int> data
     cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
 
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
-    cv::warpAffine(map,map,rot,map.size(),cv::INTER_LANCZOS4);
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_NEAREST);
 
 
 
