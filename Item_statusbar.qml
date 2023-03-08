@@ -123,7 +123,7 @@ Item {
                 sourceSize.height: 42
                 width: 46
                 height: 42
-                source: "icon/motor_power_off.png"
+                source: "icon/icon_motor_hot.png"
             }
             Image{
                 id: image_emergency
@@ -150,7 +150,7 @@ Item {
                 sourceSize.height: 42
                 width: 46
                 height: 42
-                source: "icon/icon_motor_error.png"
+                source: "icon/icon_local_error.png"
             }
             Image{
                 id: image_robot_discon
@@ -320,11 +320,14 @@ Item {
             model_details.append({"detail":"모터초기화가 되지 않았습니다.","icon":"icon/icon_motor_error.png","error":true});
         }
         if(is_local_not_ready){
-            model_details.append({"detail":"localization failed.","icon":"icon/icon_lcm_discon.png","error":true});
+            model_details.append({"detail":"로봇 위치 초기화가 필요합니다.","icon":"icon/icon_local_error.png","error":true});
         }
         if(is_motor_power){
+            model_details.append({"detail":"모터전원(48V) 정상","icon":"icon/motor_power_on.png","error":false});
+        }else{
             model_details.append({"detail":"모터에 전원이 인가되지 않았습니다.","icon":"icon/motor_power_off.png","error":true});
         }
+
         if(is_emergency){
             model_details.append({"detail":"EMO 버튼이 눌렸습니다.","icon":"icon/icon_emergency.png","error":true});
         }
@@ -403,7 +406,6 @@ Item {
             is_emergency = supervisor.getEmoStatus();
 
             if(is_motor_power && !is_emergency){
-
                 if(supervisor.getMotorTemperature(0) > supervisor.getMotorWarningTemperature()){
                     is_motor_hot = true;
                 }else if(supervisor.getMotorTemperature(0) > supervisor.getMotorWarningTemperature()){

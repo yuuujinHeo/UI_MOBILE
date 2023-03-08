@@ -25,7 +25,6 @@ Item {
         init_mode = 0;
         update_timer.start();
         statusbar.visible = false;
-//        supervisor.startSLAM();
     }
 
     function loadmap_server(result){
@@ -126,6 +125,19 @@ Item {
                 anchors.fill: parent
                 color: "#f4f4f4"
             }
+            Timer{
+                running: true
+                interval: 500
+                repeat: true
+                onTriggered:{
+                    if(supervisor.getLCMConnection()){
+                        btn_slam_start.enabled = true;
+                    }else{
+                        btn_slam_start.enabled = false;
+                    }
+                }
+            }
+
             Column{
                 anchors.top: parent.top
                 anchors.topMargin: 200
@@ -732,7 +744,7 @@ Item {
                         loadPage(pmap);
                         loader_page.item.is_init_state = true;
                         loader_page.item.map_mode = 4;
-                        loader_page.item.init();
+//                        loader_page.item.init();
                     }
                 }
             }
@@ -778,6 +790,80 @@ Item {
     }
 
 
+    //로봇과 연결은 되었으나 init되지 않을 때
+    Component{
+        id: item_motor_init
+        Item{
+            objectName: "init_motor"
+            anchors.fill: parent
+            Component.onCompleted: {
+                statusbar.visible = true;
+            }
+            Rectangle{
+                anchors.fill: parent
+                color: "#f4f4f4"
+            }
+            Image{
+                id: image_logo4
+                sourceSize.width: 2245/6
+                sourceSize.height: 1004/6
+                anchors.top: parent.top
+                anchors.topMargin: 200
+                anchors.horizontalCenter: parent.horizontalCenter
+                source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
+            }
+            Text{
+                id: text_notice4
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: image_logo4.bottom
+                anchors.topMargin: 80
+                horizontalAlignment: Text.AlignHCenter
+                color: "#7e7e7e"
+                font.family: font_noto_r.name
+                text: "모터가 초기화되지 않았습니다. Emergency 스위치를 확인해주세요."
+                font.pixelSize: 20
+            }
+            Rectangle{
+                id: btn_slam_pass
+                width: 188
+                height: 100
+                radius: 60
+                color: "transparent"
+                border.width: 3
+                border.color: "#e5e5e5"
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: text_notice4.bottom
+                anchors.topMargin: 80
+                Column{
+                    spacing: 5
+                    anchors.centerIn: parent
+                    Image{
+                        id: image_charge1
+                        width: 30
+                        height: 30
+                        source:"icon/icon_remove.png"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        id: text_slam_pass
+                        text: "넘어가기 (디버그 용)"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                    }
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        loadPage(pkitchen);
+    //                    update_timer.stop();
+                    }
+                }
+            }
+        }
+
+    }
+
+
 
 
 
@@ -789,6 +875,15 @@ Item {
         repeat: false
         onTriggered: {
             loader_init.item.disable_failload();
+        }
+    }
+    Timer{
+        id: timer_wait_lcm
+        interval: 5000
+        running: false
+        repeat: false
+        onTriggered: {
+            loader_init.sourceComponent = item_lcm;
         }
     }
 
@@ -803,6 +898,7 @@ Item {
                 if(supervisor.isExistRobotINI()){
                     supervisor.writelog("[QML] INIT - Ini found");
                     init_mode = 1;
+
                 }else{
                     if(loader_init.item.objectName != "init_ini"){
                         loader_init.sourceComponent = item_ini_init
@@ -851,18 +947,28 @@ Item {
             }else if(init_mode == 2){
                 if(supervisor.getLCMConnection()){
                     init_mode = 3;
+                    timer_wait_lcm.stop();
                 }else{
-                    if(loader_init.item.objectName != "init_lcm")
-                        loader_init.sourceComponent = item_lcm
+                    if(loader_init.item.objectName != "init_lcm" && !timer_wait_lcm.running)
+                        timer_wait_lcm.start();
                 }
             }else if(init_mode == 3){
-                if(loader_init.item.objectName != "init_slam")
-                    loader_init.sourceComponent = item_slam_init
-                if(supervisor.getLocalizationState() === 2 && supervisor.getMotorState() == 1){
+                if(supervisor.getLCMConnection() && supervisor.getLocalizationState() === 2){
                     init_mode = 4;
+                }else{
+                    if(loader_init.item.objectName != "init_slam")
+                        loader_init.sourceComponent = item_slam_init
+                }
+
+            }else if(init_mode == 4){
+                if(supervisor.getLCMConnection() && supervisor.getMotorState() === 1){
+                    init_mode = 5;
                     update_timer.stop();
                     loadPage(pkitchen);
                     supervisor.initdone();
+                }else{
+                    if(loader_init.item.objectName != "init_motor")
+                        loader_init.sourceComponent = item_motor_init
                 }
             }
         }

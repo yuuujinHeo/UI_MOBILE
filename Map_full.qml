@@ -274,9 +274,9 @@ Item {
     property int object_num: supervisor.getObjectNum();
 
     property bool new_slam_init: false
-    property var init_x: supervisor.getInitPoseX()/grid_size;
-    property var init_y: supervisor.getInitPoseY()/grid_size;
-    property var init_th:-supervisor.getInitPoseTH()-Math.PI/2;
+    property var init_x: origin_x;
+    property var init_y: origin_y;
+    property var init_th:0;
 
     property var robot_x: supervisor.getRobotx()/grid_size + origin_x;
     property var robot_y: supervisor.getRoboty()/grid_size + origin_y;
@@ -1579,6 +1579,7 @@ Item {
                 ctx.arc(init_x,init_y,robot_radius/grid_size, -init_th-Math.PI/2, -init_th-Math.PI/2+2*Math.PI, true);
                 ctx.fill()
                 ctx.stroke()
+                print(init_x,init_y,robot_radius,grid_size,init_th);
 
                 var distance = (robot_radius/grid_size)*2.2;
                 var distance2 = distance*0.7;
@@ -1613,15 +1614,12 @@ Item {
                 ctx.fillStyle = "steelblue";
                 ctx.lineWidth = 3;
 
-
                 ctx.beginPath();
                 ctx.moveTo(new_obj_x1,new_obj_y1);
                 ctx.rect(new_obj_x1,new_obj_y1, new_obj_x2-new_obj_x1, new_obj_y2 - new_obj_y1);
                 ctx.closePath();
                 ctx.stroke();
                 ctx.fill();
-
-
 
                 ctx.lineWidth = 1;
                 ctx.strokeStyle = "blue";

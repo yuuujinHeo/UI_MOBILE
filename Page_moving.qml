@@ -155,6 +155,7 @@ Item {
             if(password > 4){
                 password = 0;
                 loadPage(pmovefail);
+                loader_page.item.setNotice(3);
             }
         }
     }

@@ -446,7 +446,7 @@ Item {
                     id: voice_test
                     autoPlay: false
                     volume: slider_volume_voice.value/100
-                    source: "bgm/voice_start_serving1.mp3"
+                    source: "bgm/voice_start_serving.mp3"
                 }
                 Audio{
                     id: bgm_test
@@ -548,6 +548,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
+                                            print("test play")
                                             voice_test.play();
                                         }
                                     }
@@ -1790,8 +1791,8 @@ Item {
                                     width: rr.width*0.8
                                     height: 40
                                     from: 5.0
-                                    to: 120.0
-                                    value: 120.0
+                                    to: 360.0
+                                    value: 360.0
                                 }
                             }
                         }
@@ -3200,6 +3201,7 @@ Item {
 
 
                         supervisor.readSetting();
+                        supervisor.restartSLAM();
                         init();
                     }
                 }

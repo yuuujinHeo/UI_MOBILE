@@ -30,5 +30,7 @@ int main(int argc, char *argv[])
         QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     object = engine.rootObjects()[0];
+
+    qDebug() << "???????????????";
     return app.exec();
 }

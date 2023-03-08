@@ -16,20 +16,26 @@ Window {
     width: 1280
     height: 800
     title: qsTr("Hello World")
-    flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
-    visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
+//    flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
+//    visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
 
-    onVisibilityChanged: {
-        if(homePath.split("/")[2]==="odroid"){
-            if(mainwindow.visibility == Window.Minimized){
-                print("minimized");
-            }else if(mainwindow.visibility == Window.FullScreen){
-                print("fullscren");
-            }else{
-                supervisor.writelog("[QML - MAIN] Window show fullscreen");
-                mainwindow.visibility = Window.FullScreen;
-            }
-        }
+//    onVisibilityChanged: {
+//        if(homePath.split("/")[2]==="odroid"){
+//            if(mainwindow.visibility == Window.Minimized){
+//                print("minimized");
+//            }else if(mainwindow.visibility == Window.FullScreen){
+//                print("fullscren");
+//            }else{
+//                supervisor.writelog("[QML - MAIN] Window show fullscreen");
+//                mainwindow.visibility = Window.FullScreen;
+//            }
+//        }
+//    }
+//    Component.onDestroyed: {
+//        print("destoryed");
+//    }
+    Component.onDestruction: {
+        print("destruction")
     }
 
     property color color_red: "#E7584D"
@@ -64,13 +70,46 @@ Window {
     property string cur_location;
 
     function movefail(){
-        if(loader_page.item.objectName != "page_movefail"){
-            play_movefailmsg();
+        if(loader_page.item.objectName != "page_movefail" && loader_page.item.objectName != "page_map"){
             loadPage(pmovefail);
+            //0: no path /1: local fail /2: emergency /3: user stop /4: motor error
+            if(supervisor.getEmoStatus()){
+                loader_page.item.setNotice(2);
+                voice_all_stop();
+                voice_emergency.play();
+                print("movefail emergency")
+            }else if(supervisor.getMotorState() === 0){
+                loader_page.item.setNotice(4);
+                voice_all_stop();
+                voice_motor_error.play();
+                print("movefail motor")
+            }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
+                loader_page.item.setNotice(1);
+                voice_all_stop();
+                voice_localfail.play();
+                print("movefail local")
+            }else{
+                loader_page.item.setNotice(0);
+                voice_all_stop();
+                play_movefailmsg();
+                print("movefail no path")
+            }
         }
     }
+    function voice_all_stop(){
+        voice_avoid.stop();
+        voice_emergency.stop();
+        voice_localfail.stop();
+        voice_motor_error.stop();
+        voice_movecharge.stop();
+        voice_movefail.stop();
+        voice_movewait.stop();
+        voice_serving.stop();
+    }
+
     function stateinit(){
-        loadPage(pinit);
+        if(loader_page.item.objectName != "page_map")
+            loadPage(pinit);
     }
 
     function movelocation(){
@@ -238,6 +277,9 @@ Window {
         robot_type = supervisor.getRobotType()
         robot_name = supervisor.getRobotName()
     }
+    Supervisor{
+        id:supervisor
+    }
 
     Keyemitter{
         id: emitter
@@ -254,9 +296,6 @@ Window {
         source: pinit
     }
 
-    Supervisor{
-        id:supervisor
-    }
 
     Timer{
         id: timer_update
@@ -319,18 +358,30 @@ Window {
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_avoid.mp3"
-        onStatusChanged: {
-            print("Audio Status Avoid: ",status);
-        }
     }
     Audio{
         id: voice_movefail
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_movefail.mp3"
-        onStatusChanged: {
-            print("Audio Status MoveFail: ",status);
-        }
+    }
+    Audio{
+        id: voice_localfail
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_local_fail.mp3"
+    }
+    Audio{
+        id: voice_motor_error
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_motor_error.mp3"
+    }
+    Audio{
+        id: voice_emergency
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_emergency.mp3"
     }
 
     Item_statusbar{

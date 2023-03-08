@@ -285,10 +285,11 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
     probot->status_emo = !msg->status_emo;
     probot->status_remote = msg->status_remote;
     //DEBUG
-    probot->status_charge = 0;//msg->status_charge;
+    probot->status_charge = msg->status_charge;
     probot->motor_state = msg->ui_motor_state;
     probot->localization_state = msg->ui_loc_state;
     probot->running_state = msg->ui_auto_state;
+    probot->obs_state = msg->ui_obs_state;
     probot->curPose.x = msg->robot_pose[0];
     probot->curPose.y = msg->robot_pose[1];
     probot->curPose.th = msg->robot_pose[2];
@@ -308,7 +309,7 @@ void LCMHandler::robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::
         ST_POSE temp;
         temp.x = msg->path[i][0];
         temp.y = msg->path[i][1];
-        temp.th = msg->path[i][2];
+        temp.th = 0;//msg->path[i][2];
         if(probot->curPath.size() > i){
             probot->curPath[i] = temp;
         }else{
@@ -454,12 +455,17 @@ void LCMHandler::onTimer(){
     }
 
     static int count=0;
-    if(count++%10==0){
+    if(count++%5==0){
         flag_rx = false;
         flag_tx = false;
     }
-    //LCM 통신 연결상태 확인(3초)
-    if(connect_count++ > 15){
+
+    //LCM 통신 연결상태 확인(2초)
+    if(connect_count++ > 5){
         isconnect = false;
+    }
+
+    if(isconnect && probot->localization_state==LOCAL_READY){
+        probot->lastPose = probot->curPose;
     }
 }
