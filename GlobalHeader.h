@@ -118,9 +118,12 @@ typedef struct{
     int motor_state = 0;
     int localization_state = 0;
     int running_state = 0;
+    int obs_state = 0;
+
     int err_code = 0;
 
     ST_POSE curPose;
+    ST_POSE lastPose;
     QString curLocation = "";
     QVector<int> pickupTrays;
     ST_POSE curTarget;

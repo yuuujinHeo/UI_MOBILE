@@ -6,6 +6,7 @@ import QtQuick.Dialogs 1.2
 import Qt.labs.platform 1.0 as Platform
 import QtQuick.Shapes 1.12
 import QtGraphicalEffects 1.0
+import QtMultimedia 5.12
 import "."
 import io.qt.Supervisor 1.0
 
@@ -18,25 +19,23 @@ Item {
     property var joy_axis_left_ud: 0
     property var joy_axis_right_rl: 0
 
+    function setNotice(num){
+        notice_num = num;
+    }
 
     //0: no path /1: local fail /2: emergency /3: user stop /4: motor error
     property int notice_num: 0
     onNotice_numChanged: {
         if(notice_num === 0){
-            text_reason.text = "패스를 찾을 수 없음";
-
+            text.text = "목적지로 이동하는데 실패하였습니다.\nEmergency 버튼을 누르고 로봇을 수동으로 이동시켜주세요."
         }else if(notice_num === 1){
-            text_reason.text = "로봇 초기화 틀어짐";
-
+            text.text = "로봇의 초기화가 필요합니다.\nLocalization을 다시 수행해주세요."
         }else if(notice_num === 2){
-            text_reason.text = "수동모드로 전환됨";
-
+            text.text = "Emergency가 눌렸습니다.\n 로봇을 수동으로 이동시켜주세요."
         }else if(notice_num === 3){
-            text_reason.text = "사용자에 의해 정지됨";
-
+            text.text = "사용자에 의해 정지되었습니다."
         }else if(notice_num === 4){
-            text_reason.text = "모터 초기화 틀어짐";
-
+            text.text = "목적지로 이동하는데 실패하였습니다.\nEmergency 버튼을 누르고 로봇을 수동으로 이동시켜주세요."
         }
     }
 
@@ -113,10 +112,12 @@ Item {
                 anchors.topMargin: 50
                 spacing: 30
                 Rectangle{
+                    id: btn_reset
                     width: 90
                     height: 80
                     radius: 5
-                    color:"white"
+                    enabled: false
+                    color: enabled?"white":color_gray
                     Column{
                         anchors.centerIn: parent
                         spacing: 5
@@ -128,6 +129,7 @@ Item {
                         }
                         Text{
                             text: "다시 시작"
+                            color:btn_reset.enabled?"black":"white"
                             font.family: font_noto_r.name
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
@@ -137,6 +139,7 @@ Item {
                         radius: 5
                         color: color_navy
                         source: parent
+                        visible:btn_reset.enabled?true:false
                         z: -1
                     }
                     MouseArea{
@@ -238,12 +241,12 @@ Item {
                     height: 80
                     color: color_dark_navy
                     Text{
-                        id: text_reason
+                        id: text_obs
                         anchors.centerIn : parent
                         font.family: font_noto_b.name
                         font.pixelSize: 30
                         color: "white"
-                        text:"수동모드로 전환됨"
+                        text:""
                     }
                 }
                 Rectangle{
@@ -256,18 +259,72 @@ Item {
                     Row{
                         anchors.centerIn: parent
                         spacing: 30
-                        Item_button{
-                            id: btn_manual
-                            width: 80
-                            shadow_color: color_gray
-                            icon: "icon/icon_manualmove.png"
-                            name: "수동조작 중"
-                            running: supervisor.getEmoStatus()
+                        Rectangle{
+                            id: state_manual
+                            width: 100
+                            height: 80
+                            radius: 10
+                            color: "white"
+                            enabled: supervisor.getEmoStatus()
+                            border.color:color_green
+                            border.width: enabled?3:0
+                            Column{
+                                spacing: 3
+                                anchors.centerIn: parent
+                                Image{
+                                    source: "icon/icon_manualmove.png"
+                                    Component.onCompleted: {
+                                        if(sourceSize.width > 30)
+                                            sourceSize.width = 30
+
+                                        if(sourceSize.height > 30)
+                                            sourceSize.height = 30
+                                    }
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                                Text{
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 12
+                                    text: "Emergency 눌림"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+                        }
+                        Rectangle{
+                            id: state_obs
+                            width: 100
+                            height: 80
+                            radius: 10
+                            color: "white"
+                            enabled: supervisor.getObsState()
+                            border.color:color_red
+                            border.width: enabled?3:0
+                            Column{
+                                anchors.centerIn: parent
+                                spacing: 3
+                                Image{
+                                    source: "icon/icon_cancelpath.png"
+                                    Component.onCompleted: {
+                                        if(sourceSize.width > 30)
+                                            sourceSize.width = 30
+
+                                        if(sourceSize.height > 30)
+                                            sourceSize.height = 30
+                                    }
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                                Text{
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 12
+                                    text: "장애물 걸림"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
                         }
                     }
                 }
-
-
                 Grid{
                     id: grid_status
                     rows: 20
@@ -640,6 +697,14 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     map.tool = "SLAM_INIT";
+                                    map.new_slam_init = true;
+                                    if(supervisor.getGridWidth() > 0){
+                                        map.init_x = supervisor.getlastRobotx()/supervisor.getGridWidth() + supervisor.getOrigin()[0];
+                                        map.init_y = supervisor.getlastRoboty()/supervisor.getGridWidth() + supervisor.getOrigin()[1];
+                                        map.init_th  = supervisor.getlastRobotth();// - Math.PI/2;
+                                        supervisor.setInitPos(map.init_x,map.init_y,map.init_th);
+                                    }
+                                    map.update_canvas();
                                 }
                             }
                         }
@@ -858,7 +923,7 @@ Item {
         }
         Image{
             id: icon_warn
-            source: "icon/icon_warning.png"
+            source: "icon/icon_emergency.png"
             width: 130
             height: 130
             anchors.horizontalCenter: parent.horizontalCenter
@@ -868,7 +933,7 @@ Item {
 
         Text{
             id: text
-            text:"목적지로 이동하는데 실패하였습니다.\n주변에 방해되는 요소를 제거하거나 로봇을 수동으로 이동시켜주세요."
+            text:"목적지로 이동하는데 실패하였습니다.\nEmergency 버튼을 누르고 로봇을 수동으로 이동시켜주세요."
             anchors.top: icon_warn.bottom
             anchors.topMargin: 40
             anchors.horizontalCenter: parent.horizontalCenter
@@ -882,6 +947,7 @@ Item {
             source: "icon/joy_up.png"
             width: 60
             height: 40
+            visible: area_swipe.enabled
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 40
             anchors.horizontalCenter: parent.horizontalCenter
@@ -890,6 +956,7 @@ Item {
             text: "위로 올리시면 메뉴가 나옵니다."
             font.family: font_noto_r.name
             color: "#e8e8e8"
+            visible: image_swipe.visible
             opacity: image_swipe.opacity
             anchors.verticalCenter: image_swipe.verticalCenter
             anchors.left: image_swipe.right
@@ -899,6 +966,7 @@ Item {
     MouseArea{
         id: area_swipe
         anchors.fill: parent
+        enabled: false
         property var firstX;
         property var firstY;
         onPressed: {
@@ -922,6 +990,12 @@ Item {
         }
     }
 
+    Audio{
+        id: voice_obs_close
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_obs_too_close.mp3"
+    }
     Timer{
         id: timer_check_pause
         interval: 500
@@ -944,14 +1018,52 @@ Item {
         running: true
         repeat: true
         onTriggered: {
+            //0: no path /1: local fail /2: emergency /3: user stop /4: motor error
+            if(notice_num === 0){
+                if(supervisor.getEmoStatus()){
+                    if(notice.y === 0)
+                        area_swipe.enabled = true;
+                }else{
+                    area_swipe.enabled = false;
+                }
+            }else if(notice_num === 1){
+                if(notice.y === 0)
+                    area_swipe.enabled = true;
+            }else if(notice_num === 2){
+                if(notice.y === 0)
+                    area_swipe.enabled = true;
+            }else if(notice_num === 3){
+                if(notice.y === 0)
+                    area_swipe.enabled = true;
+            }else if(notice_num === 4){
+                if(supervisor.getEmoStatus()){
+                    if(notice.y === 0)
+                        area_swipe.enabled = true;
+                }else{
+                    area_swipe.enabled = false;
+                }
+            }
+
             if(supervisor.getEmoStatus()){
-                text_reason.text = "Emergency 눌림(수동모드)"
                 rect_emo.color = color_green;
-                btn_manual.running = true;
+                state_manual.enabled = true;
             }else{
-                btn_manual.running = false;
+                state_manual.enabled = false;
                 rect_emo.color = color_light_gray;
             }
+
+            if(supervisor.getObsState()){
+                state_obs.enabled = true;
+            }else{
+                state_obs.enabled = false;
+            }
+
+            if(supervisor.getEmoStatus() === 0 && supervisor.getObsState() === 0){
+                btn_reset.enabled = true;
+            }else{
+                btn_reset.enabled = false;
+            }
+
             if(supervisor.getRemoteStatus()){
                 rect_remote.color = color_green;
             }else{

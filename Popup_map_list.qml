@@ -23,6 +23,9 @@ Popup{
         list_map.model.clear();
         var num = supervisor.getAvailableMap();
         var mapname = supervisor.getMapname();
+        btn_use.enabled = false;
+        btn_draw.enabled = false;
+        btn_erase.enabled = false;
         for(var i=0; i<num; i++){
             list_map.model.append({"name":supervisor.getAvailableMapPath(i),"selected":false});
             if(mapname === supervisor.getAvailableMapPath(i)){
@@ -35,6 +38,8 @@ Popup{
                         btn_draw.enabled = true;
                         btn_draw_new.enabled = true;
                     }else{
+                        btn_use.enabled = false;
+                        btn_draw.enabled = false;
                         btn_draw_new.enabled = true;
                     }
                 }else{
@@ -57,9 +62,6 @@ Popup{
                 supervisor.readSetting(mapname);
             }
         }
-        btn_use.enabled = false;
-        btn_draw.enabled = false;
-        btn_erase.enabled = false;
     }
     function update_list(){
         list_map.model.clear();
@@ -69,7 +71,6 @@ Popup{
         }
         select_map_list = -1;
         map_list_view.loadmap("");
-        map_list_view.init_mode();
     }
 
     Component{
@@ -119,34 +120,37 @@ Popup{
                     }else{
                         select_map_list = index;
                         btn_erase.enabled = true;
-
-
-
+                        map_list_view.init_mode();
+                        map_list_view.show_connection= false
+                        map_list_view.show_location= true
+                        map_list_view.show_object=  true
+                        map_list_view.show_lidar= false
                         if(supervisor.isExistMap(name)){
                             map_list_view.loadmap(name,"EDITED");
+                            print(name, supervisor.isExistAnnotation(name))
                             if(supervisor.isExistAnnotation(name)){
-
                                 btn_use.enabled = true;
                                 btn_draw.enabled = true;
                                 btn_draw_new.enabled = true;
                             }else{
+                                btn_use.enabled = false;
+                                btn_draw.enabled = true;
                                 btn_draw_new.enabled = true;
                             }
                         }else{
                             map_list_view.loadmap(name,"RAW");
                             if(supervisor.isExistRawMap(name)){
                                 btn_draw_new.enabled = true;
+                                btn_use.enabled = false;
+                                btn_draw.enabled = false;
                                 if(supervisor.isExistAnnotation(name)){
                                     btn_draw.enabled = true;
                                 }
                             }else{
-
+                                btn_use.enabled = false;
+                                btn_draw.enabled = false;
                             }
-
                         }
-
-
-
                         list_map_detail.model.clear();
                         var num = supervisor.getMapFileSize(name);
                         for(var i=0; i<num; i++){
@@ -155,6 +159,8 @@ Popup{
 
                         supervisor.readSetting(name);
                     }
+
+                    map_list_view.update_canvas();
                 }
             }
         }
@@ -339,7 +345,7 @@ Popup{
                                         loader_page.item.loadmap(name);
                                         loader_page.item.is_init_state = true;
                                         loader_page.item.map_mode = 2;
-                                        loader_page.item.init();
+//                                        loader_page.item.init();
                                     }
                                 }
                             }

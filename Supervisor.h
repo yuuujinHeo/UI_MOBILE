@@ -28,6 +28,7 @@ class Supervisor : public QObject
     Q_OBJECT
 public:
     explicit Supervisor(QObject *parent = nullptr);
+    ~Supervisor();
 public:
 
     ////*********************************************  FLAGS   ***************************************************////
@@ -344,6 +345,7 @@ public:
     Q_INVOKABLE int getMotorState();
     Q_INVOKABLE int getLocalizationState();
     Q_INVOKABLE int getStateMoving();
+    Q_INVOKABLE int getObsState();
     Q_INVOKABLE int getErrcode();
     Q_INVOKABLE QString getRobotName();
 
@@ -368,6 +370,9 @@ public:
     Q_INVOKABLE float getRobotx();
     Q_INVOKABLE float getRoboty();
     Q_INVOKABLE float getRobotth();
+    Q_INVOKABLE float getlastRobotx();
+    Q_INVOKABLE float getlastRoboty();
+    Q_INVOKABLE float getlastRobotth();
 
     Q_INVOKABLE int getPathNum();
     Q_INVOKABLE float getPathx(int num);

@@ -9,6 +9,7 @@ Item {
     width: 1280
     height: 800
 
+    property var password: 0
     property bool is_charging: false
     property double battery: 0
     property string robotName: "test"
@@ -74,14 +75,40 @@ Item {
             if(supervisor.getChargeStatus()){
                 if(!is_charging){
                     timer_bat.start();
-                    voice_start_charge.play();
+                    voice_stop_charge.stop();
+                    voice_charging.play();
                     is_charging = true;
                     text_mention.text = "충전 중입니다."
                 }
             }else{
                 if(is_charging){
                     init();
+                    voice_charging.stop();
                     voice_stop_charge.play();
+                }
+            }
+
+            if(popup_question.visible){
+                if(supervisor.getLCMConnection() && supervisor.getStateMoving() !== 0){
+                    text_quest.text = "대기 장소로 이동<font color=\"white\">하시겠습니까?</font>";
+                    btn_yes.visible = true;
+                    btn_no.visible = true;
+                    area_cancel3.enabled = false;
+                }else if(supervisor.getChargeStatus()){
+                    text_quest.text = "충전 케이블을 분리해주세요.";
+                    btn_yes.visible = false;
+                    btn_no.visible = false;
+                    area_cancel3.enabled = true;
+                }else if(supervisor.getEmoStatus()){
+                    text_quest.text = "비상스위치를 풀어주세요.";
+                    btn_yes.visible = false;
+                    btn_no.visible = false;
+                    area_cancel3.enabled = true;
+                }else{
+                    text_quest.text = "로봇이 준비상태가 아닙니다.";
+                    btn_yes.visible = false;
+                    btn_no.visible = false;
+                    area_cancel3.enabled = true;
                 }
             }
         }
@@ -121,6 +148,9 @@ Item {
             popup_question.visible = true;
         }
     }
+
+
+
     Item{
         id: popup_question
         width: parent.width
@@ -132,15 +162,22 @@ Item {
                 text_quest.text = "대기 장소로 이동<font color=\"white\">하시겠습니까?</font>";
                 btn_yes.visible = true;
                 btn_no.visible = true;
+                area_cancel3.enabled = false;
             }else if(supervisor.getChargeStatus()){
                 text_quest.text = "충전 케이블을 분리해주세요.";
                 btn_yes.visible = false;
+                btn_no.visible = false;
+                area_cancel3.enabled = true;
             }else if(supervisor.getEmoStatus()){
                 text_quest.text = "비상스위치를 풀어주세요.";
                 btn_yes.visible = false;
+                btn_no.visible = false;
+                area_cancel3.enabled = true;
             }else{
                 text_quest.text = "로봇이 준비상태가 아닙니다.";
                 btn_yes.visible = false;
+                btn_no.visible = false;
+                area_cancel3.enabled = true;
             }
         }
 
@@ -243,7 +280,39 @@ Item {
             }
 
         }
-}
+        MouseArea{
+            id: area_cancel3
+            anchors.fill: parent
+            enabled: false
+            onClicked: {
+                timer_bat.start();
+                popup_question.visible = false;
+
+            }
+        }
+        MouseArea{
+            id: area_debug
+            width: 100
+            height: 100
+            anchors.right: parent.right
+            anchors.bottom : parent.bottom
+            z: 99
+            onClicked: {
+                password++;
+                print(password);
+                if(password > 4){
+                    password = 0;
+                    loadPage(pkitchen);
+                }
+            }
+        }
+    }
+    Audio{
+        id: voice_charging
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_charging.mp3"
+    }
     Audio{
         id: voice_start_charge
         autoPlay: false

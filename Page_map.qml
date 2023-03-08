@@ -5,6 +5,7 @@ import QtQuick.Dialogs 1.2
 import Qt.labs.platform 1.0 as Platform
 import QtQuick.Shapes 1.12
 import QtGraphicalEffects 1.0
+import QtMultimedia 5.12
 import "."
 import io.qt.Supervisor 1.0
 
@@ -36,6 +37,10 @@ Item {
 
     property bool is_init_state: false
     property bool is_save_annot: false
+
+    property var last_robot_x: supervisor.getOrigin()[0]
+    property var last_robot_y: supervisor.getOrigin()[1]
+    property var last_robot_th: 0
 
     //annotation
     property string select_object_type: "Wall"
@@ -754,9 +759,17 @@ Item {
                 repeat: true
                 onTriggered:{
                     if(supervisor.getMappingflag()){
-                        is_mapping = true;
+                        if(!is_mapping){
+                            voice_stop_mapping.stop();
+                            voice_start_mapping.play();
+                            is_mapping = true;
+                        }
                     }else{
-                        is_mapping = false;
+                        if(is_mapping){
+                            voice_start_mapping.stop();
+                            voice_stop_mapping.play();
+                            is_mapping = false;
+                        }
                     }
 
                     if(supervisor.getEmoStatus()){
@@ -1029,6 +1042,14 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 map.tool = "SLAM_INIT";
+                                map.new_slam_init = true;
+                                if(supervisor.getGridWidth() > 0){
+                                    map.init_x = supervisor.getlastRobotx()/supervisor.getGridWidth() + supervisor.getOrigin()[0];
+                                    map.init_y = supervisor.getlastRoboty()/supervisor.getGridWidth() + supervisor.getOrigin()[1];
+                                    map.init_th  = supervisor.getlastRobotth();// - Math.PI/2;
+                                    supervisor.setInitPos(map.init_x,map.init_y,map.init_th);
+                                }
+                                map.update_canvas();
                             }
                         }
                     }
@@ -3459,6 +3480,14 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     map.tool = "SLAM_INIT";
+                                    map.new_slam_init = true;
+                                    if(supervisor.getGridWidth() > 0){
+                                        map.init_x = supervisor.getlastRobotx()/supervisor.getGridWidth() + supervisor.getOrigin()[0];
+                                        map.init_y = supervisor.getlastRoboty()/supervisor.getGridWidth() + supervisor.getOrigin()[1];
+                                        map.init_th  = supervisor.getlastRobotth();// - Math.PI/2;
+                                        supervisor.setInitPos(map.init_x,map.init_y,map.init_th);
+                                    }
+                                    map.update_canvas();
                                 }
                             }
                         }
@@ -4424,6 +4453,7 @@ Item {
         }
     }
 
+
     //Dialog(Popup) ================================================================
     FileDialog{
         id: fileload
@@ -4707,7 +4737,7 @@ Item {
             id: timer_check_slam
             running: false
             repeat: true
-            interval: 500
+            interval: 100
             onTriggered:{
                 if(!supervisor.getLCMConnection()){
                     print("LCMCONNECTION FALSE");
@@ -4823,10 +4853,10 @@ Item {
                             onClicked:{
                                 if(textfield_name22.text == ""){
                                 }else{
+                                    timer_check_slam.start();
                                     supervisor.saveMapping(textfield_name22.text);
                                     supervisor.setMap(textfield_name22.text);
 
-                                    timer_check_slam.start();
 //                                    //save temp Image
 //                                    map.save_map("map_temp.png");
 
@@ -5829,4 +5859,16 @@ Item {
         loader_menu.item.update();
     }
 
+    Audio{
+        id: voice_start_mapping
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_start_mapping.mp3"
+    }
+    Audio{
+        id: voice_stop_mapping
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_stop_mapping.mp3"
+    }
 }
