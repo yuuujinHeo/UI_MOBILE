@@ -820,12 +820,13 @@ Item {
                     }else{
                         if(is_mapping){
                             voice_start_mapping.stop();
-                            voice_stop_mapping.play();
+//                            voice_stop_mapping.play();
                             is_mapping = false;
                         }
                     }
 
                     if(supervisor.getEmoStatus()){
+                        state_manual.enabled = true;
                         timer_check_keyboard.stop();
                         timer_get_joy.stop();
 //                        col_manual.visible = true;
@@ -833,6 +834,7 @@ Item {
 //                        row_joysticks.visible = false;
 //                        keyboard_arrow.visible = false;
                     }else{
+                        state_manual.enabled = false;
 //                        if(row_joysticks.visible || keyboard_arrow.visible){
 //                            col_manual.visible = false;
 //                        }else{
@@ -4405,6 +4407,7 @@ Item {
                                 map_current.map_mode = "EDITED";
                                 map_current.loadmap(supervisor.getMapname(),"EDITED");
                                 map_current.update_canvas();
+                                loadPage(pinit);
                             }
                         }
                     }
@@ -4849,13 +4852,13 @@ Item {
                             onClicked:{
                                 supervisor.stopMapping();
                                 popup_reset_mapping.close();
-                                if(combobox_gridsize.currentText === "3cm"){
-                                    map.grid_size = 0.03;
-                                    supervisor.startMapping(0.03);
-                                }else if(combobox_gridsize.currentText === "5cm"){
-                                    map.grid_size = 0.05;
-                                    supervisor.startMapping(0.05);
-                                }
+//                                if(combobox_gridsize.currentText === "3cm"){
+//                                    map.grid_size = 0.03;
+//                                    supervisor.startMapping(0.03);
+//                                }else if(combobox_gridsize.currentText === "5cm"){
+//                                    map.grid_size = 0.05;
+//                                    supervisor.startMapping(0.05);
+//                                }
                             }
                         }
                     }

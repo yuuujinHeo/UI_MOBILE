@@ -954,9 +954,9 @@ void Supervisor::restartSLAM(){
             plog->write("[SUPERVISOR] RESTART SLAM -> RUNNING");
             QProcess *tempprocess = new QProcess(this);
             tempprocess->start(QDir::homePath() + "/kill_slam.sh");
-            QThread::sleep(1);
-            tempprocess->kill();
-            delete tempprocess;
+            QThread::sleep(2);
+//            tempprocess->kill();
+//            delete tempprocess;
         }
         probot->localization_state = LOCAL_NOT_READY;
         probot->motor_state = MOTOR_NOT_READY;

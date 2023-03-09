@@ -107,5 +107,25 @@
         <file alias="bgm/voice_start_charge.mp3">../bgm/voice_start_charge.mp3</file>
         <file alias="bgm/voice_stop_charge.mp3">../bgm/voice_stop_charge.mp3</file>
         <file alias="bgm/voice_thanks.mp3">../bgm/voice_thanks.mp3</file>
+        <file alias="icon/bat_large_1.png">../icon/bat_large_1.png</file>
+        <file alias="icon/bat_large_2.png">../icon/bat_large_2.png</file>
+        <file alias="icon/bat_large_3.png">../icon/bat_large_3.png</file>
+        <file alias="icon/bat_large_charge.png">../icon/bat_large_charge.png</file>
+        <file alias="icon/bat_large_full.png">../icon/bat_large_full.png</file>
+        <file alias="icon/icon_emergency.png">../icon/icon_emergency.png</file>
+        <file alias="icon/icon_motor_error.png">../icon/icon_motor_error.png</file>
+        <file alias="icon/icon_motor_hot.png">../icon/icon_motor_hot.png</file>
+        <file alias="icon/motor_power_off.png">../icon/motor_power_off.png</file>
+        <file alias="icon/motor_power_on.png">../icon/motor_power_on.png</file>
+        <file alias="icon/icon_local_error.png">../icon/icon_local_error.png</file>
+        <file alias="bgm/voice_charging.mp3">../bgm/voice_charging.mp3</file>
+        <file alias="bgm/voice_emergency.mp3">../bgm/voice_emergency.mp3</file>
+        <file alias="bgm/voice_local_fail.mp3">../bgm/voice_local_fail.mp3</file>
+        <file alias="bgm/voice_motor_error.mp3">../bgm/voice_motor_error.mp3</file>
+        <file alias="bgm/voice_obs_too_close.mp3">../bgm/voice_obs_too_close.mp3</file>
+        <file alias="bgm/voice_start_mapping.mp3">../bgm/voice_start_mapping.mp3</file>
+        <file alias="bgm/voice_stop_mapping.mp3">../bgm/voice_stop_mapping.mp3</file>
+        <file alias="bgm/voice_tray_1.mp3">../bgm/voice_tray_1.mp3</file>
+        <file alias="bgm/voice_tray_2.mp3">../bgm/voice_tray_2.mp3</file>
     </qresource>
 </RCC>
