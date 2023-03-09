@@ -292,8 +292,8 @@ Item {
             Map_full{
                 id: map_current
                 objectName: "CURRENT"
-                width: 500
-                height: 500
+                width: 600
+                height: 600
                 show_robot: true
                 show_path: true
                 robot_following: true
@@ -306,7 +306,7 @@ Item {
                 anchors.horizontalCenter: text_curmap.horizontalCenter
 //                anchors.leftMargin: parent.width/2 - width/2
                 anchors.top: text_curmap.bottom
-                anchors.topMargin: 10
+                anchors.topMargin: 20
             }
 //          Text{
 //              text: "수동 조작\n(lock on-off)"
@@ -328,45 +328,45 @@ Item {
 //              touchEnabled: false
 //          }
 
-            Row{
-                anchors.top: map_current.bottom
-                anchors.topMargin: 30
-                anchors.horizontalCenter: map_current.horizontalCenter
-                spacing: 100
-                Item_joystick{
-                    id: joy_xy
-                    verticalOnly: true
-                    onUpdate_cntChanged: {
-                        print("XY : ",update_cnt,supervisor.getJoyXY())
-                        if(update_cnt == 0 && supervisor.getJoyXY() != 0){
-                            supervisor.joyMoveXY(0, 0);
-                        }else if(update_cnt > 2){
-                            if(fingerInBounds) {
-                                supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-                            }else{
-                                supervisor.joyMoveXY(Math.sin(angle));
-                            }
-                        }
-                    }
-                }
-                Item_joystick{
-                    id: joy_th
-                    horizontalOnly: true
-                    onUpdate_cntChanged: {
-                        print("R : ",update_cnt,supervisor.getJoyR())
-                        if(update_cnt == 0 && supervisor.getJoyR() != 0){
-                            supervisor.joyMoveR(0, 0);
-                        }else if(update_cnt > 2){
-                            if(fingerInBounds) {
-                                supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-                            } else {
-                                supervisor.joyMoveR(-Math.cos(angle));
-                            }
-                        }
-                    }
-                }
+//            Row{
+//                anchors.top: map_current.bottom
+//                anchors.topMargin: 30
+//                anchors.horizontalCenter: map_current.horizontalCenter
+//                spacing: 100
+//                Item_joystick{
+//                    id: joy_xy
+//                    verticalOnly: true
+//                    onUpdate_cntChanged: {
+//                        print("XY : ",update_cnt,supervisor.getJoyXY())
+//                        if(update_cnt == 0 && supervisor.getJoyXY() != 0){
+//                            supervisor.joyMoveXY(0, 0);
+//                        }else if(update_cnt > 2){
+//                            if(fingerInBounds) {
+//                                supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+//                            }else{
+//                                supervisor.joyMoveXY(Math.sin(angle));
+//                            }
+//                        }
+//                    }
+//                }
+//                Item_joystick{
+//                    id: joy_th
+//                    horizontalOnly: true
+//                    onUpdate_cntChanged: {
+//                        print("R : ",update_cnt,supervisor.getJoyR())
+//                        if(update_cnt == 0 && supervisor.getJoyR() != 0){
+//                            supervisor.joyMoveR(0, 0);
+//                        }else if(update_cnt > 2){
+//                            if(fingerInBounds) {
+//                                supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+//                            } else {
+//                                supervisor.joyMoveR(-Math.cos(angle));
+//                            }
+//                        }
+//                    }
+//                }
 
-            }
+//            }
 
         }
     }
@@ -552,6 +552,10 @@ Item {
                 }
             }
 
+            Component.onCompleted: {
+
+                map.map_mode = "MAPPING";
+            }
 
             property var count_u : 0
             property var count_d : 0
@@ -659,10 +663,11 @@ Item {
                 width: 100
                 height: 40
                 radius: 5
-                anchors.bottom: rect_annot_box444.top
+                enabled: is_mapping
+                anchors.bottom: rect_annot_box_map.top
                 anchors.bottomMargin: 10
-                anchors.left: rect_annot_box444.left
-                color: "black"
+                anchors.left: rect_annot_box_map.left
+                color: is_mapping?"black":color_gray
                 Text{
                     anchors.centerIn: parent
                     text: "Save"
@@ -678,12 +683,108 @@ Item {
                 }
             }
             Rectangle{
+                id: rect_annot_box_map
+                width: parent.width - 60
+                height: 100
+                radius: 5
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: rect_annot_state.bottom
+                anchors.topMargin: 80
+                color: "#e8e8e8"
+                Row{
+                    anchors.centerIn: parent
+                    spacing: 30
+                    Rectangle{
+                        id: state_manual
+                        width: 100
+                        height: 80
+                        radius: 10
+                        color: "white"
+                        enabled: supervisor.getEmoStatus()
+                        border.color:color_green
+                        border.width: enabled?3:0
+                        Column{
+                            spacing: 3
+                            anchors.centerIn: parent
+                            Image{
+                                source: "icon/icon_manualmove.png"
+                                Component.onCompleted: {
+                                    if(sourceSize.width > 30)
+                                        sourceSize.width = 30
+
+                                    if(sourceSize.height > 30)
+                                        sourceSize.height = 30
+                                }
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                font.family: font_noto_r.name
+                                font.pixelSize: 12
+                                text: "Emergency 눌림"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: state_mapping
+                        width: 100
+                        height: 80
+                        radius: 10
+                        color: "white"
+                        border.color:color_green
+                        border.width: is_mapping?3:0
+                        Column{
+                            spacing: 3
+                            anchors.centerIn: parent
+                            Image{
+                                source: "icon/icon_researching.png"
+                                Component.onCompleted: {
+                                    if(sourceSize.width > 30)
+                                        sourceSize.width = 30
+
+                                    if(sourceSize.height > 30)
+                                        sourceSize.height = 30
+                                }
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                font.family: font_noto_r.name
+                                font.pixelSize: 12
+                                text: is_mapping?"Mapping 중":"Mapping 시작"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                if(supervisor.getLCMConnection()){
+                                    map.map_mode = "MAPPING";
+                                    if(is_mapping){
+                                        popup_reset_mapping.open();
+                                    }else{
+                                        if(combobox_gridsize.currentText === "3cm"){
+                                            map.grid_size = 0.03;
+                                            supervisor.startMapping(0.03);
+                                        }else if(combobox_gridsize.currentText === "5cm"){
+                                            map.grid_size = 0.05;
+                                            supervisor.startMapping(0.05);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Rectangle{
                 id: rect_annot_box444
                 width: parent.width - 60
                 height: 50
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: rect_annot_state.bottom
-                anchors.topMargin: 80
+                anchors.top: rect_annot_box_map.bottom
+                anchors.topMargin: 5
                 color: "white"
                 Text{
                     text: "Grid Size"
@@ -702,54 +803,6 @@ Item {
                     height: 40
                     currentIndex: 1
                     model:["3cm","5cm"]
-                }
-            }
-
-            Rectangle{
-                id: rect_annot_box
-                width: parent.width - 60
-                height: 100
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: rect_annot_box444.bottom
-                anchors.topMargin: 3
-                color: "#e8e8e8"
-                Row{
-                    anchors.centerIn: parent
-                    spacing: 30
-                    Item_button{
-                        id: btn_start
-                        width: 78
-                        running: is_mapping
-                        icon: "icon/icon_run.png"
-                        name: "Start"
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                if(supervisor.getLCMConnection()){
-                                    map.map_mode = "MAPPING";
-                                    if(combobox_gridsize.currentText === "3cm"){
-                                        map.grid_size = 0.03;
-                                        supervisor.startMapping(0.03);
-                                    }else if(combobox_gridsize.currentText === "5cm"){
-                                        map.grid_size = 0.05;
-                                        supervisor.startMapping(0.05);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    Item_button{
-                        id: btn_stop
-                        width: 78
-                        icon: "icon/icon_stop.png"
-                        name: "Stop"
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                supervisor.stopMapping();
-                            }
-                        }
-                    }
                 }
             }
             Timer{
@@ -775,23 +828,23 @@ Item {
                     if(supervisor.getEmoStatus()){
                         timer_check_keyboard.stop();
                         timer_get_joy.stop();
-                        col_manual.visible = true;
-                        switch_joy.onoff = true;
-                        row_joysticks.visible = false;
-                        keyboard_arrow.visible = false;
+//                        col_manual.visible = true;
+//                        switch_joy.onoff = true;
+//                        row_joysticks.visible = false;
+//                        keyboard_arrow.visible = false;
                     }else{
-                        if(row_joysticks.visible || keyboard_arrow.visible){
-                            col_manual.visible = false;
-                        }else{
-                            col_manual.visible = true;
-                        }
-                        switch_joy.onoff = false;
+//                        if(row_joysticks.visible || keyboard_arrow.visible){
+//                            col_manual.visible = false;
+//                        }else{
+//                            col_manual.visible = true;
+//                        }
+//                        switch_joy.onoff = false;
                     }
                 }
             }
             Column{
-                anchors.top: rect_annot_box.bottom
-                anchors.topMargin: 10
+                anchors.top: rect_annot_box444.bottom
+                anchors.topMargin: 30
                 anchors.horizontalCenter: parent.horizontalCenter
                 spacing: 20
                 Rectangle{
@@ -862,119 +915,119 @@ Item {
                                 color: color_red
                             }
                         }
-                        Row{
-                            spacing: 30
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            Rectangle{
-                                width: 100
-                                height: 40
-                                radius: 5
-                                color: "black"
-                                Text{
-                                    anchors.centerIn: parent
-                                    color: "white"
-                                    text: "가상 조이스틱"
-                                    font.pixelSize: 15
-                                    font.family: font_noto_r.name
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked:{
-                                        row_joysticks.visible = true;
-                                        col_manual.visible = false;
-                                        keyboard_arrow.visible = false;
-                                    }
-                                }
-                            }
-                            Rectangle{
-                                width: 100
-                                height: 40
-                                radius: 5
-                                color: "black"
-                                Text{
-                                    anchors.centerIn: parent
-                                    color: "white"
-                                    text: "가상 키보드"
-                                    font.pixelSize: 15
-                                    font.family: font_noto_r.name
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked:{
-                                        row_joysticks.visible = false;
-                                        col_manual.visible = false;
-                                        keyboard_arrow.visible = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
 
-                Row{
-                    id: row_joysticks
-                    visible: false
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 60
-                    Item_joystick{
-                        id: joy_xy
-                        verticalOnly: true
-                        bold: true
-                        onUpdate_cntChanged: {
-                            if(update_cnt == 0 && supervisor.getJoyXY() != 0){
-                                supervisor.joyMoveXY(0, 0);
-                            }else if(update_cnt > 2){
-                                if(fingerInBounds) {
-                                    supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-                                }else{
-                                    supervisor.joyMoveXY(Math.sin(angle));
-                                }
-                            }
-                        }
                     }
-                    Item_joystick{
-                        id: joy_th
-                        horizontalOnly: true
-                        bold: true
-                        onUpdate_cntChanged: {
-                            if(update_cnt == 0 && supervisor.getJoyR() != 0){
-                                supervisor.joyMoveR(0, 0);
-                            }else if(update_cnt > 2){
-                                if(fingerInBounds) {
-                                    supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-                                } else {
-                                    supervisor.joyMoveR(-Math.cos(angle));
-                                }
-                            }
-                        }
-                    }
-                }
+                }//                        Row{
+                //                            spacing: 30
+                //                            anchors.horizontalCenter: parent.horizontalCenter
+                //                            Rectangle{
+                //                                width: 100
+                //                                height: 40
+                //                                radius: 5
+                //                                color: "black"
+                //                                Text{
+                //                                    anchors.centerIn: parent
+                //                                    color: "white"
+                //                                    text: "가상 조이스틱"
+                //                                    font.pixelSize: 15
+                //                                    font.family: font_noto_r.name
+                //                                }
+                //                                MouseArea{
+                //                                    anchors.fill: parent
+                //                                    onClicked:{
+                //                                        row_joysticks.visible = true;
+                //                                        col_manual.visible = false;
+                //                                        keyboard_arrow.visible = false;
+                //                                    }
+                //                                }
+                //                            }
+                //                            Rectangle{
+                //                                width: 100
+                //                                height: 40
+                //                                radius: 5
+                //                                color: "black"
+                //                                Text{
+                //                                    anchors.centerIn: parent
+                //                                    color: "white"
+                //                                    text: "가상 키보드"
+                //                                    font.pixelSize: 15
+                //                                    font.family: font_noto_r.name
+                //                                }
+                //                                MouseArea{
+                //                                    anchors.fill: parent
+                //                                    onClicked:{
+                //                                        row_joysticks.visible = false;
+                //                                        col_manual.visible = false;
+                //                                        keyboard_arrow.visible = true;
+                //                                    }
+                //                                }
+                //                            }
+                //                        }
 
-                Item_keyboard{
-                    id: keyboard_arrow
-                    visible : false
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-                Column{
-                    id: col_manual
-                    visible: true
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 5
-                    Item_switch{
-                        id: switch_joy
-                        enabled: supervisor.getLCMConnection()
-                        onoff: supervisor.getEmoStatus()?true:false
-                        touchEnabled: false
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                    Text{
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: "수동 조작"
-                        font.family: font_noto_r.name
-                        font.pixelSize: 10
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                }
+//                Row{
+//                    id: row_joysticks
+//                    visible: false
+//                    anchors.horizontalCenter: parent.horizontalCenter
+//                    spacing: 60
+//                    Item_joystick{
+//                        id: joy_xy
+//                        verticalOnly: true
+//                        bold: true
+//                        onUpdate_cntChanged: {
+//                            if(update_cnt == 0 && supervisor.getJoyXY() != 0){
+//                                supervisor.joyMoveXY(0, 0);
+//                            }else if(update_cnt > 2){
+//                                if(fingerInBounds) {
+//                                    supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+//                                }else{
+//                                    supervisor.joyMoveXY(Math.sin(angle));
+//                                }
+//                            }
+//                        }
+//                    }
+//                    Item_joystick{
+//                        id: joy_th
+//                        horizontalOnly: true
+//                        bold: true
+//                        onUpdate_cntChanged: {
+//                            if(update_cnt == 0 && supervisor.getJoyR() != 0){
+//                                supervisor.joyMoveR(0, 0);
+//                            }else if(update_cnt > 2){
+//                                if(fingerInBounds) {
+//                                    supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
+//                                } else {
+//                                    supervisor.joyMoveR(-Math.cos(angle));
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+
+//                Item_keyboard{
+//                    id: keyboard_arrow
+//                    visible : false
+//                    anchors.horizontalCenter: parent.horizontalCenter
+//                }
+//                Column{
+//                    id: col_manual
+//                    visible: true
+//                    anchors.horizontalCenter: parent.horizontalCenter
+//                    spacing: 5
+//                    Item_switch{
+//                        id: switch_joy
+//                        enabled: supervisor.getLCMConnection()
+//                        onoff: supervisor.getEmoStatus()?true:false
+//                        touchEnabled: false
+//                        anchors.horizontalCenter: parent.horizontalCenter
+//                    }
+//                    Text{
+//                        anchors.horizontalCenter: parent.horizontalCenter
+//                        text: "수동 조작"
+//                        font.family: font_noto_r.name
+//                        font.pixelSize: 10
+//                        horizontalAlignment: Text.AlignHCenter
+//                    }
+//                }
 
             }
 
@@ -4725,6 +4778,94 @@ Item {
     }
 
     Popup{
+        id: popup_reset_mapping
+        width: parent.width
+        height: parent.height
+        background:Rectangle{
+            anchors.fill: parent
+            color: "#282828"
+            opacity: 0.7
+        }
+        Rectangle{
+            anchors.centerIn: parent
+            width: 400
+            height: 250
+            color: "white"
+            radius: 10
+
+            Column{
+                anchors.centerIn: parent
+                spacing: 20
+                Column{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        text: "매핑을 초기화하고 다시 시작하시겠습니까?"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 20
+                    Rectangle{
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color:"transparent"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "취소"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_reset_mapping.close();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color: "#12d27c"
+                        border.width: 1
+                        border.color: "#12d27c"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "확인"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                supervisor.stopMapping();
+                                popup_reset_mapping.close();
+                                if(combobox_gridsize.currentText === "3cm"){
+                                    map.grid_size = 0.03;
+                                    supervisor.startMapping(0.03);
+                                }else if(combobox_gridsize.currentText === "5cm"){
+                                    map.grid_size = 0.05;
+                                    supervisor.startMapping(0.05);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    Popup{
         id: popup_save_mapping
         width: parent.width
         height: parent.height
@@ -4851,6 +4992,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.stopMapping();
                                 if(textfield_name22.text == ""){
                                 }else{
                                     timer_check_slam.start();
