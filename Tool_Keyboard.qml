@@ -22,6 +22,7 @@ Popup {
 
     property bool is_ko: false
     property bool is_shift: false
+    property bool is_capslock: false
     property bool only_en: true
 
     property var keysize: 50
@@ -41,6 +42,7 @@ Popup {
             is_ko = false;
 
         is_shift = false;
+        is_capslock = false;
         if(is_ko){
             text_ko_en.text = "영어";
             keys_2.model = ["ㅂ","ㅈ","ㄷ","ㄱ","ㅅ","ㅛ","ㅕ","ㅑ","ㅐ","ㅔ"];
@@ -70,6 +72,7 @@ Popup {
                 keys_4.model = ["Z","X","C","V","B","N","M","&","|"];
             }
         }else{
+            is_capslock = false;
             btn_shift.color = color_default;
 //            keys_1.model= [1,2,3,4,5,6,7,8,9,0]
             if(is_ko){
@@ -121,7 +124,6 @@ Popup {
                 duration: 300
             }
         }
-
         height: 0
         color: "white"
         Row{
@@ -200,7 +202,8 @@ Popup {
                                         anchors.fill: parent
                                         onClicked:{
                                             emitter.keyPressed(owner,modelData);
-                                            is_shift = false;
+                                            if(!is_capslock)
+                                                is_shift = false;
                                         }
                                     }
                                 }
@@ -220,14 +223,16 @@ Popup {
                                     anchors.fill: parent
                                     onClicked:{
                                         emitter.keyPressed(owner,Qt.Key_Backspace);
-                                        is_shift = false;
+                                        if(!is_capslock)
+                                            is_shift = false;
                                     }
                                     onPressAndHold: {
                                         timer_backspace.start();
                                     }
                                     onReleased: {
                                         timer_backspace.stop();
-                                        is_shift = false;
+                                        if(!is_capslock)
+                                            is_shift = false;
                                     }
                                     Timer{
                                         id: timer_backspace
@@ -262,7 +267,8 @@ Popup {
                                         anchors.fill: parent
                                         onClicked:{
                                             emitter.keyPressed(owner,modelData);
-                                            is_shift = false;
+                                            if(!is_capslock)
+                                                is_shift = false;
                                         }
                                     }
                                 }
@@ -306,10 +312,15 @@ Popup {
                                     anchors.fill: parent
                                     onClicked:{
                                         if(is_shift){
+                                            is_capslock = false;
                                             is_shift = false;
                                         }else{
                                             is_shift = true;
                                         }
+                                    }
+                                    onPressAndHold: {
+                                        is_shift = true;
+                                        is_capslock = true;
                                     }
                                 }
                             }
@@ -355,14 +366,16 @@ Popup {
                                     anchors.fill: parent
                                     onClicked:{
                                         emitter.keyPressed(owner,Qt.Key_Left);
-                                        is_shift = false;
+                                        if(!is_capslock)
+                                            is_shift = false;
                                     }
                                     onPressAndHold: {
                                         timer_left.start();
                                     }
                                     onReleased: {
                                         timer_left.stop();
-                                        is_shift = false;
+                                        if(!is_capslock)
+                                            is_shift = false;
                                     }
                                     Timer{
                                         id: timer_left
@@ -385,7 +398,8 @@ Popup {
                                     anchors.fill: parent
                                     onClicked:{
                                         emitter.keyPressed(owner,Qt.Key_Space);
-                                        is_shift = false;
+                                        if(!is_capslock)
+                                            is_shift = false;
                                     }
                                 }
                             }
@@ -405,14 +419,16 @@ Popup {
                                     anchors.fill: parent
                                     onClicked:{
                                         emitter.keyPressed(owner,Qt.Key_Right);
-                                        is_shift = false;
+                                        if(!is_capslock)
+                                            is_shift = false;
                                     }
                                     onPressAndHold: {
                                         timer_right.start();
                                     }
                                     onReleased: {
                                         timer_right.stop();
-                                        is_shift = false;
+                                        if(!is_capslock)
+                                            is_shift = false;
                                     }
                                     Timer{
                                         id: timer_right
@@ -451,7 +467,8 @@ Popup {
                                         anchors.fill: parent
                                         onClicked:{
                                             emitter.keyPressed(owner,modelData);
-                                            is_shift = false;
+                                            if(!is_capslock)
+                                                is_shift = false;
                                         }
                                     }
                                 }
@@ -478,7 +495,8 @@ Popup {
                                         anchors.fill: parent
                                         onClicked:{
                                             emitter.keyPressed(owner,modelData);
-                                            is_shift = false;
+                                            if(!is_capslock)
+                                                is_shift = false;
                                         }
                                     }
                                 }
@@ -505,7 +523,8 @@ Popup {
                                         anchors.fill: parent
                                         onClicked:{
                                             emitter.keyPressed(owner,modelData);
-                                            is_shift = false;
+                                            if(!is_capslock)
+                                                is_shift = false;
                                         }
                                     }
                                 }
@@ -530,7 +549,8 @@ Popup {
                                     anchors.fill: parent
                                     onClicked:{
                                         emitter.keyPressed(owner,"0");
-                                        is_shift = false;
+                                        if(!is_capslock)
+                                            is_shift = false;
                                     }
                                 }
                             }
@@ -549,7 +569,8 @@ Popup {
                                     anchors.fill: parent
                                     onClicked:{
                                         emitter.keyPressed(owner,".");
-                                        is_shift = false;
+                                        if(!is_capslock)
+                                            is_shift = false;
                                     }
                                 }
                             }

@@ -861,67 +861,6 @@ Item {
         }
         //슬램 활성화 안될 때 보여주는 안내창
         Rectangle{
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: 300
-            height: 60
-            y: -10
-            radius: 5
-            property var mode: 0
-            color: color_red
-            visible: map_mode ==="MAPPING" && supervisor.getMappingflag()
-            onVisibleChanged: {
-                if(visible){
-                    show_ani1.start();
-                }
-            }
-            function show_connect(){
-                show_ani1.start();
-            }
-            function unshow_connect(){
-                unshow_ani1.start();
-            }
-
-            NumberAnimation{
-                id: show_ani1
-                target: parent
-                property: "y"
-                from: -height
-                to: 0
-                duration: 500
-                onStarted: {
-                    parent.visible = true;
-                }
-                onFinished: {
-
-                }
-            }
-            NumberAnimation{
-                id: unshow_ani1
-                target: parent
-                property: "y"
-                from: 0
-                to: -height
-                duration: 500
-                onStarted: {
-                }
-                onFinished: {
-                    parent.visible = false;
-                }
-            }
-
-            Text{
-                text: "Mapping 중"
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: 5
-                font.family: font_noto_b.name
-                font.pixelSize: 20
-                color: "white"
-            }
-        }
-
-        //슬램 활성화 안될 때 보여주는 안내창
-        Rectangle{
             id: rect_notice
             anchors.horizontalCenter: parent.horizontalCenter
             width: 300
