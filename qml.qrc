@@ -143,7 +143,5 @@
         <file>bgm/voice_obs_too_close.mp3</file>
         <file>bgm/voice_start_mapping.mp3</file>
         <file>bgm/voice_stop_mapping.mp3</file>
-        <file>bgm/voice_tray_1.mp3</file>
-        <file>bgm/voice_tray_2.mp3</file>
     </qresource>
 </RCC>
