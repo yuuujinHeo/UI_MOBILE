@@ -149,6 +149,13 @@ Item {
                 mapview.setMap(supervisor.getRawMap(name));
             }else if(map_mode === "EDITED"){
                 mapview.setMap(supervisor.getMap(name));
+            }else if(map_mode === "T_RAW"){
+                print("kk");
+                mapview.setMap(supervisor.getCostMap(name));
+                travelview.setMap(supervisor.getTravelRawMap(name));
+            }else if(map_mode === "T_EDIT"){
+                mapview.setMap(supervisor.getCostMap(name));
+                travelview.setMap(supervisor.getTravelMap(name));
             }else{
                 supervisor.writelog("[QML MAP] LoadMap Failed : Map mode is "+map_mode);
             }
@@ -173,8 +180,9 @@ Item {
 
     function update_canvas(){
         clear_canvas();
-        if(state_annotation == "DRAWING"){
+        if(state_annotation == "DRAWING" || state_annotation == "TRAVELLINE"){
             draw_canvas_lines(true);
+            clear_canvas_temp();
         }
         draw_canvas_current();
         draw_canvas_object();
@@ -319,6 +327,7 @@ Item {
     //Annotation State (None, Drawing, Object, Location, Travelline)
     onState_annotationChanged: {
         tool = "MOVE";
+        travelview.visible = false;
         if(state_annotation == "NONE"){
 
         }else if(state_annotation == "DRAWING"){
@@ -337,7 +346,12 @@ Item {
             show_object = true;
             show_robot = true;
 //            show_travelline = true;
+        }else if(state_annotation == "TRAVELLINE"){
+            travelview.visible = true;
+            print("찡긋")
+            loadmap(supervisor.getMapname(),"T_RAW")
         }
+
         update_canvas();
     }
 
@@ -356,6 +370,7 @@ Item {
         height: parent.height
         clip: true
         color: "black"
+
         MapView{
             id: mapview
             width: map_width
@@ -407,10 +422,21 @@ Item {
             }
         }
 
+        MapView{
+            id: travelview
+            width: map_width
+            height: map_height
+            visible: state_annotation==="TRAVELLINE"
+            x: mapview.x + (mapview.width - width)/2
+            y: mapview.y + (mapview.height - height)/2
+            scale: mapview.newscale
+        }
+
         Canvas{
             id: canvas_map
             width: map_width
             height: map_height
+            visible: !state_annotation==="TRAVELLINE"
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
             scale: mapview.newscale
@@ -421,6 +447,7 @@ Item {
             property var lineX
             property var lineY
         }
+
 
         Canvas{
             id: canvas_map_margin
@@ -461,6 +488,21 @@ Item {
             scale: mapview.newscale
         }
 
+        Canvas{
+            id: canvas_map_temp
+            width: map_width
+            height: map_height
+            opacity: 0.7
+            x: mapview.x + (mapview.width - width)/2
+            y: mapview.y + (mapview.height - height)/2
+            scale: mapview.newscale
+            property var lineWidth: brush_size
+            //drawing 용
+            property real lastX
+            property real lastY
+            property var lineX
+            property var lineY
+        }
         MouseArea{
             id: area_wheel
             anchors.fill: mapview
@@ -540,9 +582,11 @@ Item {
                         area_map.startX = point2.x;
                         area_map.startY = point2.y;
                     }
-                }else if(tool == "BRUSH"){//draw
+                }else if(tool == "BRUSH" || tool == "ERASE"){//draw
                     canvas_map.lastX = point_x1;
                     canvas_map.lastY = point_y1;
+                    canvas_map_temp.lastX = point_x1;
+                    canvas_map_temp.lastY = point_y1;
                     supervisor.startLine(brush_color, canvas_map.lineWidth);
                     supervisor.setLine(point_x1,point_y1);
                 }else if(tool == "EDIT_POINT"){
@@ -591,8 +635,11 @@ Item {
                 }
                 if(!point1.pressed&&!point2.pressed){
                     double_touch = false;
-                    if(tool == "BRUSH"){
+                    if(tool == "BRUSH" || tool == "ERASE"){
                         supervisor.stopLine();
+                        if(state_annotation === "TRAVELLINE"){
+                            set_travel_draw();
+                        }
                     }else if(tool == "ADD_POINT"){//add point
                         supervisor.addObjectPoint(point_x1, point_y1);
                         loader_menu.item.check_object_size();
@@ -702,8 +749,9 @@ Item {
 
 
                     }
-                }else if(tool == "BRUSH"){
+                }else if(tool == "BRUSH" || tool == "ERASE"){
                     draw_canvas_lines(false);
+                    draw_canvas_temp();
                 }else if(tool == "EDIT_POINT"){
                     if(select_object_point != -1){
                         supervisor.editObject(select_object,select_object_point,point_x1, point_y1);
@@ -1156,6 +1204,26 @@ Item {
         return false;
     }
 
+    function save_patrol(is_edit){
+        var ctx = canvas_map.getContext('2d');
+
+        var data = ctx.getImageData(0,0,map_width, map_height);
+        var array = [];
+        for(var i=0; i<data.data.length; i=i+4){
+            if(data.data[i+3] > 0){
+                if(data.data[i] > 0){
+                    array.push(255);
+                }else{
+                    array.push(100);
+                }
+            }else{
+                array.push(0);
+            }
+
+        }
+        supervisor.saveTravel(is_edit,array);
+    }
+
     function save_map(name){
         mapview.newscale = 1;
 
@@ -1192,7 +1260,7 @@ Item {
                     ctx.stroke()
                 }
             }else{
-                if(tool == "BRUSH"){
+                if(tool == "BRUSH" || tool == "ERASE"){
                     ctx.lineWidth = canvas_map.lineWidth
                     ctx.strokeStyle = brush_color
                     ctx.lineCap = "round"
@@ -1206,9 +1274,35 @@ Item {
                     ctx.lineTo(canvas_map.lastX, canvas_map.lastY)
                     ctx.stroke()
                 }
+
             }
+
             canvas_map.requestPaint();
         }
+    }
+    function draw_canvas_temp(){
+        var ctx = canvas_map_temp.getContext('2d');
+        if(tool == "BRUSH" || tool == "ERASE"){
+            ctx.lineWidth = canvas_map_temp.lineWidth
+            ctx.strokeStyle = color_dark_navy
+            ctx.lineCap = "round"
+            ctx.beginPath()
+            ctx.moveTo(canvas_map_temp.lastX, canvas_map_temp.lastY)
+            if(point1.pressed){
+                canvas_map_temp.lastX = area_map.point_x1
+                canvas_map_temp.lastY = area_map.point_y1
+            }
+            ctx.lineTo(canvas_map_temp.lastX, canvas_map_temp.lastY)
+            ctx.stroke()
+        }
+        canvas_map_temp.requestPaint();
+
+    }
+    function clear_canvas_temp(){
+        print("clear")
+        var ctx = canvas_map_temp.getContext('2d');
+        ctx.clearRect(0,0,canvas_map_temp.width,canvas_map_temp.height);
+
     }
 
     function clear_canvas_location(){
@@ -1869,7 +1963,6 @@ Item {
 
     function draw_canvas_margin(){
         if(canvas_map_margin.available){
-
             var ctx = canvas_map_margin.getContext('2d');
 
             var map_data = supervisor.getMapData(map_name);
@@ -1904,5 +1997,25 @@ Item {
         }
     }
 
+    function set_travel_draw(){
+        var ctx = canvas_map.getContext('2d');
+
+        var data = ctx.getImageData(0,0,map_width, map_height);
+        var array = [];
+        clear_canvas_temp();
+        for(var i=0; i<data.data.length; i=i+4){
+            if(data.data[i+3] > 0){
+                if(data.data[i] > 0){
+                    array.push(255);
+                }else{
+                    array.push(100);
+                }
+            }else{
+                array.push(0);
+            }
+
+        }
+        travelview.setMap(supervisor.getTravel(array));
+    }
 }
 

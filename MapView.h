@@ -20,7 +20,7 @@ class MapView : public QQuickPaintedItem
 public:
     MapView(QQuickItem *parent = Q_NULLPTR);
     Q_INVOKABLE void setMap(QObject *pixmapContainer);
-
+    Q_INVOKABLE void setTravel(QList<int> canvas);
 protected:
     virtual void paint(QPainter *painter) Q_DECL_OVERRIDE;
 
