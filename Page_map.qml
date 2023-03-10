@@ -53,7 +53,7 @@ Item {
         id: keyboard
     }
 
-    onSelect_patrol_numChanged: {
+    onSelect_patrol_numChanged: {s
         loader_menu.item.setindex(select_patrol_num);
     }
 
@@ -1900,6 +1900,22 @@ Item {
                 anchors.fill: parent
                 color: "#f4f4f4"
             }
+            Component.onCompleted: {
+
+                //맵 다시 불러오기
+                map.map_mode = "EDITED";
+                map.loadmap(supervisor.getMapname(),"EDITED");
+                map.update_canvas();
+                text_menu_title.text = "Annotation";
+                text_menu_title.visible = true;
+                map.show_location = true;
+                map.show_connection = false;
+                map.show_object = true;
+                map.robot_following = false;
+                map.setfullscreen();
+                loader_menu.sourceComponent = menu_annot_state;
+            }
+
             Column{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
@@ -1967,6 +1983,23 @@ Item {
                                     map.init_mode();
                                     map.state_annotation = "LOCATION";
                                     loader_menu.sourceComponent = menu_annot_location;
+                                }
+                            }
+                        }
+                        Item_button{
+                            id: btn_path
+                            width: 80
+                            shadow_color: color_gray
+                            icon: "icon/icon_point.png"
+                            name: "PATH"
+                            enabled: supervisor.isExistTravelRaw(supervisor.getMapname())||supervisor.isExistTravelEdited(supervisor.getMapname())
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    supervisor.clear_all();
+                                    map.state_annotation = "TRAVELLINE";
+                                    map.init_mode();
+                                    loader_menu.sourceComponent = menu_annot_tline;
                                 }
                             }
                         }
@@ -2150,7 +2183,6 @@ Item {
                     }
 
                 }
-
             }
 
             //prev, next button
@@ -2914,6 +2946,486 @@ Item {
                                 }
 
 
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Component{
+        id: menu_annot_tline
+        Item{
+            objectName: "menu_tline"
+            width: rect_menus.width
+            height: rect_menus.height
+
+            Component.onCompleted: {
+                if(supervisor.isExistTravelEdited(supervisor.getMapname())){
+                    map.loadmap(supervisor.getMapname(),"T_EDIT");
+                    btn_load_raw_map.activated = false;
+                    btn_load_map.activated = true;
+                }else{
+                    map.loadmap(supervisor.getMapname(),"T_RAW");
+                    btn_load_raw_map.activated = true;
+                    btn_load_map.activated = false;
+                }
+                map.brush_size = slider_brush.value;
+            }
+
+            Rectangle{
+                anchors.fill: parent
+                color: "#f4f4f4"
+            }
+            Rectangle{
+                id: rect_annot_state
+                width: parent.width
+                height: 50
+                anchors.top: parent.top
+                anchors.topMargin: 2
+                color: "#4F5666"
+                Text{
+                    anchors.centerIn: parent
+                    color: "white"
+                    font.family: font_noto_b.name
+                    font.pixelSize: 20
+                    text: "이동경로 설정"
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+            Row{
+                id: load_btns
+                spacing: 10
+                anchors.top: rect_annot_state.bottom
+                anchors.topMargin: 30
+                anchors.left: parent.left
+                anchors.leftMargin: 30
+                Rectangle{
+                    id: btn_load_raw_map
+                    width: 100
+                    height: 40
+                    radius: 5
+                    color: "black"
+                    border.color: color_green
+                    border.width: activated?3:0
+                    property bool activated: false
+                    Text{
+                        anchors.centerIn: parent
+                        text: "Load(RAW)"
+                        color: "white"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            map.loadmap(supervisor.getMapname(),"T_RAW");
+                            btn_load_raw_map.activated = true;
+                            btn_load_map.activated = false;
+                        }
+                    }
+                }
+                Rectangle{
+                    id: btn_load_map
+                    width: 100
+                    height: 40
+                    radius: 5
+                    border.color: color_green
+                    border.width: activated?3:0
+                    property bool activated: false
+                    enabled: false
+                    color: enabled?"black":color_gray
+                    Text{
+                        anchors.centerIn: parent
+                        text: "Load"
+                        color: "white"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            map.loadmap(supervisor.getMapname(),"T_EDIT");
+                            btn_load_raw_map.activated = false;
+                            btn_load_map.activated = true;
+                        }
+                    }
+                }
+            }
+
+
+            Row{
+                spacing: 30
+                anchors.top: load_btns.top
+                anchors.right: parent.right
+                anchors.rightMargin: 30
+                Rectangle{
+                    id: btn_undo
+                    width: 40
+                    height: 40
+                    radius: 40
+                    color: enabled?"#282828":"#D0D0D0"
+                    Image{
+                        anchors.centerIn: parent
+                        source: "icon/icon_undo.png"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.undo();
+                            map.update_canvas();
+                            if(map.state_annotation === "TRAVELLINE"){
+                                map.set_travel_draw();
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: btn_redo
+                    width: 40
+                    height: 40
+                    radius: 40
+                    color: enabled?"#282828":"#D0D0D0"
+                    Image{
+                        anchors.centerIn: parent
+                        source: "icon/icon_redo.png"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.redo();
+                            map.update_canvas();
+                            if(map.state_annotation === "TRAVELLINE"){
+                                map.set_travel_draw();
+                            }
+                        }
+                    }
+                }
+            }
+            Timer{
+                running: true
+                repeat: true
+                interval: 500
+                triggeredOnStart: true
+                onTriggered: {
+                    if(supervisor.getCanvasSize() > 0)
+                        btn_undo.enabled = true;
+                    else
+                        btn_undo.enabled = false;
+                    if(supervisor.getRedoSize() > 0)
+                        btn_redo.enabled = true;
+                    else
+                        btn_redo.enabled = false;
+
+                    if(supervisor.isExistTravelEdited(supervisor.getMapname())){
+                        btn_load_map.enabled = true;
+                    }else{
+                        btn_load_map.enabled = false;
+                    }
+                }
+            }
+
+            Rectangle{
+                id: rect_annot_box
+                width: parent.width - 60
+                height: 100
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: load_btns.bottom
+                anchors.topMargin: 15
+                color: "#e8e8e8"
+                Row{
+                    anchors.centerIn: parent
+                    spacing: 20
+                    Rectangle{
+                        id: btn_move
+                        width: 78
+                        height: width
+                        radius: width
+                        border.width: map.tool=="MOVE"?3:0
+                        border.color: "#12d27c"
+                        Column{
+                            anchors.centerIn: parent
+                            Image{
+                                source: "icon/icon_move.png"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "Move"
+                                font.family: font_noto_r.name
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                map.tool = "MOVE";
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: btn_draw
+                        width: 78
+                        height: width
+                        radius: width
+                        border.width: map.tool=="BRUSH"?3:0
+                        border.color: "#12d27c"
+                        Column{
+                            anchors.centerIn: parent
+                            Image{
+                                source: "icon/icon_draw.png"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "Draw"
+                                font.family: font_noto_r.name
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                map.tool = "BRUSH";
+                                map.brush_color = "red"
+                                map.brush_size = slider_brush.value;
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: btn_erase
+                        width: 78
+                        height: width
+                        radius: width
+                        border.width: map.tool=="ERASE"?3:0
+                        border.color: "#12d27c"
+                        Column{
+                            anchors.centerIn: parent
+                            Image{
+                                source: "icon/icon_erase.png"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "Erase"
+                                font.family: font_noto_r.name
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                map.tool = "ERASE";
+                                map.brush_color = "black"
+                                map.brush_size = slider_erase.value;
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: btn_clear
+                        width: 78
+                        height: width
+                        radius: width
+                        Column{
+                            anchors.centerIn: parent
+                            Image{
+                                source: "icon/icon_erase.png"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "Clear"
+                                font.family: font_noto_r.name
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                supervisor.clear_all();
+                                map.update_canvas();
+                                if(map.state_annotation === "TRAVELLINE"){
+                                    map.set_travel_draw();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Rectangle{
+                id: rect_annot_boxs
+                width: parent.width - 60
+                height: 100
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: rect_annot_box.bottom
+                color: "#e8e8e8"
+                Column{
+                    anchors.centerIn: parent
+                    spacing: 2
+                    Rectangle{
+                        id: rect_annot_box3
+                        width: rect_annot_boxs.width
+                        height: 50
+                        color: "white"
+                        Text{
+                            text: "Brush Size"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 30
+                        }
+                        Slider {
+                            id: slider_brush
+                            x: 300
+                            y: 330
+                            value: 0.5
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: parent.right
+                            anchors.rightMargin: 30
+                            width: 170
+                            height: 18
+                            from: 0.1
+                            to : 5
+                            onValueChanged: {
+                                if(map.tool === "BRUSH"){
+                                    map.brush_size = value;
+                                    print("slider : " +map.brush_size);
+                                }else{
+                                    map.tool = "BRUSH";
+                                    map.brush_color = "red"
+                                    map.brush_size = value;
+                                }
+                            }
+                            onPressedChanged: {
+                                if(slider_brush.pressed){
+                                    map.brushchanged();
+                                }else{
+                                    map.brushdisappear();
+                                }
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: rect_annot_boxs.width
+                        height: 50
+                        color: "white"
+                        Text{
+                            text: "Eraser Size"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 30
+                        }
+                        Slider {
+                            id: slider_erase
+                            x: 300
+                            y: 330
+                            value: 10
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: parent.right
+                            anchors.rightMargin: 30
+                            width: 170
+                            height: 18
+                            from: 1
+                            to : 50
+                            onValueChanged: {
+                                if(map.tool === "ERASE"){
+                                    map.brush_size = value;
+                                    print("slider : " +map.brush_size);
+                                }else{
+                                    map.tool = "ERASE";
+                                    map.brush_color = "black"
+                                    map.brush_size = slider_erase.value;
+                                }
+                            }
+                            onPressedChanged: {
+                                if(slider_erase.pressed){
+                                    map.brushchanged();
+                                }else{
+                                    map.brushdisappear();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Column{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 30
+                spacing: 30
+                PageIndicator{
+                    id: indicator_annot
+                    count: 6
+                    currentIndex: 2
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 10
+                    delegate: Rectangle{
+                        implicitWidth: index===indicator_annot.currentIndex?10:8
+                        implicitHeight: implicitWidth
+                        anchors.verticalCenter: parent.verticalCenter
+                        radius: width
+                        color: index===indicator_annot.currentIndex?"black":"#d0d0d0"
+                        Behavior on color{
+                            ColorAnimation {
+                                duration: 200
+                            }
+                        }
+                    }
+                }
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 20
+                    Rectangle{
+                        id: btn_prev_0
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color:"transparent"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "Previous"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                map.init_mode();
+                                map.state_annotation = "NONE";
+                                map.show_connection = false;
+                                loader_menu.sourceComponent = menu_annot_state;
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: btn_next_0
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color: "#12d27c"
+                        border.width: 1
+                        border.color: "#12d27c"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "Confirm"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_save_travelline.open();
+                                if(btn_load_map.activated){
+                                    popup_save_travelline.edited_mode = true;
+                                }else{
+                                    popup_save_travelline.edited_mode = false;
+
+                                }
                             }
                         }
                     }
@@ -5255,6 +5767,99 @@ Item {
                                     loader_menu.sourceComponent = menu_annot_object;
                                     popup_save_edited.close();
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+    Popup{
+        id: popup_save_travelline
+        width: parent.width
+        height: parent.height
+        background:Rectangle{
+            anchors.fill: parent
+            color: "#282828"
+            opacity: 0.7
+        }
+        property bool edited_mode: false
+        Rectangle{
+            anchors.centerIn: parent
+            width: 400
+            height: 250
+            color: "white"
+            radius: 10
+
+            Column{
+                anchors.centerIn: parent
+                spacing: 20
+                Column{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        text: "이대로 <font color=\"#12d27c\">저장</font>하시겠습니까?"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        text: "기존의 파일은 삭제됩니다."
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 20
+                    Rectangle{
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color:"transparent"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "취소"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_save_travelline.close();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color: "#12d27c"
+                        border.width: 1
+                        border.color: "#12d27c"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "확인"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                //save temp Image
+                                map.save_patrol(popup_save_travelline.edited_mode);
+                                supervisor.clear_all();
+                                map.init_mode();
+                                map.state_annotation = "NONE";
+                                map.show_connection = false;
+                                loader_menu.sourceComponent = menu_annot_state;
+                                popup_save_travelline.close();
+
                             }
                         }
                     }

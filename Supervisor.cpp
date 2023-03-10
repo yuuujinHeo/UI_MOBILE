@@ -140,6 +140,15 @@ QString Supervisor::getAnnotPath(QString name){
 QString Supervisor::getMetaPath(QString name){
     return QDir::homePath()+"/maps/"+name+"/map_meta.ini";
 }
+QString Supervisor::getTravelRawPath(QString name){
+    return QDir::homePath()+"/maps/"+name+"/travel_raw.png";
+}
+QString Supervisor::getTravelPath(QString name){
+    return QDir::homePath()+"/maps/"+name+"/travel_edited.png";
+}
+QString Supervisor::getCostPath(QString name){
+    return QDir::homePath()+"/maps/"+name+"/map_cost.png";
+}
 QString Supervisor::getIniPath(){
     return QDir::homePath()+"/robot_config.ini";
 }
@@ -602,6 +611,14 @@ bool Supervisor::isExistAnnotation(QString name){
     QString file_meta = getMetaPath(name);
     QString file_annot = getAnnotPath(name);
     return QFile::exists(file_annot);
+}
+bool Supervisor::isExistTravelRaw(QString name){
+    QString file = getTravelRawPath(name);
+    return QFile::exists(file);
+}
+bool Supervisor::isExistTravelEdited(QString name){
+    QString file = getTravelPath(name);
+    return QFile::exists(file);
 }
 
 QList<int> Supervisor::getMapData(QString filename){
@@ -1412,6 +1429,144 @@ QObject *Supervisor::getRawMap(QString filename) const{
     return pc;
 }
 
+cv::Mat map_test;
+
+QObject *Supervisor::getTravelRawMap(QString filename) const{
+    PixmapContainer *pc = new PixmapContainer();
+    QString file_path = QDir::homePath()+"/maps/"+filename+"/travel_raw.png";
+    if(filename == "" || !QFile::exists(file_path)){
+        QPixmap blank(1000,1000);{
+            QPainter painter(&blank);
+            painter.fillRect(blank.rect(),"black");
+        }
+
+        pc->pixmap = blank;
+        Q_ASSERT(!pc->pixmap.isNull());
+        QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+        return pc;
+    }
+
+    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+    cv::flip(map,map,0);
+    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_NEAREST);
+
+    cv::Mat argb_map(map.rows, map.cols, CV_8UC4, cv::Scalar::all(0));
+    for(int i = 0; i < map.rows; i++)
+    {
+        for(int j = 0; j < map.cols; j++)
+        {
+            if(map.ptr<uchar>(i)[j] == 255)
+            {
+                argb_map.ptr<cv::Vec4b>(i)[j] = cv::Vec4b(0,0,255,255);
+            }
+        }
+    }
+    map_test = argb_map;
+
+    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map_test));
+    Q_ASSERT(!pc->pixmap.isNull());
+    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+    return pc;
+}
+
+QObject *Supervisor::getTravel(QList<int> canvas) const{
+    PixmapContainer *pc = new PixmapContainer();
+    cv::Mat argb_map;
+    map_test.copyTo(argb_map);
+
+    for(int i=0; i<canvas.size(); i++){
+        if(canvas[i] == 255){
+            argb_map.ptr<cv::Vec4b>(i/1000)[i%1000] = cv::Vec4b(0,0,255,255);
+        }else if(canvas[i] == 100){
+            argb_map.ptr<cv::Vec4b>(i/1000)[i%1000] = cv::Vec4b(0,0,0,0);
+        }
+    }
+    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(argb_map));
+    Q_ASSERT(!pc->pixmap.isNull());
+    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+    return pc;
+}
+
+
+QObject *Supervisor::getTest(QList<int> canvas) const{
+    PixmapContainer *pc = new PixmapContainer();
+
+    cv::Mat argb_map = map_test;
+    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(argb_map));
+    Q_ASSERT(!pc->pixmap.isNull());
+    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+    return pc;
+}
+
+QObject *Supervisor::getTravelMap(QString filename) const{
+    PixmapContainer *pc = new PixmapContainer();
+    QString file_path = QDir::homePath()+"/maps/"+filename+"/travel_edited.png";
+    if(filename == "" || !QFile::exists(file_path)){
+        QPixmap blank(1000,1000);{
+            QPainter painter(&blank);
+            painter.fillRect(blank.rect(),"black");
+        }
+
+        pc->pixmap = blank;
+        Q_ASSERT(!pc->pixmap.isNull());
+        QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+        return pc;
+    }
+    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+    cv::flip(map,map,0);
+    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_NEAREST);
+
+    cv::Mat argb_map(map.rows, map.cols, CV_8UC4, cv::Scalar::all(0));
+    for(int i = 0; i < map.rows; i++)
+    {
+        for(int j = 0; j < map.cols; j++)
+        {
+            if(map.ptr<uchar>(i)[j] == 255)
+            {
+                argb_map.ptr<cv::Vec4b>(i)[j] = cv::Vec4b(0,0,255,255);
+            }
+        }
+    }
+    map_test = argb_map;
+
+    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(argb_map));
+    Q_ASSERT(!pc->pixmap.isNull());
+    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+    return pc;
+}
+QObject *Supervisor::getCostMap(QString filename) const{
+    PixmapContainer *pc = new PixmapContainer();
+    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_cost.png";
+    if(filename == "" || !QFile::exists(file_path)){
+        QPixmap blank(1000,1000);{
+            QPainter painter(&blank);
+            painter.fillRect(blank.rect(),"black");
+        }
+
+        pc->pixmap = blank;
+        Q_ASSERT(!pc->pixmap.isNull());
+        QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+        return pc;
+    }
+    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+    cv::flip(map,map,0);
+    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_NEAREST);
+
+    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
+
+    Q_ASSERT(!pc->pixmap.isNull());
+    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+    return pc;
+}
 QPixmap Supervisor::getMappingImage(){
     return pmap->test_mapping;
 }
@@ -1482,6 +1637,45 @@ QString Supervisor::getLineColor(int index){
     }
     return "";
 }
+void Supervisor::saveTravel(bool mode, QList<int> canvas){
+    QString file_path;
+    if(mode){
+        file_path = QDir::homePath()+"/maps/"+getMapname()+"/travel_edited.png";
+    }else{
+        file_path = QDir::homePath()+"/maps/"+getMapname()+"/travel_raw.png";
+    }
+    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+    cv::flip(map,map,0);
+    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+    cv::Mat argb_map(map.rows, map.cols, CV_8UC4, cv::Scalar::all(0));
+    for(int i = 0; i < map.rows; i++)
+    {
+        for(int j = 0; j < map.cols; j++)
+        {
+            if(map.ptr<uchar>(i)[j] == 255 || canvas[i*map.rows + j] == 255)
+            {
+                argb_map.ptr<cv::Vec4b>(i)[j] = cv::Vec4b(255,255,255,255);
+            }else{
+                argb_map.ptr<cv::Vec4b>(i)[j] = cv::Vec4b(0,0,0,255);
+            }
+            if(canvas[i*map.rows + j] == 100){
+                argb_map.ptr<cv::Vec4b>(i)[j] = cv::Vec4b(0,0,0,255);
+            }
+        }
+    }
+
+    cv::rotate(argb_map,argb_map,cv::ROTATE_90_CLOCKWISE);
+    cv::flip(argb_map,argb_map,0);
+    QImage temp_image = QPixmap::fromImage(mat_to_qimage_cpy(argb_map)).toImage();
+    QString path = getTravelPath(getMapname());
+    if(temp_image.save(path,"PNG")){
+        plog->write("[MAP] Save travle : "+path);
+        restartSLAM();
+    }else{
+        plog->write("[MAP] Fail to save travle : "+path);
+    }
+}
 void Supervisor::saveMap(QString mode, QString src, QString dst, QList<int> data, QList<int> alpha){
     annotation_edit = true;
     QString file_path;
@@ -1498,8 +1692,6 @@ void Supervisor::saveMap(QString mode, QString src, QString dst, QList<int> data
 
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
     cv::warpAffine(map,map,rot,map.size(),cv::INTER_NEAREST);
-
-
 
     for(int i=0; i<alpha.size(); i++){
         if(alpha[i] > 200){

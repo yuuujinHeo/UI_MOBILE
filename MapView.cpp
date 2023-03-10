@@ -15,6 +15,11 @@ void MapView::setMap(QObject *pixmapContainer){
     update();
 }
 
+void MapView::setTravel(QList<int> canvas){
+    qDebug() << canvas.size();
+
+}
+
 void MapView::paint(QPainter *painter){
     painter->drawPixmap(0,0,width(),height(),m_pixmapContainer.pixmap);
 }

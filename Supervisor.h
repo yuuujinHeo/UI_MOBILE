@@ -60,12 +60,14 @@ public:
 
     float map_rotate_angle;
     bool annotation_edit = false;
+
     ////*********************************************  CLASS   ***************************************************////
     LCMHandler *lcm;
     ServerHandler *server;
     JoystickHandler *joystick;
     HTTPHandler *git;
     QProcess *slam_process;
+
 
     ////*********************************************  WINDOW 관련   ***************************************************////
     void setWindow(QQuickWindow* Window);
@@ -74,15 +76,15 @@ public:
     QObject* getObject();
     Q_INVOKABLE void programExit();
     Q_INVOKABLE void programHide();
-
     Q_INVOKABLE void writelog(QString msg);
-
     Q_INVOKABLE QString getRawMapPath(QString name);
     Q_INVOKABLE QString getMapPath(QString name);
     Q_INVOKABLE QString getAnnotPath(QString name);
     Q_INVOKABLE QString getMetaPath(QString name);
+    Q_INVOKABLE QString getTravelRawPath(QString name);
+    Q_INVOKABLE QString getTravelPath(QString name);
+    Q_INVOKABLE QString getCostPath(QString name);
     Q_INVOKABLE QString getIniPath();
-
 
     ////*********************************************  SETTING 관련   ***************************************************////
     Q_INVOKABLE void setSetting(QString name, QString value);
@@ -143,6 +145,8 @@ public:
     Q_INVOKABLE QString getAvailableMapPath(int num);
     Q_INVOKABLE int getMapFileSize(QString name);
     Q_INVOKABLE QString getMapFile(int num);
+    Q_INVOKABLE bool isExistTravelRaw(QString name);
+    Q_INVOKABLE bool isExistTravelEdited(QString name);
     Q_INVOKABLE bool isExistAnnotation(QString name);
     Q_INVOKABLE void deleteAnnotation();
     Q_INVOKABLE bool loadMaptoServer();
@@ -200,14 +204,12 @@ public:
 //    Q_INVOKABLE void pushMapData(QVector<unsigned char> data);
     Q_INVOKABLE void pushMapData(QList<int> data);
 
-
     ////*********************************************  JOYSTICK 관련   ***************************************************////
     Q_INVOKABLE bool isconnectJoy();
     Q_INVOKABLE float getJoyAxis(int num);
     Q_INVOKABLE int getJoyButton(int num);
     Q_INVOKABLE QString getKeyboard(int mode);
     Q_INVOKABLE QString getJoystick(int mode);
-
 
 
     ////*********************************************  ANNOTATION 관련   ***************************************************////
@@ -224,6 +226,7 @@ public:
     Q_INVOKABLE float getLineWidth(int index);
 
     Q_INVOKABLE void saveMap(QString mode, QString src, QString dst, QList<int> data, QList<int> alpha);
+    Q_INVOKABLE void saveTravel(bool mode, QList<int> canvas);
 
     Q_INVOKABLE void startLine(QString color, float width);
     Q_INVOKABLE void setLine(int x, int y);
@@ -337,9 +340,9 @@ public:
     Q_INVOKABLE void joyMoveR(float r);
     Q_INVOKABLE float getJoyXY();
     Q_INVOKABLE float getJoyR();
-
-
     Q_INVOKABLE void resetHomeFolders();
+
+
     ////*********************************************  ROBOT STATUS 관련   ***************************************************////
     Q_INVOKABLE float getBattery();
     Q_INVOKABLE int getMotorState();
@@ -364,8 +367,6 @@ public:
     Q_INVOKABLE float getPower();
     Q_INVOKABLE float getPowerTotal();
 
-
-
     Q_INVOKABLE float getRobotRadius();
     Q_INVOKABLE float getRobotx();
     Q_INVOKABLE float getRoboty();
@@ -385,8 +386,6 @@ public:
     Q_INVOKABLE int getuistate();
     Q_INVOKABLE void initdone();
 
-
-
     ////*********************************************  MAP IMAGE 관련   ***************************************************////
     Q_INVOKABLE QString getMapname();
     Q_INVOKABLE QString getMappath();
@@ -402,6 +401,11 @@ public:
     Q_INVOKABLE QObject* getMinimap(QString filename) const;
     Q_INVOKABLE QObject* getMap(QString filename) const;
     Q_INVOKABLE QObject* getRawMap(QString filename) const;
+    Q_INVOKABLE QObject* getTravelRawMap(QString filename) const;
+    Q_INVOKABLE QObject* getTravelMap(QString filename) const;
+    Q_INVOKABLE QObject* getCostMap(QString filename) const;
+    Q_INVOKABLE QObject* getTravel(QList<int> canvas) const;
+    Q_INVOKABLE QObject* getTest(QList<int> canvas) const;
 
     ////*********************************************  PATROL 관련   ***************************************************////
     Q_INVOKABLE QString getPatrolFileName();
