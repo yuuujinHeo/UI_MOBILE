@@ -879,11 +879,9 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: 5
             color: show_object?"#12d27c":"#e8e8e8"
-            Text{
-                text: "obj"
-                color: "white"
+            Image{
                 anchors.centerIn: parent
-                font.family: font_noto_r.name
+                source: show_object?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
             }
             MouseArea{
                 anchors.fill: parent

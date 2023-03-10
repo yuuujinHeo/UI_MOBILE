@@ -143,5 +143,19 @@
         <file>bgm/voice_obs_too_close.mp3</file>
         <file>bgm/voice_start_mapping.mp3</file>
         <file>bgm/voice_stop_mapping.mp3</file>
+        <file>icon/icon_test_play.png</file>
+        <file>icon/icon_random.png</file>
+        <file>icon/icon_obj_yes.png</file>
+        <file>icon/icon_obj_no.png</file>
+        <file>icon/icon_non_mute.png</file>
+        <file>icon/icon_mute.png</file>
+        <file>image/image_lock.png</file>
+        <file>image/image_localization_reset.png</file>
+        <file>image/icon_warning.png</file>
+        <file>image/battery_full.png</file>
+        <file>image/battery_3.png</file>
+        <file>image/battery_2.png</file>
+        <file>image/battery_1.png</file>
+        <file>icon/icon_test_stop.png</file>
     </qresource>
 </RCC>

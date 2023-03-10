@@ -452,7 +452,7 @@ Item {
                                         if(modelData == "mapping"){
                                             "image/image_slam.png"
                                         }else if(modelData == "localization"){
-                                            "image/image_annot.png"
+                                            "image/image_localization_reset.png"
                                         }else if(modelData == "annotation"){
                                             "image/image_annot.png"
                                         }else if(modelData == "patrol"){
@@ -1864,15 +1864,25 @@ Item {
                     }
                     Rectangle{
                         width: 200
-                        height: 80
+                        height: 150
                         radius: 10
-                        Text{
+                        Column{
                             anchors.centerIn: parent
-                            text: "랜덤 서빙"
-                            font.family: font_noto_r.name
-                            font.pixelSize: 15
+                            Image{
+                                source: "icon/icon_random.png"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            Text{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "랜덤 서빙"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+
+                            }
 
                         }
+
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
