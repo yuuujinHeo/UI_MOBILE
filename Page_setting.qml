@@ -367,25 +367,12 @@ Item {
                             width: parent.width - 351
                             height: parent.height
                             Row{
-                                spacing: 20
+                                spacing: 10
                                 anchors.centerIn: parent
-                                Rectangle{
+                                Image{
+                                    id: ttet1
+                                    source: "icon/icon_mute.png"
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: 30
-                                    height: width
-                                    color: "black"
-                                    Image{
-                                        id: ttet1
-                                        source: "icon/icon_remove.png"
-                                        width: 20
-                                        height: 20
-                                        anchors.centerIn: parent
-                                    }
-                                    ColorOverlay{
-                                        source: ttet1
-                                        anchors.fill: ttet1
-                                        color: "white"
-                                    }
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
@@ -402,38 +389,26 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     id: slider_volume_bgm
 //                                    anchors.centerIn: parent
-                                    width: tt.width*0.8
+                                    width: tt.width*0.7
                                     height: 40
                                     from: 0
                                     to: 100
                                     value: supervisor.getSetting("ROBOT_SW","volume_bgm")
                                 }
-                                Rectangle{
+
+                                Image{
+                                    id: ttet
+                                    source: "icon/icon_test_play.png"
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: 30
-                                    height: width
-                                    color: "black"
-                                    Image{
-                                        id: ttet
-                                        source: "icon/play_r.png"
-                                        width: 20
-                                        height: 20
-                                        anchors.centerIn: parent
-                                    }
-                                    ColorOverlay{
-                                        source: ttet
-                                        anchors.fill: ttet
-                                        color: "white"
-                                    }
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
                                             if(bgm_test.isplaying){
                                                 bgm_test.stop();
-                                                ttet.source = "icon/play_r.png";
+                                                ttet.source = "icon/icon_test_play.png";
                                             }else{
                                                 bgm_test.play();
-                                                ttet.source = "icon/stop_r.png";
+                                                ttet.source = "icon/icon_test_stop.png";
                                             }
                                         }
                                     }
@@ -489,25 +464,12 @@ Item {
                             width: parent.width - 351
                             height: parent.height
                             Row{
-                                spacing: 20
+                                spacing: 10
                                 anchors.centerIn: parent
-                                Rectangle{
+                                Image{
+                                    id: ttet12
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: 30
-                                    height: width
-                                    color: "black"
-                                    Image{
-                                        id: ttet12
-                                        source: "icon/icon_remove.png"
-                                        width: 20
-                                        height: 20
-                                        anchors.centerIn: parent
-                                    }
-                                    ColorOverlay{
-                                        source: ttet12
-                                        anchors.fill: ttet12
-                                        color: "white"
-                                    }
+                                    source: "icon/icon_mute.png"
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
@@ -522,29 +484,16 @@ Item {
                                 Slider{
                                     anchors.verticalCenter: parent.verticalCenter
                                     id: slider_volume_voice
-                                    width: te.width*0.8
+                                    width: te.width*0.7
                                     height: 40
                                     from: 0
                                     to: 100
                                     value: supervisor.getSetting("ROBOT_SW","volume_voice")
                                 }
-                                Rectangle{
+                                Image{
+                                    id: ttet14
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: 30
-                                    height: width
-                                    color: "black"
-                                    Image{
-                                        id: ttet14
-                                        source: "icon/play_r.png"
-                                        width: 20
-                                        height: 20
-                                        anchors.centerIn: parent
-                                    }
-                                    ColorOverlay{
-                                        source: ttet14
-                                        anchors.fill: ttet14
-                                        color: "white"
-                                    }
+                                    source: "icon/icon_test_play.png"
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {

@@ -19,7 +19,7 @@ Item {
         if(battery == 100){
             timer_bat.stop();
             text_mention.text = "충전이 완료되었습니다."
-            image_battery.source = "qrc:/icon/bat_full.png";
+            image_battery.source =  "image/battery_full.png"
         }
     }
 
@@ -32,13 +32,13 @@ Item {
         is_charging = false;
         battery = supervisor.getBatteryOut().toFixed(0);
         if(robot_battery > 90){
-            image_battery.source = "icon/bat_large_full.png"
+            image_battery.source = "image/battery_full.png"
         }else if(robot_battery > 60){
-            image_battery.source = "icon/bat_large_3.png"
+            image_battery.source = "image/battery_3.png"
         }else if(robot_battery > 30){
-            image_battery.source = "icon/bat_large_2.png"
+            image_battery.source = "image/battery_2.png"
         }else{
-            image_battery.source = "icon/bat_large_1.png"
+            image_battery.source = "image/battery_1.png"
         }
         timer_bat.stop();
         text_mention.text = "충전 케이블을 연결해 주세요."
@@ -51,7 +51,7 @@ Item {
     }
     Image{
         id: image_battery
-        source: "icon/bat_large_1.png"
+        source: "image/battery_1.png"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: 250
@@ -129,14 +129,14 @@ Item {
         interval: 1000
         repeat: true
         onTriggered: {
-            if(image_battery.source == "qrc:/icon/bat_large_1.png"){
-                image_battery.source = "qrc:/icon/bat_large_2.png";
-            }else if(image_battery.source == "qrc:/icon/bat_large_2.png"){
-                image_battery.source = "qrc:/icon/bat_large_3.png";
-            }else if(image_battery.source == "qrc:/icon/bat_large_3.png"){
-                image_battery.source = "qrc:/icon/bat_large_full.png";
+            if(image_battery.source == "image/battery_1.png"){
+                image_battery.source = "image/battery_2.png";
+            }else if(image_battery.source == "image/battery_2.png"){
+                image_battery.source = "image/battery_3.png";
+            }else if(image_battery.source == "image/battery_3.png"){
+                image_battery.source = "image/battery_full.png";
             }else{
-                image_battery.source = "qrc:/icon/bat_large_1.png";
+                image_battery.source = "image/battery_1.png";
             }
         }
     }
