@@ -436,7 +436,7 @@ Item {
             id: canvas_map
             width: map_width
             height: map_height
-            visible: !state_annotation==="TRAVELLINE"
+            visible: state_annotation==="TRAVELLINE"?false:true
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
             scale: mapview.newscale
@@ -493,6 +493,7 @@ Item {
             width: map_width
             height: map_height
             opacity: 0.7
+            visible: state_annotation==="TRAVELLINE"
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
             scale: mapview.newscale
@@ -1280,19 +1281,24 @@ Item {
     }
     function draw_canvas_temp(){
         var ctx = canvas_map_temp.getContext('2d');
-        if(tool == "BRUSH" || tool == "ERASE"){
-            ctx.lineWidth = canvas_map_temp.lineWidth
-            ctx.strokeStyle = color_dark_navy
-            ctx.lineCap = "round"
-            ctx.beginPath()
-            ctx.moveTo(canvas_map_temp.lastX, canvas_map_temp.lastY)
-            if(point1.pressed){
-                canvas_map_temp.lastX = area_map.point_x1
-                canvas_map_temp.lastY = area_map.point_y1
+        if(state_annotation === "TRAVELLINE"){
+            if(tool == "BRUSH" || tool == "ERASE"){
+                ctx.lineWidth = canvas_map_temp.lineWidth
+                ctx.strokeStyle = color_dark_navy
+                ctx.lineCap = "round"
+                ctx.beginPath()
+                ctx.moveTo(canvas_map_temp.lastX, canvas_map_temp.lastY)
+                if(point1.pressed){
+                    canvas_map_temp.lastX = area_map.point_x1
+                    canvas_map_temp.lastY = area_map.point_y1
+                }
+                ctx.lineTo(canvas_map_temp.lastX, canvas_map_temp.lastY)
+                ctx.stroke()
             }
-            ctx.lineTo(canvas_map_temp.lastX, canvas_map_temp.lastY)
-            ctx.stroke()
+        }else{
+            clear_canvas_temp();
         }
+
         canvas_map_temp.requestPaint();
 
     }
