@@ -684,39 +684,35 @@ Item {
                 font.pixelSize: 20
             }
             Rectangle{
-                id: btn_slam_minimize
+                id: btn_slam_start
                 width: 188
                 height: 100
                 radius: 60
-                color: "transparent"
                 border.width: 3
                 border.color: "#e5e5e5"
-                anchors.right: btn_slam_do_init.left
-                anchors.rightMargin: 30
-                anchors.top: text_notice4.bottom
-                anchors.topMargin: 80
+                enabled: supervisor.getLCMConnection()
+                color: enabled?"transparent":"#e5e5e5"
                 Column{
-                    spacing: 5
                     anchors.centerIn: parent
+                    spacing: 5
                     Image{
-                        id: image_charge
+                        source: "icon/icon_add.png"
                         width: 30
                         height: 30
-                        source:"icon/btn_minimize.png"
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
                     Text{
-                        id: text_slaminimize
-                        text: "창 최소화"
-                        font.family: font_noto_r.name
+                        text: "맵 생성"
                         font.pixelSize: 15
-                        horizontalAlignment: Text.AlignHCenter
+                        font.family: font_noto_r.name
+                        color:enabled?"black":"white"
                     }
                 }
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        mainwindow.showMinimized()
+                        loadPage(pmap);
+                        loader_page.item.map_mode = 1;
                     }
                 }
             }

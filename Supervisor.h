@@ -203,6 +203,7 @@ public:
 //    Q_INVOKABLE QList<int> getMiniMap(QString filename);
 //    Q_INVOKABLE void pushMapData(QVector<unsigned char> data);
     Q_INVOKABLE void pushMapData(QList<int> data);
+    Q_INVOKABLE QString getnewMapname();
 
     ////*********************************************  JOYSTICK 관련   ***************************************************////
     Q_INVOKABLE bool isconnectJoy();
