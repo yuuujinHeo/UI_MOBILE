@@ -1580,9 +1580,9 @@ void Supervisor::pushMapData(QList<int> data){
 
 QString Supervisor::getnewMapname(){
     int max_num = -1;
-    for(int i=0; i<map_list.size(); i++){
+    for(int i=0; i<getAvailableMap(); i++){
         QStringList name = map_list[i].split("_");
-        if(name.size() > 1){
+        if(name.size() > 1 && name[0] == "map"){
             if(name[1].toInt() > max_num){
                 max_num = name[1].toInt();
             }

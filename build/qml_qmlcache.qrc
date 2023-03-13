@@ -125,7 +125,19 @@
         <file alias="bgm/voice_obs_too_close.mp3">../bgm/voice_obs_too_close.mp3</file>
         <file alias="bgm/voice_start_mapping.mp3">../bgm/voice_start_mapping.mp3</file>
         <file alias="bgm/voice_stop_mapping.mp3">../bgm/voice_stop_mapping.mp3</file>
-        <file alias="bgm/voice_tray_1.mp3">../bgm/voice_tray_1.mp3</file>
-        <file alias="bgm/voice_tray_2.mp3">../bgm/voice_tray_2.mp3</file>
+        <file alias="icon/icon_test_play.png">../icon/icon_test_play.png</file>
+        <file alias="icon/icon_random.png">../icon/icon_random.png</file>
+        <file alias="icon/icon_obj_yes.png">../icon/icon_obj_yes.png</file>
+        <file alias="icon/icon_obj_no.png">../icon/icon_obj_no.png</file>
+        <file alias="icon/icon_non_mute.png">../icon/icon_non_mute.png</file>
+        <file alias="icon/icon_mute.png">../icon/icon_mute.png</file>
+        <file alias="image/image_lock.png">../image/image_lock.png</file>
+        <file alias="image/image_localization_reset.png">../image/image_localization_reset.png</file>
+        <file alias="image/icon_warning.png">../image/icon_warning.png</file>
+        <file alias="image/battery_full.png">../image/battery_full.png</file>
+        <file alias="image/battery_3.png">../image/battery_3.png</file>
+        <file alias="image/battery_2.png">../image/battery_2.png</file>
+        <file alias="image/battery_1.png">../image/battery_1.png</file>
+        <file alias="icon/icon_test_stop.png">../icon/icon_test_stop.png</file>
     </qresource>
 </RCC>
