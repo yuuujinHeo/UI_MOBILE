@@ -32,7 +32,6 @@ Window {
         }
     }
     Component.onDestruction: {
-        print("destruction")
     }
 
     property color color_red: "#E7584D"
@@ -221,6 +220,13 @@ Window {
             loader_page.item.init();
         }
     }
+    function show_loading(){
+        rect_loading.open();
+    }
+    function unshow_loading(){
+        rect_loading.close();
+    }
+
     function updatepatrol(){
         if(loader_page.item.objectName == "page_map")
             loader_page.item.updatepatrol();
@@ -293,7 +299,6 @@ Window {
         source: pinit
     }
 
-
     Timer{
         id: timer_update
         interval: 3000
@@ -305,23 +310,6 @@ Window {
         }
     }
 
-    Item{
-        focus: true
-        Keys.onReleased: {
-            if(!event.isAutoRepeat){
-                if(event.key === Qt.Key_Up){
-                    print("release key_up")
-                }
-            }
-        }
-        Keys.onPressed: {
-            if(!event.isAutoRepeat){
-                if(event.key === Qt.Key_Up){
-                    print("press key_up")
-                }
-            }
-        }
-    }
     FontLoader{
         id: font_noto_b
         source: "font/NotoSansKR-Medium.otf"
@@ -381,8 +369,26 @@ Window {
         source: "bgm/voice_emergency.mp3"
     }
 
+    Popup{
+        id: rect_loading
+        width: parent.width
+        height: parent.height
+
+        background:Rectangle{
+            anchors.fill: parent
+            color: color_dark_black
+            opacity: 0.5
+        }
+        AnimatedImage{
+            id: loading_image
+            source: "image/loading.gif"
+            anchors.centerIn: parent
+        }
+    }
+
     Item_statusbar{
         id: statusbar
         visible: false
     }
+
 }

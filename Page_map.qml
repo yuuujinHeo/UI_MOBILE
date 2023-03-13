@@ -3457,6 +3457,19 @@ Item {
                 color: "#f4f4f4"
             }
 
+            Timer{
+                running: true
+                repeat: true
+                interval: 500
+                triggeredOnStart: true
+                onTriggered: {
+                    if(supervisor.getTempObjectSize() > 0)
+                        btn_undo.enabled = true;
+                    else
+                        btn_undo.enabled = false;
+                }
+            }
+
             Component.onCompleted: {
                 var ob_num = supervisor.getObjectNum();
                 list_object.model.clear();
@@ -3726,6 +3739,7 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     map.tool = "ADD_POINT";
+                                    supervisor.clearObjectPoints();
                                 }
                             }
                         }
@@ -3753,25 +3767,27 @@ Item {
                                 }
                             }
                         }
-                    }
-
-                    Image{
-                        width: 40
-                        height: 40
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.right: parent.right
-                        anchors.rightMargin: 30
-                        source: "icon/icon_undo.png"
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                if(map.tool == "ADD_OBJECT"){
-                                    supervisor.clearObjectPoints();
-                                    map.new_object = false;
-                                }else if(map.tool == "ADD_POINT"){
-                                    supervisor.removeObjectPointLast();
+                        Rectangle{
+                            id: btn_undo
+                            width: 40
+                            height: 40
+                            radius: 40
+                            color: enabled?"#282828":"#D0D0D0"
+                            Image{
+                                anchors.centerIn: parent
+                                source: "icon/icon_undo.png"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    if(map.tool == "ADD_OBJECT"){
+                                        supervisor.clearObjectPoints();
+                                        map.new_object = false;
+                                    }else if(map.tool == "ADD_POINT"){
+                                        supervisor.removeObjectPointLast();
+                                    }
+                                    map.update_canvas();
                                 }
-                                map.update_canvas();
                             }
                         }
                     }
@@ -5419,6 +5435,7 @@ Item {
                     loader_menu.sourceComponent = menu_annot_rotate;
                     popup_save_mapping.close();
                     timer_check_slam.stop();
+                    unshow_loading();
                 }
             }
         }
@@ -5521,6 +5538,7 @@ Item {
                                 supervisor.stopMapping();
                                 if(textfield_name22.text == ""){
                                 }else{
+                                    show_loading();
                                     timer_check_slam.start();
                                     supervisor.saveMapping(textfield_name22.text);
                                     supervisor.setMap(textfield_name22.text);
@@ -5620,6 +5638,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                show_loading();
                                 if(map.map_name == "map_raw.png"){
                                     var text = "map_edited.png"
                                 }else{
@@ -5637,9 +5656,8 @@ Item {
                                 supervisor.deleteAnnotation();
                                 map.state_annotation = "DRAWING";
                                 loader_menu.sourceComponent = menu_annot_draw;
-
                                 popup_save_rotated.close();
-
+                                unshow_loading();
                             }
                         }
                     }
@@ -5763,6 +5781,7 @@ Item {
                             onClicked:{
                                 if(textfield_name.text == ""){
                                 }else{
+                                    show_loading();
                                     //save temp Image
                                     map.save_map(textfield_name.text);
 
@@ -5777,6 +5796,7 @@ Item {
                                     map.state_annotation = "OBJECT";
                                     loader_menu.sourceComponent = menu_annot_object;
                                     popup_save_edited.close();
+                                    unshow_loading();
                                 }
                             }
                         }

@@ -13,21 +13,21 @@ Item {
     height: 1000
     onWidthChanged: {
         if(robot_following){
-            var newx = width/2 - robot_x*mapview.newscale;
-            var newy = height/2 - robot_y*mapview.newscale;
+            var newx = width/2 - robot_x*newscale;
+            var newy = height/2 - robot_y*newscale;
 
             if(newx > 0){
                 mapview.x = 0;
-            }else if(newx < - map_width*mapview.newscale + width){
-                mapview.x = - map_width*mapview.newscale + width
+            }else if(newx < - map_width*newscale + width){
+                mapview.x = - map_width*newscale + width
             }else{
                 mapview.x = newx;
             }
 
             if(newy  > 0){
                 mapview.y = 0;
-            }else if(newy < - map_height*mapview.newscale + height){
-                mapview.y = - map_height*mapview.newscale + height
+            }else if(newy < - map_height*newscale + height){
+                mapview.y = - map_height*newscale + height
             }else{
                 mapview.y = newy;
             }
@@ -73,21 +73,21 @@ Item {
 
     onRobot_followingChanged: {
         if(robot_following){
-            var newx = width/2 - robot_x*mapview.newscale;
-            var newy = height/2 - robot_y*mapview.newscale;
+            var newx = width/2 - robot_x*newscale;
+            var newy = height/2 - robot_y*newscale;
 
             if(newx > 0){
                 mapview.x = 0;
-            }else if(newx < - map_width*mapview.newscale + width){
-                mapview.x = - map_width*mapview.newscale + width
+            }else if(newx < - map_width*newscale + width){
+                mapview.x = - map_width*newscale + width
             }else{
                 mapview.x = newx;
             }
 
             if(newy  > 0){
                 mapview.y = 0;
-            }else if(newy < - map_height*mapview.newscale + height){
-                mapview.y = - map_height*mapview.newscale + height
+            }else if(newy < - map_height*newscale + height){
+                mapview.y = - map_height*newscale + height
             }else{
                 mapview.y = newy;
             }
@@ -95,11 +95,11 @@ Item {
     }
     onRobot_xChanged: {
         if(robot_following){
-            var newx = width/2 - (robot_x)*mapview.newscale;
+            var newx = width/2 - (robot_x)*newscale;
             if(newx > 0){
                 mapview.x = 0;
-            }else if(newx < - map_width*mapview.newscale + width){
-                mapview.x = - map_width*mapview.newscale + width
+            }else if(newx < - map_width*newscale + width){
+                mapview.x = - map_width*newscale + width
             }else{
                 mapview.x = newx;
             }
@@ -107,11 +107,11 @@ Item {
     }
     onRobot_yChanged: {
         if(robot_following){
-            var newy = height/2 - (robot_y)*mapview.newscale;
+            var newy = height/2 - (robot_y)*newscale;
             if(newy  > 0){
                 mapview.y = 0;
-            }else if(newy < - map_height*mapview.newscale + height){
-                mapview.y = - map_height*mapview.newscale + height
+            }else if(newy < - map_height*newscale + height){
+                mapview.y = - map_height*newscale + height
             }else{
                 mapview.y = newy;
             }
@@ -175,7 +175,7 @@ Item {
 
     //맵 사이즈를 전체 화면에 맞춰서 축소
     function setfullscreen(){
-        mapview.newscale = width/map_width;
+        newscale = width/map_width;
     }
 
     function update_canvas(){
@@ -323,32 +323,59 @@ Item {
     property bool rotateMap: false
 
 
+    property var newscale: 1
+    Behavior on newscale{
+        NumberAnimation{
+            duration: 100
+        }
+    }
+    onNewscaleChanged: {
+        mapview.width = map_width*newscale
+        mapview.height = map_height*newscale
+
+        var xscale = mapview.centerx/map_width;
+        var yscale = mapview.centery/map_height;
+
+        var newx = (mapview.width - rect_map.width)*xscale;
+        var newy = (mapview.height - rect_map.height)*yscale;
+
+        mapview.x = -newx;
+        mapview.y = -newy;
+//                print(centerx, centery, xscale, yscale, newx, newy)
+    }
 
     //Annotation State (None, Drawing, Object, Location, Travelline)
     onState_annotationChanged: {
         tool = "MOVE";
         travelview.visible = false;
         if(state_annotation == "NONE"){
-
+            robot_following = false;
         }else if(state_annotation == "DRAWING"){
-
+            robot_following = false;
         }else if(state_annotation == "OBJECT"){
             show_object = true;
             show_location = true;
+            robot_following = false;
+            show_buttons = false;
         }else if(state_annotation == "LOCATION"){
             show_object = true;
             show_robot = true;
             show_location = true;
+            show_buttons = true;
             show_lidar = true;
+            robot_following = true;
             find_map_walls();
         }else if(state_annotation == "SAVE"){
             show_location = true;
             show_object = true;
+            robot_following = false;
+            show_buttons = false;
             show_robot = true;
+            setfullscreen();
 //            show_travelline = true;
         }else if(state_annotation == "TRAVELLINE"){
             travelview.visible = true;
-            print("찡긋")
+            robot_following = false;
             loadmap(supervisor.getMapname(),"T_RAW")
         }
 
@@ -375,7 +402,6 @@ Item {
             id: mapview
             width: map_width
             height: map_height
-            property var newscale: 1
             property var centerx: 0
             property var centery: 0
             property var startx: 0
@@ -386,40 +412,21 @@ Item {
                 x = newx;
             }
 
-            Behavior on newscale{
-                NumberAnimation{
-                    duration: 100
-                }
-            }
             onXChanged: {
                 if(x > 0){
                     x = 0;
-                }else if(x < - map_width*mapview.newscale + rect_map.width){
-                    x = - map_width*mapview.newscale + rect_map.width
+                }else if(x < - map_width*newscale + rect_map.width){
+                    x = - map_width*newscale + rect_map.width
                 }
             }
             onYChanged: {
                 if(y > 0){
                     y = 0;
-                }else if(x < - map_height*mapview.newscale + rect_map.height){
-                    y = - map_height*mapview.newscale + rect_map.height
+                }else if(x < - map_height*newscale + rect_map.height){
+                    y = - map_height*newscale + rect_map.height
                 }
             }
 
-            onNewscaleChanged: {
-                width = map_width*newscale
-                height = map_height*newscale
-
-                var xscale = centerx/map_width;
-                var yscale = centery/map_height;
-
-                var newx = (width - rect_map.width)*xscale;
-                var newy = (height - rect_map.height)*yscale;
-
-                x = -newx;
-                y = -newy;
-//                print(centerx, centery, xscale, yscale, newx, newy)
-            }
         }
 
         MapView{
@@ -429,7 +436,7 @@ Item {
             visible: state_annotation==="TRAVELLINE"
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
-            scale: mapview.newscale
+            scale: newscale
         }
 
         Canvas{
@@ -439,7 +446,7 @@ Item {
             visible: state_annotation==="TRAVELLINE"?false:true
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
-            scale: mapview.newscale
+            scale: newscale
             property var lineWidth: brush_size
             //drawing 용
             property real lastX
@@ -455,7 +462,7 @@ Item {
             height: map_height
             x: mapview.x
             y: mapview.y
-            scale: mapview.newscale
+            scale: newscale
         }
 
         Canvas{
@@ -466,7 +473,7 @@ Item {
             opacity: 0.7
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
-            scale: mapview.newscale
+            scale: newscale
         }
 
         Canvas{
@@ -476,7 +483,7 @@ Item {
             height: map_height
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
-            scale: mapview.newscale
+            scale: newscale
         }
 
         Canvas{
@@ -485,7 +492,7 @@ Item {
             height: map_height
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
-            scale: mapview.newscale
+            scale: newscale
         }
 
         Canvas{
@@ -496,7 +503,7 @@ Item {
             visible: state_annotation==="TRAVELLINE"
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
-            scale: mapview.newscale
+            scale: newscale
             property var lineWidth: brush_size
             //drawing 용
             property real lastX
@@ -516,19 +523,19 @@ Item {
                  mapview.centery = mouseY*(map_height/height);
 
                 if(wheel.angleDelta.y > 0){
-                    new_scale = mapview.newscale + 0.1;
+                    new_scale = newscale + 0.1;
                     if(new_scale > 5){
-                        mapview.newscale = 5;
+                        newscale = 5;
                     }else{
-                        mapview.newscale = new_scale;
+                        newscale = new_scale;
                     }
                 }else{
-                    new_scale = mapview.newscale - 0.1;
+                    new_scale = newscale - 0.1;
                     if(rect_map.width > new_scale*map_width){
-                        mapview.newscale = rect_map.width/map_width;
+                        newscale = rect_map.width/map_width;
 //                        /*print*/(rect_map.width, map_width)
                     }else{
-                        mapview.newscale = new_scale;
+                        newscale = new_scale;
                     }
                 }
             }
@@ -570,12 +577,12 @@ Item {
                         mapview.centery = (point_y1+point_y2)/2;
                         mapview.startx = mapview.x;
                         mapview.starty = mapview.y;
-                        mapview.startScale = mapview.newscale;
+                        mapview.startScale = newscale;
                         var dx = Math.abs(point_x1-point_x2);
                         var dy = Math.abs(point_y1-point_y2);
                         var dist = Math.sqrt(dx*dx + dy*dy);
                         area_map.startDist = dist;
-//                        /*print*/("PRESS : ",mapview.centerx, mapview.centery, mapview.newscale);
+//                        /*print*/("PRESS : ",mapview.centerx, mapview.centery, newscale);
                     }else if(point1.pressed){
                         area_map.startX = point1.x;
                         area_map.startY = point1.y;
@@ -622,6 +629,8 @@ Item {
                     new_obj_y1 = point_y1;
                     new_obj_x2 = point_x1;
                     new_obj_y2 = point_y1;
+                }else if(tool == "ADD_POINT"){
+                    new_object = true;
                 }
             }
 
@@ -717,11 +726,11 @@ Item {
                         var dscale = (dist)/startDist;
 
                         if(dscale > 5){
-                            mapview.newscale = 5;
+                            newscale = 5;
                         }else if(rect_map.width > dscale*map_width){
-                            mapview.newscale = rect_map.width/map_width;
+                            newscale = rect_map.width/map_width;
                         }else{
-                            mapview.newscale = dscale;
+                            newscale = dscale;
                         }
 
                     }else if(!double_touch){
@@ -734,15 +743,15 @@ Item {
 
                             if(newx > 0){
                                 mapview.x = 0;
-                            }else if(newx < - map_width*mapview.newscale + rect_map.width){
-                                mapview.x = - map_width*mapview.newscale + rect_map.width
+                            }else if(newx < - map_width*newscale + rect_map.width){
+                                mapview.x = - map_width*newscale + rect_map.width
                             }else{
                                 mapview.x = newx;
                             }
                             if(newy  > 0){
                                 mapview.y = 0;
-                            }else if(newy < - map_height*mapview.newscale + rect_map.height){
-                                mapview.y = - map_height*mapview.newscale + rect_map.height
+                            }else if(newy < - map_height*newscale + rect_map.height){
+                                mapview.y = - map_height*newscale + rect_map.height
                             }else{
                                 mapview.y = newy;
                             }
@@ -899,9 +908,9 @@ Item {
         Rectangle{
             id: brushview
             visible: false
-            width: (brush_size+1)*mapview.newscale
-            height: (brush_size+1)*mapview.newscale
-            radius: (brush_size+1)*mapview.newscale
+            width: (brush_size+1)*newscale
+            height: (brush_size+1)*newscale
+            radius: (brush_size+1)*newscale
             border.width: 1
             border.color: "black"
             anchors.centerIn: parent
@@ -1042,6 +1051,49 @@ Item {
         height: width
         source: "icon/icon_home_2.png"
     }
+
+    Column{
+        id: scale_bar
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        anchors.bottomMargin: 10
+        spacing: -5
+        Row{
+            Rectangle{
+                width: 3
+                height: 10
+                color: "white"
+                anchors.verticalCenter: parent.verticalCenter
+            }
+            Rectangle{
+                anchors.verticalCenter: parent.verticalCenter
+                width: (1/supervisor.getGridWidth())*newscale
+                height: 3
+                color: "white"
+            }
+            Rectangle{
+                width: 3
+                height: 10
+                color: "white"
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+        Text{
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "1m"
+            font.family: font_noto_r.name
+            font.pixelSize: 10
+            color: "white"
+        }
+    }
+
+    Rectangle{
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+
+    }
+
 
     //////========================================================================================Timer
     Timer{
@@ -1224,7 +1276,7 @@ Item {
     }
 
     function save_map(name){
-        mapview.newscale = 1;
+        newscale = 1;
 
         var ctx = canvas_map.getContext('2d');
         var data = ctx.getImageData(0,0,map_width,map_height);
@@ -1838,7 +1890,7 @@ Item {
         if(canvas_map_cur.available){
             var ctx = canvas_map_cur.getContext('2d');
             ctx.clearRect(0,0,canvas_map_cur.width,canvas_map_cur.height);
-            if(show_robot && supervisor.is_slam_running()){
+            if(show_robot && (supervisor.is_slam_running() || map_mode === "MAPPING")){
                 robot_x = supervisor.getRobotx()/grid_size + origin_x;
                 robot_y = supervisor.getRoboty()/grid_size + origin_y;
                 robot_th = -supervisor.getRobotth()-Math.PI/2;

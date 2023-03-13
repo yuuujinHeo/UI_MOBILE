@@ -251,6 +251,8 @@ public:
     Q_INVOKABLE float getLocationy(int num);
     Q_INVOKABLE float getLocationth(int num);
 
+    Q_INVOKABLE bool isExistLocation(int num);
+
     Q_INVOKABLE float getLidar(int num);
 
     ST_POSE setAxis(ST_POSE _pose);
