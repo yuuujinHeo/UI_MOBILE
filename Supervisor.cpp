@@ -1578,6 +1578,23 @@ void Supervisor::pushMapData(QList<int> data){
     }
 }
 
+QString Supervisor::getnewMapname(){
+    int max_num = -1;
+    for(int i=0; i<map_list.size(); i++){
+        QStringList name = map_list[i].split("_");
+        if(name.size() > 1){
+            if(name[1].toInt() > max_num){
+                max_num = name[1].toInt();
+            }
+        }
+    }
+    if(max_num == -1){
+        return "map_0";
+    }else{
+        return "map_"+QString::number(max_num+1);
+    }
+}
+
 ////*********************************************  JOYSTICK 관련   ***************************************************////
 bool Supervisor::isconnectJoy(){
     return joystick->connection;

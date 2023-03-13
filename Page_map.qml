@@ -5416,14 +5416,14 @@ Item {
                     map.map_mode = "RAW";
                     map.update_canvas();
                     supervisor.readSetting(textfield_name22.text);
-
                     loader_menu.sourceComponent = menu_annot_rotate;
                     popup_save_mapping.close();
                     timer_check_slam.stop();
-
                 }
-
             }
+        }
+        Component.onCompleted: {
+            textfield_name22.text = supervisor.getnewMapname();
         }
 
         Rectangle{
