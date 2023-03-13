@@ -157,5 +157,6 @@
         <file>image/battery_2.png</file>
         <file>image/battery_1.png</file>
         <file>icon/icon_test_stop.png</file>
+        <file>image/loading.gif</file>
     </qresource>
 </RCC>

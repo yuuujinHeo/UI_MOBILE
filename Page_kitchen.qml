@@ -287,7 +287,7 @@ Item {
                                     Text{
                                         anchors.centerIn: parent
                                         text: (table_col_num*5*pageNum)+index+1
-                                        color: "#525252"
+                                        color: supervisor.isExistLocation((table_col_num*5*pageNum)+index)?"#525252":color_red
                                         font.family: font_noto_r.name
                                         font.pixelSize: 25
                                     }
@@ -298,7 +298,11 @@ Item {
                                         if(cur_table == (table_col_num*5*pageNum)+index+1){
                                             cur_table = 0;
                                         }else{
-                                            cur_table = (table_col_num*5*pageNum)+index+1;
+                                            if(supervisor.isExistLocation((table_col_num*5*pageNum)+index)){
+                                                cur_table = (table_col_num*5*pageNum)+index+1;
+                                            }else{
+
+                                            }
                                         }
                                     }
                                 }

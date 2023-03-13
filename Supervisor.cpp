@@ -697,8 +697,10 @@ bool Supervisor::isExistMap(){
         if(QFile::exists(getMapPath(getMapname()))){
             return true;
         }else{
+
             plog->write("[SETTING - ERROR] "+getMapname()+" not found. map unloaded.");
             setSetting("FLOOR/map_load","false");
+            readSetting();
         }
     }
     return false;
@@ -1897,6 +1899,16 @@ float Supervisor::getLocationth(int num){
         return temp.th;
     }
     return 0.;
+}
+bool Supervisor::isExistLocation(int num){
+    for(int i=0; i<pmap->vecLocation.size(); i++){
+        if(pmap->vecLocation[i].name.split("_").size() > 1 && pmap->vecLocation[i].name.split("_")[0] == "Serving"){
+            if(pmap->vecLocation[i].name.split("_")[1].toInt() == num){
+                return true;
+            }
+        }
+    }
+    return false;
 }
 float Supervisor::getLidar(int num){
     return probot->lidar_data[num];
