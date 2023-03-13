@@ -556,7 +556,9 @@ qrc_qml_qmlcache.cpp: qml_qmlcache.qrc \
 		../icon/icon_move.png \
 		../icon/icon_charge_2.png \
 		../icon/image_map.png \
+		../icon/icon_non_mute.png \
 		../icon/btn_confirm.png \
+		../icon/icon_test_play.png \
 		../icon/bat_large_3.png \
 		../icon/keyboard_left.png \
 		../icon/icon_point.png \
@@ -579,12 +581,16 @@ qrc_qml_qmlcache.cpp: qml_qmlcache.qrc \
 		../icon/icon_power.png \
 		../icon/icon_server_connect.png \
 		../icon/icon_error.png \
+		../icon/icon_random.png \
 		../icon/play_r.png \
 		../icon/bat_large_2.png \
+		../icon/icon_obj_no.png \
 		../icon/icon_connect_error.png \
 		../icon/icon_cur.png \
 		../icon/icon_stop.png \
 		../icon/icon_lidar.png \
+		../icon/icon_mute.png \
+		../icon/icon_test_stop.png \
 		../icon/icon_draw.png \
 		../icon/bat_2.png \
 		../icon/icon_open.png \
@@ -597,45 +603,51 @@ qrc_qml_qmlcache.cpp: qml_qmlcache.qrc \
 		../icon/icon_emergency.png \
 		../icon/icon_researching.png \
 		../icon/bat_large_1.png \
+		../icon/icon_obj_yes.png \
 		../icon/bat_full.png \
-		../image/robot_moving.png \
-		../image/joy_finger.png \
-		../image/robot_move_charge.png \
-		../image/robot_clear.png \
-		../image/image_patrol.png \
-		../image/rainbow3.png \
-		../image/robot_callme.png \
-		../image/joy_background.png \
+		../image/battery_1.png \
 		../image/robot_head_sleep.png \
-		../image/image_localization.png \
+		../image/battery_2.png \
 		../image/warning.png \
+		../image/battery_3.png \
+		../image/robot_clear.png \
 		../image/robot_pickup.png \
-		../image/image_annot.png \
+		../image/icon_warning.png \
+		../image/joy_finger.png \
+		../image/robot_moving.png \
+		../image/robot_callme.png \
 		../image/robot_move_wait.png \
-		../image/image_location.png \
-		../image/image_slam.png \
+		../image/image_patrol.png \
 		../image/robot_head.png \
+		../image/image_location.png \
+		../image/battery_full.png \
+		../image/robot_move_charge.png \
+		../image/image_annot.png \
+		../image/image_lock.png \
+		../image/image_localization.png \
+		../image/image_slam.png \
+		../image/rainbow3.png \
+		../image/joy_background.png \
+		../image/image_localization_reset.png \
 		../font/NotoSansKR-Medium.otf \
 		../font/NotoSansKR-Light.otf \
-		../bgm/voice_avoid.mp3 \
 		../bgm/voice_move_wait.mp3 \
+		../bgm/song.mp3 \
+		../bgm/voice_charging.mp3 \
 		../bgm/voice_obs_too_close.mp3 \
 		../bgm/voice_stop_charge.mp3 \
-		../bgm/voice_stop_mapping.mp3 \
-		../bgm/voice_motor_error.mp3 \
-		../bgm/voice_thanks.mp3 \
-		../bgm/voice_tray_1.mp3 \
 		../bgm/voice_move_charge.mp3 \
 		../bgm/voice_start_charge.mp3 \
+		../bgm/voice_thanks.mp3 \
 		../bgm/voice_local_fail.mp3 \
 		../bgm/voice_pickup.mp3 \
 		../bgm/voice_start_mapping.mp3 \
-		../bgm/voice_tray_2.mp3 \
-		../bgm/song.mp3 \
 		../bgm/voice_start_serving.mp3 \
-		../bgm/voice_movefail.mp3 \
+		../bgm/voice_motor_error.mp3 \
 		../bgm/voice_emergency.mp3 \
-		../bgm/voice_charging.mp3
+		../bgm/voice_avoid.mp3 \
+		../bgm/voice_stop_mapping.mp3 \
+		../bgm/voice_movefail.mp3
 	/usr/lib/qt5/bin/rcc -name qml_qmlcache qml_qmlcache.qrc -o qrc_qml_qmlcache.cpp
 
 compiler_qmlcache_make_all: Page_init_qml.cpp Page_menus_qml.cpp Item_button_qml.cpp Item_statusbar_qml.cpp Page_pickup_qml.cpp Popup_map_list_qml.cpp Page_setting_qml.cpp Page_moving_qml.cpp Item_joystick_qml.cpp main_qml.cpp Item_keyboard_qml.cpp Map_full_qml.cpp Page_map_qml.cpp Page_MoveFail_qml.cpp Page_pickup_calling_qml.cpp Item_switch_qml.cpp Page_kitchen_qml.cpp Page_charge_qml.cpp Tool_Keyboard_qml.cpp

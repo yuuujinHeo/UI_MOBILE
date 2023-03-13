@@ -5422,7 +5422,8 @@ Item {
                 }
             }
         }
-        Component.onCompleted: {
+        onOpened: {
+            print(supervisor.getnewMapname())
             textfield_name22.text = supervisor.getnewMapname();
         }
 

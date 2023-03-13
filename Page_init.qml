@@ -689,6 +689,10 @@ Item {
                 height: 100
                 radius: 60
                 border.width: 3
+                anchors.right: btn_slam_do_init.left
+                anchors.rightMargin: 30
+                anchors.top: text_notice4.bottom
+                anchors.topMargin: 80
                 border.color: "#e5e5e5"
                 enabled: supervisor.getLCMConnection()
                 color: enabled?"transparent":"#e5e5e5"
