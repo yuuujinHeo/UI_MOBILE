@@ -659,37 +659,13 @@ Item {
                 }
             }
             Rectangle{
-                id: btn_save_map
-                width: 100
-                height: 40
-                radius: 5
-                enabled: is_mapping
-                anchors.bottom: rect_annot_box_map.top
-                anchors.bottomMargin: 10
-                anchors.left: rect_annot_box_map.left
-                color: is_mapping?"black":color_gray
-                Text{
-                    anchors.centerIn: parent
-                    text: "Save"
-                    color: "white"
-                    font.family: font_noto_r.name
-                    font.pixelSize: 15
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked:{
-                        popup_save_mapping.open();
-                    }
-                }
-            }
-            Rectangle{
                 id: rect_annot_box_map
                 width: parent.width - 60
                 height: 100
                 radius: 5
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: rect_annot_state.bottom
-                anchors.topMargin: 80
+                anchors.topMargin: 30
                 color: "#e8e8e8"
                 Row{
                     anchors.centerIn: parent
@@ -845,6 +821,7 @@ Item {
                 }
             }
             Column{
+                id: cols
                 anchors.top: rect_annot_box444.bottom
                 anchors.topMargin: 30
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -1032,7 +1009,55 @@ Item {
 //                }
 
             }
-
+            Rectangle{
+                id: btn_save_map
+                width: 200
+                height: 80
+                radius: 5
+                enabled: is_mapping
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: cols.bottom
+                anchors.topMargin : 20
+//                anchors.left: rect_annot_box_map.left
+                color: is_mapping?"black":color_gray
+                Text{
+                    anchors.centerIn: parent
+                    text: "Save"
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked:{
+                        popup_save_mapping.open();
+                    }
+                }
+            }
+//            Rectangle{
+//                id: btn_save_map
+//                width: 100
+//                height: 40
+//                radius: 5
+//                enabled: is_mapping
+//                anchors.bottom: rect_annot_box_map.top
+//                anchors.bottomMargin: 10
+//                anchors.left: rect_annot_box_map.left
+//                color: is_mapping?"black":color_gray
+//                Text{
+//                    anchors.centerIn: parent
+//                    text: "Save"
+//                    color: "white"
+//                    font.family: font_noto_r.name
+//                    font.pixelSize: 15
+//                }
+//                MouseArea{
+//                    anchors.fill: parent
+//                    onClicked:{
+//                        popup_save_mapping.open();
+//                    }
+//                }
+//            }
         }
     }
 
@@ -2697,8 +2722,8 @@ Item {
                 width: parent.width - 60
                 height: 100
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: btn_load_map.bottom
-                anchors.topMargin: 15
+                anchors.top: rect_annot_state.bottom
+                anchors.topMargin: 90
                 color: "#e8e8e8"
 
                 Row{
@@ -4081,6 +4106,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.slam_stop();
                                     map.tool = "SLAM_INIT";
                                     map.new_slam_init = true;
                                     if(supervisor.getGridWidth() > 0){
@@ -4089,6 +4115,8 @@ Item {
                                         map.init_th  = supervisor.getlastRobotth();// - Math.PI/2;
                                         supervisor.setInitPos(map.init_x,map.init_y,map.init_th);
                                     }
+                                    supervisor.slam_setInit();
+//                                    menu_location.checkInit = true;
                                     map.update_canvas();
                                 }
                             }
@@ -4117,7 +4145,7 @@ Item {
                 Rectangle{
                     width: rect_menus.width - 60
                     height: 0
-                    visible: map.tool==="SLAM_INIT"?true:false
+                    visible: false;//map.tool==="SLAM_INIT"?true:false
                     anchors.horizontalCenter: parent.horizontalCenter
                     onVisibleChanged: {
                         if(visible){
@@ -4230,6 +4258,7 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     map.tool = "ADD_LOCATION";
+                                    map.reset_canvas();
                                 }
                             }
                         }
@@ -4822,6 +4851,7 @@ Item {
                 Rectangle{
                     width: menu_save.width*0.7
                     height: 85
+                    visible: false
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: "transparent"
                     Rectangle{
@@ -5208,9 +5238,11 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                show_loading();
                                 supervisor.setMap(map.map_name);
                                 popup_map_use.close();
                                 backPage();
+                                unshow_loading();
                             }
                         }
                     }
@@ -5558,6 +5590,7 @@ Item {
 //                                    //임시 맵 이미지를 해당 폴더 안에 넣음.
 //                                    supervisor.rotate_map("map_temp.png",textfield_name22.text, 2);
                                 }
+
                             }
                         }
                     }
@@ -5892,6 +5925,7 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 //save temp Image
+                                show_loading();
                                 map.save_patrol(popup_save_travelline.edited_mode);
                                 supervisor.clear_all();
                                 map.init_mode();
@@ -5899,7 +5933,7 @@ Item {
                                 map.show_connection = false;
                                 loader_menu.sourceComponent = menu_annot_state;
                                 popup_save_travelline.close();
-
+                                unshow_loading();
                             }
                         }
                     }
@@ -6176,6 +6210,14 @@ Item {
         onOpened:{
             curpose_mode = false;
             tfield_location.text = select_location_type + "_" + Number(supervisor.getLocationSize(select_location_type))
+
+            if(supervisor.getObsState()){
+                btn_next_000.enabled = false;
+                obs_col.visible = true;
+            }else{
+                btn_next_000.enabled = true;
+                obs_col.visible = false;
+            }
         }
 
         Rectangle{
@@ -6323,14 +6365,14 @@ Item {
             font.family: font_noto_r.name
             horizontalAlignment: Text.AlignHCenter
             font.pointSize: 20
-            onFocusChanged: {
-                keyboard.owner = tfield_location;
-                if(focus){
-                    keyboard.open();
-                }else{
-                    keyboard.close();
-                }
-            }
+//            onFocusChanged: {
+//                keyboard.owner = tfield_location;
+//                if(focus){
+//                    keyboard.open();
+//                }else{
+//                    keyboard.close();
+//                }
+//            }
         }
         Row{
             anchors.top: tfield_location.bottom
@@ -6364,7 +6406,8 @@ Item {
                 width: 180
                 height: 60
                 radius: 10
-                color: "black"
+                enabled: false
+                color: enabled?"black":color_gray
                 border.width: 1
                 border.color: "#7e7e7e"
                 Text{
@@ -6398,6 +6441,21 @@ Item {
                         }
                     }
                 }
+            }
+        }
+
+        Rectangle{
+            id: obs_col
+            visible: false
+            anchors.centerIn: parent
+            width: parent.width
+            height: 50
+            color: color_red
+            Text{
+                anchors.centerIn: parent
+                font.family: font_noto_r.name
+                font.pixelSize: 15
+                text: "장애물과 너무 가깝습니다. 지정할 수 없습니다."
             }
         }
 

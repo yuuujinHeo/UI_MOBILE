@@ -18,6 +18,7 @@ Item {
 
             if(newx > 0){
                 mapview.x = 0;
+                print("??")
             }else if(newx < - map_width*newscale + width){
                 mapview.x = - map_width*newscale + width
             }else{
@@ -80,6 +81,7 @@ Item {
 
             if(newx > 0){
                 mapview.x = 0;
+                print("???")
             }else if(newx < - map_width*newscale + width){
                 mapview.x = - map_width*newscale + width
             }else{
@@ -100,6 +102,7 @@ Item {
             var newx = width/2 - (robot_x)*newscale;
             if(newx > 0){
                 mapview.x = 0;
+                print("????")
             }else if(newx < - map_width*newscale + width){
                 mapview.x = - map_width*newscale + width
             }else{
@@ -349,8 +352,8 @@ Item {
         mapview.height = map_height*newscale
 
         if(robot_following){
-            var newx = width/2 - robot_x*newscale;
-            var newy = height/2 - robot_y*newscale;
+            var newx = -width/2 + robot_x*newscale;
+            var newy = -height/2 + robot_y*newscale;
         }else{
             var newx = - mapview.x + map_width*(newscale-prevscale)*xscale;
             var newy = - mapview.y + map_height*(newscale-prevscale)*yscale;
@@ -434,6 +437,7 @@ Item {
             onXChanged: {
                 if(x > 0){
                     x = 0;
+                    print("?")
                 }else if(x < - map_width*newscale + rect_map.width){
                     x = - map_width*newscale + rect_map.width
                 }
@@ -731,6 +735,7 @@ Item {
                         tool = "NONE";
                     }else if(tool == "SLAM_INIT"){
                         supervisor.setInitPos(init_x,init_y, init_th);
+                        supervisor.slam_setInit();
                     }else if(tool == "ADD_LINE"){
                         if(state_annotation == "TRAVELLINE"){
                             if(new_line_point1){
@@ -813,6 +818,7 @@ Item {
 
                             if(newx > 0){
                                 mapview.x = 0;
+                                print("?????")
                             }else if(newx < - map_width*newscale + rect_map.width){
                                 mapview.x = - map_width*newscale + rect_map.width
                             }else{
