@@ -139,5 +139,6 @@
         <file alias="image/battery_2.png">../image/battery_2.png</file>
         <file alias="image/battery_1.png">../image/battery_1.png</file>
         <file alias="icon/icon_test_stop.png">../icon/icon_test_stop.png</file>
+        <file alias="image/loading.gif">../image/loading.gif</file>
     </qresource>
 </RCC>

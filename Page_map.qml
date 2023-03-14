@@ -2310,38 +2310,41 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
-            Rectangle{
-                id: btn_load_map
-                width: 100
-                height: 40
-                radius: 5
-                anchors.top: rect_annot_state.bottom
-                anchors.topMargin: 30
-                anchors.left: parent.left
-                anchors.leftMargin: 30
-                color: "black"
-                Text{
-                    anchors.centerIn: parent
-                    text: "Load"
-                    color: "white"
-                    font.family: font_noto_r.name
-                    font.pixelSize: 15
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked:{
-                        fileload.open();
-                    }
-                }
-            }
+//            Rectangle{
+//                id: btn_load_map
+//                width: 100
+//                height: 40
+//                radius: 5
+//                anchors.top: rect_annot_state.bottom
+//                anchors.topMargin: 30
+//                anchors.left: parent.left
+//                anchors.leftMargin: 30
+//                color: "black"
+//                Text{
+//                    anchors.centerIn: parent
+//                    text: "Load"
+//                    color: "white"
+//                    font.family: font_noto_r.name
+//                    font.pixelSize: 15
+//                }
+//                MouseArea{
+//                    anchors.fill: parent
+//                    onClicked:{
+//                        fileload.open();
+//                    }
+//                }
+//            }
+
             Rectangle{
                 id: rect_annot_map_name
                 width: parent.width*0.9
                 radius: 5
                 height: 50
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: btn_load_map.bottom
-                anchors.topMargin: 20
+//                anchors.top: btn_load_map.bottom
+//                anchors.topMargin: 20
+                anchors.top: rect_annot_state.bottom
+                anchors.topMargin: 50
                 color: "white"
                 Text{
                     anchors.centerIn: parent
@@ -2630,7 +2633,9 @@ Item {
 
             Row{
                 spacing: 30
-                anchors.top: btn_load_map.top
+                anchors.top: rect_annot_state.bottom
+                anchors.topMargin: 30
+//                anchors.top: btn_load_map.top
                 anchors.right: parent.right
                 anchors.rightMargin: 30
                 Rectangle{
