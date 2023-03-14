@@ -46,6 +46,7 @@ public:
 
     //매핑 맵 저장 플래그
     bool flagMapping = false;
+    bool is_mapping = false;
 
     //조이스틱 명령 플래그
     bool flagJoystick = false;

@@ -1022,12 +1022,13 @@ void Supervisor::startSLAM(){
 void Supervisor::startMapping(float grid){
     plog->write("[USER INPUT] START MAPPING");
     lcm->startMapping(grid);
+    lcm->is_mapping = true;
 }
 void Supervisor::stopMapping(){
     plog->write("[USER INPUT] STOP MAPPING");
     lcm->flagMapping = false;
+    lcm->is_mapping = false;
     lcm->sendCommand(ROBOT_CMD_MAPPING_STOP, "MAPPING STOP");
-
 }
 void Supervisor::saveMapping(QString name){
     lcm->saveMapping(name);

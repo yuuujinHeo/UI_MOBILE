@@ -162,40 +162,40 @@ Item {
                 Row{
                     spacing: 50
                     anchors.horizontalCenter: parent.horizontalCenter
-                    Rectangle{
-                        id: btn_server_load
-                        width: 188
-                        height: 100
-                        radius: 60
-                        border.width: 3
-                        border.color: "#e5e5e5"
-                        enabled: supervisor.isConnectServer()
-                        color: enabled?"transparent":"#e5e5e5"
-                        Column{
-                            anchors.centerIn: parent
-                            spacing: 5
-                            Image{
-                                source: "icon/icon_server_download.png"
-                                width: 30
-                                height: 30
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                            Text{
-                                text: "서버에서 받아오기"
-                                font.pixelSize: 15
-                                font.family: font_noto_r.name
-                                color:enabled?"black":"white"
-                            }
-                        }
+//                    Rectangle{
+//                        id: btn_server_load
+//                        width: 188
+//                        height: 100
+//                        radius: 60
+//                        border.width: 3
+//                        border.color: "#e5e5e5"
+//                        enabled: supervisor.isConnectServer()
+//                        color: enabled?"transparent":"#e5e5e5"
+//                        Column{
+//                            anchors.centerIn: parent
+//                            spacing: 5
+//                            Image{
+//                                source: "icon/icon_server_download.png"
+//                                width: 30
+//                                height: 30
+//                                anchors.horizontalCenter: parent.horizontalCenter
+//                            }
+//                            Text{
+//                                text: "서버에서 받아오기"
+//                                font.pixelSize: 15
+//                                font.family: font_noto_r.name
+//                                color:enabled?"black":"white"
+//                            }
+//                        }
 
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                supervisor.loadMaptoServer();
-                                update_timer.start();
-                            }
-                        }
-                    }
+//                        MouseArea{
+//                            anchors.fill: parent
+//                            onClicked: {
+//                                supervisor.loadMaptoServer();
+//                                update_timer.start();
+//                            }
+//                        }
+//                    }
                     Rectangle{
                         id: btn_slam_start
                         width: 188
@@ -934,13 +934,13 @@ Item {
                             loader_init.item.enable_rawmap();
                         }else{
                             loader_init.item.disable_rawmap();
-                            //가능한 다른 맵이 있는 경우
-                            var available_map_num = supervisor.getAvailableMap();
-                            if(available_map_num > 0){
-                                loader_init.item.enable_availablemap();
-                            }else{
-                                loader_init.item.disable_availablemap();
-                            }
+                        }
+                        //가능한 다른 맵이 있는 경우
+                        var available_map_num = supervisor.getAvailableMap();
+                        if(available_map_num > 0){
+                            loader_init.item.enable_availablemap();
+                        }else{
+                            loader_init.item.disable_availablemap();
                         }
                     }
                 }
@@ -1376,6 +1376,7 @@ Item {
             }
             map_load.show_object = true;
             map_load.show_location = true;
+            map_load.setfullscreen();
         }
         Text{
             id: text_show_popup

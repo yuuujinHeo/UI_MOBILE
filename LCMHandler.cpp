@@ -454,6 +454,12 @@ void LCMHandler::onTimer(){
         }
     }
 
+    if(is_mapping){
+
+    }else{
+        flagMapping = false;
+    }
+
     static int count=0;
     if(count++%5==0){
         flag_rx = false;

@@ -221,9 +221,11 @@ Window {
         }
     }
     function show_loading(){
+        print("SHOW")
         rect_loading.open();
     }
     function unshow_loading(){
+        print("UNSHOW")
         rect_loading.close();
     }
 
