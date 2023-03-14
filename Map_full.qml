@@ -102,7 +102,6 @@ Item {
             var newx = width/2 - (robot_x)*newscale;
             if(newx > 0){
                 mapview.x = 0;
-                print("????")
             }else if(newx < - map_width*newscale + width){
                 mapview.x = - map_width*newscale + width
             }else{
@@ -817,7 +816,6 @@ Item {
 
                             if(newx > 0){
                                 mapview.x = 0;
-                                print("?????")
                             }else if(newx < - map_width*newscale + rect_map.width){
                                 mapview.x = - map_width*newscale + rect_map.width
                             }else{
