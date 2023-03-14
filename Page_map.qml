@@ -1121,6 +1121,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.slam_stop();
                                 map.tool = "SLAM_INIT";
                                 map.new_slam_init = true;
                                 if(supervisor.getGridWidth() > 0){
@@ -1129,6 +1130,7 @@ Item {
                                     map.init_th  = supervisor.getlastRobotth();// - Math.PI/2;
                                     supervisor.setInitPos(map.init_x,map.init_y,map.init_th);
                                 }
+                                supervisor.slam_setInit();
                                 map.update_canvas();
                             }
                         }
@@ -1156,7 +1158,7 @@ Item {
             Rectangle{
                 width: rect_menus.width - 60
                 height: 100
-                visible: map.tool==="SLAM_INIT"?true:false
+                visible: false;//map.tool==="SLAM_INIT"?true:false
                 anchors.top: rect_annot_box.bottom
                 anchors.topMargin: 50
                 anchors.horizontalCenter: parent.horizontalCenter
