@@ -553,8 +553,9 @@ Item {
             }
 
             Component.onCompleted: {
-
                 map.map_mode = "MAPPING";
+                help_image.source = "video/slam_help.gif"
+                popup_help.open();
             }
 
             property var count_u : 0
@@ -1070,6 +1071,7 @@ Item {
                 anchors.fill: parent
                 color: "#f4f4f4"
             }
+
             Timer{
                 id: timer_check_localization
                 running: false
@@ -2611,6 +2613,10 @@ Item {
             width: rect_menus.width
             height: rect_menus.height
 
+            Component.onCompleted: {
+                help_image.source = "video/draw_help.gif"
+                popup_help.open();
+            }
             Rectangle{
                 anchors.fill: parent
                 color: "#f4f4f4"
@@ -3504,6 +3510,8 @@ Item {
             }
 
             Component.onCompleted: {
+                help_image.source = "video/obj_help.gif"
+                popup_help.open();
                 var ob_num = supervisor.getObjectNum();
                 list_object.model.clear();
                 for(var i=0; i<ob_num; i++){
@@ -3950,6 +3958,8 @@ Item {
             property bool checkInit:false
 
             Component.onCompleted: {
+                help_image.source = "video/loc_help.gif"
+                popup_help.open();
                 var loc_num = supervisor.getLocationNum();
                 list_location.model.clear();
                 for(var i=0; i<loc_num; i++){
@@ -6725,21 +6735,43 @@ Item {
     Popup{
         id: popup_help
         anchors.centerIn: parent
-        width: 600
-        height: 600
+        width: 800
+        height: 500
         background: Rectangle{
             anchors.fill: parent
             color: "transparent"
         }
+        onOpened: {
+            help_image.currentFrame = 0;
+        }
+
         Rectangle{
             width: parent.width
             height: parent.height
-            radius: 10
-            Loader{
-                id: loader_help
-                anchors.fill: parent
+            radius: 20
+            Column{
+                spacing: 10
+                anchors.centerIn : parent
+                Text{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                    text: "HOW TO"
+                }
 
+                AnimatedImage{
+                    id: help_image
+                    source: "video/slam_help.gif"
+                    cache: false
+                }
             }
+
+
+//            Loader{
+//                id: loader_help
+//                anchors.fill: parent
+
+//            }
         }
     }
 }

@@ -437,7 +437,6 @@ Item {
             onXChanged: {
                 if(x > 0){
                     x = 0;
-                    print("?")
                 }else if(x < - map_width*newscale + rect_map.width){
                     x = - map_width*newscale + rect_map.width
                 }
