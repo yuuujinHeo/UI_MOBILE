@@ -1912,8 +1912,12 @@ Item {
             }
             Component.onCompleted: {
                 //맵 다시 불러오기
-                map.map_mode = "EDITED";
-                map.loadmap(supervisor.getMapname(),"EDITED");
+//                if(map.map_mode === "RAW"){
+//                    map.loadmap(supervisor.getMapname(),"EDITED");
+//                }else i
+
+//                map.map_mode = "EDITED";
+//                map.loadmap(supervisor.getMapname(),"EDITED");
                 map.update_canvas();
                 text_menu_title.text = "Annotation";
                 text_menu_title.visible = true;
@@ -2599,30 +2603,30 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
-            Rectangle{
-                id: btn_load_map
-                width: 100
-                height: 40
-                radius: 5
-                anchors.top: rect_annot_state.bottom
-                anchors.topMargin: 30
-                anchors.left: parent.left
-                anchors.leftMargin: 30
-                color: "black"
-                Text{
-                    anchors.centerIn: parent
-                    text: "Load"
-                    color: "white"
-                    font.family: font_noto_r.name
-                    font.pixelSize: 15
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked:{
-                        fileload.open();
-                    }
-                }
-            }
+//            Rectangle{
+//                id: btn_load_map
+//                width: 100
+//                height: 40
+//                radius: 5
+//                anchors.top: rect_annot_state.bottom
+//                anchors.topMargin: 30
+//                anchors.left: parent.left
+//                anchors.leftMargin: 30
+//                color: "black"
+//                Text{
+//                    anchors.centerIn: parent
+//                    text: "Load"
+//                    color: "white"
+//                    font.family: font_noto_r.name
+//                    font.pixelSize: 15
+//                }
+//                MouseArea{
+//                    anchors.fill: parent
+//                    onClicked:{
+//                        fileload.open();
+//                    }
+//                }
+//            }
 
             Row{
                 spacing: 30
