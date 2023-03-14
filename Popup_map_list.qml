@@ -399,8 +399,8 @@ Popup{
                                         var name = list_map.model.get(select_map_list).name;
                                         if(supervisor.isExistAnnotation(name)){
                                             temp_name = list_map.model.get(select_map_list).name;
-//                                            popup_annotation_delete.name = name;
-//                                            popup_annotation_delete.open();
+                                            popup_annotation_delete.name = name;
+                                            popup_annotation_delete.open();
                                         }else{
                                             popup_map_list.close();
                                             loadPage(pmap);
@@ -490,5 +490,93 @@ Popup{
             }
         }
     }
+    Popup{
+        id: popup_annotation_delete
+        width: parent.width
+        height: parent.height
+        background:Rectangle{
+            anchors.fill: parent
+            color: "#282828"
+            opacity: 0.7
+        }
+        property string name: ""
+        Rectangle{
+            anchors.centerIn: parent
+            width: 400
+            height: 250
+            color: "white"
+            radius: 10
+
+            Column{
+                anchors.centerIn: parent
+                spacing: 40
+                Column{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        text: "기존 annotation이 삭제됩니다."
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 20
+                    Rectangle{
+                        id: btn_prev_00
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color:"transparent"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "취소"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_annotation_delete.close();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: btn_next_00
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color: "#12d27c"
+                        border.width: 1
+                        border.color: "#12d27c"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "확인"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                supervisor.deleteAnnotation();
+                                loadPage(pmap);
+                                loader_page.item.loadmap(popup_annotation_delete.name,"RAW");
+                                loader_page.item.is_init_state = true;
+                                loader_page.item.map_mode = 2;
+                                popup_annotation_delete.close();
+                                popup_map_list.close();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
+
 
