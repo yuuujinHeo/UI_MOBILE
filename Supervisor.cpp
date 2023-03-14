@@ -2794,7 +2794,7 @@ int Supervisor::getMapHeight(){
     return pmap->height;
 }
 float Supervisor::getGridWidth(){
-    qDebug() << pmap->gridwidth;
+//    qDebug() << pmap->gridwidth;
     return pmap->gridwidth;
 }
 QVector<int> Supervisor::getOrigin(){

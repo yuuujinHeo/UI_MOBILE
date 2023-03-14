@@ -1911,7 +1911,6 @@ Item {
                 color: "#f4f4f4"
             }
             Component.onCompleted: {
-
                 //맵 다시 불러오기
                 map.map_mode = "EDITED";
                 map.loadmap(supervisor.getMapname(),"EDITED");
@@ -3786,6 +3785,7 @@ Item {
                                     }else if(map.tool == "ADD_POINT"){
                                         supervisor.removeObjectPointLast();
                                     }
+                                    map.obj_sequence = 0;
                                     map.update_canvas();
                                 }
                             }
@@ -4940,8 +4940,8 @@ Item {
                                 }else{
                                     map_mode = 0;
                                 }
-                                
                                 //맵 다시 불러오기
+                                supervisor.setMap(supervisor.getMapname());
                                 map_current.map_mode = "EDITED";
                                 map_current.loadmap(supervisor.getMapname(),"EDITED");
                                 map_current.update_canvas();
@@ -6133,6 +6133,7 @@ Item {
                         }
                         map.update_canvas();
                         map.tool = "MOVE";
+                        map.obj_sequence = 0;
                         map.reset_canvas();
                         popup_add_object.close();
                     }
@@ -6651,5 +6652,27 @@ Item {
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_stop_mapping.mp3"
+    }
+
+
+    Popup{
+        id: popup_help
+        anchors.centerIn: parent
+        width: 600
+        height: 600
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 10
+            Loader{
+                id: loader_help
+                anchors.fill: parent
+
+            }
+        }
     }
 }

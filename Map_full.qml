@@ -55,6 +55,8 @@ Item {
     property bool show_connection: false
     property bool show_buttons: false
 
+    property int obj_sequence: 0
+
     //SLAM 상태(map load되고 localization도 된 상태면 true)
     property bool is_slam_running: false
 
@@ -252,6 +254,10 @@ Item {
     property var brush_size: 10
     property color brush_color: "black"
 
+    onToolChanged: {
+        obj_sequence = 0;
+    }
+
     function reset_canvas(){
         supervisor.clear_all();
         new_slam_init = false;
@@ -317,12 +323,18 @@ Item {
     property int new_obj_y1;
     property int new_obj_x2;
     property int new_obj_y2;
+    property int new_obj_x1_orin;
+    property int new_obj_y1_orin;
+    property int new_obj_x2_orin;
+    property int new_obj_y2_orin;
+    property int new_obj_posx;
+    property int new_obj_posy;
 
     //////========================================================================================Canvas Tool
     property bool refreshMap: true
     property bool rotateMap: false
 
-
+    property var prevscale: 1
     property var newscale: 1
     Behavior on newscale{
         NumberAnimation{
@@ -330,24 +342,31 @@ Item {
         }
     }
     onNewscaleChanged: {
+        var xscale = (area_wheel.mouseX - mapview.x)/mapview.width;
+        var yscale = (area_wheel.mouseY - mapview.y)/mapview.height;
+
         mapview.width = map_width*newscale
         mapview.height = map_height*newscale
 
-        var xscale = mapview.centerx/map_width;
-        var yscale = mapview.centery/map_height;
+        if(robot_following){
+            var newx = width/2 - robot_x*newscale;
+            var newy = height/2 - robot_y*newscale;
+        }else{
+            var newx = - mapview.x + map_width*(newscale-prevscale)*xscale;
+            var newy = - mapview.y + map_height*(newscale-prevscale)*yscale;
+        }
 
-        var newx = (mapview.width - rect_map.width)*xscale;
-        var newy = (mapview.height - rect_map.height)*yscale;
-
+//        print(newscale, mapview.centerx, mapview.x, xscale, newx)
         mapview.x = -newx;
         mapview.y = -newy;
-//                print(centerx, centery, xscale, yscale, newx, newy)
+        prevscale = newscale;
     }
 
     //Annotation State (None, Drawing, Object, Location, Travelline)
     onState_annotationChanged: {
         tool = "MOVE";
         travelview.visible = false;
+        obj_sequence = 0;
         if(state_annotation == "NONE"){
             robot_following = false;
         }else if(state_annotation == "DRAWING"){
@@ -407,10 +426,10 @@ Item {
             property var startx: 0
             property var starty: 0
             property var startScale: 0
-            property var newx: 0
-            onNewxChanged: {
-                x = newx;
-            }
+//            property var newx: 0
+//            onNewxChanged: {
+//                x = newx;
+//            }
 
             onXChanged: {
                 if(x > 0){
@@ -418,6 +437,7 @@ Item {
                 }else if(x < - map_width*newscale + rect_map.width){
                     x = - map_width*newscale + rect_map.width
                 }
+//                print("x : "+x);
             }
             onYChanged: {
                 if(y > 0){
@@ -425,6 +445,7 @@ Item {
                 }else if(x < - map_height*newscale + rect_map.height){
                     y = - map_height*newscale + rect_map.height
                 }
+//                print("y : "+y);
             }
 
         }
@@ -511,17 +532,48 @@ Item {
             property var lineX
             property var lineY
         }
+//        MouseArea{
+//            id: area_wheel
+//            anchors.fill: mapview
+//            hoverEnabled: true
+//            onWheel: {
+//                var ctx = canvas_map.getContext('2d');
+//                var new_scale;
+//                wheel.accepted = false;
+//                 mapview.centerx = mouseX*(map_width/width);
+//                 mapview.centery = mouseY*(map_height/height);
+
+//                print(mouseX, mouseY, map_width, width, mapview.centerx)
+//                if(wheel.angleDelta.y > 0){
+//                    new_scale = newscale + 0.1;
+//                    if(new_scale > 5){
+//                        newscale = 5;
+//                    }else{
+//                        newscale = new_scale;
+//                    }
+//                }else{
+//                    new_scale = newscale - 0.1;
+//                    if(rect_map.width > new_scale*map_width){
+//                        newscale = rect_map.width/map_width;
+////                        /*print*/(rect_map.width, map_width)
+//                    }else{
+//                        newscale = new_scale;
+//                    }
+//                }
+//            }
+//        }
         MouseArea{
             id: area_wheel
-            anchors.fill: mapview
+            anchors.fill: parent
             hoverEnabled: true
             onWheel: {
                 var ctx = canvas_map.getContext('2d');
                 var new_scale;
                 wheel.accepted = false;
-                 mapview.centerx = mouseX*(map_width/width);
-                 mapview.centery = mouseY*(map_height/height);
+                mapview.centerx = mouseX;//((mouseX*map_width*newscale/width)-(mapview.x))/newscale;
+                mapview.centery = mouseY;//((mouseY*map_height*newscale/height)-(mapview.y))/newscale;
 
+//                print(mouseX, mouseY, map_width, width, mapview.centerx)
                 if(wheel.angleDelta.y > 0){
                     new_scale = newscale + 0.1;
                     if(new_scale > 5){
@@ -540,6 +592,7 @@ Item {
                 }
             }
         }
+
 
         MultiPointTouchArea{
             id: area_map
@@ -624,11 +677,21 @@ Item {
                     init_th = 0;
                 }else if(tool == "ADD_OBJECT"){
                     supervisor.clearObjectPoints();
-                    new_object = true;
-                    new_obj_x1 = point_x1;
-                    new_obj_y1 = point_y1;
-                    new_obj_x2 = point_x1;
-                    new_obj_y2 = point_y1;
+                    if(obj_sequence == 0){
+                        new_object = true;
+                        new_obj_x1 = point_x1;
+                        new_obj_y1 = point_y1;
+                        new_obj_x2 = point_x1;
+                        new_obj_y2 = point_y1;
+                    }else if(obj_sequence){
+                        new_obj_posx = point_x1;
+                        new_obj_posy = point_y1;
+                        new_obj_x1_orin = new_obj_x1;
+                        new_obj_y1_orin = new_obj_y1;
+                        new_obj_x2_orin = new_obj_x2;
+                        new_obj_y2_orin = new_obj_y2;
+                    }
+
                 }else if(tool == "ADD_POINT"){
                     new_object = true;
                 }
@@ -690,6 +753,13 @@ Item {
                         supervisor.addObjectPoint(new_obj_x2,new_obj_y2);
                         supervisor.addObjectPoint(new_obj_x2,new_obj_y1);
                         loader_menu.item.check_object_size();
+                        if(obj_sequence == 0){
+                            obj_sequence = 1;
+                        }else if(obj_sequence == 1){
+                            obj_sequence = 2;
+                        }else if(obj_sequence == 2){
+
+                        }
                     }else{
                         if(state_annotation == "OBJECT"){
                             select_object = supervisor.getObjNum(point_x1,point_y1);
@@ -820,11 +890,27 @@ Item {
                     draw_canvas_location_icon();
                     draw_canvas_location_temp();
                 }else if(tool == "ADD_OBJECT"){
-                    new_obj_x2 = point_x1
-                    new_obj_y2 = point_y1
-                    clear_canvas_object();
-                    draw_canvas_object();
-                    draw_canvas_new_object();
+                    if(point1.pressed){
+                        if(obj_sequence == 0){
+                            print("0");
+                            new_obj_x2 = point_x1
+                            new_obj_y2 = point_y1
+                        }else if(obj_sequence == 1){
+                            print("1 : ",point_x1,new_obj_posx);
+                            new_obj_x1 = new_obj_x1_orin + point_x1-new_obj_posx;
+                            new_obj_y1 = new_obj_y1_orin + point_y1-new_obj_posy;
+                            new_obj_x2 = new_obj_x2_orin + point_x1-new_obj_posx;
+                            new_obj_y2 = new_obj_y2_orin + point_y1-new_obj_posy;
+                        }else if(obj_sequence == 2){
+                            print("2");
+                            new_obj_x2 = new_obj_x2_orin + point_x1-new_obj_posx;
+                            new_obj_y2 = new_obj_y2_orin + point_y1-new_obj_posy;
+                        }
+                        clear_canvas_object();
+                        draw_canvas_object();
+                        draw_canvas_new_object();
+                    }
+
                 }
             }
         }
