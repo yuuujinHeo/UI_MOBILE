@@ -680,7 +680,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 color: "#7e7e7e"
                 font.family: font_noto_r.name
-                text: "SLAM 자동 초기화에 실패하였습니다.\n맵 상에서 로봇의 현재 위치를 바로 잡아주신 뒤 수동으로 초기화를 진행해 주세요."
+                text: "초기화가 필요합니다.\n맵 상에서 로봇의 현재 위치를 바로 잡아주신 뒤 수동으로 초기화를 진행해 주세요."
                 font.pixelSize: 20
             }
             Rectangle{

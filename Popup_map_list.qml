@@ -399,14 +399,14 @@ Popup{
                                         var name = list_map.model.get(select_map_list).name;
                                         if(supervisor.isExistAnnotation(name)){
                                             temp_name = list_map.model.get(select_map_list).name;
-                                            popup_annotation_delete.name = name;
-                                            popup_annotation_delete.open();
+//                                            popup_annotation_delete.name = name;
+//                                            popup_annotation_delete.open();
                                         }else{
                                             popup_map_list.close();
                                             loadPage(pmap);
-                                            loader_page.item.loadmap(name,"RAW");
                                             loader_page.item.is_init_state = true;
                                             loader_page.item.map_mode = 2;
+                                            loader_page.item.loadmap(name,"RAW");
 //                                            loader_page.item.modeinit();
                                         }
                                     }
