@@ -324,7 +324,6 @@ Window {
             }else{
                 count_resting =0;
             }
-            print(count_resting)
         }
     }
 
@@ -411,7 +410,6 @@ Window {
         background:Rectangle{
             anchors.fill: parent
             color: color_dark_black
-            opacity: 0.5
         }
         AnimatedImage{
             id: resting_image
