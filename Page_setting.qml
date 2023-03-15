@@ -806,7 +806,7 @@ Item {
                                         font.family: font_noto_r.name
                                         color: "white"
                                         anchors.centerIn: parent
-                                        text: "changed"
+                                        text: "변경"
                                     }
                                     MouseArea{
                                         anchors.fill: parent
