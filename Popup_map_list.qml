@@ -53,12 +53,12 @@ Popup{
 
                     }
                 }
-                list_map_detail.model.clear();
-                var num = supervisor.getMapFileSize(mapname);
-                for(var i=0; i<num; i++){
-                    list_map_detail.model.append({"name":supervisor.getMapFile(i)});
-                }
 
+                list_map_detail.model.clear();
+                var num1 = supervisor.getMapFileSize(mapname);
+                for(var ii=0; i<num1; i++){
+                    list_map_detail.model.append({"name":supervisor.getMapFile(ii)});
+                }
                 supervisor.readSetting(mapname);
             }
         }
@@ -313,6 +313,7 @@ Popup{
                                     if(select_map_list > -1){
                                         supervisor.writelog("[USER INPUT] Map used changed : " + list_map.model.get(select_map_list).name);
                                         supervisor.setMap(list_map.model.get(select_map_list).name);
+                                        loader_page.item.init();
                                         popup_map_list.close();
                                     }
                                 }

@@ -27,6 +27,10 @@ Item {
         statusbar.visible = false;
     }
 
+    function init(){
+
+    }
+
     function loadmap_server(result){
         if(result){
             update_timer.stop();
