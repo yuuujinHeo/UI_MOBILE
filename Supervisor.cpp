@@ -3126,6 +3126,12 @@ void Supervisor::onTimer(){
                     ui_state = UI_STATE_READY;
                 }
             }
+        }else if(probot->status_charge == 1){
+            if(ui_state != UI_STATE_CHARGING){// && ui_state != UI_STATE_NONE){
+                plog->write("[LCM] Charging Start -> UI_STATE = UI_STATE_CHARGING");
+                ui_state = UI_STATE_CHARGING;
+                QMetaObject::invokeMethod(mMain, "docharge");
+            }
         }else if(probot->localization_state != LOCAL_START){
             //MoveFail이 우선!! State Check
             if(prev_running_state != probot->running_state){

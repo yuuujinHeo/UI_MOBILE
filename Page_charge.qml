@@ -87,6 +87,7 @@ Item {
                     voice_stop_charge.play();
                 }
             }
+            battery = supervisor.getBatteryOut().toFixed(0);
 
             if(popup_question.visible){
                 if(supervisor.getLCMConnection() && supervisor.getStateMoving() !== 0){
@@ -129,14 +130,14 @@ Item {
         interval: 1000
         repeat: true
         onTriggered: {
-            if(image_battery.source == "image/battery_1.png"){
-                image_battery.source = "image/battery_2.png";
-            }else if(image_battery.source == "image/battery_2.png"){
-                image_battery.source = "image/battery_3.png";
-            }else if(image_battery.source == "image/battery_3.png"){
-                image_battery.source = "image/battery_full.png";
+            if(image_battery.source == "qrc:/image/battery_1.png"){
+                image_battery.source = "qrc:/image/battery_2.png";
+            }else if(image_battery.source == "qrc:/image/battery_2.png"){
+                image_battery.source = "qrc:/image/battery_3.png";
+            }else if(image_battery.source == "qrc:/image/battery_3.png"){
+                image_battery.source = "qrc:/image/battery_full.png";
             }else{
-                image_battery.source = "image/battery_1.png";
+                image_battery.source = "qrc:/image/battery_1.png";
             }
         }
     }
@@ -174,10 +175,11 @@ Item {
                 btn_no.visible = false;
                 area_cancel3.enabled = true;
             }else{
-                text_quest.text = "로봇이 준비상태가 아닙니다.";
-                btn_yes.visible = false;
-                btn_no.visible = false;
-                area_cancel3.enabled = true;
+                loadPage(pkitchen);
+//                text_quest.text = "로봇이 준비상태가 아닙니다.";
+//                btn_yes.visible = false;
+//                btn_no.visible = false;
+//                area_cancel3.enabled = true;
             }
         }
 
