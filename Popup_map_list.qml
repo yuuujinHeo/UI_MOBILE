@@ -252,7 +252,7 @@ Popup{
                     color: "white"
                     font.family: font_noto_b.name
                     font.bold: true
-                    text: "확인된 맵 리스트"
+                    text: "확인된 맵 목록"
                     font.pixelSize: 30
                 }
                 Text{
@@ -260,7 +260,7 @@ Popup{
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: "white"
                     font.family: font_noto_r.name
-                    text: "로컬 경로를 통해 사용 가능한 맵 파일을 모두 찾았습니다. 원하는 파일을 선택하신 후 확인 버튼을 눌러주세요."
+                    text: "사용 가능한 맵 파일을 모두 찾았습니다. 원하는 파일을 선택하신 후 확인 버튼을 눌러주세요."
                     font.pixelSize: 15
                 }
             }
@@ -513,7 +513,7 @@ Popup{
                 Column{
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
-                        text: "기존 annotation이 삭제됩니다."
+                        text: "기존 맵 설정이 삭제됩니다."
                         font.family: font_noto_r.name
                         font.pixelSize: 20
                         anchors.horizontalCenter: parent.horizontalCenter

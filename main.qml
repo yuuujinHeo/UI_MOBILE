@@ -63,6 +63,8 @@ Window {
 
     property int margin_name: 250
 
+    property var count_resting: 0
+
     property string cur_location;
 
     function movefail(){
@@ -228,6 +230,12 @@ Window {
         print("UNSHOW")
         rect_loading.close();
     }
+    function show_resting(){
+        rect_resting.open();
+    }
+    function unshow_resting(){
+        rect_resting.close();
+    }
 
     function updatepatrol(){
         if(loader_page.item.objectName == "page_map")
@@ -309,6 +317,14 @@ Window {
         repeat: true
         onTriggered: {
             statusbar.curTime = Qt.formatTime(new Date(), "hh:mm")
+            if(loader_page.item.objectName == "page_kitchen"){
+                if(count_resting++ > 100){
+                    show_resting();
+                }
+            }else{
+                count_resting =0;
+            }
+            print(count_resting)
         }
     }
 
@@ -387,6 +403,30 @@ Window {
             anchors.centerIn: parent
         }
     }
+    Popup{
+        id: rect_resting
+        width: parent.width
+        height: parent.height
+
+        background:Rectangle{
+            anchors.fill: parent
+            color: color_dark_black
+            opacity: 0.5
+        }
+        AnimatedImage{
+            id: resting_image
+            source: "image/temp.gif"
+            anchors.fill: parent
+        }
+        MouseArea{
+            anchors.fill: parent
+            onClicked: {
+                rect_resting.close();
+                count_resting = 0;
+            }
+        }
+    }
+
 
     Item_statusbar{
         id: statusbar

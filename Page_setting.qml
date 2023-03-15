@@ -40,7 +40,7 @@ Item {
                     anchors.centerIn: parent
                     font.family: font_noto_r.name
                     color: "white"
-                    text: "Setting"
+                    text: "설정"
                     font.pixelSize: 20
                 }
             }
@@ -53,7 +53,7 @@ Item {
                     anchors.centerIn: parent
                     font.family: font_noto_r.name
                     color: "white"
-                    text: "Robot"
+                    text: "로봇"
                     font.pixelSize: 20
                 }
                 MouseArea{
@@ -80,7 +80,7 @@ Item {
                     anchors.centerIn: parent
                     font.family: font_noto_r.name
                     color: "white"
-                    text: "Map"
+                    text: "맵"
                     font.pixelSize: 20
                 }
                 MouseArea{
@@ -107,7 +107,7 @@ Item {
                     anchors.centerIn: parent
                     font.family: font_noto_r.name
                     color: "white"
-                    text: "SLAM"
+                    text: "주행"
                     font.pixelSize: 20
                 }
                 MouseArea{
@@ -134,7 +134,7 @@ Item {
                     anchors.centerIn: parent
                     font.family: font_noto_r.name
                     color: "white"
-                    text: "Motor"
+                    text: "모터"
                     font.pixelSize: 20
                 }
                 MouseArea{
@@ -767,7 +767,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"맵 이름"
+                                text:"현재 설정된 맵"
                                 font.pixelSize: 20
                             }
                         }
@@ -929,7 +929,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"AutoInit"
+                                text:"실행 시 자동 초기화"
                                 font.pixelSize: 20
                             }
                         }
@@ -2027,7 +2027,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"Motor Connection"
+                                text:"모터 연결상태"
                                 font.pixelSize: 20
                             }
                         }
@@ -2077,7 +2077,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"Motor Status"
+                                text:"모터 상태"
                                 font.pixelSize: 20
                             }
                         }
@@ -2123,7 +2123,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"Motor Temperature"
+                                text:"모터 온도"
                                 font.pixelSize: 20
                             }
                         }
@@ -2169,7 +2169,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"Status"
+                                text:"상태값"
                                 font.pixelSize: 20
                             }
                         }
@@ -2237,7 +2237,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"Battery"
+                                text:"배터리"
                                 font.pixelSize: 20
                             }
                         }
@@ -2327,7 +2327,105 @@ Item {
                         }
                     }
                 }
-
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"모터 방향"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_wheel_dir
+                                anchors.fill: parent
+                                model: [-1,1]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"left_id"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_left_id
+                                anchors.fill: parent
+                                model:[0,1]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"right_id"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_right_id
+                                anchors.fill: parent
+                                model:[0,1]
+                            }
+                        }
+                    }
+                }
                 Rectangle{
                     width: 840
                     height: 40
@@ -2659,266 +2757,6 @@ Item {
                         }
                     }
                 }
-                Rectangle{
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"limit_acc"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.1
-                                    height: 40
-                                    Text{
-                                        id: text_limit_acc
-                                        anchors.centerIn: parent
-                                        text: slider_limit_acc.value.toFixed(1)
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
-                                }
-                                Slider{
-                                    id: slider_limit_acc
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
-                                    height: 40
-                                    from: 0.5
-                                    to: 1.5
-                                    value: 1.0
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"limit_dec"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.1
-                                    height: 40
-                                    Text{
-                                        id: text_limit_dec
-                                        anchors.centerIn: parent
-                                        text: slider_limit_dec.value.toFixed(1)
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
-                                }
-                                Slider{
-                                    id: slider_limit_dec
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
-                                    height: 40
-                                    from: 0.5
-                                    to: 1.5
-                                    value: 1.0
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"limit_vel"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.1
-                                    height: 40
-                                    Text{
-                                        id: text_limit_vel
-                                        anchors.centerIn: parent
-                                        text: slider_limit_vel.value.toFixed(1)
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
-                                }
-                                Slider{
-                                    id: slider_limit_vel
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
-                                    height: 40
-                                    from: 0.1
-                                    to: 2.0
-                                    value: 2.0
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"wheel_dir"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_wheel_dir
-                                anchors.fill: parent
-                                model: [-1,1]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"left_id"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_left_id
-                                anchors.fill: parent
-                                model:[0,1]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"right_id"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_right_id
-                                anchors.fill: parent
-                                model:[0,1]
-                            }
-                        }
-                    }
-                }
-
-
-
-
-
             }
         }
 
@@ -3068,16 +2906,6 @@ Item {
                         supervisor.setSetting("ROBOT_SW/volume_bgm",slider_volume_bgm.value.toFixed(0));
                         supervisor.setSetting("ROBOT_SW/volume_voice",slider_volume_voice.value.toFixed(0));
 
-//                        if(combo_use_voice.currentIndex == 0)
-//                            supervisor.setSetting("ROBOT_SW/use_voice","false");
-//                        else
-//                            supervisor.setSetting("ROBOT_SW/use_voice","true");
-
-//                        if(combo_use_bgm.currentIndex == 0)
-//                            supervisor.setSetting("ROBOT_SW/use_bgm","false");
-//                        else
-//                            supervisor.setSetting("ROBOT_SW/use_bgm","true");
-
                         if(combo_use_uicmd.currentIndex == 0)
                             supervisor.setSetting("ROBOT_SW/use_uicmd","false");
                         else
@@ -3122,28 +2950,7 @@ Item {
 
                         supervisor.setSetting("MOTOR/left_id",combo_left_id.currentText);
                         supervisor.setSetting("MOTOR/right_id",combo_right_id.currentText);
-
-                        supervisor.setSetting("MOTOR/limit_acc",text_limit_acc.text);
-                        supervisor.setSetting("MOTOR/limit_dec",text_limit_dec.text);
-                        supervisor.setSetting("MOTOR/limit_vel",text_limit_vel.text);
-
                         supervisor.setSetting("MOTOR/wheel_dir",combo_wheel_dir.currentText);
-
-
-
-
-
-
-
-
-
-//                        if(combo_use_travelline.currentIndex == 0)
-//                            supervisor.setuseTravelline(false);
-//                        else
-//                            supervisor.setuseTravelline(true);
-
-//                        supervisor.setnumTravelline(combo_travelline.currentIndex);
-
                         supervisor.setTableNum(combo_table_num.currentIndex);
 
 
@@ -3190,16 +2997,7 @@ Item {
 
         slider_volume_bgm.value = Number(supervisor.getSetting("ROBOT_SW","volume_bgm"));
         slider_volume_voice.value = Number(supervisor.getSetting("ROBOT_SW","volume_voice"));
-//        if(supervisor.getSetting("ROBOT_SW","use_voice") === "true"){
-//            combo_use_voice.currentIndex = 1;
-//        }else{
-//            combo_use_voice.currentIndex = 0;
-//        }
-//        if(supervisor.getSetting("ROBOT_SW","use_bgm") === "true"){
-//            combo_use_bgm.currentIndex = 1;
-//        }else{
-//            combo_use_bgm.currentIndex = 0;
-//        }
+
         if(supervisor.getSetting("SERVER","use_servercmd") === "true"){
             combo_use_servercmd.currentIndex = 1;
         }else{
@@ -3212,23 +3010,7 @@ Item {
         }
 
         slider_vxy.value = parseFloat(supervisor.getSetting("ROBOT_SW","velocity"));
-
-//        if(supervisor.getuseTravelline()){
-//            combo_use_travelline.currentIndex = 1;
-//        }else{
-//            combo_use_travelline.currentIndex = 0;
-//        }
-
-//        var num_tline = supervisor.getTlineSize();
-//        print(num_tline);
-//        for(var i=0; i<num_tline; i++){
-//            combo_travelline.model.append({i});
-//        }
-
-//        combo_travelline.currentIndex = supervisor.getnumTravelline();
         combo_table_num.currentIndex = supervisor.getTableNum();
-
-
 
         gear_ratio.text = supervisor.getSetting("MOTOR","gear_ratio");
         k_d.text = supervisor.getSetting("MOTOR","k_d");
@@ -3242,10 +3024,6 @@ Item {
 
         combo_left_id.currentIndex = parseInt(supervisor.getSetting("MOTOR","left_id"));
         combo_right_id.currentIndex = parseInt(supervisor.getSetting("MOTOR","right_id"));
-
-        slider_limit_acc.value = parseFloat(supervisor.getSetting("MOTOR","limit_acc"));
-        slider_limit_dec.value = parseFloat(supervisor.getSetting("MOTOR","limit_dec"));
-        slider_limit_vel.value = parseFloat(supervisor.getSetting("MOTOR","limit_vel"));
 
         if(supervisor.getSetting("MOTOR","wheel_dir") === "-1"){
             combo_wheel_dir.currentIndex = 0;
