@@ -162,5 +162,6 @@
         <file>video/obj_help.gif</file>
         <file>video/loc_help.gif</file>
         <file>video/draw_help.gif</file>
+        <file>image/temp.gif</file>
     </qresource>
 </RCC>

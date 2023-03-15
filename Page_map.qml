@@ -281,7 +281,7 @@ Item {
             Text{
                 id: text_curmap
                 color:"white"
-                text: "Map Viewer"
+                text: "현재 맵"
                 font.pixelSize: 25
                 font.family: font_noto_b.name
                 anchors.horizontalCenterOffset: -70
@@ -430,7 +430,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 Repeater{
-                    model: ["mapping","localization","annotation","patrol"]
+                    model: ["맵 생성","맵 설정","위치 초기화","지정 순회"]
                     Rectangle{
                         property int btn_size: 120
                         width: btn_size
@@ -449,13 +449,13 @@ Item {
                                 Image{
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     source: {
-                                        if(modelData == "mapping"){
+                                        if(modelData == "맵 생성"){
                                             "image/image_slam.png"
-                                        }else if(modelData == "localization"){
+                                        }else if(modelData == "위치 초기화"){
                                             "image/image_localization_reset.png"
-                                        }else if(modelData == "annotation"){
+                                        }else if(modelData == "맵 설정"){
                                             "image/image_annot.png"
-                                        }else if(modelData == "patrol"){
+                                        }else if(modelData == "지정 순회"){
                                             "image/image_patrol.png"
                                         }
                                     }
@@ -480,14 +480,14 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                if(modelData == "mapping"){
+                                if(modelData == "맵 생성"){
                                     map_mode = 1;
-                                }else if(modelData == "annotation"){
+                                }else if(modelData == "맵 설정"){
                                     map_mode = 2;
                                     supervisor.setAnnotEditFlag(true);
-                                }else if(modelData == "localization"){
+                                }else if(modelData == "위치 초기화"){
                                     map_mode = 4;
-                                }else if(modelData == "patrol"){
+                                }else if(modelData == "지정 순회"){
                                     map_mode = 3;
                                 }
                             }
@@ -655,7 +655,7 @@ Item {
                     color: "white"
                     font.family: font_noto_b.name
                     font.pixelSize: 20
-                    text: "Mapping"
+                    text: "맵 생성"
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
@@ -697,7 +697,7 @@ Item {
                             Text{
                                 font.family: font_noto_r.name
                                 font.pixelSize: 12
-                                text: "Emergency 눌림"
+                                text: "비상스위치 눌림"
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 horizontalAlignment: Text.AlignHCenter
                             }
@@ -728,7 +728,7 @@ Item {
                             Text{
                                 font.family: font_noto_r.name
                                 font.pixelSize: 12
-                                text: is_mapping?"Mapping 중":"Mapping 시작"
+                                text: is_mapping?"맵 생성 중":"맵 생성하기"
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 horizontalAlignment: Text.AlignHCenter
                             }
@@ -764,7 +764,7 @@ Item {
                 anchors.topMargin: 5
                 color: "white"
                 Text{
-                    text: "Grid Size"
+                    text: "단위 크기"
                     font.family: font_noto_r.name
                     font.pixelSize: 15
                     anchors.verticalCenter: parent.verticalCenter
@@ -853,7 +853,7 @@ Item {
                                 color: color_red
                             }
                             Text{
-                                text: "로봇 상단의 Emergency 버튼을 눌러 수동모드로 전환하세요."
+                                text: "로봇 상단의 비상스위치를 눌러 수동모드로 전환하세요."
                                 font.pixelSize: 13
                                 font.family: font_noto_r.name
                                 color: color_red
@@ -877,7 +877,7 @@ Item {
                                 color: color_red
                             }
                             Text{
-                                text: "Start 버튼을 누르고 로봇을 끌면서 맵을 생성합니다."
+                                text: "매핑 시작하기 버튼을 누르고 로봇을 끌면서 맵을 생성합니다."
                                 font.pixelSize: 13
                                 font.family: font_noto_r.name
                                 color: color_red
@@ -889,7 +889,7 @@ Item {
                                 color: color_red
                             }
                             Text{
-                                text: "끝나면 Stop 버튼을 누르고 Save를 해주세요."
+                                text: "끝나면 저장 버튼을 눌러 저장해주세요."
                                 font.pixelSize: 13
                                 font.family: font_noto_r.name
                                 color: color_red
@@ -1023,7 +1023,7 @@ Item {
                 color: is_mapping?"black":color_gray
                 Text{
                     anchors.centerIn: parent
-                    text: "Save"
+                    text: "저장"
                     color: "white"
                     font.family: font_noto_r.name
                     font.pixelSize: 20
@@ -1105,7 +1105,7 @@ Item {
                         shadow_color: color_gray
                         highlight: map.tool=="MOVE"
                         icon: "icon/icon_move.png"
-                        name: "Move"
+                        name: "이동"
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
@@ -1248,7 +1248,7 @@ Item {
                             color: color_red
                         }
                         Text{
-                            text: "Emergency가 눌려있다면 풀어주세요."
+                            text: "비상스위치가 눌려있다면 풀어주세요."
                             font.pixelSize: 13
                             font.family: font_noto_r.name
                             color: color_red
@@ -1308,7 +1308,7 @@ Item {
                             color: color_red
                         }
                         Text{
-                            text: "Set Init 버튼을 누르고 라이다가 맵과 일치하는 지 확인해주세요."
+                            text: "라이다가 맵과 일치하는 지 확인해주세요."
                             font.pixelSize: 13
                             font.family: font_noto_r.name
                             color: color_red
@@ -1397,6 +1397,7 @@ Item {
                 width: parent.width*0.9
                 radius: 5
                 height: 50
+                visible: false
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
                 anchors.topMargin: 20
@@ -1408,7 +1409,7 @@ Item {
                         color: "#282828"
                         font.family: font_noto_b.name
                         font.pixelSize: 20
-                        text: "NAME : "
+                        text: "파일이름 : "
                     }
                     Text{
                         id: text_patrol_name
@@ -1421,6 +1422,7 @@ Item {
 
             }
             Row{
+                visible: false
                 anchors.bottom: rect_menu_box.top
                 anchors.bottomMargin: 10
                 anchors.horizontalCenter: rect_menu_box.horizontalCenter
@@ -1433,7 +1435,7 @@ Item {
                     color: "black"
                     Text{
                         anchors.centerIn: parent
-                        text: "New"
+                        text: "새로만들기"
                         color: "white"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
@@ -1460,7 +1462,7 @@ Item {
                     color: "black"
                     Text{
                         anchors.centerIn: parent
-                        text: "Load"
+                        text: "불러오기"
                         color: "white"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
@@ -1480,7 +1482,7 @@ Item {
                     color: "black"
                     Text{
                         anchors.centerIn: parent
-                        text: "Save"
+                        text: "저장"
                         color: "white"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
@@ -1502,6 +1504,7 @@ Item {
                 id: rect_menu_box
                 width: parent.width - 60
                 height: 100
+                visible: false
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: rect_annot_map_name.bottom
                 anchors.topMargin: 60
@@ -1861,9 +1864,10 @@ Item {
                 id: rect_patrol_random
                 width: parent.width
                 height: parent.height - rect_menu_box.y - rect_menu_box.height
-                anchors.top: rect_menu_box.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
+//                anchors.top: rect_menu_box.bottom
+//                anchors.horizontalCenter: parent.horizontalCenter
                 color: "transparent"
+                anchors.centerIn: parent
                 visible: patrol_mode===2
                 Column{
                     anchors.centerIn: parent
@@ -1973,7 +1977,7 @@ Item {
                         color: "white"
                         font.family: font_noto_b.name
                         font.pixelSize: 20
-                        text: "Map Meta Data"
+                        text: "설정된 맵 정보"
                         horizontalAlignment: Text.AlignHCenter
                     }
                 }
@@ -2059,7 +2063,7 @@ Item {
                         color: "#282828"
                         font.family: font_noto_b.name
                         font.pixelSize: 20
-                        text: is_init_state?"MAP : " + map.map_name:"MAP : " + supervisor.getMapname();
+                        text: is_init_state?"맵 이름 : " + map.map_name:"맵 이름 : " + supervisor.getMapname();
                         horizontalAlignment: Text.AlignHCenter
                     }
                 }
@@ -2076,7 +2080,7 @@ Item {
                         Text{
                             font.family: font_noto_r.name
                             font.pixelSize: 15
-                            text: "Map"
+                            text: "이름"
                             width: 150
                             horizontalAlignment: Text.AlignHCenter
                         }
@@ -2096,7 +2100,7 @@ Item {
                         Text{
                             font.family: font_noto_r.name
                             font.pixelSize: 15
-                            text: "Width"
+                            text: "가로길이"
                         }
                         Text{
                             font.family: font_noto_r.name
@@ -2112,7 +2116,7 @@ Item {
                         Text{
                             font.family: font_noto_r.name
                             font.pixelSize: 15
-                            text: "Height"
+                            text: "세로길이"
                         }
                         Text{
                             font.family: font_noto_r.name
@@ -2128,7 +2132,7 @@ Item {
                         Text{
                             font.family: font_noto_r.name
                             font.pixelSize: 15
-                            text: "Grid Width"
+                            text: "단위크기"
                         }
                         Text{
                             font.family: font_noto_r.name
@@ -2157,7 +2161,7 @@ Item {
                         Text{
                             font.family: font_noto_r.name
                             font.pixelSize: 15
-                            text: "Serving Location"
+                            text: "서빙위치"
                             width: 150
                             horizontalAlignment: Text.AlignHCenter
                         }
@@ -2177,7 +2181,7 @@ Item {
                         Text{
                             font.family: font_noto_r.name
                             font.pixelSize: 15
-                            text: "Resting Location"
+                            text: "대기위치"
                         }
                         Text{
                             font.family: font_noto_r.name
@@ -2193,7 +2197,7 @@ Item {
                         Text{
                             font.family: font_noto_r.name
                             font.pixelSize: 15
-                            text: "Charging Location"
+                            text: "충전위치"
                         }
                         Text{
                             font.family: font_noto_r.name
@@ -2209,7 +2213,7 @@ Item {
                         Text{
                             font.family: font_noto_r.name
                             font.pixelSize: 15
-                            text: "Object Num"
+                            text: "가상벽 개수"
                         }
                         Text{
                             font.family: font_noto_r.name
@@ -2265,7 +2269,7 @@ Item {
                         border.color: "#7e7e7e"
                         Text{
                             anchors.centerIn: parent
-                            text: "Previous"
+                            text: "이전"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
 
@@ -2287,7 +2291,7 @@ Item {
                         border.color: "#7e7e7e"
                         Text{
                             anchors.centerIn: parent
-                            text: "Next"
+                            text: "다음"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
                             color: "white"
@@ -2335,7 +2339,7 @@ Item {
                     color: "white"
                     font.family: font_noto_b.name
                     font.pixelSize: 20
-                    text: "STEP 1. Map Load and Rotate"
+                    text: "1. 맵 회전"
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
@@ -2380,7 +2384,7 @@ Item {
                     color: "#282828"
                     font.family: font_noto_b.name
                     font.pixelSize: 20
-                    text: is_init_state?"MAP : " + map.map_name:"MAP : " + supervisor.getMapname();
+                    text: is_init_state?"맵 이름 : " + map.map_name:"맵 이름 : " + supervisor.getMapname();
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
@@ -2393,7 +2397,7 @@ Item {
                 anchors.top: rect_annot_map_name.bottom
                 anchors.topMargin: 10
                 Text{
-                    text: "Rotate Map"
+                    text: "회전"
                     font.family: font_noto_r.name
                     font.pixelSize: 15
                     anchors.verticalCenter: parent.verticalCenter
@@ -2454,6 +2458,20 @@ Item {
                 }
             }
 
+            Timer{
+                id: timer_rotate
+                running: false
+                repeat: true
+                interval: 100
+                property bool isplus: false
+                onTriggered: {
+                    if(isplus){
+                        slider_rotate.value++;
+                    }else{
+                        slider_rotate.value--;
+                    }
+                }
+            }
             Rectangle{
                 id: rect_annot_box55
                 width: parent.width*0.9
@@ -2463,26 +2481,27 @@ Item {
                 anchors.top: rect_annot_box44.bottom
                 anchors.topMargin: 10
                 Text{
-                    text: "Rotate Map (1도단위)"
+                    text: "회전 (1도단위)"
                     font.family: font_noto_r.name
                     font.pixelSize: 15
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: 30
                 }
+
                 Row{
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     anchors.rightMargin: 60
                     spacing: 20
                     Rectangle{
-                        width: 50
+                        width: 80
                         height: 30
                         color: "black"
                         radius: 5
                         Text{
                             anchors.centerIn: parent
-                            text: "<-"
+                            text: "반시계방향"
                             font.family: font_noto_r.name
                             font.pixelSize: 15
                             color: "white"
@@ -2492,16 +2511,23 @@ Item {
                             onClicked: {
                                 slider_rotate.value--;
                             }
+                            onPressAndHold: {
+                                timer_rotate.isplus = false;
+                                timer_rotate.start();
+                            }
+                            onReleased: {
+                                timer_rotate.stop();
+                            }
                         }
                     }
                     Rectangle{
-                        width: 50
+                        width: 80
                         height: 30
                         color: "black"
                         radius: 5
                         Text{
                             anchors.centerIn: parent
-                            text: "->"
+                            text: "시계방향"
                             font.family: font_noto_r.name
                             font.pixelSize: 15
                             color: "white"
@@ -2510,6 +2536,13 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 slider_rotate.value++;
+                            }
+                            onPressAndHold: {
+                                timer_rotate.isplus = true;
+                                timer_rotate.start();
+                            }
+                            onReleased: {
+                                timer_rotate.stop();
                             }
                         }
                     }
@@ -2553,7 +2586,7 @@ Item {
                         border.color: "#7e7e7e"
                         Text{
                             anchors.centerIn: parent
-                            text: "Previous"
+                            text: "이전"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
 
@@ -2578,7 +2611,7 @@ Item {
                         border.color: "#7e7e7e"
                         Text{
                             anchors.centerIn: parent
-                            text: "Next"
+                            text: "다음"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
                             color: "white"
@@ -2635,35 +2668,10 @@ Item {
                     color: "white"
                     font.family: font_noto_b.name
                     font.pixelSize: 20
-                    text: "STEP 1. Map Load and Edit"
+                    text: "2. 노이즈 제거"
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
-//            Rectangle{
-//                id: btn_load_map
-//                width: 100
-//                height: 40
-//                radius: 5
-//                anchors.top: rect_annot_state.bottom
-//                anchors.topMargin: 30
-//                anchors.left: parent.left
-//                anchors.leftMargin: 30
-//                color: "black"
-//                Text{
-//                    anchors.centerIn: parent
-//                    text: "Load"
-//                    color: "white"
-//                    font.family: font_noto_r.name
-//                    font.pixelSize: 15
-//                }
-//                MouseArea{
-//                    anchors.fill: parent
-//                    onClicked:{
-//                        fileload.open();
-//                    }
-//                }
-//            }
-
             Row{
                 spacing: 30
                 anchors.top: rect_annot_state.bottom
@@ -2751,7 +2759,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "Move"
+                                text: "이동"
                                 font.family: font_noto_r.name
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
@@ -2777,7 +2785,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "Draw"
+                                text: "그리기"
                                 font.family: font_noto_r.name
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
@@ -2801,7 +2809,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "Clear"
+                                text: "초기화"
                                 font.family: font_noto_r.name
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
@@ -2833,7 +2841,7 @@ Item {
                         height: 50
                         color: "white"
                         Text{
-                            text: "Color"
+                            text: "색상"
                             font.family: font_noto_r.name
                             font.pixelSize: 15
                             anchors.verticalCenter: parent.verticalCenter
@@ -2874,7 +2882,7 @@ Item {
                         height: 50
                         color: "white"
                         Text{
-                            text: "Brush Size"
+                            text: "브러시 사이즈"
                             font.family: font_noto_r.name
                             font.pixelSize: 15
                             anchors.verticalCenter: parent.verticalCenter
@@ -2947,7 +2955,7 @@ Item {
                         border.color: "#7e7e7e"
                         Text{
                             anchors.centerIn: parent
-                            text: "Previous"
+                            text: "이전"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
 
@@ -2972,7 +2980,7 @@ Item {
                         border.color: "#7e7e7e"
                         Text{
                             anchors.centerIn: parent
-                            text: "Next"
+                            text: "다음"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
                             color: "white"
@@ -3063,7 +3071,7 @@ Item {
                     property bool activated: false
                     Text{
                         anchors.centerIn: parent
-                        text: "Load(RAW)"
+                        text: "기본파일"
                         color: "white"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
@@ -3089,7 +3097,7 @@ Item {
                     color: enabled?"black":color_gray
                     Text{
                         anchors.centerIn: parent
-                        text: "Load"
+                        text: "수정된파일"
                         color: "white"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
@@ -3202,7 +3210,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "Move"
+                                text: "이동"
                                 font.family: font_noto_r.name
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
@@ -3228,7 +3236,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "Draw"
+                                text: "그리기"
                                 font.family: font_noto_r.name
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
@@ -3256,7 +3264,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "Erase"
+                                text: "지우기"
                                 font.family: font_noto_r.name
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
@@ -3282,7 +3290,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "Clear"
+                                text: "초기화"
                                 font.family: font_noto_r.name
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
@@ -3316,7 +3324,7 @@ Item {
                         height: 50
                         color: "white"
                         Text{
-                            text: "Brush Size"
+                            text: "브러시 사이즈"
                             font.family: font_noto_r.name
                             font.pixelSize: 15
                             anchors.verticalCenter: parent.verticalCenter
@@ -3359,7 +3367,7 @@ Item {
                         height: 50
                         color: "white"
                         Text{
-                            text: "Eraser Size"
+                            text: "지우개 사이즈"
                             font.family: font_noto_r.name
                             font.pixelSize: 15
                             anchors.verticalCenter: parent.verticalCenter
@@ -3437,7 +3445,7 @@ Item {
                         border.color: "#7e7e7e"
                         Text{
                             anchors.centerIn: parent
-                            text: "Previous"
+                            text: "이전"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
 
@@ -3462,7 +3470,7 @@ Item {
                         border.color: "#12d27c"
                         Text{
                             anchors.centerIn: parent
-                            text: "Confirm"
+                            text: "확인"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
                             color: "white"
@@ -3557,7 +3565,7 @@ Item {
                     color: "white"
                     font.family: font_noto_b.name
                     font.pixelSize: 20
-                    text: "STEP 2. Add/Edit Object"
+                    text: "3. 가상 벽 그리기"
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
@@ -3623,7 +3631,7 @@ Item {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
                                 Text{
-                                    text: "Move"
+                                    text: "이동"
                                     font.family: font_noto_r.name
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
@@ -3653,7 +3661,7 @@ Item {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
                                 Text{
-                                    text: "Add"
+                                    text: "추가"
                                     font.family: font_noto_r.name
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
@@ -3681,7 +3689,7 @@ Item {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
                                 Text{
-                                    text: "Edit"
+                                    text: "수정"
                                     color: btn_edit.enabled?"black":"#e8e8e8"
                                     font.family: font_noto_r.name
                                     anchors.horizontalCenter: parent.horizontalCenter
@@ -3708,7 +3716,7 @@ Item {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
                                 Text{
-                                    text: "Remove"
+                                    text: "삭제"
                                     color: btn_erase.enabled?"black":"#e8e8e8"
                                     font.family: font_noto_r.name
                                     anchors.horizontalCenter: parent.horizontalCenter
@@ -3755,7 +3763,7 @@ Item {
                             border.width: map.tool=="ADD_OBJECT"?3:1
                             border.color: map.tool=="ADD_OBJECT"?"#12d27c":"black"
                             Text{
-                                text: "Rectangle"
+                                text: "사각형"
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
                             }
@@ -3774,7 +3782,7 @@ Item {
                             border.width: map.tool=="ADD_POINT"?3:1
                             border.color: map.tool=="ADD_POINT"?"#12d27c":"black"
                             Text{
-                                text: "Point"
+                                text: "다각형"
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
                             }
@@ -3796,7 +3804,7 @@ Item {
                             color: enabled?"white":"#f4f4f4"
                             enabled: supervisor.getTempObjectSize()>2?true:false
                             Text{
-                                text: "Save"
+                                text: "저장"
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
                                 color: parent.enabled?"black":"white"
@@ -3894,7 +3902,7 @@ Item {
                         border.color: "#7e7e7e"
                         Text{
                             anchors.centerIn: parent
-                            text: "Previous"
+                            text: "이전"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
 
@@ -3921,7 +3929,7 @@ Item {
                         border.color: "#7e7e7e"
                         Text{
                             anchors.centerIn: parent
-                            text: "Next"
+                            text: "다음"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
                             color: "white"
@@ -4026,7 +4034,7 @@ Item {
                     color: "white"
                     font.family: font_noto_b.name
                     font.pixelSize: 20
-                    text: "STEP 3. Add/Edit Location"
+                    text: "4. 위치 지정"
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
@@ -4049,7 +4057,7 @@ Item {
                             color: iscol?"white":"black"
                         }
                     }
-                    Text {
+                    Text{
                         id: text_loc_name
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.right: parent.right
@@ -4100,7 +4108,7 @@ Item {
                             shadow_color: color_gray
                             highlight: map.tool=="MOVE"
                             icon: "icon/icon_move.png"
-                            name: "Move"
+                            name: "이동"
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
@@ -4155,88 +4163,6 @@ Item {
                     }
                 }
                 Rectangle{
-                    width: rect_menus.width - 60
-                    height: 0
-                    visible: false;//map.tool==="SLAM_INIT"?true:false
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    onVisibleChanged: {
-                        if(visible){
-                            height = 50
-                        }else{
-                            height = 0
-                        }
-                    }
-                    Behavior on height {
-                        NumberAnimation{
-                            duration:300;
-                        }
-                    }
-                    color: "transparent"
-                    Row{
-                        anchors.centerIn: parent
-                        spacing: 20
-                        Rectangle{
-                            width: 80
-                            height: 40
-                            radius: 5
-                            Text{
-                                text: "Run"
-                                anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    btn_run.show_ani();
-                                    map.tool = "MOVE";
-                                    map.reset_canvas();
-                                    supervisor.slam_run();
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 80
-                            height: 40
-                            radius: 5
-                            Text{
-                                text: "Stop"
-                                anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    map.tool = "MOVE";
-                                    map.reset_canvas();
-                                    btn_stop.show_ani();
-                                    supervisor.slam_stop();
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 80
-                            height: 40
-                            radius: 5
-                            Text{
-                                text: "Set Init"
-                                anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    if(map.new_slam_init){
-                                        supervisor.slam_setInit();
-                                        menu_location.checkInit = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-
-                Rectangle{
                     id: rect_annot_box
                     width: parent.width
                     height: 100
@@ -4261,7 +4187,7 @@ Item {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
                                 Text{
-                                    text: "Add"
+                                    text: "추가"
                                     font.family: font_noto_r.name
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
@@ -4288,7 +4214,7 @@ Item {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
                                 Text{
-                                    text: "Edit"
+                                    text: "수정"
                                     color: btn_edit.enabled?"black":"#e8e8e8"
                                     font.family: font_noto_r.name
                                     anchors.horizontalCenter: parent.horizontalCenter
@@ -4315,7 +4241,7 @@ Item {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
                                 Text{
-                                    text: "Remove"
+                                    text: "삭제"
                                     color: btn_erase.enabled?"black":"#e8e8e8"
                                     font.family: font_noto_r.name
                                     anchors.horizontalCenter: parent.horizontalCenter
@@ -4361,7 +4287,7 @@ Item {
                             height: 40
                             radius: 5
                             Text{
-                                text: "Cancel"
+                                text: "취소"
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
                             }
@@ -4386,7 +4312,7 @@ Item {
                             color: enabled?"white":"#f4f4f4"
                             enabled: map.new_location?true:false
                             Text{
-                                text: "Save"
+                                text: "저장"
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
                                 color: parent.enabled?"black":"white"
@@ -4450,7 +4376,7 @@ Item {
                             height: 40
                             radius: 5
                             Text{
-                                text: "Cancel"
+                                text: "취소"
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
                             }
@@ -4605,7 +4531,7 @@ Item {
                         border.color: "#7e7e7e"
                         Text{
                             anchors.centerIn: parent
-                            text: "Previous"
+                            text: "이전"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
 
@@ -4630,7 +4556,7 @@ Item {
                         border.color: "#7e7e7e"
                         Text{
                             anchors.centerIn: parent
-                            text: "Next"
+                            text: "다음"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
                             color: "white"
@@ -4708,7 +4634,7 @@ Item {
                     color: "white"
                     font.family: font_noto_b.name
                     font.pixelSize: 20
-                    text: "STEP 5. Save"
+                    text: "5. 저장하기"
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
@@ -4726,7 +4652,7 @@ Item {
                     color: "#282828"
                     font.family: font_noto_b.name
                     font.pixelSize: 20
-                    text: is_init_state?"MAP : " + map.map_name:"MAP : " + supervisor.getMapname();
+                    text: is_init_state?"맵 이름 : " + map.map_name:"맵 이름 : " + supervisor.getMapname();
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
@@ -4753,45 +4679,13 @@ Item {
                         anchors.right: parent.right
                         Text{
                             id: state_text_meta
-                            text: "Confirm"
+                            text: "확인"
                             anchors.verticalCenter: parent.verticalCenter
                             color: "white"
                             anchors.right: parent.right
                             anchors.rightMargin: 50
                             font.family: font_noto_b.name
                             font.pixelSize: 25
-                        }
-                    }
-                    Rectangle{
-                        id: btn_move
-                        width: 85
-                        height: width
-                        anchors.verticalCenter: parent.verticalCenter
-                        radius: width
-                        border.width: 0
-                        border.color: "#12d27c"
-                        Column{
-                            anchors.centerIn: parent
-                            Image{
-                                source: "icon/icon_meta_save.png"
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                            Text{
-                                text: "Meta 저장"
-                                font.family: font_noto_r.name
-                                font.pixelSize: 13
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                        }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                if(supervisor.saveMetaData(map.map_name)){
-                                    btn_move.border.width = 3;
-                                }else{
-                                    btn_move.border.width = 0;
-                                }
-                            }
                         }
                     }
                 }
@@ -4812,7 +4706,7 @@ Item {
                         anchors.right: parent.right
                         Text{
                             id: state_text_annot
-                            text: "Confirm"
+                            text: "확인"
                             anchors.verticalCenter: parent.verticalCenter
                             color: "white"
                             anchors.right: parent.right
@@ -4835,7 +4729,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "Annot 저장"
+                                text: "맵 설정"
                                 font.family: font_noto_r.name
                                 font.pixelSize: 13
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -4876,7 +4770,7 @@ Item {
                         anchors.right: parent.right
                         Text{
                             id: rect_server_text
-                            text: "Confirm"
+                            text: "확인"
                             anchors.verticalCenter: parent.verticalCenter
                             color: "white"
                             anchors.right: parent.right
@@ -4953,7 +4847,7 @@ Item {
                         border.color: "#7e7e7e"
                         Text{
                             anchors.centerIn: parent
-                            text: "Previous"
+                            text: "이전"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
 
@@ -4978,7 +4872,7 @@ Item {
                         border.color: enabled?"#12d27c":"#A9A9A9"
                         Text{
                             anchors.centerIn: parent
-                            text: "Confirm"
+                            text: "확인"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
                             color: "white"
@@ -5191,7 +5085,7 @@ Item {
                     spacing: 5
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
-                        text: is_init_state && !is_save_annot?"Annotation이 저장되지 않았습니다.":"이대로 맵을 사용하시겠습니까?"
+                        text: is_init_state && !is_save_annot?"맵 설정이 저장되지 않았습니다.":"이대로 맵을 사용하시겠습니까?"
                         font.family: font_noto_r.name
                         font.pixelSize: 20
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -5199,7 +5093,7 @@ Item {
                     Text{
                         id: text_warning
                         visible: false
-                        text: "[Annot 저장] 버튼을 눌러 저장해주세요.\n 모든 수정을 취소하시려면 오른쪽 상단의 [뒤로가기] 버튼을 누르세요."
+                        text: "[맵 설정] 버튼을 눌러 저장해주세요.\n 모든 수정을 취소하시려면 오른쪽 상단의 [뒤로가기] 버튼을 누르세요."
                         font.family: font_noto_r.name
                         color: "#E7584D"
                         font.pixelSize: 15
@@ -5330,7 +5224,7 @@ Item {
                 anchors.top: list_location2.bottom
                 anchors.topMargin: 20
                 Repeater{
-                    model: ["confirm","in map"]
+                    model: ["확인","지도에서 선택"]
                     Rectangle{
                         property int btn_size: 100
                         width: 100
@@ -5348,7 +5242,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                if(modelData == "confirm"){
+                                if(modelData == "확인"){
                                     print(list_location2.model.get(list_location2.currentIndex).name);
                                     if(list_location2.model.get(list_location2.currentIndex).name != ""){
                                         supervisor.addPatrol("LOC",list_location2.model.get(list_location2.currentIndex).name,0,0,0);
@@ -5358,7 +5252,7 @@ Item {
                                         select_patrol_num = supervisor.getPatrolNum()-1;
                                         loader_menu.item.viewlast();
                                     }
-                                }else if(modelData == "in map"){
+                                }else if(modelData == "지도에서 선택"){
                                     popup_add_patrol.close();
                                     map.tool = "ADD_PATROL_LOCATION";
                                 }
@@ -5393,7 +5287,7 @@ Item {
                 Column{
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
-                        text: "매핑을 초기화하고 다시 시작하시겠습니까?"
+                        text: "맵 생성을 초기화하고 다시 시작하시겠습니까?"
                         font.family: font_noto_r.name
                         font.pixelSize: 20
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -6012,7 +5906,7 @@ Item {
             color: "#323744"
             Text{
                 anchors.centerIn: parent
-                text: "Add Object"
+                text: "가상벽 추가"
                 font.pixelSize: 20
                 font.family: font_noto_r.name
                 color: "white"
@@ -6043,7 +5937,7 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Text{
-                            text: "Table"
+                            text: "테이블"
                             font.family: font_noto_r.name
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
@@ -6070,7 +5964,7 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Text{
-                            text: "Chair"
+                            text: "의자"
                             font.family: font_noto_r.name
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
@@ -6097,7 +5991,7 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Text{
-                            text: "Wall"
+                            text: "벽"
                             font.family: font_noto_r.name
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
@@ -6131,7 +6025,7 @@ Item {
                 color: "#282828"
                 font.family: font_noto_b.name
                 font.pixelSize: 20
-                text: "Object Name : " + select_object_type + "_" + Number(supervisor.getObjectSize(select_object_type))
+                text: "이름 : " + select_object_type + "_" + Number(supervisor.getObjectSize(select_object_type))
                 horizontalAlignment: Text.AlignHCenter
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -6239,7 +6133,7 @@ Item {
             color: "#323744"
             Text{
                 anchors.centerIn: parent
-                text: "Add Location"
+                text: "위치 추가"
                 font.pixelSize: 20
                 font.family: font_noto_r.name
                 color: "white"
@@ -6270,7 +6164,7 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Text{
-                            text: "Serving"
+                            text: "서빙위치"
                             font.family: font_noto_r.name
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
@@ -6297,7 +6191,7 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Text{
-                            text: "Charging"
+                            text: "충전위치"
                             font.family: font_noto_r.name
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
@@ -6324,7 +6218,7 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Text{
-                            text: "Resting"
+                            text: "대기위치"
                             font.family: font_noto_r.name
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
@@ -6333,33 +6227,6 @@ Item {
                         anchors.fill: parent
                         onClicked: {
                             select_location_type = "Resting";
-                            tfield_location.text = select_location_type + "_" + Number(supervisor.getLocationSize(select_location_type))
-                        }
-                    }
-                }
-                Rectangle{
-                    id: btn_other
-                    width: 78
-                    height: width
-                    radius: width
-                    border.width: select_location_type=="Other"?3:0
-                    border.color: "#12d27c"
-                    Column{
-                        anchors.centerIn: parent
-                        Image{
-                            source: "icon/icon_move.png"
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                        Text{
-                            text: "Other"
-                            font.family: font_noto_r.name
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            select_location_type = "Other";
                             tfield_location.text = select_location_type + "_" + Number(supervisor.getLocationSize(select_location_type))
                         }
                     }
@@ -6491,7 +6358,7 @@ Item {
 
         Text{
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "Add Location"
+            text: "위치 추가"
             font.pixelSize: 20
             font.bold: true
         }
@@ -6661,7 +6528,7 @@ Item {
             map.show_buttons = true;
             text_menu_title.text = "";
         }else if(map_mode == 1){
-            text_menu_title.text = "SLAM";
+            text_menu_title.text = "맵 생성";
             text_menu_title.visible = true;
 //            timer_get_joy.start();
             map.init_mode();
@@ -6671,7 +6538,7 @@ Item {
             loader_menu.sourceComponent = menu_slam;
             map.map_mode = "MAPPING";
         }else if(map_mode == 2){
-            text_menu_title.text = "Annotation";
+            text_menu_title.text = "맵 설정";
             text_menu_title.visible = true;
             map.show_location = true;
             map.show_connection = false;
@@ -6680,7 +6547,7 @@ Item {
             map.setfullscreen();
             loader_menu.sourceComponent = menu_annot_state;
         }else if(map_mode == 3){
-            text_menu_title.text = "Patrol";
+            text_menu_title.text = "지정순회";
             text_menu_title.visible = true;
             map.show_object = true;
             map.show_connection = false;
@@ -6690,7 +6557,7 @@ Item {
             loader_menu.sourceComponent = menu_patrol;
         }else if(map_mode == 4){
             text_menu_title.visible = true;
-            text_menu_title.text = "Localization";
+            text_menu_title.text = "위치 초기화";
             map.show_lidar = true;
             map.show_buttons = true;
             map.show_robot = true;
@@ -6758,7 +6625,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.family: font_noto_r.name
                     font.pixelSize: 30
-                    text: "HOW TO"
+                    text: "방법"
                 }
 
                 AnimatedImage{

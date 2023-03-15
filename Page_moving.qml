@@ -118,7 +118,7 @@ Item {
             font.family: font_noto_b.name
             font.pixelSize: 40
             color: "#e2574c"
-            text: move_fail?"패스를 찾을 수 없습니다.":"일시정지 됨"
+            text: move_fail?"경로를 찾을 수 없습니다.":"일시정지 됨"
         }
         MouseArea{
             id: btn_page_popup

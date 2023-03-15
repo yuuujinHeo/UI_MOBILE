@@ -285,7 +285,7 @@ Item {
                                 Text{
                                     font.family: font_noto_r.name
                                     font.pixelSize: 12
-                                    text: "Emergency 눌림"
+                                    text: "비상스위치 눌림"
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     horizontalAlignment: Text.AlignHCenter
                                 }
@@ -337,7 +337,7 @@ Item {
                     Text{
                         font.family: font_noto_r.name
                         font.pixelSize: 12
-                        text: "Charging"
+                        text: "충전 중"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
@@ -358,7 +358,7 @@ Item {
                     Text{
                         font.family: font_noto_r.name
                         font.pixelSize: 12
-                        text: "Emergency"
+                        text: "비상스위치"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
@@ -379,7 +379,7 @@ Item {
                     Text{
                         font.family: font_noto_r.name
                         font.pixelSize: 12
-                        text: "Power"
+                        text: "모터 전원"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
@@ -400,7 +400,7 @@ Item {
                     Text{
                         font.family: font_noto_r.name
                         font.pixelSize: 12
-                        text: "Remote"
+                        text: "원격스위치"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
@@ -421,7 +421,7 @@ Item {
                     Text{
                         font.family: font_noto_r.name
                         font.pixelSize: 12
-                        text: "Battery"
+                        text: "배터리"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
@@ -454,7 +454,7 @@ Item {
                     Text{
                         font.family: font_noto_r.name
                         font.pixelSize: 12
-                        text: "Current"
+                        text: "전류"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
@@ -473,7 +473,7 @@ Item {
                     Text{
                         font.family: font_noto_r.name
                         font.pixelSize: 12
-                        text: "Power"
+                        text: "전력"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
@@ -492,7 +492,7 @@ Item {
                     Text{
                         font.family: font_noto_r.name
                         font.pixelSize: 12
-                        text: "Power(Total)"
+                        text: "전력(Total)"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
@@ -512,7 +512,7 @@ Item {
                     Text{
                         font.family: font_noto_r.name
                         font.pixelSize: 12
-                        text: "Motor Connection"
+                        text: "모터 연결상태"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
@@ -549,7 +549,7 @@ Item {
                     Text{
                         font.family: font_noto_r.name
                         font.pixelSize: 12
-                        text: "Motor Status 0"
+                        text: "모터 상태 0"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
@@ -569,7 +569,7 @@ Item {
                     Text{
                         font.family: font_noto_r.name
                         font.pixelSize: 12
-                        text: "Motor Status 1"
+                        text: "모터 상태 1"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
@@ -589,7 +589,7 @@ Item {
                     Text{
                         font.family: font_noto_r.name
                         font.pixelSize: 12
-                        text: "Motor Temperature"
+                        text: "모터 온도"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Text{
@@ -661,7 +661,7 @@ Item {
                         font.family: font_noto_b.name
                         font.pixelSize: 30
                         color: "white"
-                        text:"Localization"
+                        text:"위치 초기화"
                     }
                 }
                 Rectangle{
@@ -679,7 +679,7 @@ Item {
                             shadow_color: color_gray
                             highlight: map.tool=="MOVE"
                             icon: "icon/icon_move.png"
-                            name: "Move"
+                            name: "이동"
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
@@ -728,64 +728,6 @@ Item {
                         }
                     }
                 }
-                Rectangle{
-                    width: rect_menu1.width - 60
-                    height: 100
-                    visible: map.tool==="SLAM_INIT"?true:false
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: "transparent"
-                    Row{
-                        anchors.centerIn: parent
-                        spacing: 20
-                        Item_button{
-                            id: btn_run
-                            width: 78
-                            icon:"icon/icon_run.png"
-                            name:"Run"
-                            shadow_color: color_gray
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    btn_run.show_ani();
-                                    map.tool = "MOVE";
-                                    supervisor.slam_run();
-                                }
-                            }
-                        }
-                        Item_button{
-                            id: btn_stop
-                            width: 78
-                            icon:"icon/icon_stop.png"
-                            name:"Stop"
-                            shadow_color: color_gray
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    map.tool = "MOVE";
-                                    btn_stop.show_ani();
-                                    supervisor.slam_stop();
-                                }
-                            }
-                        }
-                        Item_button{
-                            id: btn_init
-                            width: 78
-                            icon:"icon/icon_set_init.png"
-                            name:"Set Init"
-                            shadow_color: color_gray
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    if(map.new_slam_init){
-                                        btn_init.show_ani();
-                                        supervisor.slam_setInit();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
             }
             Rectangle{
                 width: parent.width*0.9
@@ -816,7 +758,7 @@ Item {
                             color: color_red
                         }
                         Text{
-                            text: "Emergency가 눌려있다면 풀어주세요."
+                            text: "비상스위치가 눌려있다면 풀어주세요."
                             font.pixelSize: 13
                             font.family: font_noto_r.name
                             color: color_red
@@ -876,7 +818,7 @@ Item {
                             color: color_red
                         }
                         Text{
-                            text: "Set Init 버튼을 누르고 라이다가 맵과 일치하는 지 확인해주세요."
+                            text: "라이다가 맵과 일치하는 지 확인해주세요."
                             font.pixelSize: 13
                             font.family: font_noto_r.name
                             color: color_red
@@ -933,7 +875,7 @@ Item {
 
         Text{
             id: text
-            text:"목적지로 이동하는데 실패하였습니다.\nEmergency 버튼을 누르고 로봇을 수동으로 이동시켜주세요."
+            text:"목적지로 이동하는데 실패하였습니다.\n비상스위치 버튼을 누르고 로봇을 수동으로 이동시켜주세요."
             anchors.top: icon_warn.bottom
             anchors.topMargin: 40
             anchors.horizontalCenter: parent.horizontalCenter

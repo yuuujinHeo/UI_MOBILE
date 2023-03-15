@@ -27,7 +27,7 @@ Item {
         color: "#282828"
         Text{
             id: text_menu
-            text: "MENU"
+            text: "메뉴"
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 150
@@ -149,7 +149,7 @@ Item {
                     }
                     Text{
                         id: text_charge
-                        text:"Minimize"
+                        text:"최소화"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
                         horizontalAlignment: Text.AlignHCenter
@@ -190,7 +190,7 @@ Item {
                     }
                     Text{
                         id: text_wait
-                        text:"OFF"
+                        text:"프로그램 종료"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
                         color: "#525252"

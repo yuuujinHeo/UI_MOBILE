@@ -247,7 +247,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "로컬 맵 불러오기\n(USB)"
+                                text: "맵 불러오기\n(USB)"
                                 font.pixelSize: 15
                                 horizontalAlignment: Text.AlignHCenter
                                 font.family: font_noto_r.name
@@ -340,7 +340,7 @@ Item {
                     anchors.rightMargin: 10 + 20
                     color: "#E7584D"
                     font.family: font_noto_b.name
-                    text: "로컬 맵 파일 확인됨"
+                    text: "저장된 맵이 존재합니다."
                     font.bold: true
                     font.pixelSize: 15
                 }
@@ -385,7 +385,7 @@ Item {
                     anchors.rightMargin: 10 + 20
                     color: "#E7584D"
                     font.family: font_noto_b.name
-                    text: "설정되지 않은맵 파일\n확인됨"
+                    text: "설정되지 않은 맵이 존재합니다."
                     font.bold: true
                     font.pixelSize: 15
                 }
@@ -594,7 +594,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "START SLAM"
+                                text: "주행 프로그램 시작"
                                 font.family: font_noto_r.name
                                 font.pixelSize: 15
                                 horizontalAlignment: Text.AlignHCenter
@@ -734,7 +734,7 @@ Item {
                 Text{
                     id: text_slam_do_init
                     anchors.centerIn: parent
-                    text: "UI에서 직접 초기화"
+                    text: "초기화"
                     font.family: font_noto_r.name
                     font.pixelSize: 15
                 }
@@ -820,7 +820,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 color: "#7e7e7e"
                 font.family: font_noto_r.name
-                text: "모터가 초기화되지 않았습니다. Emergency 스위치를 확인해주세요."
+                text: "모터가 초기화되지 않았습니다. 비상 스위치를 확인해주세요."
                 font.pixelSize: 20
             }
             Rectangle{
@@ -1290,7 +1290,7 @@ Item {
                 Column{
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
-                        text: "기존 annotation이 삭제됩니다."
+                        text: "기존 맵 설정이 삭제됩니다."
                         font.family: font_noto_r.name
                         font.pixelSize: 20
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -1412,7 +1412,7 @@ Item {
                 color: "#282828"
                 font.family: font_noto_b.name
                 font.pixelSize: 20
-                text: popup_show_map.is_server?"MAP : " + supervisor.getServerMapname():"MAP : " + supervisor.getMapname();
+                text: popup_show_map.is_server?"이름 : " + supervisor.getServerMapname():"이름 : " + supervisor.getMapname();
                 horizontalAlignment: Text.AlignHCenter
             }
         }

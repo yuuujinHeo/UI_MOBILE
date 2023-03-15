@@ -11,15 +11,6 @@ Item {
     Component.onCompleted: {
         init();
     }
-
-    Timer{
-        repeat: true
-        interval: 500
-        running: true
-        onTriggered: {
-        }
-    }
-
     function init(){
         table_num = supervisor.getTableNum();
         tray_num = supervisor.getTrayNum();
@@ -189,12 +180,13 @@ Item {
                             width_dis = 0;
                         }
                         onPositionChanged: {
+                            count_resting = 0;
                             width_dis = firstX-mouseX;
 
                             if(width_dis < 0)
                                 width_dis = 0;
 
-                            if(model.set_table != 0){
+                            if(model.set_table !== 0){
                                 if(width_dis > 50){
                                     text_cancel.visible = true;
                                 }else{
@@ -295,6 +287,7 @@ Item {
                                 MouseArea{
                                     anchors.fill:parent
                                     onClicked: {
+                                        count_resting = 0;
                                         if(cur_table == (table_col_num*5*pageNum)+index+1){
                                             cur_table = 0;
                                         }else{
@@ -348,6 +341,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onPressAndHold: {
+                    count_resting = 0;
                     supervisor.writelog("[USER INPUT] TABLE NUM CHANGED DONE : "+Number(table_col_num));
                     btn_lock.visible = false;
                     btns_table.visible = true;
@@ -382,6 +376,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        count_resting = 0;
                         if(table_col_num > 1)
                             supervisor.setTableColNum(--table_col_num);
                     }
@@ -408,6 +403,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        count_resting = 0;
                         if(table_col_num < 3)
                             supervisor.setTableColNum(++table_col_num);
                     }
@@ -428,6 +424,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        count_resting = 0;
                         supervisor.writelog("[USER INPUT] TABLE NUM CHANGED");
                         btn_lock.visible = true;
                         btns_table.visible = false;
@@ -462,6 +459,7 @@ Item {
             id: btn_go
             anchors.fill: parent
             onClicked: {
+                count_resting = 0;
                 print("serving start button");
                 cur_table = 0;
                 for(var i=0; i<tray_num; i++){
@@ -594,6 +592,7 @@ Item {
             id: btn_go2
             anchors.fill: parent
             onClicked: {
+                count_resting = 0;
                 go_patrol = true;
                 popup_question.visible = true;
                 print("patrol start button");
@@ -629,6 +628,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            count_resting = 0;
                             cur_table = 0;
                             loadPage(pmenu);
                         }
@@ -657,7 +657,7 @@ Item {
                     }
                     Text{
                         id: text_charge
-                        text:"Charge"
+                        text:"충전위치로"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
                         color: "#525252"
@@ -669,6 +669,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        count_resting = 0;
                         cur_table = 0;
                         go_charge = true;
                         popup_question.visible = true;
@@ -696,7 +697,7 @@ Item {
                     }
                     Text{
                         id: text_wait
-                        text:"Ready"
+                        text:"대기위치로"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
                         color: "#525252"
@@ -708,6 +709,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        count_resting = 0;
                         cur_table = 0;
                         go_wait = true;
                         popup_question.visible = true;
@@ -789,6 +791,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
+                    count_resting = 0;
                     if(go_wait){
                         supervisor.moveToWait();
                     }else if(go_charge){
@@ -837,6 +840,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
+                    count_resting = 0;
                     go_wait = false;
                     go_charge = false;
                     go_patrol = false;
@@ -881,6 +885,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
+                    count_resting = 0;
                     if(go_wait){
                         supervisor.moveToWait();
                     }else if(go_charge){
