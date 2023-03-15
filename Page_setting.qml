@@ -812,6 +812,7 @@ Item {
                                         anchors.fill: parent
                                         onClicked: {
                                             popup_maplist.open();
+                                            init();
                                         }
                                     }
                                 }
@@ -2846,7 +2847,7 @@ Item {
                 border.color: "#7e7e7e"
                 Text{
                     anchors.centerIn: parent
-                    text: "Default"
+                    text: "초기화"
                     font.family: font_noto_r.name
                     font.pixelSize: 25
                 }
@@ -2982,6 +2983,8 @@ Item {
         }
         wheel_base.text = supervisor.getSetting("ROBOT_HW","wheel_base");
         wheel_radius.text = supervisor.getSetting("ROBOT_HW","wheel_radius");
+
+        map_name.text = supervisor.getMapname();
 
         slider_k_curve.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_curve"));
         slider_k_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_v"));
