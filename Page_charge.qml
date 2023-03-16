@@ -9,6 +9,7 @@ Item {
     width: 1280
     height: 800
 
+    property bool is_init: false
     property var password: 0
     property bool is_charging: false
     property double battery: 0
@@ -25,7 +26,10 @@ Item {
 
     Component.onCompleted: {
         init();
+    }
 
+    function setInit(){
+        is_init = true;
     }
 
     function init(){
@@ -85,8 +89,13 @@ Item {
                     init();
                     voice_charging.stop();
                     voice_stop_charge.play();
+                    if(is_init){
+                        is_init = false;
+                        loadPage(pinit);
+                    }
                 }
             }
+
             battery = supervisor.getBatteryOut().toFixed(0);
 
             if(popup_question.visible){
