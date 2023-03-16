@@ -28,7 +28,6 @@ Item {
         height: parent.height-statusbar.height
         anchors.bottom: parent.bottom
         color: "#f4f4f4"
-
         //카테고리 바
         Row{
             spacing: 5
@@ -506,74 +505,7 @@ Item {
                         }
                     }
                 }
-//                Rectangle{
-//                    id: set_robot_4
-//                    width: 840
-//                    height: 40
-//                    Row{
-//                        anchors.fill: parent
-//                        Rectangle{
-//                            width: 350
-//                            height: parent.height
-//                            Text{
-//                                anchors.verticalCenter: parent.verticalCenter
-//                                anchors.left: parent.left
-//                                anchors.leftMargin: 50
-//                                font.family: font_noto_r.name
-//                                text:"음성 안내"
-//                                font.pixelSize: 20
-//                            }
-//                        }
-//                        Rectangle{
-//                            width: 1
-//                            height: parent.height
-//                            color: "#d0d0d0"
-//                        }
-//                        Rectangle{
-//                            width: parent.width - 351
-//                            height: parent.height
-//                            ComboBox{
-//                                id: combo_use_voice
-//                                anchors.fill: parent
-//                                model:["사용 안함","사용"]
-//                            }
-//                        }
-//                    }
-//                }
-//                Rectangle{
-//                    id: set_robot_5
-//                    width: 840
-//                    height: 40
-//                    Row{
-//                        anchors.fill: parent
-//                        Rectangle{
-//                            width: 350
-//                            height: parent.height
-//                            Text{
-//                                anchors.verticalCenter: parent.verticalCenter
-//                                anchors.left: parent.left
-//                                anchors.leftMargin: 50
-//                                font.family: font_noto_r.name
-//                                text:"이동 시 음악 재생"
-//                                font.pixelSize: 20
-//                            }
-//                        }
-//                        Rectangle{
-//                            width: 1
-//                            height: parent.height
-//                            color: "#d0d0d0"
-//                        }
-//                        Rectangle{
-//                            width: parent.width - 351
-//                            height: parent.height
-//                            ComboBox{
-//                                id: combo_use_bgm
-//                                anchors.fill: parent
-//                                model:["사용 안함","사용"]
-//                            }
-//                        }
-//                    }
-//                }
+
                 Rectangle{
                     id: set_robot_6
                     width: 840
@@ -786,7 +718,7 @@ Item {
                                     id: map_name
                                     height: parent.height
                                     width: 300
-                                    text:supervisor.getMapname();//Setting("ROBOT_HW","model");
+                                    text:supervisor.getMapname();
                                     onFocusChanged: {
                                         keyboard.owner = map_name;
                                         if(focus){
@@ -856,8 +788,6 @@ Item {
                         }
                     }
                 }
-
-
                 Rectangle{
                     id: set_map_3
                     width: 840
@@ -2785,6 +2715,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
+                    supervisor.writelog("[USER INPUT] SETTING PAGE -> BACKPAGE");
                     backPage();
                 }
             }
@@ -2812,6 +2743,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
+                        supervisor.writelog("[USER INPUT] SETTING PAGE -> PROGRAM UPDATE");
                         popup_update.open();
                     }
                 }
@@ -2833,6 +2765,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
+                        supervisor.writelog("[USER INPUT] SETTING PAGE -> RESTART SLAM");
                         supervisor.restartSLAM();
                     }
                 }
@@ -2854,6 +2787,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
+                        supervisor.writelog("[USER INPUT] SETTING PAGE -> RESET DEFAULT");
                         init();
                     }
                 }
@@ -2876,6 +2810,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
+                        supervisor.writelog("[USER INPUT] SETTING PAGE -> SETTING CHANGE");
                         supervisor.setSetting("ROBOT_HW/model",platform_name.text);
                         supervisor.setSetting("ROBOT_HW/serial_num",combo_platform_serial.currentText);
                         supervisor.setSetting("ROBOT_HW/radius",radius.text);
@@ -2954,9 +2889,6 @@ Item {
                         supervisor.setSetting("MOTOR/wheel_dir",combo_wheel_dir.currentText);
                         supervisor.setTableNum(combo_table_num.currentIndex);
 
-
-
-
                         supervisor.readSetting();
                         supervisor.restartSLAM();
                         init();
@@ -2970,6 +2902,8 @@ Item {
     }
 
     function init(){
+
+        supervisor.writelog("[QML] SETTING PAGE init");
         platform_name.text = supervisor.getSetting("ROBOT_HW","model");
         combo_platform_serial.currentIndex = parseInt(supervisor.getSetting("ROBOT_HW","serial_num"))
         radius.text = supervisor.getSetting("ROBOT_HW","radius");
@@ -3133,6 +3067,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked:{
+                            supervisor.writelog("[USER INPUT] RESET HOME FOLDERS")
                             supervisor.resetHomeFolders();
                             popup_reset.close();
                         }
@@ -3151,11 +3086,13 @@ Item {
         onOpened: {
             //버전 체크
             if(supervisor.isNewVersion()){
+                supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> ALREADY NEW VERSION")
                 //버전이 이미 최신임
                 rect_lastest.visible = true;
                 rect_need_update.visible = false;
                 text_version.text = supervisor.getLocalVersionDate()
             }else{
+                supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> CHECK NEW VERSION")
                 //새로운 버전 확인됨
                 rect_lastest.visible = false;
                 rect_need_update.visible = true;
@@ -3282,6 +3219,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> UPDATE START")
                             supervisor.pullGit();
                             popup_update.close();
                         }
@@ -3557,7 +3495,6 @@ Item {
 
                                 print("LEFT ",ani_1.to, ani_2.to);
                                 ani_camera.restart();
-
                             }else{
                                 ani_1.from = cam_info_1.x;
                                 ani_1.to = popup_camera.pos_right;
@@ -3717,9 +3654,12 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     if(mousearea_1.is_left){
+                                        supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA LEFT ("+text_camera_1.text+")")
                                         print("1 : ",text_camera_1.text,text_camera_2.text);
                                         supervisor.setCamera(text_camera_1.text,text_camera_2.text);
                                     }else{
+                                        supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA LEFT ("+text_camera_2.text+")")
+
                                         print("2 : ",text_camera_2.text,text_camera_1.text);
                                         supervisor.setCamera(text_camera_2.text,text_camera_1.text);
                                     }
@@ -3765,6 +3705,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA REQUEST")
 //                                    supervisor.requestCamera();
                                     timer_load.start();
                                 }
@@ -3775,6 +3716,11 @@ Item {
 
             }
         }
+    }
+
+    Popup{
+        id: popup_password
+
     }
 
     Popup_map_list{

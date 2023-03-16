@@ -228,6 +228,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[USER INPUT] INIT PAGE : MAKE NEW MAP")
                                 loadPage(pmap);
                                 loader_page.item.map_mode = 1;
                             }
@@ -261,7 +262,8 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                popup_usb_map.open();
+                                supervisor.writelog("[USER INPUT] INIT PAGE : LOAD MAP FROM USB")
+//                                popup_usb_map.open();
         //                        supervisor.loadMaptoUSB();
         //                        update_timer.start();
                             }
@@ -351,6 +353,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        supervisor.writelog("[USER INPUT] INIT PAGE : OPEN MAP LIST")
                         popup_map_list.open();
                     }
                 }
@@ -396,6 +399,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        supervisor.writelog("[USER INPUT] INIT PAGE : SHOW UNSETTING MAP")
                         popup_show_map.is_server = false;
                         popup_show_map.open();
                     }
@@ -460,6 +464,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[USER INPUT] INIT PAGE : MAKE ROBOT.INI")
                                 supervisor.makeRobotINI();
                             }
                         }
@@ -492,6 +497,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[USER INPUT] INIT PAGE : PROGRAM MINIMIZE")
                                 supervisor.programHide();
                                 mainwindow.showMinimized()
                             }
@@ -574,6 +580,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[USER INPUT] INIT PAGE : PROGRAM MINIMIZE")
                                 supervisor.programHide();
                                 mainwindow.showMinimized()
                             }
@@ -607,6 +614,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[USER INPUT] INIT PAGE : START SLAM")
                                 supervisor.startSLAM();
                             }
                         }
@@ -639,6 +647,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[USER INPUT] INIT PAGE : PASS CONNECTION")
                                 loadPage(pkitchen);
                                 update_timer.stop();
                             }
@@ -719,6 +728,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        supervisor.writelog("[USER INPUT] INIT PAGE : MAKE NEW MAP")
                         loadPage(pmap);
                         loader_page.item.map_mode = 1;
                     }
@@ -745,6 +755,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        supervisor.writelog("[USER INPUT] INIT PAGE : DO LOCALIZATION")
                         loadPage(pmap);
                         loader_page.item.is_init_state = true;
                         loader_page.item.map_mode = 4;
@@ -784,6 +795,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        supervisor.writelog("[USER INPUT] INIT PAGE : PASS LOCALIZATION")
                         loadPage(pkitchen);
     //                    update_timer.stop();
                     }
@@ -858,6 +870,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        supervisor.writelog("[USER INPUT] INIT PAGE : PASS ROBOT INIT")
                         loadPage(pkitchen);
     //                    update_timer.stop();
                     }
@@ -866,9 +879,6 @@ Item {
         }
 
     }
-
-
-
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -887,6 +897,7 @@ Item {
         running: false
         repeat: false
         onTriggered: {
+            supervisor.writelog("[QML - ERROR] lcm connection failed.");
             loader_init.sourceComponent = item_lcm;
         }
     }
@@ -900,9 +911,7 @@ Item {
             //체크 : robot.ini 존재여부
             if(init_mode == 0){
                 if(supervisor.isExistRobotINI()){
-                    supervisor.writelog("[QML] INIT - Ini found");
                     init_mode = 1;
-
                 }else{
                     if(loader_init.item.objectName != "init_ini"){
                         loader_init.sourceComponent = item_ini_init
@@ -917,13 +926,13 @@ Item {
                     //annotation과 map 존재여부 확인
                     if(supervisor.isExistAnnotation(map_name) && supervisor.isExistMap()){
                         //이미 설정확인된 맵이 존재한다면 다음으로 넘어감
-                        supervisor.writelog("[QML] INIT - Map found");
                         popup_ask_annotation_use.close();
                         popup_map_list.close();
                         init_mode = 2;
                     }else{
                         //annotation, map 둘 중 하나라도 없으면 안내페이지 표시
                         if(loader_init.item.objectName != "init_map"){
+                            supervisor.writelog("[QML - ERROR] Map not found. "+map_name);
                             loader_init.sourceComponent = item_map_init
                         }
                         //USB연결 확인
@@ -953,35 +962,34 @@ Item {
                     init_mode = 3;
                     timer_wait_lcm.stop();
                 }else{
-                    if(loader_init.item.objectName != "init_lcm" && !timer_wait_lcm.running)
+                    if(loader_init.item.objectName != "init_lcm" && !timer_wait_lcm.running){
                         timer_wait_lcm.start();
+                    }
                 }
             }else if(init_mode == 3){
                 if(supervisor.getLCMConnection() && supervisor.getLocalizationState() === 2){
                     init_mode = 4;
                 }else{
-                    if(loader_init.item.objectName != "init_slam")
+                    if(loader_init.item.objectName != "init_slam"){
                         loader_init.sourceComponent = item_slam_init
+                    }
                 }
 
             }else if(init_mode == 4){
                 if(supervisor.getLCMConnection() && supervisor.getMotorState() === 1){
+                    supervisor.writelog("[QML] INIT ALL DONE -> ROBOT READY")
                     init_mode = 5;
                     update_timer.stop();
                     loadPage(pkitchen);
                     supervisor.initdone();
                 }else{
-                    if(loader_init.item.objectName != "init_motor")
+                    if(loader_init.item.objectName != "init_motor"){
                         loader_init.sourceComponent = item_motor_init
+                    }
                 }
             }
         }
     }
-
-
-
-
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     Popup_map_list{
@@ -1199,7 +1207,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text {
                         id: text_title_ask
-                        text: "사용가능한 <font color=\"#12d27c\">Annotation</font> 파일을 찾았습니다."
+                        text: "사용가능한 <font color=\"#12d27c\">맵 설정</font> 파일을 찾았습니다."
                         font.family: font_noto_r.name
                         horizontalAlignment: Text.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -1343,6 +1351,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.writelog("[USER INPUT] INIT PAGE : DELETE ANNOTATION "+supervisor.getMapname())
                                 supervisor.deleteAnnotation();
                                 loadPage(pmap);
                                 loader_page.item.loadmap(popup_annotation_delete.name,"RAW");

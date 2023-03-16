@@ -469,7 +469,6 @@ Item {
                                     text:modelData
                                 }
                             }
-
                         }
 //                        DropShadow{
 //                            anchors.fill: parent
@@ -482,12 +481,16 @@ Item {
                             onClicked: {
                                 if(modelData == "맵 생성"){
                                     map_mode = 1;
+                                    supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO MAPPING")
                                 }else if(modelData == "맵 설정"){
                                     map_mode = 2;
+                                    supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO ANNOTATION")
                                     supervisor.setAnnotEditFlag(true);
                                 }else if(modelData == "위치 초기화"){
+                                    supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO LOCALIZATION")
                                     map_mode = 4;
                                 }else if(modelData == "지정 순회"){
+                                    supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO PATROL")
                                     map_mode = 3;
                                 }
                             }
@@ -523,8 +526,10 @@ Item {
             anchors.fill: parent
             onClicked: {
                 if(map_mode==0 || is_init_state){
+                    supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO BACKPAGE "+Number(map_mode) + "," + Number(is_init_state))
                     backPage();
                 }else{
+                    supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO MAIN")
                     map_mode = 0;
                 }
             }
@@ -741,6 +746,7 @@ Item {
                                     if(is_mapping){
                                         popup_reset_mapping.open();
                                     }else{
+                                        supervisor.writelog("[USER INPUT] MAPPING PAGE : START MAPPING " + combobox_gridsize.currentText)
                                         if(combobox_gridsize.currentText === "3cm"){
                                             map.grid_size = 0.03;
                                             supervisor.startMapping(0.03);
@@ -749,6 +755,8 @@ Item {
                                             supervisor.startMapping(0.05);
                                         }
                                     }
+                                }else{
+                                    supervisor.writelog("[USER INPUT] MAPPING PAGE : START MAPPING -> BUT SLAM NOT CONNECTED")
                                 }
                             }
                         }
@@ -1081,9 +1089,11 @@ Item {
                     if(supervisor.is_slam_running()){
                         btn_auto_init.running = false;
                         timer_check_localization.stop();
+                        supervisor.writelog("[QML] CHECK LOCALIZATION -> STARTED")
                     }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
                         timer_check_localization.stop();
                         btn_auto_init.running = false;
+                        supervisor.writelog("[QML] CHECK LOCALIZATION -> NOT WORKING "+Number(supervisor.getLocalizationState()));
                     }
                 }
             }
@@ -1109,6 +1119,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[QML] MAP PAGE (LOCAL) -> MOVE")
                                 map.tool = "MOVE";
                                 map.reset_canvas();
                             }
@@ -1132,6 +1143,7 @@ Item {
                                     map.init_th  = supervisor.getlastRobotth();// - Math.PI/2;
                                     supervisor.setInitPos(map.init_x,map.init_y,map.init_th);
                                 }
+                                supervisor.writelog("[QML] MAP PAGE (LOCAL) -> LOCALIZATION MANUAL ")
                                 supervisor.slam_setInit();
                                 map.update_canvas();
                             }
@@ -1150,6 +1162,7 @@ Item {
                                     btn_auto_init.running = true;
                                     supervisor.slam_autoInit();
                                     timer_check_localization.start();
+                                    supervisor.writelog("[QML] MAP PAGE (LOCAL) -> LOCALIZATION AUTO ")
                                 }
 
                             }
@@ -1157,68 +1170,6 @@ Item {
                     }
                 }
             }
-            Rectangle{
-                width: rect_menus.width - 60
-                height: 100
-                visible: false;//map.tool==="SLAM_INIT"?true:false
-                anchors.top: rect_annot_box.bottom
-                anchors.topMargin: 50
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "transparent"
-                Row{
-                    anchors.centerIn: parent
-                    spacing: 20
-                    Item_button{
-                        id: btn_run
-                        width: 78
-                        icon:"icon/icon_run.png"
-                        name:"Run"
-                        shadow_color: color_gray
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                btn_run.show_ani();
-                                map.tool = "MOVE";
-                                map.reset_canvas();
-                                supervisor.slam_run();
-                            }
-                        }
-                    }
-                    Item_button{
-                        id: btn_stop
-                        width: 78
-                        icon:"icon/icon_stop.png"
-                        name:"Stop"
-                        shadow_color: color_gray
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                map.tool = "MOVE";
-                                map.reset_canvas();
-                                btn_stop.show_ani();
-                                supervisor.slam_stop();
-                            }
-                        }
-                    }
-                    Item_button{
-                        id: btn_init
-                        width: 78
-                        icon:"icon/icon_set_init.png"
-                        name:"Set Init"
-                        shadow_color: color_gray
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                if(map.new_slam_init){
-                                    btn_init.show_ani();
-                                    supervisor.slam_setInit();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             Rectangle{
                 width: parent.width*0.9
                 height: 200
@@ -1889,6 +1840,7 @@ Item {
                             onClicked: {
                                 // start random patrol (serving)
                                 if(supervisor.getuistate() === 2){//ROBOT READY
+                                    supervisor.writelog("[QML] MAP PAGE -> START RANDOM TABLES")
                                     supervisor.runRotateTables();
                                 }
 
@@ -1921,6 +1873,7 @@ Item {
                             onClicked: {
                                 // start random patrol (serving)
                                 if(supervisor.getuistate() === 2){//ROBOT READY
+                                    supervisor.writelog("[QML] MAP PAGE -> START RANDOM TABLES")
                                     supervisor.startServingTest();
                                 }
                             }
@@ -1996,6 +1949,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PASS TO DRAWING")
                                     supervisor.clear_all();
                                     map.state_annotation = "DRAWING";
                                     loader_menu.sourceComponent = menu_annot_draw;
@@ -2011,6 +1965,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PASS TO OBJECT")
                                     supervisor.clear_all();
                                     map.state_annotation = "OBJECT";
                                     loader_menu.sourceComponent = menu_annot_object;
@@ -2026,6 +1981,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PASS TO LOCATION")
                                     map.init_mode();
                                     map.state_annotation = "LOCATION";
                                     loader_menu.sourceComponent = menu_annot_location;
@@ -2042,6 +1998,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PASS TO TRAVELLINE")
                                     supervisor.clear_all();
                                     map.state_annotation = "TRAVELLINE";
                                     map.init_mode();
@@ -2277,6 +2234,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PREV (BACKPAGE)")
                                 map_mode = 0;
                             }
                         }
@@ -2299,6 +2257,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.writelog("[QML] MAP PAGE (ANNOT) -> NEXT (ROTATE)")
                                 map.state_annotation = "DRAWING";
                                 map.init_mode();
                                 map.show_connection = false;
@@ -2594,6 +2553,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PREV (ROTATE)")
                                 map.init_mode();
                                 map.state_annotation = "NONE";
                                 map.show_connection = false;
@@ -2621,12 +2581,15 @@ Item {
                             onClicked:{
                                 //변경한게 있으면(drawing or rotate)
                                 if(slider_rotate.value != 0){
+                                    supervisor.writelog("[QML] MAP PAGE (ANNOT) -> NEXT (DRAWING) ROTATE CHANGED : "+Number(slider_rotate.value.toFixed(1)))
                                     supervisor.setAnnotEditFlag(true);
                                     popup_save_rotated.open();
                                 }else if(state_map == 0){
                                     //raw파일이었으면
                                     popup_save_rotated.open();
+                                    supervisor.writelog("[QML] MAP PAGE (ANNOT) -> NEXT (DRAWING) NO EDITFILE")
                                 }else{
+                                    supervisor.writelog("[QML] MAP PAGE (ANNOT) -> NEXT (DRAWING)")
                                     //아무 변경이 없으면
                                     supervisor.clear_all();
                                     map.state_annotation = "DRAWING";
@@ -2692,6 +2655,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : DRAWING UNDO")
                             supervisor.undo();
                             map.update_canvas();
                         }
@@ -2710,12 +2674,14 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : DRAWING REDO")
                             supervisor.redo();
                             map.update_canvas();
                         }
                     }
                 }
             }
+
             Timer{
                 running: true
                 repeat: true
@@ -2726,6 +2692,7 @@ Item {
                         btn_undo.enabled = true;
                     else
                         btn_undo.enabled = false;
+
                     if(supervisor.getRedoSize() > 0)
                         btn_redo.enabled = true;
                     else
@@ -2767,6 +2734,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : DRAWING MOVE")
                                 map.tool = "MOVE";
                             }
                         }
@@ -2793,6 +2761,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : DRAWING BRUSH")
                                 map.tool = "BRUSH";
                             }
                         }
@@ -2817,6 +2786,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : DRAWING ERASE ALL")
                                 supervisor.clear_all();
                                 map.update_canvas();
                             }
@@ -2868,6 +2838,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
+                                            supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : DRAWING COLOR "+modelData)
                                             map.brush_color = color
                                             map.tool = "BRUSH";
                                         }
@@ -2963,6 +2934,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : PREV (ROTATE)")
                                 map.init_mode();
                                 map.state_annotation = "DRAWING";
                                 map.show_connection = false;
@@ -2991,20 +2963,20 @@ Item {
                                 popup_save_edited.unshow_rotate();
                                 //변경한게 있으면(drawing or rotate)
                                 if(supervisor.getCanvasSize() > 0){
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEXT (OBJECT) -> CANVAS SIZE > 0")
                                     supervisor.setAnnotEditFlag(true);
                                     popup_save_edited.open();
                                 }else if(state_map == 0){
                                     //raw파일이었으면
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEXT (OBJECT) -> NO EDITFILE")
                                     popup_save_edited.open();
                                 }else{
                                     //아무 변경이 없으면
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEXT (OBJECT)")
                                     supervisor.clear_all();
                                     map.state_annotation = "OBJECT";
                                     loader_menu.sourceComponent = menu_annot_object;
-
                                 }
-
-
                             }
                         }
                     }
@@ -3022,10 +2994,12 @@ Item {
 
             Component.onCompleted: {
                 if(supervisor.isExistTravelEdited(supervisor.getMapname())){
+                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : travel_edited.png Exist.")
                     map.loadmap(supervisor.getMapname(),"T_EDIT");
                     btn_load_raw_map.activated = false;
                     btn_load_map.activated = true;
                 }else{
+                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : travel_edited.png not Exist.")
                     map.loadmap(supervisor.getMapname(),"T_RAW");
                     btn_load_raw_map.activated = true;
                     btn_load_map.activated = false;
@@ -3079,6 +3053,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked:{
+                            supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> SET RAW FILE")
                             map.loadmap(supervisor.getMapname(),"T_RAW");
                             btn_load_raw_map.activated = true;
                             btn_load_map.activated = false;
@@ -3105,6 +3080,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked:{
+                            supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> SET EDITED FILE")
                             map.loadmap(supervisor.getMapname(),"T_EDIT");
                             btn_load_raw_map.activated = false;
                             btn_load_map.activated = true;
@@ -3132,6 +3108,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> UNDO")
                             supervisor.undo();
                             map.update_canvas();
                             if(map.state_annotation === "TRAVELLINE"){
@@ -3153,6 +3130,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> REDO")
                             supervisor.redo();
                             map.update_canvas();
                             if(map.state_annotation === "TRAVELLINE"){
@@ -3218,6 +3196,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> MOVE")
                                 map.tool = "MOVE";
                             }
                         }
@@ -3244,6 +3223,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> BRUSH")
                                 map.tool = "BRUSH";
                                 map.brush_color = "red"
                                 map.brush_size = slider_brush.value;
@@ -3272,6 +3252,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> ERASE")
                                 map.tool = "ERASE";
                                 map.brush_color = "black"
                                 map.brush_size = slider_erase.value;
@@ -3298,6 +3279,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> CLEAR ALL")
                                 supervisor.clear_all();
                                 map.update_canvas();
                                 if(map.state_annotation === "TRAVELLINE"){
@@ -3348,6 +3330,7 @@ Item {
                                     map.brush_size = value;
                                     print("slider : " +map.brush_size);
                                 }else{
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> BRUSH")
                                     map.tool = "BRUSH";
                                     map.brush_color = "red"
                                     map.brush_size = value;
@@ -3391,6 +3374,7 @@ Item {
                                     map.brush_size = value;
                                     print("slider : " +map.brush_size);
                                 }else{
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> ERASE")
                                     map.tool = "ERASE";
                                     map.brush_color = "black"
                                     map.brush_size = slider_erase.value;
@@ -3453,6 +3437,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : PREV (STATE)")
                                 map.init_mode();
                                 map.state_annotation = "NONE";
                                 map.show_connection = false;
@@ -3478,6 +3463,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TRAVEL LINE CONFIRM")
                                 popup_save_travelline.open();
                                 if(btn_load_map.activated){
                                     popup_save_travelline.edited_mode = true;
@@ -3592,6 +3578,7 @@ Item {
                         id:area_compo
                         anchors.fill:parent
                         onClicked: {
+                            supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : SELECT OBJECT "+Number(index))
                             map.select_object = supervisor.getObjNum(name);
                             list_object.currentIndex = index;
                             map.tool = "MOVE";
@@ -3639,6 +3626,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : OBJECT -> MOVE")
                                     map.tool = "MOVE";
                                     map.reset_canvas();
                                     supervisor.clearObjectPoints();
@@ -3669,6 +3657,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : OBJECT -> ADD")
                                     map.tool = "ADD_OBJECT";
                                 }
                             }
@@ -3698,6 +3687,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : OBJECT -> EDIT")
                                     map.tool = "EDIT_OBJECT";
                                 }
                             }
@@ -3725,6 +3715,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : OBJECT -> REMOVE")
                                     supervisor.removeObject(list_object.currentIndex);
                                     map.update_canvas();
                                 }
@@ -3770,6 +3761,8 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : OBJECT -> DRAW RECTANGLE")
+                                    supervisor.clearObjectPoints();
                                     map.tool = "ADD_OBJECT";
                                 }
                             }
@@ -3789,6 +3782,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : OBJECT -> DRAW POINT")
                                     map.tool = "ADD_POINT";
                                     supervisor.clearObjectPoints();
                                 }
@@ -3837,6 +3831,7 @@ Item {
                                     }else if(map.tool == "ADD_POINT"){
                                         supervisor.removeObjectPointLast();
                                     }
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : OBJECT -> UNDO")
                                     map.obj_sequence = 0;
                                     map.update_canvas();
                                 }
@@ -3910,6 +3905,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : PREV (DRAWING)")
                                 map.init_mode();
                                 map.show_connection = false;
                                 supervisor.clearObjectPoints();
@@ -3937,6 +3933,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : PREV (LOCATION)")
                                 //save temp Image
                                 map.init_mode();
                                 map.state_annotation = "LOCATION";
@@ -4081,6 +4078,7 @@ Item {
                         id:area_compo
                         anchors.fill:parent
                         onClicked: {
+                            supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : SELECT LOCATION "+Number(index))
                             map.select_location = supervisor.getLocNum(name);
                             list_location.currentIndex = index;
                             map.update_canvas();
@@ -4112,6 +4110,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> MOVE ")
                                     map.tool = "MOVE";
                                     map.reset_canvas();
                                 }
@@ -4126,6 +4125,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> LOCALIZATION MANUAL ")
                                     supervisor.slam_stop();
                                     map.tool = "SLAM_INIT";
                                     map.new_slam_init = true;
@@ -4151,6 +4151,7 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     if(supervisor.getLocalizationState() !== 1){
+                                        supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> LOCALIZATION AUTO ")
                                         btn_auto_init.running = true;
                                         supervisor.slam_autoInit();
                                         menu_location.checkInit = true;
@@ -4195,6 +4196,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> ADD ")
                                     map.tool = "ADD_LOCATION";
                                     map.reset_canvas();
                                 }
@@ -4223,6 +4225,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> EDIT ")
                                     map.tool = "EDIT_LOCATION";
                                 }
                             }
@@ -4251,6 +4254,7 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     if(list_location.currentIndex > 0){
+                                        supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> REMOVE "+Number(list_location.currentIndex))
                                         map.select_location = list_location.currentIndex-1;
                                         supervisor.removeLocation(list_location.model.get(list_location.currentIndex).name);
                                         map.update_canvas();
@@ -4294,6 +4298,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> ADD CANCEL")
                                     map.tool = "MOVE";
                                     map.reset_canvas();
                                     map.new_location = false;
@@ -4342,6 +4347,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> ADD CUR POSITION")
                                     popup_add_location.open();
                                     popup_add_location.curpose_mode = true;
                                 }
@@ -4383,6 +4389,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> CANCEL EDIT")
                                     map.tool = "MOVE";
                                     map.reset_canvas();
                                     map.select_location = -1;
@@ -4413,6 +4420,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> EDIT" +Number(map.select_location) +" CUR POSITION")
                                     supervisor.moveLocationPoint(map.select_location, map.robot_x, map.robot_y, supervisor.getRobotth());
                                     map.select_location = -1;
                                     map.select_location_show = -1;
@@ -4453,45 +4461,6 @@ Item {
                         border.color: "black"
                     }
                 }
-
-//                Row{
-//                    anchors.horizontalCenter: parent.horizontalCenter
-//                    spacing: 60
-//                    Item_joystick{
-//                        id: joy_xy
-//                        show_arrow: false
-//                        verticalOnly: true
-//                        onUpdate_cntChanged: {
-//                            if(update_cnt == 0 && supervisor.getJoyXY() != 0){
-//                                supervisor.joyMoveXY(0, 0);
-//                            }else if(update_cnt > 2){
-//                                if(fingerInBounds) {
-//                                    supervisor.joyMoveXY(Math.sin(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-//                                }else{
-//                                    supervisor.joyMoveXY(Math.sin(angle));
-//                                }
-//                            }
-//                        }
-//                    }
-//                    Item_joystick{
-//                        id: joy_th
-//                        show_arrow: false
-//                        horizontalOnly: true
-//                        onUpdate_cntChanged: {
-//                            if(update_cnt == 0 && supervisor.getJoyR() != 0){
-//                                supervisor.joyMoveR(0, 0);
-//                            }else if(update_cnt > 2){
-//                                if(fingerInBounds) {
-//                                    supervisor.joyMoveR(-Math.cos(angle) * Math.sqrt(fingerDistance2) / distanceBound);
-//                                } else {
-//                                    supervisor.joyMoveR(-Math.cos(angle));
-//                                }
-//                            }
-//                        }
-//                    }
-
-//                }
-
             }
 
            Column{
@@ -4539,6 +4508,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : PRVE(OBJECT)")
                                 map.init_mode();
                                 map.show_connection = false;
                                 map.state_annotation = "OBJECT";
@@ -4564,6 +4534,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : PRVE(SAVE)")
                                 map.init_mode();
                                 map.show_connection = false;
                                 map.state_annotation = "SAVE";
@@ -4592,17 +4563,20 @@ Item {
 
             Component.onCompleted: {
                 if(state_annot === 0){
+                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEED SAVE (NO ANNOTATION)")
                     rect_state_annot.color = "#4F5666"
                     state_text_annot.text = "저장이 필요합니다."
                     state_text_annot.anchors.rightMargin = 20
                     btn_add1.border.width = 0
                 }else if(state_annot === 1){
                     if(supervisor.getAnnotEditFlag()){
+                        supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEED SAVE (EDITED)")
                         rect_state_annot.color = "#EE9D44"
                         state_text_annot.text = "저장이 필요합니다."
                         state_text_annot.anchors.rightMargin = 20
                         btn_add1.border.width = 0
                     }else{
+                        supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : DON'T NEED SAVE")
                         rect_state_annot.color = "#12d27c"
                         state_text_annot.text = "Confirm"
                         state_text_annot.anchors.rightMargin = 50
@@ -4610,7 +4584,6 @@ Item {
                         state_annot = 2;
                     }
                 }
-
 
                 if(state_annot === 2 && !supervisor.getAnnotEditFlag()){
                     btn_next_0.enabled = true;
@@ -4741,6 +4714,7 @@ Item {
                         anchors.fill: parent
                         onClicked: {
                             if(supervisor.saveAnnotation(map.map_name)){
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : SAVE ANNOTATION")
                                 btn_add1.border.width = 3;
                                 state_annot = 2;
                                 rect_state_annot.color = "#12d27c"
@@ -4855,6 +4829,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : PREV (LOCATION)")
                                 map.init_mode();
                                 map.state_annotation = "LOCATION";
                                 loader_menu.sourceComponent = menu_annot_location;
@@ -4885,6 +4860,7 @@ Item {
                                 }else{
                                     map_mode = 0;
                                 }
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : CONFIRM SAVE ALL")
                                 //맵 다시 불러오기
                                 supervisor.setMap(supervisor.getMapname());
                                 map_current.map_mode = "EDITED";
@@ -4934,8 +4910,7 @@ Item {
             joystick_connection = supervisor.isconnectJoy();
             if(joystick_connection){
                 if(joy_init){
-//                    print(joy_axis_left_ud,joy_axis_right_rl,supervisor.getJoyAxis(1),supervisor.getJoyAxis(2))
-                    if(joy_axis_left_ud == supervisor.getJoyAxis(1) && joy_axis_right_rl == supervisor.getJoyAxis(2)){
+                    if(joy_axis_left_ud === supervisor.getJoyAxis(1) && joy_axis_right_rl === supervisor.getJoyAxis(2)){
 
                     }else{
                         joy_axis_left_ud = supervisor.getJoyAxis(1);
@@ -4962,8 +4937,6 @@ Item {
                 joy_init = false;
                 joy_axis_left_ud = 0;
                 joy_axis_right_rl = 0;
-//                joy_xy.remote_stop();
-//                joy_th.remote_stop();
             }
         }
     }
@@ -4976,15 +4949,18 @@ Item {
         onTriggered: {
             if(supervisor.getLocalizationState() === 2){
                 if(slam_initializing == false){
+                    supervisor.writelog("[QML] SLAM INIT : SUCCESS")
                     slam_initializing = true;
+                    check_slam_init_timer.stop();
                 }
             }else{
                 if(slam_initializing){
+                    supervisor.writelog("[QML] SLAM INIT : FAILED. ")
                     slam_initializing = false;
                     check_slam_init_timer.stop();
                 }else{
                     if(trigger_cnt++ > 10){
-                        print("slam auto init fail");
+                        supervisor.writelog("[QML] SLAM INIT : FAILED. TIMEOVER")
                         check_slam_init_timer.stop();
                     }
                 }
@@ -5047,7 +5023,6 @@ Item {
         folder: "file:"+homePath+"/maps"
         onAccepted: {
             print(filesavemeta.file.toString())
-
             supervisor.saveMetaData(filesavemeta.file.toString());
         }
     }
@@ -5117,7 +5092,6 @@ Item {
                             text: "취소"
                             font.family: font_noto_r.name
                             font.pixelSize: 25
-
                         }
                         MouseArea{
                             anchors.fill: parent
@@ -5145,6 +5119,7 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 show_loading();
+                                supervisor.writelog("[USER INPUT] USE MAP "+map.map_name);
                                 supervisor.setMap(map.map_name);
                                 popup_map_use.close();
                                 backPage();
@@ -5335,6 +5310,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                supervisor.writelog("[USER INPUT] RESET MAPPING ");
                                 supervisor.stopMapping();
                                 popup_reset_mapping.close();
 //                                if(combobox_gridsize.currentText === "3cm"){
@@ -5369,7 +5345,7 @@ Item {
             interval: 100
             onTriggered:{
                 if(!supervisor.getLCMConnection()){
-                    print("LCMCONNECTION FALSE");
+                    supervisor.writelog("[QML] MAP PAGE : SLAM RESTART DETECTED");
                     //맵 새로 불러오기.
                     map.init_mode();
                     map.show_connection = false;
@@ -5486,6 +5462,7 @@ Item {
                                 if(textfield_name22.text == ""){
                                 }else{
                                     show_loading();
+                                    supervisor.writelog("[QML] MAP PAGE : SAVE MAPPING "+textfield_name22.text);
                                     timer_check_slam.start();
                                     supervisor.saveMapping(textfield_name22.text);
                                     supervisor.setMap(textfield_name22.text);
@@ -5521,7 +5498,6 @@ Item {
             height: 250
             color: "white"
             radius: 10
-
             Column{
                 anchors.centerIn: parent
                 spacing: 20
@@ -5587,18 +5563,14 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 show_loading();
-                                if(map.map_name == "map_raw.png"){
-                                    var text = "map_edited.png"
-                                }else{
-                                    text = map.map_name
-                                }
 
+                                supervisor.writelog("[QML] MAP PAGE : SAVE ROTATE MAP "+map.map_name);
                                 //save temp Image
-                                map.save_map(text);
+                                map.save_map(map.map_name);
                                 map.rotate_map(0);
 
                                 //맵 새로 불러오기.
-                                map.loadmap(text,"EDITED");
+                                map.loadmap(map.map_name,"EDITED");
                                 map.setfullscreen();
                                 supervisor.clear_all();
                                 supervisor.deleteAnnotation();
@@ -5730,6 +5702,8 @@ Item {
                                 if(textfield_name.text == ""){
                                 }else{
                                     show_loading();
+
+                                    supervisor.writelog("[QML] MAP PAGE : SAVE EDITED MAP "+textfield_name.text);
                                     //save temp Image
                                     map.save_map(textfield_name.text);
 
@@ -5832,6 +5806,7 @@ Item {
                             onClicked:{
                                 //save temp Image
                                 show_loading();
+                                supervisor.writelog("[QML] MAP PAGE : SAVE TRAVELLINE "+map.map_name);
                                 map.save_patrol(popup_save_travelline.edited_mode);
                                 supervisor.clear_all();
                                 map.init_mode();
@@ -6080,6 +6055,7 @@ Item {
                         }else{
                             supervisor.addObject(select_object_type);
                         }
+                        supervisor.writelog("[QML] MAP PAGE : SAVE OBJECT -> "+select_object_type + "_" + Number(supervisor.getObjectSize(select_object_type)));
                         map.update_canvas();
                         map.tool = "MOVE";
                         map.obj_sequence = 0;
@@ -6120,6 +6096,7 @@ Item {
             if(supervisor.getObsState()){
                 btn_next_000.enabled = false;
                 obs_col.visible = true;
+                supervisor.writelog("[QML] MAP PAGE : SAVE LOCATION -> BUT OBS CLOSE");
             }else{
                 btn_next_000.enabled = true;
                 obs_col.visible = false;
@@ -6308,6 +6285,7 @@ Item {
                                 print(map.new_loc_th);
                                 supervisor.addLocation(select_location_type,tfield_location.text, map.new_loc_x, map.new_loc_y, map.new_loc_th);
                             }
+                            supervisor.writelog("[QML] MAP PAGE : SAVE LOCATION -> "+tfield_location.text);
                             map.tool = "MOVE";
                             map.reset_canvas();
                             map.new_location = false;

@@ -223,11 +223,11 @@ Window {
         }
     }
     function show_loading(){
-        print("SHOW")
+        supervisor.writelog("[QML] SHOW LOADING")
         rect_loading.open();
     }
     function unshow_loading(){
-        print("UNSHOW")
+        supervisor.writelog("[QML] UNSHOW LOADING")
         rect_loading.close();
     }
     function show_resting(){

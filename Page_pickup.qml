@@ -16,6 +16,7 @@ Item {
     property bool pickup_3: false
 
     function init(){
+        supervisor.writelog("[QML] PICKUP PAGE Init");
         pickup_1 = false;
         pickup_2 = false;
         pickup_3 = false;
@@ -152,7 +153,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    console.log("UI : CONFIRM");
+                    supervisor.writelog("[USER INPUT] PICKUP CONFIRM clicked");
                     voice_pickup.stop();
                     voice_thanks.play();
                     text_mention.visible = false;
@@ -210,7 +211,7 @@ Item {
         repeat: false
         onTriggered: {
             supervisor.confirmPickup();
-            console.log("UI : MOVE NEXT");
+            supervisor.writelog("[QML] PICKUP PAGE -> Move to Next");
         }
     }
 }

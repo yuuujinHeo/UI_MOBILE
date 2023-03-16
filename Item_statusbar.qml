@@ -268,6 +268,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            supervisor.writelog("[USER INPUT] STATUS BAR : MINIMIZED")
                             supervisor.programHide();
                             mainwindow.showMinimized()
                         }
@@ -288,6 +289,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            supervisor.writelog("[USER INPUT] STATUS BAR : PROGRAM EXIT")
                             supervisor.programExit();
                         }
                     }

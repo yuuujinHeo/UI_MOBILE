@@ -116,6 +116,13 @@ QObject *Supervisor::getObject()
     //rootobject를 리턴해준다.
     return mObject;
 }
+void Supervisor::programRestart(){
+    plog->write("[USER INPUT] PROGRAM RESTART");
+    slam_process->kill();
+    QProcess::startDetached(QApplication::applicationFilePath());
+    QApplication::exit(12);
+
+}
 void Supervisor::programExit(){
     plog->write("[USER INPUT] PROGRAM EXIT");
     slam_process->kill();
@@ -218,9 +225,7 @@ void Supervisor::setSetting(QString name, QString value){
     QString ini_path = getIniPath();
     QSettings setting(ini_path, QSettings::IniFormat);
     setting.setValue(name,value);
-//    qDebug() << value;
     plog->write("[SETTING] SET "+name+" VALUE TO "+value);
-//    readSetting();
 }
 QString Supervisor::getSetting(QString group, QString name){
     QString ini_path = getIniPath();
@@ -280,9 +285,14 @@ void Supervisor::readSetting(QString map_name){
     pmap->left_camera = setting_robot.value("left_camera").toString();
     pmap->right_camera = setting_robot.value("right_camera").toInt();
     setting_robot.endGroup();
+
+
+
     if(map_name == ""){
         map_name = pmap->map_name;
     }
+
+    plog->write("[SUPERVISOR] READ SETTING : "+map_name);
     //Map Meta Data======================================================================
     ini_path = getMetaPath(map_name);
     QSettings setting_meta(ini_path, QSettings::IniFormat);
@@ -438,6 +448,7 @@ void Supervisor::readSetting(QString map_name){
 
     QMetaObject::invokeMethod(mMain, "update_ini");
 }
+
 void Supervisor::setVelocity(float vel){
     probot->velocity = vel;
     setSetting("ROBOT_SW/velocity",QString::number(vel));
@@ -554,18 +565,7 @@ int Supervisor::getCameraNum(){
     return pmap->camera_info.size();
 }
 QList<int> Supervisor::getCamera(int num){
-//    try{
-//        Q_ASSERT(num >= 0 && num < pmap->camera_info.size());
-//        qDebug() << pmap->camera_info.size();
-//        qDebug() << pmap->camera_info.at(3).serial;
-//    }catch(const std::out_of_range& e){
-//        qDebug() <<"index error";
-//    }catch(...){
-//        qDebug() << "...";
-//    }
-
     try{
-//        if(num > -1 && num < pmap->camera_info.size()) throw num;
         return pmap->camera_info[num].data;
     }catch(...){
         qDebug() << "Something Wrong to get Camera " << num << pmap->camera_info.size();
@@ -575,18 +575,11 @@ QList<int> Supervisor::getCamera(int num){
 }
 QString Supervisor::getCameraSerial(int num){
     try{
-//        if(num > -1 && num < pmap->camera_info.size()) throw num;
         return pmap->camera_info[num].serial;
     }catch(...){
         qDebug() << "Something Wrong to get Camera Serial " << num << pmap->camera_info.size();
         return "";
     }
-
-//    if(num > -1 && num < pmap->camera_info.size()){
-//        return pmap->camera_info[num].serial;
-//    }else{
-//        return "";
-//    }
 }
 
 
@@ -1370,8 +1363,6 @@ QObject *Supervisor::getMinimap(QString filename) const{
     return pc;
 }
 
-
-
 QObject *Supervisor::getMap(QString filename) const{
     PixmapContainer *pc = new PixmapContainer();
     QString file_path = QDir::homePath()+"/maps/"+filename+"/map_edited.png";
@@ -1433,7 +1424,6 @@ QObject *Supervisor::getRawMap(QString filename) const{
 }
 
 cv::Mat map_test;
-
 QObject *Supervisor::getTravelRawMap(QString filename) const{
     PixmapContainer *pc = new PixmapContainer();
     QString file_path = QDir::homePath()+"/maps/"+filename+"/travel_raw.png";
@@ -1493,10 +1483,8 @@ QObject *Supervisor::getTravel(QList<int> canvas) const{
     return pc;
 }
 
-
 QObject *Supervisor::getTest(QList<int> canvas) const{
     PixmapContainer *pc = new PixmapContainer();
-
     cv::Mat argb_map = map_test;
     pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(argb_map));
     Q_ASSERT(!pc->pixmap.isNull());
@@ -1619,8 +1607,6 @@ void Supervisor::usb_detect(){
     usb_check = true;
     usb_check_count = 0;
 }
-
-
 
 
 
@@ -3097,69 +3083,57 @@ void Supervisor::onTimer(){
     static int prev_local_state = -1;
 
     if(lcm->isconnect){
-        //init_state 확인
-        if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY){
-            // 로봇연결되면 Charging 상태 확인
-            if(probot->running_state == ROBOT_MOVING_NOT_READY){
-                if(probot->status_charge == 1){
-                    if(ui_state != UI_STATE_CHARGING && ui_state != UI_STATE_NONE){
-                        plog->write("[LCM] Charging Start -> UI_STATE = UI_STATE_CHARGING");
-                        ui_state = UI_STATE_CHARGING;
-                        QMetaObject::invokeMethod(mMain, "docharge");
+        if(ui_state != UI_STATE_NONE){
+            if(probot->status_charge == 1){
+                if(ui_state != UI_STATE_CHARGING){
+                    plog->write("[LCM] Charging Start -> UI_STATE = UI_STATE_CHARGING");
+                    ui_state = UI_STATE_CHARGING;
+                    QMetaObject::invokeMethod(mMain, "docharge");
+                }
+            }else if(probot->motor_state == MOTOR_NOT_READY){
+                if(prev_motor_state != probot->motor_state){
+                    plog->write("[LCM] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
+                    if(ui_state != UI_STATE_MOVEFAIL){
+                        ui_state = UI_STATE_MOVEFAIL;
                     }
-                }else{
-                    if(prev_running_state != probot->running_state){
-                        if(probot->running_state == ROBOT_MOVING_NOT_READY){
-                            if(ui_state != UI_STATE_NONE && ui_state != UI_STATE_MOVEFAIL){
-                                plog->write("[LCM] NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
-                                ui_state = UI_STATE_MOVEFAIL;
-                            }
-                        }
+                }
+            }else if(probot->localization_state == LOCAL_NOT_READY){
+                if(prev_local_state != probot->localization_state){
+                    plog->write("[LCM] LOCAL NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
+                    if(ui_state != UI_STATE_MOVEFAIL){
+                        ui_state = UI_STATE_MOVEFAIL;
+                    }
+                }
+            }else if(probot->localization_state == LOCAL_FAILED){
+                if(prev_local_state != probot->localization_state){
+                    plog->write("[LCM] LOCAL FAILED -> UI_STATE = UI_STATE_MOVEFAIL");
+                    if(ui_state != UI_STATE_MOVEFAIL){
+                        ui_state = UI_STATE_MOVEFAIL;
+                    }
+                }
+            }else if(probot->running_state == ROBOT_MOVING_NOT_READY){
+                if(prev_running_state != probot->running_state){
+                    if(ui_state != UI_STATE_MOVEFAIL){
+                        plog->write("[LCM] RUNNING NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
+                        ui_state = UI_STATE_MOVEFAIL;
                     }
                 }
             }else if(probot->running_state == ROBOT_MOVING_WAIT){
                 plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");
                 QMetaObject::invokeMethod(mMain, "excuseme");
-            }else{
-                if(ui_state == UI_STATE_INIT_DONE || ui_state == UI_STATE_NONE){
+            }else if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY){
+                if(ui_state == UI_STATE_INIT_DONE){
                     plog->write("[LCM] INIT ALL DONE -> UI_STATE = UI_STATE_READY");
                     ui_state = UI_STATE_READY;
-                }
-            }
-        }else if(probot->status_charge == 1){
-            if(ui_state != UI_STATE_CHARGING){// && ui_state != UI_STATE_NONE){
-                plog->write("[LCM] Charging Start -> UI_STATE = UI_STATE_CHARGING");
-                ui_state = UI_STATE_CHARGING;
-                QMetaObject::invokeMethod(mMain, "docharge");
-            }
-        }else if(probot->localization_state != LOCAL_START){
-            //MoveFail이 우선!! State Check
-            if(prev_running_state != probot->running_state){
-                if(probot->running_state == ROBOT_MOVING_NOT_READY){
-                    if(probot->status_charge == 1){
-                        if(ui_state != UI_STATE_CHARGING && ui_state != UI_STATE_MOVEFAIL && ui_state != UI_STATE_NONE){
-                            plog->write("[LCM] Charging Start -> UI_STATE = UI_STATE_CHARGING");
-                            ui_state = UI_STATE_CHARGING;
-                            QMetaObject::invokeMethod(mMain, "docharge");
-                        }
-                    }else{
-                        if(ui_state != UI_STATE_NONE && ui_state != UI_STATE_MOVEFAIL){
-                            plog->write("[LCM] NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
-                            ui_state = UI_STATE_MOVEFAIL;
-                        }
-                    }
-                }else if(probot->running_state == ROBOT_MOVING_WAIT){
-                    plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");
-                    QMetaObject::invokeMethod(mMain, "excuseme");
                 }
             }
         }
     }else{
         // 로봇연결이 끊어졌는데 ui_state가 NONE이 아니면
         if(ui_state != UI_STATE_NONE){
+            plog->write("[LCM] DISCONNECT -> UI_STATE = NONE");
             ui_state = UI_STATE_NONE;
             QMetaObject::invokeMethod(mMain, "stateinit");
-            plog->write("[LCM] DISCONNECT -> UI_STATE = NONE");
         }
     }
 
@@ -3202,6 +3176,7 @@ void Supervisor::onTimer(){
     case UI_STATE_CHARGING:{
         if(ui_cmd == UI_CMD_MOVE_WAIT){
             ui_state = UI_STATE_GO_HOME;
+            plog->write("[SUPERVISOR] UI_STATE = GO HOME");
             ui_cmd = UI_CMD_NONE;
         }
         break;
@@ -3476,14 +3451,10 @@ void Supervisor::onTimer(){
     }
     }
 
-
-
-
     prev_state = ui_state;
     prev_running_state = probot->running_state;
     prev_motor_state = probot->motor_state;
     prev_local_state = probot->localization_state;
-
 
 //    // 로봇 상태가 에러가 아니면 에러 초기화
 //    if(probot->state != ROBOT_STATE_ERROR)

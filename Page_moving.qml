@@ -23,6 +23,7 @@ Item {
     }
 
     function init(){
+        supervisor.writelog("[QML] MOVING PAGE init")
         popup_pause.visible = false;
         robot_paused = false;
         playMusic.play();
@@ -127,12 +128,12 @@ Item {
                 password = 0;
                 if(robot_paused){
                     move_fail = false;
-                    console.log("UI : RESUME");
+                    supervisor.writelog("[USER INPUT] MOVING RESUME")
                     supervisor.moveResume();
                     timer_check_pause.start();
                 }else{
                     move_fail = false;
-                    console.log("UI : PAUSE");
+                    supervisor.writelog("[USER INPUT] MOVING PAUSE")
                     supervisor.movePaused();
                     timer_check_pause.start();
                 }
@@ -151,9 +152,10 @@ Item {
         z: 99
         onClicked: {
             password++;
-            print(password);
+            supervisor.writelog("[USER INPUT] MOVING PASSWORD "+Number(password));
             if(password > 4){
                 password = 0;
+                supervisor.writelog("[USER INPUT] ENTER THE MOVEFAIL PAGE "+Number(password));
                 loadPage(pmovefail);
                 loader_page.item.setNotice(3);
             }
@@ -169,18 +171,18 @@ Item {
             if(supervisor.getStateMoving() === 4){
                 robot_paused = true;
                 popup_pause.visible = true;
-                print("robot_paused = true");
+                supervisor.writelog("[QML] CHECK MOVING STATE : PAUSED")
                 timer_check_pause.stop();
             }else if(supervisor.getStateMoving() === 0){
                 robot_paused = true;
                 popup_pause.visible = true;
-                print("robot_paused = true, move fail");
+                supervisor.writelog("[QML] CHECK MOVING STATE : NOT READY")
                 move_fail = true;
                 timer_check_pause.stop();
             }else{
                 popup_pause.visible = false;
                 robot_paused = false;
-                print("robot_paused = false");
+                supervisor.writelog("[QML] CHECK MOVING STATE : "+Number(supervisor.getStateMoving()));
                 timer_check_pause.stop();
             }
         }
@@ -191,11 +193,11 @@ Item {
         anchors.fill: parent
         onClicked: {
             if(robot_paused){
-                console.log("UI : RESUME");
+                supervisor.writelog("[USER INPUT] MOVING RESUME 2")
                 supervisor.moveResume();
                 timer_check_pause.start();
             }else{
-                console.log("UI : PAUSE");
+                supervisor.writelog("[USER INPUT] MOVING PAUSE 2")
                 supervisor.movePause();
                 timer_check_pause.start();
 
