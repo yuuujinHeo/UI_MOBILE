@@ -966,6 +966,8 @@ Item {
                         timer_wait_lcm.start();
                     }
                 }
+            }else if(supervisor.getChargeStatus() === 1){
+                dochargeininit();
             }else if(init_mode == 3){
                 if(supervisor.getLCMConnection() && supervisor.getLocalizationState() === 2){
                     init_mode = 4;
@@ -974,7 +976,6 @@ Item {
                         loader_init.sourceComponent = item_slam_init
                     }
                 }
-
             }else if(init_mode == 4){
                 if(supervisor.getLCMConnection() && supervisor.getMotorState() === 1){
                     supervisor.writelog("[QML] INIT ALL DONE -> ROBOT READY")

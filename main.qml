@@ -143,6 +143,11 @@ Window {
         loadPage(pcharging)
         supervisor.writelog("[QML - MAIN] Do Charging");
     }
+    function dochargeininit(){
+        loadPage(pcharging)
+        loader_page.item.setInit();
+        supervisor.writelog("[QML - MAIN] Do Charging");
+    }
     function waitkitchen(){
         loadPage(pkitchen)
         supervisor.writelog("[QML - MAIN] Do Wait Kitchen");
