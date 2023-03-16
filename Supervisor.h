@@ -74,6 +74,7 @@ public:
     QQuickWindow *getWindow();
     void setObject(QObject* object);
     QObject* getObject();
+    Q_INVOKABLE void programRestart();
     Q_INVOKABLE void programExit();
     Q_INVOKABLE void programHide();
     Q_INVOKABLE void writelog(QString msg);

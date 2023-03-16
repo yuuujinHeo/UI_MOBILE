@@ -27,15 +27,15 @@ Item {
     property int notice_num: 0
     onNotice_numChanged: {
         if(notice_num === 0){
-            text.text = "목적지로 이동하는데 실패하였습니다.\nEmergency 버튼을 누르고 로봇을 수동으로 이동시켜주세요."
+            text.text = "목적지로 이동하는데 실패하였습니다.\비상스위치 버튼을 누르고 로봇을 수동으로 이동시켜주세요."
         }else if(notice_num === 1){
-            text.text = "로봇의 초기화가 필요합니다.\nLocalization을 다시 수행해주세요."
+            text.text = "로봇의 초기화가 필요합니다.\n 위치초기화를 다시 수행해주세요."
         }else if(notice_num === 2){
-            text.text = "Emergency가 눌렸습니다.\n 로봇을 수동으로 이동시켜주세요."
+            text.text = "비상스위치가 눌렸습니다.\n 로봇을 수동으로 이동시켜주세요."
         }else if(notice_num === 3){
             text.text = "사용자에 의해 정지되었습니다."
         }else if(notice_num === 4){
-            text.text = "목적지로 이동하는데 실패하였습니다.\nEmergency 버튼을 누르고 로봇을 수동으로 이동시켜주세요."
+            text.text = "목적지로 이동하는데 실패하였습니다.\n 비상스위치 버튼을 누르고 로봇을 수동으로 이동시켜주세요."
         }
     }
 
@@ -58,6 +58,7 @@ Item {
     }
 
     function init(){
+        supervisor.writelog("[QML] MOVEFAIL PAGE init")
         notice_num = 0;
         statusbar.visible = true;
         notice.y = 0;
@@ -145,6 +146,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : RESTART")
                             supervisor.moveStop();
                         }
                     }
@@ -181,10 +183,13 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            if(select_localmode)
+                            if(select_localmode){
+                                supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : LOCALIZATION STOP")
                                 select_localmode = false;
-                            else
+                            }else{
+                                supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : LOCALIZATION START")
                                 select_localmode = true;
+                            }
                         }
                     }
                 }
@@ -217,6 +222,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : RESTART SLAM")
                             supervisor.restartSLAM();
                         }
                     }
@@ -630,9 +636,11 @@ Item {
             interval: 500
             onTriggered:{
                 if(supervisor.is_slam_running()){
+                    supervisor.writelog("[QML] CHECK LOCALIZATION : STARTED")
                     btn_auto_init.running = false;
                     timer_check_localization.stop();
                 }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
+                    supervisor.writelog("[QML] CHECK LOCALIZATION : FAILED OR NOT READY "+Number(supervisor.getLocalizationState()));
                     timer_check_localization.stop();
                     btn_auto_init.running = false;
                 }
@@ -696,6 +704,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : LOCALIZATION MANUAL")
                                     map.tool = "SLAM_INIT";
                                     map.new_slam_init = true;
                                     if(supervisor.getGridWidth() > 0){
@@ -717,12 +726,12 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : LOCALIZATION AUTO")
                                     if(supervisor.getLocalizationState() !== 1){
                                         btn_auto_init.running = true;
                                         supervisor.slam_autoInit();
                                         timer_check_localization.start();
                                     }
-
                                 }
                             }
                         }
@@ -733,7 +742,6 @@ Item {
                 width: parent.width*0.9
                 height: 200
                 radius: 10
-//                anchors.bottom: parent.bottom
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 50
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -826,7 +834,6 @@ Item {
                     }
                 }
             }
-
         }
 
         Map_full{
@@ -846,7 +853,6 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: statusbar.height
         }
-
     }
     Item{
         id: notice
@@ -858,7 +864,6 @@ Item {
                 easing.type: Easing.OutCubic
             }
         }
-
         Rectangle{
             anchors.fill: parent
             color:"#282828"
@@ -872,7 +877,6 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: 200
         }
-
         Text{
             id: text
             text:"목적지로 이동하는데 실패하였습니다.\n비상스위치 버튼을 누르고 로봇을 수동으로 이동시켜주세요."
@@ -917,14 +921,15 @@ Item {
         }
         onReleased: {
             if(firstY - mouseY > 100){
+                supervisor.writelog("[USER INPUT] SWIPE MOVEFAIL PAGE TO DOWN "+Number(firstY - mouseY).toFixed(0))
                 notice.y = -800;
                 area_swipe.enabled = false;
 //                timer_get_joy.start();
             }else{
+                supervisor.writelog("[USER INPUT] SWIPE MOVEFAIL PAGE TO UP "+Number(firstY - mouseY).toFixed(0))
                 notice.y = 0;
             }
         }
-
         onPositionChanged: {
             if(firstY - mouseY > 0){
                 notice.y =  mouseY - firstY;
@@ -937,21 +942,6 @@ Item {
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_obs_too_close.mp3"
-    }
-    Timer{
-        id: timer_check_pause
-        interval: 500
-        running: false
-        repeat: true
-        onTriggered: {
-            if(supervisor.getStateMoving() === 4){
-                supervisor.moveResume();
-            }else{
-                backPage();
-                loader_page.item.checkPaused();
-                timer_check_pause.stop();
-            }
-        }
     }
 
     Timer{

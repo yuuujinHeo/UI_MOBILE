@@ -1,4 +1,8 @@
-import QtQuick 2.0
+import QtQuick 2.12
+import QtQuick.Controls 2.12
+import QtGraphicalEffects 1.0
+import "."
+import io.qt.Supervisor 1.0
 
 Item {
     id: page_menu
@@ -202,7 +206,148 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        supervisor.programExit();
+                        popup_program_exit.open();
+//                        supervisor.programExit();
+                    }
+                }
+            }
+        }
+    }
+
+    Popup{
+        id: popup_program_exit
+        width: parent.width
+        height: parent.height
+        anchors.centerIn: parent
+        visible: false
+
+        background:Rectangle{
+            anchors.fill: parent
+            color: "#282828"
+            opacity: 0.8
+        }
+//        Image{
+//            id: image_location
+//            source:"image/image_location.png"
+//            width: 160
+//            height: 160
+//            anchors.horizontalCenter: parent.horizontalCenter
+//            anchors.top: parent.top
+//            anchors.topMargin: 200
+//        }
+        Column{
+            spacing: 50
+            anchors.centerIn: parent
+            Text{
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.family: font_noto_b.name
+                font.pixelSize: 40
+                color: "#12d27c"
+                text: "프로그램을 종료<font color=\"white\">하시겠습니까?</font>"
+            }
+            Row{
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                spacing: 30
+                Rectangle{
+                    width: 200
+                    height: 90
+                    radius: 20
+                    color: "#d0d0d0"
+                    Image{
+                        id: image_no
+                        source: "icon/btn_no.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: 20
+                    }
+                    Text{
+                        id:text_nono
+                        text:"취소"
+                        font.family: font_noto_b.name
+                        font.pixelSize: 30
+                        color:"#282828"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: image_no.right
+                        anchors.leftMargin : (parent.width - image_no.x - image_no.width)/2 - text_nono.width/2
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_program_exit.close();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 200
+                    height: 90
+                    radius: 20
+                    color: "#d0d0d0"
+                    Rectangle{
+                        color:"white"
+                        width: 190
+                        height: 80
+                        radius: 19
+                        anchors.centerIn: parent
+                    }
+                    Image{
+                        id: image_yes
+                        source: "icon/btn_yes.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: 20
+                    }
+                    Text{
+                        text:"종료"
+                        font.family: font_noto_b.name
+                        font.pixelSize: 30
+                        color:"#282828"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: image_yes.right
+                        anchors.leftMargin : (parent.width - image_yes.x - image_yes.width)/2 - width/2
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.programExit();
+                            popup_program_exit.close();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 200
+                    height: 90
+                    radius: 20
+                    color: "#d0d0d0"
+                    Rectangle{
+                        color:"white"
+                        width: 190
+                        height: 80
+                        radius: 19
+                        anchors.centerIn: parent
+                    }
+                    Image{
+                        id: image_yes2
+                        source: "icon/btn_yes.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: 20
+                    }
+                    Text{
+                        text:"다시시작"
+                        font.family: font_noto_b.name
+                        font.pixelSize: 30
+                        color:"#282828"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: image_yes2.right
+                        anchors.leftMargin : (parent.width - image_yes2.x - image_yes2.width)/2 - width/2
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.programRestart();
+                            popup_program_exit.close();
+                        }
                     }
                 }
             }
