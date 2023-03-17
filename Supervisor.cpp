@@ -3082,8 +3082,11 @@ void Supervisor::onTimer(){
     static int prev_motor_state = -1;
     static int prev_local_state = -1;
 
+    static int state_count = 0;
+
     if(lcm->isconnect){
         if(ui_state != UI_STATE_NONE){
+            state_count = 0;
             if(probot->status_charge == 1){
                 if(ui_state != UI_STATE_CHARGING){
                     plog->write("[LCM] Charging Start -> UI_STATE = UI_STATE_CHARGING");
@@ -3125,6 +3128,14 @@ void Supervisor::onTimer(){
                 if(ui_state == UI_STATE_INIT_DONE){
                     plog->write("[LCM] INIT ALL DONE -> UI_STATE = UI_STATE_READY");
                     ui_state = UI_STATE_READY;
+                }
+            }
+        }else{
+            if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY){
+                if(state_count++ > 10){
+                    plog->write("[LCM] INIT ALL DONE? -> UI_STATE = UI_STATE_READY");
+                    ui_state = UI_STATE_READY;
+                    state_count = 0;
                 }
             }
         }
@@ -3174,10 +3185,8 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_STATE_CHARGING:{
-        if(ui_cmd == UI_CMD_MOVE_WAIT){
-            ui_state = UI_STATE_GO_HOME;
-            plog->write("[SUPERVISOR] UI_STATE = GO HOME");
-            ui_cmd = UI_CMD_NONE;
+        if(probot->status_charge == 0){
+            ui_state = UI_STATE_NONE;
         }
         break;
     }

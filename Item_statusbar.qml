@@ -319,27 +319,25 @@ Item {
             model_details.append({"detail":"로봇과 연결되지 않았습니다.","icon":"icon/icon_lcm_discon.png","error":true});
         }
         if(is_motor_error){
-            model_details.append({"detail":"모터초기화가 되지 않았습니다.","icon":"icon/icon_motor_error.png","error":true});
+            model_details.append({"detail":"모터에 에러가 발생했습니다.","icon":"icon/icon_motor_error.png","error":true});
         }
         if(is_local_not_ready){
             model_details.append({"detail":"로봇 위치 초기화가 필요합니다.","icon":"icon/icon_local_error.png","error":true});
         }
         if(is_motor_power){
-            model_details.append({"detail":"모터전원(48V) 정상","icon":"icon/motor_power_on.png","error":false});
+            model_details.append({"detail":"모터에 전원이 인가되었습니다.","icon":"icon/motor_power_on.png","error":false});
         }else{
             model_details.append({"detail":"모터에 전원이 인가되지 않았습니다.","icon":"icon/motor_power_off.png","error":true});
         }
 
         if(is_emergency){
-            model_details.append({"detail":"EMO 버튼이 눌렸습니다.","icon":"icon/icon_emergency.png","error":true});
+            model_details.append({"detail":"비상스위치가 눌렸습니다.","icon":"icon/icon_emergency.png","error":true});
         }
         if(is_motor_hot){
             model_details.append({"detail":"모터가 기준치 이상 뜨겁습니다.","icon":"icon/icon_lcm_discon.png","error":true});
         }
-
-
         if(robot_battery < 30 && is_con_robot){
-            model_details.append({"detail":"배터리가 부족합니다.","icon":qsTr(image_battery.source),"error":true});
+            model_details.append({"detail":"배터리가 부족합니다.","icon":"icon/bat_1.png","error":true});
         }
     }
 
@@ -374,8 +372,8 @@ Item {
                     spacing: 10
                     Image{
                         source: icon
-                        width: 20
-                        height: 20
+                        width: 25
+                        height: 25
                         anchors.verticalCenter: parent.verticalCenter
                     }
                     Text{
@@ -396,7 +394,7 @@ Item {
         repeat: true
         running: true
         onTriggered: {
-            robot_battery = supervisor.getBatteryOut();
+            robot_battery = supervisor.getBatteryIn();
             curTime = Qt.formatTime(new Date(), "hh:mm");
             robot_rx = supervisor.getLCMRX();
             robot_tx = supervisor.getLCMTX();
@@ -415,13 +413,14 @@ Item {
                 }else{
                     is_motor_hot = false;
                 }
+                if(supervisor.getMotorState() === 0){
+                    is_motor_error = true;
+                }else{
+                    is_motor_error = false;
+                }
+
             }else{
                 is_motor_hot = false;
-            }
-
-            if(supervisor.getMotorState() === 0){
-                is_motor_error = true;
-            }else{
                 is_motor_error = false;
             }
 
