@@ -294,6 +294,25 @@ Item {
                         }
                     }
                 }
+                Rectangle{
+                    width: 78
+                    height: 78
+                    radius: width
+                    Column{
+                        anchors.centerIn: parent
+                        Image{
+                            source:"icon/icon_run.png"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.writelog("[USER INPUT] STATUS BAR : PROGRAM RESTART")
+                            supervisor.programRestart();
+                        }
+                    }
+                }
             }
         }
     }

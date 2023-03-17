@@ -2364,6 +2364,12 @@ Item {
                 slider_rotate.value = 0;
             }
 
+            Component.onCompleted: {
+
+                help_image.source = "video/rotate_help.gif"
+                popup_help.open();
+            }
+
             Rectangle{
                 anchors.fill: parent
                 color: "#f4f4f4"
@@ -3086,7 +3092,10 @@ Item {
                     btn_load_raw_map.activated = true;
                     btn_load_map.activated = false;
                 }
+                help_image.source = "video/tline_help.gif"
+                popup_help.open();
                 map.brush_size = slider_brush.value;
+
             }
 
             Rectangle{
@@ -6664,43 +6673,43 @@ Item {
     Popup{
         id: popup_help
         anchors.centerIn: parent
-        width: 800
-        height: 500
+        width: parent.width
+        height: parent.height
         background: Rectangle{
             anchors.fill: parent
-            color: "transparent"
+            color: color_dark_black
+            opacity: 0.7
         }
         onOpened: {
             help_image.currentFrame = 0;
         }
 
-        Rectangle{
-            width: parent.width
-            height: parent.height
-            radius: 20
-            Column{
-                spacing: 10
-                anchors.centerIn : parent
-                Text{
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.family: font_noto_r.name
-                    font.pixelSize: 30
-                    text: "방법"
-                }
-
-                AnimatedImage{
-                    id: help_image
-                    source: "video/slam_help.gif"
-                    cache: false
-                }
-            }
-
-
-//            Loader{
-//                id: loader_help
-//                anchors.fill: parent
-
+        AnimatedImage{
+            id: help_image
+            anchors.centerIn : parent
+            source: "video/slam_help.gif"
+            cache: false
+        }
+//        Rectangle{
+//            width: parent.width
+//            height: parent.height
+//            radius: 20
+//            Column{
+//                spacing: 10
+//                anchors.centerIn : parent
+//                Text{
+//                    anchors.horizontalCenter: parent.horizontalCenter
+//                    font.family: font_noto_r.name
+//                    font.pixelSize: 30
+//                    text: "방법"
+//                }
 //            }
+//        }
+        MouseArea{
+            anchors.fill: parent
+            onClicked:{
+                popup_help.close();
+            }
         }
     }
 }
