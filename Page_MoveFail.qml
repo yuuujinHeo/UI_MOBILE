@@ -123,7 +123,7 @@ Item {
                         anchors.centerIn: parent
                         spacing: 5
                         Image{
-                            source: "icon/icon_cancelpath.png"
+                            source: "icon/icon_run.png"
                             sourceSize.width: 40
                             sourceSize.height: 40
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -278,7 +278,7 @@ Item {
                                 spacing: 3
                                 anchors.centerIn: parent
                                 Image{
-                                    source: "icon/icon_manualmove.png"
+                                    source: "icon/image_emergency.png"
                                     Component.onCompleted: {
                                         if(sourceSize.width > 30)
                                             sourceSize.width = 30
@@ -287,6 +287,13 @@ Item {
                                             sourceSize.height = 30
                                     }
                                     anchors.horizontalCenter: parent.horizontalCenter
+                                    ColorOverlay{
+                                        id: emo_light
+                                        anchors.fill: parent
+                                        source: parent
+                                        color: color_green
+                                        visible: state_manual.enabled
+                                    }
                                 }
                                 Text{
                                     font.family: font_noto_r.name
@@ -310,7 +317,7 @@ Item {
                                 anchors.centerIn: parent
                                 spacing: 3
                                 Image{
-                                    source: "icon/icon_cancelpath.png"
+                                    source: "icon/icon_obs.png"
                                     Component.onCompleted: {
                                         if(sourceSize.width > 30)
                                             sourceSize.width = 30
@@ -870,9 +877,9 @@ Item {
         }
         Image{
             id: icon_warn
-            source: "icon/icon_emergency.png"
-            width: 130
-            height: 130
+            source: "icon/image_emergency_push.png"
+//            width: 130
+//            height: 130
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 200

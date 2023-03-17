@@ -601,7 +601,7 @@ Item {
                             Image{
                                 width: 30
                                 height: 30
-                                source:"icon/btn_minimize.png"
+                                source:"icon/icon_run.png"
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{

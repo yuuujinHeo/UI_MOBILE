@@ -704,7 +704,7 @@ Item {
                             spacing: 3
                             anchors.centerIn: parent
                             Image{
-                                source: "icon/icon_manualmove.png"
+                                source: "icon/image_emergency.png"
                                 Component.onCompleted: {
                                     if(sourceSize.width > 30)
                                         sourceSize.width = 30
@@ -713,7 +713,15 @@ Item {
                                         sourceSize.height = 30
                                 }
                                 anchors.horizontalCenter: parent.horizontalCenter
+                                ColorOverlay{
+                                    id: emo_light
+                                    anchors.fill: parent
+                                    source: parent
+                                    color: color_green
+                                    visible: state_manual.enabled
+                                }
                             }
+
                             Text{
                                 font.family: font_noto_r.name
                                 font.pixelSize: 12
@@ -735,7 +743,7 @@ Item {
                             spacing: 3
                             anchors.centerIn: parent
                             Image{
-                                source: "icon/icon_researching.png"
+                                source: is_mapping?"icon/icon_mapping.png":"icon/icon_mapping_start.png"
                                 Component.onCompleted: {
                                     if(sourceSize.width > 30)
                                         sourceSize.width = 30
@@ -1145,7 +1153,7 @@ Item {
                         width: 80
                         shadow_color: color_gray
                         highlight: map.tool=="SLAM_INIT"
-                        icon: "icon/icon_point.png"
+                        icon: "icon/icon_local_manual.png"
                         name: "수동 초기화"
                         MouseArea{
                             anchors.fill: parent
@@ -1169,7 +1177,7 @@ Item {
                         id: btn_auto_init
                         width: 78
                         shadow_color: color_gray
-                        icon:"icon/icon_auto_init.png"
+                        icon:"icon/icon_local_auto.png"
                         name:"자동 초기화"
                         MouseArea{
                             anchors.fill: parent
@@ -1957,11 +1965,26 @@ Item {
                     Row{
                         anchors.centerIn: parent
                         spacing: 30
-                        Item_button{
+                        Rectangle{
                             width: 80
-                            shadow_color: color_gray
-                            icon: "icon/icon_move.png"
-                            name: "DRAWING"
+                            height: 60
+                            radius: 5
+                            DropShadow{
+                                anchors.fill: parent
+                                radius: 6
+                                color: color_gray
+                                source: parent
+                            }
+                            Rectangle{
+                                width: 80
+                                height: 60
+                                radius: 5
+                                Text{
+                                    text: "DRAWING"
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                }
+                            }
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
@@ -1972,12 +1995,26 @@ Item {
                                 }
                             }
                         }
-                        Item_button{
+                        Rectangle{
                             width: 80
-                            shadow_color: color_gray
-                            highlight: map.tool=="SLAM_INIT"
-                            icon: "icon/icon_point.png"
-                            name: "OBJECT"
+                            height: 60
+                            radius: 5
+                            DropShadow{
+                                anchors.fill: parent
+                                radius: 6
+                                color: color_gray
+                                source: parent
+                            }
+                            Rectangle{
+                                width: 80
+                                height: 60
+                                radius: 5
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "OBJECT"
+                                    font.family: font_noto_r.name
+                                }
+                            }
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
@@ -1988,12 +2025,26 @@ Item {
                                 }
                             }
                         }
-                        Item_button{
-                            id: btn_auto_init
-                            width: 78
-                            shadow_color: color_gray
-                            icon:"icon/icon_auto_init.png"
-                            name:"LOCATION"
+                        Rectangle{
+                            width: 80
+                            height: 60
+                            radius: 5
+                            DropShadow{
+                                anchors.fill: parent
+                                radius: 6
+                                color: color_gray
+                                source: parent
+                            }
+                            Rectangle{
+                                width: 80
+                                height: 60
+                                radius: 5
+                                Text{
+                                    text: "LOCATION"
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                }
+                            }
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
@@ -2004,13 +2055,28 @@ Item {
                                 }
                             }
                         }
-                        Item_button{
-                            id: btn_path
+                        Rectangle{
                             width: 80
-                            shadow_color: color_gray
-                            icon: "icon/icon_point.png"
-                            name: "PATH"
+                            height: 60
+                            radius: 5
                             enabled: supervisor.isExistTravelRaw(supervisor.getMapname())||supervisor.isExistTravelEdited(supervisor.getMapname())
+
+                            DropShadow{
+                                anchors.fill: parent
+                                radius: 6
+                                color: color_gray
+                                source: parent
+                            }
+                            Rectangle{
+                                width: 80
+                                height: 60
+                                radius: 5
+                                Text{
+                                    text: "PATH"
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                }
+                            }
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
@@ -4136,7 +4202,7 @@ Item {
                             width: 80
                             shadow_color: color_gray
                             highlight: map.tool=="SLAM_INIT"
-                            icon: "icon/icon_point.png"
+                            icon: "icon/icon_local_manual.png"
                             name: "수동 초기화"
                             MouseArea{
                                 anchors.fill: parent
@@ -4161,7 +4227,7 @@ Item {
                             id: btn_auto_init
                             width: 78
                             shadow_color: color_gray
-                            icon:"icon/icon_auto_init.png"
+                            icon:"icon/icon_local_auto.png"
                             name:"자동 초기화"
                             MouseArea{
                                 anchors.fill: parent
