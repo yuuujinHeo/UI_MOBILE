@@ -362,6 +362,27 @@ Item {
         mapview.x = -newx;
         mapview.y = -newy;
         prevscale = newscale;
+
+        if(newscale > 0.9 && newscale < 1.1){
+            print("re drawing1");
+            update_canvas();
+        }
+        if(newscale > 1.9 && newscale < 2.1){
+            print("re drawing2");
+            update_canvas();
+        }
+        if(newscale > 2.9 && newscale < 3.1){
+            print("re drawing3");
+            update_canvas();
+        }
+        if(newscale > 3.9 && newscale < 4.1){
+            print("re drawing4");
+            update_canvas();
+        }
+        if(newscale > 4.9 && newscale < 5.1){
+            print("re drawing5");
+            update_canvas();
+        }
     }
 
     //Annotation State (None, Drawing, Object, Location, Travelline)
@@ -491,31 +512,40 @@ Item {
         Canvas{
             id: canvas_object
             visible: show_object
-            width: map_width
-            height: map_height
+            width: mapview.width
+            height: mapview.height
             opacity: 0.7
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
-            scale: newscale
+//            scale: newscale
         }
 
+//        Canvas{
+//            id: canvas_location
+//            visible: show_location
+//            width: map_width
+//            height: map_height
+//            x: mapview.x + (mapview.width - width)/2
+//            y: mapview.y + (mapview.height - height)/2
+//            scale: newscale
+//        }
         Canvas{
             id: canvas_location
             visible: show_location
-            width: map_width
-            height: map_height
+            width: mapview.width
+            height: mapview.height
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
-            scale: newscale
+//            scale: newscale
         }
 
         Canvas{
             id: canvas_map_cur
-            width: map_width
-            height: map_height
+            width: mapview.width
+            height: mapview.height
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
-            scale: newscale
+//            scale: newscale
         }
 
         Canvas{
@@ -1105,8 +1135,10 @@ Item {
     Image{
         id: image_charging_selected
         visible: false
-        width: 13
-        height: width
+//        width: 13
+//        height: 13
+//        sourceSize.width: 13
+//        sourceSize.height: 13
         source: "icon/icon_charge_1.png"
         ColorOverlay{
             source: parent
@@ -1117,15 +1149,19 @@ Item {
     Image{
         id: image_charging
         visible: false
-        width: 13
-        height: width
+//        width: 13
+//        height: 13
+//        sourceSize.width: 13
+//        sourceSize.height: 13
         source: "icon/icon_charge_2.png"
     }
     Image{
         id: image_resting_selected
         visible: false
-        width: 13
-        height: width
+//        width: 13
+//        height: 13
+//        sourceSize.width: 13
+//        sourceSize.height: 13
         source: "icon/icon_home_1.png"
         ColorOverlay{
             source: parent
@@ -1136,8 +1172,10 @@ Item {
     Image{
         id: image_resting
         visible: false
-        width: 13
-        height: width
+//        width: 13
+//        height: 13
+//        sourceSize.width: 13
+//        sourceSize.height: 13
         source: "icon/icon_home_2.png"
     }
 
@@ -1472,20 +1510,22 @@ Item {
             location_num = supervisor.getLocationNum();
             for(var i=0; i<location_num; i++){
                 var loc_type = supervisor.getLocationTypes(i);
-                var loc_x = supervisor.getLocationx(i)/grid_size +origin_x;
-                var loc_y = supervisor.getLocationy(i)/grid_size +origin_y;
+                var loc_x = (supervisor.getLocationx(i)/grid_size + origin_x)*newscale;;
+                var loc_y = (supervisor.getLocationy(i)/grid_size + origin_y)*newscale;;
                 var loc_th = supervisor.getLocationth(i);
+                var radiusrobot = robot_radius*newscale;
+                var icon_size = 13*newscale;
                 if(loc_type.slice(0,4) == "Char"){
                     if(select_location == i){
                         ctx.fillStyle = "#7f7f7f";
                         ctx.strokeStyle = "#83B8F9";
                         ctx.lineWidth = 2;
                         ctx.beginPath();
-                        ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
+                        ctx.arc(loc_x,loc_y, radiusrobot/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
                         ctx.fill()
                         ctx.stroke()
 
-                        var distance = (robot_radius/grid_size)*1.8;
+                        var distance = (radiusrobot/grid_size)*1.8;
                         var distance2 = distance*0.8;
                         var th_dist = Math.PI/8;
                         var x = loc_x-distance*Math.sin(loc_th);
@@ -1501,17 +1541,17 @@ Item {
                         ctx.moveTo(x,y);
                         ctx.lineTo(x2,y2);
                         ctx.stroke()
-                        ctx.drawImage(image_charging_selected,loc_x - image_charging_selected.width/2,loc_y - image_charging_selected.width/2, image_charging_selected.width, image_charging_selected.height);
+                        ctx.drawImage(image_charging_selected,loc_x - icon_size/2,loc_y - icon_size/2, icon_size, icon_size);
 
                     }else{
                         ctx.fillStyle = "#7f7f7f";
                         ctx.strokeStyle = "white";
                         ctx.lineWidth = 1;
                         ctx.beginPath();
-                        ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
+                        ctx.arc(loc_x,loc_y,radiusrobot/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
                         ctx.fill()
                         ctx.stroke()
-                        ctx.drawImage(image_charging,loc_x - image_charging.width/2,loc_y - image_charging.width/2, image_charging.width, image_charging.height);
+                        ctx.drawImage(image_charging,loc_x - icon_size/2,loc_y - icon_size/2, icon_size,icon_size);
                     }
                 }else if(loc_type.slice(0,4) == "Rest"){
                     if(select_location === i){
@@ -1519,10 +1559,10 @@ Item {
                         ctx.strokeStyle = "#83B8F9";
                         ctx.lineWidth = 2;
                         ctx.beginPath();
-                        ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
+                        ctx.arc(loc_x,loc_y,radiusrobot/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
                         ctx.fill()
                         ctx.stroke()
-                        var distance = (robot_radius/grid_size)*1.8;
+                        var distance = (radiusrobot/grid_size)*1.8;
                         var distance2 = distance*0.8;
                         var th_dist = Math.PI/8;
                         var x = loc_x-distance*Math.sin(loc_th);
@@ -1538,16 +1578,16 @@ Item {
                         ctx.moveTo(x,y);
                         ctx.lineTo(x2,y2);
                         ctx.stroke()
-                        ctx.drawImage(image_resting_selected,loc_x - image_resting_selected.width/2,loc_y - image_resting_selected.width/2, image_resting_selected.width, image_resting_selected.height);
+                        ctx.drawImage(image_resting_selected,loc_x - icon_size/2,loc_y - icon_size/2, icon_size, icon_size);
                     }else{
                         ctx.fillStyle = "#7f7f7f";
                         ctx.strokeStyle = "white";
                         ctx.lineWidth = 1;
                         ctx.beginPath();
-                        ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
+                        ctx.arc(loc_x,loc_y,radiusrobot/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
                         ctx.fill()
                         ctx.stroke()
-                        ctx.drawImage(image_resting,loc_x - image_resting.width/2,loc_y - image_resting.width/2, image_resting.width, image_resting.height);
+                        ctx.drawImage(image_resting,loc_x - icon_size/2,loc_y - icon_size/2, icon_size, icon_size);
                     }
 
                 }
@@ -1563,9 +1603,10 @@ Item {
 
             for(var i=0; i<location_num; i++){
                 var loc_type = supervisor.getLocationTypes(i);
-                var loc_x = supervisor.getLocationx(i)/grid_size +origin_x;
-                var loc_y = supervisor.getLocationy(i)/grid_size +origin_y;
+                var loc_x = (supervisor.getLocationx(i)/grid_size +origin_x)*newscale;
+                var loc_y = (supervisor.getLocationy(i)/grid_size +origin_y)*newscale;
                 var loc_th = supervisor.getLocationth(i);//+Math.PI/2;
+                var radiusrobot = robot_radius*newscale;
 
                 if(select_location == i){
                     ctx.strokeStyle = "#83B8F9";
@@ -1578,11 +1619,11 @@ Item {
                 }
 
                 ctx.beginPath();
-                ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
+                ctx.arc(loc_x,loc_y,radiusrobot/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
                 ctx.fill()
                 ctx.stroke()
 
-                var distance = (robot_radius/grid_size)*1.8;
+                var distance = (radiusrobot/grid_size)*1.8;
                 var distance2 = distance*0.8;
                 var th_dist = Math.PI/8;
                 var x = loc_x-distance*Math.sin(loc_th);
@@ -1618,9 +1659,10 @@ Item {
             for(var i=0; i<patrol_num; i++){
                 var loc_type = supervisor.getPatrolType(i);
                 var loc_name = supervisor.getPatrolLocation(i);
-                var loc_x = supervisor.getPatrolX(i)/grid_size+origin_x;
-                var loc_y = supervisor.getPatrolY(i)/grid_size+origin_y;
+                var loc_x = (supervisor.getPatrolX(i)/grid_size+origin_x)*newscale;
+                var loc_y = (supervisor.getPatrolY(i)/grid_size+origin_y)*newscale;
                 var loc_th = -supervisor.getPatrolTH(i)-Math.PI/2;
+                var radiusrobot = robot_radius*newscale;
 
                 if(select_patrol === i){
                     ctx.lineWidth = 3;
@@ -1640,7 +1682,7 @@ Item {
                     }
                 }
                 ctx.beginPath();
-                ctx.arc(loc_x,loc_y,robot_radius/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
+                ctx.arc(loc_x,loc_y,radiusrobot/grid_size, -loc_th-Math.PI/2, -loc_th-Math.PI/2+2*Math.PI, true);
                 ctx.fill()
                 ctx.stroke()
 
@@ -1659,7 +1701,7 @@ Item {
                 }
 
                 if(select_patrol === i){
-                    var distance = (robot_radius/grid_size)*1.8;
+                    var distance = (radiusrobot/grid_size)*1.8;
                     var distance2 = distance*0.8;
                     var th_dist = Math.PI/8;
                     var x = loc_x-distance*Math.sin(loc_th);
@@ -1690,11 +1732,11 @@ Item {
                 ctx.lineWidth = 2;
                 ctx.fillStyle = "#FFD9FF";
                 ctx.beginPath();
-                ctx.arc(loc_x,loc_y,robot_radius/grid_size, 0,2*Math.PI, true);
+                ctx.arc(loc_x,loc_y,radiusrobot/grid_size, 0,2*Math.PI, true);
                 ctx.fill()
                 ctx.stroke()
 
-                var distance = (robot_radius/grid_size)*1.8;
+                var distance = (radiusrobot/grid_size)*1.8;
                 var distance2 = distance*0.8;
                 var th_dist = Math.PI/8;
                 var x = loc_x+distance*Math.cos(-loc_th-Math.PI/2);
@@ -1727,22 +1769,23 @@ Item {
             ctx.strokeStyle = "white";
             ctx.fillStyle = "yellow";
             ctx.lineWidth = 2;
+            var robotradius = robot_radius*newscale;
 
             if(new_location){
                 ctx.beginPath();
-                ctx.arc(new_loc_x,new_loc_y,robot_radius/grid_size, -new_loc_th-Math.PI/2, -new_loc_th-Math.PI/2+2*Math.PI, true);
+                ctx.arc(new_loc_x*newscale,new_loc_y*newscale,robotradius/grid_size, -new_loc_th-Math.PI/2, -new_loc_th-Math.PI/2+2*Math.PI, true);
                 ctx.fill()
                 ctx.stroke()
 
-                var distance = (robot_radius/grid_size)*2.2;
+                var distance = (robotradius/grid_size)*2.2;
                 var distance2 = distance*0.7;
                 var th_dist = Math.PI/6;
-                var x = new_loc_x-distance*Math.sin(new_loc_th);
-                var y = new_loc_y-distance*Math.cos(new_loc_th);
-                var x1 = new_loc_x-distance2*Math.sin(new_loc_th-th_dist);
-                var y1 = new_loc_y-distance2*Math.cos(new_loc_th-th_dist);
-                var x2 = new_loc_x-distance2*Math.sin(new_loc_th+th_dist);
-                var y2 = new_loc_y-distance2*Math.cos(new_loc_th+th_dist);
+                var x = new_loc_x*newscale-distance*Math.sin(new_loc_th);
+                var y = new_loc_y*newscale-distance*Math.cos(new_loc_th);
+                var x1 = new_loc_x*newscale-distance2*Math.sin(new_loc_th-th_dist);
+                var y1 = new_loc_y*newscale-distance2*Math.cos(new_loc_th-th_dist);
+                var x2 = new_loc_x*newscale-distance2*Math.sin(new_loc_th+th_dist);
+                var y2 = new_loc_y*newscale-distance2*Math.cos(new_loc_th+th_dist);
 
                 ctx.beginPath();
                 ctx.moveTo(x,y);
@@ -1754,20 +1797,20 @@ Item {
             }
             if(new_slam_init){
                 ctx.beginPath();
-                ctx.arc(init_x,init_y,robot_radius/grid_size, -init_th-Math.PI/2, -init_th-Math.PI/2+2*Math.PI, true);
+                ctx.arc(init_x*newscale,init_y*newscale,robotradius/grid_size, -init_th-Math.PI/2, -init_th-Math.PI/2+2*Math.PI, true);
                 ctx.fill()
                 ctx.stroke()
-                print(init_x,init_y,robot_radius,grid_size,init_th);
+                print(init_x*newscale,init_y*newscale,robotradius,grid_size,init_th);
 
-                var distance = (robot_radius/grid_size)*2.2;
+                var distance = (robotradius/grid_size)*2.2;
                 var distance2 = distance*0.7;
                 var th_dist = Math.PI/6;
-                var x = init_x-distance*Math.sin(init_th);
-                var y = init_y-distance*Math.cos(init_th);
-                var x1 = init_x-distance2*Math.sin(init_th-th_dist);
-                var y1 = init_y-distance2*Math.cos(init_th-th_dist);
-                var x2 = init_x-distance2*Math.sin(init_th+th_dist);
-                var y2 = init_y-distance2*Math.cos(init_th+th_dist);
+                var x = init_x*newscale-distance*Math.sin(init_th);
+                var y = init_y*newscale-distance*Math.cos(init_th);
+                var x1 = init_x*newscale-distance2*Math.sin(init_th-th_dist);
+                var y1 = init_y*newscale-distance2*Math.cos(init_th-th_dist);
+                var x2 = init_x*newscale-distance2*Math.sin(init_th+th_dist);
+                var y2 = init_y*newscale-distance2*Math.cos(init_th+th_dist);
 
                 ctx.beginPath();
                 ctx.moveTo(x,y);
@@ -1793,8 +1836,8 @@ Item {
                 ctx.lineWidth = 3;
 
                 ctx.beginPath();
-                ctx.moveTo(new_obj_x1,new_obj_y1);
-                ctx.rect(new_obj_x1,new_obj_y1, new_obj_x2-new_obj_x1, new_obj_y2 - new_obj_y1);
+                ctx.moveTo(new_obj_x1*newscale,new_obj_y1*newscale);
+                ctx.rect(new_obj_x1*newscale,new_obj_y1*newscale, (new_obj_x2-new_obj_x1)*newscale, (new_obj_y2 - new_obj_y1)*newscale);
                 ctx.closePath();
                 ctx.stroke();
                 ctx.fill();
@@ -1804,29 +1847,29 @@ Item {
                 ctx.fillStyle = "blue";
 
                 ctx.beginPath();
-                ctx.moveTo(new_obj_x1,new_obj_y1);
-                ctx.arc(new_obj_x1,new_obj_y1,2,0, Math.PI*2);
+                ctx.moveTo(new_obj_x1*newscale,new_obj_y1*newscale);
+                ctx.arc(new_obj_x1*newscale,new_obj_y1*newscale,2,0, Math.PI*2);
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
 
                 ctx.beginPath();
-                ctx.moveTo(new_obj_x1,new_obj_y2);
-                ctx.arc(new_obj_x1,new_obj_y2,2,0, Math.PI*2);
+                ctx.moveTo(new_obj_x1*newscale,new_obj_y2*newscale);
+                ctx.arc(new_obj_x1*newscale,new_obj_y2*newscale,2,0, Math.PI*2);
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
 
                 ctx.beginPath();
-                ctx.moveTo(new_obj_x2,new_obj_y1);
-                ctx.arc(new_obj_x2,new_obj_y1,2,0, Math.PI*2);
+                ctx.moveTo(new_obj_x2*newscale,new_obj_y1*newscale);
+                ctx.arc(new_obj_x2*newscale,new_obj_y1*newscale,2,0, Math.PI*2);
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
 
                 ctx.beginPath();
-                ctx.moveTo(new_obj_x2,new_obj_y2);
-                ctx.arc(new_obj_x2,new_obj_y2,2,0, Math.PI*2);
+                ctx.moveTo(new_obj_x2*newscale,new_obj_y2*newscale);
+                ctx.arc(new_obj_x2*newscale,new_obj_y2*newscale,2,0, Math.PI*2);
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
@@ -1837,8 +1880,8 @@ Item {
                     ctx.strokeStyle = "yellow";
                     ctx.fillStyle = "steelblue";
                     ctx.lineWidth = 3;
-                    var point_x = supervisor.getTempObjectX(0)/grid_size + origin_x;
-                    var point_y = supervisor.getTempObjectY(0)/grid_size + origin_y;
+                    var point_x = (supervisor.getTempObjectX(0)/grid_size + origin_x)*newscale;
+                    var point_y = (supervisor.getTempObjectY(0)/grid_size + origin_y)*newscale;
                     var point_x0 = point_x;
                     var point_y0 = point_y;
 
@@ -1846,8 +1889,8 @@ Item {
                         ctx.beginPath();
                         ctx.moveTo(point_x,point_y);
                         for(var i=1; i<point_num; i++){
-                            point_x = supervisor.getTempObjectX(i)/grid_size + origin_x;
-                            point_y = supervisor.getTempObjectY(i)/grid_size + origin_y;
+                            point_x = (supervisor.getTempObjectX(i)/grid_size + origin_x)*newscale;
+                            point_y = (supervisor.getTempObjectY(i)/grid_size + origin_y)*newscale;
                             ctx.lineTo(point_x,point_y);
                         }
                         if(point_num > 2){
@@ -1858,8 +1901,8 @@ Item {
                     }else if(point_num > 1){
                         ctx.beginPath()
                         ctx.moveTo(point_x,point_y)
-                        point_x = supervisor.getTempObjectX(1)/grid_size + origin_x;
-                        point_y = supervisor.getTempObjectY(1)/grid_size + origin_y;
+                        point_x = (supervisor.getTempObjectX(1)/grid_size + origin_x)*newscale;
+                        point_y = (supervisor.getTempObjectY(1)/grid_size + origin_y)*newscale;
                         ctx.lineTo(point_x,point_y)
                         ctx.stroke();
                     }
@@ -1867,12 +1910,12 @@ Item {
                     ctx.lineWidth = 1;
                     ctx.strokeStyle = "blue";
                     ctx.fillStyle = "blue";
-                    point_x = supervisor.getTempObjectX(0)/grid_size + origin_x;
-                    point_y = supervisor.getTempObjectY(0)/grid_size + origin_y;
+                    point_x = (supervisor.getTempObjectX(0)/grid_size + origin_x)*newscale;
+                    point_y = (supervisor.getTempObjectY(0)/grid_size + origin_y)*newscale;
                     for(i=0; i<point_num; i++){
                         ctx.beginPath();
-                        point_x = supervisor.getTempObjectX(i)/grid_size + origin_x;
-                        point_y = supervisor.getTempObjectY(i)/grid_size + origin_y;
+                        point_x = (supervisor.getTempObjectX(i)/grid_size + origin_x)*newscale;
+                        point_y = (supervisor.getTempObjectY(i)/grid_size + origin_y)*newscale;
                         ctx.moveTo(point_x,point_y);
                         ctx.arc(point_x,point_y,2,0, Math.PI*2);
                         ctx.closePath();
@@ -1896,8 +1939,8 @@ Item {
             for(var i=0; i<object_num; i++){
                 var obj_type = supervisor.getObjectName(i);
                 var obj_size = supervisor.getObjectPointSize(i);
-                var obj_x = supervisor.getObjectX(i,0)/grid_size +origin_x;
-                var obj_y = supervisor.getObjectY(i,0)/grid_size +origin_y;
+                var obj_x = (supervisor.getObjectX(i,0)/grid_size +origin_x)*newscale;
+                var obj_y = (supervisor.getObjectY(i,0)/grid_size +origin_y)*newscale;
                 var obj_x0 = obj_x;
                 var obj_y0 = obj_y;
 
@@ -1928,8 +1971,8 @@ Item {
                 ctx.beginPath();
                 ctx.moveTo(obj_x,obj_y);
                 for(var j=1; j<obj_size; j++){
-                    var obj_x_new = supervisor.getObjectX(i,j)/grid_size + origin_x;
-                    var obj_y_new = supervisor.getObjectY(i,j)/grid_size + origin_y;
+                    var obj_x_new = (supervisor.getObjectX(i,j)/grid_size + origin_x)*newscale;
+                    var obj_y_new = (supervisor.getObjectY(i,j)/grid_size + origin_y)*newscale;
     //                print(obj_x,obj_y,obj_x_new,obj_y_new);
                     if(Math.abs(obj_x - obj_x_new) > 2 || Math.abs(obj_y - obj_y_new) > 2){
                         obj_x = obj_x_new;
@@ -1949,8 +1992,8 @@ Item {
                         ctx.fillStyle = "#83B8F9";
                         for(j=0; j<obj_size; j++){
                             ctx.beginPath();
-                            obj_x = supervisor.getObjectX(i,j)/grid_size +origin_x;
-                            obj_y = supervisor.getObjectY(i,j)/grid_size +origin_y;
+                            obj_x = (supervisor.getObjectX(i,j)/grid_size +origin_x)*newscale;
+                            obj_y = (supervisor.getObjectY(i,j)/grid_size +origin_y)*newscale;
                             ctx.moveTo(obj_x,obj_y);
                             if(select_object == i){
                                 ctx.arc(obj_x,obj_y,4,0, Math.PI*2);
@@ -1980,20 +2023,21 @@ Item {
             var ctx = canvas_map_cur.getContext('2d');
             ctx.clearRect(0,0,canvas_map_cur.width,canvas_map_cur.height);
             if(show_robot && (supervisor.is_slam_running() || map_mode === "MAPPING")){
-                robot_x = supervisor.getRobotx()/grid_size + origin_x;
-                robot_y = supervisor.getRoboty()/grid_size + origin_y;
+                robot_x = (supervisor.getRobotx()/grid_size + origin_x)*newscale;
+                robot_y = (supervisor.getRoboty()/grid_size + origin_y)*newscale;
                 robot_th = -supervisor.getRobotth()-Math.PI/2;
+                var robotradius = robot_radius*newscale
 
 //                print(robot_th);
                 ctx.strokeStyle = "white";
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(robot_x,robot_y,robot_radius/grid_size, robot_th, robot_th+2*Math.PI, true);
+                ctx.arc(robot_x,robot_y,robotradius/grid_size, robot_th, robot_th+2*Math.PI, true);
                 ctx.fillStyle = "red";
                 ctx.fill()
                 ctx.stroke()
 
-                var distance = (robot_radius/grid_size)*2.2;
+                var distance = (robotradius/grid_size)*2.2;
                 var distance2 = distance*0.7;
                 var th_dist = Math.PI/6;
                 var x = robot_x+distance*Math.cos(robot_th);
@@ -2018,7 +2062,7 @@ Item {
                 ctx.strokeStyle = "red";
                 ctx.fillStyle = "red";
                 for(var i=0; i<360; i++){
-                    var data = supervisor.getLidar(i)/grid_size;
+                    var data = (supervisor.getLidar(i)/grid_size)*newscale;
                     if(data > 0.01){
                         ctx.beginPath();
                         var lidar_x = robot_x + data*Math.cos((-Math.PI*i)/180 + robot_th);
@@ -2044,8 +2088,8 @@ Item {
                     var path_x_before = path_x;
                     var path_y_before = path_y;
                     var path_th_before = path_th;
-                    path_x = supervisor.getPathx(i)/grid_size+origin_x;
-                    path_y = supervisor.getPathy(i)/grid_size+origin_y;
+                    path_x = (supervisor.getPathx(i)/grid_size+origin_x)*newscale;
+                    path_y = (supervisor.getPathy(i)/grid_size+origin_y)*newscale;
                     path_th = -supervisor.getPathth(i)-Math.PI/2;
 
                     ctx.strokeStyle = "#FFD9FF";
@@ -2061,11 +2105,11 @@ Item {
                 //target pose
                 if(path_num > 0){
                     ctx.beginPath();
-                    ctx.arc(path_x,path_y,robot_radius/grid_size, -path_th-Math.PI/2, -path_th-Math.PI/2+2*Math.PI, true);
+                    ctx.arc(path_x,path_y,robotradius/grid_size, -path_th-Math.PI/2, -path_th-Math.PI/2+2*Math.PI, true);
                     ctx.fill()
                     ctx.stroke()
 
-                    var distance = (robot_radius/grid_size)*1.8;
+                    var distance = (robotradius/grid_size)*1.8;
                     var distance2 = distance*0.8;
                     var th_dist = Math.PI/8;
                     var x = path_x+distance*Math.cos(-path_th-Math.PI/2);
@@ -2092,8 +2136,8 @@ Item {
 //                    print("local num : ",localpath_num);
                     for(var i=0; i<localpath_num; i++){
                         ctx.beginPath();
-                        var local_x = supervisor.getLocalPathx(i)/grid_size +origin_x;
-                        var local_y = supervisor.getLocalPathy(i)/grid_size +origin_y;
+                        var local_x = (supervisor.getLocalPathx(i)/grid_size +origin_x)*newscale;
+                        var local_y = (supervisor.getLocalPathy(i)/grid_size +origin_y)*newscale;
                         ctx.moveTo(local_x,local_y);
                         ctx.arc(local_x,local_y,2,0, Math.PI*2);
                         ctx.closePath();

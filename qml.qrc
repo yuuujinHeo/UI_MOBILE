@@ -163,5 +163,13 @@
         <file>video/loc_help.gif</file>
         <file>video/draw_help.gif</file>
         <file>image/temp.gif</file>
+        <file>icon/image_emergency_push.png</file>
+        <file>icon/image_emergency.png</file>
+        <file>icon/icon_obs.png</file>
+        <file>icon/icon_mapping_start.png</file>
+        <file>icon/icon_mapping.png</file>
+        <file>icon/icon_local_manual.png</file>
+        <file>icon/icon_local_auto.png</file>
+        <file>icon/icon_init.png</file>
     </qresource>
 </RCC>
