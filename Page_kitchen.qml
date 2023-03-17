@@ -458,8 +458,8 @@ Item {
             id: btn_go
             anchors.fill: parent
             onClicked: {
-                supervisor.writelog("[USER INPUT] GO SERVING : "+Number(traymodel.get(0).set_table)+Number(traymodel.get(1).set_table)+Number(traymodel.get(2).set_table));
                 count_resting = 0;
+                print("serving start button");
                 cur_table = 0;
                 for(var i=0; i<tray_num; i++){
                     supervisor.setTray(i,traymodel.get(i).set_table);
@@ -792,16 +792,12 @@ Item {
                 onClicked: {
                     count_resting = 0;
                     if(go_wait){
-                        supervisor.writelog("[USER INPUT] GO TO WAIT")
                         supervisor.moveToWait();
                     }else if(go_charge){
-                        supervisor.writelog("[USER INPUT] GO TO CHARGING")
                         supervisor.moveToCharge();
                     }else if(go_patrol){
-                        supervisor.writelog("[USER INPUT] GO TO PATROL")
 
                     }else{
-                        supervisor.writelog("[USER INPUT] GO TO ?")
 
                     }
 
@@ -890,15 +886,12 @@ Item {
                 onClicked: {
                     count_resting = 0;
                     if(go_wait){
-                        supervisor.writelog("[USER INPUT] GO TO WAIT")
                         supervisor.moveToWait();
                     }else if(go_charge){
-                        supervisor.writelog("[USER INPUT] GO TO CHARGING")
                         supervisor.moveToCharge();
                     }else if(go_patrol){
                         print("patrol start command");
                     }else if(robot_type == "CALLING"){
-
                     }
                     go_wait = false;
                     go_charge = false;
@@ -908,4 +901,5 @@ Item {
             }
         }
     }
+
 }

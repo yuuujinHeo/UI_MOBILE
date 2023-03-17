@@ -511,6 +511,7 @@ Item {
         anchors.topMargin: 50
         color: map_mode==0?"white":"transparent"
         radius: 30
+        property bool is_restart: false
         Behavior on width{
             NumberAnimation{
                 duration: 500;
@@ -528,6 +529,19 @@ Item {
                 if(map_mode==0 || is_init_state){
                     supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO BACKPAGE "+Number(map_mode) + "," + Number(is_init_state))
                     backPage();
+                }else if(map_mode == 1){
+                    if(btn_menu.is_restart){
+                        supervisor.stopMapping();
+                        supervisor.restartSLAM();
+                        supervisor.setMap(supervisor.getMapname());
+                        map.map_mode = "EDITED";
+                        map.loadmap(supervisor.getMapname(),"EDITED");
+                        map.update_canvas();
+                        loadPage(pinit);
+                    }else{
+                        supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO MAIN")
+                        map_mode = 0;
+                    }
                 }else{
                     supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO MAIN")
                     map_mode = 0;
@@ -558,6 +572,7 @@ Item {
             }
 
             Component.onCompleted: {
+                btn_menu.is_restart = false;
                 map.map_mode = "MAPPING";
                 help_image.source = "video/slam_help.gif"
                 popup_help.open();
@@ -746,6 +761,7 @@ Item {
                                     if(is_mapping){
                                         popup_reset_mapping.open();
                                     }else{
+                                        btn_menu.is_restart = true;
                                         supervisor.writelog("[USER INPUT] MAPPING PAGE : START MAPPING " + combobox_gridsize.currentText)
                                         if(combobox_gridsize.currentText === "3cm"){
                                             map.grid_size = 0.03;
