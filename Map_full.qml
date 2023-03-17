@@ -418,6 +418,7 @@ Item {
         }else if(state_annotation == "TRAVELLINE"){
             travelview.visible = true;
             robot_following = false;
+            show_location = true;
             loadmap(supervisor.getMapname(),"T_RAW")
         }
 

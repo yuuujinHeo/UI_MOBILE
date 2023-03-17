@@ -171,5 +171,7 @@
         <file>icon/icon_local_manual.png</file>
         <file>icon/icon_local_auto.png</file>
         <file>icon/icon_init.png</file>
+        <file>video/tline_help.gif</file>
+        <file>video/rotate_help.gif</file>
     </qresource>
 </RCC>
