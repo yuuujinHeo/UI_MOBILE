@@ -158,10 +158,6 @@
         <file>image/battery_1.png</file>
         <file>icon/icon_test_stop.png</file>
         <file>image/loading.gif</file>
-        <file>video/slam_help.gif</file>
-        <file>video/obj_help.gif</file>
-        <file>video/loc_help.gif</file>
-        <file>video/draw_help.gif</file>
         <file>image/temp.gif</file>
         <file>icon/image_emergency_push.png</file>
         <file>icon/image_emergency.png</file>
@@ -171,7 +167,11 @@
         <file>icon/icon_local_manual.png</file>
         <file>icon/icon_local_auto.png</file>
         <file>icon/icon_init.png</file>
-        <file>video/tline_help.gif</file>
+        <file>video/slam_help.gif</file>
         <file>video/rotate_help.gif</file>
+        <file>video/obj_help.gif</file>
+        <file>video/loc_help.gif</file>
+        <file>video/draw_help.gif</file>
+        <file>video/tline_help.gif</file>
     </qresource>
 </RCC>
