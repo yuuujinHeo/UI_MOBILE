@@ -7,11 +7,11 @@ CONFIG += c++11 qtquickcompiler
 # depend on your compiler). Refer to the documentation for the
 # deprecated API to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
-unix{
-   CONFIG+= use_gold_linker  # betterlink speed
-   QMAKE_CXX = ccache $$QMAKE_CXX # use ccache. apt install ccache
-   QMAKE_CC = ccache $$QMAKE_CC # use ccache
-}
+#unix{
+#   CONFIG+= use_gold_linker  # betterlink speed
+#   QMAKE_CXX = ccache $$QMAKE_CXX # use ccache. apt install ccache
+#   QMAKE_CC = ccache $$QMAKE_CC # use ccache
+#}
 
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
