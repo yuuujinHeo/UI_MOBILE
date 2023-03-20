@@ -4344,7 +4344,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    if(list_location.currentIndex > 0){
+                                    if(list_location.currentIndex > -1){
                                         supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> REMOVE "+Number(list_location.currentIndex))
                                         map.select_location = list_location.currentIndex-1;
                                         supervisor.removeLocation(list_location.model.get(list_location.currentIndex).name);
@@ -6371,7 +6371,7 @@ Item {
                         }else{
                             if(popup_add_location.curpose_mode){
                                 print(map.robot_th);
-                                supervisor.addLocation(select_location_type,tfield_location.text, map.robot_x, map.robot_y,supervisor.getRobotth());
+                                supervisor.addLocation(select_location_type,tfield_location.text, map.robot_x/map.newscale, map.robot_y/map.newscale,supervisor.getRobotth());
                             }else{
                                 print(map.new_loc_th);
                                 supervisor.addLocation(select_location_type,tfield_location.text, map.new_loc_x, map.new_loc_y, map.new_loc_th);
