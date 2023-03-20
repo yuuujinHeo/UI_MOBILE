@@ -313,7 +313,7 @@ Item {
             }
             Rectangle{
                 id: notice_map_edited
-                width: 220
+                width: 250
                 height: 60
                 radius: 10
                 border.width: 3
@@ -360,7 +360,7 @@ Item {
             }
             Rectangle{
                 id: notice_map_raw
-                width: 220
+                width: 250
                 height: 60
                 radius: 10
                 border.width: 3
@@ -394,7 +394,7 @@ Item {
                     font.family: font_noto_b.name
                     text: "설정되지 않은 맵이 존재합니다."
                     font.bold: true
-                    font.pixelSize: 15
+                    font.pixelSize: 12
                 }
                 MouseArea{
                     anchors.fill: parent
