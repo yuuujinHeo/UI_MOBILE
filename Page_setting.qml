@@ -21,6 +21,7 @@ Item {
     }
 
     function set_call_done(){
+        init();
         popup_change_call.close();
     }
 
@@ -889,13 +890,19 @@ Item {
                                 id: combo_call_num
                                 anchors.fill: parent
                                 model:20
+                                onCurrentIndexChanged: {
+                                    model_callbell.clear();
+                                    for(var i=0; i<combo_call_num.currentIndex; i++){
+                                        model_callbell.append({name:supervisor.getSetting("CALLING","call_"+Number(i))});
+                                    }
+                                }
                             }
                         }
                     }
 
                 }
                 Repeater{
-                    model: combo_call_num.currentIndex
+                    model: ListModel{id:model_callbell}//combo_call_num.currentIndex
                     Rectangle{
                         width: 840
                         height: 40
@@ -928,7 +935,7 @@ Item {
                                         id: call_id
                                         width: 300
                                         height: parent.height
-                                        text: ""
+                                        text: name//supervisor.getSetting("CALLING","call_"+Number(index))
                                     }
                                     Rectangle{
                                         width: 100
@@ -3022,6 +3029,9 @@ Item {
                         supervisor.setSetting("MOTOR/wheel_dir",combo_wheel_dir.currentText);
                         supervisor.setTableNum(combo_table_num.currentIndex);
 
+                        supervisor.setSetting("CALLING/call_num",combo_call_num.currentText);
+                        supervisor.setSetting("CALLING/call_maximum",combo_call_max.currentText);
+
                         supervisor.readSetting();
                         supervisor.restartSLAM();
                         init();
@@ -3036,7 +3046,6 @@ Item {
     }
 
     function init(){
-
         supervisor.writelog("[QML] SETTING PAGE init");
         platform_name.text = supervisor.getSetting("ROBOT_HW","model");
         combo_platform_serial.currentIndex = parseInt(supervisor.getSetting("ROBOT_HW","serial_num"))
@@ -3119,6 +3128,17 @@ Item {
         }else if(supervisor.getSetting("SENSOR","baudrate") === "256000"){
             combo_baudrate.currentIndex = 1;
         }
+
+        combo_call_max.currentIndex = parseInt(supervisor.getSetting("CALLING","call_maximum"));
+        combo_call_num.currentIndex = parseInt(supervisor.getSetting("CALLING","call_num"));
+
+        model_callbell.clear();
+        for(var i=0; i<combo_call_num.currentIndex; i++){
+            model_callbell.append({name:supervisor.getSetting("CALLING","call_"+Number(i))});
+        }
+
+
+
         slider_mask.value = parseFloat(supervisor.getSetting("SENSOR","mask"));
         slider_max_range.value = parseFloat(supervisor.getSetting("SENSOR","max_range"));
         offset_x.text = supervisor.getSetting("SENSOR","offset_x");
@@ -3183,6 +3203,7 @@ Item {
             supervisor.setCallbell(callid);
         }
         onClosed: {
+            supervisor.setCallbell(-1);
 //            timer_popup_call.stop();
         }
 

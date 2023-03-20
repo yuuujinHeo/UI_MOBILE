@@ -4512,7 +4512,7 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> EDIT" +Number(map.select_location) +" CUR POSITION")
-                                    supervisor.moveLocationPoint(map.select_location, map.robot_x, map.robot_y, supervisor.getRobotth());
+                                    supervisor.moveLocationPoint(map.select_location, map.robot_x/map.newscale, map.robot_y/map.newscale, supervisor.getRobotth());
                                     map.select_location = -1;
                                     map.select_location_show = -1;
                                     map.new_location = false;
