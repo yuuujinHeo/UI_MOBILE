@@ -12,18 +12,18 @@ CallbellHandler::CallbellHandler()
     connect(m_serialPort, SIGNAL(readyRead()), this, SLOT(readData()));
     connect(m_serialPort, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(handleError(QSerialPort::SerialPortError)));
 
-    m_serialPort->setPortName("ttyUSB0");
-    m_serialPort->setBaudRate(QSerialPort::Baud115200);
-    m_serialPort->setDataBits(QSerialPort::Data8);
-    m_serialPort->setParity(QSerialPort::NoParity);
-    m_serialPort->setStopBits(QSerialPort::OneStop);
-    m_serialPort->setFlowControl(QSerialPort::SoftwareControl);
+//    m_serialPort->setPortName("ttyUSB0");
+//    m_serialPort->setBaudRate(QSerialPort::Baud115200);
+//    m_serialPort->setDataBits(QSerialPort::Data8);
+//    m_serialPort->setParity(QSerialPort::NoParity);
+//    m_serialPort->setStopBits(QSerialPort::OneStop);
+//    m_serialPort->setFlowControl(QSerialPort::SoftwareControl);
 
-    m_serialPort->open(QIODevice::ReadWrite);
+//    m_serialPort->open(QIODevice::ReadWrite);
 
-    timer = new QTimer();
-    connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
-    timer->start(200);
+//    timer = new QTimer();
+//    connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
+//    timer->start(200);
 }
 
 void CallbellHandler::onTimer(){
