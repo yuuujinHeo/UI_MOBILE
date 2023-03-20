@@ -242,6 +242,10 @@ Window {
         rect_resting.close();
     }
 
+    function call_setting(){
+        loader_page.item.set_call_done();
+    }
+
     function updatepatrol(){
         if(loader_page.item.objectName == "page_map")
             loader_page.item.updatepatrol();

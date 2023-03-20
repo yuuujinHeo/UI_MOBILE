@@ -9,6 +9,7 @@
 #include "LCMHandler.h"
 #include "JoystickHandler.h"
 #include "ServerHandler.h"
+#include "CallbellHandler.h"
 #include "HTTPHandler.h"
 #include "MapView.h"
 #include <libusb-1.0/libusb.h>
@@ -61,12 +62,20 @@ public:
     float map_rotate_angle;
     bool annotation_edit = false;
 
+    QVector<QString> call_list;
+    int setting_call_id = -1;
+
+
     ////*********************************************  CLASS   ***************************************************////
     LCMHandler *lcm;
     ServerHandler *server;
     JoystickHandler *joystick;
     HTTPHandler *git;
+    CallbellHandler *call;
     QProcess *slam_process;
+
+
+
 
 
     ////*********************************************  WINDOW 관련   ***************************************************////
@@ -205,6 +214,13 @@ public:
 //    Q_INVOKABLE void pushMapData(QVector<unsigned char> data);
     Q_INVOKABLE void pushMapData(QList<int> data);
     Q_INVOKABLE QString getnewMapname();
+
+    ////*********************************************  CALLING 관련   ***************************************************////
+    Q_INVOKABLE QString getLastCall(){return call->getBellID();}
+    Q_INVOKABLE int getCallSize(){return call_list.size();}
+    Q_INVOKABLE QString getCall(int id){return call_list[id];}
+    Q_INVOKABLE void setCallbell(int id);
+
 
     ////*********************************************  JOYSTICK 관련   ***************************************************////
     Q_INVOKABLE bool isconnectJoy();
@@ -453,6 +469,7 @@ public slots:
     void usb_detect();
     void git_pull_failed();
     void git_pull_success();
+    void new_call();
 
 private:
     QTimer *timer;

@@ -1,4 +1,4 @@
-QT += core gui quick widgets network websockets sql quickcontrols2 #multimedia
+QT += core gui quick widgets network websockets sql quickcontrols2 serialport #multimedia
 
 CONFIG += c++11 qtquickcompiler
 
@@ -19,6 +19,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    CallbellHandler.cpp \
     JoystickHandler.cpp \
     LCMHandler.cpp \
     MapView.cpp \
@@ -50,6 +51,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    CallbellHandler.h \
     GlobalHeader.h \
     JoystickHandler.h \
     Keyemitter.h \

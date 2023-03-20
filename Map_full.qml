@@ -32,7 +32,7 @@ Item {
             }else{
                 mapview.y = newy;
             }
-//            print(newx, newy, mapview.x, mapview.y)
+            print(newx, newy, mapview.x, mapview.y)
         }
     }
 
@@ -75,51 +75,51 @@ Item {
     }
 
     onRobot_followingChanged: {
-        if(robot_following){
-            var newx = width/2 - robot_x*newscale;
-            var newy = height/2 - robot_y*newscale;
+//        if(robot_following){
+//            var newx = width/2 - robot_x*newscale;
+//            var newy = height/2 - robot_y*newscale;
 
-            if(newx > 0){
-                mapview.x = 0;
-                print("???")
-            }else if(newx < - map_width*newscale + width){
-                mapview.x = - map_width*newscale + width
-            }else{
-                mapview.x = newx;
-            }
+//            if(newx > 0){
+//                mapview.x = 0;
+//                print("???")
+//            }else if(newx < - map_width*newscale + width){
+//                mapview.x = - map_width*newscale + width
+//            }else{
+//                mapview.x = newx;
+//            }
 
-            if(newy  > 0){
-                mapview.y = 0;
-            }else if(newy < - map_height*newscale + height){
-                mapview.y = - map_height*newscale + height
-            }else{
-                mapview.y = newy;
-            }
-        }
+//            if(newy  > 0){
+//                mapview.y = 0;
+//            }else if(newy < - map_height*newscale + height){
+//                mapview.y = - map_height*newscale + height
+//            }else{
+//                mapview.y = newy;
+//            }
+//        }
     }
     onRobot_xChanged: {
-        if(robot_following){
-            var newx = width/2 - (robot_x)*newscale;
-            if(newx > 0){
-                mapview.x = 0;
-            }else if(newx < - map_width*newscale + width){
-                mapview.x = - map_width*newscale + width
-            }else{
-                mapview.x = newx;
-            }
-        }
+//        if(robot_following){
+//            var newx = width/2 - (robot_x)*newscale;
+//            if(newx > 0){
+//                mapview.x = 0;
+//            }else if(newx < - map_width*newscale + width){
+//                mapview.x = - map_width*newscale + width
+//            }else{
+//                mapview.x = newx;
+//            }
+//        }
     }
     onRobot_yChanged: {
-        if(robot_following){
-            var newy = height/2 - (robot_y)*newscale;
-            if(newy  > 0){
-                mapview.y = 0;
-            }else if(newy < - map_height*newscale + height){
-                mapview.y = - map_height*newscale + height
-            }else{
-                mapview.y = newy;
-            }
-        }
+//        if(robot_following){
+//            var newy = height/2 - (robot_y)*newscale;
+//            if(newy  > 0){
+//                mapview.y = 0;
+//            }else if(newy < - map_height*newscale + height){
+//                mapview.y = - map_height*newscale + height
+//            }else{
+//                mapview.y = newy;
+//            }
+//        }
     }
 
     //굳이 필요?/*
@@ -351,38 +351,68 @@ Item {
         mapview.height = map_height*newscale
 
         if(robot_following){
-            var newx = -width/2 + robot_x*newscale;
-            var newy = -height/2 + robot_y*newscale;
+            robot_x = (supervisor.getRobotx()/grid_size + origin_x)*newscale;
+            robot_y = (supervisor.getRoboty()/grid_size + origin_y)*newscale;
+            var newx = -width/2 + robot_x;//*newscale;
+            var newy = -height/2 + robot_y;//*newscale;
+//            print(supervisor.getRobotx(), newscale, robot_x, mapview.width, newscale, newx);
+
+//            if(newx > 0){
+//                mapview.x = 0;
+//                print("??")
+//            }else if(newx < - map_width*newscale + width){
+//                mapview.x = - map_width*newscale + width
+//            }else{
+//                mapview.x = newx;
+//            }
+
+//            if(newy  > 0){
+//                mapview.y = 0;
+//            }else if(newy < - map_height*newscale + height){
+//                mapview.y = - map_height*newscale + height
+//            }else{
+//                mapview.y = newy;
+//            }
+//            print(newx, newy, mapview.x, mapview.y)
+
+
+
+
+//            var newx = -width/2 + (supervisor.getRobotx()/grid_size + origin_x)*newscale;
+//            var newy = -height/2 + (supervisor.getRoboty()/grid_size + origin_y)*newscale;
         }else{
             var newx = - mapview.x + map_width*(newscale-prevscale)*xscale;
             var newy = - mapview.y + map_height*(newscale-prevscale)*yscale;
         }
 
-//        print(newscale, mapview.centerx, mapview.x, xscale, newx)
+//        print(supervisor.getRobotx()/grid_size + origin_x, (supervisor.getRobotx()/grid_size + origin_x)*newscale, newscale, mapview.centerx, mapview.x, xscale, newx)
         mapview.x = -newx;
         mapview.y = -newy;
         prevscale = newscale;
 
-        if(newscale > 0.9 && newscale < 1.1){
-            print("re drawing1");
-            update_canvas();
-        }
-        if(newscale > 1.9 && newscale < 2.1){
-            print("re drawing2");
-            update_canvas();
-        }
-        if(newscale > 2.9 && newscale < 3.1){
-            print("re drawing3");
-            update_canvas();
-        }
-        if(newscale > 3.9 && newscale < 4.1){
-            print("re drawing4");
-            update_canvas();
-        }
-        if(newscale > 4.9 && newscale < 5.1){
-            print("re drawing5");
-            update_canvas();
-        }
+//        print(robot_x,robot_y, mapview.x, canvas_map_cur.x)
+
+        update_canvas();
+//        if(newscale > 0.9 && newscale < 1.1){
+//            print("re drawing1");
+//            update_canvas();
+//        }
+//        if(newscale > 1.9 && newscale < 2.1){
+//            print("re drawing2");
+//            update_canvas();
+//        }
+//        if(newscale > 2.9 && newscale < 3.1){
+//            print("re drawing3");
+//            update_canvas();
+//        }
+//        if(newscale > 3.9 && newscale < 4.1){
+//            print("re drawing4");
+//            update_canvas();
+//        }
+//        if(newscale > 4.9 && newscale < 5.1){
+//            print("re drawing5");
+//            update_canvas();
+//        }
     }
 
     //Annotation State (None, Drawing, Object, Location, Travelline)
@@ -1263,8 +1293,8 @@ Item {
         onTriggered: {
             if(supervisor.getLCMConnection()){
                 is_slam_running = supervisor.is_slam_running();
-                robot_x = supervisor.getRobotx()/grid_size + origin_x;
-                robot_y = supervisor.getRoboty()/grid_size + origin_y;
+                robot_x = (supervisor.getRobotx()/grid_size + origin_x)*newscale;
+                robot_y = (supervisor.getRoboty()/grid_size + origin_y)*newscale;
                 robot_th = -supervisor.getRobotth()-Math.PI/2;
                 path_num = supervisor.getPathNum();
                 draw_canvas_current();
@@ -2022,6 +2052,8 @@ Item {
     function draw_canvas_current(){
         if(canvas_map_cur.available){
             var ctx = canvas_map_cur.getContext('2d');
+//            ctx.fillStyle = "white"
+//            ctx.fillRect(0,0,canvas_map_cur.width,canvas_map_cur.height);
             ctx.clearRect(0,0,canvas_map_cur.width,canvas_map_cur.height);
             if(show_robot && (supervisor.is_slam_running() || map_mode === "MAPPING")){
                 robot_x = (supervisor.getRobotx()/grid_size + origin_x)*newscale;
@@ -2062,6 +2094,10 @@ Item {
                 ctx.lineWidth = 0.5;
                 ctx.strokeStyle = "red";
                 ctx.fillStyle = "red";
+                robot_x = (supervisor.getRobotx()/grid_size + origin_x)*newscale;
+                robot_y = (supervisor.getRoboty()/grid_size + origin_y)*newscale;
+                robot_th = -supervisor.getRobotth()-Math.PI/2;
+//                print("REDRAW, "+robot_x,canvas_map_cur.width,canvas_map_cur.x)
                 for(var i=0; i<360; i++){
                     var data = (supervisor.getLidar(i)/grid_size)*newscale;
                     if(data > 0.01){
