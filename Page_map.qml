@@ -3531,6 +3531,7 @@ Item {
                                 supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : PREV (STATE)")
                                 map.init_mode();
                                 map.state_annotation = "NONE";
+                                map.loadmap(supervisor.getMapname(),"EDIT");
                                 map.show_connection = false;
                                 loader_menu.sourceComponent = menu_annot_state;
                             }
@@ -5902,6 +5903,7 @@ Item {
                                 supervisor.clear_all();
                                 map.init_mode();
                                 map.state_annotation = "NONE";
+                                map.loadmap(supervisor.getMapname(),"EDIT");
                                 map.show_connection = false;
                                 loader_menu.sourceComponent = menu_annot_state;
                                 popup_save_travelline.close();
