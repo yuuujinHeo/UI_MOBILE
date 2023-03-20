@@ -47,7 +47,9 @@ Supervisor::Supervisor(QObject *parent)
     lcm = new LCMHandler();
     server = new ServerHandler();
     joystick = new JoystickHandler();
+    call = new CallbellHandler();
     git = new HTTPHandler();
+    connect(call, SIGNAL(new_call()),this,SLOT(new_call()));
     connect(git, SIGNAL(pullSuccess()),this,SLOT(git_pull_success()));
     connect(git, SIGNAL(pullFailed()),this,SLOT(git_pull_failed()));
 
@@ -159,6 +161,35 @@ QString Supervisor::getCostPath(QString name){
 QString Supervisor::getIniPath(){
     return QDir::homePath()+"/robot_config.ini";
 }
+
+////*********************************************  CALLING 관련   ***************************************************////
+void Supervisor::new_call(){
+    if(setting_call_id > -1){
+        plog->write("[SUPERVISOR] NEW CALL ("+call->getBellID()+") SETTING");
+        setSetting("CALLING/call_"+QString::number(setting_call_id),call->getBellID());
+        QMetaObject::invokeMethod(mMain, "call_setting");
+    }else{
+        bool already_in = false;
+        for(int i=0; i<call_list.size(); i++){
+            if(call_list[i] == call->getBellID()){
+                already_in = true;
+                plog->write("[SUPERVISOR] NEW CALL ("+call_list[i]+") BUT ALREADY LIST IN");
+                break;
+            }
+        }
+        if(already_in){
+
+        }else{
+            call_list.push_back(call->getBellID());
+            plog->write("[SUPERVISOR] NEW CALL ("+call->getBellID()+") GET -> LIST SIZE IS "+QString::number(call_list.size()));
+        }
+    }
+}
+
+void Supervisor::setCallbell(int id){
+    setting_call_id = id;
+}
+
 
 ////*********************************************  SETTING 관련   ***************************************************////
 void Supervisor::git_pull_success(){

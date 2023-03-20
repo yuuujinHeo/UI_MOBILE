@@ -20,6 +20,10 @@ Item {
             popup_camera.update();
     }
 
+    function set_call_done(){
+        popup_change_call.close();
+    }
+
     Tool_Keyboard{
         id: keyboard
     }
@@ -822,6 +826,135 @@ Item {
                         }
                     }
 
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"최대 호출 횟수"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_call_max
+                                anchors.fill: parent
+                                model:[1,2,3,4,5]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"호출벨 개수"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_call_num
+                                anchors.fill: parent
+                                model:20
+                            }
+                        }
+                    }
+
+                }
+                Repeater{
+                    model: combo_call_num.currentIndex
+                    Rectangle{
+                        width: 840
+                        height: 40
+                        Row{
+                            anchors.fill: parent
+                            Rectangle{
+                                width: 350
+                                height: parent.height
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: 50
+                                    font.family: font_noto_r.name
+                                    text:"호출벨 "+Number(index)
+                                    font.pixelSize: 20
+                                }
+                            }
+                            Rectangle{
+                                width: 1
+                                height: parent.height
+                                color: "#d0d0d0"
+                            }
+                            Rectangle{
+                                width: parent.width - 351
+                                height: parent.height
+                                Row{
+                                    anchors.centerIn: parent
+                                    spacing: 20
+                                    TextField{
+                                        id: call_id
+                                        width: 300
+                                        height: parent.height
+                                        text: ""
+                                    }
+                                    Rectangle{
+                                        width: 100
+                                        height: 40
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        color: "black"
+                                        radius: 5
+                                        Text{
+                                            anchors.centerIn: parent
+                                            text: "변경"
+                                            font.family: font_noto_r.name
+                                            font.pixelSize: 10
+                                            color: "white"
+                                        }
+                                        MouseArea{
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                popup_change_call.callid = index
+                                                popup_change_call.open();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -2897,6 +3030,7 @@ Item {
             }
         }
     }
+
     Component.onCompleted: {
         init();
     }
@@ -3031,6 +3165,44 @@ Item {
             text_power.text = "Power : " + supervisor.getPower().toString();
             text_power_total.text = "Total : " + supervisor.getPowerTotal().toString();
 
+        }
+    }
+
+    Popup{
+        id: popup_change_call
+        width: 400
+        height: 300
+        anchors.centerIn: parent
+        leftPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        rightPadding: 0
+        property var callid: 0
+        onOpened: {
+//            timer_popup_call.start();
+            supervisor.setCallbell(callid);
+        }
+        onClosed: {
+//            timer_popup_call.stop();
+        }
+
+        Rectangle{
+            anchors.fill: parent
+            Text{
+                anchors.centerIn: parent
+                text: "변경하실 호출벨을 눌러주세요."
+                font.family: font_noto_r.name
+                font.pixelSize: 25
+            }
+        }
+        Timer{
+            id: timer_popup_call
+            interval: 300
+            running: false
+            repeat: true
+            onTriggered: {
+                print("hello " + Number(popup_change_call.callid))
+            }
         }
     }
 
