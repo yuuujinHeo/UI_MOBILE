@@ -219,7 +219,10 @@ public:
     Q_INVOKABLE QString getLastCall(){return call->getBellID();}
     Q_INVOKABLE int getCallSize(){return call_list.size();}
     Q_INVOKABLE QString getCall(int id){return call_list[id];}
+    Q_INVOKABLE QString getCallName(QString id);
     Q_INVOKABLE void setCallbell(int id);
+    Q_INVOKABLE void acceptCall(bool yes);
+    Q_INVOKABLE void removeCall(int id);
 
 
     ////*********************************************  JOYSTICK 관련   ***************************************************////
@@ -329,10 +332,6 @@ public:
     Q_INVOKABLE void sendMaptoServer();
 
 
-
-
-    ////*********************************************  SCHEDULER(CALLING) 관련   ***************************************************////
-    Q_INVOKABLE void acceptCall(bool yes);
 
 
 

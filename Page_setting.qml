@@ -21,7 +21,11 @@ Item {
     }
 
     function set_call_done(){
-        init();
+//        init();
+        model_callbell.clear();
+        for(var i=0; i<combo_call_num.currentIndex; i++){
+            model_callbell.append({name:supervisor.getSetting("CALLING","call_"+Number(i))});
+        }
         popup_change_call.close();
     }
 

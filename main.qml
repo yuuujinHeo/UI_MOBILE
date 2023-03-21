@@ -152,16 +152,25 @@ Window {
         loadPage(pkitchen)
         supervisor.writelog("[QML - MAIN] Do Wait Kitchen");
     }
+
+    function clearkitchen(){
+        loadPage(pkitchen)
+        loader_page.item.clearkitchen();
+        supervisor.writelog("[QML - MAIN] Do Clear Kitchen");
+    }
+
     function movetarget(){
         loadPage(pmoving);
         loader_page.pos = "지정장소";
         supervisor.writelog("[QML - MOVING] MOVE TO " + loader_page.pos);
     }
+
     function updatecamera(){
         if(loader_page.item.objectName == "page_setting"){
             loader_page.item.update_camera();
         }
     }
+
     function updatemapping(){
 //        mapview.setMap(supervisor.getMapping())
         if(loader_page.item.objectName == "page_map"){
