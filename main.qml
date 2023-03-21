@@ -103,6 +103,7 @@ Window {
         voice_movefail.stop();
         voice_movewait.stop();
         voice_serving.stop();
+        voice_calling.stop();
     }
 
     function stateinit(){
@@ -123,7 +124,10 @@ Window {
             str_target = "대기 장소";
             voice_movewait.play();
         }else{
-            voice_serving.play();
+            if(robot_type==="SERVING")
+                voice_serving.play();
+            else
+                voice_calling.play();
             var curtable = supervisor.getcurTable();
             str_target = curtable + "번 테이블";
             supervisor.writelog("[QML - MOVING] MOVE TO " + str_target);
@@ -372,7 +376,12 @@ Window {
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_start_serving.mp3"
     }
-
+    Audio{
+        id: voice_calling
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_start_calling.mp3"
+    }
     Audio{
         id: voice_avoid
         autoPlay: false

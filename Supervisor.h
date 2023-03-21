@@ -223,6 +223,7 @@ public:
     Q_INVOKABLE void setCallbell(int id);
     Q_INVOKABLE void acceptCall(bool yes);
     Q_INVOKABLE void removeCall(int id);
+    Q_INVOKABLE void removeCallAll();
 
 
     ////*********************************************  JOYSTICK 관련   ***************************************************////

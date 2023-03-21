@@ -173,5 +173,7 @@
         <file>video/loc_help.gif</file>
         <file>video/draw_help.gif</file>
         <file>video/tline_help.gif</file>
+        <file>bgm/voice_start_calling.mp3</file>
+        <file>bgm/voice_pickup_calling.mp3</file>
     </qresource>
 </RCC>
