@@ -203,6 +203,10 @@ void Supervisor::removeCall(int id){
     plog->write("[USER INPUT] REMOVE CALL_LIST "+QString::number(id));
     call_list.remove(id);
 }
+void Supervisor::removeCallAll(){
+    plog->write("[USER INPUT] REMOVE CALL_LIST ALL");
+    call_list.clear();
+}
 
 ////*********************************************  SETTING 관련   ***************************************************////
 void Supervisor::git_pull_success(){

@@ -912,6 +912,48 @@ Item {
             }
         }
         Rectangle{
+            id: btn_no
+            width: 250
+            height: 90
+            radius: 20
+            visible: !go_charge&&!go_wait&&!go_patrol
+            color: "#d0d0d0"
+            anchors.top: text_quest.bottom
+            anchors.topMargin: 50
+            anchors.right: parent.horizontalCenter
+            anchors.rightMargin: 20
+            Image{
+                id: image_no
+                source: "icon/btn_no.png"
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: 20
+            }
+            Text{
+                id:text_nono
+                text:"전부 취소"
+                font.family: font_noto_b.name
+                font.pixelSize: 30
+                color:"#282828"
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: image_no.right
+                anchors.leftMargin : (parent.width - image_no.x - image_no.width)/2 - text_nono.width/2
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    supervisor.removeCallAll();
+                    ready_call = false;
+                    count_resting = 0;
+                    go_wait = false;
+                    go_charge = false;
+                    go_patrol = false;
+                    popup_question.visible = false;
+                }
+            }
+        }
+
+        Rectangle{
             id: btn_confirm
             width: 250
             height: 90
@@ -920,7 +962,9 @@ Item {
             color: "#d0d0d0"
             anchors.top: text_quest.bottom
             anchors.topMargin: 50
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.left: parent.horizontalCenter
+            anchors.leftMargin: 20
+//            anchors.horizontalCenter: parent.horizontalCenter
             Image{
                 id: image_confirm
                 source: "icon/btn_yes.png"
@@ -951,7 +995,6 @@ Item {
                     }else{
 
                     }
-
                     go_wait = false;
                     go_charge = false;
                     go_patrol = false;
@@ -961,7 +1004,6 @@ Item {
             }
         }
         Rectangle{
-            id: btn_no
             width: 250
             height: 90
             radius: 20
@@ -972,21 +1014,20 @@ Item {
             anchors.right: parent.horizontalCenter
             anchors.rightMargin: 20
             Image{
-                id: image_no
+                id: image_nonono
                 source: "icon/btn_no.png"
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: 20
             }
             Text{
-                id:text_nono
                 text:"아니오"
                 font.family: font_noto_b.name
                 font.pixelSize: 30
                 color:"#282828"
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.left: image_no.right
-                anchors.leftMargin : (parent.width - image_no.x - image_no.width)/2 - text_nono.width/2
+                anchors.left: image_nonono.right
+                anchors.leftMargin : (parent.width - image_nonono.x - image_nonono.width)/2 - width/2
             }
             MouseArea{
                 anchors.fill: parent

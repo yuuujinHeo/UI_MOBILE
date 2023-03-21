@@ -130,6 +130,8 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     console.log("UI : CONFIRM");
+                    voice_pickup.stop();
+                    voice_thanks.play();
                     text_mention.visible = false;
                     target_pos.visible = false;
                     target_pos2.visible = false;
@@ -155,8 +157,14 @@ Item {
     Audio{
         id: voice_pickup
         autoPlay: false
-        volume: Number(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
-        source: "bgm/voice_pickup.mp3"
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_pickup_calling.mp3"
+    }
+    Audio{
+        id: voice_thanks
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_thanks.mp3"
     }
 
     Timer{
