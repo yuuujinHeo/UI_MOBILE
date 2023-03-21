@@ -190,6 +190,19 @@ void Supervisor::setCallbell(int id){
     setting_call_id = id;
 }
 
+QString Supervisor::getCallName(QString id){
+    for(int i=0; i<getSetting("CALLING","call_num").toInt(); i++){
+        if(getSetting("CALLING","call_"+QString::number(i)) == id){
+            return "Serving_"+QString::number(i);
+        }
+    }
+    return id;
+}
+
+void Supervisor::removeCall(int id){
+    plog->write("[USER INPUT] REMOVE CALL_LIST "+QString::number(id));
+    call_list.remove(id);
+}
 
 ////*********************************************  SETTING 관련   ***************************************************////
 void Supervisor::git_pull_success(){
@@ -288,6 +301,11 @@ void Supervisor::readSetting(QString map_name){
     setting.useAutoInit = setting_robot.value("use_autoinit").toBool();
     setting.useBGM = setting_robot.value("use_bgm").toBool();
     pmap->use_uicmd = setting_robot.value("use_uicmd").toBool();
+    setting_robot.endGroup();
+
+
+    setting_robot.beginGroup("CALLING");
+    probot->max_moving_count = setting_robot.value("call_maximum").toInt();
     setting_robot.endGroup();
 
     setting_robot.beginGroup("FLOOR");
@@ -3225,8 +3243,13 @@ void Supervisor::onTimer(){
         if(probot->running_state == ROBOT_MOVING_READY){
             if(isaccepted){
                 ui_cmd = UI_CMD_NONE;
-                QMetaObject::invokeMethod(mMain, "waitkitchen");
-                ui_state = UI_STATE_READY;
+                if(probot->type == "SERVING"){
+                    QMetaObject::invokeMethod(mMain, "waitkitchen");
+                    ui_state = UI_STATE_READY;
+                }else{
+                    QMetaObject::invokeMethod(mMain, "clearkitchen");
+                    ui_state = UI_STATE_CLEAR;
+                }
                 isaccepted = false;
             }else{
                 lcm->moveTo("Resting_0");
@@ -3332,8 +3355,9 @@ void Supervisor::onTimer(){
     case UI_STATE_CALLING:{
         if(probot->running_state == ROBOT_MOVING_READY){
             if(isaccepted){//도착
-                plog->write("[SCHEDULER] CALLING MOVE ARRIVED "+probot->call_list[0]);
-                probot->call_list.pop_front();
+                plog->write("[SCHEDULER] CALLING MOVE ARRIVED "+call_list[0]);
+                ui_state = UI_STATE_PICKUP;
+                call_list.pop_front();
                 QMetaObject::invokeMethod(mMain, "showpickup");
                 isaccepted = false;
             }else{//출발
@@ -3357,7 +3381,7 @@ void Supervisor::onTimer(){
                         ui_state = UI_STATE_GO_HOME;
                     }else{
                         //call_list에서 타겟 지정 후 move
-                        QString cur_target = probot->call_list[0];
+                        QString cur_target = getCallName(call_list[0]);
                         plog->write("[SCHEDULER] CALLING MOVE TO "+cur_target);
                         lcm->moveTo(cur_target);
                     }
@@ -3374,6 +3398,9 @@ void Supervisor::onTimer(){
         }
         break;
     }
+    case UI_STATE_CLEAR:{
+        break;
+    }
     case UI_STATE_PICKUP:{
         if(probot->running_state == ROBOT_MOVING_PAUSED){
             lcm->moveResume();
@@ -3386,8 +3413,12 @@ void Supervisor::onTimer(){
             }
         }
         if(ui_cmd == UI_CMD_PICKUP_CONFIRM){
-            ui_state = UI_STATE_SERVING;
-            ui_cmd = UI_CMD_NONE;
+            if(probot->type == "SERVING"){
+                ui_state = UI_STATE_SERVING;
+                ui_cmd = UI_CMD_NONE;
+            }else{
+
+            }
         }
         break;
     }
