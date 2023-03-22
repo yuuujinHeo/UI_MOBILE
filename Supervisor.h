@@ -192,6 +192,10 @@ public:
     Q_INVOKABLE void setSLAMMode(int mode);
     Q_INVOKABLE void saveMapping(QString name);
 
+    Q_INVOKABLE void startObjecting();
+    Q_INVOKABLE void stopObjecting();
+    Q_INVOKABLE void saveObjecting();
+
     Q_INVOKABLE void setInitPos(int x, int y, float th);
     Q_INVOKABLE float getInitPoseX();
     Q_INVOKABLE float getInitPoseY();
@@ -205,6 +209,9 @@ public:
 
     Q_INVOKABLE bool getMappingflag();
     Q_INVOKABLE void setMappingflag(bool flag);
+
+    Q_INVOKABLE bool getObjectingflag();
+    Q_INVOKABLE void setObjectingflag(bool flag);
 
     Q_INVOKABLE QPixmap getMappingImage();
 
@@ -424,8 +431,12 @@ public:
     Q_INVOKABLE QObject* getTravelRawMap(QString filename) const;
     Q_INVOKABLE QObject* getTravelMap(QString filename) const;
     Q_INVOKABLE QObject* getCostMap(QString filename) const;
+    Q_INVOKABLE QObject* getObjectMap(QString filename) const;
     Q_INVOKABLE QObject* getTravel(QList<int> canvas) const;
     Q_INVOKABLE QObject* getTest(QList<int> canvas) const;
+    Q_INVOKABLE QObject* getObjecting() const;
+
+    ////*********************************************  OBJECTING 관련   ***************************************************////
 
     ////*********************************************  PATROL 관련   ***************************************************////
     Q_INVOKABLE QString getPatrolFileName();
@@ -466,6 +477,7 @@ public slots:
     void path_changed();
     void camera_update();
     void mapping_update();
+    void objecting_update();
     void usb_detect();
     void git_pull_failed();
     void git_pull_success();

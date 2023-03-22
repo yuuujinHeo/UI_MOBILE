@@ -39,7 +39,7 @@ Item {
     //불러올 맵 폴더 이름
     property string map_name: ""
 
-    //불러올 맵 파일 모드(RAW, EDITED, MINIMAP, MAPPING)
+    //불러올 맵 파일 모드(RAW, EDITED, MINIMAP, MAPPING, OBJECTING)
     property string map_mode: "EDITED"
     onMap_modeChanged: {
         print("MAP_MODE : "+map_mode);
@@ -52,6 +52,7 @@ Item {
     property bool show_robot: false
     property bool show_path: false
     property bool show_icon_only: false
+    property bool show_objecting: false
 
     property bool show_connection: false
     property bool show_buttons: false
@@ -75,51 +76,53 @@ Item {
     }
 
     onRobot_followingChanged: {
-//        if(robot_following){
-//            var newx = width/2 - robot_x*newscale;
-//            var newy = height/2 - robot_y*newscale;
+        if(robot_following){
+            robot_x = (supervisor.getRobotx()/grid_size + origin_x)*newscale;
+            robot_y = (supervisor.getRoboty()/grid_size + origin_y)*newscale;
+            var newx = width/2 - robot_x*newscale;
+            var newy = height/2 - robot_y*newscale;
 
-//            if(newx > 0){
-//                mapview.x = 0;
-//                print("???")
-//            }else if(newx < - map_width*newscale + width){
-//                mapview.x = - map_width*newscale + width
-//            }else{
-//                mapview.x = newx;
-//            }
+            if(newx > 0){
+                mapview.x = 0;
+                print("???")
+            }else if(newx < - map_width*newscale + width){
+                mapview.x = - map_width*newscale + width
+            }else{
+                mapview.x = newx;
+            }
 
-//            if(newy  > 0){
-//                mapview.y = 0;
-//            }else if(newy < - map_height*newscale + height){
-//                mapview.y = - map_height*newscale + height
-//            }else{
-//                mapview.y = newy;
-//            }
-//        }
+            if(newy  > 0){
+                mapview.y = 0;
+            }else if(newy < - map_height*newscale + height){
+                mapview.y = - map_height*newscale + height
+            }else{
+                mapview.y = newy;
+            }
+        }
     }
     onRobot_xChanged: {
-//        if(robot_following){
-//            var newx = width/2 - (robot_x)*newscale;
-//            if(newx > 0){
-//                mapview.x = 0;
-//            }else if(newx < - map_width*newscale + width){
-//                mapview.x = - map_width*newscale + width
-//            }else{
-//                mapview.x = newx;
-//            }
-//        }
+        if(robot_following){
+            var newx = width/2 - robot_x;
+            if(newx > 0){
+                mapview.x = 0;
+            }else if(newx < - map_width*newscale + width){
+                mapview.x = - map_width*newscale + width
+            }else{
+                mapview.x = newx;
+            }
+        }
     }
     onRobot_yChanged: {
-//        if(robot_following){
-//            var newy = height/2 - (robot_y)*newscale;
-//            if(newy  > 0){
-//                mapview.y = 0;
-//            }else if(newy < - map_height*newscale + height){
-//                mapview.y = - map_height*newscale + height
-//            }else{
-//                mapview.y = newy;
-//            }
-//        }
+        if(robot_following){
+            var newy = height/2 - robot_y;
+            if(newy  > 0){
+                mapview.y = 0;
+            }else if(newy < - map_height*newscale + height){
+                mapview.y = - map_height*newscale + height
+            }else{
+                mapview.y = newy;
+            }
+        }
     }
 
     //굳이 필요?/*
@@ -175,6 +178,11 @@ Item {
     //맵 불러오기(매핑 중)
     function loadmapping(){
         mapview.setMap(supervisor.getMapping())
+    }
+
+    //맵 불러오기(매핑 중)
+    function loadobjecting(){
+        objectview.setMap(supervisor.getObjecting())
     }
 
     //맵 사이즈를 전체 화면에 맞춰서 축소
@@ -336,6 +344,7 @@ Item {
     property bool refreshMap: true
     property bool rotateMap: false
 
+
     property var prevscale: 1
     property var newscale: 1
     Behavior on newscale{
@@ -427,8 +436,12 @@ Item {
         }else if(state_annotation == "OBJECT"){
             show_object = true;
             show_location = true;
-            robot_following = false;
-            show_buttons = false;
+            show_robot = true;
+            show_objecting = true;
+//            robot_following = false;
+            show_buttons = true;
+            show_lidar = true;
+            robot_following = true;
         }else if(state_annotation == "LOCATION"){
             show_object = true;
             show_robot = true;
@@ -509,6 +522,15 @@ Item {
             width: map_width
             height: map_height
             visible: state_annotation==="TRAVELLINE"
+            x: mapview.x + (mapview.width - width)/2
+            y: mapview.y + (mapview.height - height)/2
+            scale: newscale
+        }
+        MapView{
+            id: objectview
+            width: map_width
+            height: map_height
+            visible: state_annotation==="OBJECT" && show_objecting
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
             scale: newscale
@@ -811,7 +833,7 @@ Item {
                             tool = "NONE";
                         }
                     }else if(tool == "ADD_OBJECT"){
-//                        print("addObjectPoint"+new_obj_x1,new_obj_x2);
+                        print("addObjectPoint"+new_obj_x1,new_obj_x2);
                         supervisor.addObjectPoint(new_obj_x1,new_obj_y1);
                         supervisor.addObjectPoint(new_obj_x1,new_obj_y2);
                         supervisor.addObjectPoint(new_obj_x2,new_obj_y2);
@@ -1029,11 +1051,37 @@ Item {
         }
 
         Rectangle{
+            id: btn_show_objecting
+            width: 40
+            height: 40
+            radius: 40
+            visible: show_buttons && state_annotation === "OBJECT"
+            anchors.top: btn_show_lidar.bottom
+            anchors.topMargin: 5
+            anchors.left: parent.left
+            anchors.leftMargin: 5
+            color: show_objecting?"#12d27c":"#e8e8e8"
+            Image{
+                anchors.centerIn: parent
+                source: show_objecting?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    if(show_objecting){
+                        show_objecting = false;
+                    }else{
+                        show_objecting = true;
+                    }
+                }
+            }
+        }
+        Rectangle{
             id: btn_show_object
             width: 40
             height: 40
             radius: 40
-            visible: show_buttons
+            visible: show_buttons && state_annotation !== "OBJECT"
             anchors.top: btn_show_lidar.bottom
             anchors.topMargin: 5
             anchors.left: parent.left
@@ -1305,6 +1353,11 @@ Item {
                         rect_notice.msg =  "맵 생성 중";
                         rect_notice.color = color_navy;
                         rect_notice.show_icon = false;
+                    }else if(supervisor.getObjectingflag()){
+                        rect_notice.visible = true;
+                        rect_notice.msg =  "오브젝트 생성 중";
+                        rect_notice.color = color_navy;
+                        rect_notice.show_icon = false;
                     }else if(supervisor.getLocalizationState()===1){
                         rect_notice.visible = true;
                         rect_notice.msg =  "위치 초기화 중";
@@ -1353,6 +1406,7 @@ Item {
         show_object = false;
         show_path = false;
         show_robot = false;
+        show_objecting = false;
         clear_margin();
         clear_canvas();
         update_canvas();

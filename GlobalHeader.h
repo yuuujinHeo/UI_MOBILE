@@ -69,7 +69,10 @@ typedef struct{
     int chunkSize = 0;
     int imageSize = 0;
     QVector<int> data;
+    QVector<int> data_objecting;
     QPixmap test_mapping;
+//    QPixmap test_objecting;
+    cv::Mat test_objecting;
 
     QVector<ST_CAMERA> camera_info;
     QString left_camera;
@@ -215,7 +218,10 @@ enum ROBOT_CMD{
 
     ROBOT_CMD_MAPPING_STOP,//=15
     ROBOT_CMD_REQ_CAMERA,
-    ROBOT_CMD_MAPPING_SAVE
+    ROBOT_CMD_MAPPING_SAVE,
+    ROBOT_CMD_OBJECTING_START,
+    ROBOT_CMD_OBJECTING_STOP,
+    ROBOT_CMD_OBJECTING_SAVE
 };
 
 

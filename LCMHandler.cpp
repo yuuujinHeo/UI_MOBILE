@@ -266,14 +266,28 @@ void LCMHandler::saveMapping(QString name){
     sendCommand(send_msg,"SAVE MAPPING ("+name+")");
 
 }
+
+void LCMHandler::startObjecting(){
+    command send_msg;
+    send_msg.cmd = ROBOT_CMD_OBJECTING_START;
+    sendCommand(send_msg,"START OBJECTING ");
+}
+
+void LCMHandler::saveObjecting(){
+    command send_msg;
+    send_msg.cmd = ROBOT_CMD_OBJECTING_SAVE;
+    sendCommand(send_msg,"SAVE OBJECTING");
+}
 ////*********************************************  CALLBACK FUNCTIONS   ***************************************************////
 void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg){
     isconnect = true;
 //    qDebug() << "read Status";
     flag_rx = true;
     connect_count = 0;
-    probot->battery_in = msg->bat_in;
-    probot->battery_out = msg->bat_out;
+    probot->battery_in = (msg->bat_in-43)*100/11;
+    probot->battery_out = (msg->bat_out-43)*100/11;
+    if(probot->battery_in > 100) probot->battery_in = 100;
+    if(probot->battery_out > 100) probot->battery_out = 100;
     probot->battery_cur = msg->bat_cur;
     probot->motor[0].connection = msg->connection_m0;
     probot->motor[1].connection = msg->connection_m1;
@@ -364,6 +378,27 @@ void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const st
      emit mappingin();
 }
 
+void LCMHandler::robot_objecting_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data *msg){
+     isconnect = true;
+     connect_count = 0;
+
+     pmap->data.clear();
+     cv::Mat map1(1000,1000, CV_8U, cv::Scalar::all(0));
+     memcpy(map1.data, msg->data.data(), msg->len);
+     cv::flip(map1, map1, 0);
+     cv::rotate(map1, map1, cv::ROTATE_90_COUNTERCLOCKWISE);
+     cv::cvtColor(map1, map1,cv::COLOR_GRAY2RGBA);
+
+     std::vector<int> vec;
+     vec.assign(map1.data, map1.data + map1.cols*map1.rows*map1.channels());
+
+     pmap->data = QVector<int>::fromStdVector(vec);
+     pmap->test_objecting = map1;//QPixmap::fromImage(mat_to_qimage_cpy(map1));
+
+     flagObjecting = true;
+     emit objectingin();
+}
+
 void LCMHandler::robot_command_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const command *msg){
     qDebug() << "COMMAND CALLBACK" << msg->cmd;
 }
@@ -424,11 +459,13 @@ void LCMHandler::subscribe(){
     lcm.unsubscribe(sub_path);
     lcm.unsubscribe(sub_localpath);
     lcm.unsubscribe(sub_mapping);
+    lcm.unsubscribe(sub_objecting);
     lcm.unsubscribe(sub_camera);
     lcm.unsubscribe(sub_test_cmd);
     if(is_debug){
         qDebug() << "Change Subscribe " << probot->name_debug;
         sub_mapping = lcm.subscribe("MAP_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_mapping_callback, this);
+        sub_objecting = lcm.subscribe("OBS_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_objecting_callback, this);
         sub_status = lcm.subscribe("STATUS_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_status_callback, this);
         sub_path = lcm.subscribe("ROBOT_PATH_"+probot->name_debug.toStdString(), &LCMHandler::robot_path_callback, this);
         sub_localpath = lcm.subscribe("ROBOT_LOCAL_PATH_"+probot->name_debug.toStdString(), &LCMHandler::robot_local_path_callback, this);
@@ -436,6 +473,7 @@ void LCMHandler::subscribe(){
     }else{
         qDebug() << "Change Subscribe " << probot->name;
         sub_mapping = lcm.subscribe("MAP_DATA_"+probot->name.toStdString(), &LCMHandler::robot_mapping_callback, this);
+        sub_objecting = lcm.subscribe("OBS_DATA_"+probot->name.toStdString(), &LCMHandler::robot_objecting_callback, this);
         sub_status = lcm.subscribe("STATUS_DATA_"+probot->name.toStdString(), &LCMHandler::robot_status_callback, this);
         sub_path = lcm.subscribe("ROBOT_PATH_"+probot->name.toStdString(), &LCMHandler::robot_path_callback, this);
         sub_localpath = lcm.subscribe("ROBOT_LOCAL_PATH_"+probot->name.toStdString(), &LCMHandler::robot_local_path_callback, this);
@@ -458,6 +496,12 @@ void LCMHandler::onTimer(){
 
     }else{
         flagMapping = false;
+    }
+
+    if(is_objecting){
+
+    }else{
+        flagObjecting = false;
     }
 
     static int count=0;

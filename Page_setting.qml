@@ -3133,7 +3133,7 @@ Item {
             combo_baudrate.currentIndex = 1;
         }
 
-        combo_call_max.currentIndex = parseInt(supervisor.getSetting("CALLING","call_maximum"));
+        combo_call_max.currentIndex = parseInt(supervisor.getSetting("CALLING","call_maximum"))-1;
         combo_call_num.currentIndex = parseInt(supervisor.getSetting("CALLING","call_num"));
 
         model_callbell.clear();

@@ -159,7 +159,7 @@ Window {
 
     function clearkitchen(){
         loadPage(pkitchen)
-        loader_page.item.clearkitchen();
+//        loader_page.item.clearkitchen();
         supervisor.writelog("[QML - MAIN] Do Clear Kitchen");
     }
 
@@ -179,6 +179,12 @@ Window {
 //        mapview.setMap(supervisor.getMapping())
         if(loader_page.item.objectName == "page_map"){
             loader_page.item.update_mapping();
+        }
+    }
+    function updateobjecting(){
+//        mapview.setMap(supervisor.getMapping())
+        if(loader_page.item.objectName == "page_map"){
+            loader_page.item.update_objecting();
         }
     }
     function pausedcheck(){
@@ -222,6 +228,7 @@ Window {
             supervisor.writelog("[QML - MAIN] Show Pickup Page : " + loader_page.item.pos);
         }else if(robot_type == "CALLING"){
             loadPage(ppickupCall);
+            loader_page.item.init();
         }
     }
     function loadmap_server_fail(){
