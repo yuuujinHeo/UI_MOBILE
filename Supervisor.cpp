@@ -74,6 +74,7 @@ Supervisor::Supervisor(QObject *parent)
     connect(server,SIGNAL(server_get_map()),this,SLOT(server_get_map()));
     connect(lcm, SIGNAL(pathchanged()),this,SLOT(path_changed()));
     connect(lcm, SIGNAL(mappingin()),this,SLOT(mapping_update()));
+    connect(lcm, SIGNAL(objectingin()),this,SLOT(mapping_update()));
     connect(lcm, SIGNAL(cameraupdate()),this,SLOT(camera_update()));
     plog->write("");
     plog->write("");
@@ -1079,6 +1080,20 @@ void Supervisor::stopMapping(){
 void Supervisor::saveMapping(QString name){
     lcm->saveMapping(name);
 }
+void Supervisor::startObjecting(){
+    plog->write("[USER INPUT] START OBJECTING");
+    lcm->startObjecting();
+    lcm->is_objecting = true;
+}
+void Supervisor::stopObjecting(){
+    plog->write("[USER INPUT] STOP OBJECTING");
+    lcm->flagObjecting = false;
+    lcm->is_objecting = false;
+    lcm->sendCommand(ROBOT_CMD_OBJECTING_STOP, "OBJECTING STOP");
+}
+void Supervisor::saveObjecting(){
+    lcm->saveObjecting();
+}
 void Supervisor::setSLAMMode(int mode){
 
 }
@@ -1114,7 +1129,6 @@ void Supervisor::slam_stop(){
 void Supervisor::slam_autoInit(){
     lcm->sendCommand(ROBOT_CMD_SLAM_AUTO, "LOCALIZATION AUTO INIT");
 }
-
 bool Supervisor::is_slam_running(){
     if(probot->localization_state == LOCAL_READY){
         return true;
@@ -1122,13 +1136,17 @@ bool Supervisor::is_slam_running(){
         return false;
     }
 }
-
 bool Supervisor::getMappingflag(){
     return lcm->flagMapping;
 }
-
 void Supervisor::setMappingflag(bool flag){
     lcm->flagMapping = flag;
+}
+bool Supervisor::getObjectingflag(){
+    return lcm->flagObjecting;
+}
+void Supervisor::setObjectingflag(bool flag){
+    lcm->flagObjecting = flag;
 }
 
 QList<int> Supervisor::getListMap(QString filename){
@@ -1298,6 +1316,33 @@ QObject *Supervisor::getMapping() const{
     Q_ASSERT(!pc->pixmap.isNull());
     QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
     return pc;
+}
+QObject *Supervisor::getObjecting() const{
+    PixmapContainer *pc = new PixmapContainer();
+    cv::Mat argb_map;
+    pmap->test_objecting.copyTo(argb_map);
+
+//    for(int i=0; i<canvas.size(); i++){
+//        if(canvas[i] == 255){
+//            argb_map.ptr<cv::Vec4b>(i/1000)[i%1000] = cv::Vec4b(0,0,255,255);
+//        }else if(canvas[i] == 100){
+//            argb_map.ptr<cv::Vec4b>(i/1000)[i%1000] = cv::Vec4b(0,0,0,0);
+//        }
+//    }
+    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(argb_map));
+    Q_ASSERT(!pc->pixmap.isNull());
+    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+    return pc;
+
+
+
+
+
+//    PixmapContainer *pc = new PixmapContainer();
+//    pc->pixmap = pmap->test_objecting;
+//    Q_ASSERT(!pc->pixmap.isNull());
+//    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+//    return pc;
 }
 
 QObject *Supervisor::getMinimap(QString filename) const{
@@ -1587,6 +1632,34 @@ QObject *Supervisor::getTravelMap(QString filename) const{
 QObject *Supervisor::getCostMap(QString filename) const{
     PixmapContainer *pc = new PixmapContainer();
     QString file_path = QDir::homePath()+"/maps/"+filename+"/map_cost.png";
+    if(filename == "" || !QFile::exists(file_path)){
+        QPixmap blank(1000,1000);{
+            QPainter painter(&blank);
+            painter.fillRect(blank.rect(),"black");
+        }
+
+        pc->pixmap = blank;
+        Q_ASSERT(!pc->pixmap.isNull());
+        QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+        return pc;
+    }
+    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+    cv::flip(map,map,0);
+    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
+    cv::warpAffine(map,map,rot,map.size(),cv::INTER_NEAREST);
+
+    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
+
+    Q_ASSERT(!pc->pixmap.isNull());
+    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+    return pc;
+}
+
+QObject *Supervisor::getObjectMap(QString filename) const{
+    PixmapContainer *pc = new PixmapContainer();
+    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_obs.png";
     if(filename == "" || !QFile::exists(file_path)){
         QPixmap blank(1000,1000);{
             QPainter painter(&blank);
@@ -3066,6 +3139,9 @@ void Supervisor::camera_update(){
 void Supervisor::mapping_update(){
     QMetaObject::invokeMethod(mMain, "updatemapping");
 }
+void Supervisor::objecting_update(){
+    QMetaObject::invokeMethod(mMain, "updateobjecting");
+}
 void Supervisor::server_cmd_pause(){
     plog->write("[SERVER] PAUSE");
     lcm->movePause();
@@ -3233,6 +3309,7 @@ void Supervisor::onTimer(){
         }else if(ui_cmd == UI_CMD_MOVE_CALLING){
             plog->write("[SUPERVISOR] UI_STATE = CALLING");
             ui_state = UI_STATE_CALLING;
+            probot->call_moving_count = 0;
             ui_cmd = UI_CMD_NONE;
         }
         break;
@@ -3252,7 +3329,7 @@ void Supervisor::onTimer(){
                     ui_state = UI_STATE_READY;
                 }else{
                     QMetaObject::invokeMethod(mMain, "clearkitchen");
-                    ui_state = UI_STATE_CLEAR;
+                    ui_state = UI_STATE_READY;
                 }
                 isaccepted = false;
             }else{
@@ -3362,6 +3439,7 @@ void Supervisor::onTimer(){
                 plog->write("[SCHEDULER] CALLING MOVE ARRIVED "+call_list[0]);
                 ui_state = UI_STATE_PICKUP;
                 call_list.pop_front();
+                probot->call_moving_count++;
                 QMetaObject::invokeMethod(mMain, "showpickup");
                 isaccepted = false;
             }else{//출발
@@ -3376,13 +3454,14 @@ void Supervisor::onTimer(){
                     }
 
                     //call_list 비어있으면 -> 대기장소로 이동(혹은 패트롤 재시작)
-                    if(probot->call_list.size() == 0){
+                    if(call_list.size() == 0){
                         plog->write("[SCHEDULER] CALLING MOVE DONE(NO LIST)");
                         moveDone = true;
                     }
 
                     if(moveDone){
                         ui_state = UI_STATE_GO_HOME;
+                        probot->call_moving_count = 0;
                     }else{
                         //call_list에서 타겟 지정 후 move
                         QString cur_target = getCallName(call_list[0]);
@@ -3421,7 +3500,8 @@ void Supervisor::onTimer(){
                 ui_state = UI_STATE_SERVING;
                 ui_cmd = UI_CMD_NONE;
             }else{
-
+                ui_state = UI_STATE_CALLING;
+                ui_cmd = UI_CMD_NONE;
             }
         }
         break;

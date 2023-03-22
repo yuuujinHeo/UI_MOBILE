@@ -67,6 +67,7 @@ Item {
                 for(var i=0; i<supervisor.getCallSize(); i++){
                     model_call.append({name:supervisor.getCallName(supervisor.getCall(i))})
                 }
+
                 if(supervisor.getCallSize() > 0 && ready_call){
                     supervisor.server_cmd_newcall();
                 }

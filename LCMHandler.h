@@ -31,6 +31,7 @@ public:
     lcm::Subscription *sub_path;
     lcm::Subscription *sub_localpath;
     lcm::Subscription *sub_mapping;
+    lcm::Subscription *sub_objecting;
     lcm::Subscription *sub_camera;
     lcm::Subscription *sub_test_cmd;
 
@@ -47,6 +48,10 @@ public:
     //매핑 맵 저장 플래그
     bool flagMapping = false;
     bool is_mapping = false;
+
+    //매핑 맵 저장 플래그
+    bool flagObjecting = false;
+    bool is_objecting = false;
 
     //조이스틱 명령 플래그
     bool flagJoystick = false;
@@ -78,12 +83,15 @@ public:
     void saveMapping(QString name);
     void startMapping(float grid_size);
     void restartSLAM();
+    void saveObjecting();
+    void startObjecting();
 
     ////*********************************************  CALLBACK FUNCTIONS   ***************************************************////
     void robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg);
     void robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
     void robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg);
     void robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data *msg);
+    void robot_objecting_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data *msg);
     void robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const camera_data *msg);
     void robot_command_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const command*msg);
     ////***********************************************   THREADS  ********************************************************////
@@ -93,6 +101,7 @@ signals:
     void pathchanged();
     void cameraupdate();
     void mappingin();
+    void objectingin();
 
 public slots:
     void onTimer();
