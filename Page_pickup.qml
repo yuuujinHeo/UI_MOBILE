@@ -14,6 +14,9 @@ Item {
     property bool pickup_1: false
     property bool pickup_2: false
     property bool pickup_3: false
+    property bool blink_1: false
+    property bool blink_2: false
+    property bool blink_3: false
 
     function init(){
         supervisor.writelog("[QML] PICKUP PAGE Init");
@@ -34,14 +37,33 @@ Item {
     }
 
 
-//    Timer{
-//        repeat: true
-//        interval: 500
-//        running: true
-//        onTriggered: {
-//            print("pickup timer");
-//        }
-//    }
+    Timer{
+        repeat: true
+        interval: 1000
+        running: true
+        onTriggered: {
+            if(pickup_1){
+                if(blink_1) blink_1 = false;
+                else blink_1 = true;
+            }else{
+                blink_1 = false;
+            }
+
+            if(pickup_2){
+                if(blink_2) blink_2 = false;
+                else blink_2 = true;
+            }else{
+                blink_2 = false;
+            }
+
+            if(pickup_3){
+                if(blink_3) blink_3 = false;
+                else blink_3 = true;
+            }else{
+                blink_3 = false;
+            }
+        }
+    }
 
     Rectangle{
         id: rect_background
@@ -60,7 +82,7 @@ Item {
     }
     Rectangle{
         id: rect_tray_1
-        color: pickup_1?"#12d27c":"#525252"
+        color: blink_1?"#12d27c":"#525252"
         width: 187
         height: 50
         anchors.top: parent.top
@@ -76,7 +98,7 @@ Item {
     }
     Rectangle{
         id: rect_tray_2
-        color: pickup_2?"#12d27c":"#525252"
+        color: blink_2?"#12d27c":"#525252"
         width: 187
         height: 50
         anchors.top: rect_tray_1.bottom
@@ -92,7 +114,7 @@ Item {
     }
     Rectangle{
         id: rect_tray_3
-        color: pickup_3?"#12d27c":"#525252"
+        color: blink_3?"#12d27c":"#525252"
         width: 187
         height: 50
         anchors.top: rect_tray_2.bottom

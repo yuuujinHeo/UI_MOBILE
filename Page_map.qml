@@ -67,6 +67,10 @@ Item {
             map.loadmapping();
         }
     }
+    function update_objecting(){
+        map.loadobjecting();
+
+    }
 
     Component.onCompleted: {
         init_map();
@@ -2019,10 +2023,14 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PASS TO OBJECT")
+                                    supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PASS TO DRAWING")
                                     supervisor.clear_all();
-                                    map.state_annotation = "OBJECT";
-                                    loader_menu.sourceComponent = menu_annot_object;
+                                    map.state_annotation = "DRAWING";
+                                    loader_menu.sourceComponent = menu_annot_draw;
+//                                    supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PASS TO OBJECTING")
+//                                    supervisor.clear_all();
+//                                    map.state_annotation = "OBJECTING";
+//                                    loader_menu.sourceComponent = menu_annot_objecting;
                                 }
                             }
                         }
@@ -3063,7 +3071,7 @@ Item {
                                     //아무 변경이 없으면
                                     supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEXT (OBJECTING)")
                                     supervisor.clear_all();
-                                    map.state_annotation = "OBJECT";
+                                    map.state_annotation = "OBJECTING";
                                     loader_menu.sourceComponent = menu_annot_objecting;
                                 }
                             }
@@ -3683,109 +3691,110 @@ Item {
                         }
                     }
                 }
-            }
-            Rectangle{
-                id: rect_annot_box_map
-                width: parent.width - 60
-                height: 100
-                radius: 5
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: rect_annot_state.bottom
-                anchors.topMargin: 30
-                color: "#e8e8e8"
-                Row{
-                    anchors.centerIn: parent
-                    spacing: 30
-                    Rectangle{
-                        id: state_manual
-                        width: 100
-                        height: 80
-                        radius: 10
-                        color: "white"
-                        enabled: supervisor.getEmoStatus()
-                        border.color:color_green
-                        border.width: enabled?3:0
-                        Column{
-                            spacing: 3
-                            anchors.centerIn: parent
-                            Image{
-                                source: "icon/image_emergency.png"
-                                Component.onCompleted: {
-                                    if(sourceSize.width > 30)
-                                        sourceSize.width = 30
 
-                                    if(sourceSize.height > 30)
-                                        sourceSize.height = 30
-                                }
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                ColorOverlay{
-                                    id: emo_light
-                                    anchors.fill: parent
-                                    source: parent
-                                    color: color_green
-                                    visible: state_manual.enabled
-                                }
-                            }
+                Rectangle{
+                    id: rect_annot_box_map
+                    width: parent.width - 60
+                    height: 100
+                    radius: 5
+                    anchors.horizontalCenter: parent.horizontalCenter
+//                    anchors.top: rect_annot_state.bottom
+//                    anchors.topMargin: 30
+                    color: "#e8e8e8"
+                    Row{
+                        anchors.centerIn: parent
+                        spacing: 30
+                        Rectangle{
+                            id: state_manual
+                            width: 100
+                            height: 80
+                            radius: 10
+                            color: "white"
+                            enabled: supervisor.getEmoStatus()
+                            border.color:color_green
+                            border.width: enabled?3:0
+                            Column{
+                                spacing: 3
+                                anchors.centerIn: parent
+                                Image{
+                                    source: "icon/image_emergency.png"
+                                    Component.onCompleted: {
+                                        if(sourceSize.width > 30)
+                                            sourceSize.width = 30
 
-                            Text{
-                                font.family: font_noto_r.name
-                                font.pixelSize: 12
-                                text: "비상스위치 눌림"
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                horizontalAlignment: Text.AlignHCenter
-                            }
-                        }
-                    }
-                    Rectangle{
-                        id: state_objecting
-                        width: 100
-                        height: 80
-                        radius: 10
-                        color: "white"
-                        border.color:color_green
-                        border.width: is_objecting?3:0
-                        Column{
-                            spacing: 3
-                            anchors.centerIn: parent
-                            Image{
-                                source: is_objecting?"icon/icon_mapping.png":"icon/icon_mapping_start.png"
-                                Component.onCompleted: {
-                                    if(sourceSize.width > 30)
-                                        sourceSize.width = 30
-
-                                    if(sourceSize.height > 30)
-                                        sourceSize.height = 30
-                                }
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                            Text{
-                                font.family: font_noto_r.name
-                                font.pixelSize: 12
-                                text: is_objecting?"오브젝트 생성 중":"오브젝트 생성하기"
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                horizontalAlignment: Text.AlignHCenter
-                            }
-                        }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked:{
-                                if(supervisor.getLCMConnection()){
-                                    if(is_objecting){
-                                        popup_reset_mapping.open();
-                                    }else{
-//                                        btn_menu.is_restart = true;
-                                        supervisor.writelog("[USER INPUT] ANNOTATION PAGE : START OBJECTING ")
-                                        supervisor.startObjecting();
+                                        if(sourceSize.height > 30)
+                                            sourceSize.height = 30
                                     }
-                                }else{
-                                    supervisor.writelog("[USER INPUT] ANNOTATION PAGE : START OBJECTING -> BUT SLAM NOT CONNECTED")
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    ColorOverlay{
+                                        id: emo_light
+                                        anchors.fill: parent
+                                        source: parent
+                                        color: color_green
+                                        visible: state_manual.enabled
+                                    }
+                                }
+
+                                Text{
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 12
+                                    text: "비상스위치 눌림"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+                        }
+                        Rectangle{
+                            id: state_objecting
+                            width: 100
+                            height: 80
+                            radius: 10
+                            color: "white"
+                            border.color:color_green
+                            border.width: is_objecting?3:0
+                            Column{
+                                spacing: 3
+                                anchors.centerIn: parent
+                                Image{
+                                    source: is_objecting?"icon/icon_mapping.png":"icon/icon_mapping_start.png"
+                                    Component.onCompleted: {
+                                        if(sourceSize.width > 30)
+                                            sourceSize.width = 30
+
+                                        if(sourceSize.height > 30)
+                                            sourceSize.height = 30
+                                    }
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                                Text{
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 12
+                                    text: is_objecting?"오브젝트 생성 중":"오브젝트 생성하기"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked:{
+                                    if(supervisor.getLCMConnection()){
+                                        if(is_objecting){
+                                            popup_reset_objecting.open();
+                                        }else{
+    //                                        btn_menu.is_restart = true;
+                                            supervisor.writelog("[USER INPUT] ANNOTATION PAGE : START OBJECTING ")
+                                            supervisor.startObjecting();
+                                        }
+                                    }else{
+                                        supervisor.writelog("[USER INPUT] ANNOTATION PAGE : START OBJECTING -> BUT SLAM NOT CONNECTED")
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
+            }
             Timer{
                 id: update_timer
                 interval: 500
@@ -3834,7 +3843,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
-                        popup_save_mapping.open();
+                        popup_save_objecting.open();
                     }
                 }
             }
@@ -3884,10 +3893,15 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
-                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEXT (OBJECTING)")
+                                supervisor.writelog("[QML] MAP PAGE (ANNOT) -> NEXT (DRAWING)")
+                                //아무 변경이 없으면
                                 supervisor.clear_all();
-                                map.state_annotation = "OBJECT";
-                                loader_menu.sourceComponent = menu_annot_objecting;
+                                map.state_annotation = "DRAWING";
+                                loader_menu.sourceComponent = menu_annot_draw;
+//                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEXT (OBJECTING)")
+//                                supervisor.clear_all();
+//                                map.state_annotation = "OBJECTING";
+//                                loader_menu.sourceComponent = menu_annot_objecting;
                             }
                         }
                     }
@@ -3956,6 +3970,7 @@ Item {
                 for(var i=0; i<ob_num; i++){
                     list_object.model.append({"name":supervisor.getObjectName(i)});
                 }
+                map.loadobjectingpng();
                 map.update_canvas();
                 map.setfullscreen();
             }
@@ -4039,78 +4054,78 @@ Item {
                 anchors.topMargin: 20
                 spacing: 10
 
-                Rectangle{
-                    id: rect_annot_localization
-                    width: parent.width
-                    height: 100
-                    color: "#e8e8e8"
-                    Row{
-                        anchors.centerIn: parent
-                        spacing: 30
-                        Item_button{
-                            id: btn_move
-                            width: 80
-                            shadow_color: color_gray
-                            highlight: map.tool=="MOVE"
-                            icon: "icon/icon_move.png"
-                            name: "이동"
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> MOVE ")
-                                    map.tool = "MOVE";
-                                    map.reset_canvas();
-                                    supervisor.clearObjectPoints();
-                                }
-                            }
-                        }
-                        Item_button{
-                            width: 80
-                            shadow_color: color_gray
-                            highlight: map.tool=="SLAM_INIT"
-                            icon: "icon/icon_local_manual.png"
-                            name: "수동 초기화"
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> LOCALIZATION MANUAL ")
-                                    supervisor.slam_stop();
-                                    map.tool = "SLAM_INIT";
-                                    map.new_slam_init = true;
-                                    if(supervisor.getGridWidth() > 0){
-                                        map.init_x = supervisor.getlastRobotx()/supervisor.getGridWidth() + supervisor.getOrigin()[0];
-                                        map.init_y = supervisor.getlastRoboty()/supervisor.getGridWidth() + supervisor.getOrigin()[1];
-                                        map.init_th  = supervisor.getlastRobotth();// - Math.PI/2;
-                                        supervisor.setInitPos(map.init_x,map.init_y,map.init_th);
-                                    }
-                                    supervisor.slam_setInit();
-//                                    menu_location.checkInit = true;
-                                    map.update_canvas();
-                                }
-                            }
-                        }
-                        Item_button{
-                            id: btn_auto_init
-                            width: 78
-                            shadow_color: color_gray
-                            icon:"icon/icon_local_auto.png"
-                            name:"자동 초기화"
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    if(supervisor.getLocalizationState() !== 1){
-                                        supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> LOCALIZATION AUTO ")
-                                        btn_auto_init.running = true;
-                                        supervisor.slam_autoInit();
-                                        menu_location.checkInit = true;
-//                                        timer_check_localization.start();
-                                    }
+//                Rectangle{
+//                    id: rect_annot_localization
+//                    width: parent.width
+//                    height: 100
+//                    color: "#e8e8e8"
+//                    Row{
+//                        anchors.centerIn: parent
+//                        spacing: 30
+//                        Item_button{
+//                            id: btn_move
+//                            width: 80
+//                            shadow_color: color_gray
+//                            highlight: map.tool=="MOVE"
+//                            icon: "icon/icon_move.png"
+//                            name: "이동"
+//                            MouseArea{
+//                                anchors.fill: parent
+//                                onClicked: {
+//                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> MOVE ")
+//                                    map.tool = "MOVE";
+//                                    map.reset_canvas();
+//                                    supervisor.clearObjectPoints();
+//                                }
+//                            }
+//                        }
+//                        Item_button{
+//                            width: 80
+//                            shadow_color: color_gray
+//                            highlight: map.tool=="SLAM_INIT"
+//                            icon: "icon/icon_local_manual.png"
+//                            name: "수동 초기화"
+//                            MouseArea{
+//                                anchors.fill: parent
+//                                onClicked: {
+//                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> LOCALIZATION MANUAL ")
+//                                    supervisor.slam_stop();
+//                                    map.tool = "SLAM_INIT";
+//                                    map.new_slam_init = true;
+//                                    if(supervisor.getGridWidth() > 0){
+//                                        map.init_x = supervisor.getlastRobotx()/supervisor.getGridWidth() + supervisor.getOrigin()[0];
+//                                        map.init_y = supervisor.getlastRoboty()/supervisor.getGridWidth() + supervisor.getOrigin()[1];
+//                                        map.init_th  = supervisor.getlastRobotth();// - Math.PI/2;
+//                                        supervisor.setInitPos(map.init_x,map.init_y,map.init_th);
+//                                    }
+//                                    supervisor.slam_setInit();
+////                                    menu_location.checkInit = true;
+//                                    map.update_canvas();
+//                                }
+//                            }
+//                        }
+//                        Item_button{
+//                            id: btn_auto_init
+//                            width: 78
+//                            shadow_color: color_gray
+//                            icon:"icon/icon_local_auto.png"
+//                            name:"자동 초기화"
+//                            MouseArea{
+//                                anchors.fill: parent
+//                                onClicked: {
+//                                    if(supervisor.getLocalizationState() !== 1){
+//                                        supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> LOCALIZATION AUTO ")
+//                                        btn_auto_init.running = true;
+//                                        supervisor.slam_autoInit();
+//                                        menu_location.checkInit = true;
+////                                        timer_check_localization.start();
+//                                    }
 
-                                }
-                            }
-                        }
-                    }
-                }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
                 Rectangle{
                     id: rect_annot_box
                     width: parent.width
@@ -4120,35 +4135,35 @@ Item {
                         id: row_annot_loc
                         anchors.centerIn: parent
                         spacing: 15
-//                        Rectangle{
-//                            id: btn_move
-//                            width: 78
-//                            height: width
-//                            radius: width
-//                            border.width: map.tool=="MOVE"?3:0
-//                            border.color: "#12d27c"
-//                            Column{
-//                                anchors.centerIn: parent
-//                                Image{
-//                                    source: "icon/icon_move.png"
-//                                    anchors.horizontalCenter: parent.horizontalCenter
-//                                }
-//                                Text{
-//                                    text: "이동"
-//                                    font.family: font_noto_r.name
-//                                    anchors.horizontalCenter: parent.horizontalCenter
-//                                }
-//                            }
-//                            MouseArea{
-//                                anchors.fill: parent
-//                                onClicked: {
-//                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : OBJECT -> MOVE")
-//                                    map.tool = "MOVE";
-//                                    map.reset_canvas();
-//                                    supervisor.clearObjectPoints();
-//                                }
-//                            }
-//                        }
+                        Rectangle{
+                            id: btn_move
+                            width: 78
+                            height: width
+                            radius: width
+                            border.width: map.tool=="MOVE"?3:0
+                            border.color: "#12d27c"
+                            Column{
+                                anchors.centerIn: parent
+                                Image{
+                                    source: "icon/icon_move.png"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                                Text{
+                                    text: "이동"
+                                    font.family: font_noto_r.name
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : OBJECT -> MOVE")
+                                    map.tool = "MOVE";
+                                    map.reset_canvas();
+                                    supervisor.clearObjectPoints();
+                                }
+                            }
+                        }
                         Rectangle{
                             id: btn_add_location
                             width: 78
@@ -4423,7 +4438,7 @@ Item {
                             onClicked:{
                                 supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEXT (OBJECTING)")
                                 supervisor.clear_all();
-                                map.state_annotation = "OBJECT";
+                                map.state_annotation = "OBJECTING";
                                 loader_menu.sourceComponent = menu_annot_objecting;
 
 //                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : PREV (DRAWING)")
@@ -6004,6 +6019,8 @@ Item {
                                 show_loading();
                                 supervisor.writelog("[QML] MAP PAGE : SAVE OBJECTING ");
                                 supervisor.saveObjecting();
+                                unshow_loading();
+                                popup_save_objecting.close();
                             }
                         }
                     }
@@ -6408,7 +6425,7 @@ Item {
                                     map.loadmap(textfield_name.text,"EDITED");
 
                                     supervisor.clear_all();
-                                    map.state_annotation = "OBJECT";
+                                    map.state_annotation = "OBJECTING";
                                     loader_menu.sourceComponent = menu_annot_objecting;
                                     popup_save_edited.close();
                                     unshow_loading();
@@ -6504,7 +6521,7 @@ Item {
                                 supervisor.clear_all();
                                 map.init_mode();
                                 map.state_annotation = "NONE";
-                                map.loadmap(supervisor.getMapname(),"EDIT");
+                                map.loadmap(supervisor.getMapname(),"EDITED");
                                 map.show_connection = false;
                                 loader_menu.sourceComponent = menu_annot_state;
                                 popup_save_travelline.close();

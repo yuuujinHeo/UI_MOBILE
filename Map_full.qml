@@ -144,6 +144,7 @@ Item {
 
     //맵 불러오기
     function loadmap(name,type){
+        grid_size = supervisor.getGridWidth();
         supervisor.writelog("[QML MAP] LoadMap "+objectName+": "+name+" (mode = "+type+")");
         if(typeof(name) !== 'undefined'){
             map_name = name;
@@ -182,8 +183,14 @@ Item {
 
     //맵 불러오기(매핑 중)
     function loadobjecting(){
+        print("objecting")
         objectview.setMap(supervisor.getObjecting())
     }
+    function loadobjectingpng(){
+        print("objectingpng")
+        objectview.setMap(supervisor.getObjectMap(supervisor.getMapname()))
+    }
+
 
     //맵 사이즈를 전체 화면에 맞춰서 축소
     function setfullscreen(){
@@ -270,6 +277,7 @@ Item {
 
     function reset_canvas(){
         supervisor.clear_all();
+        grid_size = supervisor.getGridWidth();
         new_slam_init = false;
         select_object= -1
         select_object_point= -1
@@ -353,6 +361,7 @@ Item {
         }
     }
     onNewscaleChanged: {
+        grid_size = supervisor.getGridWidth();
         var xscale = (area_wheel.mouseX - mapview.x)/mapview.width;
         var yscale = (area_wheel.mouseY - mapview.y)/mapview.height;
 
@@ -429,11 +438,12 @@ Item {
         tool = "MOVE";
         travelview.visible = false;
         obj_sequence = 0;
+        grid_size = supervisor.getGridWidth();
         if(state_annotation == "NONE"){
             robot_following = false;
         }else if(state_annotation == "DRAWING"){
             robot_following = false;
-        }else if(state_annotation == "OBJECT"){
+        }else if(state_annotation == "OBJECTING"){
             show_object = true;
             show_location = true;
             show_robot = true;
@@ -442,6 +452,12 @@ Item {
             show_buttons = true;
             show_lidar = true;
             robot_following = true;
+        }else if(state_annotation == "OBJECT"){
+            show_object = true;
+            show_location = true;
+            show_objecting = true;
+//            robot_following = false;
+            show_buttons = true;
         }else if(state_annotation == "LOCATION"){
             show_object = true;
             show_robot = true;
@@ -530,7 +546,7 @@ Item {
             id: objectview
             width: map_width
             height: map_height
-            visible: state_annotation==="OBJECT" && show_objecting
+            visible: (state_annotation==="OBJECT" || state_annotation==="OBJECTING")&& show_objecting
             x: mapview.x + (mapview.width - width)/2
             y: mapview.y + (mapview.height - height)/2
             scale: newscale
@@ -1055,7 +1071,7 @@ Item {
             width: 40
             height: 40
             radius: 40
-            visible: show_buttons && state_annotation === "OBJECT"
+            visible: show_buttons && (state_annotation === "OBJECT" || state_annotation === "OBJECTING")
             anchors.top: btn_show_lidar.bottom
             anchors.topMargin: 5
             anchors.left: parent.left
@@ -1081,7 +1097,7 @@ Item {
             width: 40
             height: 40
             radius: 40
-            visible: show_buttons && state_annotation !== "OBJECT"
+            visible: show_buttons && (state_annotation !== "OBJECT" && state_annotation !== "OBJECTING")
             anchors.top: btn_show_lidar.bottom
             anchors.topMargin: 5
             anchors.left: parent.left
@@ -2159,7 +2175,7 @@ Item {
                         var lidar_x = robot_x + data*Math.cos((-Math.PI*i)/180 + robot_th);
                         var lidar_y = robot_y  + data*Math.sin((-Math.PI*i)/180 + robot_th);
                         ctx.moveTo(lidar_x, lidar_y);
-                        ctx.arc(lidar_x,lidar_y,1,0,Math.PI*2);
+                        ctx.arc(lidar_x,lidar_y,newscale,0,Math.PI*2);
                         ctx.closePath();
                         ctx.fill();
                         ctx.stroke();
