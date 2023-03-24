@@ -74,7 +74,7 @@ Supervisor::Supervisor(QObject *parent)
     connect(server,SIGNAL(server_get_map()),this,SLOT(server_get_map()));
     connect(lcm, SIGNAL(pathchanged()),this,SLOT(path_changed()));
     connect(lcm, SIGNAL(mappingin()),this,SLOT(mapping_update()));
-    connect(lcm, SIGNAL(objectingin()),this,SLOT(mapping_update()));
+    connect(lcm, SIGNAL(objectingin()),this,SLOT(objecting_update()));
     connect(lcm, SIGNAL(cameraupdate()),this,SLOT(camera_update()));
     plog->write("");
     plog->write("");
@@ -1318,31 +1318,35 @@ QObject *Supervisor::getMapping() const{
     return pc;
 }
 QObject *Supervisor::getObjecting() const{
-    PixmapContainer *pc = new PixmapContainer();
-    cv::Mat argb_map;
-    pmap->test_objecting.copyTo(argb_map);
-
-//    for(int i=0; i<canvas.size(); i++){
-//        if(canvas[i] == 255){
-//            argb_map.ptr<cv::Vec4b>(i/1000)[i%1000] = cv::Vec4b(0,0,255,255);
-//        }else if(canvas[i] == 100){
-//            argb_map.ptr<cv::Vec4b>(i/1000)[i%1000] = cv::Vec4b(0,0,0,0);
-//        }
-//    }
-    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(argb_map));
-    Q_ASSERT(!pc->pixmap.isNull());
-    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
-    return pc;
-
-
-
-
-
 //    PixmapContainer *pc = new PixmapContainer();
-//    pc->pixmap = pmap->test_objecting;
+////    cv::Mat argb_map;
+////    pmap->test_objecting.copyTo(argb_map);
+////    for(int i=0; i<pmap->data.size(); i++){
+////        if(pmap->data[i] == 0){
+////            argb_map.ptr<cv::Vec4b>(i/1000)[i%1000] = cv::Vec4b(0,0,0,0);
+////        }else{
+////            argb_map.ptr<cv::Vec4b>(i/1000)[i%1000] = cv::Vec4b(pmap->data[i],pmap->data[i],pmap->data[i],255);
+////        }/*
+////        if(canvas[i] == 255){
+////            argb_map.ptr<cv::Vec4b>(i/1000)[i%1000] = cv::Vec4b(0,0,255,255);
+////        }else if(canvas[i] == 100){
+////            argb_map.ptr<cv::Vec4b>(i/1000)[i%1000] = cv::Vec4b(0,0,0,0);
+////        }*/
+////    }
+//    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(argb_map));
 //    Q_ASSERT(!pc->pixmap.isNull());
 //    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
 //    return pc;
+
+
+
+
+
+    PixmapContainer *pc = new PixmapContainer();
+    pc->pixmap = pmap->test_objecting;
+    Q_ASSERT(!pc->pixmap.isNull());
+    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
+    return pc;
 }
 
 QObject *Supervisor::getMinimap(QString filename) const{
@@ -1678,7 +1682,18 @@ QObject *Supervisor::getObjectMap(QString filename) const{
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
     cv::warpAffine(map,map,rot,map.size(),cv::INTER_NEAREST);
 
-    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
+    cv::Mat argb_map(map.rows, map.cols, CV_8UC4, cv::Scalar::all(0));
+    for(int i = 0; i < map.rows; i++)
+    {
+        for(int j = 0; j < map.cols; j++)
+        {
+            if(map.ptr<uchar>(i)[j] != 0)
+            {
+                argb_map.ptr<cv::Vec4b>(i)[j] = cv::Vec4b(map.ptr<uchar>(i)[j],map.ptr<uchar>(i)[j],map.ptr<uchar>(i)[j],255);
+            }
+        }
+    }
+    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(argb_map));
 
     Q_ASSERT(!pc->pixmap.isNull());
     QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
@@ -3315,12 +3330,14 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_STATE_CHARGING:{
+        flag_patrol_serving = false;
         if(probot->status_charge == 0){
             ui_state = UI_STATE_NONE;
         }
         break;
     }
     case UI_STATE_GO_HOME:{
+        flag_patrol_serving = false;
         if(probot->running_state == ROBOT_MOVING_READY){
             if(isaccepted){
                 ui_cmd = UI_CMD_NONE;
@@ -3345,6 +3362,7 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_STATE_GO_CHARGE:{
+        flag_patrol_serving = false;
         if(probot->running_state == ROBOT_MOVING_READY){
             if(isaccepted){
                 ui_cmd = UI_CMD_NONE;
@@ -3434,6 +3452,7 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_STATE_CALLING:{
+        flag_patrol_serving = false;
         if(probot->running_state == ROBOT_MOVING_READY){
             if(isaccepted){//도착
                 plog->write("[SCHEDULER] CALLING MOVE ARRIVED "+call_list[0]);
@@ -3577,6 +3596,7 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_STATE_MOVEFAIL:{
+        flag_patrol_serving = false;
         if(prev_motor_state != probot->motor_state){
             //UI에 movefail 페이지 표시
             flag_patrol_serving = false;

@@ -72,7 +72,7 @@ typedef struct{
     QVector<int> data_objecting;
     QPixmap test_mapping;
 //    QPixmap test_objecting;
-    cv::Mat test_objecting;
+    QPixmap test_objecting;
 
     QVector<ST_CAMERA> camera_info;
     QString left_camera;

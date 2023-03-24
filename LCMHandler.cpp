@@ -284,10 +284,12 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
 //    qDebug() << "read Status";
     flag_rx = true;
     connect_count = 0;
-    probot->battery_in = (msg->bat_in-43)*100/11;
-    probot->battery_out = (msg->bat_out-43)*100/11;
+    probot->battery_in = (msg->bat_in-44)*100/10;
+    probot->battery_out = (msg->bat_out-44)*100/10;
     if(probot->battery_in > 100) probot->battery_in = 100;
     if(probot->battery_out > 100) probot->battery_out = 100;
+    if(probot->battery_in < 0) probot->battery_in = 0;
+    if(probot->battery_out < 0) probot->battery_out = 0;
     probot->battery_cur = msg->bat_cur;
     probot->motor[0].connection = msg->connection_m0;
     probot->motor[1].connection = msg->connection_m1;
@@ -382,7 +384,7 @@ void LCMHandler::robot_objecting_callback(const lcm::ReceiveBuffer *rbuf, const 
      isconnect = true;
      connect_count = 0;
 
-     pmap->data.clear();
+//     pmap->data.clear();
      cv::Mat map1(1000,1000, CV_8U, cv::Scalar::all(0));
      memcpy(map1.data, msg->data.data(), msg->len);
      cv::flip(map1, map1, 0);
@@ -392,8 +394,9 @@ void LCMHandler::robot_objecting_callback(const lcm::ReceiveBuffer *rbuf, const 
      std::vector<int> vec;
      vec.assign(map1.data, map1.data + map1.cols*map1.rows*map1.channels());
 
+//     qDebug() << map1.cols << map1.rows;
      pmap->data = QVector<int>::fromStdVector(vec);
-     pmap->test_objecting = map1;//QPixmap::fromImage(mat_to_qimage_cpy(map1));
+     pmap->test_objecting = QPixmap::fromImage(mat_to_qimage_cpy(map1));
 
      flagObjecting = true;
      emit objectingin();
