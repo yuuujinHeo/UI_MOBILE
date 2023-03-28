@@ -35,6 +35,7 @@ public:
     //서버 연결상태
     bool isconnect = false;
     bool acceptCmd = true;
+
     ////*********************************************  SEND FUNCTIONS   ***************************************************////
     void sendCalllist();
     void sendMap(QString map_name);

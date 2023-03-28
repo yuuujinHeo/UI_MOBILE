@@ -342,6 +342,8 @@ Popup{
                                     if(select_map_list > -1){
                                         var name = list_map.model.get(select_map_list).name;
                                         popup_map_list.close();
+                                        print(name);
+                                        supervisor.readSetting(name);
                                         loadPage(pmap);
                                         loader_page.item.loadmap(name);
                                         loader_page.item.is_init_state = true;
@@ -396,18 +398,27 @@ Popup{
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    print("hello 1");
                                     if(select_map_list > -1){
+                                        print("hello 2");
                                         var name = list_map.model.get(select_map_list).name;
+                                        print("name : ",name);
                                         if(supervisor.isExistAnnotation(name)){
+                                            print("??????????????????????ANNOTA?")
                                             temp_name = list_map.model.get(select_map_list).name;
                                             popup_annotation_delete.name = name;
                                             popup_annotation_delete.open();
                                         }else{
-                                            popup_map_list.close();
+                                            print("??????????????????????")
                                             loadPage(pmap);
-                                            loader_page.item.is_init_state = true;
-                                            loader_page.item.map_mode = 2;
                                             loader_page.item.loadmap(name,"RAW");
+                                            loader_page.item.map_mode = 2;
+                                            print("??????????????????????")
+                                            loader_page.item.is_init_state = true;
+                                            print("??????????????????????")
+                                            print("??????????????????????")
+                                            print("??????????????????????")
+                                            popup_map_list.close();
 //                                            loader_page.item.modeinit();
                                         }
                                     }

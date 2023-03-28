@@ -18,7 +18,6 @@ Item {
 
             if(newx > 0){
                 mapview.x = 0;
-                print("??")
             }else if(newx < - map_width*newscale + width){
                 mapview.x = - map_width*newscale + width
             }else{
@@ -72,7 +71,7 @@ Item {
     property string state_annotation: "NONE"
 
     Component.onCompleted: {
-        loadmap("");
+//        loadmap();
     }
 
     onRobot_followingChanged: {
@@ -167,6 +166,7 @@ Item {
             }else{
                 supervisor.writelog("[QML MAP] LoadMap Failed : Map mode is "+map_mode);
             }
+            setfullscreen();
         }else{
             supervisor.writelog("[QML MAP] LoadMap Failed : Map name is undefined");
             map_name = "";
@@ -195,6 +195,7 @@ Item {
     //맵 사이즈를 전체 화면에 맞춰서 축소
     function setfullscreen(){
         newscale = width/map_width;
+        print(width, map_width, newscale)
     }
 
     function update_canvas(){
@@ -243,6 +244,7 @@ Item {
         origin_y = supervisor.getOrigin()[1];
         grid_size = supervisor.getGridWidth();
         object_num = supervisor.getObjectNum();
+        print(origin_x, origin_y, grid_size, object_num, location_num)
     }
 
     function rotate_map(angle){
@@ -258,12 +260,12 @@ Item {
 
     //Annotation State (0: state, 1: load/edit, 2: object, 3: location, 4: travel line)
     //////========================================================================================Map Image Variable
-    property var grid_size: 0.05
-    property int origin_x: 500
-    property int origin_y: 500
+    property var grid_size: supervisor.getSetting("ROBOT_SW","grid_size");
+    property int origin_x: supervisor.getOrigin()[0];//500
+    property int origin_y: supervisor.getOrigin()[1];//500
     property var robot_radius: supervisor.getRobotRadius() + 0.02
-    property var map_width: 1000
-    property var map_height: 1000
+    property var map_width: supervisor.getMapWidth()
+    property var map_height: supervisor.getMapHeight()
 
     //////========================================================================================Annotation Tool
     //Tool Num (MOVE, BRUSH, ADD_OBJECT, ADD_POINT, EDIT_POINT, ADD_LOCATION, EDIT_LOCATION, ADD_LINE, SLAM_INIT, ADD_PATROL_LOCATION)
@@ -277,7 +279,7 @@ Item {
 
     function reset_canvas(){
         supervisor.clear_all();
-        grid_size = supervisor.getGridWidth();
+        grid_size = supervisor.getSetting("ROBOT_SW","grid_size");
         new_slam_init = false;
         select_object= -1
         select_object_point= -1
@@ -289,6 +291,7 @@ Item {
         new_location= false
         new_loc_available= false
         new_object= false
+        update_annotation();
         update_canvas();
     }
 
@@ -361,7 +364,7 @@ Item {
         }
     }
     onNewscaleChanged: {
-        grid_size = supervisor.getGridWidth();
+        grid_size = supervisor.getSetting("ROBOT_SW","grid_size");
         var xscale = (area_wheel.mouseX - mapview.x)/mapview.width;
         var yscale = (area_wheel.mouseY - mapview.y)/mapview.height;
 
@@ -438,7 +441,7 @@ Item {
         tool = "MOVE";
         travelview.visible = false;
         obj_sequence = 0;
-        grid_size = supervisor.getGridWidth();
+        grid_size = supervisor.getSetting("ROBOT_SW","grid_size");
         if(state_annotation == "NONE"){
             robot_following = false;
         }else if(state_annotation == "DRAWING"){
@@ -520,6 +523,7 @@ Item {
                 }else if(x < - map_width*newscale + rect_map.width){
                     x = - map_width*newscale + rect_map.width
                 }
+                print(map_width, map_height);
 //                print("x : "+x);
             }
             onYChanged: {
@@ -1515,6 +1519,7 @@ Item {
             array.push(data.data[i]);
             array_alpha.push(data.data[i+3]);
         }
+        print(map_width, map_height, data.data.length);
         supervisor.saveMap(map_mode,map_name,name,array,array_alpha);
     }
 

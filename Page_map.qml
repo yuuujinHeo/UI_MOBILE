@@ -775,14 +775,14 @@ Item {
                                         popup_reset_mapping.open();
                                     }else{
                                         btn_menu.is_restart = true;
-                                        supervisor.writelog("[USER INPUT] MAPPING PAGE : START MAPPING " + combobox_gridsize.currentText)
-                                        if(combobox_gridsize.currentText === "3cm"){
-                                            map.grid_size = 0.03;
-                                            supervisor.startMapping(0.03);
-                                        }else if(combobox_gridsize.currentText === "5cm"){
-                                            map.grid_size = 0.05;
-                                            supervisor.startMapping(0.05);
-                                        }
+                                        supervisor.writelog("[USER INPUT] MAPPING PAGE : START MAPPING " + supervisor.getSetting("ROBOT_SW","grid_size"))
+                                        map.grid_size = parseFloat(supervisor.getSetting("ROBOT_SW","grid_size"));
+                                        supervisor.startMapping(0);
+//                                        if(combobox_gridsize.currentText === "3cm"){
+//                                        }else if(combobox_gridsize.currentText === "5cm"){
+//                                            map.grid_size = 0.05;
+//                                            supervisor.startMapping(0.05);
+//                                        }
                                     }
                                 }else{
                                     supervisor.writelog("[USER INPUT] MAPPING PAGE : START MAPPING -> BUT SLAM NOT CONNECTED")
@@ -793,31 +793,122 @@ Item {
                 }
             }
             Rectangle{
-                id: rect_annot_box444
+                id: rect_annot_box_map_2
                 width: parent.width - 60
                 height: 50
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: rect_annot_box_map.bottom
                 anchors.topMargin: 5
                 color: "white"
-                Text{
-                    text: "단위 크기"
-                    font.family: font_noto_r.name
-                    font.pixelSize: 15
+                Row{
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: 50
+                    spacing: 10
+                    Text{
+                        text: "맵 크기 : "
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+//                            anchors.verticalCenter: parent.verticalCenter
+//                            anchors.left: parent.left
+//                            anchors.leftMargin: 50
+                    }
+                    Text{
+                        id: map_size
+                        text: supervisor.getSetting("ROBOT_SW","map_size");
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                    }
+                    Text{
+                        text: "pixel"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                    }
                 }
-                ComboBox{
-                    id: combobox_gridsize
+                Rectangle{
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     anchors.rightMargin: 50
-                    width: 200
-                    height: 40
-                    currentIndex: 1
-                    model:["3cm","5cm"]
+                    width: 80
+                    height: 30
+                    radius: 5
+                    color: "black"
+                    Text{
+                        text: "변경하기"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: "white"
+                        anchors.centerIn: parent
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            loadPage(psetting);
+                            loader_page.item.set_category(2);
+                        }
+                    }
                 }
+
+            }
+
+            Rectangle{
+                id: rect_annot_box444
+                width: parent.width - 60
+                height: 50
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: rect_annot_box_map_2.bottom
+                anchors.topMargin: 5
+                color: "white"
+
+                Row{
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 50
+                    spacing: 10
+                    Text{
+                        text: "단위 크기 : "
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+//                            anchors.verticalCenter: parent.verticalCenter
+//                            anchors.left: parent.left
+//                            anchors.leftMargin: 50
+                    }
+                    Text{
+                        id: grid_size
+                        text: supervisor.getSetting("ROBOT_SW","grid_size");
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                    }
+                    Text{
+                        text: "m"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                    }
+                }
+                Rectangle{
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.rightMargin: 50
+                    width: 80
+                    height: 30
+                    radius: 5
+                    color: "black"
+                    Text{
+                        text: "변경하기"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: "white"
+                        anchors.centerIn: parent
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            loadPage(psetting);
+                            loader_page.item.set_category(2);
+                        }
+                    }
+                }
+
             }
             Timer{
                 id: update_timer
@@ -2023,14 +2114,10 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PASS TO DRAWING")
+                                    supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PASS TO OBJECTING")
                                     supervisor.clear_all();
-                                    map.state_annotation = "DRAWING";
-                                    loader_menu.sourceComponent = menu_annot_draw;
-//                                    supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PASS TO OBJECTING")
-//                                    supervisor.clear_all();
-//                                    map.state_annotation = "OBJECTING";
-//                                    loader_menu.sourceComponent = menu_annot_objecting;
+                                    map.state_annotation = "OBJECTING";
+                                    loader_menu.sourceComponent = menu_annot_objecting;
                                 }
                             }
                         }
@@ -3540,7 +3627,7 @@ Item {
                                 supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : PREV (STATE)")
                                 map.init_mode();
                                 map.state_annotation = "NONE";
-                                map.loadmap(supervisor.getMapname(),"EDIT");
+                                map.loadmap(supervisor.getMapname(),"EDITED");
                                 map.show_connection = false;
                                 loader_menu.sourceComponent = menu_annot_state;
                             }
@@ -5399,9 +5486,9 @@ Item {
                                 }
                                 supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : CONFIRM SAVE ALL")
                                 //맵 다시 불러오기
-                                supervisor.setMap(supervisor.getMapname());
+                                supervisor.setMap(map.map_name);
                                 map_current.map_mode = "EDITED";
-                                map_current.loadmap(supervisor.getMapname(),"EDITED");
+                                map_current.loadmap(map.map_name,"EDITED");
                                 map_current.update_canvas();
                                 loadPage(pinit);
                             }
@@ -7200,6 +7287,7 @@ Item {
     }
 
     function loadmap(name,type){
+        print("map loadmap ",name,type);
         check_slam_init_timer.stop();
         map.loadmap(name,type);
         updatemap();

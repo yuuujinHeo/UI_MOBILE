@@ -47,20 +47,6 @@ void LCMHandler::sendCommand(command cmd, QString msg, bool force){
             plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
         }
         flag_tx = true;
-//        if(probot->init_state != ROBOT_INIT_NOT_READY || force){
-//            if(is_debug){
-//                lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&cmd);
-//                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
-//            }else{
-//                lcm.publish("COMMAND_"+probot->name.toStdString(),&cmd);
-//                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
-//            }
-//            flag_tx = true;
-//        }else{
-//            if(msg != ""){
-//                plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) TO COMMAND_" + probot->name + ": " + msg);
-//            }
-//        }
     }else{
         if(msg != ""){
             plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) TO COMMAND_" + probot->name + ": " + msg);
@@ -385,7 +371,10 @@ void LCMHandler::robot_objecting_callback(const lcm::ReceiveBuffer *rbuf, const 
      connect_count = 0;
 
 //     pmap->data.clear();
-     cv::Mat map1(1000,1000, CV_8U, cv::Scalar::all(0));
+     int rows = 1000;//msg->map_h;
+     int cols = 1000;//msg->map_w;
+
+     cv::Mat map1(rows,cols, CV_8U, cv::Scalar::all(0));
      memcpy(map1.data, msg->data.data(), msg->len);
      cv::flip(map1, map1, 0);
      cv::rotate(map1, map1, cv::ROTATE_90_COUNTERCLOCKWISE);

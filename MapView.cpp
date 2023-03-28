@@ -21,5 +21,6 @@ void MapView::setTravel(QList<int> canvas){
 }
 
 void MapView::paint(QPainter *painter){
+    qDebug() << width() << height();
     painter->drawPixmap(0,0,width(),height(),m_pixmapContainer.pixmap);
 }
