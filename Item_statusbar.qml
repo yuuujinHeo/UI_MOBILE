@@ -373,7 +373,6 @@ Item {
             }else{
                 ani_popup_show.start();
             }
-
         }
 
         Rectangle{

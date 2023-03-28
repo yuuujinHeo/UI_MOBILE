@@ -20,6 +20,10 @@ Item {
             popup_camera.update();
     }
 
+    function set_category(num){
+        select_category = num;
+    }
+
     function set_call_done(){
 //        init();
         model_callbell.clear();
@@ -755,6 +759,90 @@ Item {
                                             popup_maplist.open();
                                             init();
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"맵 크기"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: map_size
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT_SW","map_size");
+                                onFocusChanged: {
+                                    keyboard.owner = map_size;
+                                    if(focus){
+                                        keyboard.open();
+                                        map_size.selectAll();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"맵 단위 크기"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: grid_size
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT_SW","grid_size");
+                                onFocusChanged: {
+                                    keyboard.owner = grid_size;
+                                    if(focus){
+                                        keyboard.open();
+                                        grid_size.selectAll();
+                                    }else{
+                                        keyboard.close();
                                     }
                                 }
                             }
@@ -2982,6 +3070,9 @@ Item {
                         supervisor.setSetting("ROBOT_SW/limit_manual_w",text_limit_manual_w.text);
                         supervisor.setSetting("ROBOT_SW/look_ahead_dist",text_look_ahead_dist.text);
 
+                        supervisor.setSetting("ROBOT_SW/grid_size",grid_size.text);
+
+                        supervisor.setSetting("ROBOT_SW/map_size",map_size.text);
 
                         supervisor.setSetting("ROBOT_SW/volume_bgm",slider_volume_bgm.value.toFixed(0));
                         supervisor.setSetting("ROBOT_SW/volume_voice",slider_volume_voice.value.toFixed(0));
@@ -3066,6 +3157,8 @@ Item {
         wheel_radius.text = supervisor.getSetting("ROBOT_HW","wheel_radius");
 
         map_name.text = supervisor.getMapname();
+        grid_size.text = supervisor.getSetting("ROBOT_SW","grid_size");
+        map_size.text = supervisor.getSetting("ROBOT_SW","map_size");
 
         slider_k_curve.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_curve"));
         slider_k_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_v"));

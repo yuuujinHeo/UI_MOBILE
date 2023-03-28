@@ -80,8 +80,8 @@ typedef struct{
 
     QString map_name = "";
     QString map_path = "";
-    int width = 0;
-    int height = 0;
+    int width = 1000;
+    int height = 1000;
     float gridwidth = 0;
     int origin[2] = {0,};
 

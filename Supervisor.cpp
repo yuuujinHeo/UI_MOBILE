@@ -306,6 +306,12 @@ void Supervisor::readSetting(QString map_name){
     setting.useAutoInit = setting_robot.value("use_autoinit").toBool();
     setting.useBGM = setting_robot.value("use_bgm").toBool();
     pmap->use_uicmd = setting_robot.value("use_uicmd").toBool();
+    pmap->width = setting_robot.value("map_size").toInt();
+    pmap->height = setting_robot.value("map_size").toInt();
+    pmap->origin[0] = pmap->width/2;
+    pmap->origin[1] = pmap->height/2;
+    pmap->gridwidth = setting_robot.value("grid_size").toFloat();
+    qDebug() << "READ GRID WIDTH " << pmap->gridwidth;
     setting_robot.endGroup();
 
 
@@ -352,12 +358,12 @@ void Supervisor::readSetting(QString map_name){
     QSettings setting_meta(ini_path, QSettings::IniFormat);
 
     setting_meta.beginGroup("map_metadata");
-    pmap->width = setting_meta.value("map_w").toInt();
-    pmap->height = setting_meta.value("map_h").toInt();
-    pmap->gridwidth = setting_meta.value("map_grid_width").toFloat();
-    pmap->origin[0] = setting_meta.value("map_origin_u").toInt();
-    pmap->origin[1] = setting_meta.value("map_origin_v").toInt();
-    qDebug() << "Read Setting " << pmap->gridwidth;
+//    pmap->width = setting_meta.value("map_w").toInt();
+//    pmap->height = setting_meta.value("map_h").toInt();
+//    pmap->gridwidth = setting_meta.value("map_grid_width").toFloat();
+//    pmap->origin[0] = setting_meta.value("map_origin_u").toInt();
+//    pmap->origin[1] = setting_meta.value("map_origin_v").toInt();
+//    qDebug() << "Read Setting " << pmap->gridwidth;
     setting_meta.endGroup();
 
     //Annotation======================================================================
@@ -429,6 +435,8 @@ void Supervisor::readSetting(QString map_name){
         pmap->vecLocation.push_back(temp_loc);
     }
     setting_anot.endGroup();
+
+    qDebug() << pmap->vecLocation.size() << map_name;
 
     setting_anot.beginGroup("objects");
     int obj_num = setting_anot.value("num").toInt();
@@ -1354,7 +1362,7 @@ QObject *Supervisor::getMinimap(QString filename) const{
 
     QString file_path = QDir::homePath()+"/maps/"+filename+"/map_edited.png";
     if(filename == "" || !QFile::exists(file_path)){
-        QPixmap blank(1000,1000);{
+        QPixmap blank(pmap->height, pmap->width);{
             QPainter painter(&blank);
             painter.fillRect(blank.rect(),"black");
         }
@@ -1470,7 +1478,7 @@ QObject *Supervisor::getMap(QString filename) const{
     QString file_path = QDir::homePath()+"/maps/"+filename+"/map_edited.png";
 
     if(filename == "" || !QFile::exists(file_path)){
-        QPixmap blank(1000,1000);{
+        QPixmap blank(pmap->height, pmap->width);{
             QPainter painter(&blank);
             painter.fillRect(blank.rect(),"black");
         }
@@ -1501,6 +1509,7 @@ QObject *Supervisor::getRawMap(QString filename) const{
     QString file_path = QDir::homePath()+"/maps/"+filename+"/map_raw.png";
 
     if(filename == "" || !QFile::exists(file_path)){
+//        QPixmap blank(pmap->height, pmap->width);{
         QPixmap blank(1000,1000);{
             QPainter painter(&blank);
             painter.fillRect(blank.rect(),"black");
@@ -1515,6 +1524,7 @@ QObject *Supervisor::getRawMap(QString filename) const{
     cv::flip(map,map,0);
     cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
 
+    qDebug() << map.rows << map.cols;
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
     cv::warpAffine(map,map,rot,map.size(),cv::INTER_NEAREST);
 
@@ -1530,7 +1540,7 @@ QObject *Supervisor::getTravelRawMap(QString filename) const{
     PixmapContainer *pc = new PixmapContainer();
     QString file_path = QDir::homePath()+"/maps/"+filename+"/travel_raw.png";
     if(filename == "" || !QFile::exists(file_path)){
-        QPixmap blank(1000,1000);{
+        QPixmap blank(pmap->height, pmap->width);{
             QPainter painter(&blank);
             painter.fillRect(blank.rect(),"black");
         }
@@ -1574,9 +1584,9 @@ QObject *Supervisor::getTravel(QList<int> canvas) const{
 
     for(int i=0; i<canvas.size(); i++){
         if(canvas[i] == 255){
-            argb_map.ptr<cv::Vec4b>(i/1000)[i%1000] = cv::Vec4b(0,0,255,255);
+            argb_map.ptr<cv::Vec4b>(i/pmap->height)[i%pmap->width] = cv::Vec4b(0,0,255,255);
         }else if(canvas[i] == 100){
-            argb_map.ptr<cv::Vec4b>(i/1000)[i%1000] = cv::Vec4b(0,0,0,0);
+            argb_map.ptr<cv::Vec4b>(i/pmap->height)[i%pmap->width] = cv::Vec4b(0,0,0,0);
         }
     }
     pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(argb_map));
@@ -1598,7 +1608,7 @@ QObject *Supervisor::getTravelMap(QString filename) const{
     PixmapContainer *pc = new PixmapContainer();
     QString file_path = QDir::homePath()+"/maps/"+filename+"/travel_edited.png";
     if(filename == "" || !QFile::exists(file_path)){
-        QPixmap blank(1000,1000);{
+        QPixmap blank(pmap->height, pmap->width);{
             QPainter painter(&blank);
             painter.fillRect(blank.rect(),"black");
         }
@@ -1637,7 +1647,7 @@ QObject *Supervisor::getCostMap(QString filename) const{
     PixmapContainer *pc = new PixmapContainer();
     QString file_path = QDir::homePath()+"/maps/"+filename+"/map_cost.png";
     if(filename == "" || !QFile::exists(file_path)){
-        QPixmap blank(1000,1000);{
+        QPixmap blank(pmap->height, pmap->width);{
             QPainter painter(&blank);
             painter.fillRect(blank.rect(),"black");
         }
@@ -1665,7 +1675,7 @@ QObject *Supervisor::getObjectMap(QString filename) const{
     PixmapContainer *pc = new PixmapContainer();
     QString file_path = QDir::homePath()+"/maps/"+filename+"/map_obs.png";
     if(filename == "" || !QFile::exists(file_path)){
-        QPixmap blank(1000,1000);{
+        QPixmap blank(pmap->height, pmap->width);{
             QPainter painter(&blank);
             painter.fillRect(blank.rect(),"black");
         }
@@ -2059,6 +2069,7 @@ ST_FPOINT Supervisor::canvasTomap(int x, int y){
     ST_FPOINT temp;
     temp.x = -pmap->gridwidth*(y-pmap->origin[1]);
     temp.y = -pmap->gridwidth*(x-pmap->origin[0]);
+    qDebug() << pmap->gridwidth << pmap->origin[0] << x << temp.y;
     return temp;
 }
 ST_POINT Supervisor::mapTocanvas(float x, float y){
@@ -2481,19 +2492,19 @@ int Supervisor::getTlineNum(int x, int y){
 }
 bool Supervisor::saveMetaData(QString filename){
     //기존 파일 백업
-    QString backup = QDir::homePath()+"/maps/"+filename+"/map_meta_backup.ini";
-    QString origin = getMetaPath(filename);
-    if(QFile::exists(origin) == true){
-        if(QFile::copy(origin, backup)){
-            plog->write("[DEBUG] Copy map_meta.ini to map_meta_backup.ini");
-        }else{
-            plog->write("[DEBUG] Fail to copy map_meta.ini to map_meta_backup.ini");
-            return false;
-        }
-    }else{
-        plog->write("[DEBUG] Fail to copy map_meta.ini to map_meta_backup.ini (No file found)");
-        return false;
-    }
+//    QString backup = QDir::homePath()+"/maps/"+filename+"/map_meta_backup.ini";
+//    QString origin = getMetaPath(filename);
+//    if(QFile::exists(origin) == true){
+//        if(QFile::copy(origin, backup)){
+//            plog->write("[DEBUG] Copy map_meta.ini to map_meta_backup.ini");
+//        }else{
+//            plog->write("[DEBUG] Fail to copy map_meta.ini to map_meta_backup.ini");
+//            return false;
+//        }
+//    }else{
+//        plog->write("[DEBUG] Fail to copy map_meta.ini to map_meta_backup.ini (No file found)");
+//        return false;
+//    }
 
     //데이터 입력(맵데이터)
 //    QSettings settings(getMetaPath(filename), QSettings::IniFormat);
@@ -2507,6 +2518,7 @@ bool Supervisor::saveMetaData(QString filename){
 
 }
 bool Supervisor::saveAnnotation(QString filename){
+    qDebug() << "SaveAnnotation " << filename;
     //기존 파일 백업
     QString backup = QDir::homePath()+"/maps/"+filename+"/annotation_backup.ini";
     QString origin = getAnnotPath(filename);
@@ -2590,7 +2602,7 @@ bool Supervisor::saveAnnotation(QString filename){
     }
     settings.setValue("travel_lines/num",pmap->vecTline.size());
 
-    readSetting();
+    readSetting(filename);
     restartSLAM();
 //    lcm->restartSLAM();
     annotation_edit = false;

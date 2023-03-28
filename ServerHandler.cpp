@@ -230,7 +230,7 @@ void ServerHandler::onTimer(){ // 200ms
 
         QJsonObject lidar_element;
         for(int i=0; i<360; i++){
-            lidar_element["data"] = std::round(probot->lidar_data[i]*1000)/1000;
+            lidar_element["data"] = std::round(probot->lidar_data[i]*pmap->height)/pmap->width;
             lidar_array.push_back(lidar_element);
         }
         json["lidar"] = lidar_array;

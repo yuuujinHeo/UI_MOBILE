@@ -62,7 +62,7 @@ void CallbellHandler::onTimer(){
         if(m_serialPort->open(QIODevice::ReadWrite)){
             plog->write("[CALLBELL] SERIAL "+m_serialPort->portName() + " OPEN SUCCESS!");
         }else{
-            plog->write("[CALLBELL] SERIAL "+m_serialPort->portName() + " OPEN FAIL");
+//            plog->write("[CALLBELL] SERIAL "+m_serialPort->portName() + " OPEN FAIL");
         }
         time_cnt = 0;
 
