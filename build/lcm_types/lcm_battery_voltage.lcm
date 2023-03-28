@@ -1,6 +1,0 @@
-// package lcm_rb;
-
-struct lcm_battery_voltage
-{
-    double battery_voltage;
-}

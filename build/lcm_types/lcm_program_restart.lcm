@@ -1,6 +1,0 @@
-// package lcm_rb;
-
-struct lcm_program_restart
-{
-    boolean program_restart;
-}
