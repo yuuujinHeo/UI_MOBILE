@@ -1,7 +1,0 @@
-// package lcm_rb;
-
-struct lcm_limit
-{
-    double limit_vel;
-    double limit_acc;
-}

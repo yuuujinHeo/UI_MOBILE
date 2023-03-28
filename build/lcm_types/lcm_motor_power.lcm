@@ -1,6 +1,0 @@
-// package lcm_rb;
-
-struct lcm_motor_power
-{
-    boolean motor_power;
-}

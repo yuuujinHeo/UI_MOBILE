@@ -1,7 +1,0 @@
-// package lcm_rb;
-
-struct lcm_reference
-{
-    double ref_r;
-    double ref_l;
-}
