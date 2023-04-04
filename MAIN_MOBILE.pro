@@ -57,6 +57,7 @@ HEADERS += \
     Keyemitter.h \
     LCMHandler.h \
     Logger.h \
+    MapHeader.h \
     MapView.h \
     ServerHandler.h \
     SoundHandler.h \

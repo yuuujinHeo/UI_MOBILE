@@ -6,50 +6,11 @@
 #include <QDir>
 #include <QPixmap>
 #include "cv_to_qt.h"
+#include "MapHeader.h"
 
 extern Logger *plog;
 extern int ui_state;
 extern bool is_debug;
-
-typedef struct{
-    int x;
-    int y;
-}ST_POINT;
-
-typedef struct{
-    QString name;
-    bool check;
-    int x;
-    int y;
-}ST_GRID;
-
-typedef struct{
-    QVector<ST_POINT>   line;
-    QString     color;
-    float      width;
-}ST_LINE;
-
-typedef struct{
-    float x = 0;
-    float y = 0;
-    float th = 0;
-}ST_POSE;
-typedef struct{
-    float x = 0;
-    float y = 0;
-}ST_FPOINT;
-
-typedef struct{
-    QString type;
-    bool is_rect;
-    QVector<ST_FPOINT> pose;
-}ST_OBJECT;
-
-typedef struct{
-    QString type;
-    QString name;
-    ST_POSE pose;
-}ST_LOCATION;
 
 typedef struct{
     QString serial;
@@ -65,13 +26,21 @@ typedef struct{
     QString date;
 }ST_GIT;
 
+float setAxis(float _angle);
+float setAxisBack(float _angle);
+cv::Point2f setAxis(cv::Point2f _point);
+cv::Point2f setAxisBack(cv::Point2f _point);
+POSE setAxis(POSE _pose);
+POSE setAxisBack(POSE _pose);
+POSE setAxis(cv::Point2f _point, float _angle);
+POSE setAxisBack(cv::Point2f _point, float _angle);
+
 typedef struct{
     int chunkSize = 0;
     int imageSize = 0;
     QVector<int> data;
     QVector<int> data_objecting;
     QPixmap test_mapping;
-//    QPixmap test_objecting;
     QPixmap test_objecting;
 
     QVector<ST_CAMERA> camera_info;
@@ -84,17 +53,22 @@ typedef struct{
     int height = 1000;
     float gridwidth = 0;
     int origin[2] = {0,};
+    float robot_radius = 0.3;
 
-    QVector<ST_LOCATION> vecLocation;
-    QVector<QVector<ST_FPOINT>> vecTline;
-    QVector<ST_OBJECT> vecObject;
+    QVector<LOCATION> locations;
+    QVector<QVector<cv::Point2f>> tlines;
+    QVector<OBJECT> objects;
+
+
+    QVector<cv::Point2f> list_obj_uL;
+    QVector<cv::Point2f> list_obj_dR;
 
     float margin;
     bool use_server;
     bool use_uicmd;
     bool map_loaded;
 
-    ST_POSE init_pose;
+    POSE init_pose;
 }ST_MAP;
 extern ST_MAP *pmap;
 
@@ -103,6 +77,7 @@ typedef struct{
     int status = 0;
     int temperature = 0;
 }ST_MOTOR;
+
 typedef struct{
     //from Robot
     ST_MOTOR motor[2];
@@ -125,16 +100,16 @@ typedef struct{
 
     int err_code = 0;
 
-    ST_POSE curPose;
-    ST_POSE lastPose;
+    POSE curPose;
+    POSE lastPose;
     QString curLocation = "";
     QVector<int> pickupTrays;
-    ST_POSE curTarget;
+    POSE curTarget;
 
     int pathSize =0;
-    QVector<ST_POSE> curPath;
+    QVector<POSE> curPath;
     int localpathSize =0;
-    ST_POSE localPath[4];
+    POSE localPath[4];
 
     //mine
     QString name = "";
@@ -147,7 +122,7 @@ typedef struct{
     QVector<int> trays;
     QVector<QString> call_list;
 
-    ST_POSE targetPose;
+    POSE targetPose;
     QString targetLocation;
 
     int call_moving_count;
@@ -170,7 +145,7 @@ extern ST_ROBOT *probot;
 typedef struct{
     QString type;
     QString location;
-    ST_POSE pose;
+    POSE pose;
 }ST_PATROL;
 
 typedef struct{

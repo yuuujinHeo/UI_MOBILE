@@ -490,12 +490,12 @@ Popup{
                 height: width
                 anchors.centerIn: parent
                 show_connection: false
-                show_location: true
-                show_object:  true
-                show_lidar: false
+//                show_location: true
+//                show_object:  true
+//                show_lidar: false
 //                show_robot: false
 //                show_path: false
-                show_buttons: false
+//                show_buttons: false
                 Component.onCompleted: {
                     setfullscreen();
                 }
