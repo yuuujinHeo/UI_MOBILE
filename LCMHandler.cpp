@@ -124,9 +124,9 @@ void LCMHandler::moveTo(float x, float y, float th){
     send_msg.params[10]= array[2];
     send_msg.params[11]= array[3];
 
-    probot->curTarget.x = x;
-    probot->curTarget.y = y;
-    probot->curTarget.th = th;
+    probot->curTarget.point.x = x;
+    probot->curTarget.point.y = y;
+    probot->curTarget.angle = th;
     sendCommand(send_msg, "MOVE TARGET TO"+QString().sprintf("%f, %f, %f",x,y,th));
 }
 void LCMHandler::movePause(){
@@ -292,9 +292,9 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
     probot->localization_state = msg->ui_loc_state;
     probot->running_state = msg->ui_auto_state;
     probot->obs_state = msg->ui_obs_state;
-    probot->curPose.x = msg->robot_pose[0];
-    probot->curPose.y = msg->robot_pose[1];
-    probot->curPose.th = msg->robot_pose[2];
+    probot->curPose.point.x = msg->robot_pose[0];
+    probot->curPose.point.y = msg->robot_pose[1];
+    probot->curPose.angle = msg->robot_pose[2];
     for(int i=0; i<360; i++){
         probot->lidar_data[i] = msg->robot_scan[i];
     }
@@ -308,10 +308,10 @@ void LCMHandler::robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::
     probot->pathSize = msg->num;
     qDebug() <<"ROBOT PATH CALL BACK " << probot->pathSize;
     for(int i=0; i<probot->pathSize; i++){
-        ST_POSE temp;
-        temp.x = msg->path[i][0];
-        temp.y = msg->path[i][1];
-        temp.th = 0;//msg->path[i][2];
+        POSE temp;
+        temp.point.x = msg->path[i][0];
+        temp.point.y = msg->path[i][1];
+        temp.angle = 0;//msg->path[i][2];
         if(probot->curPath.size() > i){
             probot->curPath[i] = temp;
         }else{
@@ -330,10 +330,10 @@ void LCMHandler::robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const
     flagLocalPath = true;
     probot->localpathSize = msg->num;
     for(int i=0; i<probot->localpathSize; i++){
-        ST_POSE temp;
-        temp.x = msg->path[i][0];
-        temp.y = msg->path[i][1];
-        temp.th = msg->path[i][2];
+        POSE temp;
+        temp.point.x = msg->path[i][0];
+        temp.point.y = msg->path[i][1];
+        temp.angle = msg->path[i][2];
         probot->localPath[i] = temp;
     }
     flagLocalPath = false;
