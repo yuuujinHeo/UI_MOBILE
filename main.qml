@@ -335,7 +335,7 @@ Window {
             supervisor.writelog("[QML] Load Page : "+source);
             timer_update.start();
         }
-        source: pinit
+        source: pmap// pinit
     }
 
     Timer{

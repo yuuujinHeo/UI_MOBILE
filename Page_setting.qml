@@ -263,6 +263,40 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_robot_1_id
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"플랫폼 번호(중복 주의)"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_platform_id
+                                anchors.fill: parent
+                                model:[0,1,2,3,4,5,6,7,8,9,10]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
                     id: set_robot_2
                     width: 840
                     height: 40
@@ -3045,6 +3079,7 @@ Item {
                         supervisor.writelog("[USER INPUT] SETTING PAGE -> SETTING CHANGE");
                         supervisor.setSetting("ROBOT_HW/model",platform_name.text);
                         supervisor.setSetting("ROBOT_HW/serial_num",combo_platform_serial.currentText);
+                        supervisor.setSetting("ROBOT_SW/robot_id",combo_platform_id.currentText);
                         supervisor.setSetting("ROBOT_HW/radius",radius.text);
                         supervisor.setSetting("ROBOT_HW/tray_num",combo_tray_num.currentText);
 
@@ -3144,6 +3179,7 @@ Item {
         supervisor.writelog("[QML] SETTING PAGE init");
         platform_name.text = supervisor.getSetting("ROBOT_HW","model");
         combo_platform_serial.currentIndex = parseInt(supervisor.getSetting("ROBOT_HW","serial_num"))
+        combo_platform_id.currentIndex = parseInt(supervisor.getSetting("ROBOT_SW","robot_id"))
         radius.text = supervisor.getSetting("ROBOT_HW","radius");
 
         combo_tray_num.currentIndex = supervisor.getSetting("ROBOT_HW","tray_num")-1;

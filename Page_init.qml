@@ -1181,7 +1181,9 @@ Item {
         Map_full{
             objectName: "INITSHOW"
             id: map_load2
-            anchors.fill: parent
+            width: popup_show_map_light.width
+            height: popup_show_map_light.height
+//            anchors.fill: parent
         }
     }
     Popup{

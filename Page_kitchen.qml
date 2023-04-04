@@ -10,10 +10,6 @@ Item {
 
     Component.onCompleted: {
         init();
-        if(supervisor.getRobotType() === "CALLING"){
-            ready_call = false;
-            popup_question.visible = true;
-        }
     }
     function init(){
         table_num = supervisor.getTableNum();
@@ -24,58 +20,29 @@ Item {
         for(var i=0; i<tray_num; i++){
             traymodel.append({x:0,y:0,tray_num:i+1,set_table:0,color:"white"});
         }
-
         if(robot_type == "CALLING"){
             if(pbefore != pmenu)
                 popup_question.visible = true;
+            supervisor.loadPatrolFile(supervisor.getPatrolFileName());
+            var num=supervisor.getPatrolNum();
 
+            repeat_patrol.model.clear();
+            repeat_patrol.model.append({type:0,name:"Start"});
 
-            model_call.clear();
-            for(var i=0; i<supervisor.getCallSize(); i++){
-                model_call.append({name:supervisor.getCallName(supervisor.getCall(i))})
+            for(var i=0; i<num; i++){
+                repeat_patrol.model.append({type:2,name:""});
+                print(supervisor.getPatrolLocation(i));
+                if(supervisor.getPatrolLocation(i) == ""){
+                    var text="x:"+supervisor.getPatrolX(i)+", y:"+supervisor.getPatrolY(i)+", th:"+supervisor.getPatrolTH(i);
+                    repeat_patrol.model.append({type:1,name:text});
+                    print(text);
+                }else{
+                    repeat_patrol.model.append({type:1,name:supervisor.getPatrolLocation(i)});
+                }
             }
-
-
-//            supervisor.loadPatrolFile(supervisor.getPatrolFileName());
-//            var num=supervisor.getPatrolNum();
-
-//            repeat_patrol.model.clear();
-//            repeat_patrol.model.append({type:0,name:"Start"});
-
-//            for(var i=0; i<num; i++){
-//                repeat_patrol.model.append({type:2,name:""});
-//                print(supervisor.getPatrolLocation(i));
-//                if(supervisor.getPatrolLocation(i) == ""){
-//                    var text="x:"+supervisor.getPatrolX(i)+", y:"+supervisor.getPatrolY(i)+", th:"+supervisor.getPatrolTH(i);
-//                    repeat_patrol.model.append({type:1,name:text});
-//                    print(text);
-//                }else{
-//                    repeat_patrol.model.append({type:1,name:supervisor.getPatrolLocation(i)});
-//                }
-//            }
         }
         statusbar.visible = true;
     }
-    Timer{
-        running: true
-        repeat: true
-        interval: 500
-        onTriggered: {
-            robot_type = supervisor.getRobotType();
-            if(robot_type == "CALLING"){
-                model_call.clear();
-                for(var i=0; i<supervisor.getCallSize(); i++){
-                    model_call.append({name:supervisor.getCallName(supervisor.getCall(i))})
-                }
-
-                if(supervisor.getCallSize() > 0 && ready_call){
-                    supervisor.server_cmd_newcall();
-                }
-            }
-
-        }
-    }
-
     property int tray_num: 3
     property int table_num: 5
     property int table_col_num: 1
@@ -94,7 +61,6 @@ Item {
     property bool go_wait: false
     property bool go_charge: false
     property bool go_patrol: false
-    property bool ready_call: false
 
     Rectangle{
         anchors.fill : parent
@@ -123,17 +89,7 @@ Item {
 
         width: 90*1.5
         height: 50*1.5
-        source:{
-            if(robot_type=="SERVING"){
-                "image/robot_head.png"
-            }else{
-                if(ready_call){
-                    "image/robot_head.png"
-                }else{
-                    "image/robot_head_sleep.png"
-                }
-            }
-        }
+        source:"image/robot_head.png"
     }
 
     Rectangle{
@@ -294,6 +250,7 @@ Item {
                 onModelChanged: {
                     swipeview_tables.currentIndex = 0;
                 }
+
                 Item{
                     property int pageNum: index
                     Grid{
@@ -510,87 +467,8 @@ Item {
             }
         }
     }
-//    Rectangle{
-//        id: rect_patrol_box
-//        visible: robot_type=="CALLING"?true:false
-//        width: (table_num/5).toFixed(0)*100 - 20 + 160
-//        height: parent.height - statusbar.height
-//        anchors.left: parent.left
-//        anchors.top: parent.top
-//        anchors.topMargin: statusbar.height
-//        color: "#282828"
-//        onWidthChanged: {
-//            margin_name = rect_table_box.width
-//        }
-
-//        Text{
-//            id: text_patrol
-//            color:"white"
-//            font.bold: true
-//            font.family: font_noto_b.name
-//            text: "로봇 이동경로"
-//            anchors.horizontalCenter: parent.horizontalCenter
-//            anchors.top: parent.top
-//            anchors.topMargin: 40
-//            font.pixelSize: 30
-//        }
-
-//        Flickable{
-//            width: 180
-//            height: parent.height - y - 100
-//            contentHeight: column_patrol.height
-//            anchors.horizontalCenter: parent.horizontalCenter
-//            anchors.top: text_patrol.bottom
-//            anchors.topMargin: 50
-//            clip: true
-//            Column{
-//                id: column_patrol
-//                anchors.centerIn: parent
-//                Repeater{
-//                    id: repeat_patrol
-//                    model: patrolmodel
-//                    Rectangle{
-//                        width: 179
-//                        height: 44
-//                        color: "transparent"
-//                        Rectangle{
-//                            enabled: patrolmodel.get(index).type===2?false:true
-//                            visible:patrolmodel.get(index).type===2?false:true
-//                            anchors.fill: parent
-//                            color:{
-//                                if(patrolmodel.get(index).type == 0){
-//                                    "#282828"
-//                                }else{
-//                                    "#d0d0d0"
-//                                }
-//                            }
-//                            radius: 10
-//                            border.width: 4
-//                            border.color: "#d0d0d0"
-//                            Text{
-//                                anchors.centerIn: parent
-//                                color:patrolmodel.get(index).type===0?"#d0d0d0":"#282828"
-//                                text:patrolmodel.get(index).name
-//                                font.family: font_noto_r.name
-//                                font.pixelSize: 20
-//                            }
-//                        }
-//                        Image{
-//                            visible:patrolmodel.get(index).type===2?true:false
-//                            anchors.centerIn: parent
-//                            width: 22
-//                            height: 13
-//                            source: "icon/patrol_down.png"
-//                        }
-//                    }
-//                }
-//            }
-
-//        }
-
-//    }
     Rectangle{
-        id: rect_calling_list
+        id: rect_patrol_box
         visible: robot_type=="CALLING"?true:false
         width: (table_num/5).toFixed(0)*100 - 20 + 160
         height: parent.height - statusbar.height
@@ -607,7 +485,7 @@ Item {
             color:"white"
             font.bold: true
             font.family: font_noto_b.name
-            text: "호출 리스트"
+            text: "로봇 이동경로"
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 40
@@ -617,54 +495,57 @@ Item {
         Flickable{
             width: 180
             height: parent.height - y - 100
-            contentHeight: column_call.height
+            contentHeight: column_patrol.height
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: text_patrol.bottom
             anchors.topMargin: 50
             clip: true
             Column{
-                id: column_call
-                spacing: 10
+                id: column_patrol
+                anchors.centerIn: parent
                 Repeater{
-                    model: ListModel{id:model_call}
-                    Column{
-                        spacing: 10
-                        Image{
-                            visible:index > 0?true:false
-                            width: 22
-                            height: 13
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            source: "icon/patrol_down.png"
-                        }
+                    id: repeat_patrol
+                    model: patrolmodel
+                    Rectangle{
+                        width: 179
+                        height: 44
+                        color: "transparent"
                         Rectangle{
-                            width: 170
-                            height: 44
-                            color: color_dark_black
+                            enabled: patrolmodel.get(index).type===2?false:true
+                            visible:patrolmodel.get(index).type===2?false:true
+                            anchors.fill: parent
+                            color:{
+                                if(patrolmodel.get(index).type == 0){
+                                    "#282828"
+                                }else{
+                                    "#d0d0d0"
+                                }
+                            }
                             radius: 10
                             border.width: 4
-                            border.color: color_gray
+                            border.color: "#d0d0d0"
                             Text{
                                 anchors.centerIn: parent
-                                color:color_gray
-                                text:name
+                                color:patrolmodel.get(index).type===0?"#d0d0d0":"#282828"
+                                text:patrolmodel.get(index).name
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
                             }
-                            MouseArea{
-                                anchors.fill: parent
-                                onDoubleClicked: {
-                                    supervisor.removeCall(index);
-                                }
-                            }
+                        }
+                        Image{
+                            visible:patrolmodel.get(index).type===2?true:false
+                            anchors.centerIn: parent
+                            width: 22
+                            height: 13
+                            source: "icon/patrol_down.png"
                         }
                     }
-
-
                 }
             }
-        }
-    }
 
+        }
+
+    }
     Rectangle{
         id: rect_calling_box
         visible: robot_type=="CALLING"?true:false
@@ -677,50 +558,18 @@ Item {
 //        anchors.left: rect_table_box.right
 //        anchors.leftMargin: traybox_margin
         Text{
-            id: text_calling_box
             color:"white"
             font.bold: true
             font.family: font_noto_b.name
-            text: ready_call?"호출 대기 중":"비활성화 됨"
+            text: "호출 대기 중"
             anchors.centerIn: parent
             font.pixelSize: 50
         }
     }
 
 
-//    Rectangle{
-//        id: rect_go_patrol
-//        width: 300
-//        visible: robot_type=="CALLING"?true:false
-//        height: 100
-//        radius: 100
-//        anchors.horizontalCenter: rect_calling_box.horizontalCenter
-//        anchors.top: rect_calling_box.bottom
-//        anchors.topMargin: 40
-//        color: "#24a9f7"
-//        Text{
-//            id: text_go2
-//            anchors.centerIn: parent
-//            text: "패트롤 시작"
-//            font.family: font_noto_r.name
-//            font.pixelSize: 35
-//            font.bold: true
-//            color: "white"
-//        }
-//        MouseArea{
-//            id: btn_go2
-//            anchors.fill: parent
-//            onClicked: {
-//                count_resting = 0;
-//                go_patrol = true;
-//                popup_question.visible = true;
-//                print("patrol start button");
-//            }
-//        }
-//    }
-
     Rectangle{
-        id: rect_calling_enable
+        id: rect_go_patrol
         width: 300
         visible: robot_type=="CALLING"?true:false
         height: 100
@@ -730,23 +579,22 @@ Item {
         anchors.topMargin: 40
         color: "#24a9f7"
         Text{
-            id: text_enable
+            id: text_go2
             anchors.centerIn: parent
-            text: ready_call?"비활성화":"활성화"
+            text: "패트롤 시작"
             font.family: font_noto_r.name
             font.pixelSize: 35
             font.bold: true
             color: "white"
         }
         MouseArea{
+            id: btn_go2
             anchors.fill: parent
             onClicked: {
                 count_resting = 0;
-                if(ready_call){
-                    ready_call = false;
-                }else{
-                    ready_call = true;
-                }
+                go_patrol = true;
+                popup_question.visible = true;
+                print("patrol start button");
             }
         }
     }
@@ -913,48 +761,6 @@ Item {
             }
         }
         Rectangle{
-            id: btn_no
-            width: 250
-            height: 90
-            radius: 20
-            visible: !go_charge&&!go_wait&&!go_patrol
-            color: "#d0d0d0"
-            anchors.top: text_quest.bottom
-            anchors.topMargin: 50
-            anchors.right: parent.horizontalCenter
-            anchors.rightMargin: 20
-            Image{
-                id: image_no
-                source: "icon/btn_no.png"
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.leftMargin: 20
-            }
-            Text{
-                id:text_nono
-                text:"전부 취소"
-                font.family: font_noto_b.name
-                font.pixelSize: 30
-                color:"#282828"
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: image_no.right
-                anchors.leftMargin : (parent.width - image_no.x - image_no.width)/2 - text_nono.width/2
-            }
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
-                    supervisor.removeCallAll();
-                    ready_call = false;
-                    count_resting = 0;
-                    go_wait = false;
-                    go_charge = false;
-                    go_patrol = false;
-                    popup_question.visible = false;
-                }
-            }
-        }
-
-        Rectangle{
             id: btn_confirm
             width: 250
             height: 90
@@ -963,9 +769,7 @@ Item {
             color: "#d0d0d0"
             anchors.top: text_quest.bottom
             anchors.topMargin: 50
-            anchors.left: parent.horizontalCenter
-            anchors.leftMargin: 20
-//            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
             Image{
                 id: image_confirm
                 source: "icon/btn_yes.png"
@@ -996,15 +800,16 @@ Item {
                     }else{
 
                     }
+
                     go_wait = false;
                     go_charge = false;
                     go_patrol = false;
-                    ready_call = true;
                     popup_question.visible = false;
                 }
             }
         }
         Rectangle{
+            id: btn_no
             width: 250
             height: 90
             radius: 20
@@ -1015,20 +820,21 @@ Item {
             anchors.right: parent.horizontalCenter
             anchors.rightMargin: 20
             Image{
-                id: image_nonono
+                id: image_no
                 source: "icon/btn_no.png"
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: 20
             }
             Text{
+                id:text_nono
                 text:"아니오"
                 font.family: font_noto_b.name
                 font.pixelSize: 30
                 color:"#282828"
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.left: image_nonono.right
-                anchors.leftMargin : (parent.width - image_nonono.x - image_nonono.width)/2 - width/2
+                anchors.left: image_no.right
+                anchors.leftMargin : (parent.width - image_no.x - image_no.width)/2 - text_nono.width/2
             }
             MouseArea{
                 anchors.fill: parent

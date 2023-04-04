@@ -62,9 +62,9 @@ void ServerHandler::onTextMessageReceived(QString message){
             float y = json["y"].toDouble();
             float th = json["th"].toDouble();
 
-            probot->targetPose.x = x;
-            probot->targetPose.y = y;
-            probot->targetPose.th = th;
+            probot->targetPose.point.x = x;
+            probot->targetPose.point.y = y;
+            probot->targetPose.angle = th;
             emit server_new_target();
         }else if(cmd == "NEW_CALL"){
             probot->targetLocation = json["location"].toString();
@@ -200,30 +200,30 @@ void ServerHandler::onTimer(){ // 200ms
 
         json["robot_type"] = probot->type;
         // cur_pose
-        json["cur_pose_x"] = probot->curPose.x;
-        json["cur_pose_y"] = probot->curPose.y;
-        json["cur_pose_th"] = probot->curPose.th;
+        json["cur_pose_x"] = probot->curPose.point.x;
+        json["cur_pose_y"] = probot->curPose.point.y;
+        json["cur_pose_th"] = probot->curPose.angle;
 
         // target_pose
-        json["target_pose_x"] = probot->targetPose.x;
-        json["target_pose_y"] = probot->targetPose.y;
-        json["target_pose_th"] = probot->targetPose.th;
+        json["target_pose_x"] = probot->targetPose.point.x;
+        json["target_pose_y"] = probot->targetPose.point.y;
+        json["target_pose_th"] = probot->targetPose.angle;
 
         // path
         QJsonObject path_element;
         for(int i=0; i<probot->pathSize; i++){
-            path_element["x"] = probot->curPath[i].x;
-            path_element["y"] = probot->curPath[i].y;
-            path_element["th"] = probot->curPath[i].th;
+            path_element["x"] = probot->curPath[i].point.x;
+            path_element["y"] = probot->curPath[i].point.y;
+            path_element["th"] = probot->curPath[i].angle;
             path_array.push_back(path_element);
         }
         json["path"] = path_array;
 
         QJsonObject path_element_local;
         for(int i=0; i<probot->localpathSize; i++){
-            path_element_local["x"] = probot->localPath[i].x;
-            path_element_local["y"] = probot->localPath[i].y;
-            path_element_local["th"] = probot->localPath[i].th;
+            path_element_local["x"] = probot->localPath[i].point.x;
+            path_element_local["y"] = probot->localPath[i].point.y;
+            path_element_local["th"] = probot->localPath[i].angle;
             local_path_array.push_back(path_element_local);
         }
         json["local_path"] = local_path_array;
