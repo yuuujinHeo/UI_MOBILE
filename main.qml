@@ -16,21 +16,21 @@ Window {
     width: 1280
     height: 800
     title: qsTr("Hello World")
-//    flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
-//    visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
+    flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
+    visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
 
-//    onVisibilityChanged: {
-//        if(homePath.split("/")[2]==="odroid"){
-//            if(mainwindow.visibility == Window.Minimized){
-//                print("minimized");
-//            }else if(mainwindow.visibility == Window.FullScreen){
-//                print("fullscren");
-//            }else{
-//                supervisor.writelog("[QML - MAIN] Window show fullscreen");
-//                mainwindow.visibility = Window.FullScreen;
-//            }
-//        }
-//    }
+    onVisibilityChanged: {
+        if(homePath.split("/")[2]==="odroid"){
+            if(mainwindow.visibility == Window.Minimized){
+                print("minimized");
+            }else if(mainwindow.visibility == Window.FullScreen){
+                print("fullscren");
+            }else{
+                supervisor.writelog("[QML - MAIN] Window show fullscreen");
+                mainwindow.visibility = Window.FullScreen;
+            }
+        }
+    }
     Component.onDestruction: {
     }
 

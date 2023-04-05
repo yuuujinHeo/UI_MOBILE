@@ -96,7 +96,7 @@ void MapView::setMode(QString name){
         show_location_icon = true;
         robot_following = false;
         setFullScreen();
-    }else if(mode == "annot_drawing"){
+    }else if(mode == "annot_drawing" || mode == "annot_rotate"){
         show_robot = false;
         show_global_path = false;
         show_local_path = false;
@@ -210,7 +210,8 @@ void MapView::setMapMap(){
 //        qDebug() << scale << map_x << map_y << map_width << map_width*scale << map_orin.cols << map_height << map_height*scale << map_orin.rows;
 
         //Rotation Map
-        cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(map_orin.cols/2, map_orin.rows/2),-rotate_angle,1.0);
+        cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(map_orin.cols/2, map_orin.rows/2),-dangle,1.0);
+//        qDebug() << "setMApMap "<<rotate_angle;
         cv::warpAffine(map_orin,map_orin,rot,map_orin.size(),cv::INTER_NEAREST);
         cv::warpAffine(map_drawing,map_drawing,rot,map_drawing.size(),cv::INTER_NEAREST);
         cv::warpAffine(map_drawing_mask,map_drawing_mask,rot,map_drawing_mask.size(),cv::INTER_NEAREST);
@@ -788,18 +789,23 @@ void MapView::clearInitPose(){
 }
 
 void MapView::rotateMap(int angle){
+    dangle = angle - rotate_angle;
     rotate_angle = angle;
     setMapMap();
 //    updateMap();
 }
 
 void MapView::rotateMapCW(){
+    dangle = 1;
     rotate_angle++;
+//    qDebug() << "rotateCW " << rotate_angle;
     setMapMap();
 }
 
 void MapView::rotateMapCCW(){
     rotate_angle--;
+    dangle = -1;
+//    qDebug() << "rotateCCW " << rotate_angle;
     setMapMap();
 
 }
@@ -930,15 +936,31 @@ void MapView::saveMap(){
     cv::Mat temp_mask;
     cv::Mat map_merge;
 
-    cv::cvtColor(map_drawing,temp_draw,cv::COLOR_BGRA2BGR);
-    cv::cvtColor(map_drawing_mask,temp_mask,cv::COLOR_BGRA2BGR);
-    cv::cvtColor(map_orin,temp_orin,cv::COLOR_GRAY2BGR);
+    map_orin.copyTo(temp_orin);
+    map_drawing.copyTo(temp_draw);
+    map_drawing_mask.copyTo(temp_mask);
+
+    if(temp_orin.channels() == 1)
+        cv::cvtColor(temp_orin,temp_orin,cv::COLOR_GRAY2BGR);
+    else if(temp_orin.channels() == 4)
+        cv::cvtColor(temp_orin,temp_orin,cv::COLOR_BGRA2BGR);
+    if(temp_draw.channels() == 1)
+        cv::cvtColor(temp_draw,temp_draw,cv::COLOR_GRAY2BGR);
+    else if(temp_draw.channels() == 4)
+        cv::cvtColor(temp_draw,temp_draw,cv::COLOR_BGRA2BGR);
+    if(temp_mask.channels() == 1)
+        cv::cvtColor(temp_mask,temp_mask,cv::COLOR_GRAY2BGR);
+    else if(temp_mask.channels() == 4)
+        cv::cvtColor(temp_mask,temp_mask,cv::COLOR_BGRA2BGR);
+
     cv::multiply(cv::Scalar::all(1.0)-temp_mask,temp_orin,temp_orin);
     cv::add(temp_orin,temp_draw,map_merge);
+    cv::imshow("map_merge",map_merge);
 //    cv::cvtColor(temp_orin,temp_orin,cv::COLOR_GRAY2BGRA);
 //    cv::addWeighted(temp_orin, 1, map_drawing, 1, 0, map_merge);
 
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(map_orin.cols/2, map_orin.rows/2),-rotate_angle,1.0);
+    rotate_angle = 0;
     cv::Mat rotated;
     map_merge.copyTo(rotated);
     cv::warpAffine(rotated,rotated,rot,rotated.size(),cv::INTER_NEAREST);

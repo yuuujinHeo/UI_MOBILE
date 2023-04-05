@@ -76,6 +76,7 @@ public:
 
     //---------------------------------------------------Rotation
     int rotate_angle = 0;
+    int dangle = 0;
     Q_INVOKABLE void rotateMap(int angle);
     Q_INVOKABLE void rotateMapCW();
     Q_INVOKABLE void rotateMapCCW();

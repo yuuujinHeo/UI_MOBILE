@@ -204,6 +204,7 @@ Item {
         }
     }
     function rotate(dir){
+        print("rotate map : "+dir)
         if(dir === "cw"){
             mapview.rotateMapCW();
         }else if(dir === "ccw"){
@@ -333,8 +334,8 @@ Item {
                 if(double_touch){
                     firstX = mapview.getX() + (point1.x+point2.x)*mapview.getScale()/2;
                     firstY = mapview.getY() + (point1.y+point2.y)*mapview.getScale()/2;
-                    var dx = Math.abs(point_x1-point_x2);
-                    var dy = Math.abs(point_y1-point_y2);
+                    var dx = Math.abs(point1.x-point2.x);
+                    var dy = Math.abs(point1.y-point2.y);
                     firstDist = Math.sqrt(dx*dx + dy*dy);
                 }
             }else if(tool == "draw"){
@@ -405,9 +406,9 @@ Item {
                         var dist = Math.sqrt(dx*dx + dy*dy);
 
                         var threshold = 10;
-                        if(startDist - dist > threshold){
+                        if(firstDist - dist > threshold){
                             mapview.zoomIn(newX/mapview.getScale(),newY/mapview.getScale());
-                        }else if(dist - startDist > threshold){
+                        }else if(dist - firstDist > threshold){
                             mapview.zoomOut(newX/mapview.getScale(),newY/mapview.getScale());
                         }
                     }else if(point1.pressed){

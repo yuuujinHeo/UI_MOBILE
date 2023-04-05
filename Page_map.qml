@@ -158,7 +158,7 @@ Item {
         id: ani_mode_change
         running: false
         onStarted: {
-            timer_get_joy.stop();
+//            timer_get_joy.stop();
             loader_menu.item.disappear();
             map_annot.enabled = false;
             map_cur.enabled = false;
@@ -772,7 +772,7 @@ Item {
                 running: true
                 repeat: true
                 onTriggered:{
-                    print(supervisor.getMappingflag())
+//                    print(supervisor.getMappingflag())
                     if(supervisor.getMappingflag()){
                         if(!is_mapping){
                             voice_stop_mapping.stop();
@@ -789,8 +789,8 @@ Item {
 
                     if(supervisor.getEmoStatus()){
                         state_manual.enabled = true;
-                        timer_check_keyboard.stop();
-                        timer_get_joy.stop();
+//                        timer_check_keyboard.stop();
+//                        timer_get_joy.stop();
                     }else{
                         state_manual.enabled = false;
                     }
@@ -2256,9 +2256,8 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 supervisor.writelog("[QML] MAP PAGE (ANNOT) -> NEXT (ROTATE)")
-                                map.state_annotation = "DRAWING";
-                                map.init_mode();
-                                map.show_connection = false;
+                                map.setTool("move");
+                                map.setViewer("annot_rotate");
                                 loader_menu.sourceComponent = menu_annot_rotate;
                             }
                         }
@@ -2406,13 +2405,19 @@ Item {
                     to : 180
                     property var angle_init: 0
                     onValueChanged: {
-                        map.rotate(value - angle_init);
+                        if(pressed){
+
+                            map.rotate(value - angle_init);
+                            print("slider rotate : ",value,angle_init,value-angle_init);
+
+                        }
                     }
                     onPressedChanged: {
                         if(pressed){
                             angle_init = value;
                         }else{
                             //released
+                            angle_init = 0;
                             map.rotate(value - angle_init);
 //                                    print(value, angle_init);
                         }
@@ -2430,8 +2435,10 @@ Item {
                 onTriggered: {
                     if(isplus){
                         slider_rotate.value++;
+                        map.rotate("cw");
                     }else{
                         slider_rotate.value--;
+                        map.rotate("ccw");
                     }
                 }
             }
@@ -2473,6 +2480,7 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 slider_rotate.value--;
+                                map.rotate("ccw");
                             }
                             onPressAndHold: {
                                 timer_rotate.isplus = false;
@@ -2499,6 +2507,7 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 slider_rotate.value++;
+                                map.rotate("cw");
                             }
                             onPressAndHold: {
                                 timer_rotate.isplus = true;
@@ -5867,8 +5876,6 @@ Item {
                 if(!supervisor.getLCMConnection()){
                     supervisor.writelog("[QML] MAP PAGE : SLAM RESTART DETECTED");
                     //맵 새로 불러오기.
-                    map.init_mode();
-                    map.show_connection = false;
                     map.loadmap(textfield_name22.text,"RAW");
                     supervisor.readSetting(textfield_name22.text);
                     map.init();
