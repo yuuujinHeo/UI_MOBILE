@@ -26,6 +26,7 @@ Popup{
         btn_use.enabled = false;
         btn_draw.enabled = false;
         btn_erase.enabled = false;
+        map_list_view.enabled = true;
         for(var i=0; i<num; i++){
             list_map.model.append({"name":supervisor.getAvailableMapPath(i),"selected":false});
             if(mapname === supervisor.getAvailableMapPath(i)){
@@ -63,6 +64,11 @@ Popup{
             }
         }
     }
+    onClosed:{
+
+        map_list_view.enabled = false;
+    }
+
     function update_list(){
         list_map.model.clear();
         var num = supervisor.getAvailableMap();

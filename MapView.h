@@ -12,12 +12,14 @@ class MapView : public QQuickPaintedItem
 public:
     MapView(QQuickItem *parent = nullptr);
 
+    bool enable = false;
     QString tool = "move";
     QString mode = "none";
     QString object_name = "";
 
-    int res = 2;
+    int res = 1;
 
+    Q_INVOKABLE void setEnable(bool en){enable = en;}
     Q_INVOKABLE void setName(QString name){object_name = name;}
     Q_INVOKABLE void setTool(QString name){tool = name;}
     Q_INVOKABLE QString getTool(){return tool;}
@@ -50,6 +52,7 @@ public:
     //--------------------------------------------------Map Generation
     Q_INVOKABLE void setMap(QObject *pixmapContainer);
     Q_INVOKABLE void updateMap();
+    Q_INVOKABLE void moveMap();
     Q_INVOKABLE void reloadMap();
     Q_INVOKABLE void setMapping();
     Q_INVOKABLE void setObjecting();
@@ -61,6 +64,7 @@ public:
     void setMapCurrent();
     void setMapDrawing();
     void setMapObject();
+    void setMapMap();
     void setMapLocation();
     void setMapTravelline();
 
@@ -175,10 +179,13 @@ private:
     PixmapContainer pixmap_tline;
     PixmapContainer pixmap_current;
     cv::Mat map_orin;
-    cv::Mat map_current;
     cv::Mat map_tline;
+    cv::Mat map_map;
     cv::Mat map_drawing;
     cv::Mat map_drawing_mask;
+    QPixmap map_object;
+    QPixmap map_location;
+    QPixmap map_current;
 
 private slots:
     void onTimer();

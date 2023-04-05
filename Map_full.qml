@@ -40,6 +40,11 @@ Item {
     property bool is_drawing_undo: false
     property bool is_drawing_redo: false
 
+    onEnabledChanged: {
+        print("enabled changed : "+objectName + enabled);
+        mapview.setEnable(enabled);
+    }
+
     onWidthChanged: {
         if(width>0 && height>0){
             mapview.setMapSize(width, height);
@@ -50,6 +55,12 @@ Item {
         mapview.setRawMap("");
         mapview.setName(objectName);
     }
+
+    function setEnable(en){
+        enabled = en;
+        mapview.setEnable(en);
+    }
+
     function setViewer(mode){
         supervisor.writelog("[QML MAP] SET Viewer "+objectName+" to "+mode);
         mapview.setMode(mode);
@@ -106,6 +117,7 @@ Item {
         if(typeof(name) === 'undefined'){
             name = supervisor.getMapname();
         }
+        supervisor.readSetting(name);
 
         if(typeof(type) !== 'undefined'){
             map_type = type;
@@ -175,6 +187,7 @@ Item {
     }
 
     function init(){
+        mapview.reloadMap();
         clear("all");
         setTool("move");
     }
@@ -249,6 +262,7 @@ Item {
     }
 
     function setAutoInit(x,y,th){
+        print(objectName+" ?:",x,y,th);
         mapview.setInitPose(x,y,th);
         supervisor.setInitPos(x,y,th);
     }
@@ -280,6 +294,7 @@ Item {
         }
     }
     MouseArea{
+        enabled: parent.enabled
         anchors.fill: parent
         hoverEnabled: true
         onWheel: {
@@ -292,6 +307,7 @@ Item {
     }
 
     MultiPointTouchArea{
+        enabled: parent.enabled
         anchors.fill: parent
         minimumTouchPoints: 1
         maximumTouchPoints: 2
@@ -302,6 +318,7 @@ Item {
         touchPoints: [TouchPoint{id:point1},TouchPoint{id:point2}]
         onPressed:{
             double_touch = false;
+            mapview.setRobotFollowing(false);
             if(point1.pressed && point2.pressed){
                 double_touch = true;
             }else if(point1.pressed){
@@ -311,7 +328,6 @@ Item {
                 firstX = mapview.getX() + point2.x*mapview.getScale();
                 firstY = mapview.getY() + point2.y*mapview.getScale();
             }
-
 
             if(tool == "move"){
                 if(double_touch){
@@ -368,8 +384,8 @@ Item {
                 }else if( tool === "add_location"){
 
                 }else if( tool === "slam_init"){
-                    var angle = Math.atan2(-(newX-firstX),-(newY-firstY));
-                    supervisor.setInitPos(newX,newY, angle);
+                    angle = Math.atan2(-(newY-firstY),-(newX-firstX));
+                    supervisor.setInitPos(firstX, firstY, angle);
                     supervisor.slam_setInit();
                 }
             }
@@ -377,7 +393,6 @@ Item {
         }
         onTouchUpdated: {
             if(point1.pressed || point2.pressed){
-
                 var newX = mapview.getX() + point1.x*mapview.getScale();
                 var newY = mapview.getY() + point1.y*mapview.getScale();
                 if(tool == "move"){
@@ -415,15 +430,15 @@ Item {
                 }else if( tool === "add_point"){
                     mapview.setObject(newX, newY);
                 }else if( tool === "add_location"){
-                    var angle = Math.atan2(-(newX-firstX),-(newY-firstY));
-    //                print(angle);
+                    var angle = Math.atan2((newY-firstY),(newX-firstX));
+                    print(angle);
                     mapview.addLocation(firstX, firstY,angle);
                 }else if( tool === "edit_location"){
-                    angle = Math.atan2(-(newX-firstX),-(newY-firstY));
-    //                print(angle);
+                    angle = Math.atan2((newY-firstY),(newX-firstX));
+                    print(angle, newX-firstX, newY-firstY);
                     mapview.editLocation(firstX, firstY,angle);
                 }else if( tool === "slam_init"){
-                    angle = Math.atan2(-(newX-firstX),-(newY-firstY));
+                    angle = Math.atan2((newY-firstY),(newX-firstX));
                     mapview.setInitPose(firstX,firstY,angle);
                 }
             }

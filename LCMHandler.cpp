@@ -342,12 +342,13 @@ void LCMHandler::robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const
 void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data *msg){
     isconnect = true;
      connect_count = 0;
-     pmap->width = msg->map_w;
-     pmap->height = msg->map_h;
-     pmap->gridwidth = msg->map_grid_w;
-     pmap->origin[0] = msg->map_origin[0];
-     pmap->origin[1] = msg->map_origin[1];
-     pmap->imageSize = msg->len;
+//     pmap->width = 2000;//msg->map_w;
+//     pmap->height = 2000;//msg->map_h;
+//     pmap->gridwidth = msg->map_grid_w;
+//     qDebug() << "mapping " << msg->map_grid_w << msg->map_w << msg->map_origin[0];
+//     pmap->origin[0] = pmap->width/2;//msg->map_origin[0];
+//     pmap->origin[1] = pmap->height/2;//msg->map_origin[1];
+//     pmap->imageSize = msg->len;
 
      pmap->data.clear();
      cv::Mat map1(msg->map_h, msg->map_w, CV_8U, cv::Scalar::all(0));
@@ -358,7 +359,7 @@ void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const st
 
      std::vector<int> vec;
      vec.assign(map1.data, map1.data + map1.cols*map1.rows*map1.channels());
-
+     pmap->map_mapping = map1;
      pmap->data = QVector<int>::fromStdVector(vec);
      pmap->test_mapping = QPixmap::fromImage(mat_to_qimage_cpy(map1));
 
@@ -487,6 +488,9 @@ void LCMHandler::onTimer(){
     if(is_mapping){
 
     }else{
+        if(flagMapping){
+            sendCommand(ROBOT_CMD_MAPPING_STOP, "MAPPING STOP");
+        }
         flagMapping = false;
     }
 

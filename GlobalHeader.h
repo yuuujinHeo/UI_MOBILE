@@ -41,6 +41,7 @@ typedef struct{
     QVector<int> data;
     QVector<int> data_objecting;
     QPixmap test_mapping;
+    cv::Mat map_mapping;
     QPixmap test_objecting;
 
     QVector<ST_CAMERA> camera_info;
@@ -79,6 +80,7 @@ typedef struct{
 }ST_MOTOR;
 
 typedef struct{
+    bool lcmconnection = false;
     //from Robot
     ST_MOTOR motor[2];
 
