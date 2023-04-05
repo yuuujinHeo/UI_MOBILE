@@ -63,6 +63,8 @@ public:
     //로봇 이름이 달라졌을 때 subscribe 다시
     void subscribe();
 
+    //mapping width
+    int mapping_width;
     ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
     void sendCommand(command cmd, QString msg, bool force=false);
     void sendCommand(int cmd, QString msg);

@@ -55,6 +55,10 @@ Item {
 
     Component.onCompleted: {
         init();
+        map.enabled = true;
+    }
+    Component.onDestruction: {
+        map.enabled = false;
     }
 
     function init(){
@@ -63,16 +67,8 @@ Item {
         statusbar.visible = true;
         notice.y = 0;
         area_swipe.enabled = true;
-        map.init_mode();
-        map.show_buttons = true;
-        map.show_connection = true;
-        map.robot_following = true;
-        map.show_lidar = true;
-        map.show_path = true;
-        map.show_object = true;
-        if(select_localmode)
-            map.show_location = true;
-        map.show_robot = true;
+        map.init();
+        map.setViewer("current");
     }
 
     SequentialAnimation{
@@ -848,14 +844,10 @@ Item {
             objectName: "MOVEFAIL"
             width: 740
             height: width
-            show_robot: true
-            show_path: true
-            robot_following: true
-            show_lidar: true
-            show_buttons: true
+            show_button_following: true
+            show_button_lidar: true
+            show_button_object: true
             show_connection: true
-            show_location: true
-            show_object: true
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.topMargin: statusbar.height

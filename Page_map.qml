@@ -279,6 +279,13 @@ Item {
         height: parent.height - status_bar.height
         anchors.left: rect_menus.right
         anchors.top: status_bar.bottom
+        Component.onCompleted: {
+            map_current.enabled = true;
+        }
+        Component.onDestruction: {
+            map_current.enabled = false;
+        }
+
         Rectangle{
             id: rect_mapview
             anchors.fill: parent
@@ -303,8 +310,8 @@ Item {
                 show_button_lidar: true
                 show_button_object: true
                 Component.onCompleted: {
-                    supervisor.readSetting("newmap")
-                    loadmap("newmap","EDITED")
+//                    supervisor.readSetting()
+                    loadmap(supervisor.getMapname(),"EDITED")
                     setViewer("current");
                 }
                 anchors.horizontalCenter: text_curmap.horizontalCenter
@@ -321,6 +328,15 @@ Item {
         height: parent.height - status_bar.height
         anchors.left: rect_menus.right
         anchors.top: status_bar.bottom
+        Component.onCompleted: {
+            print("map_annot completed");
+            map.setEnable(true);
+
+        }
+        Component.onDestruction: {
+            print("map_annot destruction");
+            map.setEnable(false);
+        }
 
         Rectangle{
             anchors.fill: parent
@@ -336,6 +352,7 @@ Item {
                 Component.onCompleted: {
                     supervisor.readSetting();
                     map.loadmap(supervisor.getMapname());
+                    map.setViewer("current")
                 }
             }
             Rectangle{
@@ -482,9 +499,8 @@ Item {
                         supervisor.stopMapping();
                         supervisor.restartSLAM();
                         supervisor.setMap(supervisor.getMapname());
-                        map.map_mode = "EDITED";
+                        map.setViewer("current");
                         map.loadmap(supervisor.getMapname(),"EDITED");
-                        map.update_canvas();
                         loadPage(pinit);
                     }else{
                         supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO MAIN")
@@ -621,7 +637,7 @@ Item {
                                     }else{
                                         btn_menu.is_restart = true;
                                         supervisor.writelog("[USER INPUT] MAPPING PAGE : START MAPPING " + supervisor.getSetting("ROBOT_SW","grid_size"))
-                                        map.grid_size = parseFloat(supervisor.getSetting("ROBOT_SW","grid_size"));
+//                                        map.grid_size = parseFloat(supervisor.getSetting("ROBOT_SW","grid_size"));
                                         supervisor.startMapping(0);
                                     }
                                 }else{
@@ -756,6 +772,7 @@ Item {
                 running: true
                 repeat: true
                 onTriggered:{
+                    print(supervisor.getMappingflag())
                     if(supervisor.getMappingflag()){
                         if(!is_mapping){
                             voice_stop_mapping.stop();
@@ -1039,22 +1056,21 @@ Item {
                         id: btn_move
                         width: 80
                         shadow_color: color_gray
-                        highlight: map.tool=="MOVE"
+                        highlight: map.tool=="move"
                         icon: "icon/icon_move.png"
                         name: "이동"
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
                                 supervisor.writelog("[QML] MAP PAGE (LOCAL) -> MOVE")
-                                map.tool = "MOVE";
-                                map.reset_canvas();
+                                map.setTool("move");
                             }
                         }
                     }
                     Item_button{
                         width: 80
                         shadow_color: color_gray
-                        highlight: map.tool=="SLAM_INIT"
+                        highlight: map.tool=="slam_init"
                         icon: "icon/icon_local_manual.png"
                         name: "수동 초기화"
                         MouseArea{
@@ -1063,9 +1079,10 @@ Item {
                                 supervisor.slam_stop();
                                 map.setTool("slam_init");
                                 if(supervisor.getGridWidth() > 0){
-                                    var init_x = supervisor.getlastRobotx()/supervisor.getGridWidth() + supervisor.getOrigin()[0];
-                                    var init_y = supervisor.getlastRoboty()/supervisor.getGridWidth() + supervisor.getOrigin()[1];
+                                    var init_x = supervisor.getlastRobotx();
+                                    var init_y = supervisor.getlastRoboty();
                                     var init_th  = supervisor.getlastRobotth();
+//                                    print(supervisor.getlastRobotx(),supervisor.getGridWidth(),supervisor.getOrigin()[0],init_x);
                                     map.setAutoInit(init_x,init_y,init_th);
                                 }
                                 supervisor.writelog("[QML] MAP PAGE (LOCAL) -> LOCALIZATION MANUAL ")
@@ -1219,22 +1236,22 @@ Item {
             }
             Component.onCompleted: {
                 patrol_location_model.clear();
-                if(supervisor.getPatrolFileName()===""){
-                    text_patrol_name.text = "설정 된 파일이 없습니다.";
-                    start_point.location_text = "";
-                }else{
-                    text_patrol_name.text = supervisor.getPatrolFileName();
-                    supervisor.loadPatrolFile(supervisor.getPatrolFileName());
+//                if(supervisor.getPatrolFileName()===""){
+//                    text_patrol_name.text = "설정 된 파일이 없습니다.";
+//                    start_point.location_text = "";
+//                }else{
+//                    text_patrol_name.text = supervisor.getPatrolFileName();
+//                    supervisor.loadPatrolFile(supervisor.getPatrolFileName());
 
-                    for(var i=0; i<supervisor.getPatrolNum(); i++){
-                        if(i===0){
-                            start_point.location_text = supervisor.getPatrolLocation(0);
-                        }else{
-                            patrol_location_model.append({name:supervisor.getPatrolType(i),location:supervisor.getPatrolLocation(i),loc_x:supervisor.getPatrolX(i),loc_y:supervisor.getPatrolY(i),loc_th:supervisor.getPatrolTH(i)});
+//                    for(var i=0; i<supervisor.getPatrolNum(); i++){
+//                        if(i===0){
+//                            start_point.location_text = supervisor.getPatrolLocation(0);
+//                        }else{
+//                            patrol_location_model.append({name:supervisor.getPatrolType(i),location:supervisor.getPatrolLocation(i),loc_x:supervisor.getPatrolX(i),loc_y:supervisor.getPatrolY(i),loc_th:supervisor.getPatrolTH(i)});
 
-                        }
-                    }
-                }
+//                        }
+//                    }
+//                }
             }
             function update(){
                 supervisor.setPatrolMode(2);
@@ -3541,9 +3558,10 @@ Item {
                                     supervisor.slam_stop();
                                     map.setTool("SLAM_INIT");
                                     if(supervisor.getGridWidth() > 0){
-                                        var init_x = supervisor.getlastRobotx()/supervisor.getGridWidth() + supervisor.getOrigin()[0];
-                                        var init_y = supervisor.getlastRoboty()/supervisor.getGridWidth() + supervisor.getOrigin()[1];
+                                        var init_x = supervisor.getlastRobotx();
+                                        var init_y = supervisor.getlastRoboty();
                                         var init_th  = supervisor.getlastRobotth();// - Math.PI/2;
+                                        print(supervisor.getlastRobotx(),supervisor.getGridWidth(),supervisor.getOrigin()[0],init_x);
                                         map.setAutoInit(init_x,init_y,init_th);
                                         supervisor.setInitPos(init_x,init_y,init_th);
                                     }
@@ -4465,11 +4483,12 @@ Item {
                                     supervisor.slam_stop();
                                     map.setTool("slam_init");
                                     if(supervisor.getGridWidth() > 0){
-                                        var init_x = supervisor.getlastRobotx()/supervisor.getGridWidth() + supervisor.getOrigin()[0];
-                                        var init_y = supervisor.getlastRoboty()/supervisor.getGridWidth() + supervisor.getOrigin()[1];
+                                        var init_x = supervisor.getlastRobotx();
+                                        var init_y = supervisor.getlastRoboty();
                                         var init_th  = supervisor.getlastRobotth();// - Math.PI/2;
+                                        print(supervisor.getlastRobotx(),supervisor.getGridWidth(),supervisor.getOrigin()[0],init_x);
                                         map.setAutoInit(init_x,init_y,init_th);
-                                        supervisor.setInitPos(map.init_x,map.init_y,map.init_th);
+                                        supervisor.setInitPos(init_x,init_y,init_th);
                                     }
                                     supervisor.slam_setInit();
                                 }

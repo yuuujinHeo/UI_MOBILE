@@ -1050,6 +1050,11 @@ void Supervisor::startSLAM(){
 ////*******************************************  SLAM(LOCALIZATION) 관련   ************************************************////
 void Supervisor::startMapping(float grid){
     plog->write("[USER INPUT] START MAPPING");
+    pmap->width = getSetting("ROBOT_SW","map_size").toInt();
+    pmap->height = getSetting("ROBOT_SW","map_size").toInt();
+    pmap->gridwidth = getSetting("ROBOT_SW","grid_size").toFloat();
+    pmap->origin[0] = pmap->width/2;
+    pmap->origin[1] = pmap->height/2;
     lcm->startMapping(grid);
     lcm->is_mapping = true;
 }
@@ -1080,6 +1085,7 @@ void Supervisor::setSLAMMode(int mode){
 
 }
 void Supervisor::setInitPos(int x, int y, float th){
+    qDebug() << "INIT" << x << y << setAxisBack(cv::Point2f(x,y)).x << setAxisBack(cv::Point2f(x,y)).y;
     pmap->init_pose.point = setAxisBack(cv::Point2f(x,y));
     pmap->init_pose.angle = setAxisBack(th);
     plog->write("[LOCALIZATION] SET INIT POSE : "+QString().sprintf("%f, %f, %f",pmap->init_pose.point.x, pmap->init_pose.point.y, pmap->init_pose.angle));
@@ -1643,7 +1649,7 @@ float Supervisor::getLidar(int num){
 }
 
 float setAxis(float _angle){
-    return -_angle + M_PI/2;
+    return -_angle - M_PI/2;
 }
 float setAxisBack(float _angle){
     return -_angle + M_PI/2;
@@ -1658,6 +1664,7 @@ cv::Point2f setAxisBack(cv::Point2f _point){
     cv::Point2f temp;
     temp.x = -pmap->gridwidth*(_point.y-pmap->origin[1]);
     temp.y = -pmap->gridwidth*(_point.x-pmap->origin[0]);
+    qDebug() << _point.y << temp.x << pmap->gridwidth << pmap->origin[1];
     return temp;
 }
 POSE setAxis(POSE _pose){
@@ -2528,6 +2535,7 @@ void Supervisor::onTimer(){
 
     static int state_count = 0;
 
+    probot->lcmconnection = lcm->isconnect;
     if(lcm->isconnect){
         if(ui_state != UI_STATE_NONE){
             state_count = 0;

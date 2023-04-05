@@ -1175,12 +1175,18 @@ Item {
         anchors.centerIn: parent
         property string map: ""
         onOpened: {
+            map_load2.enabled = true;
             map_load2.just_show_map = true;
             map_load2.loadmap(map);
         }
+        onClosed:{
+            map_load2.enabled = false;
+        }
+
         Map_full{
             objectName: "INITSHOW"
             id: map_load2
+            enabled: popup_show_map_light.opened
             width: popup_show_map_light.width
             height: popup_show_map_light.height
 //            anchors.fill: parent
@@ -1390,10 +1396,15 @@ Item {
                 text_show_popup.text = "매장의 환경과 일치하는 맵인지 확인해주세요."
                 map_load.loadmap(supervisor.getMapname(),"EDITED");
             }
+            map_load.enabled = true;
             map_load.show_object = true;
             map_load.show_location = true;
             map_load.setfullscreen();
         }
+        onClosed: {
+            map_load.enabled = false;
+        }
+
         Text{
             id: text_show_popup
             anchors.horizontalCenter: parent.horizontalCenter
@@ -1408,6 +1419,7 @@ Item {
         Map_full{
             id: map_load
             objectName: "SHOWSERVER"
+            enabled: popup_show_map.opened
             width: 500
             height: 500
             anchors.horizontalCenter: parent.horizontalCenter
