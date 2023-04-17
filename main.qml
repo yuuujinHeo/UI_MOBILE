@@ -16,6 +16,7 @@ Window {
     width: 1280
     height: 800
     title: qsTr("Hello World")
+
     flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
     visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
 
@@ -24,7 +25,7 @@ Window {
             if(mainwindow.visibility == Window.Minimized){
                 print("minimized");
             }else if(mainwindow.visibility == Window.FullScreen){
-                print("fullscren");
+                print("fullscreen");
             }else{
                 supervisor.writelog("[QML - MAIN] Window show fullscreen");
                 mainwindow.visibility = Window.FullScreen;
@@ -104,11 +105,15 @@ Window {
         voice_movewait.stop();
         voice_serving.stop();
         voice_calling.stop();
+        voice_battery.stop();
     }
 
     function stateinit(){
         if(loader_page.item.objectName != "page_map")
             loadPage(pinit);
+    }
+    function lessbattery(){
+        voice_battery.play();
     }
 
     function movelocation(){
@@ -134,10 +139,6 @@ Window {
         }
         loadPage(pmoving)
         loader_page.item.pos = str_target;
-    }
-    function play_avoidmsg(){
-        print("play excuseme");
-        voice_avoid.play();
     }
     function play_movefailmsg(){
         print("play movefail");
@@ -192,11 +193,6 @@ Window {
         if(loader_page.item.objectName == "page_moving"){
             loader_page.item.checkPaused();
         }
-    }
-    function nopathfound(){
-        supervisor.writelog("[QML - MAIN] No path found -> movefail");
-        play_avoidmsg();
-        loadPage(pmovefail);
     }
     function movestopped(){
         supervisor.writelog("[QML - MAIN] Move Stopped");
@@ -418,6 +414,12 @@ Window {
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_emergency.mp3"
+    }
+    Audio{
+        id: voice_battery
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/battery.mp3"
     }
 
     Popup{

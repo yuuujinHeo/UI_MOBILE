@@ -1073,7 +1073,7 @@ Item {
                         anchors.fill: parent
                         onClicked: {
                             for(var i=0; i<supervisor.getUsbMapSize(); i++){
-                                print(i,list_map_usb.model.get(i).selected,list_map_usb.model.get(i).name);
+//                                print(i,list_map_usb.model.get(i).selected,list_map_usb.model.get(i).name);
                                 if(list_map_usb.model.get(i).selected){
                                     supervisor.saveMapfromUsb(list_map_usb.model.get(i).name);
                                 }

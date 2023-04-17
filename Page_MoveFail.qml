@@ -41,16 +41,14 @@ Item {
 
     property bool select_localmode: false
     onSelect_localmodeChanged: {
-        map.init_mode();
-        map.show_buttons = true;
-        map.show_connection = true;
-        map.robot_following = true;
-        map.show_lidar = true;
-        map.show_path = true;
-        map.show_object = true;
-        if(select_localmode)
-            map.show_location = true;
-        map.show_robot = true;
+        map.init();
+        map.loadmap(supervisor.getMapname(),"EDITED");
+        if(select_localmode){
+            map.setViewer("localization");
+        }else{
+            map.setViewer("current");
+        }
+        map.setfullscreen();
     }
 
     Component.onCompleted: {
@@ -67,8 +65,10 @@ Item {
         statusbar.visible = true;
         notice.y = 0;
         area_swipe.enabled = true;
+        map.loadmap(supervisor.getMapname(),"EDITED");
         map.init();
         map.setViewer("current");
+        map.setfullscreen();
     }
 
     SequentialAnimation{
@@ -688,35 +688,56 @@ Item {
                             id: btn_move
                             width: 80
                             shadow_color: color_gray
-                            highlight: map.tool=="MOVE"
+                            highlight: map.tool=="move"
                             icon: "icon/icon_move.png"
                             name: "이동"
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    map.tool = "MOVE";
+                                    map.setTool("move");
                                 }
                             }
                         }
                         Item_button{
                             width: 80
                             shadow_color: color_gray
-                            highlight: map.tool=="SLAM_INIT"
+                            icon: "icon/icon_local_manual.png"
+                            name: "대기위치로\n초기화"
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    supervisor.slam_stop();
+                                    if(supervisor.getGridWidth() > 0){
+                                        var init_x = supervisor.getRestingLocationx();
+                                        var init_y = supervisor.getRestingLocationy();
+                                        var init_th  = supervisor.getRestingLocationth();
+                                        map.setAutoInit(init_x,init_y,init_th);
+                                    }
+                                    supervisor.writelog("[QML] MAP PAGE (LOCAL) -> LOCALIZATION MANUAL ")
+                                    supervisor.slam_setInit();
+                                }
+                            }
+                        }
+                        Item_button{
+                            width: 80
+                            shadow_color: color_gray
+                            highlight: map.tool=="slam_init"
                             icon: "icon/icon_point.png"
                             name: "수동 초기화"
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
                                     supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : LOCALIZATION MANUAL")
-                                    map.tool = "SLAM_INIT";
-                                    map.new_slam_init = true;
+                                    supervisor.slam_stop();
+                                    map.setTool("slam_init");
                                     if(supervisor.getGridWidth() > 0){
-                                        map.init_x = supervisor.getlastRobotx()/supervisor.getGridWidth() + supervisor.getOrigin()[0];
-                                        map.init_y = supervisor.getlastRoboty()/supervisor.getGridWidth() + supervisor.getOrigin()[1];
-                                        map.init_th  = supervisor.getlastRobotth();// - Math.PI/2;
-                                        supervisor.setInitPos(map.init_x,map.init_y,map.init_th);
+                                        var init_x = supervisor.getlastRobotx();
+                                        var init_y = supervisor.getlastRoboty();
+                                        var init_th  = supervisor.getlastRobotth();// - Math.PI/2;
+                                        map.setAutoInit(init_x,init_y,init_th);
+                                        supervisor.setInitPos(init_x,init_y,init_th);
                                     }
-                                    map.update_canvas();
+                                    supervisor.slam_setInit();
                                 }
                             }
                         }

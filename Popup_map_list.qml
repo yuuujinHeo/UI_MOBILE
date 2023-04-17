@@ -27,12 +27,13 @@ Popup{
         btn_draw.enabled = false;
         btn_erase.enabled = false;
         map_list_view.enabled = true;
+        map_list_view.setViewer("annot_view");
         for(var i=0; i<num; i++){
             list_map.model.append({"name":supervisor.getAvailableMapPath(i),"selected":false});
             if(mapname === supervisor.getAvailableMapPath(i)){
                 select_map_list = i;
-
                 if(supervisor.isExistMap(mapname)){
+                    print(mapname, "map exist");
                     map_list_view.loadmap(mapname,"EDITED");
                     if(supervisor.isExistAnnotation(mapname)){
                         btn_use.enabled = true;
@@ -44,6 +45,7 @@ Popup{
                         btn_draw_new.enabled = true;
                     }
                 }else{
+                    print(mapname, "map no exist");
                     map_list_view.loadmap(mapname,"RAW");
                     if(supervisor.isExistRawMap(mapname)){
                         btn_draw_new.enabled = true;
@@ -114,11 +116,6 @@ Popup{
                     if(select_map_list == index){
                         select_map_list = -1;
                         map_list_view.loadmap("");
-                        map_list_view.init_mode();
-                        map_list_view.show_connection= false
-                        map_list_view.show_location= true
-                        map_list_view.show_object=  true
-                        map_list_view.show_lidar= false
                         btn_use.enabled = false;
                         btn_draw.enabled = false;
                         btn_draw_new.enabled = false;
@@ -126,11 +123,7 @@ Popup{
                     }else{
                         select_map_list = index;
                         btn_erase.enabled = true;
-                        map_list_view.init_mode();
-                        map_list_view.show_connection= false
-                        map_list_view.show_location= true
-                        map_list_view.show_object=  true
-                        map_list_view.show_lidar= false
+                        map_list_view.setViewer("annot_view");
                         if(supervisor.isExistMap(name)){
                             map_list_view.loadmap(name,"EDITED");
                             print(name, supervisor.isExistAnnotation(name))
@@ -166,7 +159,7 @@ Popup{
                         supervisor.readSetting(name);
                     }
 
-                    map_list_view.update_canvas();
+//                    map_list_view.update_canvas();
                 }
             }
         }
@@ -504,6 +497,7 @@ Popup{
 //                show_buttons: false
                 Component.onCompleted: {
                     setfullscreen();
+                    setViewer("current")
                 }
             }
         }

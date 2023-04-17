@@ -53,6 +53,8 @@ public:
     bool usb_check;
     int usb_check_count;
 
+    int count_excuseme = 0;
+    bool flag_excuseme = false;
     bool annotation_edit = false;
 
     QVector<QString> call_list;
@@ -68,6 +70,12 @@ public:
     QProcess *slam_process;
 
 
+
+    void checkShellFiles();
+    void makeKillShell();
+    void makeKillSlam();
+    void makeStartShell();
+    void makeAllKillShell();
 
 
 
@@ -95,31 +103,15 @@ public:
     Q_INVOKABLE QString getSetting(QString group, QString name);
     Q_INVOKABLE void setVelocity(float vel);
     Q_INVOKABLE float getVelocity();
-    Q_INVOKABLE bool getuseTravelline();
-    Q_INVOKABLE void setuseTravelline(bool use);
-    Q_INVOKABLE int getnumTravelline();
-    Q_INVOKABLE void setnumTravelline(int num);
 
     Q_INVOKABLE int getTrayNum();
-    Q_INVOKABLE void setTrayNum(int tray_num);
     Q_INVOKABLE int getTableNum();
     Q_INVOKABLE void setTableNum(int table_num);
     Q_INVOKABLE int getTableColNum();
     Q_INVOKABLE void setTableColNum(int col_num);
 
-    Q_INVOKABLE bool getuseVoice();
-    Q_INVOKABLE void setuseVoice(bool use);
-    Q_INVOKABLE bool getuseBGM();
-    Q_INVOKABLE void setuseBGM(bool use);
-    Q_INVOKABLE bool getserverCMD();
-    Q_INVOKABLE void setserverCMD(bool use);
 
     Q_INVOKABLE QString getRobotType();
-    Q_INVOKABLE void setRobotType(int type);
-    Q_INVOKABLE void setDebugName(QString name);
-    Q_INVOKABLE QString getDebugName();
-    Q_INVOKABLE bool getDebugState();
-    Q_INVOKABLE void setDebugState(bool isdebug);
 
     Q_INVOKABLE void requestCamera();
     Q_INVOKABLE QString getLeftCamera();
@@ -206,13 +198,6 @@ public:
     Q_INVOKABLE bool getObjectingflag();
     Q_INVOKABLE void setObjectingflag(bool flag);
 
-//    Q_INVOKABLE QPixmap getMappingImage();
-
-    Q_INVOKABLE QList<int> getListMap(QString filename);
-    Q_INVOKABLE QList<int> getRawListMap(QString filename);
-//    Q_INVOKABLE QList<int> getMiniMap(QString filename);
-//    Q_INVOKABLE void pushMapData(QVector<unsigned char> data);
-//    Q_INVOKABLE void pushMapData(QList<int> data);
     Q_INVOKABLE QString getnewMapname();
 
     ////*********************************************  CALLING 관련   ***************************************************////
@@ -236,31 +221,8 @@ public:
 
     ////*********************************************  ANNOTATION 관련   ***************************************************////
 
-//    Q_INVOKABLE void setRotateAngle(float angle);
-//    Q_INVOKABLE int getCanvasSize();
-//    Q_INVOKABLE int getRedoSize();
-//    Q_INVOKABLE QVector<int> getLineX(int index);
-//    Q_INVOKABLE QVector<int> getLineY(int index);
-//    Q_INVOKABLE QString getLineColor(int index);
-//    Q_INVOKABLE float getLineWidth(int index);
-
-//    Q_INVOKABLE void saveMap(QString mode, QString src, QString dst, QList<int> data, QList<int> alpha);
-//    Q_INVOKABLE void saveTravel(bool mode, QList<int> canvas);
-
-//    Q_INVOKABLE void startLine(QString color, float width);
-//    Q_INVOKABLE void setLine(int x, int y);
-//    Q_INVOKABLE void stopLine();
-
-//    Q_INVOKABLE void undo();
-//    Q_INVOKABLE void redo();
-//    Q_INVOKABLE void clear_all();
     Q_INVOKABLE void setObjPose();
-//    Q_INVOKABLE void setMarginObj();
-//    Q_INVOKABLE void clearMarginObj();
-//    Q_INVOKABLE void setMarginPoint(int pixel_num);
-//    Q_INVOKABLE QVector<int> getMarginObj();
 
-//    Q_INVOKABLE float getMargin();
     Q_INVOKABLE int getLocationNum();
     Q_INVOKABLE int getLocationSize(QString type);
     Q_INVOKABLE QString getLocationName(int num);
@@ -268,14 +230,17 @@ public:
     Q_INVOKABLE float getLocationx(int num);
     Q_INVOKABLE float getLocationy(int num);
     Q_INVOKABLE float getLocationth(int num);
+    Q_INVOKABLE float getRestingLocationx();
+    Q_INVOKABLE float getRestingLocationy();
+    Q_INVOKABLE float getRestingLocationth();
 
     Q_INVOKABLE bool isExistLocation(int num);
-
     Q_INVOKABLE float getLidar(int num);
-
 
     Q_INVOKABLE bool getAnnotEditFlag();
     Q_INVOKABLE void setAnnotEditFlag(bool flag);
+
+
     //***********************************************************************Object(INI)..
     Q_INVOKABLE int getObjectNum();
     Q_INVOKABLE QString getObjectName(int num);
@@ -285,44 +250,16 @@ public:
 
 
     //***********************************************************************Object(NEW)..
-//    Q_INVOKABLE void newObjectPoint(int x, int y);
-//    Q_INVOKABLE int getTempObjectSize();
-//    Q_INVOKABLE float getTempObjectX(int num);
-//    Q_INVOKABLE float getTempObjectY(int num);
-
-    Q_INVOKABLE int getObjNum(QString name);
-    Q_INVOKABLE int getObjNum(int x, int y);
     Q_INVOKABLE int getObjPointNum(int obj_num, int x, int y);
     Q_INVOKABLE int getLocNum(QString name);
     Q_INVOKABLE int getLocNum(int x, int y);
 
-//    Q_INVOKABLE void addObjectPoint(int x, int y);
-//    Q_INVOKABLE void removeObjectPoint(int num);
-//    Q_INVOKABLE void removeObjectPointLast();
-//    Q_INVOKABLE void clearObjectPoints();
     Q_INVOKABLE int getObjectSize(QString type);
-//    Q_INVOKABLE void addObject(QString type);
-//    Q_INVOKABLE void addObjectRect(QString type);
-//    Q_INVOKABLE void editObject(int num, int point, int x, int y);
-
     Q_INVOKABLE void removeObject(int num);
-
-//    Q_INVOKABLE void clearLocationTemp();
     Q_INVOKABLE void removeLocation(QString name);
-//    Q_INVOKABLE void addLocation(QString type, QString name, int x, int y, float th);
-//    Q_INVOKABLE void moveLocationPoint(int loc_num, int x, int y, float th);
-    //******************************************************************Travel line
-//    Q_INVOKABLE int getTlineSize();
-//    Q_INVOKABLE int getTlineSize(int num);
-//    Q_INVOKABLE QString getTlineName(int num);
-//    Q_INVOKABLE float getTlineX(int num, int point);
-//    Q_INVOKABLE float getTlineY(int num, int point);
 
-//    Q_INVOKABLE void addTline(int num, int x1, int y1, int x2, int y2);
-//    Q_INVOKABLE void removeTline(int num, int line);
-//    Q_INVOKABLE int getTlineNum(int x, int y);
+    //******************************************************************Travel line
     Q_INVOKABLE bool saveAnnotation(QString filename);
-//    Q_INVOKABLE bool saveMetaData(QString filename);
     Q_INVOKABLE void sendMaptoServer();
 
 
@@ -348,7 +285,7 @@ public:
     Q_INVOKABLE void moveToWait();
     Q_INVOKABLE QString getcurLoc();
     Q_INVOKABLE QString getcurTable();
-//    Q_INVOKABLE QVector<float> getcurTarget();
+
     Q_INVOKABLE void joyMoveXY(float x);
     Q_INVOKABLE void joyMoveR(float r);
     Q_INVOKABLE float getJoyXY();
@@ -370,6 +307,7 @@ public:
     Q_INVOKABLE QString getMotorStatusStr(int id);
     Q_INVOKABLE int getMotorTemperature(int id);
     Q_INVOKABLE int getMotorWarningTemperature();
+    Q_INVOKABLE int getMotorCurrent(int id);
     Q_INVOKABLE int getPowerStatus();
     Q_INVOKABLE int getRemoteStatus();
     Q_INVOKABLE int getChargeStatus();
@@ -409,44 +347,9 @@ public:
     Q_INVOKABLE float getGridWidth();
     Q_INVOKABLE QVector<int> getOrigin();
 
-//    Q_INVOKABLE QList<int> getMapData(QString filename);
-//    Q_INVOKABLE QObject* getMapping() const;
-//    Q_INVOKABLE QObject* getMinimap(QString filename) const;
-//    Q_INVOKABLE QObject* getMap(QString filename) const;
-//    Q_INVOKABLE QObject* getRawMap(QString filename) const;
-//    Q_INVOKABLE QObject* getTravelRawMap(QString filename) const;
-//    Q_INVOKABLE QObject* getTravelMap(QString filename) const;
-//    Q_INVOKABLE QObject* getCostMap(QString filename) const;
-//    Q_INVOKABLE QObject* getObjectMap(QString filename) const;
-//    Q_INVOKABLE QObject* getTravel(QList<int> canvas) const;
-//    Q_INVOKABLE QObject* getTest(QList<int> canvas) const;
-//    Q_INVOKABLE QObject* getObjecting() const;
-
     ////*********************************************  OBJECTING 관련   ***************************************************////
 
     ////*********************************************  PATROL 관련   ***************************************************////
-//    Q_INVOKABLE QString getPatrolFileName();
-//    Q_INVOKABLE void makePatrol();
-//    Q_INVOKABLE void loadPatrolFile(QString path);
-//    Q_INVOKABLE void savePatrolFile(QString path);
-//    Q_INVOKABLE void addPatrol(QString type, QString location, float x, float y, float th);
-//    Q_INVOKABLE int getPatrolNum();
-//    Q_INVOKABLE QString getPatrolType(int num);
-//    Q_INVOKABLE QString getPatrolLocation(int num);
-//    Q_INVOKABLE float getPatrolX(int num);
-//    Q_INVOKABLE float getPatrolY(int num);
-//    Q_INVOKABLE float getPatrolTH(int num);
-
-//    Q_INVOKABLE void removePatrol(int num);
-//    Q_INVOKABLE void movePatrolUp(int num);
-//    Q_INVOKABLE void movePatrolDown(int num);
-//    Q_INVOKABLE int getPatrolMode();
-//    Q_INVOKABLE void setPatrolMode(int mode);
-//    Q_INVOKABLE void startRecordPath();
-//    Q_INVOKABLE void startcurPath();
-//    Q_INVOKABLE void stopcurPath();
-//    Q_INVOKABLE void pausecurPath();
-
     Q_INVOKABLE void runRotateTables();
     Q_INVOKABLE void stopRotateTables();
     Q_INVOKABLE void startServingTest();

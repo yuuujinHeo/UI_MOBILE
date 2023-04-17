@@ -552,6 +552,166 @@ Item {
                         }
                     }
                 }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"음성 볼륨"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                TextField{
+                                    id: ip_1
+                                    width: 50
+                                    height: 30
+                                    onFocusChanged: {
+                                        keyboard.owner = ip_1;
+                                        ip_1.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            keyboard.close();
+                                            ip_1.select(0,0);
+                                        }
+                                    }
+                                    onTextChanged: {
+                                        if(ip_1.text.split(".").length > 1){
+                                            ip_1.text = ip_1.text.split(".")[0];
+                                            ip_1.focus = false;
+                                            ip_2.focus = true;
+                                        }
+                                        if(ip_1.text.length == 3){
+                                            ip_1.focus = false;
+                                            ip_2.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+
+                                TextField{
+                                    id: ip_2
+                                    width: 50
+                                    height: 30
+                                    onFocusChanged: {
+                                        keyboard.owner = ip_2;
+                                        ip_2.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            keyboard.close();
+                                            ip_2.select(0,0);
+                                        }
+                                    }
+                                    onTextChanged: {
+                                        if(ip_2.text == "."){
+                                            ip_2.text = ip_2.text.split(".")[0]
+                                        }
+
+                                        if(ip_2.text.split(".").length > 1){
+                                            ip_2.text = ip_2.text.split(".")[0];
+                                            ip_2.focus = false;
+                                            ip_3.focus = true;
+                                        }
+                                        if(ip_2.text.length == 3){
+                                            ip_2.focus = false;
+                                            ip_3.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+                                TextField{
+                                    id: ip_3
+                                    width: 50
+                                    height: 30
+                                    onFocusChanged: {
+                                        keyboard.owner = ip_3;
+                                        ip_3.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            ip_3.select(0,0);
+                                            keyboard.close();
+                                        }
+                                    }
+                                    onTextChanged: {
+                                        if(ip_3.text == "."){
+                                            ip_3.text = ip_3.text.split(".")[0]
+                                        }
+
+                                        if(ip_3.text.split(".").length > 1){
+                                            ip_3.text = ip_3.text.split(".")[0];
+                                            ip_3.focus = false;
+                                            ip_4.focus = true;
+                                        }
+                                        if(ip_3.text.length == 3){
+                                            ip_3.focus = false;
+                                            ip_4.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+                                TextField{
+                                    id: ip_4
+                                    width: 50
+                                    height: 30
+                                    onFocusChanged: {
+                                        keyboard.owner = ip_4;
+                                        ip_4.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            ip_4.select(0,0);
+                                            keyboard.close();
+                                        }
+                                    }
+                                    onTextChanged: {
+                                        if(ip_4.text == "."){
+                                            ip_4.text = ip_4.text.split(".")[0]
+                                        }
+
+                                        if(ip_4.text.split(".").length > 1){
+                                            ip_4.text = ip_4.text.split(".")[0];
+                                            ip_4.focus = false;
+                                        }
+                                        if(ip_4.text.length == 3){
+                                            ip_4.focus = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 Rectangle{
                     id: set_robot_6
@@ -2366,6 +2526,52 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
+                                text:"모터 전류"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/2
+                            height: parent.height
+                            Text{
+                                id: text_cur_0
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"모터 0 : "+supervisor.getMotorCurrent(0).toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/2
+                            height: parent.height
+                            Text{
+                                id: text_cur_1
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"모터 1 : "+supervisor.getMotorCurrent(1).toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
                                 text:"상태값"
                                 font.pixelSize: 20
                             }
@@ -3305,6 +3511,8 @@ Item {
 
             text_temp_0.text = "모터 0 : " + supervisor.getMotorTemperature(0).toString();
             text_temp_1.text = "모터 1 : " + supervisor.getMotorTemperature(1).toString();
+            text_cur_0.text = "모터 0 : " + supervisor.getMotorCurrent(0).toString();
+            text_cur_1.text = "모터 1 : " + supervisor.getMotorCurrent(1).toString();
 
             text_status_charging.text = "Charge : " + supervisor.getChargeStatus().toString();
             text_status_power.text = "Power : " + supervisor.getPowerStatus().toString();

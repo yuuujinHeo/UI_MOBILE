@@ -34,7 +34,7 @@ Item {
 
     function init(){
         is_charging = false;
-        battery = supervisor.getBatteryOut().toFixed(0);
+        battery = supervisor.getBattery().toFixed(0);
         if(robot_battery > 90){
             image_battery.source = "image/battery_full.png"
         }else if(robot_battery > 60){
@@ -96,7 +96,7 @@ Item {
                 }
             }
 
-            battery = supervisor.getBatteryOut().toFixed(0);
+            battery = supervisor.getBattery().toFixed(0);
 
             if(popup_question.visible){
                 if(supervisor.getLCMConnection() && supervisor.getStateMoving() !== 0){

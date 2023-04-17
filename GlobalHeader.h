@@ -42,6 +42,7 @@ typedef struct{
     QVector<int> data_objecting;
     QPixmap test_mapping;
     cv::Mat map_mapping;
+    cv::Mat map_objecting;
     QPixmap test_objecting;
 
     QVector<ST_CAMERA> camera_info;
@@ -77,6 +78,7 @@ typedef struct{
     bool connection = false;
     int status = 0;
     int temperature = 0;
+    int current = 0;
 }ST_MOTOR;
 
 typedef struct{
@@ -89,6 +91,7 @@ typedef struct{
     int status_remote = 0;
     int status_charge = 0;
 
+    float battery = 0.;
     float battery_in = 0;
     float battery_out = 0;
     float battery_cur = 0;

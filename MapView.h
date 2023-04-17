@@ -16,8 +16,11 @@ public:
     QString tool = "move";
     QString mode = "none";
     QString object_name = "";
+    QString map_name = "";
 
     int res = 1;
+
+    cv::Point2f curPoint;
 
     Q_INVOKABLE void setEnable(bool en){enable = en;}
     Q_INVOKABLE void setName(QString name){object_name = name;}
@@ -66,7 +69,6 @@ public:
     void setMapObject();
     void setMapMap();
     void setMapLocation();
-    void setMapTravelline();
 
     //---------------------------------------------------Mapping, Localization
     POSE set_init_pose;
@@ -91,6 +93,8 @@ public:
     QVector<LINE> lines_trash;
     int cur_line_color=255;
     int cur_line_width=3;
+    bool show_brush = false;
+    Q_INVOKABLE void showBrush(bool onoff){show_brush = onoff;}
     Q_INVOKABLE bool getDrawingFlag();
     Q_INVOKABLE bool getDrawingUndoFlag();
     Q_INVOKABLE void startDrawing(int x, int y);
@@ -100,7 +104,9 @@ public:
     Q_INVOKABLE void undoLine();
     Q_INVOKABLE void redoLine();
     Q_INVOKABLE void setLineColor(int color){cur_line_color = color;}
-    Q_INVOKABLE void setLineWidth(int width){cur_line_width = width;}
+    Q_INVOKABLE void setLineWidth(int width){
+        cur_line_width = width;
+    }
 
     //---------------------------------------------------Object
     void initObject();
@@ -134,6 +140,7 @@ public:
     Q_INVOKABLE void clearLocation();
     Q_INVOKABLE void selectLocation(int num);
     Q_INVOKABLE void addLocation(int x, int y,float th);
+    Q_INVOKABLE void addLocationCur(int x, int y,float th);
     Q_INVOKABLE void setLocation(int x, int y, float th);
     Q_INVOKABLE void editLocation(int x, int y, float th);
     Q_INVOKABLE void editLocation();
@@ -160,6 +167,8 @@ public:
     Q_INVOKABLE void setMapSize(int width, int height);
     Q_INVOKABLE void zoomIn(int x, int y);
     Q_INVOKABLE void zoomOut(int x, int y);
+    Q_INVOKABLE void scaledIn(int x, int y);
+    Q_INVOKABLE void scaledOut(int x, int y);
     Q_INVOKABLE void move(int x, int y);
     Q_INVOKABLE int getX(){return map_x;}
     Q_INVOKABLE int getY(){return map_y;}
@@ -181,6 +190,7 @@ private:
     PixmapContainer pixmap_current;
     cv::Mat map_orin;
     cv::Mat map_tline;
+    cv::Mat map_objecting;
     cv::Mat map_map;
     cv::Mat map_drawing;
     cv::Mat map_drawing_mask;

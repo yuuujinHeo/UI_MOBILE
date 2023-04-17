@@ -51,27 +51,37 @@ Item {
                 }
             }
         }
-        Text{
-            id: test
-            width: 100
-            horizontalAlignment: Text.AlignHCenter
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: textName.right
-            font.family: font_noto_r.name
-            font.pixelSize: 20
-            text: ""
-            Timer{
-                running: true
-                interval: 200
-                repeat: true
-
-                property var count_num: 0
-                onTriggered: {
-                    count_num++;
-                    test.text = count_num;
-                }
+        Timer{
+            running: true
+            interval: 200
+            repeat: true
+            onTriggered: {
+                temp_0.text = supervisor.getMotorTemperature(0).toFixed(1);
+                temp_1.text = supervisor.getMotorTemperature(1).toFixed(1);
             }
         }
+        Row{
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: textName.right
+            spacing: 20
+            Text{
+                id: temp_0
+                width: 100
+                horizontalAlignment: Text.AlignHCenter
+                font.family: font_noto_r.name
+                font.pixelSize: 20
+                text: "-"
+            }
+            Text{
+                id: temp_1
+                width: 100
+                horizontalAlignment: Text.AlignHCenter
+                font.family: font_noto_r.name
+                font.pixelSize: 20
+                text: "-"
+            }
+        }
+
         Text{
             id: textTime
             anchors.horizontalCenter: parent.horizontalCenter
@@ -412,7 +422,7 @@ Item {
         repeat: true
         running: true
         onTriggered: {
-            robot_battery = supervisor.getBatteryIn();
+            robot_battery = supervisor.getBattery();
             curTime = Qt.formatTime(new Date(), "hh:mm");
             robot_rx = supervisor.getLCMRX();
             robot_tx = supervisor.getLCMTX();
@@ -436,7 +446,6 @@ Item {
                 }else{
                     is_motor_error = false;
                 }
-
             }else{
                 is_motor_hot = false;
                 is_motor_error = false;

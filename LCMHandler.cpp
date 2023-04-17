@@ -270,12 +270,12 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
 //    qDebug() << "read Status";
     flag_rx = true;
     connect_count = 0;
-    probot->battery_in = (msg->bat_in-44)*100/10;
-    probot->battery_out = (msg->bat_out-44)*100/10;
-    if(probot->battery_in > 100) probot->battery_in = 100;
-    if(probot->battery_out > 100) probot->battery_out = 100;
-    if(probot->battery_in < 0) probot->battery_in = 0;
-    if(probot->battery_out < 0) probot->battery_out = 0;
+    probot->battery_in = msg->bat_in;
+    probot->battery_out = msg->bat_out;
+    probot->battery = (msg->bat_in-44)*100/10;
+    if(probot->battery > 100) probot->battery = 100;
+    if(probot->battery < 0) probot->battery = 0;
+
     probot->battery_cur = msg->bat_cur;
     probot->motor[0].connection = msg->connection_m0;
     probot->motor[1].connection = msg->connection_m1;
@@ -283,6 +283,8 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
     probot->motor[1].status = msg->status_m1;
     probot->motor[0].temperature = msg->temp_m0;
     probot->motor[1].temperature = msg->temp_m1;
+    probot->motor[0].current = msg->cur_m0;
+    probot->motor[1].current = msg->cur_m1;
     probot->status_power = msg->status_power;
     probot->status_emo = !msg->status_emo;
     probot->status_remote = msg->status_remote;
@@ -342,26 +344,13 @@ void LCMHandler::robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const
 void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data *msg){
     isconnect = true;
      connect_count = 0;
-//     pmap->width = 2000;//msg->map_w;
-//     pmap->height = 2000;//msg->map_h;
-//     pmap->gridwidth = msg->map_grid_w;
-//     qDebug() << "mapping " << msg->map_grid_w << msg->map_w << msg->map_origin[0];
-//     pmap->origin[0] = pmap->width/2;//msg->map_origin[0];
-//     pmap->origin[1] = pmap->height/2;//msg->map_origin[1];
-//     pmap->imageSize = msg->len;
 
-     pmap->data.clear();
      cv::Mat map1(msg->map_h, msg->map_w, CV_8U, cv::Scalar::all(0));
      memcpy(map1.data, msg->data.data(), msg->len);
      cv::flip(map1, map1, 0);
      cv::rotate(map1, map1, cv::ROTATE_90_COUNTERCLOCKWISE);
-     cv::cvtColor(map1, map1,cv::COLOR_GRAY2RGBA);
 
-     std::vector<int> vec;
-     vec.assign(map1.data, map1.data + map1.cols*map1.rows*map1.channels());
      pmap->map_mapping = map1;
-     pmap->data = QVector<int>::fromStdVector(vec);
-     pmap->test_mapping = QPixmap::fromImage(mat_to_qimage_cpy(map1));
 
      flagMapping = true;
      emit mappingin();
@@ -371,22 +360,12 @@ void LCMHandler::robot_objecting_callback(const lcm::ReceiveBuffer *rbuf, const 
      isconnect = true;
      connect_count = 0;
 
-//     pmap->data.clear();
-     int rows = 1000;//msg->map_h;
-     int cols = 1000;//msg->map_w;
-
-     cv::Mat map1(rows,cols, CV_8U, cv::Scalar::all(0));
+     cv::Mat map1(msg->map_h, msg->map_w, CV_8U, cv::Scalar::all(0));
      memcpy(map1.data, msg->data.data(), msg->len);
      cv::flip(map1, map1, 0);
      cv::rotate(map1, map1, cv::ROTATE_90_COUNTERCLOCKWISE);
-     cv::cvtColor(map1, map1,cv::COLOR_GRAY2RGBA);
 
-     std::vector<int> vec;
-     vec.assign(map1.data, map1.data + map1.cols*map1.rows*map1.channels());
-
-//     qDebug() << map1.cols << map1.rows;
-     pmap->data = QVector<int>::fromStdVector(vec);
-     pmap->test_objecting = QPixmap::fromImage(mat_to_qimage_cpy(map1));
+     pmap->map_objecting = map1;
 
      flagObjecting = true;
      emit objectingin();
