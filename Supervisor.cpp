@@ -446,6 +446,9 @@ void Supervisor::readSetting(QString map_name){
         temp_loc.name = strlist[0];
         pmap->locations.push_back(temp_loc);
     }
+    if(setting.table_num > serv_num){
+        setting.table_num = serv_num;
+    }
     setting_anot.endGroup();
 
     qDebug() << pmap->locations.size() << map_name;
@@ -561,13 +564,15 @@ int Supervisor::getCameraNum(){
     return pmap->camera_info.size();
 }
 QList<int> Supervisor::getCamera(int num){
-    try{
-        return pmap->camera_info[num].data;
-    }catch(...){
-        qDebug() << "Something Wrong to get Camera " << num << pmap->camera_info.size();
-        QList<int> temp;
-        return temp;
-    }
+    QList<int> temp;
+    return temp;
+//    try{
+////        return pmap->camera_info[num].data;
+//    }catch(...){
+//        qDebug() << "Something Wrong to get Camera " << num << pmap->camera_info.size();
+//        QList<int> temp;
+//        return temp;
+//    }
 }
 QString Supervisor::getCameraSerial(int num){
     try{
@@ -768,39 +773,54 @@ void Supervisor::makeRobotINI(){
     plog->write("[SETTING] Make robot_config.ini basic format");
     setSetting("ROBOT_HW/model","TEMP");
     setSetting("ROBOT_HW/serial_num","1");
-    setSetting("ROBOT_HW/radius","0.35");
-    setSetting("ROBOT_HW/tray_num","3");
+    setSetting("ROBOT_HW/radius","0.3");
+    setSetting("ROBOT_HW/tray_num","2");
     setSetting("ROBOT_HW/type","SERVING");
     setSetting("ROBOT_HW/wheel_base","0.3542");
     setSetting("ROBOT_HW/wheel_radius","0.0635");
 
+    setSetting("ROBOT_SW/robot_id","0");
+    setSetting("ROBOT_SW/st_v","0.3");
     setSetting("ROBOT_SW/version","");
     setSetting("ROBOT_SW/version_msg","");
     setSetting("ROBOT_SW/version_date","");
     setSetting("ROBOT_SW/use_bgm","true");
     setSetting("ROBOT_SW/use_voice","true");
     setSetting("ROBOT_SW/use_autoinit","false");
-    setSetting("ROBOT_SW/use_avoid","true");
+    setSetting("ROBOT_SW/use_avoid","false");
+    setSetting("ROBOT_SW/use_multirobot","false");
     setSetting("ROBOT_SW/velocity","1.0");
     setSetting("ROBOT_SW/volume_bgm","50");
     setSetting("ROBOT_SW/volume_voice","50");
     setSetting("ROBOT_SW/use_uicmd","true");
     setSetting("ROBOT_SW/k_curve","0.005");
     setSetting("ROBOT_SW/k_v","1.0");
-    setSetting("ROBOT_SW/k_w","1.0");
+    setSetting("ROBOT_SW/k_w","1.5");
     setSetting("ROBOT_SW/limit_manual_v","0.3");
     setSetting("ROBOT_SW/limit_manual_w","30.0");
     setSetting("ROBOT_SW/limit_pivot","30.0");
     setSetting("ROBOT_SW/limit_v","0.5");
     setSetting("ROBOT_SW/limit_w","90.0");
-    setSetting("ROBOT_SW/limit_v_acc","0.5");
-    setSetting("ROBOT_SW/limit_w_acc","120.0");
+    setSetting("ROBOT_SW/limit_v_acc","0.2");
+    setSetting("ROBOT_SW/limit_w_acc","90.0");
     setSetting("ROBOT_SW/look_ahead_dist","0.50");
-
-
-    setSetting("SERVER/travelline","0");
-    setSetting("SERVER/use_servercmd","true");
-    setSetting("SERVER/use_travelline","true");
+    setSetting("ROBOT_SW/min_look_ahead_dist","0.1");
+    setSetting("ROBOT_SW/narrow_decel_ratio","0.5");
+    setSetting("ROBOT_SW/obs_deadzone","0.4");
+    setSetting("ROBOT_SW/obs_wait_time","5.0");
+    setSetting("ROBOT_SW/path_out_dist","1.0");
+    setSetting("ROBOT_SW/goal_dist","0.1");
+    setSetting("ROBOT_SW/goal_th","3.0");
+    setSetting("ROBOT_SW/goal_v","0.05");
+    setSetting("ROBOT_SW/grid_size","0.03");
+    setSetting("ROBOT_SW/map_size","1000");
+    setSetting("ROBOT_SW/icp_dist","0.5");
+    setSetting("ROBOT_SW/icp_error","0.1");
+    setSetting("ROBOT_SW/icp_near","1.0");
+    setSetting("ROBOT_SW/icp_odometry_weight","0.5");
+    setSetting("ROBOT_SW/icp_ratio","0.5");
+    setSetting("ROBOT_SW/icp_repeat_dist","0.15");
+    setSetting("ROBOT_SW/icp_repeat_time","1.0");
 
     setSetting("FLOOR/map_load","true");
     setSetting("FLOOR/map_server","false");
@@ -813,14 +833,11 @@ void Supervisor::makeRobotINI(){
     setSetting("PATROL/curfile","");
 
     setSetting("MOTOR/gear_ratio","1.0");
-    setSetting("MOTOR/k_d","4900.0");
+    setSetting("MOTOR/k_d","4400.0");
     setSetting("MOTOR/k_i","0.0");
     setSetting("MOTOR/k_p","100.0");
     setSetting("MOTOR/left_id","1");
     setSetting("MOTOR/right_id","0");
-    setSetting("MOTOR/limit_acc","0.5");
-    setSetting("MOTOR/limit_dec","0.5");
-    setSetting("MOTOR/limit_vel","0.1");
     setSetting("MOTOR/limit_v","1.5");
     setSetting("MOTOR/limit_v_acc","1.0");
     setSetting("MOTOR/limit_w","360.0");
@@ -835,10 +852,13 @@ void Supervisor::makeRobotINI(){
     setSetting("SENSOR/offset_y","0.0");
     setSetting("SENSOR/left_camera","");
     setSetting("SENSOR/right_camera","");
+    setSetting("SENSOR/left_camera_tf","0,0,0,0,0,0");
+    setSetting("SENSOR/right_camera_tf","0,0,0,0,0,0");
 
     readSetting();
     restartSLAM();
 }
+
 bool Supervisor::rotate_map(QString _src, QString _dst, int mode){
     cv::Mat map1 = cv::imread(_src.toStdString());
 
@@ -2485,7 +2505,8 @@ void Supervisor::onTimer(){
                 }
             }else if(probot->motor_state == MOTOR_NOT_READY){
                 if(prev_motor_state != probot->motor_state){
-                    plog->write("[LCM] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
+                    plog->write(QString::number(probot->status_emo)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
+                    plog->write("[LCM] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL ");
                     if(ui_state != UI_STATE_MOVEFAIL){
                         ui_state = UI_STATE_MOVEFAIL;
                     }

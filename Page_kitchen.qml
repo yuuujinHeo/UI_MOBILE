@@ -23,23 +23,23 @@ Item {
         if(robot_type == "CALLING"){
             if(pbefore != pmenu)
                 popup_question.visible = true;
-//            supervisor.loadPatrolFile(supervisor.getPatrolFileName());
-//            var num=supervisor.getPatrolNum();
+            supervisor.loadPatrolFile(supervisor.getPatrolFileName());
+            var num=supervisor.getPatrolNum();
 
-//            repeat_patrol.model.clear();
-//            repeat_patrol.model.append({type:0,name:"Start"});
+            repeat_patrol.model.clear();
+            repeat_patrol.model.append({type:0,name:"Start"});
 
-//            for(var i=0; i<num; i++){
-//                repeat_patrol.model.append({type:2,name:""});
-//                print(supervisor.getPatrolLocation(i));
-//                if(supervisor.getPatrolLocation(i) == ""){
-//                    var text="x:"+supervisor.getPatrolX(i)+", y:"+supervisor.getPatrolY(i)+", th:"+supervisor.getPatrolTH(i);
-//                    repeat_patrol.model.append({type:1,name:text});
-//                    print(text);
-//                }else{
-//                    repeat_patrol.model.append({type:1,name:supervisor.getPatrolLocation(i)});
-//                }
-//            }
+            for(var i=0; i<num; i++){
+                repeat_patrol.model.append({type:2,name:""});
+                print(supervisor.getPatrolLocation(i));
+                if(supervisor.getPatrolLocation(i) == ""){
+                    var text="x:"+supervisor.getPatrolX(i)+", y:"+supervisor.getPatrolY(i)+", th:"+supervisor.getPatrolTH(i);
+                    repeat_patrol.model.append({type:1,name:text});
+                    print(text);
+                }else{
+                    repeat_patrol.model.append({type:1,name:supervisor.getPatrolLocation(i)});
+                }
+            }
         }
         statusbar.visible = true;
     }

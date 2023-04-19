@@ -15,7 +15,9 @@ extern bool is_debug;
 typedef struct{
     QString serial;
     int imageSize = 0;
-    QList<int> data;
+//    QList<int> data;
+    cv::Mat data;
+    QPixmap pixmap;
     int width;
     int height;
 }ST_CAMERA;

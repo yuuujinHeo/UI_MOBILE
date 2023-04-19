@@ -4,6 +4,7 @@
 #include <QQuickWindow>
 #include <QQmlContext>
 #include "MapView.h"
+#include "CameraView.h"
 #include "Supervisor.h"
 #include "Keyemitter.h"
 #include "Logger.h"
@@ -15,6 +16,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     qmlRegisterType<Supervisor>("io.qt.Supervisor",1,0, "Supervisor");
     qmlRegisterType<MapView>("io.qt.MapView",1,0, "MapView");
+    qmlRegisterType<CameraView>("io.qt.CameraView",1,0, "CameraView");
     qmlRegisterType<KeyEmitter>("io.qt.Keyemitter",1,0, "Keyemitter");
 
     QApplication app(argc, argv);

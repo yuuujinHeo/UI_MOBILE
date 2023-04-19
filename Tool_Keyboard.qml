@@ -25,9 +25,9 @@ Popup {
     property bool is_capslock: false
     property bool only_en: true
 
-    property var keysize: 50
-    property var keytopmargin: 20
-    property var keyrightmargin: 15
+    property var keysize: 55
+    property var keytopmargin: 15
+    property var keyrightmargin: 10
 
     property var textsize: 25
 
@@ -129,8 +129,25 @@ Popup {
         Row{
             Rectangle{
                 height: 300
-                width: 200
+                width: 100
                 color: "#D0D0D0"
+                Image{
+                    source: "icon/joy_up.png"
+                    width: parent.width*0.8
+                    height: 40
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    anchors.topMargin: 30
+                }
+                Image{
+                    source: "icon/joy_down.png"
+                    width: parent.width*0.8
+                    height: 40
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 30
+                }
+
                 Column{
                     anchors.centerIn: parent
                     spacing: keytopmargin
@@ -175,9 +192,9 @@ Popup {
             Rectangle{
                 id: rect_keys
                 height: 300
-                width: 1280 - 200
+                width: 1280 - 100
                 Row{
-                    spacing: 50
+                    spacing: 80
                     anchors.centerIn: parent
                     Column{
                         spacing: keytopmargin

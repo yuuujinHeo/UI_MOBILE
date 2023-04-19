@@ -3,7 +3,7 @@ import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
 import "."
 import io.qt.Supervisor 1.0
-
+import io.qt.CameraView 1.0
 import QtMultimedia 5.12
 Item {
     id: page_setting
@@ -35,6 +35,25 @@ Item {
 
     Tool_Keyboard{
         id: keyboard
+    }
+    Audio{
+        id: voice_test
+        autoPlay: false
+        volume: slider_volume_voice.value/100
+        source: "bgm/voice_start_serving.mp3"
+    }
+    Audio{
+        id: bgm_test
+        property bool isplaying: false
+        autoPlay: false
+        volume: slider_volume_bgm.value/100
+        source: "bgm/song.mp3"
+        onPlaying: {
+            isplaying = true;
+        }
+        onStopped: {
+            isplaying = false;
+        }
     }
     Rectangle{
         width: parent.width
@@ -186,6 +205,20 @@ Item {
                 id:column_setting
                 width: parent.width
                 spacing:25
+
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"로봇 기본 정보"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
                 Rectangle{
                     id: set_robot_1
                     width: 840
@@ -330,9 +363,57 @@ Item {
                         }
                     }
                 }
+                Rectangle{
+                    id: set_tray_num
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"트레이 개수"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_tray_num
+                                anchors.fill: parent
+                                model:[1,2,3,4,5]
+                            }
+                        }
+                    }
+
+                }
 
                 Rectangle{
-                    id: set_robot_3
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"로봇 설정"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_velocity
                     width: 840
                     height: 40
                     Row{
@@ -387,6 +468,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_bgm_volume
                     width: 840
                     height: 40
                     Row{
@@ -463,26 +545,8 @@ Item {
                         }
                     }
                 }
-                Audio{
-                    id: voice_test
-                    autoPlay: false
-                    volume: slider_volume_voice.value/100
-                    source: "bgm/voice_start_serving.mp3"
-                }
-                Audio{
-                    id: bgm_test
-                    property bool isplaying: false
-                    autoPlay: false
-                    volume: slider_volume_bgm.value/100
-                    source: "bgm/song.mp3"
-                    onPlaying: {
-                        isplaying = true;
-                    }
-                    onStopped: {
-                        isplaying = false;
-                    }
-                }
                 Rectangle{
+                    id: set_voice_volume
                     width: 840
                     height: 40
                     Row{
@@ -552,7 +616,22 @@ Item {
                         }
                     }
                 }
+
                 Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"로봇 설정(전문가용)"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_ip
                     width: 840
                     height: 40
                     Row{
@@ -565,7 +644,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"음성 볼륨"
+                                text:"IP"
                                 font.pixelSize: 20
                             }
                         }
@@ -714,40 +793,7 @@ Item {
                 }
 
                 Rectangle{
-                    id: set_robot_6
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"서버 명령 사용"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_use_servercmd
-                                anchors.fill: parent
-                                model:["사용 안함","사용"]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
+                    id: set_robot_radius
                     width: 840
                     height: 40
                     Row{
@@ -788,8 +834,194 @@ Item {
                         }
                     }
                 }
-
                 Rectangle{
+                    id: set_wheelbase
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"wheel_base"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: wheel_base
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","wheel_base");
+                                onFocusChanged: {
+                                    keyboard.owner = wheel_base;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_wheelradius
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"wheel_radius"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: wheel_radius
+                                anchors.fill: parent
+                                text:supervisor.getSetting("ROBOT","wheel_radius");
+                                onFocusChanged: {
+                                    keyboard.owner = wheel_radius;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_auto_init
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"실행 시 자동 초기화"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_autoinit
+                                anchors.fill: parent
+                                model:["사용안함","사용"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_use_Avoid
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"대기 후 경로재탐색"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_avoid
+                                anchors.fill: parent
+                                model:["사용안함","사용"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_use_multirobot
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"멀티 로봇"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_multirobot
+                                anchors.fill: parent
+                                model:["사용안함","사용"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_ui_cmd
                     width: 840
                     height: 40
                     Row{
@@ -823,6 +1055,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: init_
                     width: 840
                     height: 40
                     Row{
@@ -870,6 +1103,7 @@ Item {
                     }
                 }
             }
+
         }
 
         Flickable{
@@ -893,7 +1127,20 @@ Item {
                 width: parent.width
                 spacing:25
                 Rectangle{
-                    id: set_map_0
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"매장 설정"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_cur_map
                     width: 840
                     height: 40
                     Row{
@@ -960,6 +1207,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_map_size
                     width: 840
                     height: 40
                     Row{
@@ -1002,6 +1250,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_grid_size
                     width: 840
                     height: 40
                     Row{
@@ -1044,7 +1293,7 @@ Item {
                     }
                 }
                 Rectangle{
-                    id: set_map_4
+                    id: set_table_num
                     width: 840
                     height: 40
                     Row{
@@ -1080,41 +1329,7 @@ Item {
                     }
                 }
                 Rectangle{
-                    id: set_map_3
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"트레이 개수"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_tray_num
-                                anchors.fill: parent
-                                model:[1,2,3,4,5]
-                            }
-                        }
-                    }
-
-                }
-                Rectangle{
+                    id: set_max_call
                     width: 840
                     height: 40
                     Row{
@@ -1148,6 +1363,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_call_num
                     width: 840
                     height: 40
                     Row{
@@ -1273,298 +1489,20 @@ Item {
                 width: parent.width
                 spacing:25
                 Rectangle{
-                    id: set_slam_0
-                    width: 840
+                    width: 1100
                     height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"실행 시 자동 초기화"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_autoinit
-                                anchors.fill: parent
-                                model:["사용안함","사용"]
-                            }
-                        }
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"카메라 설정"
+                        color: "white"
+                        font.pixelSize: 20
                     }
                 }
                 Rectangle{
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"대기 후 경로재탐색"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_avoid
-                                anchors.fill: parent
-                                model:["사용안함","사용"]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_slam_1
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"baudrate"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_baudrate
-                                anchors.fill: parent
-                                model:[115200,256000]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_slam_2
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"mask"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.1
-                                    height: 40
-                                    Text{
-                                        id: text_mask
-                                        anchors.centerIn: parent
-                                        text: slider_mask.value.toFixed(1)
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
-                                }
-                                Slider{
-                                    id: slider_mask
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
-                                    height: 40
-                                    from: 0
-                                    to: 15.0
-                                    value: 10.0
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_slam_3
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"max_range"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.1
-                                    height: 40
-                                    Text{
-                                        id: text_max_range
-                                        anchors.centerIn: parent
-                                        text: slider_max_range.value.toFixed(1)
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
-                                }
-                                Slider{
-                                    id: slider_max_range
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
-                                    height: 40
-                                    from: 10.0
-                                    to: 50.0
-                                    value: 40.0
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_slam_4
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"offset_x"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: offset_x
-                                anchors.fill: parent
-                                text:supervisor.getSetting("SENSOR","offset_x");
-                                onFocusChanged: {
-                                    keyboard.owner = offset_x;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_slam_5
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"offset_y"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: offset_y
-                                anchors.fill: parent
-                                text:supervisor.getSetting("SENSOR","offset_y");
-                                onFocusChanged: {
-                                    keyboard.owner = offset_y;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_slam_6
+                    id: set_left_camera
                     width: 840
                     height: 40
                     Row{
@@ -1623,7 +1561,7 @@ Item {
                     }
                 }
                 Rectangle{
-                    id: set_slam_7
+                    id: set_right_camera
                     width: 840
                     height: 40
                     Row{
@@ -1688,6 +1626,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_baudrate
                     width: 840
                     height: 40
                     Row{
@@ -1700,7 +1639,41 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"k_curve"
+                                text:"baudrate"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_baudrate
+                                anchors.fill: parent
+                                model:[115200,256000]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_mask
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"mask"
                                 font.pixelSize: 20
                             }
                         }
@@ -1719,27 +1692,28 @@ Item {
                                     width: rr.width*0.1
                                     height: 40
                                     Text{
-                                        id: text_k_curve
+                                        id: text_mask
                                         anchors.centerIn: parent
-                                        text: slider_k_curve.value.toFixed(3)
+                                        text: slider_mask.value.toFixed(1)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
                                 }
                                 Slider{
-                                    id: slider_k_curve
+                                    id: slider_mask
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.8
                                     height: 40
-                                    from: 0.001
-                                    to: 0.01
-                                    value: 0.005
+                                    from: 0
+                                    to: 15.0
+                                    value: 10.0
                                 }
                             }
                         }
                     }
                 }
                 Rectangle{
+                    id: set_max_range
                     width: 840
                     height: 40
                     Row{
@@ -1752,7 +1726,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"k_v"
+                                text:"max_range"
                                 font.pixelSize: 20
                             }
                         }
@@ -1771,27 +1745,28 @@ Item {
                                     width: rr.width*0.1
                                     height: 40
                                     Text{
-                                        id: text_k_v
+                                        id: text_max_range
                                         anchors.centerIn: parent
-                                        text: slider_k_v.value.toFixed(1)
+                                        text: slider_max_range.value.toFixed(1)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
                                 }
                                 Slider{
-                                    id: slider_k_v
+                                    id: slider_max_range
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.8
                                     height: 40
-                                    from: 0.1
-                                    to: 2.0
-                                    value: 0.7
+                                    from: 10.0
+                                    to: 50.0
+                                    value: 40.0
                                 }
                             }
                         }
                     }
                 }
                 Rectangle{
+                    id: set_cam_exposure
                     width: 840
                     height: 40
                     Row{
@@ -1804,7 +1779,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"k_w"
+                                text:"cam_exposure"
                                 font.pixelSize: 20
                             }
                         }
@@ -1823,27 +1798,237 @@ Item {
                                     width: rr.width*0.1
                                     height: 40
                                     Text{
-                                        id: text_k_w
+                                        id: text_cam_exposure
                                         anchors.centerIn: parent
-                                        text: slider_k_w.value.toFixed(1)
+                                        text: slider_mask.value.toFixed(1)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
                                 }
                                 Slider{
-                                    id: slider_k_w
+                                    id: slider_cam_exposure
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.8
                                     height: 40
-                                    from: 1.0
-                                    to: 3.0
-                                    value: 2.5
+                                    from: 0
+                                    to: 4000
+                                    value: 2000
                                 }
                             }
                         }
                     }
                 }
                 Rectangle{
+                    id: set_offset_X
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"offset_x"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: offset_x
+                                anchors.fill: parent
+                                text:supervisor.getSetting("SENSOR","offset_x");
+                                onFocusChanged: {
+                                    keyboard.owner = offset_x;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_offset_y
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"offset_y"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: offset_y
+                                anchors.fill: parent
+                                text:supervisor.getSetting("SENSOR","offset_y");
+                                onFocusChanged: {
+                                    keyboard.owner = offset_y;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_left_camera_tf
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"left_camera_tf"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                anchors.fill: parent
+                                TextField{
+                                    id: left_camera_tf
+                                    width: parent.width*0.7
+                                    height: parent.height
+    //                                anchors.fill: parent
+                                    text:supervisor.getSetting("SENSOR","left_camera_tf");
+                                }
+                                Rectangle{
+                                    width: parent.widht*0.2
+                                    height: parent.height
+                                    radius: 5
+                                    color: "black"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        text: "change"
+                                        color: "white"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_right_camera_tf
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"right_camera_tf"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                anchors.fill: parent
+                                TextField{
+                                    id: right_camera_tf
+                                    width: parent.width*0.7
+                                    height: parent.height
+    //                                anchors.fill: parent
+                                    text:supervisor.getSetting("SENSOR","right_camera_tf");
+                                }
+                                Rectangle{
+                                    width: parent.widht*0.2
+                                    height: parent.height
+                                    radius: 5
+                                    color: "black"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        text: "change"
+                                        color: "white"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"속도 설정"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_limitpivot
                     width: 840
                     height: 40
                     Row{
@@ -1896,6 +2081,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_limitv
                     width: 840
                     height: 40
                     Row{
@@ -1947,8 +2133,8 @@ Item {
                         }
                     }
                 }
-
                 Rectangle{
+                    id: set_limit_vacc
                     width: 840
                     height: 40
                     Row{
@@ -2001,6 +2187,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_limitw
                     width: 840
                     height: 40
                     Row{
@@ -2053,6 +2240,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_limitwacc
                     width: 840
                     height: 40
                     Row{
@@ -2105,6 +2293,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: setlimitmanualv
                     width: 840
                     height: 40
                     Row{
@@ -2157,6 +2346,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: setlimitmanualw
                     width: 840
                     height: 40
                     Row{
@@ -2208,7 +2398,234 @@ Item {
                         }
                     }
                 }
+
                 Rectangle{
+                    id: set_st_v
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"st_v"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_st_v
+                                        anchors.centerIn: parent
+                                        text: slider_st_v.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_st_v
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 1.0
+                                    value: 0.3
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"SLAM 설정"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_kcurve
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"k_curve"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_k_curve
+                                        anchors.centerIn: parent
+                                        text: slider_k_curve.value.toFixed(3)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_k_curve
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.001
+                                    to: 0.01
+                                    value: 0.005
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_kv
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"k_v"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_k_v
+                                        anchors.centerIn: parent
+                                        text: slider_k_v.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_k_v
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.1
+                                    to: 2.0
+                                    value: 0.7
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_kw
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"k_w"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_k_w
+                                        anchors.centerIn: parent
+                                        text: slider_k_w.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_k_w
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 1.0
+                                    to: 3.0
+                                    value: 2.5
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_lookaheaddist
                     width: 840
                     height: 40
                     Row{
@@ -2261,6 +2678,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_minlookaheaddist
                     width: 840
                     height: 40
                     Row{
@@ -2273,7 +2691,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"wheel_base"
+                                text:"min_look_ahead_dist"
                                 font.pixelSize: 20
                             }
                         }
@@ -2285,23 +2703,35 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: wheel_base
-                                anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT","wheel_base");
-                                onFocusChanged: {
-                                    keyboard.owner = wheel_base;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_min_look_ahead_dist
+                                        anchors.centerIn: parent
+                                        text: slider_min_look_ahead_dist.value.toFixed(2)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
                                     }
+                                }
+                                Slider{
+                                    id: slider_min_look_ahead_dist
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 0.5
+                                    value: 0.1
                                 }
                             }
                         }
                     }
                 }
                 Rectangle{
+                    id: set_narrow_decel_ratio
                     width: 840
                     height: 40
                     Row{
@@ -2314,7 +2744,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"wheel_radius"
+                                text:"narrow_decel_ratio"
                                 font.pixelSize: 20
                             }
                         }
@@ -2326,26 +2756,748 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            TextField{
-                                id: wheel_radius
-                                anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT","wheel_radius");
-                                onFocusChanged: {
-                                    keyboard.owner = wheel_radius;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_narrow_decel_ratio
+                                        anchors.centerIn: parent
+                                        text: slider_narrow_decel_ratio.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
                                     }
+                                }
+                                Slider{
+                                    id: slider_narrow_decel_ratio
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 1.0
+                                    value: 0.5
                                 }
                             }
                         }
                     }
                 }
-
-
-
-
+                Rectangle{
+                    id: set_obs_deadzone
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"obs_deadzone"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_obs_deadzone
+                                        anchors.centerIn: parent
+                                        text: slider_obs_deadzone.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_obs_deadzone
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 1.0
+                                    value: 0.4
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_obs_wait_time
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"obs_wait_time"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_obs_wait_time
+                                        anchors.centerIn: parent
+                                        text: slider_obs_wait_time.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_obs_wait_time
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 20.0
+                                    value: 5.0
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_path_out_dist
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"path_out_dist"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_path_out_dist
+                                        anchors.centerIn: parent
+                                        text: slider_path_out_dist.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_path_out_dist
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 3.0
+                                    value: 1.0
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"ICP 설정"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_icp_dist
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"icp_dist"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_icp_dist
+                                        anchors.centerIn: parent
+                                        text: slider_icp_dist.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_icp_dist
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 1.0
+                                    value: 0.5
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_icp_error
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"icp_error"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_icp_error
+                                        anchors.centerIn: parent
+                                        text: slider_icp_error.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_icp_error
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 1.0
+                                    value: 0.1
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_icp_near
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"icp_near"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_icp_near
+                                        anchors.centerIn: parent
+                                        text: slider_icp_near.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_icp_near
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 2.0
+                                    value: 1.0
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_icp_odometry_weight
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"icp_odometry_weight"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_icp_odometry_weight
+                                        anchors.centerIn: parent
+                                        text: slider_icp_odometry_weight.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_icp_odometry_weight
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 1.0
+                                    value: 0.5
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_icp_ratio
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"icp_ratio"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_icp_ratio
+                                        anchors.centerIn: parent
+                                        text: slider_icp_ratio.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_icp_ratio
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 1.0
+                                    value: 0.5
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_icp_repeat_dist
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"icp_repeat_dist"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_icp_repeat_dist
+                                        anchors.centerIn: parent
+                                        text: slider_icp_ratio.value.toFixed(2)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_icp_repeat_dist
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 0.3
+                                    value: 0.15
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_icp_repeat_time
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"icp_repeat_time"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_icp_repeat_time
+                                        anchors.centerIn: parent
+                                        text: slider_icp_repeat_time.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_icp_repeat_time
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 5.0
+                                    value: 1.0
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"GOAL 설정"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_goal_dist
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"goal_dist"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_goal_dist
+                                        anchors.centerIn: parent
+                                        text: slider_goal_dist.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_goal_dist
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 0.5
+                                    value: 0.1
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_goal_v
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"goal_v"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_goal_v
+                                        anchors.centerIn: parent
+                                        text: slider_goal_v.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_goal_v
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 0.3
+                                    value: 0.05
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_goal_th
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"goal_th"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_goal_th
+                                        anchors.centerIn: parent
+                                        text: slider_goal_th.value.toFixed(1)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_goal_th
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 1.0
+                                    to: 10.0
+                                    value: 3.0
+                                }
+                            }
+                        }
+                    }
+                }
 
             }
         }
@@ -2370,6 +3522,19 @@ Item {
                 id:column_setting4
                 width: parent.width
                 spacing:25
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"현재 값"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
                 Rectangle{
                     id: set_motor_1
                     width: 840
@@ -2730,7 +3895,22 @@ Item {
                         }
                     }
                 }
+
                 Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"세팅 값"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_wheel_dir
                     width: 840
                     height: 40
                     Row{
@@ -2764,6 +3944,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_left_id
                     width: 840
                     height: 40
                     Row{
@@ -2797,6 +3978,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_right_id
                     width: 840
                     height: 40
                     Row{
@@ -2830,6 +4012,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_gear_ratio
                     width: 840
                     height: 40
                     Row{
@@ -2871,7 +4054,7 @@ Item {
                     }
                 }
                 Rectangle{
-                    id: set_motor_2
+                    id: set_kp
                     width: 840
                     height: 40
                     Row{
@@ -2913,7 +4096,7 @@ Item {
                     }
                 }
                 Rectangle{
-                    id: set_motor_3
+                    id: set_ki
                     width: 840
                     height: 40
                     Row{
@@ -2955,7 +4138,7 @@ Item {
                     }
                 }
                 Rectangle{
-                    id: set_motor_4
+                    id: set_kd
                     width: 840
                     height: 40
                     Row{
@@ -2997,6 +4180,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_limit_v
                     width: 840
                     height: 40
                     Row{
@@ -3038,6 +4222,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_limitv_acc
                     width: 840
                     height: 40
                     Row{
@@ -3079,6 +4264,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_limit_w
                     width: 840
                     height: 40
                     Row{
@@ -3120,6 +4306,7 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_limit_wacc
                     width: 840
                     height: 40
                     Row{
@@ -3311,6 +4498,23 @@ Item {
                         supervisor.setSetting("ROBOT_SW/limit_manual_w",text_limit_manual_w.text);
                         supervisor.setSetting("ROBOT_SW/look_ahead_dist",text_look_ahead_dist.text);
 
+                        supervisor.setSetting("ROBOT_SW/icp_dist",text_icp_dist.text);
+                        supervisor.setSetting("ROBOT_SW/icp_error",text_icp_error.text);
+                        supervisor.setSetting("ROBOT_SW/icp_near",text_icp_near.text);
+                        supervisor.setSetting("ROBOT_SW/icp_odometry_weight",text_icp_odometry_weight.text);
+                        supervisor.setSetting("ROBOT_SW/icp_ratio",text_icp_ratio.text);
+                        supervisor.setSetting("ROBOT_SW/icp_repeat_dist",text_icp_repeat_dist.text);
+                        supervisor.setSetting("ROBOT_SW/icp_repeat_time",text_icp_repeat_time.text);
+                        supervisor.setSetting("ROBOT_SW/obs_deadzone",text_obs_deadzone.text);
+                        supervisor.setSetting("ROBOT_SW/narrow_decel_ratio",text_narrow_decel_ratio.text);
+                        supervisor.setSetting("ROBOT_SW/obs_wait_time",text_obs_wait_time.text);
+                        supervisor.setSetting("ROBOT_SW/path_out_dist",text_path_out_dist.text);
+                        supervisor.setSetting("ROBOT_SW/st_v",text_st_v.text);
+                        supervisor.setSetting("ROBOT_SW/min_look_ahead_dist",text_min_look_ahead_dist.text);
+                        supervisor.setSetting("ROBOT_SW/goal_dist",text_goal_dist.text);
+                        supervisor.setSetting("ROBOT_SW/goal_th",text_goal_th.text);
+                        supervisor.setSetting("ROBOT_SW/goal_v",text_goal_v.text);
+
                         supervisor.setSetting("ROBOT_SW/grid_size",grid_size.text);
 
                         supervisor.setSetting("ROBOT_SW/map_size",map_size.text);
@@ -3323,10 +4527,10 @@ Item {
                         else
                             supervisor.setSetting("ROBOT_SW/use_uicmd","true");
 
-                        if(combo_use_servercmd.currentIndex == 0)
-                            supervisor.setSetting("SERVER/use_servercmd","false");
+                        if(combo_multirobot.currentIndex == 0)
+                            supervisor.setSetting("ROBOT_SW/use_multirobot","false");
                         else
-                            supervisor.setSetting("SERVER/use_servercmd","true");
+                            supervisor.setSetting("ROBOT_SW/use_multirobot","true");
 
 
                         supervisor.setSetting("ROBOT_SW/velocity",text_velocity.text);
@@ -3348,6 +4552,9 @@ Item {
                         supervisor.setSetting("SENSOR/offset_y",offset_y.text);
                         supervisor.setSetting("SENSOR/right_camera",right_camera.text);
                         supervisor.setSetting("SENSOR/left_camera",left_camera.text);
+                        supervisor.setSetting("SENSOR/left_camera_tf",left_camera_tf.text);
+                        supervisor.setSetting("SENSOR/right_camera_tf",right_camera_tf.text);
+                        supervisor.setSetting("SENSOR/cam_exposure",text_cam_exposure.text);
 
 
                         supervisor.setSetting("MOTOR/gear_ratio",gear_ratio.text);
@@ -3402,6 +4609,29 @@ Item {
         grid_size.text = supervisor.getSetting("ROBOT_SW","grid_size");
         map_size.text = supervisor.getSetting("ROBOT_SW","map_size");
 
+
+        left_camera_tf.text = supervisor.getSetting("SENSOR","left_camera_tf");
+        right_camera_tf.text = supervisor.getSetting("SENSOR","right_camera_tf");
+        slider_cam_exposure.value = parseFloat(supervisor.getSetting("SENSOR","cam_exposure"));
+
+        slider_icp_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_dist"));
+        slider_icp_error.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_error"));
+        slider_icp_near.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_near"));
+        slider_icp_odometry_weight.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_odometry_weight"));
+        slider_icp_ratio.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_ratio"));
+        slider_icp_repeat_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_repeat_dist"));
+        slider_icp_repeat_time.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_repeat_time"));
+        slider_narrow_decel_ratio.value = parseFloat(supervisor.getSetting("ROBOT_SW","narrow_decel_ratio"));
+        slider_obs_deadzone.value = parseFloat(supervisor.getSetting("ROBOT_SW","obs_deadzone"));
+        slider_obs_wait_time.value = parseFloat(supervisor.getSetting("ROBOT_SW","obs_wait_time"));
+        slider_path_out_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","path_out_dist"));
+        slider_st_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","st_v"));
+        slider_min_look_ahead_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","min_look_ahead_dist"));
+        slider_goal_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_dist"));
+        slider_goal_th.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_th"));
+        slider_goal_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_v"));
+
+
         slider_k_curve.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_curve"));
         slider_k_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_v"));
         slider_k_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_w"));
@@ -3417,15 +4647,15 @@ Item {
         slider_volume_bgm.value = Number(supervisor.getSetting("ROBOT_SW","volume_bgm"));
         slider_volume_voice.value = Number(supervisor.getSetting("ROBOT_SW","volume_voice"));
 
-        if(supervisor.getSetting("SERVER","use_servercmd") === "true"){
-            combo_use_servercmd.currentIndex = 1;
-        }else{
-            combo_use_servercmd.currentIndex = 0;
-        }
         if(supervisor.getSetting("ROBOT_SW","use_uicmd") === "true"){
             combo_use_uicmd.currentIndex = 1;
         }else{
             combo_use_uicmd.currentIndex = 0;
+        }
+        if(supervisor.getSetting("ROBOT_SW","use_multirobot") === "true"){
+            combo_multirobot.currentIndex = 1;
+        }else{
+            combo_multirobot.currentIndex = 0;
         }
 
         slider_vxy.value = parseFloat(supervisor.getSetting("ROBOT_SW","velocity"));
@@ -3771,95 +5001,77 @@ Item {
             opacity: 0.8
             color: "#282828"
         }
-
         property bool is_load: false
+        property bool is_switched: false
+        property var left_id: 0
+        property var right_id: 1
 
         onOpened: {
             timer_load.start();
         }
+
         onClosed: {
             timer_load.stop();
         }
 
         function update(){
-            timer_load.stop();
             //카메라 대수에 따라 UI 업데이트
-            if(supervisor.getCameraNum() > 1){
-                text_camera_1.text = supervisor.getCameraSerial(0);
-                text_camera_2.text = supervisor.getCameraSerial(1);
-                popup_camera.is_load = true;
-            }else if(supervisor.getCameraNum() === 1){
-                text_camera_1.text = supervisor.getCameraSerial(0);
-                popup_camera.is_load = true;
-            }else{
-                text_camera_1.text = supervisor.getLeftCamera();
-                text_camera_2.text = supervisor.getRightCamera();
-            }
-
-            if(popup_camera.is_load){
-                //지정된 왼쪽카메라 확인
-//                if(supervisor.getLeftCamera() === supervisor.getCameraSerial(0)){
-//                    mousearea_1.is_left = true;
-//                    mousearea_2.is_left = false;
-
-//                    ani_1.to = popup_camera.pos_left;
-//                    ani_2.to = popup_camera.pos_right;
-//                    ani_camera.restart();
-//                }
-//                if(supervisor.getRightCamera() === supervisor.getCameraSerial(0)){
-//                    mousearea_1.is_left = false;
-//                    mousearea_2.is_left = true;
-//                    ani_1.to = popup_camera.pos_right;
-//                    ani_2.to = popup_camera.pos_left;
-//                    ani_camera.restart();
-//                }
-
-                if(supervisor.getCameraNum() > 1){
-                    if(mousearea_1.is_left && supervisor.getLeftCamera() === supervisor.getCameraSerial(0)){
-                        cam_info_1.set = true;
+            if(supervisor.getCameraNum() === 2){
+                is_load = true;
+                if(is_switched){
+                    cameraview_1.setCamera(left_id);
+                    cameraview_2.setCamera(right_id);
+                    text_camera_1.text = supervisor.getCameraSerial(left_id);
+                    text_camera_2.text = supervisor.getCameraSerial(right_id);
+                }else{
+                    if(supervisor.getLeftCamera()===supervisor.getCameraSerial(0)){
+                        left_id = 0;
+                        right_id = 1;
+                    }else if(supervisor.getLeftCamera() === supervisor.getCameraSerial(1)){
+                        left_id = 1;
+                        right_id = 0;
+                    }else{
+                        if(supervisor.getRightCamera()===supervisor.getCameraSerial(0)){
+                            left_id = 1;
+                            right_id = 0;
+                        }else if(supervisor.getRightCamera() === supervisor.getCameraSerial(1)){
+                            left_id = 0;
+                            right_id = 1;
+                        }else{
+                            left_id = 0;
+                            right_id = 1;
+                        }
                     }
-                    if(mousearea_2.is_left && supervisor.getLeftCamera() === supervisor.getCameraSerial(1)){
-                        cam_info_2.set = true;
-                    }
-                    if(!mousearea_1.is_left && supervisor.getRightCamera() === supervisor.getCameraSerial(0)){
-                        cam_info_1.set = true;
-                    }
-                    if(!mousearea_2.is_left && supervisor.getRightCamera() === supervisor.getCameraSerial(1)){
-                        cam_info_2.set = true;
-                    }
+                    cameraview_1.setCamera(left_id);
+                    cameraview_2.setCamera(right_id);
+                    text_camera_1.text = supervisor.getCameraSerial(left_id);
+                    text_camera_2.text = supervisor.getCameraSerial(right_id);
                 }
-
-                canvas_camera_1.requestPaint();
-                canvas_camera_2.requestPaint();
             }else{
-                cam_info_1.set = false;
-                cam_info_2.set = false;
+                is_load = false;
+                text_camera_1.text = "";
+                text_camera_2.text = "";
             }
-
-            timer_load.start();
         }
 
         Timer{
             id: timer_load
             interval: 500
             repeat: true
+            running: popup_camera.opened
             onTriggered:{
                 //카메라 정보 요청
                 supervisor.requestCamera();
-
             }
         }
-
-        property var pos_left: rect_remain.width/4 - cam_info_1.width/2
-        property var pos_right: rect_remain.width*3/4 - cam_info_1.width/2
         Rectangle{
             anchors.centerIn: parent
             width: 800
-            height: 800
+            height: 700
             Rectangle{
                 id: rect_title
                 width: parent.width
-                height: 100
+                height: 70
                 color: "#323744"
                 Text{
                     anchors.centerIn: parent
@@ -3874,379 +5086,188 @@ Item {
                 width: parent.width
                 height: parent.height - rect_title.height
                 anchors.top: rect_title.bottom
-
-                Rectangle{
-                    id: rect_black_left
-                    width: rect_remain.width/2
-                    height: 500
-                    color: "#282828"
-                    Text{
-                        id: text_left
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                        anchors.topMargin: 10
-                        text: "Left"
-                        font.family: font_noto_b.name
-                        font.pixelSize: 20
-                        color: "white"
-                    }
-                }
-                Rectangle{
-                    id: rect_black_right
-                    width: rect_remain.width/2
-                    anchors.left: rect_black_left.right
-                    height: 500
-                    color: "#282828"
-                    Text{
-                        id: text_right
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                        anchors.topMargin: 10
-                        text: "Right"
-                        font.family: font_noto_b.name
-                        font.pixelSize: 20
-                        color: "white"
-                    }
-                }
-
-                ParallelAnimation{
-                    id: ani_camera;
-                    SpringAnimation{
-                        id:ani_1
-                        target:cam_info_1
-                        property:"x"
-                        duration:500
-                        spring: 2
-                        damping: 0.2
-                    }
-                    SpringAnimation{
-                        id:ani_2
-                        target:cam_info_2
-                        property:"x"
-                        duration:500
-                        spring: 2
-                        damping: 0.2
-                    }
-                }
-
-                Rectangle{
-                    id: cam_info_1
-                    width: 350
-                    height: 400
-                    color: "transparent"
-                    property bool set:false
-                    z: mousearea_1.pressed?2:1
-                    x: parent.width/4 - width/2
-                    y: 60
-
+                Column{
+                    anchors.centerIn: parent
                     Rectangle{
-                        id: rect_cam_1
-                        clip: true
-                        width: parent.width
-                        height: width
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        Canvas{
-                            id: canvas_camera_1
-                            width: 212
-                            height: 120
-                            scale: parent.width/212
+                        width: rect_remain.width
+                        height: 450
+                        color: "black"
+                        Grid{
                             anchors.centerIn: parent
-                            onPaint:{
-                                var ctx = getContext('2d');
+                            columns: 2
+                            rows: 3
+                            horizontalItemAlignment: Grid.AlignHCenter
+                            verticalItemAlignment: Grid.AlignVCenter
+                            spacing: 20
 
-                                if(supervisor.getCameraNum() > 0){
-                                    var image_data = supervisor.getCamera(0);
-
-                                    if(image_data.length > 0){
-
-                                        ctx.clearRect(0,0,width,height);
-                                        var temp_image = ctx.createImageData(width,height);
-
-                                        for(var i=0; i<image_data.length; i++){
-                                            temp_image.data[4*i+0] = image_data[i];
-                                            temp_image.data[4*i+1] = image_data[i];
-                                            temp_image.data[4*i+2] = image_data[i];
-                                            temp_image.data[4*i+3] = 255;
-                                        }
-                                        ctx.drawImage(temp_image,0,0,width,height);
-
-                                    }
-                                }
-                            }
-                        }
-
-                    }
-
-                    Rectangle{
-                        anchors.top: rect_cam_1.bottom
-                        width: parent.width
-                        height: 50
-                        radius: 5
-                        color: cam_info_1.set?"#12d27c":"#d0d0d0"
-                        Row{
-                            spacing: 10
-                            anchors.centerIn: parent
                             Text{
-                                text: "Serial : "
-                                font.family: font_noto_r.name
-
-                            }
-                            Text{
-                                id: text_camera_1
-                                text: {
-                                    if(supervisor.getCameraNum() > 0){
-                                        supervisor.getCameraSerial(0);
-                                    }else{
-                                        ""
-                                    }
-                                }
-                                font.family: font_noto_r.name
-
-                            }
-                        }
-                    }
-
-                    MouseArea{
-                        id:mousearea_1
-                        anchors.fill: parent
-                        property var firstX;
-                        property var firstY;
-                        property bool is_left: true
-                        propagateComposedEvents: true
-                        preventStealing: false
-
-                        onPressed:{
-                            firstX = mouseX;
-                            firstY = mouseY;
-                        }
-                        onReleased: {
-                            if(is_left){
-                                ani_1.from = cam_info_1.x;
-                                ani_1.to = popup_camera.pos_left;
-
-                                ani_2.from = cam_info_2.x;
-                                ani_2.to = popup_camera.pos_right;
-
-                                print("LEFT ",ani_1.to, ani_2.to);
-                                ani_camera.restart();
-                            }else{
-                                ani_1.from = cam_info_1.x;
-                                ani_1.to = popup_camera.pos_right;
-                                ani_2.from = cam_info_2.x;
-                                ani_2.to = popup_camera.pos_left;
-                                print("RIGHT ",ani_1.to, ani_2.to);
-                                ani_camera.restart();
-                            }
-                        }
-                        onPositionChanged: {
-                            cam_info_1.x += mouseX - firstX;
-                            if(mouseX - firstX > 0){
-                                is_left = false;
-                            }else{
-                                is_left = true;
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: cam_info_2
-                    width: 350
-                    height: 400
-                    color: "transparent"
-                    property bool set: false
-                    z: mousearea_2.pressed?2:1
-                    x: parent.width*3/4 - width/2
-                    y: 60
-                    Rectangle{
-                        id: rect_cam_2
-                        clip: true
-                        width: parent.width
-                        height: width
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        Canvas{
-                            id: canvas_camera_2
-                            width: 212
-                            height: 120
-                            scale: parent.width/212
-                            anchors.centerIn: parent
-                            onPaint:{
-                                var ctx = getContext('2d');
-
-                                if(supervisor.getCameraNum() > 1){
-                                    var image_data = supervisor.getCamera(1);
-                                    if(image_data.length > 0){
-                                        ctx.clearRect(0,0,width,height);
-                                        var temp_image = ctx.createImageData(width,height);
-                                        for(var i=0; i<image_data.length; i++){
-                                            temp_image.data[4*i+0] = image_data[i];
-                                            temp_image.data[4*i+1] = image_data[i];
-                                            temp_image.data[4*i+2] = image_data[i];
-                                            temp_image.data[4*i+3] = 255;
-                                        }
-                                        ctx.drawImage(temp_image,0,0,width,height);
-                                    }
-                                }
-                            }
-                        }
-
-                    }
-
-                    Rectangle{
-                        anchors.top: rect_cam_2.bottom
-                        width: parent.width
-                        height: 50
-                        radius: 5
-                        color: cam_info_2.set?"#12d27c":"#d0d0d0"
-                        Row{
-                            spacing: 10
-                            anchors.centerIn: parent
-                            Text{
-                                text: "Serial : "
-                                font.family: font_noto_r.name
-
-                            }
-                            Text{
-                                id: text_camera_2
-                                text: {
-                                    if(supervisor.getCameraNum() > 1){
-                                        supervisor.getCameraSerial(1);
-                                    }else{
-                                        ""
-                                    }
-                                }
-                                font.family: font_noto_r.name
-
-                            }
-                        }
-                    }
-
-                    MouseArea{
-                        id:mousearea_2
-                        anchors.fill: parent
-                        property var firstX;
-                        property var firstY;
-                        property bool is_left: true
-                        propagateComposedEvents: true
-                        preventStealing: false
-
-                        onPressed:{
-                            firstX = mouseX;
-                            firstY = mouseY;
-                        }
-                        onReleased: {
-                            if(!is_left){
-                                ani_1.from = cam_info_1.x;
-                                ani_1.to = popup_camera.pos_left;
-
-                                ani_2.from = cam_info_2.x;
-                                ani_2.to = popup_camera.pos_right;
-
-                                ani_camera.restart();
-
-                            }else{
-                                ani_1.from = cam_info_1.x;
-                                ani_1.to = popup_camera.pos_right;
-                                ani_2.from = cam_info_2.x;
-                                ani_2.to = popup_camera.pos_left;
-                                ani_camera.restart();
-                            }
-                        }
-                        onPositionChanged: {
-                            cam_info_2.x += mouseX - firstX;
-                            if(mouseX - firstX > 0){
-                                is_left = false;
-                            }else{
-                                is_left = true;
-                            }
-                        }
-                    }
-                }
-
-                Rectangle{
-                    width: rect_remain.width
-                    height: rect_remain.height - rect_black_left.height
-                    anchors.top: rect_black_left.bottom
-                    Row{
-                        spacing: 50
-                        anchors.centerIn: parent
-                        Rectangle{
-                            width: 180
-                            height: 60
-                            radius: 10
-                            color: enabled?"#12d27c":"#e9e9e9"
-                            border.width: enabled?1:0
-                            border.color: "#12d27c"
-                            enabled: popup_camera.is_load
-                            Text{
-                                anchors.centerIn: parent
-                                text: "확인"
-                                font.family: font_noto_r.name
-                                font.pixelSize: 25
+                                id: text_left
+                                text: "Left"
+                                font.family: font_noto_b.name
+                                font.pixelSize: 20
                                 color: "white"
                             }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    if(mousearea_1.is_left){
-                                        supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA LEFT ("+text_camera_1.text+")")
-                                        print("1 : ",text_camera_1.text,text_camera_2.text);
-                                        supervisor.setCamera(text_camera_1.text,text_camera_2.text);
-                                    }else{
-                                        supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA LEFT ("+text_camera_2.text+")")
 
-                                        print("2 : ",text_camera_2.text,text_camera_1.text);
-                                        supervisor.setCamera(text_camera_2.text,text_camera_1.text);
+                            Text{
+                                id: text_right
+                                text: "Right"
+                                font.family: font_noto_b.name
+                                font.pixelSize: 20
+                                color: "white"
+                            }
+
+                            CameraView{
+                                id: cameraview_1
+                                width: 300
+                                height: 250
+                            }
+                            CameraView{
+                                id: cameraview_2
+                                width: 300
+                                height: 250
+                            }
+                            Rectangle{
+                                width: 350
+                                height: 50
+                                color: "white"
+//                                radius: 5
+                                Row{
+                                    spacing: 10
+                                    anchors.centerIn: parent
+                                    Text{
+                                        text: "Serial : "
+                                        font.family: font_noto_r.name
+
                                     }
-                                    supervisor.readSetting();
-                                    init();
-                                    popup_camera.close();
+                                    Text{
+                                        id: text_camera_1
+                                        text: {
+                                            if(supervisor.getCameraNum() > 0){
+                                                supervisor.getCameraSerial(0);
+                                            }else{
+                                                ""
+                                            }
+                                        }
+                                        font.family: font_noto_r.name
+
+                                    }
                                 }
+
                             }
-                        }
-                        Rectangle{
-                            width: 180
-                            height: 60
-                            radius: 10
-                            color:"transparent"
-                            border.width: 1
-                            border.color: "#7e7e7e"
-                            Text{
-                                anchors.centerIn: parent
-                                text: "취소"
-                                font.family: font_noto_r.name
-                                font.pixelSize: 25
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    popup_camera.close();
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 180
-                            height: 60
-                            radius: 10
-                            color:popup_camera.is_load?"transparent":"#12d27c"
-                            border.width: 1
-                            border.color: "#7e7e7e"
-                            Text{
-                                anchors.centerIn: parent
-                                text: "사진 요청"
-                                font.family: font_noto_r.name
-                                font.pixelSize: 25
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA REQUEST")
-//                                    supervisor.requestCamera();
-                                    timer_load.start();
+                            Rectangle{
+                                width: 350
+                                height: 50
+                                color: "white"
+                                Row{
+                                    spacing: 10
+                                    anchors.centerIn: parent
+                                    Text{
+                                        text: "Serial : "
+                                        font.family: font_noto_r.name
+                                    }
+                                    Text{
+                                        id: text_camera_2
+                                        text: {
+                                            if(supervisor.getCameraNum() > 0){
+                                                supervisor.getCameraSerial(1);
+                                            }else{
+                                                ""
+                                            }
+                                        }
+                                        font.family: font_noto_r.name
+                                    }
                                 }
                             }
                         }
                     }
+                    Rectangle{
+                        width: rect_remain.width
+                        height: rect_remain.height - 450
+                        Row{
+                            spacing: 50
+                            anchors.centerIn: parent
+                            Rectangle{
+                                width: 180
+                                height: 60
+                                radius: 10
+                                color: enabled?"#12d27c":"#e9e9e9"
+                                border.width: enabled?1:0
+                                border.color: "#12d27c"
+                                enabled: popup_camera.is_load
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "확인"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 25
+                                    color: "white"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        if(mousearea_1.is_left){
+                                            supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA LEFT ("+text_camera_1.text+")")
+                                            print("1 : ",text_camera_1.text,text_camera_2.text);
+                                            supervisor.setCamera(text_camera_1.text,text_camera_2.text);
+                                        }else{
+                                            supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA LEFT ("+text_camera_2.text+")")
+                                            print("2 : ",text_camera_2.text,text_camera_1.text);
+                                            supervisor.setCamera(text_camera_2.text,text_camera_1.text);
+                                        }
+                                        supervisor.readSetting();
+                                        init();
+                                        popup_camera.close();
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 180
+                                height: 60
+                                radius: 10
+                                color:"transparent"
+                                border.width: 1
+                                border.color: "#7e7e7e"
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "위치 바꾸기"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 25
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA Position Switch")
+                                        popup_camera.is_switched = true;
+                                        var temp_id = popup_camera.left_id;
+                                        popup_camera.left_id = popup_camera.right_id;
+                                        popup_camera.right_id = temp_id;
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 180
+                                height: 60
+                                radius: 10
+                                color:"transparent"
+                                border.width: 1
+                                border.color: "#7e7e7e"
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "취소"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 25
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        popup_camera.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                 }
+
 
             }
         }

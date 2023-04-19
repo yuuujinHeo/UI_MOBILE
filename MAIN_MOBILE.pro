@@ -20,6 +20,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 SOURCES += \
     CallbellHandler.cpp \
+    CameraView.cpp \
     JoystickHandler.cpp \
     LCMHandler.cpp \
     MapView.cpp \
@@ -52,6 +53,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     CallbellHandler.h \
+    CameraView.h \
     GlobalHeader.h \
     JoystickHandler.h \
     Keyemitter.h \

@@ -37,20 +37,26 @@ LCMHandler::~LCMHandler(){
 ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
 void LCMHandler::sendCommand(command cmd, QString msg, bool force){
     if(!pmap->use_uicmd){
-        plog->write("[LCM ERROR] SEND COMMAND (BLOCKED) : " + msg);
+        if(msg != ""){
+            plog->write("[LCM ERROR] SEND COMMAND (BLOCKED) : " + msg);
+        }
     }else if(isconnect){
         if(is_debug){
             lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&cmd);
-            plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
+            if(msg != ""){
+                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
+            }
         }else{
             lcm.publish("COMMAND_"+probot->name.toStdString(),&cmd);
-            plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
+            if(msg != ""){
+                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
+            }
         }
         flag_tx = true;
     }else{
+//        lcm.publish("COMMAND_"+probot->name.toStdString(),&cmd);
         if(msg != ""){
             plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) TO COMMAND_" + probot->name + ": " + msg);
-            lcm.publish("COMMAND_"+probot->name.toStdString(),&cmd);
         }
     }
 }
@@ -60,30 +66,26 @@ void LCMHandler::sendCommand(int cmd, QString msg){
     send_msg.cmd = cmd;
 
     if(!pmap->use_uicmd){
-        plog->write("[LCM ERROR] SEND COMMAND (BLOCKED) : " + msg);
+        if(msg != ""){
+            plog->write("[LCM ERROR] SEND COMMAND (BLOCKED) : " + msg);
+        }
     }else if(isconnect){
         if(is_debug){
             lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&send_msg);
-            plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
+            if(msg != ""){
+                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
+            }
         }else{
             lcm.publish("COMMAND_"+probot->name.toStdString(),&send_msg);
-            plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
+            if(msg != ""){
+                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
+            }
         }
         flag_tx = true;
-//        if(probot->init_state != ROBOT_INIT_NOT_READY){
-//            if(is_debug){
-//                lcm.publish("COMMAND_"+probot->name_debug.toStdString(),&send_msg);
-//                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name_debug + ": " + msg);
-//            }else{
-//                lcm.publish("COMMAND_"+probot->name.toStdString(),&send_msg);
-//                plog->write("[LCM] SEND COMMAND TO COMMAND_" + probot->name + ": " + msg);
-//            }
-//            flag_tx = true;
-//        }else{
-//            plog->write("[LCM ERROR] SEND COMMAND (ROBOT BUSY) TO COMMAND_" + probot->name + ": " + msg);
-//        }
     }else{
-        plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) TO COMMAND_" + probot->name + ": " + msg);
+        if(msg != ""){
+            plog->write("[LCM ERROR] SEND COMMAND (DISCONNECTED) TO COMMAND_" + probot->name + ": " + msg);
+        }
         lcm.publish("COMMAND_"+probot->name.toStdString(),&send_msg);
     }
 }
@@ -286,6 +288,9 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
     probot->motor[0].current = msg->cur_m0;
     probot->motor[1].current = msg->cur_m1;
     probot->status_power = msg->status_power;
+    if(probot->status_emo == msg->status_emo){
+        plog->write("[LCM] EMO status changed !! "+QString::number(!msg->status_emo));
+    }
     probot->status_emo = !msg->status_emo;
     probot->status_remote = msg->status_remote;
     //DEBUG
@@ -372,7 +377,7 @@ void LCMHandler::robot_objecting_callback(const lcm::ReceiveBuffer *rbuf, const 
 }
 
 void LCMHandler::robot_command_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const command *msg){
-    qDebug() << "COMMAND CALLBACK" << msg->cmd;
+//    qDebug() << "COMMAND CALLBACK" << msg->cmd;
 }
 
 void LCMHandler::robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const camera_data *msg){
@@ -383,21 +388,17 @@ void LCMHandler::robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std
         temp_info.imageSize = msg->image_len;
         temp_info.width = msg->width;
         temp_info.height = msg->height;
-        cv::Mat map1(msg->width, msg->height,  CV_8U, cv::Scalar::all(0));
-        memcpy(map1.data, msg->image[i].data(), msg->image_len);
-        for(size_t k =0; k<msg->image_len; ++k)
-        {
-           int y = k / map1.cols;
-           int x = k % map1.cols;
-           temp_info.data.push_back(map1.ptr<uchar>(y)[x]);
-        }
+        qDebug() << msg->width << msg->height;
 
-        if(pmap->camera_info.count() > i){
-            pmap->camera_info[i] = temp_info;
-        }else{
-            pmap->camera_info.push_back(temp_info);
-        }
-
+         cv::Mat map(temp_info.height, temp_info.width, CV_8U, cv::Scalar::all(0));
+         memcpy(map.data, msg->image[i].data(), temp_info.width*temp_info.height);
+         temp_info.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
+         cv::imshow("map",map);
+         if(pmap->camera_info.count() > i){
+             pmap->camera_info[i] = temp_info;
+         }else{
+             pmap->camera_info.push_back(temp_info);
+         }
     }
     try{
         emit cameraupdate();

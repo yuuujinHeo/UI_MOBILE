@@ -1404,21 +1404,24 @@ void MapView::paint(QPainter *painter){
     painter->drawPixmap(0,0,width(),height(),pixmap_tline.pixmap);
     painter->drawPixmap(0,0,width(),height(),pixmap_current.pixmap);
 }
+
 void MapView::setWindow(QQuickWindow *Window){
     plog->write("[BUILDER] MAPVIEW SET WINDOW ");
     mMain = Window;
 }
+
 QQuickWindow *MapView::getWindow()
 {
     return mMain;
 }
+
 void MapView::setObject(QObject *object)
 {
     mObject = object;
 }
+
 QObject *MapView::getObject()
 {
     //rootobject를 리턴해준다.
     return mObject;
 }
-
