@@ -393,7 +393,7 @@ void LCMHandler::robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std
          cv::Mat map(temp_info.height, temp_info.width, CV_8U, cv::Scalar::all(0));
          memcpy(map.data, msg->image[i].data(), temp_info.width*temp_info.height);
          temp_info.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
-         cv::imshow("map",map);
+//         cv::imshow("map",map);
          if(pmap->camera_info.count() > i){
              pmap->camera_info[i] = temp_info;
          }else{
