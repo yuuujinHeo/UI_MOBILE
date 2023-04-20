@@ -702,7 +702,7 @@ Item {
         repeat: true
         interval: 500
         onTriggered: {
-            if(supervisor.getLCMConnection()){
+            if(supervisor.isIPCused() || supervisor.getLCMConnection()){
                 is_slam_running = supervisor.is_slam_running();
                 if(show_connection){
                     if(supervisor.getMappingflag()){

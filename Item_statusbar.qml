@@ -424,11 +424,12 @@ Item {
         onTriggered: {
             robot_battery = supervisor.getBattery();
             curTime = Qt.formatTime(new Date(), "hh:mm");
+
+            is_con_robot = supervisor.getLCMConnection();
             robot_rx = supervisor.getLCMRX();
             robot_tx = supervisor.getLCMTX();
             is_con_joystick = supervisor.isconnectJoy();
             is_con_server = supervisor.isConnectServer();
-            is_con_robot = supervisor.getLCMConnection();
 
             is_motor_power = supervisor.getPowerStatus();
             is_emergency = supervisor.getEmoStatus();

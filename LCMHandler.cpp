@@ -252,7 +252,6 @@ void LCMHandler::saveMapping(QString name){
     send_msg.cmd = ROBOT_CMD_MAPPING_SAVE;
     memcpy(send_msg.params,name.toUtf8(),sizeof(char)*255);
     sendCommand(send_msg,"SAVE MAPPING ("+name+")");
-
 }
 
 void LCMHandler::startObjecting(){
@@ -348,7 +347,7 @@ void LCMHandler::robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const
 
 void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data *msg){
     isconnect = true;
-     connect_count = 0;
+    connect_count = 0;
 
      cv::Mat map1(msg->map_h, msg->map_w, CV_8U, cv::Scalar::all(0));
      memcpy(map1.data, msg->data.data(), msg->len);
@@ -393,7 +392,7 @@ void LCMHandler::robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std
          cv::Mat map(temp_info.height, temp_info.width, CV_8U, cv::Scalar::all(0));
          memcpy(map.data, msg->image[i].data(), temp_info.width*temp_info.height);
          temp_info.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
-         cv::imshow("map",map);
+//         cv::imshow("map",map);
          if(pmap->camera_info.count() > i){
              pmap->camera_info[i] = temp_info;
          }else{

@@ -42,6 +42,7 @@ Supervisor::Supervisor(QObject *parent)
     usb_check = false;
     usb_check_count = 0;
 
+    ipc = new IPCHandler();
     lcm = new LCMHandler();
     server = new ServerHandler();
     joystick = new JoystickHandler();
@@ -74,6 +75,10 @@ Supervisor::Supervisor(QObject *parent)
     connect(lcm, SIGNAL(mappingin()),this,SLOT(mapping_update()));
     connect(lcm, SIGNAL(objectingin()),this,SLOT(objecting_update()));
     connect(lcm, SIGNAL(cameraupdate()),this,SLOT(camera_update()));
+    connect(ipc, SIGNAL(pathchanged()),this,SLOT(path_changed()));
+    connect(ipc, SIGNAL(mappingin()),this,SLOT(mapping_update()));
+    connect(ipc, SIGNAL(objectingin()),this,SLOT(objecting_update()));
+    connect(ipc, SIGNAL(cameraupdate()),this,SLOT(camera_update()));
     plog->write("");
     plog->write("");
     plog->write("");
@@ -368,8 +373,6 @@ void Supervisor::readSetting(QString map_name){
     pmap->right_camera = setting_robot.value("right_camera").toInt();
     setting_robot.endGroup();
 
-
-
     if(map_name == ""){
         map_name = pmap->map_name;
     }
@@ -508,7 +511,11 @@ void Supervisor::readSetting(QString map_name){
         probot->trays.push_back(0);
     }
 
-    lcm->subscribe();
+    if(probot->ipc_use){
+
+    }else{
+        lcm->subscribe();
+    }
     flag_read_ini = true;
 
     QMetaObject::invokeMethod(mMain, "update_ini");
@@ -518,8 +525,13 @@ void Supervisor::setVelocity(float vel){
     probot->velocity = vel;
     setSetting("ROBOT_SW/velocity",QString::number(vel));
     readSetting();
-    lcm->setVelocity(vel);
+    if(probot->ipc_use){
+        ipc->set_velocity(vel);
+    }else{
+        lcm->setVelocity(vel);
+    }
 }
+
 float Supervisor::getVelocity(){
     return probot->velocity;
 }
@@ -545,9 +557,15 @@ QString Supervisor::getRobotType(){
 }
 
 void Supervisor::requestCamera(){
-    command send_msg;
-    send_msg.cmd = ROBOT_CMD_REQ_CAMERA;
-    lcm->sendCommand(send_msg, "");
+    if(probot->ipc_use){
+        IPCHandler::CMD send_msg;
+        send_msg.cmd = ROBOT_CMD_REQ_CAMERA;
+        ipc->set_cmd(send_msg);
+    }else{
+        command send_msg;
+        send_msg.cmd = ROBOT_CMD_REQ_CAMERA;
+        lcm->sendCommand(send_msg, "");
+    }
 }
 void Supervisor::setCamera(QString left, QString right){
     setSetting("SENSOR/left_camera",left);
@@ -896,13 +914,22 @@ bool Supervisor::rotate_map(QString _src, QString _dst, int mode){
     }
 }
 bool Supervisor::getLCMConnection(){
-    return lcm->isconnect;
+    if(probot->ipc_use)
+        return true;
+    else
+        return lcm->isconnect;
 }
 bool Supervisor::getLCMRX(){
-    return lcm->flag_rx;
+    if(probot->ipc_use)
+        return ipc->flag_rx;
+    else
+        return lcm->flag_rx;
 }
 bool Supervisor::getLCMTX(){
-    return lcm->flag_tx;
+    if(probot->ipc_use)
+        return ipc->flag_tx;
+    else
+        return lcm->flag_tx;
 }
 bool Supervisor::getLCMProcess(){
     return false;
@@ -977,10 +1004,11 @@ void Supervisor::restartSLAM(){
             probot->status_emo = 0;
             probot->status_power = 0;
             probot->status_remote = 0;
-            lcm->isconnect = false;
             QString file = "xterm ./auto_test.sh";
             slam_process->setWorkingDirectory(QDir::homePath());
             slam_process->start(file);
+            slam_process->waitForReadyRead(3000);
+            lcm->isconnect = false;
             plog->write("[SUPERVISOR] RESTART SLAM -> START SLAM "+QString::number(slam_process->pid()));
         }else if(slam_process->state() == QProcess::Starting){
             plog->write("[SUPERVISOR] RESTART SLAM -> STARTING");
@@ -988,9 +1016,7 @@ void Supervisor::restartSLAM(){
             plog->write("[SUPERVISOR] RESTART SLAM -> RUNNING");
             QProcess *tempprocess = new QProcess(this);
             tempprocess->start(QDir::homePath() + "/kill_slam.sh");
-            QThread::sleep(2);
-//            tempprocess->kill();
-//            delete tempprocess;
+            tempprocess->waitForReadyRead(3000);
         }
         probot->localization_state = LOCAL_NOT_READY;
         probot->motor_state = MOTOR_NOT_READY;
@@ -1005,6 +1031,7 @@ void Supervisor::restartSLAM(){
         QString file = "xterm ./auto_test.sh";
         slam_process->setWorkingDirectory(QDir::homePath());
         slam_process->start(file);
+        slam_process->waitForReadyRead(3000);
         plog->write("[SUPERVISOR] RESTART SLAM -> START SLAM "+QString::number(slam_process->pid()));
     }
     probot->localization_state = LOCAL_NOT_READY;
@@ -1014,6 +1041,7 @@ void Supervisor::restartSLAM(){
     probot->status_power = 0;
     probot->status_remote = 0;
     lcm->isconnect = false;
+    ipc->update();
 }
 
 void Supervisor::startSLAM(){
@@ -1030,6 +1058,8 @@ void Supervisor::startSLAM(){
     QString file = "xterm ./auto_test.sh";
     slam_process->setWorkingDirectory(QDir::homePath());
     slam_process->start(file);
+    slam_process->waitForReadyRead(3000);
+    ipc->update();
     plog->write("[SUPERVISOR] RESTART SLAM -> START SLAM "+QString::number(slam_process->pid()));
 }
 
@@ -1041,31 +1071,61 @@ void Supervisor::startMapping(float grid){
     pmap->gridwidth = getSetting("ROBOT_SW","grid_size").toFloat();
     pmap->origin[0] = pmap->width/2;
     pmap->origin[1] = pmap->height/2;
-    lcm->startMapping(grid);
-    lcm->is_mapping = true;
+    if(probot->ipc_use){
+        ipc->startMapping(grid);
+        ipc->is_mapping = true;
+    }else{
+        lcm->startMapping(grid);
+        lcm->is_mapping = true;
+    }
 }
 void Supervisor::stopMapping(){
     plog->write("[USER INPUT] STOP MAPPING");
-    lcm->flagMapping = false;
-    lcm->is_mapping = false;
-    lcm->sendCommand(ROBOT_CMD_MAPPING_STOP, "MAPPING STOP");
+    if(probot->ipc_use){
+        ipc->flag_mapping = false;
+        ipc->is_mapping = false;
+        ipc->stopMapping();
+    }else{
+        lcm->flagMapping = false;
+        lcm->is_mapping = false;
+        lcm->sendCommand(ROBOT_CMD_MAPPING_STOP, "MAPPING STOP");
+    }
 }
 void Supervisor::saveMapping(QString name){
-    lcm->saveMapping(name);
+    if(probot->ipc_use){
+        ipc->saveMapping(name);
+    }else{
+        lcm->saveMapping(name);
+    }
 }
 void Supervisor::startObjecting(){
     plog->write("[USER INPUT] START OBJECTING");
-    lcm->startObjecting();
-    lcm->is_objecting = true;
+    if(probot->ipc_use){
+        ipc->startObjecting();
+        ipc->is_objecting = true;
+    }else{
+        lcm->startObjecting();
+        lcm->is_objecting = true;
+    }
 }
 void Supervisor::stopObjecting(){
     plog->write("[USER INPUT] STOP OBJECTING");
-    lcm->flagObjecting = false;
-    lcm->is_objecting = false;
-    lcm->sendCommand(ROBOT_CMD_OBJECTING_STOP, "OBJECTING STOP");
+    if(probot->ipc_use){
+        ipc->flag_objecting = false;
+        ipc->is_objecting = false;
+        ipc->stopObjecting();
+    }else{
+        lcm->flagObjecting = false;
+        lcm->is_objecting = false;
+        lcm->sendCommand(ROBOT_CMD_OBJECTING_STOP, "OBJECTING STOP");
+    }
 }
 void Supervisor::saveObjecting(){
-    lcm->saveObjecting();
+    if(probot->ipc_use){
+        ipc->saveObjecting();
+    }else{
+        lcm->saveObjecting();
+    }
 }
 void Supervisor::setSLAMMode(int mode){
 
@@ -1089,16 +1149,32 @@ float Supervisor::getInitPoseTH(){
 }
 void Supervisor::slam_setInit(){
     plog->write("[SLAM] SLAM SET INIT : "+QString().sprintf("%f, %f, %f",pmap->init_pose.point.x,pmap->init_pose.point.y,pmap->init_pose.angle));
-    lcm->setInitPose(pmap->init_pose.point.x, pmap->init_pose.point.y, pmap->init_pose.angle);
+    if(probot->ipc_use){
+        ipc->setInitPose(pmap->init_pose.point.x, pmap->init_pose.point.y, pmap->init_pose.angle);
+    }else{
+        lcm->setInitPose(pmap->init_pose.point.x, pmap->init_pose.point.y, pmap->init_pose.angle);
+    }
 }
 void Supervisor::slam_run(){
-    lcm->sendCommand(ROBOT_CMD_SLAM_RUN, "LOCALIZATION RUN");
+    if(probot->ipc_use){
+        ipc->set_cmd(ROBOT_CMD_SLAM_RUN, "LOCALIZATION RUN");
+    }else{
+        lcm->sendCommand(ROBOT_CMD_SLAM_RUN, "LOCALIZATION RUN");
+    }
 }
 void Supervisor::slam_stop(){
-    lcm->sendCommand(ROBOT_CMD_SLAM_STOP, "LOCALIZATION STOP");
+    if(probot->ipc_use){
+        ipc->set_cmd(ROBOT_CMD_SLAM_STOP, "LOCALIZATION STOP");
+    }else{
+        lcm->sendCommand(ROBOT_CMD_SLAM_STOP, "LOCALIZATION STOP");
+    }
 }
 void Supervisor::slam_autoInit(){
-    lcm->sendCommand(ROBOT_CMD_SLAM_AUTO, "LOCALIZATION AUTO INIT");
+    if(probot->ipc_use){
+        ipc->set_cmd(ROBOT_CMD_SLAM_AUTO, "LOCALIZATION AUTO INIT");
+    }else{
+        lcm->sendCommand(ROBOT_CMD_SLAM_AUTO, "LOCALIZATION AUTO INIT");
+    }
 }
 bool Supervisor::is_slam_running(){
     if(probot->localization_state == LOCAL_READY){
@@ -1108,16 +1184,28 @@ bool Supervisor::is_slam_running(){
     }
 }
 bool Supervisor::getMappingflag(){
-    return lcm->flagMapping;
+    if(probot->ipc_use){
+        return ipc->flag_mapping;
+    }else{
+        return lcm->flagMapping;
+    }
 }
+
 void Supervisor::setMappingflag(bool flag){
     lcm->flagMapping = flag;
 }
+
 bool Supervisor::getObjectingflag(){
-    return lcm->flagObjecting;
+    if(probot->ipc_use){
+        return ipc->flag_objecting;
+    }else{
+        return lcm->flagMapping;
+    }
 }
+
 void Supervisor::setObjectingflag(bool flag){
     lcm->flagObjecting = flag;
+    ipc->flag_objecting = flag;
 }
 
 
@@ -1743,29 +1831,58 @@ QVector<int> Supervisor::getPickuptrays(){
 
 ////*********************************************  ROBOT MOVE 관련   ***************************************************////
 void Supervisor::moveTo(QString target_num){
-    lcm->moveTo(target_num);
+    if(probot->ipc_use){
+        ipc->moveTo(target_num);
+    }else{
+        lcm->moveTo(target_num);
+    }
 }
 void Supervisor::moveToLast(){
-    lcm->moveToLast();
+    if(probot->ipc_use){
+//        ipc->moveTo(target_num);
+    }else{
+        lcm->moveToLast();
+    }
 }
 void Supervisor::moveTo(float x, float y, float th){
+    if(probot->ipc_use){
+//        ipc->moveTo(target_num);
+    }else{
+        lcm->moveToLast();
+    }
     lcm->moveTo(x,y,th);
 }
 void Supervisor::movePause(){
-    lcm->movePause();
+    if(probot->ipc_use){
+        ipc->movePause();
+    }else{
+        lcm->movePause();
+    }
 }
 void Supervisor::moveResume(){
-    lcm->moveResume();
+    if(probot->ipc_use){
+        ipc->moveResume();
+    }else{
+        lcm->moveResume();
+    }
 }
 void Supervisor::moveStop(){
-    lcm->moveStop();
+    if(probot->ipc_use){
+        ipc->moveStop();
+    }else{
+        lcm->moveStop();
+    }
     ui_cmd = UI_CMD_NONE;
     ui_state = UI_STATE_INIT_DONE;
     isaccepted = false;
     QMetaObject::invokeMethod(mMain, "movestopped");
 }
 void Supervisor::moveManual(){
-    lcm->moveManual();
+    if(probot->ipc_use){
+        ipc->moveManual();
+    }else{
+        lcm->moveManual();
+    }
 }
 void Supervisor::moveToCharge(){
     ui_cmd = UI_CMD_MOVE_CHARGE;
@@ -1787,10 +1904,12 @@ QString Supervisor::getcurTable(){
 void Supervisor::joyMoveXY(float x){
     probot->joystick[0] = x;
     lcm->flagJoystick = true;
+    ipc->flag_joystick = true;
 }
 void Supervisor::joyMoveR(float r){
     probot->joystick[1] = r;
     lcm->flagJoystick = true;
+    ipc->flag_joystick = true;
 }
 float Supervisor::getJoyXY(){
     return probot->joystick[0];
@@ -1955,14 +2074,14 @@ float Supervisor::getlastRobotth(){
     return temp.angle;
 }
 int Supervisor::getPathNum(){
-    if(lcm->flagPath){
+    if(ipc->flag_path || lcm->flagPath){
         return 0;
     }else{
         return probot->pathSize;
     }
 }
 float Supervisor::getPathx(int num){
-    if(lcm->flagPath){
+    if(ipc->flag_path || lcm->flagPath){
         return 0;
     }else{
         POSE temp = setAxis(probot->curPath[num]);
@@ -1970,7 +2089,7 @@ float Supervisor::getPathx(int num){
     }
 }
 float Supervisor::getPathy(int num){
-    if(lcm->flagPath){
+    if(ipc->flag_path || lcm->flagPath){
         return 0;
     }else{
         POSE temp = setAxis(probot->curPath[num]);
@@ -1978,7 +2097,7 @@ float Supervisor::getPathy(int num){
     }
 }
 float Supervisor::getPathth(int num){
-    if(lcm->flagPath){
+    if(ipc->flag_path || lcm->flagPath){
         return 0;
     }else{
         POSE temp = setAxis(probot->curPath[num]);
@@ -2494,74 +2613,146 @@ void Supervisor::onTimer(){
     static int timer_cnt = 0;
 
     probot->lcmconnection = lcm->isconnect;
-    if(lcm->isconnect){
-        if(ui_state != UI_STATE_NONE){
-            state_count = 0;
-            if(probot->status_charge == 1){
-                if(ui_state != UI_STATE_CHARGING){
-                    plog->write("[LCM] Charging Start -> UI_STATE = UI_STATE_CHARGING");
-                    ui_state = UI_STATE_CHARGING;
-                    QMetaObject::invokeMethod(mMain, "docharge");
-                }
-            }else if(probot->motor_state == MOTOR_NOT_READY){
-                if(prev_motor_state != probot->motor_state){
-                    plog->write(QString::number(probot->status_emo)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
-                    plog->write("[LCM] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL ");
-                    if(ui_state != UI_STATE_MOVEFAIL){
-                        ui_state = UI_STATE_MOVEFAIL;
+    if(probot->ipc_use){
+        if(ipc->getConnection()){
+            if(ui_state != UI_STATE_NONE){
+                state_count = 0;
+                if(probot->status_charge == 1){
+                    if(ui_state != UI_STATE_CHARGING){
+                        plog->write("[LCM] Charging Start -> UI_STATE = UI_STATE_CHARGING");
+                        ui_state = UI_STATE_CHARGING;
+                        QMetaObject::invokeMethod(mMain, "docharge");
+                    }
+                }else if(probot->motor_state == MOTOR_NOT_READY){
+                    if(prev_motor_state != probot->motor_state){
+                        plog->write(QString::number(probot->status_emo)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
+                        plog->write("[LCM] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL ");
+                        if(ui_state != UI_STATE_MOVEFAIL){
+                            ui_state = UI_STATE_MOVEFAIL;
+                        }
+                    }
+                }else if(probot->localization_state == LOCAL_NOT_READY){
+                    if(prev_local_state != probot->localization_state){
+                        plog->write("[LCM] LOCAL NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
+                        if(ui_state != UI_STATE_MOVEFAIL){
+                            ui_state = UI_STATE_MOVEFAIL;
+                        }
+                    }
+                }else if(probot->localization_state == LOCAL_FAILED){
+                    if(prev_local_state != probot->localization_state){
+                        plog->write("[LCM] LOCAL FAILED -> UI_STATE = UI_STATE_MOVEFAIL");
+                        if(ui_state != UI_STATE_MOVEFAIL){
+                            ui_state = UI_STATE_MOVEFAIL;
+                        }
+                    }
+                }else if(probot->running_state == ROBOT_MOVING_NOT_READY){
+                    if(prev_running_state != probot->running_state){
+                        if(ui_state != UI_STATE_MOVEFAIL){
+                            plog->write("[LCM] RUNNING NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
+                            ui_state = UI_STATE_MOVEFAIL;
+                        }
+                    }
+                }else if(probot->running_state == ROBOT_MOVING_WAIT){
+                    if(!flag_excuseme){
+                        plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");
+                        QMetaObject::invokeMethod(mMain, "excuseme");
+                        count_excuseme = 0;
+                        flag_excuseme = true;
+                    }
+                }else if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY){
+                    if(ui_state == UI_STATE_INIT_DONE){
+                        plog->write("[LCM] INIT ALL DONE -> UI_STATE = UI_STATE_READY");
+                        ui_state = UI_STATE_READY;
                     }
                 }
-            }else if(probot->localization_state == LOCAL_NOT_READY){
-                if(prev_local_state != probot->localization_state){
-                    plog->write("[LCM] LOCAL NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
-                    if(ui_state != UI_STATE_MOVEFAIL){
-                        ui_state = UI_STATE_MOVEFAIL;
+            }else{
+                if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY){
+                    if(state_count++ > 10){
+                        plog->write("[LCM] INIT ALL DONE? -> UI_STATE = UI_STATE_READY");
+                        ui_state = UI_STATE_READY;
+                        state_count = 0;
                     }
-                }
-            }else if(probot->localization_state == LOCAL_FAILED){
-                if(prev_local_state != probot->localization_state){
-                    plog->write("[LCM] LOCAL FAILED -> UI_STATE = UI_STATE_MOVEFAIL");
-                    if(ui_state != UI_STATE_MOVEFAIL){
-                        ui_state = UI_STATE_MOVEFAIL;
-                    }
-                }
-            }else if(probot->running_state == ROBOT_MOVING_NOT_READY){
-                if(prev_running_state != probot->running_state){
-                    if(ui_state != UI_STATE_MOVEFAIL){
-                        plog->write("[LCM] RUNNING NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
-                        ui_state = UI_STATE_MOVEFAIL;
-                    }
-                }
-            }else if(probot->running_state == ROBOT_MOVING_WAIT){
-                if(!flag_excuseme){
-                    plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");
-                    QMetaObject::invokeMethod(mMain, "excuseme");
-                    count_excuseme = 0;
-                    flag_excuseme = true;
-                }
-            }else if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY){
-                if(ui_state == UI_STATE_INIT_DONE){
-                    plog->write("[LCM] INIT ALL DONE -> UI_STATE = UI_STATE_READY");
-                    ui_state = UI_STATE_READY;
                 }
             }
         }else{
-            if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY){
-                if(state_count++ > 10){
-                    plog->write("[LCM] INIT ALL DONE? -> UI_STATE = UI_STATE_READY");
-                    ui_state = UI_STATE_READY;
-                    state_count = 0;
-                }
+            // 로봇연결이 끊어졌는데 ui_state가 NONE이 아니면
+            if(ui_state != UI_STATE_NONE){
+                plog->write("[LCM] DISCONNECT -> UI_STATE = NONE");
+                ui_state = UI_STATE_NONE;
+                QMetaObject::invokeMethod(mMain, "stateinit");
             }
         }
     }else{
-        // 로봇연결이 끊어졌는데 ui_state가 NONE이 아니면
-        if(ui_state != UI_STATE_NONE){
-            plog->write("[LCM] DISCONNECT -> UI_STATE = NONE");
-            ui_state = UI_STATE_NONE;
-            QMetaObject::invokeMethod(mMain, "stateinit");
+        if(lcm->isconnect){
+            if(ui_state != UI_STATE_NONE){
+                state_count = 0;
+                if(probot->status_charge == 1){
+                    if(ui_state != UI_STATE_CHARGING){
+                        plog->write("[LCM] Charging Start -> UI_STATE = UI_STATE_CHARGING");
+                        ui_state = UI_STATE_CHARGING;
+                        QMetaObject::invokeMethod(mMain, "docharge");
+                    }
+                }else if(probot->motor_state == MOTOR_NOT_READY){
+                    if(prev_motor_state != probot->motor_state){
+                        plog->write(QString::number(probot->status_emo)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
+                        plog->write("[LCM] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL ");
+                        if(ui_state != UI_STATE_MOVEFAIL){
+                            ui_state = UI_STATE_MOVEFAIL;
+                        }
+                    }
+                }else if(probot->localization_state == LOCAL_NOT_READY){
+                    if(prev_local_state != probot->localization_state){
+                        plog->write("[LCM] LOCAL NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
+                        if(ui_state != UI_STATE_MOVEFAIL){
+                            ui_state = UI_STATE_MOVEFAIL;
+                        }
+                    }
+                }else if(probot->localization_state == LOCAL_FAILED){
+                    if(prev_local_state != probot->localization_state){
+                        plog->write("[LCM] LOCAL FAILED -> UI_STATE = UI_STATE_MOVEFAIL");
+                        if(ui_state != UI_STATE_MOVEFAIL){
+                            ui_state = UI_STATE_MOVEFAIL;
+                        }
+                    }
+                }else if(probot->running_state == ROBOT_MOVING_NOT_READY){
+                    if(prev_running_state != probot->running_state){
+                        if(ui_state != UI_STATE_MOVEFAIL){
+                            plog->write("[LCM] RUNNING NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
+                            ui_state = UI_STATE_MOVEFAIL;
+                        }
+                    }
+                }else if(probot->running_state == ROBOT_MOVING_WAIT){
+                    if(!flag_excuseme){
+                        plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");
+                        QMetaObject::invokeMethod(mMain, "excuseme");
+                        count_excuseme = 0;
+                        flag_excuseme = true;
+                    }
+                }else if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY){
+                    if(ui_state == UI_STATE_INIT_DONE){
+                        plog->write("[LCM] INIT ALL DONE -> UI_STATE = UI_STATE_READY");
+                        ui_state = UI_STATE_READY;
+                    }
+                }
+            }else{
+                if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY){
+                    if(state_count++ > 10){
+                        plog->write("[LCM] INIT ALL DONE? -> UI_STATE = UI_STATE_READY");
+                        ui_state = UI_STATE_READY;
+                        state_count = 0;
+                    }
+                }
+            }
+        }else{
+            // 로봇연결이 끊어졌는데 ui_state가 NONE이 아니면
+            if(ui_state != UI_STATE_NONE){
+                plog->write("[LCM] DISCONNECT -> UI_STATE = NONE");
+                ui_state = UI_STATE_NONE;
+                QMetaObject::invokeMethod(mMain, "stateinit");
+            }
         }
     }
+
 
     if(flag_excuseme){
         if(count_excuseme++ > 5000/MAIN_THREAD){
@@ -2573,7 +2764,11 @@ void Supervisor::onTimer(){
     switch(ui_state){
     case UI_STATE_NONE:{
         if(probot->running_state == ROBOT_MOVING_PAUSED){
-            lcm->moveStop();
+            if(probot->ipc_use){
+                ipc->moveStop();
+            }else{
+                lcm->moveStop();
+            }
         }
         break;
     }
@@ -2642,11 +2837,19 @@ void Supervisor::onTimer(){
             }else{
                 if(timer_cnt%5==0){
                     if(count_moveto++ > 5){
-                        lcm->moveStop();
+                        if(probot->ipc_use){
+                            ipc->moveStop();
+                        }else{
+                            lcm->moveStop();
+                        }
                         ui_state = UI_STATE_MOVEFAIL;
                         plog->write("[SCHEDULER] GO HOME MOVE FAILED");
                     }else{
-                        lcm->moveTo("Resting_0");
+                        if(probot->ipc_use){
+                            ipc->moveTo("Resting_0");
+                        }else{
+                            lcm->moveTo("Resting_0");
+                        }
                         plog->write("[SCHEDULER] MOVE TO Resting_0");
                     }
                 }
@@ -2674,11 +2877,19 @@ void Supervisor::onTimer(){
             }else{
                 if(timer_cnt%5==0){
                     if(count_moveto++ > 5){
-                        lcm->moveStop();
+                        if(probot->ipc_use){
+                            ipc->moveStop();
+                        }else{
+                            lcm->moveStop();
+                        }
                         ui_state = UI_STATE_MOVEFAIL;
                         plog->write("[SCHEDULER] GO CHARGE MOVE FAILED");
                     }else{
-                        lcm->moveTo("Charging_0");
+                        if(probot->ipc_use){
+                            ipc->moveTo("Charging_0");
+                        }else{
+                            lcm->moveTo("Charging_0");
+                        }
                         plog->write("[SCHEDULER] MOVE TO Charging_0");
                     }
                 }
@@ -2722,12 +2933,21 @@ void Supervisor::onTimer(){
                     if(is_set){
                         if(timer_cnt%5 == 0){//1초 한번
                             if(count_moveto++ > 5){
-                                lcm->moveStop();
+                                if(probot->ipc_use){
+                                    ipc->moveStop();
+                                }else{
+                                    lcm->moveStop();
+                                }
                                 ui_state = UI_STATE_MOVEFAIL;
                                 plog->write("[SCHEDULER] RANDOM SERVING MOVE FAILED");
                             }else{
                                 plog->write("[SCHEDULER] RANDOM SERVING : MOVE TO Serving_"+QString::number(table_num));
-                                lcm->moveTo("Serving_"+QString().sprintf("%d",table_num));
+
+                                if(probot->ipc_use){
+                                    ipc->moveTo("Serving_"+QString().sprintf("%d",table_num));
+                                }else{
+                                    lcm->moveTo("Serving_"+QString().sprintf("%d",table_num));
+                                }
                                 table_num_last = table_num;
                             }
                         }
@@ -2750,12 +2970,21 @@ void Supervisor::onTimer(){
                         for(int i=0; i<setting.tray_num; i++){
                             if(probot->trays[i] != 0){
                                 if(count_moveto++ > 5){
-                                    lcm->moveStop();
+                                    if(probot->ipc_use){
+                                        ipc->moveStop();
+                                    }else{
+                                        lcm->moveStop();
+                                    }
                                     ui_state = UI_STATE_MOVEFAIL;
                                     plog->write("[SCHEDULER] SERVING MOVE FAILED");
                                 }else{
                                     plog->write("[SCHEDULER] SERVING : MOVE TO (Table"+QString::number(probot->trays[i])+")");
-                                    lcm->moveTo("Serving_"+QString().sprintf("%d",probot->trays[i]-1));
+
+                                    if(probot->ipc_use){
+                                        ipc->moveTo("Serving_"+QString().sprintf("%d",probot->trays[i]-1));
+                                    }else{
+                                        lcm->moveTo("Serving_"+QString().sprintf("%d",probot->trays[i]-1));
+                                    }
                                     serveDone = false;
                                 }
                                 break;
@@ -2814,14 +3043,22 @@ void Supervisor::onTimer(){
                         probot->call_moving_count = 0;
                     }else{
                         if(count_moveto++ > 5){
-                            lcm->moveStop();
+                            if(probot->ipc_use){
+                                ipc->moveStop();
+                            }else{
+                                lcm->moveStop();
+                            }
                             ui_state = UI_STATE_MOVEFAIL;
                             plog->write("[SCHEDULER] CALLING MOVE FAILED");
                         }else{
                             //call_list에서 타겟 지정 후 move
                             QString cur_target = getCallName(call_list[0]);
                             plog->write("[SCHEDULER] CALLING MOVE TO "+cur_target);
-                            lcm->moveTo(cur_target);
+                            if(probot->ipc_use){
+                                ipc->moveTo(cur_target);
+                            }else{
+                                lcm->moveTo(cur_target);
+                            }
                         }
                     }
                 }
@@ -2844,7 +3081,11 @@ void Supervisor::onTimer(){
     case UI_STATE_PICKUP:{
         if(probot->running_state == ROBOT_MOVING_PAUSED){
             plog->write("[SCHEDULER] IN PICKUP BUT ROBOT PAUSED -> RESUME");
-            lcm->moveResume();
+            if(probot->ipc_use){
+                ipc->moveResume();
+            }else{
+                lcm->moveResume();
+            }
         }
         if(flag_patrol_serving){
             count_pass++;
@@ -2878,7 +3119,11 @@ void Supervisor::onTimer(){
                 ui_cmd = UI_CMD_NONE;
                 if(state_rotate_tables != 0){
                     ui_state = UI_STATE_NONE;
-                    lcm->moveStop();
+                    if(probot->ipc_use){
+                        ipc->moveStop();
+                    }else{
+                        lcm->moveStop();
+                    }
                     state_rotate_tables = 0;
                 }
             }
@@ -2893,7 +3138,12 @@ void Supervisor::onTimer(){
                         table_num = qrand()%5;
                     }
                     qDebug() << "Move To " << "Serving_"+QString().sprintf("%d",table_num);
-                    lcm->moveTo("Serving_"+QString().sprintf("%d",table_num));
+
+                    if(probot->ipc_use){
+                        ipc->moveTo("Serving_"+QString().sprintf("%d",table_num));
+                    }else{
+                        lcm->moveTo("Serving_"+QString().sprintf("%d",table_num));
+                    }
                     state_rotate_tables = 2;
                     table_num_last = table_num;
                 }
@@ -2907,7 +3157,11 @@ void Supervisor::onTimer(){
                     state_rotate_tables = 3;
                 }else{
                     if(timer_cnt%10==0){
-                        lcm->moveTo("Serving_"+QString().sprintf("%d",table_num_last));
+                        if(probot->ipc_use){
+                            ipc->moveTo("Serving_"+QString().sprintf("%d",table_num_last));
+                        }else{
+                            lcm->moveTo("Serving_"+QString().sprintf("%d",table_num_last));
+                        }
                     }
                 }
                 break;

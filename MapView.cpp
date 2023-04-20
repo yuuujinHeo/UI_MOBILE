@@ -50,6 +50,7 @@ void MapView::onTimer(){
         if(robot_following){
             setZoomCenter();
         }
+
         if(probot->lcmconnection){
             setMapCurrent();
         }

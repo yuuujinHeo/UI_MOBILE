@@ -11,6 +11,7 @@
 #include "ServerHandler.h"
 #include "CallbellHandler.h"
 #include "HTTPHandler.h"
+#include "IPCHandler.h"
 #include "MapView.h"
 #include <libusb-1.0/libusb.h>
 
@@ -67,6 +68,7 @@ public:
     JoystickHandler *joystick;
     HTTPHandler *git;
     CallbellHandler *call;
+    IPCHandler *ipc;
     QProcess *slam_process;
 
 
@@ -78,6 +80,14 @@ public:
     void makeAllKillShell();
 
 
+    ////*********************************************  IPC 관련   ***************************************************////
+    Q_INVOKABLE bool isIPCused(){return probot->ipc_use;}
+
+    ////*********************************************  LCM 관련   ***************************************************////
+    Q_INVOKABLE bool getLCMConnection();
+    Q_INVOKABLE bool getLCMRX();
+    Q_INVOKABLE bool getLCMTX();
+    Q_INVOKABLE bool getLCMProcess();
 
     ////*********************************************  WINDOW 관련   ***************************************************////
     void setWindow(QQuickWindow* Window);
@@ -156,10 +166,6 @@ public:
     Q_INVOKABLE bool isExistRobotINI();
     Q_INVOKABLE void makeRobotINI();
     Q_INVOKABLE bool rotate_map(QString _src, QString _dst, int mode);
-    Q_INVOKABLE bool getLCMConnection();
-    Q_INVOKABLE bool getLCMRX();
-    Q_INVOKABLE bool getLCMTX();
-    Q_INVOKABLE bool getLCMProcess();
     Q_INVOKABLE bool getIniRead();
     Q_INVOKABLE int getUsbMapSize();
     Q_INVOKABLE QString getUsbMapPath(int num);
