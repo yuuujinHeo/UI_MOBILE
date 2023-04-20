@@ -21,6 +21,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 SOURCES += \
     CallbellHandler.cpp \
     CameraView.cpp \
+    IPCHandler.cpp \
     JoystickHandler.cpp \
     LCMHandler.cpp \
     MapView.cpp \
@@ -55,6 +56,7 @@ HEADERS += \
     CallbellHandler.h \
     CameraView.h \
     GlobalHeader.h \
+    IPCHandler.h \
     JoystickHandler.h \
     Keyemitter.h \
     LCMHandler.h \

@@ -85,6 +85,7 @@ typedef struct{
 
 typedef struct{
     bool lcmconnection = false;
+    bool ipc_use = false;
     //from Robot
     ST_MOTOR motor[2];
 
@@ -138,13 +139,10 @@ typedef struct{
     float lidar_data[360];
     float radius;
 
-
     QString program_version;
     QString program_date;
     QString program_message;
     QVector<ST_GIT> gitList;
-
-
 
 }ST_ROBOT;
 extern ST_ROBOT *probot;

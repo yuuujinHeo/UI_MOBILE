@@ -134,7 +134,7 @@ Item {
                 interval: 500
                 repeat: true
                 onTriggered:{
-                    if(supervisor.getLCMConnection()){
+                    if(supervisor.getLCMConnection() || supervisor.isIPCused()){
                         btn_slam_start.enabled = true;
                     }else{
                         btn_slam_start.enabled = false;

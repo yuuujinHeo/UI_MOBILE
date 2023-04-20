@@ -252,7 +252,6 @@ void LCMHandler::saveMapping(QString name){
     send_msg.cmd = ROBOT_CMD_MAPPING_SAVE;
     memcpy(send_msg.params,name.toUtf8(),sizeof(char)*255);
     sendCommand(send_msg,"SAVE MAPPING ("+name+")");
-
 }
 
 void LCMHandler::startObjecting(){
@@ -348,7 +347,7 @@ void LCMHandler::robot_local_path_callback(const lcm::ReceiveBuffer *rbuf, const
 
 void LCMHandler::robot_mapping_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const map_data *msg){
     isconnect = true;
-     connect_count = 0;
+    connect_count = 0;
 
      cv::Mat map1(msg->map_h, msg->map_w, CV_8U, cv::Scalar::all(0));
      memcpy(map1.data, msg->data.data(), msg->len);
