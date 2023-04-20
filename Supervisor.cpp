@@ -915,7 +915,7 @@ bool Supervisor::rotate_map(QString _src, QString _dst, int mode){
 }
 bool Supervisor::getLCMConnection(){
     if(probot->ipc_use)
-        return true;
+        return ipc->getConnection();
     else
         return lcm->isconnect;
 }

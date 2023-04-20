@@ -77,6 +77,28 @@ IPCHandler::~IPCHandler()
 }
 
 void IPCHandler::onTimer(){
+
+    if(is_mapping){
+
+    }else{
+        if(flag_mapping){
+            set_cmd(ROBOT_CMD_MAPPING_STOP, "MAPPING STOP");
+        }
+        flag_mapping = false;
+    }
+
+    if(is_objecting){
+
+    }else{
+        flag_objecting = false;
+    }
+
+
+    if(getConnection() && probot->localization_state==LOCAL_READY){
+        probot->lastPose = probot->curPose;
+    }
+
+
     IPCHandler::STATUS temp1 = get_status();
     if((int)temp1.tick != prev_tick_status){
         flag_rx = true;
@@ -252,6 +274,12 @@ void IPCHandler::onTimer(){
         prev_tick_cam1 = temp.tick;
     }
 
+    static int count=0;
+    if(count++%5==0){
+        flag_rx = false;
+        flag_tx = false;
+    }
+
     read_count++;
 }
 
@@ -344,6 +372,7 @@ IPCHandler::IMG IPCHandler::get_cam1()
 void IPCHandler::set_cmd(IPCHandler::CMD val, QString log)
 {
     shm_cmd.lock();
+    flag_tx = true;
     val.tick = ++tick;
     memcpy((char*)shm_cmd.data(), &val, sizeof(IPCHandler::CMD));
     if(log != ""){
