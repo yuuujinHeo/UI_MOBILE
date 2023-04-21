@@ -36,6 +36,8 @@ public:
         int8_t     status_m1 = 0;
         int8_t     temp_m0 = 0;
         int8_t     temp_m1 = 0;
+        int8_t     temp_ex_m0 = 0;
+        int8_t     temp_ex_m1 = 0;
         int8_t     cur_m0 = 0;
         int8_t     cur_m1 = 0;
         int8_t     status_charge = 0;
@@ -66,6 +68,8 @@ public:
             status_m1 = p.status_m1;
             temp_m0 = p.temp_m0;
             temp_m1 = p.temp_m1;
+            temp_ex_m0 = p.temp_ex_m0;
+            temp_ex_m1 = p.temp_ex_m1;
             cur_m0 = p.cur_m0;
             cur_m1 = p.cur_m1;
             status_charge = p.status_charge;
@@ -108,10 +112,9 @@ public:
     struct MAP
     {
         uint32_t tick = 0;
-        uint32_t width = 0;
-        uint32_t height = 0;
-        uint8_t *buf;
-//        uint8_t buf[1000*1000] = {0,};
+        uint32_t width = 1000;
+        uint32_t height = 1000;
+        uint8_t buf[1000*1000] = {0,};
 
         MAP()
         {
@@ -121,19 +124,16 @@ public:
             tick = p.tick;
             width = p.width;
             height = p.height;
-            memcpy(buf, p.buf, width*height);
+            memcpy(buf, p.buf, 1000000);
         }
     };
     struct IMG
     {
         uint32_t tick = 0;
-        uint32_t width = 0;
-        uint32_t height = 0;
-        uint8_t *buf;
-        uint32_t *serial;
-        uint8_t serial_len = 0;
-//        QString serial = "";
-//        uint8_t buf[480*270] = {0,};
+        uint8_t serial[255] = {0,};
+        uint32_t width = 480;
+        uint32_t height = 270;
+        uint8_t buf[480*270] = {0,};
 
         IMG()
         {
@@ -143,9 +143,8 @@ public:
             tick = p.tick;
             width = p.width;
             height = p.height;
-            serial = p.serial;
-            serial_len = p.serial_len;
-            memcpy(buf, p.buf, width*height);
+            memcpy(serial, p.serial, 255);
+            memcpy(buf, p.buf, 480*270);
         }
     };
 
@@ -220,14 +219,15 @@ public:
     void stopObjecting();
     void set_velocity(float vel);
 
+    QString tempstr = "";
     int read_count = 0;
-    int prev_tick_status = -1;
-    int prev_tick_global_path = -1;
-    int prev_tick_local_path = -1;
-    int prev_tick_map = -1;
-    int prev_tick_obs = -1;
-    int prev_tick_cam0 = -1;
-    int prev_tick_cam1 = -1;
+    int prev_tick_status = 0;
+    int prev_tick_global_path = 0;
+    int prev_tick_local_path = 0;
+    int prev_tick_map = 0;
+    int prev_tick_obs = 0;
+    int prev_tick_cam0 = 0;
+    int prev_tick_cam1 = 0;
 
 signals:
     void pathchanged();

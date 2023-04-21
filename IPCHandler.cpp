@@ -27,6 +27,8 @@ IPCHandler::IPCHandler(QObject *parent)
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     timer->start(200);
+
+    probot->ipc_use = true;
 }
 
 void IPCHandler::updateSharedMemory(QSharedMemory &mem, QString name, int size){
@@ -101,6 +103,7 @@ void IPCHandler::onTimer(){
 
     IPCHandler::STATUS temp1 = get_status();
     if((int)temp1.tick != prev_tick_status){
+        qDebug() << "status " << temp1.tick;
         flag_rx = true;
         read_count = 0;
         probot->battery_in = temp1.bat_in;
@@ -139,51 +142,52 @@ void IPCHandler::onTimer(){
         prev_tick_status = temp1.tick;
     }
 
-    IPCHandler::PATH temp2 = get_global_path();
-    if((int)temp2.tick != prev_tick_global_path){
-        flag_rx = true;
-        read_count = 0;
+//    IPCHandler::PATH temp2 = get_global_path();
+//    if((int)temp2.tick != prev_tick_global_path){
+//        flag_rx = true;
+//        read_count = 0;
 
-        probot->pathSize = temp2.num;
-        for(int i=0; i<probot->pathSize; i++){
-            POSE temp;
-            temp.point.x = temp2.x[i];
-            temp.point.y = temp2.y[i];
-            temp.angle = 0;
-            if(probot->curPath.size() > i){
-                probot->curPath[i] = temp;
-            }else{
-                probot->curPath.push_back(temp);
-            }
-        }
-        prev_tick_global_path = temp2.tick;
-        emit pathchanged();
-    }
+//        probot->pathSize = temp2.num;
+//        for(int i=0; i<probot->pathSize; i++){
+//            POSE temp;
+//            temp.point.x = temp2.x[i];
+//            temp.point.y = temp2.y[i];
+//            temp.angle = 0;
+//            if(probot->curPath.size() > i){
+//                probot->curPath[i] = temp;
+//            }else{
+//                probot->curPath.push_back(temp);
+//            }
+//        }
+//        prev_tick_global_path = temp2.tick;
+//        emit pathchanged();
+//    }
 
-    temp2 = get_local_path();
-    if((int)temp2.tick != prev_tick_local_path){
-        flag_rx = true;
-        read_count = 0;
+//    temp2 = get_local_path();
+//    if((int)temp2.tick != prev_tick_local_path){
+//        flag_rx = true;
+//        read_count = 0;
 
-        probot->localpathSize = temp2.num;
-        for(int i=0; i<probot->localpathSize; i++){
-            POSE temp;
-            temp.point.x = temp2.x[i];
-            temp.point.y = temp2.y[i];
-            temp.angle = 0;
-            probot->localPath[i] = temp;
-        }
-        prev_tick_local_path = temp2.tick;
-        emit pathchanged();
-    }
+//        probot->localpathSize = temp2.num;
+//        for(int i=0; i<probot->localpathSize; i++){
+//            POSE temp;
+//            temp.point.x = temp2.x[i];
+//            temp.point.y = temp2.y[i];
+//            temp.angle = 0;
+//            probot->localPath[i] = temp;
+//        }
+//        prev_tick_local_path = temp2.tick;
+//        emit pathchanged();
+//    }
 
     IPCHandler::MAP temp3 = get_map();
     if((int)temp3.tick != prev_tick_map){
+        qDebug() << "map " << temp1.tick;
         flag_rx = true;
         read_count = 0;
 
         cv::Mat map1(temp3.height, temp3.width, CV_8U, cv::Scalar::all(0));
-        memcpy(map1.data, temp3.buf, temp3.height*temp3.width);
+        memcpy((uint8_t*)map1.data, temp3.buf, temp3.height*temp3.width);
         cv::flip(map1, map1, 0);
         cv::rotate(map1, map1, cv::ROTATE_90_COUNTERCLOCKWISE);
 
@@ -197,10 +201,11 @@ void IPCHandler::onTimer(){
     temp3 = get_obs();
     if((int)temp3.tick != prev_tick_obs){
         flag_rx = true;
+        qDebug() << "obs " << temp3.tick;
         read_count = 0;
 
         cv::Mat map1(temp3.height, temp3.width, CV_8U, cv::Scalar::all(0));
-        memcpy(map1.data, temp3.buf, temp3.width*temp3.height);
+        memcpy((uint8_t*)map1.data, temp3.buf, temp3.width*temp3.height);
         cv::flip(map1, map1, 0);
         cv::rotate(map1, map1, cv::ROTATE_90_COUNTERCLOCKWISE);
 
@@ -211,68 +216,90 @@ void IPCHandler::onTimer(){
         emit objectingin();
     }
 
-    IPCHandler::IMG temp = get_cam0();
-    if((int)temp.tick != prev_tick_cam0){
-        flag_rx = true;
-        read_count = 0;
+    IPCHandler::IMG cam0 = get_cam0();
+    if(cam0.tick != prev_tick_cam0)
+    {
+        cv::Mat cam0_img(270, 480, CV_8U, cv::Scalar(0));
+        memcpy((uint8_t*)cam0_img.data, cam0.buf, sizeof(cam0.buf);
 
-        ST_CAMERA temp_info;
 
-        temp_info.serial = QString::fromUcs4(temp.serial,temp.serial_len);
-//        temp_info.serial = temp.serial;// QString::fromStdString(temp.serial);
-        temp_info.imageSize = temp.width*temp.height;
-        temp_info.width = temp.width;
-        temp_info.height = temp.height;
+        memcpy(tempstr.toUtf8().data(), cam0.serial, sizeof(cam0.serial));
+        qDebug() << tempstr;
 
-        cv::Mat map(temp_info.height, temp_info.width, CV_8U, cv::Scalar::all(0));
-        memcpy(map.data, temp.buf, temp_info.width*temp_info.height);
-        temp_info.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
-
-        if(pmap->camera_info.count() > 0){
-            pmap->camera_info[0] = temp_info;
-        }else{
-            pmap->camera_info.push_back(temp_info);
-        }
-
-        try{
-            emit cameraupdate();
-        }catch(std::bad_alloc){
-            qDebug() << "bad alloc?";
-        }
-        prev_tick_cam0 = temp.tick;
     }
+//    last_cam0_tick = cam0.tick
+//    IPCHandler::IMG cam0 = get_cam0();
+//    if(temp.tick != prev_tick_cam0){
+//        flag_rx = true;
+//        read_count = 0;
+//        ST_CAMERA temp_info;
 
-    temp = get_cam1();
-    if((int)temp.tick != prev_tick_cam1){
-        flag_rx = true;
-        read_count = 0;
+//        QString temp_s;
+//        memcpy(temp_s.toUtf8().data(), temp.serial, 255);
+//        temp_info.serial = temp_s;
+//        qDebug() << temp_s;
 
-        ST_CAMERA temp_info;
+//        temp_info.imageSize = temp.width*temp.height;
 
-        temp_info.serial = QString::fromUcs4(temp.serial,temp.serial_len);
-//        temp_info.serial = temp.serial;//QString::fromStdString(temp.serial);
-        temp_info.imageSize = temp.width*temp.height;
-        temp_info.width = temp.width;
-        temp_info.height = temp.height;
+//        temp_info.width = temp.width;
+//        temp_info.height = temp.height;
 
-        cv::Mat map(temp_info.height, temp_info.width, CV_8U, cv::Scalar::all(0));
-        memcpy(map.data, temp.buf, temp_info.width*temp_info.height);
-        temp_info.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
+//        cv::Mat cam0_img(270, 480, CV_8U, cv::Scalar(0));
+//        memcpy((uint8_t*)cam0_img.data, temp3.buf, 270*480);
 
-        if(pmap->camera_info.count() > 1){
-            pmap->camera_info[1] = temp_info;
-        }else{
-            pmap->camera_info.push_back(temp_info);
-        }
+//        cv::Mat map(temp_info.height, temp_info.width, CV_8U, cv::Scalar::all(0));
+//        memcpy((uint8_t*)map.data, temp.buf, temp_info.width*temp_info.height);
 
-        try{
-            emit cameraupdate();
-        }catch(std::bad_alloc){
-            qDebug() << "bad alloc?";
-        }
+//        temp_info.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(cam0_img));
 
-        prev_tick_cam1 = temp.tick;
-    }
+//        qDebug() << "cam0 " << temp.tick;
+//        if(pmap->camera_info.count() > 0){
+//            pmap->camera_info[0] = temp_info;
+//        }else{
+//            pmap->camera_info.push_back(temp_info);
+//        }
+
+//        qDebug() << "cam0 " << temp.tick;
+//        try{
+//            emit cameraupdate();
+//        }catch(std::bad_alloc){
+//            qDebug() << "bad alloc?";
+//        }
+//        prev_tick_cam0 = temp.tick;
+//    }
+
+//    temp = get_cam1();
+//    if(temp.tick != prev_tick_cam1){
+//        flag_rx = true;
+//        read_count = 0;
+
+//        ST_CAMERA temp_info;
+
+////        QString temp_s;
+////        memcpy(temp_s.toUtf8().data(), temp.serial, 255);
+////        temp_info.serial = temp_s;//QString::fromStdString(std::string(temp_s));
+//        temp_info.imageSize = temp.width*temp.height;
+//        temp_info.width = temp.width;
+//        temp_info.height = temp.height;
+
+//        cv::Mat map(temp_info.height, temp_info.width, CV_8U, cv::Scalar::all(0));
+//        memcpy((uint8_t*)map.data, temp.buf, temp_info.width*temp_info.height);
+//        temp_info.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
+
+//        if(pmap->camera_info.count() > 1){
+//            pmap->camera_info[1] = temp_info;
+//        }else{
+//            pmap->camera_info.push_back(temp_info);
+//        }
+
+//        try{
+//            emit cameraupdate();
+//        }catch(std::bad_alloc){
+//            qDebug() << "bad alloc?";
+//        }
+
+//        prev_tick_cam1 = temp.tick;
+//    }
 
     static int count=0;
     if(count++%5==0){
