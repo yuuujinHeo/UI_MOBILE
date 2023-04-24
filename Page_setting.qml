@@ -378,6 +378,110 @@ Item {
                     }
                 }
                 Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"preset"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                anchors.centerIn: parent
+                                spacing: 25
+                                Rectangle{
+                                    width:80
+                                    height: 40
+                                    radius: 5
+                                    border.width: 1
+                                    Text{
+                                        id: text_preset_name_1
+                                        anchors.centerIn: parent
+                                        text: "preset 1"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            popup_preset_set.preset_num = 1;
+                                            popup_preset_set.open();
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width:80
+                                    height: 40
+                                    radius: 5
+                                    border.width: 1
+                                    Text{
+                                        id: text_preset_name_2
+                                        anchors.centerIn: parent
+                                        text: "preset 2"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            popup_preset_set.preset_num = 2;
+                                            popup_preset_set.open();
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width:80
+                                    height: 40
+                                    radius: 5
+                                    border.width: 1
+                                    Text{
+                                        id: text_preset_name_3
+                                        anchors.centerIn: parent
+                                        text: "preset 3"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            popup_preset_set.preset_num = 3;
+                                            popup_preset_set.open();
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width:80
+                                    height: 40
+                                    radius: 5
+                                    color: "black"
+                                    visible: is_admin
+                                    Text{
+                                        anchors.centerIn: parent
+                                        text: "edit"
+                                        color: "white"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            popup_preset.open();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
                     id: set_tray_num
                     width: 840
                     height: 40
@@ -4708,7 +4812,7 @@ Item {
                         supervisor.setSetting("ROBOT_HW/wheel_base",wheel_base.text);
                         supervisor.setSetting("ROBOT_HW/wheel_radius",wheel_radius.text);
 
-                        supervisor.setSetting("ROBOT_SW/k_curve",text_k_curve.text);
+//                        supervisor.setSetting("ROBOT_SW/k_curve",text_k_curve.text);
                         supervisor.setSetting("ROBOT_SW/k_v",text_k_v.text);
                         supervisor.setSetting("ROBOT_SW/k_w",text_k_w.text);
                         supervisor.setSetting("ROBOT_SW/limit_pivot",text_limit_pivot.text);
@@ -4856,7 +4960,7 @@ Item {
         slider_goal_near_th.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_near_th"));
 
 
-        slider_k_curve.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_curve"));
+//        slider_k_curve.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_curve"));
         slider_k_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_v"));
         slider_k_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_w"));
         slider_limit_pivot.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_pivot"));
@@ -4870,6 +4974,11 @@ Item {
 
         slider_volume_bgm.value = Number(supervisor.getSetting("ROBOT_SW","volume_bgm"));
         slider_volume_voice.value = Number(supervisor.getSetting("ROBOT_SW","volume_voice"));
+
+
+        text_preset_name_1.text = supervisor.getSetting("PRESET1","name");
+        text_preset_name_2.text = supervisor.getSetting("PRESET2","name");
+        text_preset_name_3.text = supervisor.getSetting("PRESET3","name");
 
         if(supervisor.getSetting("ROBOT_SW","use_uicmd") === "true"){
             combo_use_uicmd.currentIndex = 1;
@@ -5500,8 +5609,8 @@ Item {
     Popup{
         id: popup_preset
         anchors.centerIn: parent
-        width: 1000
-        height: 800
+        width: 900
+        height: 500
         background: Rectangle{
             anchors.fill: parent
             color: "transparent"
@@ -5510,6 +5619,10 @@ Item {
         onOpened:{
             update();
         }
+        onClosed:{
+            init();
+        }
+
         function update(){
             text_preset_1.text = supervisor.getSetting("PRESET1","name");
             text_preset_2.text = supervisor.getSetting("PRESET2","name");
@@ -5519,7 +5632,6 @@ Item {
             slider_preset_limit_vacc.value = parseFloat(supervisor.getSetting("PRESET"+Number(select_preset),"limit_v_acc"));
             slider_preset_limit_w.value = parseFloat(supervisor.getSetting("PRESET"+Number(select_preset),"limit_w"));
             slider_preset_limit_wacc.value = parseFloat(supervisor.getSetting("PRESET"+Number(select_preset),"limit_w_acc"));
-
         }
 
         Rectangle{
@@ -5530,7 +5642,7 @@ Item {
                 Rectangle{
                     id: rect_preset_t
                     width: popup_preset.width
-                    height: 50
+                    height: 80
                     color: color_dark_navy
                     Text{
                         anchors.centerIn: parent
@@ -5546,75 +5658,87 @@ Item {
                         id: rect_preset_l
                         width: 300
                         height: popup_preset.height - rect_preset_t.height
-                        color: "red"
+                        color: color_gray
                         Column{
                             anchors.centerIn: parent
-                            spacing: 20
+                            spacing: 40
                             Row{
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 spacing: 10
                                 Rectangle{
                                     width: 80
-                                    height: 40
+                                    height: 50
                                     radius: 10
                                     Text{
                                         anchors.centerIn: parent
-                                        font.family: font_noto_l.name
+                                        font.family: font_noto_r.name
                                         font.pixelSize: 15
                                         text: "초기화"
                                     }
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            update();
+                                            popup_preset.update();
                                         }
                                     }
                                 }
                                 Rectangle{
                                     width: 80
-                                    height: 40
+                                    height: 50
                                     radius: 10
                                     Text{
                                         anchors.centerIn: parent
-                                        font.family: font_noto_l.name
+                                        font.family: font_noto_r.name
                                         font.pixelSize: 15
                                         text: "이름변경"
                                     }
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-
+                                            popup_preset_name.open();
                                         }
                                     }
                                 }
                                 Rectangle{
                                     width: 80
-                                    height: 40
+                                    height: 50
                                     radius: 10
                                     Text{
                                         anchors.centerIn: parent
-                                        font.family: font_noto_l.name
+                                        font.family: font_noto_r.name
                                         font.pixelSize: 15
                                         text: "저장"
                                     }
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/name",text_preset_1.text);
+                                            if(popup_preset.select_preset === 1){
+                                                supervisor.setSetting("PRESET1/name",text_preset_1.text);
+                                            }else if(popup_preset.select_preset === 2){
+                                                supervisor.setSetting("PRESET2/name",text_preset_2.text);
+
+                                            }else if(popup_preset.select_preset === 3){
+                                                supervisor.setSetting("PRESET3/name",text_preset_3.text);
+
+                                            }
+
                                             supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_pivot",text_preset_limit_pivot.text);
                                             supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_v",text_preset_limit_v.text);
                                             supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_v_acc",text_preset_limit_vacc.text);
                                             supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_w",text_preset_limit_w.text);
                                             supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_w_acc",text_preset_limit_wacc.text);
+                                            popup_preset.close();
                                         }
                                     }
                                 }
                             }
                             Rectangle{
+                                anchors.horizontalCenter: parent.horizontalCenter
                                 width: rect_preset_l.width*0.8
-                                height: 50
+                                height: 70
                                 radius: 5
-                                border.width: 1
+                                border.width: popup_preset.select_preset===1?3:1
+                                border.color: popup_preset.select_preset===1?color_green:"black"
                                 Text{
                                     id: text_preset_1
                                     anchors.centerIn: parent
@@ -5627,15 +5751,17 @@ Item {
                                     anchors.fill: parent
                                     onClicked:{
                                         popup_preset.select_preset = 1;
-                                        update();
+                                        popup_preset.update();
                                     }
                                 }
                             }
                             Rectangle{
+                                anchors.horizontalCenter: parent.horizontalCenter
                                 width: rect_preset_l.width*0.8
-                                height: 50
+                                height: 70
                                 radius: 5
-                                border.width: 1
+                                border.width: popup_preset.select_preset===2?3:1
+                                border.color: popup_preset.select_preset===2?color_green:"black"
                                 Text{
                                     id: text_preset_2
                                     anchors.centerIn: parent
@@ -5648,15 +5774,17 @@ Item {
                                     anchors.fill: parent
                                     onClicked:{
                                         popup_preset.select_preset = 2;
-                                        update();
+                                        popup_preset.update();
                                     }
                                 }
                             }
                             Rectangle{
+                                anchors.horizontalCenter: parent.horizontalCenter
                                 width: rect_preset_l.width*0.8
-                                height: 50
+                                height: 70
                                 radius: 5
-                                border.width: 1
+                                border.width: popup_preset.select_preset===3?3:1
+                                border.color: popup_preset.select_preset===3?color_green:"black"
                                 Text{
                                     id: text_preset_3
                                     anchors.centerIn: parent
@@ -5669,7 +5797,7 @@ Item {
                                     anchors.fill: parent
                                     onClicked:{
                                         popup_preset.select_preset = 3;
-                                        update();
+                                        popup_preset.update();
                                     }
                                 }
                             }
@@ -5680,6 +5808,7 @@ Item {
                         width: popup_preset.width - rect_preset_l.width
                         height:rect_preset_l.height
                         Column{
+                            spacing: 15
                             anchors.centerIn: parent
                             Rectangle{
                                 width: rect_preset_r.width*0.9
@@ -5723,7 +5852,7 @@ Item {
                                             Slider{
                                                 id: slider_preset_limit_pivot
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                width: rr.width*0.8
+                                                width: rr.width*0.6
                                                 height: 40
                                                 from: 5.0
                                                 to: 90.0
@@ -5775,7 +5904,7 @@ Item {
                                             Slider{
                                                 id: slider_preset_limit_v
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                width: rr.width*0.8
+                                                width: rr.width*0.6
                                                 height: 40
                                                 from: 0.1
                                                 to: 2.0
@@ -5827,7 +5956,7 @@ Item {
                                             Slider{
                                                 id: slider_preset_limit_vacc
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                width: rr.width*0.8
+                                                width: rr.width*0.6
                                                 height: 40
                                                 from: 0.1
                                                 to: 2.0
@@ -5879,7 +6008,7 @@ Item {
                                             Slider{
                                                 id: slider_preset_limit_w
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                width: rr.width*0.8
+                                                width: rr.width*0.6
                                                 height: 40
                                                 from: 5.0
                                                 to: 120.0
@@ -5931,7 +6060,7 @@ Item {
                                             Slider{
                                                 id: slider_preset_limit_wacc
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                width: rr.width*0.8
+                                                width: rr.width*0.6
                                                 height: 40
                                                 from: 5.0
                                                 to: 360.0
@@ -5941,15 +6070,171 @@ Item {
                                     }
                                 }
                             }
-
-
-
                         }
                     }
                 }
             }
 
         }
+
+    }
+    Popup{
+        id: popup_preset_name
+        anchors.centerIn: parent
+        width: 300
+        height: 200
+        background: Rectangle{
+            anchors.fill: parent
+            color: color_dark_navy
+        }
+        Column{
+            anchors.centerIn: parent
+            spacing: 20
+            TextField{
+                id: preset_name
+                width: 200
+                height: 70
+                horizontalAlignment: Text.AlignHCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: supervisor.getSetting("PRESET"+Number(popup_preset.select_preset),"name");
+                onFocusChanged: {
+                    keyboard.owner = preset_name;
+                    preset_name.selectAll();
+                    if(focus){
+                        keyboard.open();
+                    }else{
+                        keyboard.close();
+                        preset_name.select(0,0);
+                    }
+                }
+            }
+            Row{
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 20
+                Rectangle{
+                    width: 100
+                    height: 50
+                    radius: 5
+                    Text{
+                        anchors.centerIn: parent
+                        text: "cancel"
+                        font.family: font_noto_r.name
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            popup_preset_name.close();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 100
+                    height: 50
+                    radius: 5
+                    Text{
+                        anchors.centerIn: parent
+                        text: "set"
+                        font.family: font_noto_r.name
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/name",preset_name.text);
+                            popup_preset.update();
+                            popup_preset_name.close();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Popup{
+        id: popup_preset_set
+        width: 400
+        height: 300
+        anchors.centerIn: parent
+        property var preset_num: 0
+        onOpened:{
+            if(preset_num === 1){
+                text_preset_name_set.text = "(  "+supervisor.getSetting("PRESET1","name") + "   )";
+            }else if(preset_num === 2){
+                text_preset_name_set.text = "(  "+supervisor.getSetting("PRESET2","name") + "   )";
+            }else if(preset_num === 3){
+                text_preset_name_set.text = "(  "+supervisor.getSetting("PRESET3","name") + "   )";
+            }
+        }
+
+        background:Rectangle{
+            anchors.fill: parent
+        }
+        Column{
+            anchors.centerIn: parent
+            spacing: 10
+            Text{
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Are you sure?"
+                font.family: font_noto_r.name
+                font.pixelSize: 25
+            }
+            Text{
+                id: text_preset_name_set
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "(        )"
+                font.family: font_noto_r.name
+                font.pixelSize: 20
+            }
+            Row{
+                spacing: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+                Rectangle{
+                    width: 100
+                    height: 60
+                    color: color_navy
+                    Text{
+                        anchors.centerIn: parent
+                        text: "no"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        color: "white"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            popup_preset_set.close();
+                        }
+                    }
+            }
+
+                Rectangle{
+                    width: 100
+                    height: 60
+                    color: color_navy
+                    Text{
+                        anchors.centerIn: parent
+                        text: "yes"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        color: "white"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            var name = "PRESET"+Number(popup_preset_set.preset_num);
+                            print("setting! ",name,supervisor.getSetting(name,"limit_pivot"))
+                            supervisor.setSetting("ROBOT_SW/limit_pivot",supervisor.getSetting(name,"limit_pivot"));
+                            supervisor.setSetting("ROBOT_SW/limit_v",supervisor.getSetting(name,"limit_v"));
+                            supervisor.setSetting("ROBOT_SW/limit_v_acc",supervisor.getSetting(name,"limit_v_acc"));
+                            supervisor.setSetting("ROBOT_SW/limit_w",supervisor.getSetting(name,"limit_w"));
+                            supervisor.setSetting("ROBOT_SW/limit_w_acc",supervisor.getSetting(name,"limit_w_acc"));
+                            popup_preset_set.close();
+                            init();
+                        }
+                    }
+                }
+            }
+        }
+
 
     }
 

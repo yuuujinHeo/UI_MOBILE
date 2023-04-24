@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("homePath", QDir::homePath());
 
     QList<QString> path_home_str = QDir::homePath().split("/");
-    if(path_home_str[path_home_str.size()-1] == "odroid")
-        QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
+//    if(path_home_str[path_home_str.size()-1] == "odroid")
+//        QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     object = engine.rootObjects()[0];
     return app.exec();

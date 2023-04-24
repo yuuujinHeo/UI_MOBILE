@@ -1325,7 +1325,7 @@ Item {
                         color: "#282828"
                         font.family: font_noto_b.name
                         font.pixelSize: 20
-                        text: supervisor.getPatrolFileName()==""?"설정 된 파일이 없습니다.":supervisor.getPatrolFileName()
+//                        text: supervisor.getPatrolFileName()==""?"설정 된 파일이 없습니다.":supervisor.getPatrolFileName()
                     }
                 }
 

@@ -56,8 +56,8 @@ Item {
             interval: 200
             repeat: true
             onTriggered: {
-                temp_0.text = supervisor.getMotorTemperature(0).toFixed(1)+"("+supervisor.getMotorInsideTemperature(0).toFixed(1)+")";
-                temp_1.text = supervisor.getMotorTemperature(1).toFixed(1)+"("+supervisor.getMotorInsideTemperature(1).toFixed(1)+")";
+                temp_0.text = supervisor.getMotorTemperature(0).toFixed(0)+"("+supervisor.getMotorInsideTemperature(0).toFixed(0)+")";
+                temp_1.text = supervisor.getMotorTemperature(1).toFixed(0)+"("+supervisor.getMotorInsideTemperature(1).toFixed(0)+")";
             }
         }
         Row{
