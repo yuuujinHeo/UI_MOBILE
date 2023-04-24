@@ -5498,6 +5498,462 @@ Item {
     }
 
     Popup{
+        id: popup_preset
+        anchors.centerIn: parent
+        width: 1000
+        height: 800
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+        property var select_preset: 1
+        onOpened:{
+            update();
+        }
+        function update(){
+            text_preset_1.text = supervisor.getSetting("PRESET1","name");
+            text_preset_2.text = supervisor.getSetting("PRESET2","name");
+            text_preset_3.text = supervisor.getSetting("PRESET3","name");
+            slider_preset_limit_pivot.value = parseFloat(supervisor.getSetting("PRESET"+Number(select_preset),"limit_pivot"));
+            slider_preset_limit_v.value = parseFloat(supervisor.getSetting("PRESET"+Number(select_preset),"limit_v"));
+            slider_preset_limit_vacc.value = parseFloat(supervisor.getSetting("PRESET"+Number(select_preset),"limit_v_acc"));
+            slider_preset_limit_w.value = parseFloat(supervisor.getSetting("PRESET"+Number(select_preset),"limit_w"));
+            slider_preset_limit_wacc.value = parseFloat(supervisor.getSetting("PRESET"+Number(select_preset),"limit_w_acc"));
+
+        }
+
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 10
+            Column{
+                Rectangle{
+                    id: rect_preset_t
+                    width: popup_preset.width
+                    height: 50
+                    color: color_dark_navy
+                    Text{
+                        anchors.centerIn: parent
+                        color: "white"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 30
+                        font.bold: true
+                        text: "로봇 프리셋 설정"
+                    }
+                }
+                Row{
+                    Rectangle{
+                        id: rect_preset_l
+                        width: 300
+                        height: popup_preset.height - rect_preset_t.height
+                        color: "red"
+                        Column{
+                            anchors.centerIn: parent
+                            spacing: 20
+                            Row{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: 10
+                                Rectangle{
+                                    width: 80
+                                    height: 40
+                                    radius: 10
+                                    Text{
+                                        anchors.centerIn: parent
+                                        font.family: font_noto_l.name
+                                        font.pixelSize: 15
+                                        text: "초기화"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            update();
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width: 80
+                                    height: 40
+                                    radius: 10
+                                    Text{
+                                        anchors.centerIn: parent
+                                        font.family: font_noto_l.name
+                                        font.pixelSize: 15
+                                        text: "이름변경"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width: 80
+                                    height: 40
+                                    radius: 10
+                                    Text{
+                                        anchors.centerIn: parent
+                                        font.family: font_noto_l.name
+                                        font.pixelSize: 15
+                                        text: "저장"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/name",text_preset_1.text);
+                                            supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_pivot",text_preset_limit_pivot.text);
+                                            supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_v",text_preset_limit_v.text);
+                                            supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_v_acc",text_preset_limit_vacc.text);
+                                            supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_w",text_preset_limit_w.text);
+                                            supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_w_acc",text_preset_limit_wacc.text);
+                                        }
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: rect_preset_l.width*0.8
+                                height: 50
+                                radius: 5
+                                border.width: 1
+                                Text{
+                                    id: text_preset_1
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 20
+                                    font.bold: true
+                                    text: "프리셋 1"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        popup_preset.select_preset = 1;
+                                        update();
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: rect_preset_l.width*0.8
+                                height: 50
+                                radius: 5
+                                border.width: 1
+                                Text{
+                                    id: text_preset_2
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 20
+                                    font.bold: true
+                                    text: "프리셋 2"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        popup_preset.select_preset = 2;
+                                        update();
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: rect_preset_l.width*0.8
+                                height: 50
+                                radius: 5
+                                border.width: 1
+                                Text{
+                                    id: text_preset_3
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 20
+                                    font.bold: true
+                                    text: "프리셋 3"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        popup_preset.select_preset = 3;
+                                        update();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: rect_preset_r
+                        width: popup_preset.width - rect_preset_l.width
+                        height:rect_preset_l.height
+                        Column{
+                            anchors.centerIn: parent
+                            Rectangle{
+                                width: rect_preset_r.width*0.9
+                                height: 40
+                                Row{
+                                    anchors.fill: parent
+                                    Rectangle{
+                                        width: 200
+                                        height: parent.height
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 50
+                                            font.family: font_noto_r.name
+                                            text:"limit_pivot"
+                                            font.pixelSize: 20
+                                        }
+                                    }
+                                    Rectangle{
+                                        width: 1
+                                        height: parent.height
+                                        color: "#d0d0d0"
+                                    }
+                                    Rectangle{
+                                        width: parent.width - 200
+                                        height: parent.height
+                                        Row{
+                                            spacing: 10
+                                            anchors.centerIn: parent
+                                            Rectangle{
+                                                width: rr.width*0.1
+                                                height: 40
+                                                Text{
+                                                    id: text_preset_limit_pivot
+                                                    anchors.centerIn: parent
+                                                    text: slider_preset_limit_pivot.value.toFixed(1)
+                                                    font.pixelSize: 15
+                                                    font.family: font_noto_r.name
+                                                }
+                                            }
+                                            Slider{
+                                                id: slider_preset_limit_pivot
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                width: rr.width*0.8
+                                                height: 40
+                                                from: 5.0
+                                                to: 90.0
+                                                value: 45.0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: rect_preset_r.width*0.9
+                                height: 40
+                                Row{
+                                    anchors.fill: parent
+                                    Rectangle{
+                                        width: 200
+                                        height: parent.height
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 50
+                                            font.family: font_noto_r.name
+                                            text:"limit_v"
+                                            font.pixelSize: 20
+                                        }
+                                    }
+                                    Rectangle{
+                                        width: 1
+                                        height: parent.height
+                                        color: "#d0d0d0"
+                                    }
+                                    Rectangle{
+                                        width: parent.width - 200
+                                        height: parent.height
+                                        Row{
+                                            spacing: 10
+                                            anchors.centerIn: parent
+                                            Rectangle{
+                                                width: rr.width*0.1
+                                                height: 40
+                                                Text{
+                                                    id: text_preset_limit_v
+                                                    anchors.centerIn: parent
+                                                    text: slider_preset_limit_v.value.toFixed(1)
+                                                    font.pixelSize: 15
+                                                    font.family: font_noto_r.name
+                                                }
+                                            }
+                                            Slider{
+                                                id: slider_preset_limit_v
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                width: rr.width*0.8
+                                                height: 40
+                                                from: 0.1
+                                                to: 2.0
+                                                value: 1.0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: rect_preset_r.width*0.9
+                                height: 40
+                                Row{
+                                    anchors.fill: parent
+                                    Rectangle{
+                                        width: 200
+                                        height: parent.height
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 50
+                                            font.family: font_noto_r.name
+                                            text:"limit_v_acc"
+                                            font.pixelSize: 20
+                                        }
+                                    }
+                                    Rectangle{
+                                        width: 1
+                                        height: parent.height
+                                        color: "#d0d0d0"
+                                    }
+                                    Rectangle{
+                                        width: parent.width - 200
+                                        height: parent.height
+                                        Row{
+                                            spacing: 10
+                                            anchors.centerIn: parent
+                                            Rectangle{
+                                                width: rr.width*0.1
+                                                height: 40
+                                                Text{
+                                                    id: text_preset_limit_vacc
+                                                    anchors.centerIn: parent
+                                                    text: slider_preset_limit_vacc.value.toFixed(1)
+                                                    font.pixelSize: 15
+                                                    font.family: font_noto_r.name
+                                                }
+                                            }
+                                            Slider{
+                                                id: slider_preset_limit_vacc
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                width: rr.width*0.8
+                                                height: 40
+                                                from: 0.1
+                                                to: 2.0
+                                                value: 1.0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: rect_preset_r.width*0.9
+                                height: 40
+                                Row{
+                                    anchors.fill: parent
+                                    Rectangle{
+                                        width: 200
+                                        height: parent.height
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 50
+                                            font.family: font_noto_r.name
+                                            text:"limit_w"
+                                            font.pixelSize: 20
+                                        }
+                                    }
+                                    Rectangle{
+                                        width: 1
+                                        height: parent.height
+                                        color: "#d0d0d0"
+                                    }
+                                    Rectangle{
+                                        width: parent.width - 200
+                                        height: parent.height
+                                        Row{
+                                            spacing: 10
+                                            anchors.centerIn: parent
+                                            Rectangle{
+                                                width: rr.width*0.1
+                                                height: 40
+                                                Text{
+                                                    id: text_preset_limit_w
+                                                    anchors.centerIn: parent
+                                                    text: slider_preset_limit_w.value.toFixed(1)
+                                                    font.pixelSize: 15
+                                                    font.family: font_noto_r.name
+                                                }
+                                            }
+                                            Slider{
+                                                id: slider_preset_limit_w
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                width: rr.width*0.8
+                                                height: 40
+                                                from: 5.0
+                                                to: 120.0
+                                                value: 120.0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: rect_preset_r.width*0.9
+                                height: 40
+                                Row{
+                                    anchors.fill: parent
+                                    Rectangle{
+                                        width: 200
+                                        height: parent.height
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 50
+                                            font.family: font_noto_r.name
+                                            text:"limit_wacc"
+                                            font.pixelSize: 20
+                                        }
+                                    }
+                                    Rectangle{
+                                        width: 1
+                                        height: parent.height
+                                        color: "#d0d0d0"
+                                    }
+                                    Rectangle{
+                                        width: parent.width - 200
+                                        height: parent.height
+                                        Row{
+                                            spacing: 10
+                                            anchors.centerIn: parent
+                                            Rectangle{
+                                                width: rr.width*0.1
+                                                height: 40
+                                                Text{
+                                                    id: text_preset_limit_wacc
+                                                    anchors.centerIn: parent
+                                                    text: slider_preset_limit_wacc.value.toFixed(1)
+                                                    font.pixelSize: 15
+                                                    font.family: font_noto_r.name
+                                                }
+                                            }
+                                            Slider{
+                                                id: slider_preset_limit_wacc
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                width: rr.width*0.8
+                                                height: 40
+                                                from: 5.0
+                                                to: 360.0
+                                                value: 360.0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+
+
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    Popup{
         id: popup_password
         anchors.centerIn: parent
         width: 400
