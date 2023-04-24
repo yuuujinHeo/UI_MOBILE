@@ -594,7 +594,11 @@ QList<int> Supervisor::getCamera(int num){
 }
 QString Supervisor::getCameraSerial(int num){
     try{
-        return pmap->camera_info[num].serial;
+        if(num > -1 && num < pmap->camera_info.size()){
+            return pmap->camera_info[num].serial;
+        }else{
+            return "";
+        }
     }catch(...){
         qDebug() << "Something Wrong to get Camera Serial " << num << pmap->camera_info.size();
         return "";
@@ -1990,6 +1994,9 @@ QString Supervisor::getMotorStatusStr(int id){
 int Supervisor::getMotorTemperature(int id){
     return probot->motor[id].temperature;
 }
+int Supervisor::getMotorInsideTemperature(int id){
+    return probot->motor[id].motor_temp;
+}
 int Supervisor::getMotorWarningTemperature(){
     return 50;
 }
@@ -2366,6 +2373,7 @@ void Supervisor::path_changed(){
     QMetaObject::invokeMethod(mMain, "updatepath");
 }
 void Supervisor::camera_update(){
+    qDebug() << "camera_update";
     QMetaObject::invokeMethod(mMain, "updatecamera");
 }
 void Supervisor::mapping_update(){

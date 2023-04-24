@@ -933,6 +933,7 @@ Item {
         id: area_swipe
         anchors.fill: parent
         enabled: false
+        property var password:0;
         property var firstX;
         property var firstY;
         onPressed: {
@@ -944,6 +945,7 @@ Item {
                 supervisor.writelog("[USER INPUT] SWIPE MOVEFAIL PAGE TO DOWN "+Number(firstY - mouseY).toFixed(0))
                 notice.y = -800;
                 area_swipe.enabled = false;
+                password = 0;
 //                timer_get_joy.start();
             }else{
                 supervisor.writelog("[USER INPUT] SWIPE MOVEFAIL PAGE TO UP "+Number(firstY - mouseY).toFixed(0))
@@ -953,6 +955,16 @@ Item {
         onPositionChanged: {
             if(firstY - mouseY > 0){
                 notice.y =  mouseY - firstY;
+            }
+        }
+        onClicked: {
+            if(mouseX > parent.width - 100 && mouseY > parent.height-100){
+                password++;
+                print(password);
+                if(password > 4){
+                    password = 0;
+                    loadPage(pkitchen);
+                }
             }
         }
     }

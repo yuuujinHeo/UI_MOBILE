@@ -312,6 +312,7 @@ public:
     Q_INVOKABLE int getMotorStatus(int id);
     Q_INVOKABLE QString getMotorStatusStr(int id);
     Q_INVOKABLE int getMotorTemperature(int id);
+    Q_INVOKABLE int getMotorInsideTemperature(int id);
     Q_INVOKABLE int getMotorWarningTemperature();
     Q_INVOKABLE int getMotorCurrent(int id);
     Q_INVOKABLE int getPowerStatus();

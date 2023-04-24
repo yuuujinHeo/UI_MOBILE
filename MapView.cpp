@@ -51,8 +51,12 @@ void MapView::onTimer(){
             setZoomCenter();
         }
 
-        if(probot->lcmconnection){
+        if(probot->ipc_use){
             setMapCurrent();
+        }else{
+            if(probot->lcmconnection){
+                setMapCurrent();
+            }
         }
     }
 }

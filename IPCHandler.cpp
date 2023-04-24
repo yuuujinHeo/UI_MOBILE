@@ -4,8 +4,7 @@ IPCHandler::IPCHandler(QObject *parent)
     : QObject(parent)
     , shm_cmd("slamnav_cmd")
     , shm_status("slamnav_status")
-    , shm_global_path("slamnav_globalpath")
-    , shm_local_path("slamnav_localpath")
+    , shm_path("slamnav_path")
     , shm_map("slamnav_map")
     , shm_obs("slamnav_obs")
     , shm_cam0("slamnav_cam0")
@@ -17,18 +16,33 @@ IPCHandler::IPCHandler(QObject *parent)
     // create or attach
     updateSharedMemory(shm_cmd,"Command",sizeof(IPCHandler::CMD));
     updateSharedMemory(shm_status,"Status",sizeof(IPCHandler::STATUS));
-    updateSharedMemory(shm_global_path,"GlobalPath",sizeof(IPCHandler::PATH));
-    updateSharedMemory(shm_local_path,"LocalPath",sizeof(IPCHandler::PATH));
+    updateSharedMemory(shm_path,"Path",sizeof(IPCHandler::PATH));
     updateSharedMemory(shm_map,"Map",sizeof(IPCHandler::MAP));
     updateSharedMemory(shm_obs,"ObsMap",sizeof(IPCHandler::MAP));
     updateSharedMemory(shm_cam0,"Camera0",sizeof(IPCHandler::IMG));
     updateSharedMemory(shm_cam1,"Camera1",sizeof(IPCHandler::IMG));
+
+    clearSharedMemory(shm_cmd);
 
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     timer->start(200);
 
     probot->ipc_use = true;
+    if(probot->ipc_use){
+        plog->write("[IPC] IPCHandler Constructed. IPC_USE = TRUE");
+    }else{
+        plog->write("[IPC] IPCHandler Constructed. IPC_USE = FALSE");
+    }
+}
+
+void IPCHandler::clearSharedMemory(QSharedMemory &mem){
+    if(mem.isAttached()){
+        mem.lock();
+        memset(mem.data(),0,sizeof(mem.data()));
+        mem.unlock();
+        plog->write("[IPC] Clear CMD ShardMemory");
+    }
 }
 
 void IPCHandler::updateSharedMemory(QSharedMemory &mem, QString name, int size){
@@ -58,8 +72,7 @@ void IPCHandler::detachSharedMemory(QSharedMemory &mem, QString name){
 void IPCHandler::update(){
     updateSharedMemory(shm_cmd,"Command",sizeof(IPCHandler::CMD));
     updateSharedMemory(shm_status,"Status",sizeof(IPCHandler::STATUS));
-    updateSharedMemory(shm_global_path,"GlobalPath",sizeof(IPCHandler::PATH));
-    updateSharedMemory(shm_local_path,"LocalPath",sizeof(IPCHandler::PATH));
+    updateSharedMemory(shm_path,"Path",sizeof(IPCHandler::PATH));
     updateSharedMemory(shm_map,"Map",sizeof(IPCHandler::MAP));
     updateSharedMemory(shm_obs,"ObsMap",sizeof(IPCHandler::MAP));
     updateSharedMemory(shm_cam0,"Camera0",sizeof(IPCHandler::IMG));
@@ -70,8 +83,7 @@ IPCHandler::~IPCHandler()
 {
     detachSharedMemory(shm_cmd,"Command");
     detachSharedMemory(shm_status,"Status");
-    detachSharedMemory(shm_global_path,"GlobalPath");
-    detachSharedMemory(shm_local_path,"LocalPath");
+    detachSharedMemory(shm_path,"Path");
     detachSharedMemory(shm_map,"Map");
     detachSharedMemory(shm_obs,"ObsMap");
     detachSharedMemory(shm_cam0,"Camera0");
@@ -79,7 +91,6 @@ IPCHandler::~IPCHandler()
 }
 
 void IPCHandler::onTimer(){
-
     if(is_mapping){
 
     }else{
@@ -95,15 +106,12 @@ void IPCHandler::onTimer(){
         flag_objecting = false;
     }
 
-
     if(getConnection() && probot->localization_state==LOCAL_READY){
         probot->lastPose = probot->curPose;
     }
 
-
     IPCHandler::STATUS temp1 = get_status();
-    if((int)temp1.tick != prev_tick_status){
-        qDebug() << "status " << temp1.tick;
+    if(temp1.tick != prev_tick_status){
         flag_rx = true;
         read_count = 0;
         probot->battery_in = temp1.bat_in;
@@ -119,6 +127,10 @@ void IPCHandler::onTimer(){
         probot->motor[1].status = temp1.status_m1;
         probot->motor[0].temperature = temp1.temp_m0;
         probot->motor[1].temperature = temp1.temp_m1;
+        probot->motor[0].motor_temp = temp1.temp_ex_m0;
+        probot->motor[1].motor_temp = temp1.temp_ex_m1;
+
+//        qDebug() << probot->motor[0].motor_temp << probot->motor[1].motor_temp;
         probot->motor[0].current = temp1.cur_m0;
         probot->motor[1].current = temp1.cur_m1;
         probot->status_power = temp1.status_power;
@@ -135,6 +147,7 @@ void IPCHandler::onTimer(){
         probot->obs_state = temp1.ui_obs_state;
         probot->curPose.point.x = temp1.robot_pose[0];
         probot->curPose.point.y = temp1.robot_pose[1];
+//        qDebug() << "status" << probot->curPose.point.x;
         probot->curPose.angle = temp1.robot_pose[2];
         for(int i=0; i<360; i++){
             probot->lidar_data[i] = temp1.robot_scan[i];
@@ -142,47 +155,30 @@ void IPCHandler::onTimer(){
         prev_tick_status = temp1.tick;
     }
 
-//    IPCHandler::PATH temp2 = get_global_path();
-//    if((int)temp2.tick != prev_tick_global_path){
-//        flag_rx = true;
-//        read_count = 0;
+    IPCHandler::PATH temp2 = get_path();
+    if(temp2.tick != prev_tick_path){
+        flag_rx = true;
+        read_count = 0;
 
-//        probot->pathSize = temp2.num;
-//        for(int i=0; i<probot->pathSize; i++){
-//            POSE temp;
-//            temp.point.x = temp2.x[i];
-//            temp.point.y = temp2.y[i];
-//            temp.angle = 0;
-//            if(probot->curPath.size() > i){
-//                probot->curPath[i] = temp;
-//            }else{
-//                probot->curPath.push_back(temp);
-//            }
-//        }
-//        prev_tick_global_path = temp2.tick;
-//        emit pathchanged();
-//    }
-
-//    temp2 = get_local_path();
-//    if((int)temp2.tick != prev_tick_local_path){
-//        flag_rx = true;
-//        read_count = 0;
-
-//        probot->localpathSize = temp2.num;
-//        for(int i=0; i<probot->localpathSize; i++){
-//            POSE temp;
-//            temp.point.x = temp2.x[i];
-//            temp.point.y = temp2.y[i];
-//            temp.angle = 0;
-//            probot->localPath[i] = temp;
-//        }
-//        prev_tick_local_path = temp2.tick;
-//        emit pathchanged();
-//    }
+        probot->pathSize = temp2.num;
+        for(int i=0; i<probot->pathSize; i++){
+            POSE temp;
+            temp.point.x = temp2.x[i];
+            temp.point.y = temp2.y[i];
+            temp.angle = 0;
+            if(probot->curPath.size() > i){
+                probot->curPath[i] = temp;
+            }else{
+                probot->curPath.push_back(temp);
+            }
+        }
+        prev_tick_path = temp2.tick;
+        emit pathchanged();
+    }
 
     IPCHandler::MAP temp3 = get_map();
-    if((int)temp3.tick != prev_tick_map){
-        qDebug() << "map " << temp1.tick;
+    if(temp3.tick != prev_tick_map){
+//        qDebug() << "map " << temp1.tick;
         flag_rx = true;
         read_count = 0;
 
@@ -199,9 +195,9 @@ void IPCHandler::onTimer(){
     }
 
     temp3 = get_obs();
-    if((int)temp3.tick != prev_tick_obs){
+    if(temp3.tick != prev_tick_obs){
         flag_rx = true;
-        qDebug() << "obs " << temp3.tick;
+//        qDebug() << "obs " << temp3.tick;
         read_count = 0;
 
         cv::Mat map1(temp3.height, temp3.width, CV_8U, cv::Scalar::all(0));
@@ -219,87 +215,75 @@ void IPCHandler::onTimer(){
     IPCHandler::IMG cam0 = get_cam0();
     if(cam0.tick != prev_tick_cam0)
     {
-        cv::Mat cam0_img(270, 480, CV_8U, cv::Scalar(0));
-        memcpy((uint8_t*)cam0_img.data, cam0.buf, sizeof(cam0.buf);
+        flag_rx = true;
+        read_count = 0;
+        ST_CAMERA temp_info;
+        char temp_char[255];
+        for (int a = 0; a < 255; a++) {
+            temp_char[a] = (char)cam0.serial[a];
+        }
+        char* temp_pchar = &temp_char[0];
+        temp_info.serial = QString::fromUtf8(temp_pchar);
+        qDebug() << temp_info.serial;
+
+        temp_info.width = cam0.width;
+        temp_info.height = cam0.height;
+        temp_info.imageSize = cam0.width*cam0.height;
 
 
-        memcpy(tempstr.toUtf8().data(), cam0.serial, sizeof(cam0.serial));
-        qDebug() << tempstr;
+        cv::Mat cam0_img(temp_info.height, temp_info.width, CV_8U, cv::Scalar(0));
+        memcpy((uint8_t*)cam0_img.data, cam0.buf, sizeof(cam0.buf));
+        temp_info.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(cam0_img));
 
+        if(pmap->camera_info.count() > 0){
+            pmap->camera_info[0] = temp_info;
+        }else{
+            pmap->camera_info.push_back(temp_info);
+        }
+
+        try{
+            emit cameraupdate();
+        }catch(std::bad_alloc){
+            qDebug() << "bad alloc?";
+        }
+        prev_tick_cam0 = cam0.tick;
     }
-//    last_cam0_tick = cam0.tick
-//    IPCHandler::IMG cam0 = get_cam0();
-//    if(temp.tick != prev_tick_cam0){
-//        flag_rx = true;
-//        read_count = 0;
-//        ST_CAMERA temp_info;
 
-//        QString temp_s;
-//        memcpy(temp_s.toUtf8().data(), temp.serial, 255);
-//        temp_info.serial = temp_s;
-//        qDebug() << temp_s;
+    IPCHandler::IMG cam1 = get_cam1();
+    if(cam1.tick != prev_tick_cam1)
+    {
+        flag_rx = true;
+        read_count = 0;
+        ST_CAMERA temp_info;
+        char temp_char[255];
+        for (int a = 0; a < 255; a++) {
+            temp_char[a] = (char)cam1.serial[a];
+        }
+        char* temp_pchar = &temp_char[0];
+        temp_info.serial = QString::fromUtf8(temp_pchar);
+        qDebug() << temp_info.serial;
 
-//        temp_info.imageSize = temp.width*temp.height;
+        temp_info.width = cam1.width;
+        temp_info.height = cam1.height;
+        temp_info.imageSize = cam1.width*cam1.height;
 
-//        temp_info.width = temp.width;
-//        temp_info.height = temp.height;
+        cv::Mat cam1_img(temp_info.height, temp_info.width, CV_8U, cv::Scalar(0));
+        memcpy((uint8_t*)cam1_img.data, cam1.buf, sizeof(cam1.buf));
+        temp_info.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(cam1_img));
 
-//        cv::Mat cam0_img(270, 480, CV_8U, cv::Scalar(0));
-//        memcpy((uint8_t*)cam0_img.data, temp3.buf, 270*480);
+        if(pmap->camera_info.count() > 1){
+            pmap->camera_info[1] = temp_info;
+        }else{
+            pmap->camera_info.push_back(temp_info);
+        }
 
-//        cv::Mat map(temp_info.height, temp_info.width, CV_8U, cv::Scalar::all(0));
-//        memcpy((uint8_t*)map.data, temp.buf, temp_info.width*temp_info.height);
-
-//        temp_info.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(cam0_img));
-
-//        qDebug() << "cam0 " << temp.tick;
-//        if(pmap->camera_info.count() > 0){
-//            pmap->camera_info[0] = temp_info;
-//        }else{
-//            pmap->camera_info.push_back(temp_info);
-//        }
-
-//        qDebug() << "cam0 " << temp.tick;
-//        try{
-//            emit cameraupdate();
-//        }catch(std::bad_alloc){
-//            qDebug() << "bad alloc?";
-//        }
-//        prev_tick_cam0 = temp.tick;
-//    }
-
-//    temp = get_cam1();
-//    if(temp.tick != prev_tick_cam1){
-//        flag_rx = true;
-//        read_count = 0;
-
-//        ST_CAMERA temp_info;
-
-////        QString temp_s;
-////        memcpy(temp_s.toUtf8().data(), temp.serial, 255);
-////        temp_info.serial = temp_s;//QString::fromStdString(std::string(temp_s));
-//        temp_info.imageSize = temp.width*temp.height;
-//        temp_info.width = temp.width;
-//        temp_info.height = temp.height;
-
-//        cv::Mat map(temp_info.height, temp_info.width, CV_8U, cv::Scalar::all(0));
-//        memcpy((uint8_t*)map.data, temp.buf, temp_info.width*temp_info.height);
-//        temp_info.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map));
-
-//        if(pmap->camera_info.count() > 1){
-//            pmap->camera_info[1] = temp_info;
-//        }else{
-//            pmap->camera_info.push_back(temp_info);
-//        }
-
-//        try{
-//            emit cameraupdate();
-//        }catch(std::bad_alloc){
-//            qDebug() << "bad alloc?";
-//        }
-
-//        prev_tick_cam1 = temp.tick;
-//    }
+        try{
+            emit cameraupdate();
+        }catch(std::bad_alloc){
+            qDebug() << "bad alloc?";
+        }
+        prev_tick_cam1 = cam1.tick;
+    }
 
     static int count=0;
     if(count++%5==0){
@@ -330,24 +314,13 @@ IPCHandler::STATUS IPCHandler::get_status()
     return res;
 }
 
-IPCHandler::PATH IPCHandler::get_global_path()
+IPCHandler::PATH IPCHandler::get_path()
 {
     IPCHandler::PATH res;
 
-    shm_global_path.lock();
-    memcpy(&res, (char*)shm_global_path.constData(), sizeof(IPCHandler::PATH));
-    shm_global_path.unlock();
-
-    return res;
-}
-
-IPCHandler::PATH IPCHandler::get_local_path()
-{
-    IPCHandler::PATH res;
-
-    shm_local_path.lock();
-    memcpy(&res, (char*)shm_local_path.constData(), sizeof(IPCHandler::PATH));
-    shm_local_path.unlock();
+    shm_path.lock();
+    memcpy(&res, (char*)shm_path.constData(), sizeof(IPCHandler::PATH));
+    shm_path.unlock();
 
     return res;
 }

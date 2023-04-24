@@ -10,14 +10,21 @@ Item {
     objectName: "page_setting"
     width: 1280
     height: 800
-
-    property int select_category: 1
+    property bool is_admin: false
+    property int select_category: 4
     property string platform_name: supervisor.getRobotName()
     property string debug_platform_name: ""
     property bool is_debug: false
+    property int motor_left_id: 1
+    property int motor_right_id: 0
     function update_camera(){
         if(popup_camera.opened)
             popup_camera.update();
+    }
+
+    Component.onCompleted: {
+        is_admin = false;
+        init();
     }
 
     function set_category(num){
@@ -73,6 +80,12 @@ Item {
                     color: "white"
                     text: "설정"
                     font.pixelSize: 20
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onDoubleClicked:{
+                        popup_password.open();
+                    }
                 }
             }
             Rectangle{
@@ -133,6 +146,7 @@ Item {
                 id: rect_category_3
                 width: 264
                 height: 40
+                visible: is_admin
                 color: "#647087"
                 Text{
                     anchors.centerIn: parent
@@ -165,7 +179,7 @@ Item {
                     anchors.centerIn: parent
                     font.family: font_noto_r.name
                     color: "white"
-                    text: "모터"
+                    text: "상태"
                     font.pixelSize: 20
                 }
                 MouseArea{
@@ -620,6 +634,7 @@ Item {
                 Rectangle{
                     width: 1100
                     height: 40
+                    visible: is_admin
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
@@ -634,6 +649,7 @@ Item {
                     id: set_ip
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -795,6 +811,7 @@ Item {
                 Rectangle{
                     id: set_robot_radius
                     width: 840
+                    visible: is_admin
                     height: 40
                     Row{
                         anchors.fill: parent
@@ -837,6 +854,7 @@ Item {
                 Rectangle{
                     id: set_wheelbase
                     width: 840
+                    visible: is_admin
                     height: 40
                     Row{
                         anchors.fill: parent
@@ -880,6 +898,7 @@ Item {
                     id: set_wheelradius
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -922,6 +941,7 @@ Item {
                     id: set_auto_init
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -956,6 +976,7 @@ Item {
                     id: set_use_Avoid
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -990,6 +1011,7 @@ Item {
                     id: set_use_multirobot
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -1024,6 +1046,7 @@ Item {
                     id: set_ui_cmd
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -1058,6 +1081,7 @@ Item {
                     id: init_
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -2466,59 +2490,6 @@ Item {
                     }
                 }
                 Rectangle{
-                    id: set_kcurve
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"k_curve"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.1
-                                    height: 40
-                                    Text{
-                                        id: text_k_curve
-                                        anchors.centerIn: parent
-                                        text: slider_k_curve.value.toFixed(3)
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
-                                }
-                                Slider{
-                                    id: slider_k_curve
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
-                                    height: 40
-                                    from: 0.001
-                                    to: 0.01
-                                    value: 0.005
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
                     id: set_kv
                     width: 840
                     height: 40
@@ -2617,7 +2588,7 @@ Item {
                                     width: rr.width*0.8
                                     height: 40
                                     from: 1.0
-                                    to: 3.0
+                                    to: 5.0
                                     value: 2.5
                                 }
                             }
@@ -2990,7 +2961,7 @@ Item {
                                     Text{
                                         id: text_icp_dist
                                         anchors.centerIn: parent
-                                        text: slider_icp_dist.value.toFixed(1)
+                                        text: slider_icp_dist.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3043,7 +3014,7 @@ Item {
                                     Text{
                                         id: text_icp_error
                                         anchors.centerIn: parent
-                                        text: slider_icp_error.value.toFixed(1)
+                                        text: slider_icp_error.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3096,7 +3067,7 @@ Item {
                                     Text{
                                         id: text_icp_near
                                         anchors.centerIn: parent
-                                        text: slider_icp_near.value.toFixed(1)
+                                        text: slider_icp_near.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3149,7 +3120,7 @@ Item {
                                     Text{
                                         id: text_icp_odometry_weight
                                         anchors.centerIn: parent
-                                        text: slider_icp_odometry_weight.value.toFixed(1)
+                                        text: slider_icp_odometry_weight.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3202,7 +3173,7 @@ Item {
                                     Text{
                                         id: text_icp_ratio
                                         anchors.centerIn: parent
-                                        text: slider_icp_ratio.value.toFixed(1)
+                                        text: slider_icp_ratio.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3255,7 +3226,7 @@ Item {
                                     Text{
                                         id: text_icp_repeat_dist
                                         anchors.centerIn: parent
-                                        text: slider_icp_ratio.value.toFixed(2)
+                                        text: slider_icp_repeat_dist.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3308,7 +3279,7 @@ Item {
                                     Text{
                                         id: text_icp_repeat_time
                                         anchors.centerIn: parent
-                                        text: slider_icp_repeat_time.value.toFixed(1)
+                                        text: slider_icp_repeat_time.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3374,7 +3345,7 @@ Item {
                                     Text{
                                         id: text_goal_dist
                                         anchors.centerIn: parent
-                                        text: slider_goal_dist.value.toFixed(1)
+                                        text: slider_goal_dist.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3427,7 +3398,7 @@ Item {
                                     Text{
                                         id: text_goal_v
                                         anchors.centerIn: parent
-                                        text: slider_goal_v.value.toFixed(1)
+                                        text: slider_goal_v.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3480,7 +3451,7 @@ Item {
                                     Text{
                                         id: text_goal_th
                                         anchors.centerIn: parent
-                                        text: slider_goal_th.value.toFixed(1)
+                                        text: slider_goal_th.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3499,6 +3470,112 @@ Item {
                     }
                 }
 
+                Rectangle{
+                    id: set_goal_near_dist
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"goal_near_dist"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_goal_near_dist
+                                        anchors.centerIn: parent
+                                        text: slider_goal_near_dist.value.toFixed(2)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_goal_near_dist
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 0.5
+                                    value: 0.1
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_goal_near_th
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"goal_near_th"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.1
+                                    height: 40
+                                    Text{
+                                        id: text_goal_near_th
+                                        anchors.centerIn: parent
+                                        text: slider_goal_near_th.value.toFixed(2)
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_goal_near_th
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.8
+                                    height: 40
+                                    from: 0.0
+                                    to: 0.5
+                                    value: 0.1
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -3518,25 +3595,86 @@ Item {
                 anchors.right: parent.right
                 policy: ScrollBar.AlwaysOn
             }
+
+            Rectangle{
+                id: rect_motor_1
+                width: 1100
+                height: 40
+                color: "black"
+                anchors.horizontalCenter: parent.horizontalCenter
+                Text{
+                    anchors.centerIn: parent
+                    font.family: font_noto_b.name
+                    text:"모터 상태"
+                    color: "white"
+                    font.pixelSize: 20
+                }
+            }
+            Rectangle{
+                id: rect_motor_2
+                anchors.top: rect_motor_1.bottom
+                anchors.topMargin: 3
+                width: 840
+                color: "transparent"
+                height: 20
+                Row{
+                    anchors.fill: parent
+                    Rectangle{
+                        width: 350
+                        color: "transparent"
+                        height: parent.height
+                    }
+                    Rectangle{
+                        width: 1
+                        height: parent.height
+                        color: "transparent"
+                    }
+                    Rectangle{
+                        width: (parent.width - 351)/2
+                        height: parent.height
+                        color: "transparent"
+                        Rectangle{
+                            anchors.centerIn: parent
+                            height: parent.height
+                            width: parent.width*0.8
+                            color: color_navy
+                            Text{
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"모터 좌측"
+                                color: "white"
+                                font.pixelSize: 15
+                            }
+                        }
+
+                    }
+                    Rectangle{
+                        width: (parent.width - 351)/2
+                        height: parent.height
+                        color: "transparent"
+                        Rectangle{
+                            anchors.centerIn: parent
+                            height: parent.height
+                            width: parent.width*0.8
+                            color: color_navy
+                            Text{
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"모터 우측"
+                                color: "white"
+                                font.pixelSize: 15
+                            }
+                        }
+                    }
+                }
+            }
             Column{
                 id:column_setting4
                 width: parent.width
+                anchors.top: rect_motor_2.bottom
+                anchors.topMargin: 2
                 spacing:25
                 Rectangle{
-                    width: 1100
-                    height: 40
-                    color: "black"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_b.name
-                        text:"현재 값"
-                        color: "white"
-                        font.pixelSize: 20
-                    }
-                }
-                Rectangle{
-                    id: set_motor_1
                     width: 840
                     height: 40
                     Row{
@@ -3559,29 +3697,41 @@ Item {
                             color: "#d0d0d0"
                         }
                         Rectangle{
-                            id: rect_connection_0
                             width: (parent.width - 351)/2
                             height: parent.height
-                            color: supervisor.getMotorConnection(0)?color_green:color_red
-                            Text{
-                                id: text_connection_0
+                            color: "transparent"
+                            Rectangle{
+                                id: rect_connection_0
+                                height: parent.height
                                 anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                                text:supervisor.getMotorConnection(0)?"모터 0번 연결됨":"모터 0번 연결안됨"
-                                font.pixelSize: 15
+                                width: parent.width*0.8
+                                color: supervisor.getMotorConnection(motor_left_id)?color_green:color_red
+                                Text{
+                                    id: text_connection_0
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    text:supervisor.getMotorConnection(motor_left_id)?"연결됨":"연결안됨"
+                                    font.pixelSize: 15
+                                }
                             }
                         }
                         Rectangle{
-                            id: rect_connection_1
                             width: (parent.width - 351)/2
                             height: parent.height
-                            color: supervisor.getMotorConnection(1)?color_green:color_red
-                            Text{
-                                id: text_connection_1
+                            color: "transparent"
+                            Rectangle{
+                                id: rect_connection_1
+                                height: parent.height
                                 anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                                text:supervisor.getMotorConnection(1)?"모터 1번 연결됨":"모터 1번 연결안됨"
-                                font.pixelSize: 15
+                                width: parent.width*0.8
+                                color: supervisor.getMotorConnection(motor_right_id)?color_green:color_red
+                                Text{
+                                    id: text_connection_1
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    text:supervisor.getMotorConnection(motor_right_id)?"연결됨":"연결안됨"
+                                    font.pixelSize: 15
+                                }
                             }
                         }
                     }
@@ -3615,7 +3765,7 @@ Item {
                                 id: text_status_0
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
-                                text:"모터 0 : "+supervisor.getMotorStatus(0).toString()
+                                text:supervisor.getMotorStatus(0).toString()
                                 font.pixelSize: 15
                             }
                         }
@@ -3626,7 +3776,7 @@ Item {
                                 id: text_status_1
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
-                                text:"모터 1 : "+supervisor.getMotorStatus(1).toString()
+                                text:supervisor.getMotorStatus(1).toString()
                                 font.pixelSize: 15
                             }
                         }
@@ -3661,7 +3811,7 @@ Item {
                                 id: text_temp_0
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
-                                text:"모터 0 : "+supervisor.getMotorTemperature(0).toString()
+                                text:supervisor.getMotorTemperature(0).toString()
                                 font.pixelSize: 15
                             }
                         }
@@ -3672,7 +3822,53 @@ Item {
                                 id: text_temp_1
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
-                                text:"모터 1 : "+supervisor.getMotorTemperature(1).toString()
+                                text:supervisor.getMotorTemperature(1).toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"모터 내부 온도"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/2
+                            height: parent.height
+                            Text{
+                                id: text_temp_0_1
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:supervisor.getMotorInsideTemperature(0).toString()
+                                font.pixelSize: 15
+                            }
+                        }
+                        Rectangle{
+                            width: (parent.width - 351)/2
+                            height: parent.height
+                            Text{
+                                id: text_temp_1_1
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:supervisor.getMotorInsideTemperature(1).toString()
                                 font.pixelSize: 15
                             }
                         }
@@ -3707,7 +3903,7 @@ Item {
                                 id: text_cur_0
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
-                                text:"모터 0 : "+supervisor.getMotorCurrent(0).toString()
+                                text:supervisor.getMotorCurrent(0).toString()
                                 font.pixelSize: 15
                             }
                         }
@@ -3718,12 +3914,27 @@ Item {
                                 id: text_cur_1
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
-                                text:"모터 1 : "+supervisor.getMotorCurrent(1).toString()
+                                text:supervisor.getMotorCurrent(1).toString()
                                 font.pixelSize: 15
                             }
                         }
                     }
                 }
+
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"로봇 상태"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+
                 Rectangle{
                     width: 840
                     height: 40
@@ -3900,6 +4111,7 @@ Item {
                     width: 1100
                     height: 40
                     color: "black"
+                    visible: is_admin
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
                         anchors.centerIn: parent
@@ -3913,6 +4125,7 @@ Item {
                     id: set_wheel_dir
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -3947,6 +4160,7 @@ Item {
                     id: set_left_id
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -3981,6 +4195,7 @@ Item {
                     id: set_right_id
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -4015,6 +4230,7 @@ Item {
                     id: set_gear_ratio
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -4057,6 +4273,7 @@ Item {
                     id: set_kp
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -4099,6 +4316,7 @@ Item {
                     id: set_ki
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -4141,6 +4359,7 @@ Item {
                     id: set_kd
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -4182,6 +4401,7 @@ Item {
                 Rectangle{
                     id: set_limit_v
                     width: 840
+                    visible: is_admin
                     height: 40
                     Row{
                         anchors.fill: parent
@@ -4224,6 +4444,7 @@ Item {
                 Rectangle{
                     id: set_limitv_acc
                     width: 840
+                    visible: is_admin
                     height: 40
                     Row{
                         anchors.fill: parent
@@ -4267,6 +4488,7 @@ Item {
                     id: set_limit_w
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -4309,6 +4531,7 @@ Item {
                     id: set_limit_wacc
                     width: 840
                     height: 40
+                    visible: is_admin
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -4514,6 +4737,8 @@ Item {
                         supervisor.setSetting("ROBOT_SW/goal_dist",text_goal_dist.text);
                         supervisor.setSetting("ROBOT_SW/goal_th",text_goal_th.text);
                         supervisor.setSetting("ROBOT_SW/goal_v",text_goal_v.text);
+                        supervisor.setSetting("ROBOT_SW/goal_near_dist",text_goal_near_dist.text);
+                        supervisor.setSetting("ROBOT_SW/goal_near_th",text_goal_near_th.text);
 
                         supervisor.setSetting("ROBOT_SW/grid_size",grid_size.text);
 
@@ -4584,9 +4809,6 @@ Item {
         }
     }
 
-    Component.onCompleted: {
-        init();
-    }
 
     function init(){
         supervisor.writelog("[QML] SETTING PAGE init");
@@ -4630,6 +4852,8 @@ Item {
         slider_goal_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_dist"));
         slider_goal_th.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_th"));
         slider_goal_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_v"));
+        slider_goal_near_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_near_dist"));
+        slider_goal_near_th.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_near_th"));
 
 
         slider_k_curve.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_curve"));
@@ -4722,27 +4946,30 @@ Item {
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            if(supervisor.getMotorConnection(0)){
+            motor_left_id = parseInt(supervisor.getSetting("MOTOR","left_id"));
+            motor_right_id = parseInt(supervisor.getSetting("MOTOR","right_id"));
+
+            if(supervisor.getMotorConnection(motor_left_id)){
                 rect_connection_0.color = color_green;
-                text_connection_0.text = "모터 0번 연결됨"
+                text_connection_0.text = "연결됨"
             }else{
                 rect_connection_0.color = color_red;
-                text_connection_0.text = "모터 0번 연결안됨"
+                text_connection_0.text = "연결안됨"
             }
-            if(supervisor.getMotorConnection(1)){
+            if(supervisor.getMotorConnection(motor_right_id)){
                 rect_connection_1.color = color_green;
-                text_connection_1.text = "모터 1번 연결됨"
+                text_connection_1.text = "연결됨"
             }else{
                 rect_connection_1.color = color_red;
-                text_connection_1.text = "모터 1번 연결안됨"
+                text_connection_1.text = "연결안됨"
             }
-            text_status_0.text = "모터 0 : " + supervisor.getMotorStatus(0).toString();
-            text_status_1.text = "모터 1 : " + supervisor.getMotorStatus(1).toString();
+            text_status_0.text = supervisor.getMotorStatus(motor_left_id).toString();
+            text_status_1.text = supervisor.getMotorStatus(motor_right_id).toString();
 
-            text_temp_0.text = "모터 0 : " + supervisor.getMotorTemperature(0).toString();
-            text_temp_1.text = "모터 1 : " + supervisor.getMotorTemperature(1).toString();
-            text_cur_0.text = "모터 0 : " + supervisor.getMotorCurrent(0).toString();
-            text_cur_1.text = "모터 1 : " + supervisor.getMotorCurrent(1).toString();
+            text_temp_0.text = supervisor.getMotorTemperature(motor_left_id).toString();
+            text_temp_1.text = supervisor.getMotorTemperature(motor_right_id).toString();
+            text_cur_0.text = supervisor.getMotorCurrent(motor_left_id).toString();
+            text_cur_1.text = supervisor.getMotorCurrent(motor_right_id).toString();
 
             text_status_charging.text = "Charge : " + supervisor.getChargeStatus().toString();
             text_status_power.text = "Power : " + supervisor.getPowerStatus().toString();
@@ -5017,6 +5244,7 @@ Item {
         function update(){
             //카메라 대수에 따라 UI 업데이트
             if(supervisor.getCameraNum() === 2){
+                print(supervisor.getCameraNum(),supervisor.getCameraSerial(left_id));
                 is_load = true;
                 if(is_switched){
                     cameraview_1.setCamera(left_id);
@@ -5062,6 +5290,7 @@ Item {
             onTriggered:{
                 //카메라 정보 요청
                 supervisor.requestCamera();
+                update();
             }
         }
         Rectangle{
@@ -5204,14 +5433,9 @@ Item {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: {
-                                        if(mousearea_1.is_left){
-                                            supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA LEFT ("+text_camera_1.text+")")
-                                            print("1 : ",text_camera_1.text,text_camera_2.text);
+                                        if(popup_camera.is_switched){
+                                            supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA SWITCH LEFT("+text_camera_1.text+") RIGHT("+text_camera_2.text+")");
                                             supervisor.setCamera(text_camera_1.text,text_camera_2.text);
-                                        }else{
-                                            supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA LEFT ("+text_camera_2.text+")")
-                                            print("2 : ",text_camera_2.text,text_camera_1.text);
-                                            supervisor.setCamera(text_camera_2.text,text_camera_1.text);
                                         }
                                         supervisor.readSetting();
                                         init();
@@ -5275,6 +5499,167 @@ Item {
 
     Popup{
         id: popup_password
+        anchors.centerIn: parent
+        width: 400
+        height: 600
+        background: Rectangle{
+            anchors.fill: parent
+            color: color_dark_navy
+        }
+        property string passwd: "2011"
+        property string answer: ""
+        property var input_len: 0
+        onOpened:{
+            model_passwd.clear();
+            model_passwd.append({"show":false})
+            model_passwd.append({"show":false})
+            model_passwd.append({"show":false})
+            model_passwd.append({"show":false})
+
+            model_pad.clear();
+            model_pad.append({"name":"1"});
+            model_pad.append({"name":"2"});
+            model_pad.append({"name":"3"});
+            model_pad.append({"name":"4"});
+            model_pad.append({"name":"5"});
+            model_pad.append({"name":"6"});
+            model_pad.append({"name":"7"});
+            model_pad.append({"name":"8"});
+            model_pad.append({"name":"9"});
+            model_pad.append({"name":"clear"});
+            model_pad.append({"name":"0"});
+            model_pad.append({"name":"<-"});
+            answer = "";
+            input_len = 0;
+        }
+
+        Rectangle{
+            anchors.centerIn: parent
+            width: parent.width*0.99
+            height: parent.height*0.99
+            Rectangle{
+                id: rect_password_top
+                width: parent.width
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+//                anchors.topMargin: 50
+                height: 80
+                color: color_dark_navy
+                Text{
+                    anchors.centerIn: parent
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                    text: "패스워드를 입력하세요."
+                }
+            }
+            Column{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: rect_password_top.bottom
+                anchors.topMargin: 50
+                spacing: 50
+                Rectangle{
+                    width: 300
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: 60
+                    border.width: 1
+                    border.color: color_dark_navy
+                    Row{
+                        anchors.centerIn: parent
+                        spacing: 10
+                        Repeater{
+                            model: ListModel{id: model_passwd}
+                            Rectangle{
+                                width: 50
+                                height: 55
+                                color: "transparent"
+                                Rectangle{
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.top: parent.top
+                                    anchors.topMargin: 5
+                                    visible: show
+                                    width: 40
+                                    height: width
+                                    radius: width
+                                    color: color_green
+                                }
+                                Rectangle{
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.bottom: parent.bottom
+                                    anchors.bottomMargin: 3
+                                    width: 50
+                                    height: 2
+                                    color: color_dark_navy
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Grid{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 50
+                spacing: 15
+                rows: 4
+                columns: 3
+                Repeater{
+                    model: ListModel{id: model_pad}
+                    Rectangle{
+                        width: 60
+                        height: width
+                        color: color_navy
+                        Text{
+                            text: name
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                if(name==="clear"){
+                                    popup_password.input_len = 0;
+                                    model_passwd.set(0,{"show":false});
+                                    model_passwd.set(1,{"show":false});
+                                    model_passwd.set(2,{"show":false});
+                                    model_passwd.set(3,{"show":false});
+                                    popup_password.answer = "";
+                                }else if(name==="<-"){
+                                    if(popup_password.input_len === 0){
+
+                                    }else{
+                                        popup_password.input_len--;
+                                        model_passwd.set(popup_password.input_len,{"show":false});
+                                        popup_password.answer = popup_password.answer.slice(0,popup_password.input_len);
+                                    }
+                                }else{
+                                    if(popup_password.input_len === 4){
+                                        is_admin = false;
+                                        supervisor.writelog("[USER INPUT] SETTING PAGE -> ADMIN LOGIN FAILED "+popup_password.answer);
+                                    }else{
+                                        popup_password.answer += name;
+                                        model_passwd.set(popup_password.input_len,{"show":true});
+                                        popup_password.input_len++;
+                                        if(popup_password.answer===popup_password.passwd){
+                                            supervisor.writelog("[USER INPUT] SETTING PAGE -> ADMIN LOGIN SUCCESS");
+                                            is_admin = true;
+                                            popup_password.close();
+                                        }else{
+                                            is_admin = false;
+                                            supervisor.writelog("[USER INPUT] SETTING PAGE -> ADMIN LOGIN FAILED "+popup_password.answer);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
 
     }
 

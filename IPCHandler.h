@@ -156,6 +156,7 @@ public:
 
     void updateSharedMemory(QSharedMemory &mem, QString name, int size);
     void detachSharedMemory(QSharedMemory &mem, QString name);
+    void clearSharedMemory(QSharedMemory &mem);
     void update();
 
     std::atomic<uint32_t> tick;
@@ -170,8 +171,7 @@ public:
 
     QSharedMemory shm_cmd;
     QSharedMemory shm_status;
-    QSharedMemory shm_global_path;
-    QSharedMemory shm_local_path;
+    QSharedMemory shm_path;
     QSharedMemory shm_map;
     QSharedMemory shm_obs;
     QSharedMemory shm_cam0;
@@ -179,8 +179,7 @@ public:
 
     CMD get_cmd();
     STATUS get_status();
-    PATH get_global_path();
-    PATH get_local_path();
+    PATH get_path();
     MAP get_map();
     MAP get_obs();
     IMG get_cam0();
@@ -221,13 +220,12 @@ public:
 
     QString tempstr = "";
     int read_count = 0;
-    int prev_tick_status = 0;
-    int prev_tick_global_path = 0;
-    int prev_tick_local_path = 0;
-    int prev_tick_map = 0;
-    int prev_tick_obs = 0;
-    int prev_tick_cam0 = 0;
-    int prev_tick_cam1 = 0;
+    unsigned int prev_tick_status = 0;
+    unsigned int prev_tick_path = 0;
+    unsigned int prev_tick_map = 0;
+    unsigned int prev_tick_obs = 0;
+    unsigned int prev_tick_cam0 = 0;
+    unsigned int prev_tick_cam1 = 0;
 
 signals:
     void pathchanged();

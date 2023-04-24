@@ -24,6 +24,7 @@ CallbellHandler::CallbellHandler()
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     timer->start(200);
+
 //    qDebug() << QDir::homePath().split("/")[1];
 //    if(QDir::homePath().split("/")[1] == "odroid"){
 //        m_serialPort->setPortName("ttyUSB1");
@@ -66,12 +67,6 @@ void CallbellHandler::onTimer(){
         }
         time_cnt = 0;
 
-//        if(connection_count > 0){
-//            connection_count--;
-//////            if(ConnectionSendCnt == 0){
-////                SendConnectionCheckMessage();
-//////            }
-//        }
     }
 }
 
