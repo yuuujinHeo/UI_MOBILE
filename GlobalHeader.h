@@ -81,7 +81,7 @@ typedef struct{
     int status = 0;
     int temperature = 0;
     int motor_temp = 0;
-    int current = 0;
+    float current = 0;
 }ST_MOTOR;
 
 typedef struct{

@@ -57,6 +57,7 @@ Window {
     property string ppickup: "qrc:/Page_pickup.qml"
     property string ppickupCall: "qrc:/Page_pickup_calling.qml"
     property string psetting: "qrc:/Page_setting.qml"
+    property string plog: "qrc:/Page_log.qml"
 
     property string robot_type: supervisor.getRobotType()
     property string robot_name: supervisor.getRobotName()

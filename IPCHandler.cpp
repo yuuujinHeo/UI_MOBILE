@@ -131,8 +131,8 @@ void IPCHandler::onTimer(){
         probot->motor[1].motor_temp = temp1.temp_ex_m1;
 
 //        qDebug() << probot->motor[0].motor_temp << probot->motor[1].motor_temp;
-        probot->motor[0].current = temp1.cur_m0;
-        probot->motor[1].current = temp1.cur_m1;
+        probot->motor[0].current = temp1.cur_m0/10;
+        probot->motor[1].current = temp1.cur_m1/10;
         probot->status_power = temp1.status_power;
         if(probot->status_emo == temp1.status_emo){
             plog->write("[LCM] EMO status changed !! "+QString::number(!temp1.status_emo));

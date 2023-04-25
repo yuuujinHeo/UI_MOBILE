@@ -581,7 +581,6 @@ Item {
                                     value: supervisor.getVelocity()
                                 }
                             }
-
                         }
                     }
                 }
@@ -4731,6 +4730,28 @@ Item {
                     onClicked:{
                         supervisor.writelog("[USER INPUT] SETTING PAGE -> PROGRAM UPDATE");
                         popup_update.open();
+                    }
+                }
+            }
+            Rectangle{
+                id: btn_log
+                width: 180
+                height: 60
+                radius: 10
+                color:"transparent"
+                border.width: 1
+                border.color: "#7e7e7e"
+                Text{
+                    anchors.centerIn: parent
+                    text: "Log"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked:{
+                        supervisor.writelog("[USER INPUT] SETTING PAGE -> LOG");
+                        loader_page.source = plog;
                     }
                 }
             }
