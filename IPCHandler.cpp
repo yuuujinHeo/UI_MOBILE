@@ -147,7 +147,7 @@ void IPCHandler::onTimer(){
         probot->obs_state = temp1.ui_obs_state;
         probot->curPose.point.x = temp1.robot_pose[0];
         probot->curPose.point.y = temp1.robot_pose[1];
-//        qDebug() << "status" << probot->curPose.point.x;
+//        qDebug() << "status" << probot->localization_state;
         probot->curPose.angle = temp1.robot_pose[2];
         for(int i=0; i<360; i++){
             probot->lidar_data[i] = temp1.robot_scan[i];
@@ -182,6 +182,7 @@ void IPCHandler::onTimer(){
         flag_rx = true;
         read_count = 0;
 
+
         cv::Mat map1(temp3.height, temp3.width, CV_8U, cv::Scalar::all(0));
         memcpy((uint8_t*)map1.data, temp3.buf, temp3.height*temp3.width);
         cv::flip(map1, map1, 0);
@@ -204,6 +205,14 @@ void IPCHandler::onTimer(){
         memcpy((uint8_t*)map1.data, temp3.buf, temp3.width*temp3.height);
         cv::flip(map1, map1, 0);
         cv::rotate(map1, map1, cv::ROTATE_90_COUNTERCLOCKWISE);
+
+//        cv::Mat colortemp(temp3.height, temp3.width, CV_8UC3, cv::Scalar(127,255,200));
+//        cv::Mat a(temp3.height, temp3.width, CV_32F, cv::Scalar::all(0.5));
+//        cv::cvtColor(colortemp,colortemp,cv::COLOR_BGR2GRAY);
+
+//        cv::blendLinear(map1,colortemp,a,a,map1);
+
+
 
         pmap->map_objecting = map1;
 

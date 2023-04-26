@@ -19,7 +19,7 @@ Item {
     property string map_type: ""
     property string map_name: ""
 
-    property bool show_connection: false
+    property bool show_connection: true
     property bool show_button_lidar: false
     property bool show_button_object: false
     property bool show_button_following: false
@@ -55,6 +55,7 @@ Item {
     Component.onCompleted: {
         mapview.setRawMap("");
         mapview.setName(objectName);
+        mapview.setMapSize(width, height);
     }
 
     function setEnable(en){
@@ -114,6 +115,7 @@ Item {
 
 
     function loadmap(name,type){
+        print(objectName);
         supervisor.writelog("[QML MAP] LoadMap "+objectName+": "+name+" (mode = "+type+")");
         if(typeof(name) === 'undefined'){
             name = supervisor.getMapname();
@@ -510,7 +512,7 @@ Item {
                             }
                             firstDist = dist;
 
-                            print("UPDATE : ",newX,newY,dist);
+//                            print("UPDATE : ",newX,newY,dist);
                             mapview.setRobotFollowing(false);
                             mapview.move(firstX-newX, firstY-newY);
                         }else{
@@ -524,7 +526,7 @@ Item {
                             newX = point2.x*mapview.getScale();
                             newY = point2.y*mapview.getScale();
                         }
-                        print("UPDATE : ",newX,newY);
+//                        print("UPDATE : ",newX,newY);
                         mapview.setRobotFollowing(false);
                         mapview.move(firstX-newX, firstY-newY);
                     }

@@ -16,7 +16,7 @@ Item {
     property date currentDate: new Date()
     property string today: ""
     property var year: 2023
-    property var month: 4
+    property var month: 40
     property var date: 24
     property string week: ""
     property var date_end: 30

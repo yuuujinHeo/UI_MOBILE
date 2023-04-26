@@ -85,6 +85,7 @@ Supervisor::Supervisor(QObject *parent)
     plog->write("");
     plog->write("[BUILDER] SUPERVISOR constructed");
 
+
     QProcess *process = new QProcess(this);
     QString file = QDir::homePath() + "/auto_reset.sh";
     process->start(file);
@@ -121,7 +122,7 @@ Supervisor::~Supervisor(){
     plog->write("[BUILDER] SUPERVISOR desployed");
     slam_process->kill();
     slam_process->close();
-    QString file = QDir::homePath() + "/auto_kill.sh";//"/code/build-SLAMNAV-Desktop-Release/SLAMNAV";
+    QString file = QDir::homePath() + "/auto_kill.sh";
     slam_process->start(file);
     QThread::sleep(1);
     slam_process->kill();
@@ -383,12 +384,12 @@ void Supervisor::readSetting(QString map_name){
     QSettings setting_meta(ini_path, QSettings::IniFormat);
 
     setting_meta.beginGroup("map_metadata");
-    pmap->width = setting_meta.value("map_w").toInt();
-    pmap->height = setting_meta.value("map_h").toInt();
-    pmap->gridwidth = setting_meta.value("map_grid_width").toFloat();
-    pmap->origin[0] = setting_meta.value("map_origin_u").toInt();
-    pmap->origin[1] = setting_meta.value("map_origin_v").toInt();
-    qDebug() << "Read Setting " << pmap->gridwidth;
+//    pmap->width = setting_meta.value("map_w").toInt();
+//    pmap->height = setting_meta.value("map_h").toInt();
+//    pmap->gridwidth = setting_meta.value("map_grid_width").toFloat();
+//    pmap->origin[0] = setting_meta.value("map_origin_u").toInt();
+//    pmap->origin[1] = setting_meta.value("map_origin_v").toInt();
+//    qDebug() << "Read Setting " << pmap->gridwidth;
     setting_meta.endGroup();
 
     //Annotation======================================================================
@@ -747,7 +748,7 @@ void Supervisor::setuseServerMap(bool use){
     QSettings settings(ini_path, QSettings::IniFormat);
     settings.setValue("FLOOR/map_server",use);
     if(use){
-        settings.setValue("FLOOR/map_load",true);
+//        settings.setValue("FLOOR/map_load",true);
         settings.setValue("FLOOR/map_name",server->server_map_name);
         settings.setValue("FLOOR/map_path",QDir::homePath()+"/maps/"+server->server_map_name);
         readSetting();
@@ -984,13 +985,18 @@ void Supervisor::saveMapfromUsb(QString path){
 void Supervisor::setMap(QString name){
     setSetting("FLOOR/map_path",QDir::homePath()+"/maps/"+name);
     setSetting("FLOOR/map_name",name);
+    setSetting("FLOOR/map_load","true");
     readSetting(name);
-    setloadMap(true);
     restartSLAM();
 //    lcm->restartSLAM();
 }
 
 void Supervisor::loadMap(QString name){
+    setSetting("FLOOR/map_path",QDir::homePath()+"/maps/"+name);
+    setSetting("FLOOR/map_name",name);
+    setSetting("FLOOR/map_load","false");
+    readSetting(name);
+    restartSLAM();
 //    readSetting()
 }
 
@@ -2409,22 +2415,34 @@ void Supervisor::checkShellFiles(){
     //auto_test.sh
     file_path = QDir::homePath() + "/auto_test.sh";
     if(!QFile::exists(file_path)){
-        qDebug() << "Make Start Shell";
+        plog->write("[SUPERVISOR] auto_test.sh not found. make new");
         makeStartShell();
     }
 
     //kill_slam.sh
     file_path = QDir::homePath() + "/kill_slam.sh";
     if(!QFile::exists(file_path)){
-        qDebug() << "Make Kill Shell";
+        plog->write("[SUPERVISOR] kill_slam.sh not found. make new");
         makeKillShell();
     }
 
     //auto_kill.sh
     file_path = QDir::homePath() + "/auto_kill.sh";
     if(!QFile::exists(file_path)){
-        qDebug() << "Make All Kill Shell";
+        plog->write("[SUPERVISOR] auto_kill.sh not found. make new");
         makeAllKillShell();
+    }
+
+    //auto_reset.sh
+    file_path = QDir::homePath() + "/auto_reset.sh";
+    if(!QFile::exists(file_path)){
+        plog->write("[SUPERVISOR] auto_reset.sh not found. make new");
+        makeKillSlam();
+    }
+    QString path = QDir::homePath()+"/ui_log";
+    QDir directory(path);
+    if(!directory.exists()){
+        directory.mkpath(".");
     }
 }
 void Supervisor::makeKillShell(){

@@ -269,6 +269,40 @@ Item {
                             }
                         }
                     }
+                    Rectangle{
+                        id: btn_lcm_pass
+                        width: 188
+                        height: 100
+                        radius: 60
+                        color: "transparent"
+                        border.width: 3
+                        border.color: "#e5e5e5"
+                        Column{
+                            spacing: 5
+                            anchors.centerIn: parent
+                            Image{
+                                id: image_charge1
+                                width: 30
+                                height: 30
+                                source:"icon/icon_remove.png"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                id: text_slam_pass
+                                text: "넘어가기 (디버그 용)"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                            }
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                supervisor.writelog("[USER INPUT] INIT PAGE : PASS CONNECTION")
+                                loadPage(pkitchen);
+                                update_timer.stop();
+                            }
+                        }
+                    }
                 }
             }
 

@@ -418,8 +418,11 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            popup_preset_set.preset_num = 1;
-                                            popup_preset_set.open();
+                                            if(text_preset_name_1.text !== ""){
+                                                popup_preset_set.preset_num = 1;
+                                                popup_preset_set.open();
+                                            }
+
                                         }
                                     }
                                 }
@@ -436,8 +439,11 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            popup_preset_set.preset_num = 2;
-                                            popup_preset_set.open();
+                                            if(text_preset_name_2.text !== ""){
+                                                popup_preset_set.preset_num = 2;
+                                                popup_preset_set.open();
+                                            }
+
                                         }
                                     }
                                 }
@@ -454,8 +460,10 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            popup_preset_set.preset_num = 3;
-                                            popup_preset_set.open();
+                                            if(text_preset_name_3.text !== ""){
+                                                popup_preset_set.preset_num = 3;
+                                                popup_preset_set.open();
+                                            }
                                         }
                                     }
                                 }
@@ -3619,8 +3627,8 @@ Item {
                                     width: rr.width*0.8
                                     height: 40
                                     from: 0.0
-                                    to: 0.5
-                                    value: 0.1
+                                    to: 3.0
+                                    value: 0.5
                                 }
                             }
                         }
@@ -3672,8 +3680,8 @@ Item {
                                     width: rr.width*0.8
                                     height: 40
                                     from: 0.0
-                                    to: 0.5
-                                    value: 0.1
+                                    to: 10.0
+                                    value: 3.0
                                 }
                             }
                         }
@@ -6138,7 +6146,7 @@ Item {
                     radius: 5
                     Text{
                         anchors.centerIn: parent
-                        text: "cancel"
+                        text: "취소"
                         font.family: font_noto_r.name
                     }
                     MouseArea{
@@ -6154,7 +6162,7 @@ Item {
                     radius: 5
                     Text{
                         anchors.centerIn: parent
-                        text: "set"
+                        text: "확인"
                         font.family: font_noto_r.name
                     }
                     MouseArea{
@@ -6194,7 +6202,7 @@ Item {
             spacing: 10
             Text{
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "Are you sure?"
+                text: "선택하신 프리셋으로 세팅을 변경하시겠습니까?"
                 font.family: font_noto_r.name
                 font.pixelSize: 25
             }
@@ -6214,7 +6222,7 @@ Item {
                     color: color_navy
                     Text{
                         anchors.centerIn: parent
-                        text: "no"
+                        text: "취소"
                         font.family: font_noto_r.name
                         font.pixelSize: 20
                         color: "white"
@@ -6233,7 +6241,7 @@ Item {
                     color: color_navy
                     Text{
                         anchors.centerIn: parent
-                        text: "yes"
+                        text: "확인"
                         font.family: font_noto_r.name
                         font.pixelSize: 20
                         color: "white"

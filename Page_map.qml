@@ -2898,13 +2898,13 @@ Item {
                             id: slider_brush
                             x: 300
                             y: 330
-                            value: 15
+                            value: 3
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
                             anchors.rightMargin: 30
                             width: 170
                             height: 18
-                            from: 0.1
+                            from: 1
                             to : 50
                             onValueChanged: {
                                 map.setDrawingWidth(value);
@@ -3353,13 +3353,13 @@ Item {
                             id: slider_brush
                             x: 300
                             y: 330
-                            value: 0.5
+                            value: 1
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
                             anchors.rightMargin: 30
                             width: 170
                             height: 18
-                            from: 0.1
+                            from: 1
                             to : 5
                             onValueChanged: {
                                 map.setDrawingWidth(value)
@@ -3846,6 +3846,7 @@ Item {
                                 supervisor.writelog("[QML] MAP PAGE (ANNOT) -> NEXT (DRAWING)")
                                 //아무 변경이 없으면
                                 map.init();
+                                map.setViewer("annot_drawing");
                                 loader_menu.sourceComponent = menu_annot_draw;
                             }
                         }
@@ -5741,13 +5742,6 @@ Item {
                                 supervisor.writelog("[USER INPUT] RESET MAPPING ");
                                 supervisor.stopMapping();
                                 popup_reset_mapping.close();
-//                                if(combobox_gridsize.currentText === "3cm"){
-//                                    map.grid_size = 0.03;
-//                                    supervisor.startMapping(0.03);
-//                                }else if(combobox_gridsize.currentText === "5cm"){
-//                                    map.grid_size = 0.05;
-//                                    supervisor.startMapping(0.05);
-//                                }
                             }
                         }
                     }

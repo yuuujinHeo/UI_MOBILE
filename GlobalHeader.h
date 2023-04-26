@@ -8,6 +8,8 @@
 #include "cv_to_qt.h"
 #include "MapHeader.h"
 
+#define NO_LCM
+
 extern Logger *plog;
 extern int ui_state;
 extern bool is_debug;

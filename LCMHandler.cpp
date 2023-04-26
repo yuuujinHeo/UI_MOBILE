@@ -267,6 +267,8 @@ void LCMHandler::saveObjecting(){
 }
 ////*********************************************  CALLBACK FUNCTIONS   ***************************************************////
 void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_status *msg){
+#ifdef NO_LCM
+#else
     isconnect = true;
 //    qDebug() << "read Status";
     flag_rx = true;
@@ -304,6 +306,7 @@ void LCMHandler::robot_status_callback(const lcm::ReceiveBuffer *rbuf, const std
     for(int i=0; i<360; i++){
         probot->lidar_data[i] = msg->robot_scan[i];
     }
+#endif
 }
 
 void LCMHandler::robot_path_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const robot_path *msg){
@@ -382,7 +385,6 @@ void LCMHandler::robot_command_callback(const lcm::ReceiveBuffer *rbuf, const st
 void LCMHandler::robot_camera_callback(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const camera_data *msg){
     for(int i=0; i<msg->num; i++){
         ST_CAMERA temp_info;
-
         temp_info.serial = QString::fromStdString(msg->serial[i]);
         temp_info.imageSize = msg->image_len;
         temp_info.width = msg->width;
