@@ -3256,8 +3256,91 @@ void Supervisor::onTimer(){
 
 
 
+QString Supervisor::getLogDate(int num){
+    QString str = curLog[num].split("[")[0];
+    if(str.length() > 20){
+        return str.left(20);
+    }else{
+        return str;
+    }
+}
+QString Supervisor::getLogAuth(int num){
+    QString str = curLog[num];
+    if(str.split("[").size() > 1)
+        return str.split("[")[1].split("]")[0];
+    else
+        return "";
+}
+QString Supervisor::getLogMessage(int num){
+    QString str = curLog[num];
+    if(str.split("[").size() > 1){
+        str = curLog[num];
+        if(str.split("]").size() > 1)
+            return str.split("]")[1];
+        else
+            return "";
+    }else{
+        if(str.split("[")[0].length() > 20){
+            return str.mid(20,str.length()-20);
+        }else{
+            return "";
+        }
+    }
 
+}
+void Supervisor::readLogList(){
+}
 
+void Supervisor::readLog(int year, int month, int date){
+
+}
+void Supervisor::readLog(QDateTime date){
+
+    std::string path = QString().toStdString();
+    QFile file(QDir::homePath()+"/"+log_folder+"/"+date.toString("yyyy_MM_dd")+".txt");
+    if(!file.open(QIODevice::ReadOnly)){
+        curLog.clear();
+        plog->write("[SUPERVISOR] READ LOG FAILED : "+file.fileName());
+        return;
+    }
+
+    curLog.clear();
+    QTextStream logs(&file);
+    while(!logs.atEnd()){
+        QString line = logs.readLine();
+        curLog.append(line);
+    }
+}
+
+int Supervisor::getLogLineNum(){
+    return curLog.size();
+}
+
+bool Supervisor::isHasLog(QDateTime date){
+    std::string path = QString(QDir::homePath()+"/"+log_folder).toStdString();
+    QDir directory(path.c_str());
+    QStringList logList = directory.entryList();
+
+    QString logName = date.toString("yyyy_MM_dd")+".txt";
+    for(int i=0; i<logList.size(); i++){
+        if(logList[i] == logName){
+            return true;
+        }
+    }
+    return false;
+}
+bool Supervisor::isHasLog(int year, int month, int date){
+    std::string path = QString(QDir::homePath()+"/"+log_folder).toStdString();
+    QDir directory(path.c_str());
+    QStringList logList = directory.entryList();
+    QString logName = QString().sprintf("%d_%02d_%02d.txt",year,month,date);
+    for(int i=0; i<logList.size(); i++){
+        if(logList[i] == logName){
+            return true;
+        }
+    }
+    return false;
+}
 
 
 

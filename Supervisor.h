@@ -140,6 +140,29 @@ public:
     Q_INVOKABLE QString getLocalVersionMessage();
     Q_INVOKABLE QString getServerVersionMessage();
 
+    QStringList curLog;
+    QString log_folder = "ui_log";
+    Q_INVOKABLE void setLog(int num){
+        if(num==1){
+            log_folder = "ui_log";
+        }else{
+            log_folder = "sn_log";
+        }
+    }
+    Q_INVOKABLE int getLogLineNum();
+    Q_INVOKABLE QString getLogLine(int num){return curLog[num];}
+    Q_INVOKABLE QString getLogDate(int num);
+    Q_INVOKABLE QString getLogAuth(int num);
+    Q_INVOKABLE QString getLogMessage(int num);
+    Q_INVOKABLE void readLogList();
+    Q_INVOKABLE void readLog(QDateTime date);
+    Q_INVOKABLE void readLog(int year, int month, int date);
+    Q_INVOKABLE bool isHasLog(QDateTime date);
+    Q_INVOKABLE bool isHasLog(int year, int month, int date);
+    Q_INVOKABLE QString getLocaleDate(int year, int month, int date){
+        return QString().sprintf("%d-%02d-%02d",year,month,date);
+    }
+
     ////*********************************************  INIT PAGE 관련   ***************************************************////
     Q_INVOKABLE bool isConnectServer();
     //0:no map, 1:map_server, 2: map_edited only, 3:raw_map only
