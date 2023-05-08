@@ -11,10 +11,10 @@
 #include "ServerHandler.h"
 #include "CallbellHandler.h"
 #include "HTTPHandler.h"
+#include "ZIPHandler.h"
 #include "IPCHandler.h"
 #include "MapView.h"
 #include <libusb-1.0/libusb.h>
-
 
 #define MOTOR_RUN(x)            ((x)&0x01)
 #define MOTOR_MOD_ERROR(x)      ((x>>1)&0x01)
@@ -48,11 +48,13 @@ public:
     ST_PATROLMODE patrol;
 
     ////*********************************************  VARIABLE   ***************************************************////
+    QStringList usb_list;
+    QStringList usb_file_full_list;
+    QStringList usb_file_list;
+    QStringList usb_backup_list;
     QVector<QString> usb_map_list;
     QVector<QString> map_list;
     QVector<QString> map_detail_list;
-    bool usb_check;
-    int usb_check_count;
 
     int count_excuseme = 0;
     bool flag_excuseme = false;
@@ -64,6 +66,7 @@ public:
 
     ////*********************************************  CLASS   ***************************************************////
     LCMHandler *lcm;
+    ZIPHandler *zip;
     ServerHandler *server;
     JoystickHandler *joystick;
     HTTPHandler *git;
@@ -163,6 +166,18 @@ public:
         return QString().sprintf("%d-%02d-%02d",year,month,date);
     }
 
+    void makeUSBShell();
+    Q_INVOKABLE void updateUSB();
+    Q_INVOKABLE int getusbsize();
+    Q_INVOKABLE void readusbfile(QString name);
+    Q_INVOKABLE void readusbrecentfile();
+    Q_INVOKABLE int getusbfilesize();
+    Q_INVOKABLE QString getusbfile(int num);
+    Q_INVOKABLE QString getusbrecentfile();
+    Q_INVOKABLE QString getusbname(int num);
+    Q_INVOKABLE void readusb();
+
+
     ////*********************************************  INIT PAGE 관련   ***************************************************////
     Q_INVOKABLE bool isConnectServer();
     //0:no map, 1:map_server, 2: map_edited only, 3:raw_map only
@@ -190,9 +205,6 @@ public:
     Q_INVOKABLE void makeRobotINI();
     Q_INVOKABLE bool rotate_map(QString _src, QString _dst, int mode);
     Q_INVOKABLE bool getIniRead();
-    Q_INVOKABLE int getUsbMapSize();
-    Q_INVOKABLE QString getUsbMapPath(int num);
-    Q_INVOKABLE QString getUsbMapPathFull(int num);
     Q_INVOKABLE void saveMapfromUsb(QString path);
     Q_INVOKABLE void loadMap(QString name);
     Q_INVOKABLE void setMap(QString name);
@@ -385,6 +397,10 @@ public:
     Q_INVOKABLE void startServingTest();
     Q_INVOKABLE void stopServingTest();
 
+    Q_INVOKABLE int getusberrorsize();
+    Q_INVOKABLE QString getusberror(int num);
+    Q_INVOKABLE int getzipstate();
+    Q_INVOKABLE void usbsave(QString usb="", bool _ui=true, bool _slam=true, bool _config=true, bool _map=true, bool _log=true);
 public slots:
     void onTimer();
     void server_cmd_pause();
@@ -401,11 +417,16 @@ public slots:
     void git_pull_failed();
     void git_pull_success();
     void new_call();
+    void zip_done();
+    void unzip_done();
+    void zip_failed();
+    void unzip_failed();
 
 private:
     QTimer *timer;
     QQuickWindow *mMain;
     QObject *mObject = nullptr;
 };
+
 
 #endif // SUPERVISOR_H

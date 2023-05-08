@@ -241,7 +241,7 @@ Item {
                         radius: 60
                         border.width: 3
                         border.color: "#e5e5e5"
-                        enabled: supervisor.getUsbMapSize()>0?true:false
+                        enabled: supervisor.getusbsize()>0?true:false
                         color: enabled?"transparent":"#e5e5e5"
                         Column{
                             anchors.centerIn: parent
@@ -252,7 +252,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "맵 불러오기\n(USB)"
+                                text: "USB에서\n가져오기"
                                 font.pixelSize: 15
                                 horizontalAlignment: Text.AlignHCenter
                                 font.family: font_noto_r.name
@@ -263,6 +263,7 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 supervisor.writelog("[USER INPUT] INIT PAGE : LOAD MAP FROM USB")
+                                popup_usb_download.open();
 //                                popup_usb_map.open();
         //                        supervisor.loadMaptoUSB();
         //                        update_timer.start();
@@ -969,8 +970,9 @@ Item {
                             supervisor.writelog("[QML - ERROR] Map not found. "+map_name);
                             loader_init.sourceComponent = item_map_init
                         }
+
                         //USB연결 확인
-                        if(supervisor.getUsbMapSize() > 0){
+                        if(supervisor.getusbsize() > 0){
                             loader_init.item.enable_usb();
                         }else{
                             loader_init.item.disable_usb();
@@ -1614,6 +1616,452 @@ Item {
                         supervisor.removeMap(name);
                         popup_show_map.close();
                         update_timer.start();
+                    }
+                }
+            }
+        }
+    }
+
+    Popup{
+        id: popup_usb_download
+        anchors.centerIn: parent
+        width: 400
+        height: 500
+        leftPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        rightPadding: 0
+        background: Rectangle{
+            color: "transparent"
+        }
+        property var index: 0
+        property bool is_ui: false
+        property bool is_slam: false
+        property bool is_map: false
+        property bool is_log: false
+        property bool is_config: false
+        property string set_name: ""
+        onOpened:{
+            timer_usb_new.start();
+
+            model_usb_file_list.clear();
+            for(var i=0; i<supervisor.getusbfilesize(); i++){
+                model_usb_file_list.append({"name":supervisor.getusbfile(i)});
+            }
+
+            text_recent_file.text = supervisor.getusbrecentfile();
+            if(text_recent_file.text == ""){
+                notice_recent.visible = false;
+                btn_recent_confirm.visible = false;
+            }else{
+                notice_recent.visible = true;
+                btn_recent_confirm.visible = true;
+            }
+        }
+        onClosed:{
+            timer_usb_new.stop();
+        }
+
+        Rectangle{
+            anchors.fill: parent
+            Rectangle{
+//                id: rect_1
+                width: parent.width
+                height: 50
+                color: color_dark_navy
+                Text{
+                    anchors.centerIn: parent
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    color: "white"
+                    text: {
+                        if(popup_usb_download.index === 0)
+                            "가져오실 파일 목록을 선택해주세요."
+                        else if(popup_usb_download.index === 1)
+                            "가져오실 목록을 선택해주세요."
+                    }
+                }
+            }
+
+            Column{
+                anchors.centerIn: parent
+                visible: popup_usb_download.index === 0
+                spacing: 10
+                Rectangle{
+                    id: notice_recent
+                    width: 200
+                    height: 40
+                    color: color_navy
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        text: "가장 최신 파일"
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: "white"
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: 50
+                    color: color_light_gray
+                    Text{
+                        id: text_recent_file
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: ""
+                    }
+                }
+                Rectangle{
+                    id: btn_recent_confirm
+                    visible: false
+                    width: 100
+                    radius: 5
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: 40
+                    border.width:1
+                    color: "white"//color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "확인"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            supervisor.writelog("[USER INPUT] GET RECENT USB FILE : "+supervisor.getusbrecentfile());
+                            popup_usb_notice.mode = "extract_recent";
+                            popup_usb_notice.open();
+//                            supervisor.readusbrecentfile();
+                        }
+                    }
+                }
+
+                Rectangle{
+                    width: 200
+                    height: 40
+                    color: color_navy
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        text: "그 외 발견한 파일 목록"
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: "white"
+                    }
+                }
+                Repeater{
+                    model: ListModel{id:model_usb_file_list}
+                    Rectangle{
+                        width: 280
+                        radius: 10
+                        height: 50
+                        color: color_light_gray
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            font.pixelSize: 10
+                            text: name
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+//                                popup_usb_download.index = 1;
+//                                popup_usb_download.set_name = name;
+                            }
+                        }
+                    }
+                }
+            }
+            Column{
+                anchors.centerIn: parent
+                spacing: 10
+                visible: popup_usb_download.index === 1
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_download.is_ui?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "UI"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_download.is_ui = !popup_usb_download.is_ui;
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_download.is_slam?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "SLAMNAV"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_download.is_slam = !popup_usb_download.is_slam;
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_download.is_config?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "robot_config"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_download.is_config = !popup_usb_download.is_config;
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_download.is_map?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "maps"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_download.is_map = !popup_usb_download.is_map;
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_download.is_log?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "Log"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_download.is_log = !popup_usb_download.is_log;
+                        }
+                    }
+                }
+            }
+            Rectangle{
+                width: 250
+                radius: 10
+                height: 50
+                color: "black"
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottomMargin: 30
+                visible: popup_usb_download.index === 1
+                Text{
+                    anchors.centerIn: parent
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    color:"white"
+                    text: "확인"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        popup_usb_notice.setProperty("compress",popup_usb_download.set_name,popup_usb_download.is_ui,popup_usb_download.is_slam,popup_usb_download.is_config,popup_usb_download.is_map,popup_usb_download.is_log);
+                        popup_usb_download.close();
+                        popup_usb_notice.open();
+                    }
+                }
+            }
+
+        }
+        Timer{
+            id: timer_usb_new
+            interval: 500
+            running: false
+            repeat: true
+            onTriggered: {
+                if(supervisor.getusbsize() > 0){
+                }else{
+                }
+            }
+        }
+    }
+
+    Popup{
+        id: popup_usb_notice
+        anchors.centerIn: parent
+        width: 400
+        height: 300
+        leftPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        rightPadding: 0
+        background: Rectangle{
+            anchors.fill: parent
+            color : "transparent"
+        }
+        function setProperty(mo,na,ui,slam,config,map,log){
+            mode = mo;
+            name = na;
+            is_ui = ui;
+            is_slam = slam;
+            is_map = map;
+            is_log = log;
+            is_config = config;
+        }
+
+        property bool is_ui: false
+        property bool is_slam: false
+        property bool is_map: false
+        property bool is_log: false
+        property bool is_config: false
+        property string name: "Desktop"
+        property string mode: "compress";
+        property bool is_new: true
+        Timer{
+            id: timer_usb_check
+            running: false
+            repeat: true
+            interval: 300
+            onTriggered: {
+                if(popup_usb_notice.is_new){
+                    popup_usb_notice.is_new = false;
+                    if(popup_usb_notice.mode == "compress"){
+                        supervisor.usbsave(popup_usb_notice.name, popup_usb_notice.is_ui, popup_usb_notice.is_slam, popup_usb_notice.is_config, popup_usb_notice.is_map, popup_usb_notice.is_log);
+                    }else if(popup_usb_notice.mode == "extract_recent"){
+                        supervisor.readusbrecentfile();
+                    }else if(popup_usb_notice.mode == "extract"){
+
+                    }
+                }
+
+                if(supervisor.getzipstate() === 1){
+                    if(popup_usb_notice.mode== "compress"){
+                        text_usb_state.text = "파일을 압축하여 저장 중..";
+                    }else{
+                        text_usb_state.text = "파일을 가져오는 중..";
+                    }
+                }else if(supervisor.getzipstate() === 2){
+                    if(popup_usb_notice.mode== "compress"){
+                        text_usb_state.text = "저장에 성공하였습니다.";
+                    }else{
+                        btn_usb_confirm.visible = true;
+                        text_usb_state.text = "파일을 성공적으로 가져왔습니다.\n확인을 누르시면 업데이트를 진행합니다.";
+                    }
+
+                }else if(supervisor.getzipstate() === 3){
+                    if(popup_usb_notice.mode== "compress"){
+                        text_usb_state.text = "저장에 성공하였지만 일부 과정에서 에러가 발생했습니다.";
+                    }else{
+                        text_usb_state.text = "파일을 성공적으로 가져왔습니다만 일부 과정에서 에러가 발생했습니다.\n확인을 누르시면 업데이트를 진행합니다.";
+                        btn_usb_confirm.visible = true;
+                    }
+                    model_usb_error.clear();
+                    for(var i=0; i<supervisor.getusberrorsize(); i++){
+                        model_usb_error.append({"error":supervisor.getusberror(i)});
+                    }
+                }else if(supervisor.getzipstate() === 4){
+                    if(popup_usb_notice.mode== "compress"){
+                        text_usb_state.text = "저장에 실패했습니다.";
+                    }else{
+                        text_usb_state.text = "파일을 가져오지 못했습니다.";
+                    }
+                    model_usb_error.clear();
+                    for(var i=0; i<supervisor.getusberrorsize(); i++){
+                        model_usb_error.append({"error":supervisor.getusberror(i)});
+                    }
+                }else{
+                    print(supervisor.getzipstate());
+                    text_usb_state.text = "잠시만 기다려주세요.";
+                }
+            }
+        }
+        onOpened:{
+            timer_usb_check.start();
+            model_usb_error.clear();
+            btn_usb_confirm.visible = false;
+            text_usb_state.text = "잠시만 기다려주세요.";
+            is_new = true;
+        }
+        onClosed: {
+            timer_usb_check.stop();
+        }
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 10
+            color: color_dark_navy
+            Column{
+                anchors.centerIn: parent
+                spacing: 10
+                Text{
+                    id: text_usb_state
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.family: font_noto_r.name
+                    color: "white"
+                    font.pixelSize: 20
+                    horizontalAlignment: Text.AlignHCenter
+                    text:"잠시만 기다려주세요."
+                }
+                Repeater{
+                    model: ListModel{id:model_usb_error}
+                    Text{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 10
+                        color: color_red
+                        horizontalAlignment: Text.AlignHCenter
+                        text:error
+                    }
+                }
+
+                Rectangle{
+                    id: btn_usb_confirm
+                    visible: false
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: 100
+                    height: 50
+                    radius: 5
+                    border.width: 1
+                    Text{
+                        anchors.centerIn: parent
+                        font.family:font_noto_r.name
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+
+                            if(popup_usb_notice.mode== "compress"){
+
+                            }else{
+                                supervisor.updateUSB();
+                            }
+                        }
                     }
                 }
             }

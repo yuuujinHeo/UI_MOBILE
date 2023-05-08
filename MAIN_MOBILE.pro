@@ -1,4 +1,4 @@
-QT += core gui quick widgets network websockets sql quickcontrols2 serialport #multimedia
+QT += core gui quick widgets network websockets sql quickcontrols2 serialport gui-private #multimedia
 
 CONFIG += c++11 qtquickcompiler
 
@@ -24,13 +24,29 @@ SOURCES += \
     IPCHandler.cpp \
     JoystickHandler.cpp \
     LCMHandler.cpp \
+    Loading.cpp \
     MapView.cpp \
     ServerHandler.cpp \
     SoundHandler.cpp \
+    ZIPHandler.cpp \
     cv_to_qt.cpp \
     Logger.cpp \
     Supervisor.cpp \
     main.cpp \
+    quazip/JlCompress.cpp \
+    quazip/qioapi.cpp \
+    quazip/quaadler32.cpp \
+    quazip/quachecksum32.cpp \
+    quazip/quacrc32.cpp \
+    quazip/quagzipfile.cpp \
+    quazip/quaziodevice.cpp \
+    quazip/quazip.cpp \
+    quazip/quazipdir.cpp \
+    quazip/quazipfile.cpp \
+    quazip/quazipfileinfo.cpp \
+    quazip/quazipnewinfo.cpp \
+    quazip/unzip.c \
+    quazip/zip.c \
     websocket/QtHttpServer.cpp \
     websocket/QtHttpReply.cpp \
     websocket/QtHttpRequest.cpp \
@@ -52,21 +68,42 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+LIBS += -lz
 HEADERS += \
     CallbellHandler.h \
     CameraView.h \
     GlobalHeader.h \
     IPCHandler.h \
+    spline.h \
     JoystickHandler.h \
     Keyemitter.h \
     LCMHandler.h \
+    Loading.h \
     Logger.h \
     MapHeader.h \
     MapView.h \
     ServerHandler.h \
     SoundHandler.h \
+    ZIPHandler.h \
     cv_to_qt.h \
     Supervisor.h\
+    quazip/JlCompress.h \
+    quazip/ioapi.h \
+    quazip/minizip_crypt.h \
+    quazip/quaadler32.h \
+    quazip/quachecksum32.h \
+    quazip/quacrc32.h \
+    quazip/quagzipfile.h \
+    quazip/quaziodevice.h \
+    quazip/quazip.h \
+    quazip/quazip_global.h \
+    quazip/quazip_qt_compat.h \
+    quazip/quazipdir.h \
+    quazip/quazipfile.h \
+    quazip/quazipfileinfo.h \
+    quazip/quazipnewinfo.h \
+    quazip/unzip.h \
+    quazip/zip.h \
     websocket/QtHttpServer.h \
     websocket/QtHttpReply.h \
     websocket/QtHttpRequest.h \
@@ -98,7 +135,9 @@ contains(QT_ARCH, x86_64){
     INCLUDEPATH += /usr/local/include/
     LIBS += -L/usr/local/lib/
     INCLUDEPATH += /usr/include/lcm/
+    INCLUDEPATH += /usr/local/include/QuaZip-Qt5-1.4
     LIBS += -L/usr/lib/aarch64-linux-gnu/
+    LIBS += -lz
     LIBS += -llcm
 
     # USB
@@ -134,3 +173,7 @@ contains(QT_ARCH, arm64) {
     # USB
     LIBS += -lusb
 }
+
+DISTFILES += \
+    quazip/QuaZipConfig.cmake.in \
+    quazip/quazip.pc.cmakein

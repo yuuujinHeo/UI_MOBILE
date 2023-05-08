@@ -11,10 +11,16 @@
 #include <QSslSocket>
 #include <exception>
 #include <QGuiApplication>
+#include <zlib.h>
 #include <usb.h>
 #include <QDir>
 #include <QFileSystemWatcher>
 #include <QtQuick/qquickimageprovider.h>
+#include <QtGui>
+
+
+//#include <sys/socket.h>
+//#include <net/
 
 extern QObject *object;
 
@@ -38,10 +44,10 @@ Supervisor::Supervisor(QObject *parent)
     pmap = &map;
     mMain = nullptr;
 
-    usb_map_list.clear();
-    usb_check = false;
-    usb_check_count = 0;
+    usb_list.clear();
+    usb_backup_list.clear();
 
+    zip = new ZIPHandler();
     ipc = new IPCHandler();
     lcm = new LCMHandler();
     server = new ServerHandler();
@@ -51,7 +57,10 @@ Supervisor::Supervisor(QObject *parent)
     connect(call, SIGNAL(new_call()),this,SLOT(new_call()));
     connect(git, SIGNAL(pullSuccess()),this,SLOT(git_pull_success()));
     connect(git, SIGNAL(pullFailed()),this,SLOT(git_pull_failed()));
-
+    connect(zip, SIGNAL(zip_done()),this,SLOT(zip_done()));
+    connect(zip, SIGNAL(unzip_done()),this,SLOT(unzip_done()));
+    connect(zip, SIGNAL(zip_fail()),this,SLOT(zip_failed()));
+    connect(zip, SIGNAL(unzip_fail()),this,SLOT(unzip_failed()));
     //Test USB
     QFileSystemWatcher *FSwatcher;
     FSwatcher = new QFileSystemWatcher(this);
@@ -95,11 +104,11 @@ Supervisor::Supervisor(QObject *parent)
 //    const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
 //    for(QHostAddress &address: QNetworkInterface::allAddresses()){
 //        if(address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost){
-//            qDebug() << "!!!!!!!!!!!!!!!!!!!!! : " << address.toString();
+//            qDebug() << "!!!!!!!!!!!!!!!!!!!!! 1 : " << address.toString();
 ////            qDebug() << QNetworkInterface::type();
 //            if(address.toString() == "192.168.2.1"){
 //                qDebug() << "CHANGED";
-//                address.setAddress("192.168.2.11");
+////                address.setAddress("192.168.2.11");
 //            }
 //        }
 //    }
@@ -107,11 +116,13 @@ Supervisor::Supervisor(QObject *parent)
 //    for(QNetworkInterface &interface: QNetworkInterface::allInterfaces()){
 //        if(interface.type() == QNetworkInterface::Wifi && interface.addressEntries().size()>0){
 //            QHostAddress address = interface.addressEntries().at(0).ip();
+////            address.
+////            interface.addressEntries().at(0)
 //            if(address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost){
-//                qDebug() << "!!!!!!!!!!!!!!!!!!!!! : " << address.toString();
+//                qDebug() << "!!!!!!!!!!!!!!!!!!!!!  2 : " << address.toString();
 //                if(address.toString() == "192.168.2.1"){
 //                    qDebug() << "CHANGED";
-//                    address.setAddress("192.168.2.11");
+////                    address.setAddress("192.168.2.11");
 //                }
 //            }
 //        }
@@ -124,6 +135,7 @@ Supervisor::~Supervisor(){
     slam_process->close();
     QString file = QDir::homePath() + "/auto_kill.sh";
     slam_process->start(file);
+    slam_process->waitForReadyRead(3000);
     QThread::sleep(1);
     slam_process->kill();
     slam_process->close();
@@ -241,6 +253,7 @@ void Supervisor::removeCallAll(){
 void Supervisor::git_pull_success(){
     QString date = probot->program_date;
     plog->write("[SUPERVISOR] GIT PULL SUCCESS : "+probot->program_date+", "+date);
+    plog->write("[SUPERVISOR] GIT PULL SUCCESS : "+probot->program_message+", "+probot->program_version);
     setSetting("ROBOT_SW/version_msg",probot->program_message);
     setSetting("ROBOT_SW/version_date",date);//probot->program_date);
     setSetting("ROBOT_SW/version",probot->program_version);
@@ -451,7 +464,8 @@ void Supervisor::readSetting(QString map_name){
         pmap->locations.push_back(temp_loc);
     }
     if(setting.table_num > serv_num){
-        setting.table_num = serv_num;
+        //DEBUG 230504 임시로 table개수 늘려보려고 주석처리함
+//        setting.table_num = serv_num;
     }
     setting_anot.endGroup();
 
@@ -698,6 +712,7 @@ bool Supervisor::isExistMap(QString name){
         return false;
     }
 }
+
 bool Supervisor::isExistRawMap(QString name){
     if(QFile::exists(getRawMapPath(name))){
         return true;
@@ -942,23 +957,19 @@ bool Supervisor::getLCMProcess(){
 bool Supervisor::getIniRead(){
     return flag_read_ini;
 }
-int Supervisor::getUsbMapSize(){
-    return usb_map_list.size();
+int Supervisor::getusbsize(){
+    return usb_list.size();
 }
-QString Supervisor::getUsbMapPath(int num){
-    QStringList templist = usb_map_list[num].split("/");
-    QString temp;
-
-    if(templist.size() > 5){
-        temp = templist[templist.size() - 3] + "/" + templist[templist.size() - 2] + "/" + templist[templist.size()-1];
-    }else{
-        temp = templist[templist.size() - 2] + "/" + templist[templist.size() - 1];
+QString Supervisor::getusbname(int num){
+    if(num > -1 && num < usb_list.size()){
+        return usb_list[num];
     }
-    return temp;
+    return "";
 }
-QString Supervisor::getUsbMapPathFull(int num){
-    return usb_map_list[num];
+void Supervisor::readusb(){
+
 }
+
 void Supervisor::saveMapfromUsb(QString path){
     std::string user = getenv("USER");
     std::string path1 = "/media/" + user + "/";
@@ -1435,12 +1446,196 @@ QString Supervisor::getJoystick(int mode){
     return "";
 }
 void Supervisor::usb_detect(){
-    plog->write("[USB] NEW USB Detected");
-    usb_check = true;
-    usb_check_count = 0;
+    std::string user = getenv("USER");
+    std::string path = "/media/" + user;
+    QDir directory(path.c_str());
+    QStringList temp = directory.entryList();
+    usb_list.clear();
+    usb_file_list.clear();
+    usb_file_full_list.clear();
+    foreach (QString name, temp) {
+        if(name != "." && name != ".."){
+            usb_list.append(name);
+
+            QDir dd(directory.path()+"/"+name);
+            QStringList files = dd.entryList();
+
+            foreach(QString file, files){
+                QStringList ex = file.split(".");
+                if(ex.size() > 1){
+
+                    if(ex[1] == "zip"){
+                        if(ex[0].left(11) == "MobileRobot"){
+                            QStringList names = ex[0].split("_");
+                            if(names.size() == 3){
+                                usb_file_full_list.append(name+"/"+file);
+                                usb_file_list.append(names[2]);
+                                qDebug() << "FIND !!!!!" << ex[0];
+                            }
+                        }
+                    }else{
+                        continue;
+                    }
+                }else{
+                    continue;
+                }
+            }
+
+
+
+        }
+    }
+
+    plog->write("[USB] NEW USB Detected : "+QString::number(usb_list.size()));
+
 }
 
+int Supervisor::getusberrorsize(){
+    return zip->errorlist.size();
+}
 
+int Supervisor::getusbfilesize(){
+    return usb_file_list.size();
+}
+QString Supervisor::getusbfile(int num){
+    if(usb_file_full_list.size() > num && num > -1)
+        return usb_file_full_list[num];
+    else
+        return "";
+}
+QString Supervisor::getusbrecentfile(){
+    double temp = 0;
+    QString filename = "";
+    for(int i=0; i<usb_file_list.size(); i++){
+        QString tempstr = usb_file_list[i];
+        if(temp < tempstr.toDouble()){
+            temp = tempstr.toDouble();
+            filename = tempstr;
+        }
+    }
+    return filename;
+}
+QString Supervisor::getusberror(int num){
+    if(num > -1 && num < zip->errorlist.size()){
+        return zip->errorlist[num];
+    }else{
+        return "";
+    }
+}
+
+void Supervisor::readusbfile(QString name){
+
+}
+void Supervisor::readusbrecentfile(){
+    double temp = 0;
+    int num = -1;
+    for(int i=0; i<usb_file_list.size(); i++){
+        QString tempstr = usb_file_list[i];
+        if(temp < tempstr.toDouble()){
+            temp = tempstr.toDouble();
+            num = i;
+        }
+    }
+    if(num == -1){
+        return;
+    }
+
+    QString path = getusbfile(num);
+    zip->getZip(path);
+
+
+}
+
+void Supervisor::updateUSB(){
+    QString updatestr = QDir::homePath()+"/update.sh";
+    if(!QFile::exists(updatestr)){
+        makeUSBShell();;
+    }
+    updatestr = QDir::homePath()+"/update_dummy.sh";
+    if(!QFile::exists(updatestr)){
+        QString file_name = QDir::homePath() + "/update_dummy.sh";
+        QFile file(file_name);
+        if(file.open(QIODevice::ReadWrite)){
+            QTextStream stream(&file);
+            stream << "#!/bin/bash" << endl << endl;
+
+            stream << "/home/odroid/update.sh" << endl;
+        }
+        file.close();
+        //Chmod
+        QProcess process;
+        process.setWorkingDirectory(QDir::homePath());
+        process.start("chmod +x update_dummy.sh");
+        process.waitForReadyRead(200);
+    }
+
+    QProcess process;
+    process.setWorkingDirectory(QDir::homePath());
+    process.start("xterm ./update_dummy.sh");
+    process.waitForReadyRead(-1);
+}
+void Supervisor::makeUSBShell(){
+    QString file_name = QDir::homePath() + "/update.sh";
+    QFile file(file_name);
+    if(file.open(QIODevice::ReadWrite)){
+        QTextStream stream(&file);
+        stream << "#!/bin/bash" << endl << endl;
+        stream << "cd /home/odroid/tempBackup" << endl;
+
+        stream << "if [ -d \"config\" ]" << endl;
+        stream << "then" << endl;
+        stream << "    cp config/robot_config.ini /home/odroid/robot_config.ini" << endl;
+        stream << "fi" << endl;
+
+        stream << "if [ -d \"sn_log\" ]" << endl;
+        stream << "then" << endl;
+        stream << "    cp -R sn_log /home/odroid/" << endl;
+        stream << "fi" << endl;
+
+        stream << "if [ -d \"ui_log\" ]" << endl;
+        stream << "then" << endl;
+        stream << "    cp -R ui_log /home/odroid/" << endl;
+        stream << "fi" << endl;
+
+        stream << "if [ -d \"maps\" ]" << endl;
+        stream << "then" << endl;
+        stream << "    cp -R maps /home/odroid/" << endl;
+        stream << "fi" << endl;
+
+        stream << "if [ -d \"SLAMNAV\" ]" << endl;
+        stream << "then" << endl;
+        stream << "    cp -R SLAMNAV /home/odroid/code/" << endl;
+        stream << "fi" << endl;
+
+        stream << "if [ -d \"build-SLAMNAV-Desktop-Release\" ]" << endl;
+        stream << "then" << endl;
+        stream << "    cp -R SLAMNAV_release /home/odroid/code/" << endl;
+        stream << "fi" << endl;
+
+        stream << "if [ -d \"build-SLAMNAV-Desktop-Debug\" ]" << endl;
+        stream << "then" << endl;
+        stream << "    cp -R build-SLAMNAV-Desktop-Debug /home/odroid/code/" << endl;
+        stream << "fi" << endl;
+
+        stream << "if [ -d \"UI_MOBILE_release\" ]" << endl;
+        stream << "then" << endl;
+        stream << "    cp -R UI_MOBILE_release /home/odroid/" << endl;
+        stream << "fi" << endl;
+
+        stream << "cd /home/odroid" << endl;
+        stream << "rm -R tempBackup" << endl;
+        stream << "rm tempBackup.zip" << endl;
+
+        stream << "/home/odroid/auto_kill.sh" << endl;
+        stream << "/home/odroid/UI_MOBILE_release/autostart.sh" << endl;
+    }
+    file.close();
+    //Chmod
+    QProcess process;
+    process.setWorkingDirectory(QDir::homePath());
+    process.start("chmod +x update.sh");
+    process.waitForReadyRead(200);
+}
 
 
 ////*********************************************  ANNOTATION 관련   ***************************************************////
@@ -2574,55 +2769,6 @@ void Supervisor::onTimer(){
     }
 
     static int count_pass = 0;
-    // usb 파일 확인
-    if(usb_check){
-        if(usb_check_count++ > 15){
-            usb_check = false;
-        }else{
-            std::string user = getenv("USER");
-            std::string path = "/media/" + user;
-            QDir directory(path.c_str());
-            QStringList FilesList = directory.entryList();
-
-            usb_map_list.clear();
-
-            for(int i=0; i<FilesList.size(); i++){
-                std::string path1 = path + "/";
-                QString path_usb = path1.c_str() + FilesList[i];
-                QDir directory1(path_usb);
-                QStringList FilesList2 = directory1.entryList();
-
-                for(int j=0; j<FilesList2.size(); j++){
-                    if(FilesList2[j] == "maps"){
-                        QString path_folder = path_usb+"/"+FilesList2[j];
-                        QDir directory2(path_folder);
-                        QStringList FilesList3 = directory2.entryList();
-                        for(int k=0; k<FilesList3.size(); k++){
-                            usb_map_list.push_back(path_folder +  "/" + FilesList3[k]);
-                        }
-                    }else if(FilesList2[j] == "lcm_types"){
-                        usb_map_list.push_back(path_usb +  "/" + FilesList2[j]);
-                    }else if(FilesList2[j] == "robot_config.ini"){
-                        usb_map_list.push_back(path_usb +  "/" + FilesList2[j]);
-                    }else if(FilesList2[j] == "auto_test.sh"){
-                        usb_map_list.push_back(path_usb +  "/" + FilesList2[j]);
-                    }else if(FilesList2[j] == "kill_slam.sh"){
-                        usb_map_list.push_back(path_usb +  "/" + FilesList2[j]);
-                    }else if(FilesList2[j] == "auto_kill.sh"){
-                        usb_map_list.push_back(path_usb +  "/" + FilesList2[j]);
-                    }
-                }
-            }
-
-            if(usb_map_list.size() > 0){
-                for(int i=0; i<usb_map_list.size(); i++){
-                    plog->write("[SUPERVISOR] USB Detected : "+usb_map_list[i]);
-                }
-                usb_check = false;
-                usb_check_count = 0;
-            }
-        }
-    }
     // 스케줄러 변수 초기화
     static int prev_error = -1;
     static int prev_state = -1;
@@ -2813,6 +2959,7 @@ void Supervisor::onTimer(){
         }else{
             count_battery = 0;
         }
+        isaccepted = false;
         if(ui_cmd == UI_CMD_MOVE_TABLE){
             plog->write("[SUPERVISOR] UI_STATE = SERVING");
             ui_state = UI_STATE_SERVING;
@@ -3342,5 +3489,45 @@ bool Supervisor::isHasLog(int year, int month, int date){
     return false;
 }
 
+int Supervisor::getzipstate(){
+    return zip->process;
+}
+void Supervisor::usbsave(QString usb, bool _ui, bool _slam, bool _config, bool _map, bool _log){
+    zip->process = 0;
+    std::string user = getenv("USER");
+    std::string path = "/media/" + user;
+    qDebug() << _ui << _slam;
+    if(usb == "Destkop"){
+        plog->write("[USER INPUT] USB SAVE : Desktop");
+        zip->makeZip(QDir::homePath()+"/Desktop",_ui,_slam,_config,_map,_log);
+    }else if(usb == ""){
+        if(usb_list.size() > 0){
+            QString usb_path = QString::fromStdString(path) + "/" + usb_list[0];
+            plog->write("[USER INPUT] USB SAVE : "+usb_list[0]);
+            zip->makeZip(usb_path,_ui,_slam,_config,_map,_log);
+        }else{
+            plog->write("[USER INPUT] USB SAVE ERROR : usb_list size = 0");
+        }
+    }else{
+        QString usb_path = QString::fromStdString(path) + "/" + usb;
+        qDebug() << usb_path;
+        plog->write("[USER INPUT] USB SAVE : "+usb);
+        zip->makeZip(usb_path,_ui,_slam,_config,_map,_log);
+    }
+}
 
+void Supervisor::zip_done(){
 
+}
+
+void Supervisor::unzip_done(){
+
+}
+
+void Supervisor::zip_failed(){
+
+}
+
+void Supervisor::unzip_failed(){
+
+}

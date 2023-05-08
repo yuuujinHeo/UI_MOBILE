@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import "."
+import QtGraphicalEffects 1.0
 import io.qt.Supervisor 1.0
 Item {
     id: page_kitchen
@@ -57,6 +58,7 @@ Item {
     property int rect_size: 70
     property int traybox_margin: 150
 
+    property bool tray_empty: true
     property int cur_table: 0
     property bool go_wait: false
     property bool go_charge: false
@@ -93,6 +95,33 @@ Item {
     }
 
     Rectangle{
+        width: 40
+        height: 40
+        color: "#e8e8e8"
+        radius: 5
+        visible: robot_type==="SERVING"?true:false
+        anchors.bottom: rect_tray_box.top
+        anchors.bottomMargin: -5
+        anchors.rightMargin: 20
+        anchors.right: rect_tray_box.right
+        Image{
+            anchors.centerIn: parent
+            source: "icon/icon_remove.png"
+            ColorOverlay{
+                anchors.fill: parent
+                source: parent
+                color: "white"
+            }
+        }
+        MouseArea{
+            anchors.fill: parent
+            onClicked:{
+                init();
+            }
+        }
+    }
+
+    Rectangle{
         id: rect_tray_box
         visible: robot_type=="SERVING"?true:false
         width: 500
@@ -109,6 +138,7 @@ Item {
             Repeater{
                 id: repeat_tray
                 model: traymodel
+
                 Rectangle{
                     id: rect_tray
                     width: tray_width
@@ -173,7 +203,6 @@ Item {
                                     model.set_table = cur_table;
                                     model.color =  "#12d27c"
                                 }
-
                             }
                             rect_tray_fill.width = rect_tray.width;
                             text_cancel.visible = false;
@@ -214,15 +243,18 @@ Item {
     Rectangle{
         id: rect_table_box
         visible: robot_type=="SERVING"?true:false
-        width: (table_col_num)*100 - 20 + 160
+        width: {
+            if(table_col_num < 3){
+                (table_col_num)*100 - 20 + 160
+            }else{
+                450
+            }
+        }
         height: parent.height - statusbar.height
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.topMargin: statusbar.height
         color: "#282828"
-        onWidthChanged: {
-            margin_name = rect_table_box.width
-        }
 
         Text{
             id: text_tables
@@ -403,7 +435,7 @@ Item {
                     anchors.fill: parent
                     onClicked: {
                         count_resting = 0;
-                        if(table_col_num < 3)
+                        if(table_col_num < 4)
                             supervisor.setTableColNum(++table_col_num);
                     }
                 }
@@ -441,10 +473,11 @@ Item {
         visible: robot_type=="SERVING"?true:false
         height: 100
         radius: 100
+        enabled: !tray_empty
         anchors.horizontalCenter: rect_tray_box.horizontalCenter
         anchors.top: rect_tray_box.bottom
         anchors.topMargin: 40
-        color: "#24a9f7"
+        color: enabled?color_blue:color_mid_gray
         Text{
             id: text_go
             anchors.centerIn: parent
@@ -476,10 +509,6 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: statusbar.height
         color: "#282828"
-        onWidthChanged: {
-            margin_name = rect_table_box.width
-        }
-
         Text{
             id: text_patrol
             color:"white"
@@ -567,6 +596,19 @@ Item {
         }
     }
 
+
+    Timer{
+        interval: 500
+        running: true
+        repeat: true
+        onTriggered: {
+            tray_empty = true;
+            for(var i=0; i<traymodel.count; i++){
+                if(traymodel.get(i).set_table !== 0)
+                    tray_empty = false;
+            }
+        }
+    }
 
     Rectangle{
         id: rect_go_patrol

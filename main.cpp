@@ -5,6 +5,7 @@
 #include <QQmlContext>
 #include "MapView.h"
 #include "CameraView.h"
+#include "Loading.h"
 #include "Supervisor.h"
 #include "Keyemitter.h"
 #include "Logger.h"
@@ -18,6 +19,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<MapView>("io.qt.MapView",1,0, "MapView");
     qmlRegisterType<CameraView>("io.qt.CameraView",1,0, "CameraView");
     qmlRegisterType<KeyEmitter>("io.qt.Keyemitter",1,0, "Keyemitter");
+    qmlRegisterType<Loading>("io.qt.Loading",1,0, "Loading");
 
     QApplication app(argc, argv);
     app.setOrganizationName("Mobile");
@@ -28,8 +30,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("homePath", QDir::homePath());
 
     QList<QString> path_home_str = QDir::homePath().split("/");
-//    if(path_home_str[path_home_str.size()-1] == "odroid")
-//        QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
+    if(path_home_str[path_home_str.size()-1] == "odroid")
+        QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     object = engine.rootObjects()[0];
     return app.exec();

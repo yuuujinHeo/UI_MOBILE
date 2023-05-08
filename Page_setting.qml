@@ -569,7 +569,7 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_velocity
@@ -582,7 +582,7 @@ Item {
                                 Slider{
                                     id: slider_vxy
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
                                     from: 0
                                     to: 1
@@ -754,6 +754,49 @@ Item {
                         text:"로봇 설정(전문가용)"
                         color: "white"
                         font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_wifi_ssd
+                    width: 840
+                    visible: is_admin
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"WIFI SSD"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+//                        Rectangle{
+//                            width: parent.width - 351
+//                            height: parent.height
+//                            TextField{
+//                                id: radius
+//                                anchors.fill: parent
+//                                text:supervisor.getSetting("ROBOT_HW","radius");
+//                                onFocusChanged: {
+//                                    keyboard.owner = radius;
+//                                    if(focus){
+//                                        keyboard.open();
+//                                    }else{
+//                                        keyboard.close();
+//                                    }
+//                                }
+//                            }
+//                        }
                     }
                 }
                 Rectangle{
@@ -1384,6 +1427,7 @@ Item {
                         }
                     }
                 }
+
                 Rectangle{
                     id: set_grid_size
                     width: 840
@@ -1824,12 +1868,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_mask
                                         anchors.centerIn: parent
-                                        text: slider_mask.value.toFixed(1)
+                                        text: slider_mask.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -1837,7 +1881,7 @@ Item {
                                 Slider{
                                     id: slider_mask
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
                                     from: 0
                                     to: 15.0
@@ -1877,12 +1921,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_max_range
                                         anchors.centerIn: parent
-                                        text: slider_max_range.value.toFixed(1)
+                                        text: slider_max_range.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -1890,7 +1934,7 @@ Item {
                                 Slider{
                                     id: slider_max_range
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
                                     from: 10.0
                                     to: 50.0
@@ -1930,12 +1974,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_cam_exposure
                                         anchors.centerIn: parent
-                                        text: slider_mask.value.toFixed(1)
+                                        text: slider_cam_exposure.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -1943,10 +1987,10 @@ Item {
                                 Slider{
                                     id: slider_cam_exposure
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 0
-                                    to: 4000
+                                    from: 500
+                                    to: 8000
                                     value: 2000
                                 }
                             }
@@ -2073,7 +2117,7 @@ Item {
                                     text:supervisor.getSetting("SENSOR","left_camera_tf");
                                 }
                                 Rectangle{
-                                    width: parent.widht*0.2
+                                    width: parent.width*0.2
                                     height: parent.height
                                     radius: 5
                                     color: "black"
@@ -2085,7 +2129,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-
+                                            popup_tf.open();
                                         }
                                     }
                                 }
@@ -2129,7 +2173,7 @@ Item {
                                     text:supervisor.getSetting("SENSOR","right_camera_tf");
                                 }
                                 Rectangle{
-                                    width: parent.widht*0.2
+                                    width: parent.width*0.2
                                     height: parent.height
                                     radius: 5
                                     color: "black"
@@ -2141,7 +2185,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-
+                                            popup_tf.open();
                                         }
                                     }
                                 }
@@ -2192,12 +2236,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_limit_pivot
                                         anchors.centerIn: parent
-                                        text: slider_limit_pivot.value.toFixed(1)
+                                        text: slider_limit_pivot.value.toFixed(2) + " [deg/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2205,11 +2249,64 @@ Item {
                                 Slider{
                                     id: slider_limit_pivot
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 5.0
-                                    to: 90.0
-                                    value: 45.0
+                                    from: 1.0
+                                    to: 360.0
+                                    value: 30.0
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_limitpivotacc
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_pivot_acc"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.2
+                                    height: 40
+                                    Text{
+                                        id: text_limit_pivot_acc
+                                        anchors.centerIn: parent
+                                        text: slider_limit_pivot_acc.value.toFixed(2) + " [deg/s^2]"
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_limit_pivot_acc
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.7
+                                    height: 40
+                                    from: 1.0
+                                    to: 360.0
+                                    value: 10.0
                                 }
                             }
                         }
@@ -2245,12 +2342,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_limit_v
                                         anchors.centerIn: parent
-                                        text: slider_limit_v.value.toFixed(1)
+                                        text: slider_limit_v.value.toFixed(2) + " [m/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2258,7 +2355,7 @@ Item {
                                 Slider{
                                     id: slider_limit_v
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
                                     from: 0.1
                                     to: 2.0
@@ -2298,12 +2395,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_limit_v_acc
                                         anchors.centerIn: parent
-                                        text: slider_limit_v_acc.value.toFixed(1)
+                                        text: slider_limit_v_acc.value.toFixed(2) + " [m/s^2]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2311,11 +2408,11 @@ Item {
                                 Slider{
                                     id: slider_limit_v_acc
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 0.1
+                                    from: 0.01
                                     to: 2.0
-                                    value: 1.0
+                                    value: 0.5
                                 }
                             }
                         }
@@ -2351,12 +2448,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_limit_w
                                         anchors.centerIn: parent
-                                        text: slider_limit_w.value.toFixed(1)
+                                        text: slider_limit_w.value.toFixed(2) + " [deg/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2364,10 +2461,10 @@ Item {
                                 Slider{
                                     id: slider_limit_w
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 5.0
-                                    to: 120.0
+                                    from: 1.0
+                                    to: 360.0
                                     value: 120.0
                                 }
                             }
@@ -2404,12 +2501,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_limit_w_acc
                                         anchors.centerIn: parent
-                                        text: slider_limit_w_acc.value.toFixed(1)
+                                        text: slider_limit_w_acc.value.toFixed(2) + " [deg/s^2]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2417,9 +2514,9 @@ Item {
                                 Slider{
                                     id: slider_limit_w_acc
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 5.0
+                                    from: 1.0
                                     to: 360.0
                                     value: 360.0
                                 }
@@ -2457,12 +2554,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_limit_manual_v
                                         anchors.centerIn: parent
-                                        text: slider_limit_manual_v.value.toFixed(1)
+                                        text: slider_limit_manual_v.value.toFixed(2) + " [m/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2470,7 +2567,7 @@ Item {
                                 Slider{
                                     id: slider_limit_manual_v
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
                                     from: 0.1
                                     to: 2.0
@@ -2510,12 +2607,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_limit_manual_w
                                         anchors.centerIn: parent
-                                        text: slider_limit_manual_w.value.toFixed(1)
+                                        text: slider_limit_manual_w.value.toFixed(2) + " [deg/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2523,10 +2620,10 @@ Item {
                                 Slider{
                                     id: slider_limit_manual_w
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 5.0
-                                    to: 120.0
+                                    from: 1.0
+                                    to: 360.0
                                     value: 120.0
                                 }
                             }
@@ -2564,12 +2661,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_st_v
                                         anchors.centerIn: parent
-                                        text: slider_st_v.value.toFixed(1)
+                                        text: slider_st_v.value.toFixed(2) + " [m/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2577,16 +2674,529 @@ Item {
                                 Slider{
                                     id: slider_st_v
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 0.0
-                                    to: 1.0
+                                    from: 0.1
+                                    to: 2.0
                                     value: 0.3
                                 }
                             }
                         }
                     }
                 }
+
+
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    visible: is_admin
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"모터 세팅 값"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_wheel_dir
+                    width: 840
+                    height: 40
+                    visible: is_admin
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"모터 방향"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_wheel_dir
+                                anchors.fill: parent
+                                model: [-1,1]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_left_id
+                    width: 840
+                    height: 40
+                    visible: is_admin
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"left_id"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_left_id
+                                anchors.fill: parent
+                                model:[0,1]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_right_id
+                    width: 840
+                    height: 40
+                    visible: is_admin
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"right_id"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_right_id
+                                anchors.fill: parent
+                                model:[0,1]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_gear_ratio
+                    width: 840
+                    height: 40
+                    visible: is_admin
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"gear_ratio"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: gear_ratio
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","gear_ratio");
+                                onFocusChanged: {
+                                    keyboard.owner = gear_ratio;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_kp
+                    width: 840
+                    height: 40
+                    visible: is_admin
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"k_p"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: k_p
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","k_p");
+                                onFocusChanged: {
+                                    keyboard.owner = k_p;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_ki
+                    width: 840
+                    height: 40
+                    visible: is_admin
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"k_i"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: k_i
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","k_i");
+                                onFocusChanged: {
+                                    keyboard.owner = k_i;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_kd
+                    width: 840
+                    height: 40
+                    visible: is_admin
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"k_d"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: k_d
+                                anchors.fill: parent
+                                text: supervisor.getSetting("MOTOR","k_d");
+                                onFocusChanged: {
+                                    keyboard.owner = k_d;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_limit_v
+                    width: 840
+                    visible: is_admin
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_v"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.2
+                                    height: 40
+                                    Text{
+                                        id: text_motor_limit_v
+                                        anchors.centerIn: parent
+                                        text: slider_motor_limit_v.value.toFixed(2) + " [m/s]"
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_motor_limit_v
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.7
+                                    height: 40
+                                    from: 0.10
+                                    to: 2.00
+                                    value: 1.00
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_limitv_acc
+                    width: 840
+                    visible: is_admin
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_v_acc"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.2
+                                    height: 40
+                                    Text{
+                                        id: text_motor_limit_v_acc
+                                        anchors.centerIn: parent
+                                        text: slider_motor_limit_v_acc.value.toFixed(2) + " [m/s^2]"
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_motor_limit_v_acc
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.7
+                                    height: 40
+                                    from: 0.01
+                                    to: 2.00
+                                    value: 1.00
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_limit_w
+                    width: 840
+                    height: 40
+                    visible: is_admin
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_w"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.2
+                                    height: 40
+                                    Text{
+                                        id: text_motor_limit_w
+                                        anchors.centerIn: parent
+                                        text: slider_motor_limit_w.value.toFixed(2) + " [deg/s]"
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_motor_limit_w
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.7
+                                    height: 40
+                                    from: 1.0
+                                    to: 360.0
+                                    value: 180.00
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_limit_wacc
+                    width: 840
+                    height: 40
+                    visible: is_admin
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"limit_w_acc"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Rectangle{
+                                    width: rr.width*0.2
+                                    height: 40
+                                    Text{
+                                        id: text_motor_limit_w_acc
+                                        anchors.centerIn: parent
+                                        text: slider_motor_limit_w_acc.value.toFixed(2) + " [deg/s^2]"
+                                        font.pixelSize: 15
+                                        font.family: font_noto_r.name
+                                    }
+                                }
+                                Slider{
+                                    id: slider_motor_limit_w_acc
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: rr.width*0.7
+                                    height: 40
+                                    from: 1.0
+                                    to: 360.0
+                                    value: 180.00
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+
+
                 Rectangle{
                     width: 1100
                     height: 40
@@ -2630,12 +3240,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_k_v
                                         anchors.centerIn: parent
-                                        text: slider_k_v.value.toFixed(1)
+                                        text: slider_k_v.value.toFixed(2) + " [gain]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2643,11 +3253,11 @@ Item {
                                 Slider{
                                     id: slider_k_v
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 0.1
-                                    to: 2.0
-                                    value: 0.7
+                                    from: 0.0
+                                    to: 10.0
+                                    value: 1.0
                                 }
                             }
                         }
@@ -2683,12 +3293,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_k_w
                                         anchors.centerIn: parent
-                                        text: slider_k_w.value.toFixed(1)
+                                        text: slider_k_w.value.toFixed(2) + " [gain]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2696,10 +3306,10 @@ Item {
                                 Slider{
                                     id: slider_k_w
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 1.0
-                                    to: 5.0
+                                    from: 0.0
+                                    to: 10.0
                                     value: 2.5
                                 }
                             }
@@ -2736,12 +3346,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_look_ahead_dist
                                         anchors.centerIn: parent
-                                        text: slider_look_ahead_dist.value.toFixed(2)
+                                        text: slider_look_ahead_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2749,11 +3359,11 @@ Item {
                                 Slider{
                                     id: slider_look_ahead_dist
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 0.3
-                                    to: 1.0
-                                    value: 0.45
+                                    from: 0.0
+                                    to: 2.0
+                                    value: 0.5
                                 }
                             }
                         }
@@ -2789,12 +3399,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_min_look_ahead_dist
                                         anchors.centerIn: parent
-                                        text: slider_min_look_ahead_dist.value.toFixed(2)
+                                        text: slider_min_look_ahead_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2802,10 +3412,10 @@ Item {
                                 Slider{
                                     id: slider_min_look_ahead_dist
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
                                     from: 0.0
-                                    to: 0.5
+                                    to: 2.0
                                     value: 0.1
                                 }
                             }
@@ -2842,12 +3452,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_narrow_decel_ratio
                                         anchors.centerIn: parent
-                                        text: slider_narrow_decel_ratio.value.toFixed(1)
+                                        text: slider_narrow_decel_ratio.value.toFixed(2) + " [ratio, %]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2855,11 +3465,11 @@ Item {
                                 Slider{
                                     id: slider_narrow_decel_ratio
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 0.0
-                                    to: 1.0
-                                    value: 0.5
+                                    from: 0.00
+                                    to: 1.00
+                                    value: 0.7
                                 }
                             }
                         }
@@ -2895,12 +3505,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_obs_deadzone
                                         anchors.centerIn: parent
-                                        text: slider_obs_deadzone.value.toFixed(1)
+                                        text: slider_obs_deadzone.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2908,10 +3518,10 @@ Item {
                                 Slider{
                                     id: slider_obs_deadzone
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 0.0
-                                    to: 1.0
+                                    from: 0.1
+                                    to: 2.0
                                     value: 0.4
                                 }
                             }
@@ -2948,12 +3558,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_obs_wait_time
                                         anchors.centerIn: parent
-                                        text: slider_obs_wait_time.value.toFixed(1)
+                                        text: slider_obs_wait_time.value.toFixed(2) + " [sec]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -2961,10 +3571,10 @@ Item {
                                 Slider{
                                     id: slider_obs_wait_time
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
                                     from: 0.0
-                                    to: 20.0
+                                    to: 5.0
                                     value: 5.0
                                 }
                             }
@@ -3001,12 +3611,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_path_out_dist
                                         anchors.centerIn: parent
-                                        text: slider_path_out_dist.value.toFixed(1)
+                                        text: slider_path_out_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3014,10 +3624,10 @@ Item {
                                 Slider{
                                     id: slider_path_out_dist
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 0.0
-                                    to: 3.0
+                                    from: 0.1
+                                    to: 2.0
                                     value: 1.0
                                 }
                             }
@@ -3067,12 +3677,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_icp_dist
                                         anchors.centerIn: parent
-                                        text: slider_icp_dist.value.toFixed(2)
+                                        text: slider_icp_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3080,11 +3690,11 @@ Item {
                                 Slider{
                                     id: slider_icp_dist
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 0.0
-                                    to: 1.0
-                                    value: 0.5
+                                    from: 0.30
+                                    to: 1.00
+                                    value: 0.3
                                 }
                             }
                         }
@@ -3120,12 +3730,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_icp_error
                                         anchors.centerIn: parent
-                                        text: slider_icp_error.value.toFixed(2)
+                                        text: slider_icp_error.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3133,11 +3743,11 @@ Item {
                                 Slider{
                                     id: slider_icp_error
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 0.0
-                                    to: 1.0
-                                    value: 0.1
+                                    from: 0.00
+                                    to: 0.50
+                                    value: 0.2
                                 }
                             }
                         }
@@ -3173,12 +3783,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_icp_near
                                         anchors.centerIn: parent
-                                        text: slider_icp_near.value.toFixed(2)
+                                        text: slider_icp_near.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3186,10 +3796,10 @@ Item {
                                 Slider{
                                     id: slider_icp_near
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 0.0
-                                    to: 2.0
+                                    from: 0.10
+                                    to: 2.00
                                     value: 1.0
                                 }
                             }
@@ -3226,12 +3836,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_icp_odometry_weight
                                         anchors.centerIn: parent
-                                        text: slider_icp_odometry_weight.value.toFixed(2)
+                                        text: slider_icp_odometry_weight.value.toFixed(2) + " [ratio, %]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3239,11 +3849,11 @@ Item {
                                 Slider{
                                     id: slider_icp_odometry_weight
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 0.0
-                                    to: 1.0
-                                    value: 0.5
+                                    from: 0.00
+                                    to: 1.00
+                                    value: 0.75
                                 }
                             }
                         }
@@ -3279,12 +3889,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_icp_ratio
                                         anchors.centerIn: parent
-                                        text: slider_icp_ratio.value.toFixed(2)
+                                        text: slider_icp_ratio.value.toFixed(2) + " [ratio, %]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3292,7 +3902,7 @@ Item {
                                 Slider{
                                     id: slider_icp_ratio
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
                                     from: 0.0
                                     to: 1.0
@@ -3332,12 +3942,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_icp_repeat_dist
                                         anchors.centerIn: parent
-                                        text: slider_icp_repeat_dist.value.toFixed(2)
+                                        text: slider_icp_repeat_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3345,10 +3955,10 @@ Item {
                                 Slider{
                                     id: slider_icp_repeat_dist
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 0.0
-                                    to: 0.3
+                                    from: 0.00
+                                    to: 1.00
                                     value: 0.15
                                 }
                             }
@@ -3385,12 +3995,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_icp_repeat_time
                                         anchors.centerIn: parent
-                                        text: slider_icp_repeat_time.value.toFixed(2)
+                                        text: slider_icp_repeat_time.value.toFixed(2) + " [sec]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3398,11 +4008,11 @@ Item {
                                 Slider{
                                     id: slider_icp_repeat_time
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
                                     from: 0.0
                                     to: 5.0
-                                    value: 1.0
+                                    value: 0.5
                                 }
                             }
                         }
@@ -3451,12 +4061,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_goal_dist
                                         anchors.centerIn: parent
-                                        text: slider_goal_dist.value.toFixed(2)
+                                        text: slider_goal_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3464,11 +4074,11 @@ Item {
                                 Slider{
                                     id: slider_goal_dist
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
                                     from: 0.0
-                                    to: 0.5
-                                    value: 0.1
+                                    to: 1.0
+                                    value: 0.03
                                 }
                             }
                         }
@@ -3504,12 +4114,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_goal_v
                                         anchors.centerIn: parent
-                                        text: slider_goal_v.value.toFixed(2)
+                                        text: slider_goal_v.value.toFixed(2) + " [m/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3517,10 +4127,10 @@ Item {
                                 Slider{
                                     id: slider_goal_v
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
                                     from: 0.0
-                                    to: 0.3
+                                    to: 2.0
                                     value: 0.05
                                 }
                             }
@@ -3557,12 +4167,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_goal_th
                                         anchors.centerIn: parent
-                                        text: slider_goal_th.value.toFixed(2)
+                                        text: slider_goal_th.value.toFixed(2) + " [deg]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3570,11 +4180,11 @@ Item {
                                 Slider{
                                     id: slider_goal_th
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
-                                    from: 1.0
-                                    to: 10.0
-                                    value: 3.0
+                                    from: 0.0
+                                    to: 30.0
+                                    value: 2.0
                                 }
                             }
                         }
@@ -3611,12 +4221,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_goal_near_dist
                                         anchors.centerIn: parent
-                                        text: slider_goal_near_dist.value.toFixed(2)
+                                        text: slider_goal_near_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3624,10 +4234,10 @@ Item {
                                 Slider{
                                     id: slider_goal_near_dist
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
                                     from: 0.0
-                                    to: 3.0
+                                    to: 1.0
                                     value: 0.5
                                 }
                             }
@@ -3664,12 +4274,12 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Rectangle{
-                                    width: rr.width*0.1
+                                    width: rr.width*0.2
                                     height: 40
                                     Text{
                                         id: text_goal_near_th
                                         anchors.centerIn: parent
-                                        text: slider_goal_near_th.value.toFixed(2)
+                                        text: slider_goal_near_th.value.toFixed(2) + " [deg]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
                                     }
@@ -3677,11 +4287,11 @@ Item {
                                 Slider{
                                     id: slider_goal_near_th
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.8
+                                    width: rr.width*0.7
                                     height: 40
                                     from: 0.0
-                                    to: 10.0
-                                    value: 3.0
+                                    to: 30.0
+                                    value: 10.0
                                 }
                             }
                         }
@@ -4217,470 +4827,6 @@ Item {
                         }
                     }
                 }
-
-                Rectangle{
-                    width: 1100
-                    height: 40
-                    color: "black"
-                    visible: is_admin
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_b.name
-                        text:"세팅 값"
-                        color: "white"
-                        font.pixelSize: 20
-                    }
-                }
-                Rectangle{
-                    id: set_wheel_dir
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"모터 방향"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_wheel_dir
-                                anchors.fill: parent
-                                model: [-1,1]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_left_id
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"left_id"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_left_id
-                                anchors.fill: parent
-                                model:[0,1]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_right_id
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"right_id"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_right_id
-                                anchors.fill: parent
-                                model:[0,1]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_gear_ratio
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"gear_ratio"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: gear_ratio
-                                anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","gear_ratio");
-                                onFocusChanged: {
-                                    keyboard.owner = gear_ratio;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_kp
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"k_p"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: k_p
-                                anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","k_p");
-                                onFocusChanged: {
-                                    keyboard.owner = k_p;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_ki
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"k_i"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: k_i
-                                anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","k_i");
-                                onFocusChanged: {
-                                    keyboard.owner = k_i;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_kd
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"k_d"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: k_d
-                                anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","k_d");
-                                onFocusChanged: {
-                                    keyboard.owner = k_d;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_limit_v
-                    width: 840
-                    visible: is_admin
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"limit_v"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: limit_v
-                                anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","limit_v");
-                                onFocusChanged: {
-                                    keyboard.owner = limit_v;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_limitv_acc
-                    width: 840
-                    visible: is_admin
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"limit_v_acc"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: limit_v_acc
-                                anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","limit_v_acc");
-                                onFocusChanged: {
-                                    keyboard.owner = limit_v_acc;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_limit_w
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"limit_w"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: limit_w
-                                anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","limit_w");
-                                onFocusChanged: {
-                                    keyboard.owner = limit_w;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_limit_wacc
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"limit_w_acc"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: limit_w_acc
-                                anchors.fill: parent
-                                text: supervisor.getSetting("MOTOR","limit_w_acc");
-                                onFocusChanged: {
-                                    keyboard.owner = limit_w_acc;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
 
@@ -4720,7 +4866,7 @@ Item {
             anchors.rightMargin: (parent.width - area_setting_robot.width - area_setting_robot.x - btn_default.width)/2
             spacing: 30
             Rectangle{
-                id: btn_update
+                id: btn_manager
                 width: 180
                 height: 60
                 radius: 10
@@ -4729,59 +4875,20 @@ Item {
                 border.color: "#7e7e7e"
                 Text{
                     anchors.centerIn: parent
-                    text: "Program Update"
+                    text: "관리자 메뉴"
                     font.family: font_noto_r.name
                     font.pixelSize: 20
                 }
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
-                        supervisor.writelog("[USER INPUT] SETTING PAGE -> PROGRAM UPDATE");
-                        popup_update.open();
-                    }
-                }
-            }
-            Rectangle{
-                id: btn_log
-                width: 180
-                height: 60
-                radius: 10
-                color:"transparent"
-                border.width: 1
-                border.color: "#7e7e7e"
-                Text{
-                    anchors.centerIn: parent
-                    text: "Log"
-                    font.family: font_noto_r.name
-                    font.pixelSize: 20
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked:{
-                        supervisor.writelog("[USER INPUT] SETTING PAGE -> LOG");
-                        loader_page.source = plog;
-                    }
-                }
-            }
-            Rectangle{
-                id: btn_reset_slam
-                width: 180
-                height: 60
-                radius: 10
-                color:"transparent"
-                border.width: 1
-                border.color: "#7e7e7e"
-                Text{
-                    anchors.centerIn: parent
-                    text: "SLAM restart"
-                    font.family: font_noto_r.name
-                    font.pixelSize: 20
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked:{
-                        supervisor.writelog("[USER INPUT] SETTING PAGE -> RESTART SLAM");
-                        supervisor.restartSLAM();
+                        supervisor.writelog("[USER INPUT] SETTING PAGE -> SHOW MANAGER MENU");
+                        if(is_admin){
+                            popup_manager.open();
+                        }else{
+                            popup_password.open();
+                        }
+
                     }
                 }
             }
@@ -4795,7 +4902,7 @@ Item {
                 border.color: "#7e7e7e"
                 Text{
                     anchors.centerIn: parent
-                    text: "초기화"
+                    text: "설정 초기화"
                     font.family: font_noto_r.name
                     font.pixelSize: 25
                 }
@@ -4842,36 +4949,37 @@ Item {
                         supervisor.setSetting("ROBOT_HW/wheel_radius",wheel_radius.text);
 
 //                        supervisor.setSetting("ROBOT_SW/k_curve",text_k_curve.text);
-                        supervisor.setSetting("ROBOT_SW/k_v",text_k_v.text);
-                        supervisor.setSetting("ROBOT_SW/k_w",text_k_w.text);
-                        supervisor.setSetting("ROBOT_SW/limit_pivot",text_limit_pivot.text);
-                        supervisor.setSetting("ROBOT_SW/limit_v",text_limit_v.text);
-                        supervisor.setSetting("ROBOT_SW/limit_w",text_limit_w.text);
-                        supervisor.setSetting("ROBOT_SW/limit_v_acc",text_limit_v_acc.text);
-                        supervisor.setSetting("ROBOT_SW/limit_w_acc",text_limit_w_acc.text);
+                        supervisor.setSetting("ROBOT_SW/k_v"                    ,slider_k_v.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/k_w"                    ,slider_k_w.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/limit_pivot"            ,slider_limit_pivot.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/limit_pivot_acc"        ,slider_limit_pivot_acc.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/limit_v"                ,slider_limit_v.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/limit_w"                ,slider_limit_w.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/limit_v_acc"            ,slider_limit_v_acc.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/limit_w_acc"            ,slider_limit_w_acc.value.toFixed(2));
 
-                        supervisor.setSetting("ROBOT_SW/limit_manual_v",text_limit_manual_v.text);
-                        supervisor.setSetting("ROBOT_SW/limit_manual_w",text_limit_manual_w.text);
-                        supervisor.setSetting("ROBOT_SW/look_ahead_dist",text_look_ahead_dist.text);
+                        supervisor.setSetting("ROBOT_SW/limit_manual_v"          ,slider_limit_manual_v.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/limit_manual_w"          ,slider_limit_manual_w.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/look_ahead_dist"         ,slider_look_ahead_dist.value.toFixed(2));
 
-                        supervisor.setSetting("ROBOT_SW/icp_dist",text_icp_dist.text);
-                        supervisor.setSetting("ROBOT_SW/icp_error",text_icp_error.text);
-                        supervisor.setSetting("ROBOT_SW/icp_near",text_icp_near.text);
-                        supervisor.setSetting("ROBOT_SW/icp_odometry_weight",text_icp_odometry_weight.text);
-                        supervisor.setSetting("ROBOT_SW/icp_ratio",text_icp_ratio.text);
-                        supervisor.setSetting("ROBOT_SW/icp_repeat_dist",text_icp_repeat_dist.text);
-                        supervisor.setSetting("ROBOT_SW/icp_repeat_time",text_icp_repeat_time.text);
-                        supervisor.setSetting("ROBOT_SW/obs_deadzone",text_obs_deadzone.text);
-                        supervisor.setSetting("ROBOT_SW/narrow_decel_ratio",text_narrow_decel_ratio.text);
-                        supervisor.setSetting("ROBOT_SW/obs_wait_time",text_obs_wait_time.text);
-                        supervisor.setSetting("ROBOT_SW/path_out_dist",text_path_out_dist.text);
-                        supervisor.setSetting("ROBOT_SW/st_v",text_st_v.text);
-                        supervisor.setSetting("ROBOT_SW/min_look_ahead_dist",text_min_look_ahead_dist.text);
-                        supervisor.setSetting("ROBOT_SW/goal_dist",text_goal_dist.text);
-                        supervisor.setSetting("ROBOT_SW/goal_th",text_goal_th.text);
-                        supervisor.setSetting("ROBOT_SW/goal_v",text_goal_v.text);
-                        supervisor.setSetting("ROBOT_SW/goal_near_dist",text_goal_near_dist.text);
-                        supervisor.setSetting("ROBOT_SW/goal_near_th",text_goal_near_th.text);
+                        supervisor.setSetting("ROBOT_SW/icp_dist"               ,slider_icp_dist.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/icp_error"              ,slider_icp_error.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/icp_near"               ,slider_icp_near.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/icp_odometry_weight"    ,slider_icp_odometry_weight.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/icp_ratio"              ,slider_icp_ratio.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/icp_repeat_dist"        ,slider_icp_repeat_dist.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/icp_repeat_time"        ,slider_icp_repeat_time.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/obs_deadzone"           ,slider_obs_deadzone.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/narrow_decel_ratio"     ,slider_narrow_decel_ratio.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/obs_wait_time"          ,slider_obs_wait_time.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/path_out_dist"          ,slider_path_out_dist.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/st_v"                   ,slider_st_v.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/min_look_ahead_dist"    ,slider_min_look_ahead_dist.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/goal_dist"              ,slider_goal_dist.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/goal_th"                ,slider_goal_th.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/goal_v"                 ,slider_goal_v.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/goal_near_dist"         ,slider_goal_near_dist.value.toFixed(2));
+                        supervisor.setSetting("ROBOT_SW/goal_near_th"           ,slider_goal_near_th.value.toFixed(2));
 
                         supervisor.setSetting("ROBOT_SW/grid_size",grid_size.text);
 
@@ -4920,10 +5028,10 @@ Item {
                         supervisor.setSetting("MOTOR/k_i",k_i.text);
                         supervisor.setSetting("MOTOR/k_p",k_p.text);
 
-                        supervisor.setSetting("MOTOR/limit_v",limit_v.text);
-                        supervisor.setSetting("MOTOR/limit_v_acc",limit_v_acc.text);
-                        supervisor.setSetting("MOTOR/limit_w",limit_w.text);
-                        supervisor.setSetting("MOTOR/limit_w_acc",limit_w_acc.text);
+                        supervisor.setSetting("MOTOR/limit_v",slider_motor_limit_v.value.toFixed(2));
+                        supervisor.setSetting("MOTOR/limit_v_acc",slider_motor_limit_v_acc.value.toFixed(2));
+                        supervisor.setSetting("MOTOR/limit_w",slider_motor_limit_w.value.toFixed(2));
+                        supervisor.setSetting("MOTOR/limit_w_acc",slider_motor_limit_w_acc.value.toFixed(2));
 
                         supervisor.setSetting("MOTOR/left_id",combo_left_id.currentText);
                         supervisor.setSetting("MOTOR/right_id",combo_right_id.currentText);
@@ -4988,11 +5096,15 @@ Item {
         slider_goal_near_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_near_dist"));
         slider_goal_near_th.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_near_th"));
 
-
+        slider_motor_limit_v.value = parseFloat(supervisor.getSetting("MOTOR","limit_v"));
+        slider_motor_limit_v_acc.value = parseFloat(supervisor.getSetting("MOTOR","limit_v_acc"));
+        slider_motor_limit_w.value = parseFloat(supervisor.getSetting("MOTOR","limit_w"));
+        slider_motor_limit_w_acc.value = parseFloat(supervisor.getSetting("MOTOR","limit_w_acc"));
 //        slider_k_curve.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_curve"));
         slider_k_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_v"));
         slider_k_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_w"));
         slider_limit_pivot.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_pivot"));
+        slider_limit_pivot_acc.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_pivot_acc"));
         slider_limit_manual_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_manual_v"));
         slider_limit_manual_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_manual_w"));
         slider_limit_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_v"));
@@ -5028,10 +5140,7 @@ Item {
         k_i.text = supervisor.getSetting("MOTOR","k_i");
         k_p.text = supervisor.getSetting("MOTOR","k_p");
 
-        limit_v.text = supervisor.getSetting("MOTOR","limit_v");
-        limit_v_acc.text = supervisor.getSetting("MOTOR","limit_v_acc");
-        limit_w.text = supervisor.getSetting("MOTOR","limit_w");
-        limit_w_acc.text = supervisor.getSetting("MOTOR","limit_w_acc");
+
 
         combo_left_id.currentIndex = parseInt(supervisor.getSetting("MOTOR","left_id"));
         combo_right_id.currentIndex = parseInt(supervisor.getSetting("MOTOR","right_id"));
@@ -5084,6 +5193,13 @@ Item {
         repeat: true
         triggeredOnStart: true
         onTriggered: {
+
+            if(supervisor.getusbsize() > 0){
+                btn_usb_download.enabled = true;
+            }else{
+                btn_usb_download.enabled = false;
+            }
+
             motor_left_id = parseInt(supervisor.getSetting("MOTOR","left_id"));
             motor_right_id = parseInt(supervisor.getSetting("MOTOR","right_id"));
 
@@ -5114,12 +5230,851 @@ Item {
             text_status_emo.text = "Emo : " + supervisor.getEmoStatus().toString();
             text_status_remote.text = "Remote : " + supervisor.getRemoteStatus().toString();
 
-            text_battery_in.text = "In : " + supervisor.getBatteryIn().toFixed(1).toString();
-            text_battery_out.text = "Out : " + supervisor.getBatteryOut().toFixed(1).toString();
-            text_battery_current.text = "Current : " + supervisor.getBatteryCurrent().toFixed(1).toString();
+            text_battery_in.text = "In : " + supervisor.getBatteryIn().toFixed(2).toString();
+            text_battery_out.text = "Out : " + supervisor.getBatteryOut().toFixed(2).toString();
+            text_battery_current.text = "Current : " + supervisor.getBatteryCurrent().toFixed(2).toString();
 
             text_power.text = "Power : " + supervisor.getPower().toString();
             text_power_total.text = "Total : " + supervisor.getPowerTotal().toString();
+
+        }
+    }
+
+    Popup{
+        id: popup_manager
+        width: 500
+        height: 400
+        anchors.centerIn: parent
+        leftPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        rightPadding: 0
+        background: Rectangle{
+            anchors.fill: parent
+            color : "transparent"
+        }
+
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 5
+            Grid{
+                anchors.centerIn: parent
+                rows: 3
+                columns: 2
+                spacing: 30
+                Rectangle{
+                    id: btn_update
+                    width: 180
+                    height: 60
+                    radius: 10
+                    color:"transparent"
+                    border.width: 1
+                    border.color: "#7e7e7e"
+                    Text{
+                        anchors.centerIn: parent
+                        text: "Program Update"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            supervisor.writelog("[USER INPUT] SETTING PAGE -> PROGRAM UPDATE");
+                            popup_update.open();
+                        }
+                    }
+                }
+                Rectangle{
+                    id: btn_log
+                    width: 180
+                    height: 60
+                    radius: 10
+                    color:"transparent"
+                    border.width: 1
+                    border.color: "#7e7e7e"
+                    Text{
+                        anchors.centerIn: parent
+                        text: "Log"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            supervisor.writelog("[USER INPUT] SETTING PAGE -> LOG");
+                            loader_page.source = plog;
+                        }
+                    }
+                }
+                Rectangle{
+                    id: btn_usb_upload
+                    width: 180
+                    height: 60
+                    radius: 10
+                    color: enabled?"white":color_light_gray
+                    border.width: 1
+                    border.color: "#7e7e7e"
+                    Text{
+                        anchors.centerIn: parent
+                        text: "USB에 저장하기"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        color: btn_usb_upload.enabled?"black":color_gray
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            supervisor.writelog("[USER INPUT] SETTING PAGE -> SAVE TO USB");
+                            popup_usb_select.open();
+                        }
+                    }
+                }
+                Rectangle{
+                    id: btn_usb_download
+                    width: 180
+                    height: 60
+                    radius: 10
+                    enabled: false
+                    color:enabled?"white":color_light_gray
+                    border.width: 1
+                    border.color: "#7e7e7e"
+                    Text{
+                        anchors.centerIn: parent
+                        text: "USB에서 받아오기"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        color: btn_usb_download.enabled?"black":color_gray
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            supervisor.writelog("[USER INPUT] SETTING PAGE -> DOWNLOAD FROM USB");
+                            if(is_admin){
+                                popup_usb_download.open();
+                            }else{
+                                popup_password.open();
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: btn_reset_slam
+                    width: 180
+                    height: 60
+                    radius: 10
+                    color:"transparent"
+                    border.width: 1
+                    border.color: "#7e7e7e"
+                    Text{
+                        anchors.centerIn: parent
+                        text: "SLAM restart"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            supervisor.writelog("[USER INPUT] SETTING PAGE -> RESTART SLAM");
+                            supervisor.restartSLAM();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Popup{
+        id: popup_usb_notice
+        anchors.centerIn: parent
+        width: 400
+        height: 300
+        leftPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        rightPadding: 0
+        background: Rectangle{
+            anchors.fill: parent
+            color : "transparent"
+        }
+        function setProperty(mo,na,ui,slam,config,map,log){
+            mode = mo;
+            name = na;
+            is_ui = ui;
+            is_slam = slam;
+            is_map = map;
+            is_log = log;
+            is_config = config;
+        }
+
+        property bool is_ui: false
+        property bool is_slam: false
+        property bool is_map: false
+        property bool is_log: false
+        property bool is_config: false
+        property string name: "Desktop"
+        property string mode: "compress";
+        property bool is_new: true
+        Timer{
+            id: timer_usb_check
+            running: false
+            repeat: true
+            interval: 300
+            onTriggered: {
+                if(popup_usb_notice.is_new){
+                    popup_usb_notice.is_new = false;
+                    if(popup_usb_notice.mode == "compress"){
+                        supervisor.usbsave(popup_usb_notice.name, popup_usb_notice.is_ui, popup_usb_notice.is_slam, popup_usb_notice.is_config, popup_usb_notice.is_map, popup_usb_notice.is_log);
+                    }else if(popup_usb_notice.mode == "extract_recent"){
+                        supervisor.readusbrecentfile();
+                    }else if(popup_usb_notice.mode == "extract"){
+
+                    }
+                }
+
+                if(supervisor.getzipstate() === 1){
+                    if(popup_usb_notice.mode== "compress"){
+                        text_usb_state.text = "파일을 압축하여 저장 중..";
+                    }else{
+                        text_usb_state.text = "파일을 가져오는 중..";
+                    }
+                }else if(supervisor.getzipstate() === 2){
+                    if(popup_usb_notice.mode== "compress"){
+                        text_usb_state.text = "저장에 성공하였습니다.";
+                    }else{
+                        btn_usb_confirm.visible = true;
+                        text_usb_state.text = "파일을 성공적으로 가져왔습니다.\n확인을 누르시면 업데이트를 진행합니다.";
+                    }
+
+                }else if(supervisor.getzipstate() === 3){
+                    if(popup_usb_notice.mode== "compress"){
+                        text_usb_state.text = "저장에 성공하였지만 일부 과정에서 에러가 발생했습니다.";
+                    }else{
+                        text_usb_state.text = "파일을 성공적으로 가져왔습니다만 일부 과정에서 에러가 발생했습니다.\n확인을 누르시면 업데이트를 진행합니다.";
+                        btn_usb_confirm.visible = true;
+                    }
+                    model_usb_error.clear();
+                    for(var i=0; i<supervisor.getusberrorsize(); i++){
+                        model_usb_error.append({"error":supervisor.getusberror(i)});
+                    }
+                }else if(supervisor.getzipstate() === 4){
+                    if(popup_usb_notice.mode== "compress"){
+                        text_usb_state.text = "저장에 실패했습니다.";
+                    }else{
+                        text_usb_state.text = "파일을 가져오지 못했습니다.";
+                    }
+                    model_usb_error.clear();
+                    for(var i=0; i<supervisor.getusberrorsize(); i++){
+                        model_usb_error.append({"error":supervisor.getusberror(i)});
+                    }
+                }else{
+                    print(supervisor.getzipstate());
+                    text_usb_state.text = "잠시만 기다려주세요.";
+                }
+            }
+        }
+        onOpened:{
+            timer_usb_check.start();
+            model_usb_error.clear();
+            btn_usb_confirm.visible = false;
+            text_usb_state.text = "잠시만 기다려주세요.";
+            is_new = true;
+        }
+        onClosed: {
+            timer_usb_check.stop();
+        }
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 10
+            color: color_dark_navy
+            Column{
+                anchors.centerIn: parent
+                spacing: 10
+                Text{
+                    id: text_usb_state
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.family: font_noto_r.name
+                    color: "white"
+                    font.pixelSize: 20
+                    horizontalAlignment: Text.AlignHCenter
+                    text:"잠시만 기다려주세요."
+                }
+                Repeater{
+                    model: ListModel{id:model_usb_error}
+                    Text{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 10
+                        color: color_red
+                        horizontalAlignment: Text.AlignHCenter
+                        text:error
+                    }
+                }
+
+                Rectangle{
+                    id: btn_usb_confirm
+                    visible: false
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: 100
+                    height: 50
+                    radius: 5
+                    border.width: 1
+                    Text{
+                        anchors.centerIn: parent
+                        font.family:font_noto_r.name
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+
+                            if(popup_usb_notice.mode== "compress"){
+
+                            }else{
+                                supervisor.updateUSB();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    Popup{
+        id: popup_usb_download
+        anchors.centerIn: parent
+        width: 400
+        height: 500
+        leftPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        rightPadding: 0
+        background: Rectangle{
+            color: "transparent"
+        }
+        property var index: 0
+        property bool is_ui: false
+        property bool is_slam: false
+        property bool is_map: false
+        property bool is_log: false
+        property bool is_config: false
+        property string set_name: ""
+        onOpened:{
+            timer_usb_new.start();
+
+            model_usb_file_list.clear();
+            for(var i=0; i<supervisor.getusbfilesize(); i++){
+                model_usb_file_list.append({"name":supervisor.getusbfile(i)});
+            }
+
+            text_recent_file.text = supervisor.getusbrecentfile();
+            if(text_recent_file.text == ""){
+                notice_recent.visible = false;
+                btn_recent_confirm.visible = false;
+            }else{
+                notice_recent.visible = true;
+                btn_recent_confirm.visible = true;
+            }
+        }
+        onClosed:{
+            timer_usb_new.stop();
+        }
+
+        Rectangle{
+            anchors.fill: parent
+            Rectangle{
+//                id: rect_1
+                width: parent.width
+                height: 50
+                color: color_dark_navy
+                Text{
+                    anchors.centerIn: parent
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    color: "white"
+                    text: {
+                        if(popup_usb_download.index === 0)
+                            "가져오실 파일 목록을 선택해주세요."
+                        else if(popup_usb_download.index === 1)
+                            "가져오실 목록을 선택해주세요."
+                    }
+                }
+            }
+
+            Column{
+                anchors.centerIn: parent
+                visible: popup_usb_download.index === 0
+                spacing: 10
+                Rectangle{
+                    id: notice_recent
+                    width: 200
+                    height: 40
+                    color: color_navy
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        text: "가장 최신 파일"
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: "white"
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: 50
+                    color: color_light_gray
+                    Text{
+                        id: text_recent_file
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: ""
+                    }
+                }
+                Rectangle{
+                    id: btn_recent_confirm
+                    visible: false
+                    width: 100
+                    radius: 5
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: 40
+                    border.width:1
+                    color: "white"//color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "확인"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            supervisor.writelog("[USER INPUT] GET RECENT USB FILE : "+supervisor.getusbrecentfile());
+                            popup_usb_notice.mode = "extract_recent";
+                            popup_usb_notice.open();
+//                            supervisor.readusbrecentfile();
+                        }
+                    }
+                }
+
+                Rectangle{
+                    width: 200
+                    height: 40
+                    color: color_navy
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        text: "그 외 발견한 파일 목록"
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: "white"
+                    }
+                }
+                Repeater{
+                    model: ListModel{id:model_usb_file_list}
+                    Rectangle{
+                        width: 280
+                        radius: 10
+                        height: 50
+                        color: color_light_gray
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            font.pixelSize: 10
+                            text: name
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+//                                popup_usb_download.index = 1;
+//                                popup_usb_download.set_name = name;
+                            }
+                        }
+                    }
+                }
+            }
+            Column{
+                anchors.centerIn: parent
+                spacing: 10
+                visible: popup_usb_download.index === 1
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_download.is_ui?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "UI"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_download.is_ui = !popup_usb_download.is_ui;
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_download.is_slam?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "SLAMNAV"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_download.is_slam = !popup_usb_download.is_slam;
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_download.is_config?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "robot_config"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_download.is_config = !popup_usb_download.is_config;
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_download.is_map?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "maps"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_download.is_map = !popup_usb_download.is_map;
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_download.is_log?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "Log"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_download.is_log = !popup_usb_download.is_log;
+                        }
+                    }
+                }
+            }
+            Rectangle{
+                width: 250
+                radius: 10
+                height: 50
+                color: "black"
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottomMargin: 30
+                visible: popup_usb_download.index === 1
+                Text{
+                    anchors.centerIn: parent
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    color:"white"
+                    text: "확인"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        popup_usb_notice.setProperty("compress",popup_usb_download.set_name,popup_usb_download.is_ui,popup_usb_download.is_slam,popup_usb_download.is_config,popup_usb_download.is_map,popup_usb_download.is_log);
+                        popup_usb_download.close();
+                        popup_usb_notice.open();
+                    }
+                }
+            }
+
+        }
+        Timer{
+            id: timer_usb_new
+            interval: 500
+            running: false
+            repeat: true
+            onTriggered: {
+                if(supervisor.getusbsize() > 0){
+                }else{
+                }
+            }
+        }
+    }
+
+    Popup{
+        id: popup_usb_select
+        anchors.centerIn: parent
+        width: 400
+        height: 500
+        leftPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        rightPadding: 0
+        property int usb_size: 0
+        property int index: 0
+        property bool is_ui: false
+        property bool is_slam: false
+        property bool is_map: false
+        property bool is_log: false
+        property bool is_config: false
+        property string set_name: "Desktop"
+        background: Rectangle{
+            color: "transparent"
+        }
+        onOpened: {
+            if(supervisor.getusbsize() > 0){
+                text_no_usb.visible =false;
+            }else{
+                text_no_usb.visible = true;
+            }
+
+            timer_check_usb_new.start();
+            index = 0;
+            is_ui = true;
+            is_slam = true;
+            is_map = false;
+            is_log = false;
+            is_config = true;
+            model_usb_list.clear();
+            for(var i=0; i<supervisor.getusbsize(); i++){
+                print(i, supervisor.getusbname(i));
+                model_usb_list.append({"name":supervisor.getusbname(i)});
+            }
+            model_usb_list.append({"name":"Desktop"});
+        }
+        onClosed: {
+            timer_check_usb_new.stop();
+        }
+
+        Timer{
+            id: timer_check_usb_new
+            interval: 500
+            running: false
+            repeat: true
+            onTriggered: {
+                if(supervisor.getusbsize() > 0){
+                    text_no_usb.visible =false;
+                }else{
+                    text_no_usb.visible = true;
+                }
+                model_usb_list.clear();
+                for(var i=0; i<supervisor.getusbsize(); i++){
+                    model_usb_list.append({"name":supervisor.getusbname(i)});
+                }
+                model_usb_list.append({"name":"Desktop"});
+            }
+        }
+
+        Rectangle{
+            anchors.fill: parent
+            Rectangle{
+                id: rect_1
+                width: parent.width
+                height: 50
+                color: color_dark_navy
+                Text{
+                    anchors.centerIn: parent
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    color: "white"
+                    text: {
+                        if(popup_usb_select.index === 0)
+                            "저장할 USB 이름(혹은 Desktop)을 선택해주세요."
+                        else if(popup_usb_select.index === 1)
+                            "저장할 목록을 선택해주세요."
+                    }
+                }
+            }
+            Text{
+                id: text_no_usb
+                anchors.top: rect_1.bottom
+                anchors.topMargin: 30
+                visible: false
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.family: font_noto_r.name
+                font.pixelSize: 15
+                horizontalAlignment: Text.AlignHCenter
+                color: color_red
+                text: "** USB를 인식할 수 없습니다. **\n(USB를 뺏다 꼽아주시면 인식될 수 있습니다.)"
+            }
+
+            Column{
+                anchors.centerIn: parent
+                visible: popup_usb_select.index === 0
+                spacing: 10
+                Repeater{
+                    model: ListModel{id:model_usb_list}
+                    Rectangle{
+                        width: 280
+                        radius: 10
+                        height: 50
+                        color: color_light_gray
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: name
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                popup_usb_select.index = 1;
+                                popup_usb_select.set_name = name;
+                            }
+                        }
+                    }
+                }
+            }
+            Column{
+                anchors.centerIn: parent
+                spacing: 10
+                visible: popup_usb_select.index === 1
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_select.is_ui?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "UI"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_select.is_ui = !popup_usb_select.is_ui;
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_select.is_slam?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "SLAMNAV"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_select.is_slam = !popup_usb_select.is_slam;
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_select.is_config?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "robot_config"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_select.is_config = !popup_usb_select.is_config;
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_select.is_map?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "maps"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_select.is_map = !popup_usb_select.is_map;
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 280
+                    radius: 10
+                    height: 50
+                    color: popup_usb_select.is_log?color_green:color_light_gray
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        text: "Log"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_usb_select.is_log = !popup_usb_select.is_log;
+                        }
+                    }
+                }
+            }
+            Rectangle{
+                width: 250
+                radius: 10
+                height: 50
+                color: "black"
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottomMargin: 30
+                visible: popup_usb_select.index === 1
+                Text{
+                    anchors.centerIn: parent
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    color:"white"
+                    text: "확인"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        popup_usb_notice.setProperty("compress",popup_usb_select.set_name,popup_usb_select.is_ui,popup_usb_select.is_slam,popup_usb_select.is_config,popup_usb_select.is_map,popup_usb_select.is_log);
+                        popup_usb_select.close();
+                        popup_usb_notice.open();
+                    }
+                }
+            }
+
 
         }
     }
@@ -5349,8 +6304,12 @@ Item {
                         anchors.fill: parent
                         onClicked: {
                             supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> UPDATE START")
-                            supervisor.pullGit();
-                            popup_update.close();
+                            if(is_admin){
+                                supervisor.pullGit();
+                                popup_update.close();
+                            }else{
+                                popup_password.open();
+                            }
                         }
                     }
                 }
@@ -5868,12 +6827,12 @@ Item {
                                             spacing: 10
                                             anchors.centerIn: parent
                                             Rectangle{
-                                                width: rr.width*0.1
+                                                width: rr.width*0.2
                                                 height: 40
                                                 Text{
                                                     id: text_preset_limit_pivot
                                                     anchors.centerIn: parent
-                                                    text: slider_preset_limit_pivot.value.toFixed(1)
+                                                    text: slider_preset_limit_pivot.value.toFixed(2)
                                                     font.pixelSize: 15
                                                     font.family: font_noto_r.name
                                                 }
@@ -5920,12 +6879,12 @@ Item {
                                             spacing: 10
                                             anchors.centerIn: parent
                                             Rectangle{
-                                                width: rr.width*0.1
+                                                width: rr.width*0.2
                                                 height: 40
                                                 Text{
                                                     id: text_preset_limit_v
                                                     anchors.centerIn: parent
-                                                    text: slider_preset_limit_v.value.toFixed(1)
+                                                    text: slider_preset_limit_v.value.toFixed(2)
                                                     font.pixelSize: 15
                                                     font.family: font_noto_r.name
                                                 }
@@ -5972,12 +6931,12 @@ Item {
                                             spacing: 10
                                             anchors.centerIn: parent
                                             Rectangle{
-                                                width: rr.width*0.1
+                                                width: rr.width*0.2
                                                 height: 40
                                                 Text{
                                                     id: text_preset_limit_vacc
                                                     anchors.centerIn: parent
-                                                    text: slider_preset_limit_vacc.value.toFixed(1)
+                                                    text: slider_preset_limit_vacc.value.toFixed(2)
                                                     font.pixelSize: 15
                                                     font.family: font_noto_r.name
                                                 }
@@ -6024,12 +6983,12 @@ Item {
                                             spacing: 10
                                             anchors.centerIn: parent
                                             Rectangle{
-                                                width: rr.width*0.1
+                                                width: rr.width*0.2
                                                 height: 40
                                                 Text{
                                                     id: text_preset_limit_w
                                                     anchors.centerIn: parent
-                                                    text: slider_preset_limit_w.value.toFixed(1)
+                                                    text: slider_preset_limit_w.value.toFixed(2)
                                                     font.pixelSize: 15
                                                     font.family: font_noto_r.name
                                                 }
@@ -6076,12 +7035,12 @@ Item {
                                             spacing: 10
                                             anchors.centerIn: parent
                                             Rectangle{
-                                                width: rr.width*0.1
+                                                width: rr.width*0.2
                                                 height: 40
                                                 Text{
                                                     id: text_preset_limit_wacc
                                                     anchors.centerIn: parent
-                                                    text: slider_preset_limit_wacc.value.toFixed(1)
+                                                    text: slider_preset_limit_wacc.value.toFixed(2)
                                                     font.pixelSize: 15
                                                     font.family: font_noto_r.name
                                                 }
@@ -6274,17 +7233,27 @@ Item {
         height: 600
         background: Rectangle{
             anchors.fill: parent
-            color: color_dark_navy
+            color: "transparent"
         }
         property string passwd: "2011"
         property string answer: ""
+        property bool is_fail: false
         property var input_len: 0
+        onIs_failChanged: {
+            if(is_fail){
+                setfailed();
+            }else{
+                setfailclear();
+            }
+        }
+
         onOpened:{
             model_passwd.clear();
-            model_passwd.append({"show":false})
-            model_passwd.append({"show":false})
-            model_passwd.append({"show":false})
-            model_passwd.append({"show":false})
+            is_fail = false
+            model_passwd.append({"show":false,"failed":false})
+            model_passwd.append({"show":false,"failed":false})
+            model_passwd.append({"show":false,"failed":false})
+            model_passwd.append({"show":false,"failed":false})
 
             model_pad.clear();
             model_pad.append({"name":"1"});
@@ -6302,17 +7271,46 @@ Item {
             answer = "";
             input_len = 0;
         }
+        function setfailed(){
+            for(var i=0; i<model_passwd.count; i++){
+                model_passwd.get(i).failed = true;
+            }
+        }
+        function setfailclear(){
+            for(var i=0; i<model_passwd.count; i++){
+                model_passwd.get(i).failed = false;
+            }
+        }
+
+        onClosed:{
+            if(is_admin && popup_update.opened){
+                supervisor.writelog("[USER INPUT] Program Update : Password Correct -> pull start")
+                supervisor.pullGit();
+                popup_update.close();
+            }
+        }
 
         Rectangle{
+            radius: 20
+            clip: true
             anchors.centerIn: parent
             width: parent.width*0.99
             height: parent.height*0.99
+            border.width: 3
+            border.color: color_dark_navy
             Rectangle{
+                radius: 20
                 id: rect_password_top
                 width: parent.width
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
-//                anchors.topMargin: 50
+                Rectangle{
+                    width: parent.width
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    height: 20
+                    color: color_dark_navy
+                }
                 height: 80
                 color: color_dark_navy
                 Text{
@@ -6326,10 +7324,10 @@ Item {
             Column{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: rect_password_top.bottom
-                anchors.topMargin: 50
+                anchors.topMargin: 30
                 spacing: 50
                 Rectangle{
-                    width: 300
+                    width: 260
                     anchors.horizontalCenter: parent.horizontalCenter
                     height: 60
                     border.width: 1
@@ -6342,6 +7340,7 @@ Item {
                             Rectangle{
                                 width: 50
                                 height: 55
+                                radius: 5
                                 color: "transparent"
                                 Rectangle{
                                     anchors.horizontalCenter: parent.horizontalCenter
@@ -6351,7 +7350,7 @@ Item {
                                     width: 40
                                     height: width
                                     radius: width
-                                    color: color_green
+                                    color: failed ? color_red : color_green
                                 }
                                 Rectangle{
                                     anchors.horizontalCenter: parent.horizontalCenter
@@ -6370,15 +7369,16 @@ Item {
             Grid{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: 50
-                spacing: 15
+                anchors.bottomMargin: 40
+                spacing: 17
                 rows: 4
                 columns: 3
                 Repeater{
                     model: ListModel{id: model_pad}
                     Rectangle{
-                        width: 60
+                        width: 68
                         height: width
+                        radius: 5
                         color: color_navy
                         Text{
                             text: name
@@ -6391,6 +7391,8 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 if(name==="clear"){
+                                    popup_password.setfailclear();
+                                    popup_password.is_fail = false;
                                     popup_password.input_len = 0;
                                     model_passwd.set(0,{"show":false});
                                     model_passwd.set(1,{"show":false});
@@ -6405,21 +7407,27 @@ Item {
                                         model_passwd.set(popup_password.input_len,{"show":false});
                                         popup_password.answer = popup_password.answer.slice(0,popup_password.input_len);
                                     }
+                                    popup_password.is_fail = false;
                                 }else{
                                     if(popup_password.input_len === 4){
                                         is_admin = false;
+                                        popup_password.is_fail = true;
                                         supervisor.writelog("[USER INPUT] SETTING PAGE -> ADMIN LOGIN FAILED "+popup_password.answer);
                                     }else{
+                                        popup_password.is_fail = false;
                                         popup_password.answer += name;
                                         model_passwd.set(popup_password.input_len,{"show":true});
                                         popup_password.input_len++;
                                         if(popup_password.answer===popup_password.passwd){
                                             supervisor.writelog("[USER INPUT] SETTING PAGE -> ADMIN LOGIN SUCCESS");
                                             is_admin = true;
+                                            popup_password.is_fail = true;
                                             popup_password.close();
-                                        }else{
+                                        }else if(popup_password.input_len === 4){
                                             is_admin = false;
+                                            popup_password.is_fail = true;
                                             supervisor.writelog("[USER INPUT] SETTING PAGE -> ADMIN LOGIN FAILED "+popup_password.answer);
+                                        }else{
                                         }
                                     }
                                 }
@@ -6431,6 +7439,375 @@ Item {
 
         }
 
+    }
+
+    Popup{
+        id: popup_tf
+        anchors.centerIn: parent
+        leftPadding: 0
+        rightPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+        onOpened:{
+            var left_str = supervisor.getSetting("SENSOR","left_camera_tf");
+            var left_strs = left_str.split(",");
+            tf_left_x.text = left_strs[0];
+            tf_left_y.text = left_strs[1];
+            tf_left_z.text = left_strs[2];
+            tf_left_rx.text = left_strs[3];
+            tf_left_ry.text = left_strs[4];
+            tf_left_rz.text = left_strs[5];
+            var right_str = supervisor.getSetting("SENSOR","right_camera_tf");
+            var right_strs = right_str.split(",");
+            tf_right_x.text = right_strs[0];
+            tf_right_y.text = right_strs[1];
+            tf_right_z.text = right_strs[2];
+            tf_right_rx.text = right_strs[3];
+            tf_right_ry.text = right_strs[4];
+            tf_right_rz.text = right_strs[5];
+        }
+
+        width: 400
+        height: 500
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 10
+            color: color_dark_navy
+            Text{
+                id: text_tf
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 30
+                text: "카메라 TF 설정"
+                color: "white"
+                font.family: font_noto_r.name
+                font.pixelSize: 20
+            }
+
+            Grid{
+                id: grid_tf
+                columns: 3
+                rows: 6
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: text_tf.bottom
+                anchors.topMargin: 20
+                horizontalItemAlignment: Grid.AlignHCenter
+                verticalItemAlignment: Grid.AlignVCenter
+                spacing: 15
+                TextField{
+                    id: tf_left_x
+                    width: 80
+                    height: 40
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    horizontalAlignment: Text.AlignHCenter
+                    onFocusChanged: {
+                        keyboard.owner = tf_left_x;
+                        tf_left_x.selectAll();
+                        if(focus){
+                            keyboard.open();
+                        }else{
+                            keyboard.close();
+                            tf_left_x.select(0,0);
+                        }
+                    }
+                }
+                Text{
+                    text: "X"
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 18
+                }
+                TextField{
+                    id: tf_right_x
+                    width: 80
+                    height: 40
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    horizontalAlignment: Text.AlignHCenter
+                    onFocusChanged: {
+                        keyboard.owner = tf_right_x;
+                        tf_right_x.selectAll();
+                        if(focus){
+                            keyboard.open();
+                        }else{
+                            keyboard.close();
+                            tf_right_x.select(0,0);
+                        }
+                    }
+                }
+                TextField{
+                    id: tf_left_y
+                    width: 80
+                    height: 40
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    horizontalAlignment: Text.AlignHCenter
+                    onFocusChanged: {
+                        keyboard.owner = tf_left_y;
+                        tf_left_y.selectAll();
+                        if(focus){
+                            keyboard.open();
+                        }else{
+                            keyboard.close();
+                            tf_left_y.select(0,0);
+                        }
+                    }
+                }
+                Text{
+                    text: "Y"
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 18
+                }
+                TextField{
+                    id: tf_right_y
+                    width: 80
+                    height: 40
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    horizontalAlignment: Text.AlignHCenter
+                    onFocusChanged: {
+                        keyboard.owner = tf_right_y;
+                        tf_right_y.selectAll();
+                        if(focus){
+                            keyboard.open();
+                        }else{
+                            keyboard.close();
+                            tf_right_y.select(0,0);
+                        }
+                    }
+                }
+                TextField{
+                    id: tf_left_z
+                    width: 80
+                    height: 40
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    horizontalAlignment: Text.AlignHCenter
+                    onFocusChanged: {
+                        keyboard.owner = tf_left_z;
+                        tf_left_z.selectAll();
+                        if(focus){
+                            keyboard.open();
+                        }else{
+                            keyboard.close();
+                            tf_left_z.select(0,0);
+                        }
+                    }
+                }
+                Text{
+                    text: "Z"
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 18
+                }
+                TextField{
+                    id: tf_right_z
+                    width: 80
+                    height: 40
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    horizontalAlignment: Text.AlignHCenter
+                    onFocusChanged: {
+                        keyboard.owner = tf_right_z;
+                        tf_right_z.selectAll();
+                        if(focus){
+                            keyboard.open();
+                        }else{
+                            keyboard.close();
+                            tf_right_z.select(0,0);
+                        }
+                    }
+                }
+                TextField{
+                    id: tf_left_rx
+                    width: 80
+                    height: 40
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    horizontalAlignment: Text.AlignHCenter
+                    onFocusChanged: {
+                        keyboard.owner = tf_left_rx;
+                        tf_left_rx.selectAll();
+                        if(focus){
+                            keyboard.open();
+                        }else{
+                            keyboard.close();
+                            tf_left_rx.select(0,0);
+                        }
+                    }
+                }
+                Text{
+                    text: "RX"
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 18
+                }
+                TextField{
+                    id: tf_right_rx
+                    width: 80
+                    height: 40
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    horizontalAlignment: Text.AlignHCenter
+                    onFocusChanged: {
+                        keyboard.owner = tf_right_rx;
+                        tf_right_rx.selectAll();
+                        if(focus){
+                            keyboard.open();
+                        }else{
+                            keyboard.close();
+                            tf_right_rx.select(0,0);
+                        }
+                    }
+                }
+                TextField{
+                    id: tf_left_ry
+                    width: 80
+                    horizontalAlignment: Text.AlignHCenter
+                    height: 40
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    onFocusChanged: {
+                        keyboard.owner = tf_left_ry;
+                        tf_left_ry.selectAll();
+                        if(focus){
+                            keyboard.open();
+                        }else{
+                            keyboard.close();
+                            tf_left_ry.select(0,0);
+                        }
+                    }
+                }
+                Text{
+                    text: "RY"
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 18
+                }
+                TextField{
+                    id: tf_right_ry
+                    width: 80
+                    height: 40
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    horizontalAlignment: Text.AlignHCenter
+                    onFocusChanged: {
+                        keyboard.owner = tf_right_ry;
+                        tf_right_ry.selectAll();
+                        if(focus){
+                            keyboard.open();
+                        }else{
+                            keyboard.close();
+                            tf_right_ry.select(0,0);
+                        }
+                    }
+                }
+                TextField{
+                    id: tf_left_rz
+                    width: 80
+                    height: 40
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    horizontalAlignment: Text.AlignHCenter
+                    onFocusChanged: {
+                        keyboard.owner = tf_left_rz;
+                        tf_left_rz.selectAll();
+                        if(focus){
+                            keyboard.open();
+                        }else{
+                            keyboard.close();
+                            tf_left_rz.select(0,0);
+                        }
+                    }
+                }
+                Text{
+                    text: "RZ"
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 18
+                }
+                TextField{
+                    id: tf_right_rz
+                    width: 80
+                    height: 40
+                    horizontalAlignment: Text.AlignHCenter
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                    onFocusChanged: {
+                        keyboard.owner = tf_right_rz;
+                        tf_right_rz.selectAll();
+                        if(focus){
+                            keyboard.open();
+                        }else{
+                            keyboard.close();
+                            tf_right_rz.select(0,0);
+                        }
+                    }
+                }
+            }
+
+            Row{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: grid_tf.bottom
+                anchors.topMargin: 30
+                spacing: 30
+                Rectangle{
+                    width: 100
+                    height: 50
+                    radius: 5
+                    border.width: 1
+                    border.color: color_gray
+                    Text{
+                        anchors.centerIn: parent
+                        color: color_dark_navy
+                        font.family: font_noto_r.name
+                        font.pixelSize: 16
+                        text: "취소"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            popup_tf.close();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 100
+                    height: 50
+                    radius: 5
+                    border.width: 1
+                    border.color: color_gray
+                    Text{
+                        anchors.centerIn: parent
+                        color: color_dark_navy
+                        font.family: font_noto_r.name
+                        font.pixelSize: 16
+                        text: "확인"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            supervisor.writelog("[USER INPUT] SETTING CAMERA TF CHANGED");
+
+                            var left_str = tf_left_x.text + ", " + tf_left_y.text + ", " + tf_left_z.text + ", " + tf_left_rx.text + ", " + tf_left_ry.text  + ", " + tf_left_rz;
+                            var right_str = tf_right_x.text + ", " + tf_right_y.text + ", " + tf_right_z.text + ", " + tf_right_rx.text + ", " + tf_right_ry.text  + ", " + tf_right_rz;
+
+                            supervisor.setSetting("SENSOR/left_camera_tf",left_str);
+                            supervisor.setSetting("SENSOR/right_camera_tf",right_str);
+
+                            popup_tf.close();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     Popup_map_list{

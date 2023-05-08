@@ -148,6 +148,28 @@ void MapView::setMode(QString name){
         show_location_icon = true;
         robot_following = false;
         setFullScreen();
+    }else if(mode == "annot_tline"){
+        show_robot = false;
+        show_global_path = false;
+        show_local_path = false;
+        show_lidar = false;
+        show_object = true;
+        show_object_box = true;
+        show_location = true;
+        show_location_icon = true;
+        robot_following = false;
+        setFullScreen();
+    }else if(mode == "localization"){
+        show_robot = true;
+        show_global_path = false;
+        show_local_path = false;
+        show_lidar = true;
+        show_object = true;
+        show_object_box = true;
+        show_location = false;
+        show_location_icon = false;
+        robot_following = true;
+        setFullScreen();
     }
     updateMap();
 }
@@ -347,7 +369,6 @@ void MapView::setRawMap(QString filename){
     map_orin.release();
 
     if(filename == "" || !QFile::exists(file_path)){
-        plog->write("[MAPVIEW] SET RAW MAP ERROR : "+filename+", "+file_path);
         QPixmap blank(map_width,map_height);{
             QPainter painter(&blank);
             painter.fillRect(blank.rect(),"black");
@@ -361,8 +382,7 @@ void MapView::setRawMap(QString filename){
         cv::flip(map_orin,map_orin,0);
         cv::rotate(map_orin,map_orin,cv::ROTATE_90_COUNTERCLOCKWISE);
         cv::resize(map_orin,map_orin,map_orin.size());
-
-        qDebug() << "SET RAW MAP : " << map_orin.rows << map_orin.cols;
+        plog->write("[MAPVIEW] SET RAW MAP " + object_name + ": "+file_path+QString().sprintf(" (size = %d x %d)",map_orin.rows,map_orin.cols));
     }
     delete pc;
     reloadMap();
@@ -374,7 +394,6 @@ void MapView::setEditedMap(QString filename){
     map_orin.release();
 
     if(filename == "" || !QFile::exists(file_path)){
-        plog->write("[MAPVIEW] SET EDITED MAP ERROR : "+filename+", "+file_path);
         QPixmap blank(map_width,map_height);{
             QPainter painter(&blank);
             painter.fillRect(blank.rect(),"black");
@@ -387,7 +406,7 @@ void MapView::setEditedMap(QString filename){
         cv::flip(map_orin,map_orin,0);
         cv::rotate(map_orin,map_orin,cv::ROTATE_90_COUNTERCLOCKWISE);
         cv::resize(map_orin,map_orin,map_orin.size());
-        plog->write("[MAPVIEW] SET EDITED MAP SUCCESS : "+QString().sprintf("size(%d,%d)",map_orin.rows,map_orin.cols));
+        plog->write("[MAPVIEW] SET EDITED MAP " + object_name + " : "+file_path+QString().sprintf(" (size = %d x %d)",map_orin.rows,map_orin.cols));
     }
     delete pc;
     reloadMap();
@@ -399,7 +418,6 @@ void MapView::setCostMap(QString filename){
     map_orin.release();
 
     if(filename == "" || !QFile::exists(file_path)){
-        plog->write("[MAPVIEW] SET COST MAP ERROR : "+filename+", "+file_path);
         QPixmap blank(map_width,map_height);{
             QPainter painter(&blank);
             painter.fillRect(blank.rect(),"black");
@@ -412,7 +430,7 @@ void MapView::setCostMap(QString filename){
         map_orin = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
         cv::flip(map_orin,map_orin,0);
         cv::rotate(map_orin,map_orin,cv::ROTATE_90_COUNTERCLOCKWISE);
-        qDebug() << "SET COST MAP : " << map_orin.rows << map_orin.cols;
+        plog->write("[MAPVIEW] SET COST MAP " + object_name + ": "+file_path+QString().sprintf(" (size = %d x %d)",map_orin.rows,map_orin.cols));
     }
     delete pc;
     reloadMap();
@@ -425,7 +443,6 @@ void MapView::setObjectMap(QString filename){
     map_orin.release();
 
     if(filename == "" || !QFile::exists(file_path)){
-        plog->write("[MAPVIEW] SET EDITED(OB) MAP ERROR : "+filename+", "+file_path);
         QPixmap blank(map_width,map_height);{
             QPainter painter(&blank);
             painter.fillRect(blank.rect(),"black");
@@ -438,7 +455,7 @@ void MapView::setObjectMap(QString filename){
         map_orin = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
         cv::flip(map_orin,map_orin,0);
         cv::rotate(map_orin,map_orin,cv::ROTATE_90_COUNTERCLOCKWISE);
-        qDebug() << "SET OBJECT MAP : " << map_orin.rows << map_orin.cols;
+        plog->write("[MAPVIEW] SET COST MAP " + object_name + ": "+file_path+QString().sprintf(" (size = %d x %d)",map_orin.rows,map_orin.cols));
     }
     delete pc;
     reloadMap();
@@ -616,11 +633,16 @@ void MapView::setMapCurrent(){
 }
 void MapView::setMapDrawing(){
     initDrawing();
+    qDebug() << "setmapdrawing" << lines.size() << straight[0].x << straight[1].x;
     for(int line=0; line<lines.size(); line++){
         for(int i=0; i<lines[line].points.size()-1; i++){
             cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar(lines[line].color,lines[line].color,lines[line].color),lines[line].width,8,0);
             cv::line(map_drawing_mask,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar::all(255),lines[line].width,8,0);
         }
+    }
+    if(new_straight_flag){
+        cv::line(map_drawing,straight[0],straight[1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
+        cv::line(map_drawing_mask,straight[0],straight[1],cv::Scalar::all(255),cur_line_width,8,0);
     }
 }
 void MapView::setMapObject(){
@@ -1024,7 +1046,45 @@ bool MapView::getDrawingUndoFlag(){
         return false;
     }
 }
+
+void MapView::startDrawingLine(int x, int y){
+    qDebug() << "startDrawingLine";
+    new_straight_flag = true;
+    straight[0].x = x;
+    straight[0].y = y;
+    straight[1].x = x;
+    straight[1].y = y;
+    setMapDrawing();
+}
+void MapView::setDrawingLine(int x, int y){
+    qDebug() << "setDrawingLine" << x << y;
+    straight[1].x = x;
+    straight[1].y = y;
+    initTline(map_name);
+    setMapDrawing();
+    setMapMap();
+}
+void MapView::stopDrawingLine(int x, int y){
+    qDebug() << "stopDrawingLine";
+    line.clear();
+    lines_trash.clear();
+    new_straight_flag = false;
+    curPoint.x = straight[0].x;
+    curPoint.y = straight[0].y;
+    line.push_back(curPoint);
+    curPoint.x = straight[1].x;
+    curPoint.y = straight[1].y;
+    line.push_back(curPoint);
+    LINE temp_line;
+    temp_line.color = cur_line_color;
+    temp_line.width = cur_line_width;
+    temp_line.points = line;
+    lines.push_back(temp_line);
+    setMapDrawing();
+    setMapMap();
+}
 void MapView::startDrawing(int x, int y){
+    qDebug() << "startDrawing";
     line.clear();
     lines_trash.clear();
     curPoint.x = x;
@@ -1033,6 +1093,7 @@ void MapView::startDrawing(int x, int y){
 }
 
 void MapView::addLinePoint(int x, int y){
+    qDebug() << "addlinepoint";
     curPoint.x = x;
     curPoint.y = y;
     line.push_back(curPoint);
@@ -1043,13 +1104,58 @@ void MapView::addLinePoint(int x, int y){
 }
 
 void MapView::endDrawing(int x, int y){
+    qDebug() << "endDrawing";
     curPoint.x = x;
     curPoint.y = y;
     line.push_back(curPoint);
+
+
+
+    //SPLINE
+    std::vector<double> x_list;
+    std::vector<double> y_list;
+
+    for(int i=0; i<line.size(); i++){
+        x_list.push_back(line[i].x);
+        y_list.push_back(line[i].y);
+    }
+
+    std::vector<double> d_list(x_list.size(), 0);
+
+    double sum_d = 0;
+    for(size_t p = 1; p< x_list.size(); p++){
+        double x0 = x_list[p-1];
+        double y0 = y_list[p-1];
+        double x1 = x_list[p];
+        double y1 = y_list[p];
+
+        double dx = x1-x0;
+        double dy = y1-y0;
+
+        sum_d += std::sqrt(dx*dx + dy*dy);
+        d_list[p] = sum_d;
+    }
+    tk::spline::spline_type type = tk::spline::cspline_hermite;
+    tk::spline sx, sy;
+    sx.set_points(d_list, x_list, type);
+    sx.make_monotonic();
+    sy.set_points(d_list, y_list, type);
+    sy.make_monotonic();
+
+
+
     LINE temp_line;
     temp_line.color = cur_line_color;
     temp_line.width = cur_line_width;
-    temp_line.points = line;
+
+    for(double d = 0; d<=sum_d; d+= 0.03){
+        temp_line.points.push_back(cv::Point2f(sx(d),sy(d)));
+    }
+//    temp_line.points = line;
+
+
+
+
     lines.push_back(temp_line);
     setMapDrawing();
     setMapMap();
@@ -1317,6 +1423,7 @@ void MapView::selectObject(int num){
 void MapView::selectLocation(int num){
     plog->write("[MAPVIEW] SELECT LOCATION : "+QString::number(num));
     select_location = num;
+    setMapLocation();
 }
 void MapView::saveLocation(QString type, QString name){
     LOCATION temp;
@@ -1478,7 +1585,6 @@ void MapView::paint(QPainter *painter){
 }
 
 void MapView::setWindow(QQuickWindow *Window){
-    plog->write("[BUILDER] MAPVIEW SET WINDOW ");
     mMain = Window;
 }
 

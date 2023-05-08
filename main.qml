@@ -8,6 +8,7 @@ import "."
 import io.qt.Supervisor 1.0
 import io.qt.Keyemitter 1.0
 import QtMultimedia 5.12
+import io.qt.Loading 1.0
 import io.qt.MapView 1.0
 
 Window {
@@ -17,21 +18,21 @@ Window {
     height: 800
     title: qsTr("Hello World")
 
-//    flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
-//    visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
+    flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
+    visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
 
-//    onVisibilityChanged: {
-//        if(homePath.split("/")[2]==="odroid"){
-//            if(mainwindow.visibility == Window.Minimized){
-//                print("minimized");
-//            }else if(mainwindow.visibility == Window.FullScreen){
-//                print("fullscreen");
-//            }else{
-//                supervisor.writelog("[QML - MAIN] Window show fullscreen");
-//                mainwindow.visibility = Window.FullScreen;
-//            }
-//        }
-//    }
+    onVisibilityChanged: {
+        if(homePath.split("/")[2]==="odroid"){
+            if(mainwindow.visibility == Window.Minimized){
+                print("minimized");
+            }else if(mainwindow.visibility == Window.FullScreen){
+                print("fullscreen");
+            }else{
+                supervisor.writelog("[QML - MAIN] Window show fullscreen");
+                mainwindow.visibility = Window.FullScreen;
+            }
+        }
+    }
     Component.onDestruction: {
     }
 
@@ -44,6 +45,7 @@ Window {
     property color color_light_gray: "#F4F4F4"
     property color color_navy: "#4f5666"
     property color color_dark_navy: "#323744"
+    property color color_blue: "#24a9f7"
 
     property string pbefore: pinit
     property string ploading: "qrc:/Page_loading.qml"
@@ -62,8 +64,6 @@ Window {
     property string robot_type: supervisor.getRobotType()
     property string robot_name: supervisor.getRobotName()
     property var robot_battery: 0
-
-    property int margin_name: 250
 
     property var count_resting: 0
 
@@ -293,7 +293,8 @@ Window {
             loader_page.item.updatepath();
     }
     function excuseme(){
-        play_avoidmsg();
+        voice_all_stop();
+        voice_avoid.play();
     }
     function newcall(){
         if(loader_page.item.objectName == "page_kitchen"){
@@ -462,10 +463,12 @@ Window {
         }
     }
 
-
     Item_statusbar{
         id: statusbar
         visible: false
     }
 
+    Loading{
+        id: loading
+    }
 }

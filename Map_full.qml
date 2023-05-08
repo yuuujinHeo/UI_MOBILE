@@ -23,6 +23,7 @@ Item {
     property bool show_button_lidar: false
     property bool show_button_object: false
     property bool show_button_following: false
+    property bool show_button_location: false
     property bool show_brush: false
 
     property int obj_sequence: 0
@@ -66,11 +67,21 @@ Item {
     function setViewer(mode){
         supervisor.writelog("[QML MAP] SET Viewer "+objectName+" to "+mode);
         mapview.setMode(mode);
+        show_connection = true;
+        show_button_following = true;
+        show_button_lidar = true;
+        show_button_object = true;
+        show_button_location = false;
         if(mode === "annot_drawing"){
             show_connection = false;
             show_button_following = false;
             show_button_lidar = false;
             show_button_object = false;
+        }else if(mode === "annot_tline"){
+            show_connection = false;
+            show_button_location = true;
+            show_button_following = false;
+            show_button_lidar = false;
         }
     }
 
@@ -293,6 +304,7 @@ Item {
         repeat: true
         running: true
         onTriggered: {
+            btn_show_location.active = mapview.getlocationView();
             btn_robot_following.active = mapview.getRobotFollowing();
             btn_show_lidar.active = mapview.getlidarView();
             btn_show_objecting.active = mapview.getobjectView();
@@ -432,6 +444,9 @@ Item {
             }else if(tool == "draw"){
                 mapview.showBrush(true);
                 mapview.startDrawing(firstX, firstY);
+            }else if(tool == "straight"){
+                mapview.showBrush(true);
+                mapview.startDrawingLine(firstX, firstY);
             }else if(tool == "erase"){
                 mapview.showBrush(true);
                 mapview.setLineColor(-1);
@@ -465,6 +480,8 @@ Item {
                     }
                 }else if(tool == "draw"){
                     mapview.endDrawing(newX, newY);
+                }else if(tool == "straight"){
+                    mapview.stopDrawingLine(newX, newY);
                 }else if(tool == "erase"){
                     mapview.endDrawing(newX, newY);
                 }else if( tool === "add_object"){
@@ -532,6 +549,8 @@ Item {
                     }
                 }else if(tool == "draw"){
                     mapview.addLinePoint(newX, newY);
+                }else if(tool == "straight"){
+                    mapview.setDrawingLine(newX, newY);
                 }else if(tool == "erase"){
                     mapview.addLinePoint(newX, newY);
                 }else if( tool === "add_object"){
@@ -558,113 +577,131 @@ Item {
 
     //Buttons
 
-    Rectangle{
-        id: btn_robot_following
-        width: 40
-        height: 40
-        radius: 40
-        visible: show_button_following
+    Column{
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.leftMargin: 5
-        property bool active: false
-        color: active?"#12d27c":"#e8e8e8"
-        Image{
-            anchors.centerIn: parent
-            source: "icon/icon_cur.png"
+        anchors.topMargin: 5
+        spacing: 10
+
+        Rectangle{
+            id: btn_robot_following
+            width: 40
+            height: 40
+            radius: 40
+            visible: show_button_following
+            property bool active: false
+            color: active?"#12d27c":"#e8e8e8"
+            Image{
+                anchors.centerIn: parent
+                source: "icon/icon_cur.png"
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    mapview.setRobotFollowing(true);
+                }
+            }
         }
-        MouseArea{
-            anchors.fill: parent
-            onClicked: {
-                mapview.setRobotFollowing(true);
+
+        Rectangle{
+            id: btn_show_lidar
+            width: 40
+            height: 40
+            radius: 40
+            visible: show_button_lidar
+            property bool active: false
+            color:active?"#12d27c":"#e8e8e8"
+            Image{
+                anchors.centerIn: parent
+                source: "icon/icon_lidar.png"
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    if(parent.active){
+                        mapview.setlidarView(false);
+                    }else{
+                        mapview.setlidarView(true);
+                    }
+                }
+            }
+        }
+
+        Rectangle{
+            id: btn_show_objecting
+            width: 40
+            height: 40
+            radius: 40
+            visible: show_button_object
+            property bool active: false
+            color: active?"#12d27c":"#e8e8e8"
+            Image{
+                anchors.centerIn: parent
+                source: {
+                     parent.active?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
+                }
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    if(parent.active){
+                        mapview.setobjectView(false);
+                    }else{
+                        mapview.setobjectView(true);
+                    }
+                }
+            }
+        }
+        Rectangle{
+            id: btn_show_object
+            width: 40
+            height: 40
+            radius: 40
+            visible: show_button_object
+            property bool active: false
+            color:  active?"#12d27c":"#e8e8e8"
+            Image{
+                anchors.centerIn: parent
+                source: parent.active?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    if(parent.active){
+                        mapview.setobjectBoxView(false);
+                    }else{
+                        mapview.setobjectBoxView(true);
+                    }
+                }
+            }
+        }
+
+        Rectangle{
+            id: btn_show_location
+            width: 40
+            height: 40
+            radius: 40
+            visible: show_button_location
+            property bool active: false
+            color:  active?"#12d27c":"#e8e8e8"
+            Image{
+                anchors.centerIn: parent
+                source: "icon/icon_point_1.png"
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    if(parent.active){
+                        mapview.setLocationView(false);
+                    }else{
+                        mapview.setLocationView(true);
+                    }
+                }
             }
         }
     }
 
-    Rectangle{
-        id: btn_show_lidar
-        width: 40
-        height: 40
-        radius: 40
-        visible: show_button_lidar
-        property bool active: false
-        anchors.top: btn_robot_following.bottom
-        anchors.topMargin: 5
-        anchors.left: parent.left
-        anchors.leftMargin: 5
-        color:active?"#12d27c":"#e8e8e8"
-        Image{
-            anchors.centerIn: parent
-            source: "icon/icon_lidar.png"
-        }
-        MouseArea{
-            anchors.fill: parent
-            onClicked: {
-                if(parent.active){
-                    mapview.setlidarView(false);
-                }else{
-                    mapview.setlidarView(true);
-                }
-            }
-        }
-    }
-
-    Rectangle{
-        id: btn_show_objecting
-        width: 40
-        height: 40
-        radius: 40
-        visible: show_button_object
-        anchors.top: btn_show_lidar.bottom
-        anchors.topMargin: 5
-        property bool active: false
-        anchors.left: parent.left
-        anchors.leftMargin: 5
-        color: active?"#12d27c":"#e8e8e8"
-        Image{
-            anchors.centerIn: parent
-            source: {
-                 parent.active?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
-            }
-        }
-        MouseArea{
-            anchors.fill: parent
-            onClicked: {
-                if(parent.active){
-                    mapview.setobjectView(false);
-                }else{
-                    mapview.setobjectView(true);
-                }
-            }
-        }
-    }
-    Rectangle{
-        id: btn_show_object
-        width: 40
-        height: 40
-        radius: 40
-        visible: show_button_object
-        anchors.top: btn_show_objecting.bottom
-        anchors.topMargin: 5
-        anchors.left: parent.left
-        property bool active: false
-        anchors.leftMargin: 5
-        color:  active?"#12d27c":"#e8e8e8"
-        Image{
-            anchors.centerIn: parent
-            source: parent.active?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
-        }
-        MouseArea{
-            anchors.fill: parent
-            onClicked: {
-                if(parent.active){
-                    mapview.setobjectBoxView(false);
-                }else{
-                    mapview.setobjectBoxView(true);
-                }
-            }
-        }
-    }
     Rectangle{
         id: brushview
         visible: show_brush

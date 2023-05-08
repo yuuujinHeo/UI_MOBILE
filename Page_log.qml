@@ -23,13 +23,15 @@ Item {
     property var select_category: 1
 
     Component.onCompleted: {
+        select_category = 1;
         setdateToday();
     }
 
     onSelect_categoryChanged: {
         supervisor.setLog(select_category);
         supervisor.readLog(currentDate)
-        setdateToday();
+//        setdateToday();
+        setdate(currentDate);
     }
 
     function setdateToday(){
@@ -48,11 +50,13 @@ Item {
     }
 
     function update_log(){
+        show_loading();
         supervisor.readLog(currentDate);
         model_log.clear();
         for(var i=0;i<supervisor.getLogLineNum(); i++){
             model_log.append({"date":supervisor.getLogDate(i),"auth":supervisor.getLogAuth(i),"message":supervisor.getLogMessage(i)})
         }
+        unshow_loading();
     }
 
     function set_datelist(){

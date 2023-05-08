@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QObject>
 #include "MapHeader.h"
+#include "spline.h"
 #include "GlobalHeader.h"
 
 class MapView : public QQuickPaintedItem
@@ -37,6 +38,7 @@ public:
         setZoomCenter();
         updateMap();
     }
+    Q_INVOKABLE bool getlocationView(){return show_location;}
     Q_INVOKABLE bool getRobotFollowing(){return robot_following;}
     Q_INVOKABLE bool getlidarView(){return show_lidar;}
     Q_INVOKABLE bool getobjectView(){return show_object;}
@@ -85,6 +87,7 @@ public:
 
     //---------------------------------------------------Drawing
     void initDrawing(){
+        qDebug() << "init drawing";
         map_drawing = cv::Mat(map_orin.rows, map_orin.cols, CV_8UC4, cv::Scalar::all(0));
         map_drawing_mask = cv::Mat(map_orin.rows, map_orin.cols, CV_8UC4, cv::Scalar::all(0));
     }
@@ -94,6 +97,8 @@ public:
     int cur_line_color=255;
     int cur_line_width=3;
     bool show_brush = false;
+    bool new_straight_flag = false;
+    cv::Point2f straight[2];
     Q_INVOKABLE void showBrush(bool onoff){show_brush = onoff;}
     Q_INVOKABLE bool getDrawingFlag();
     Q_INVOKABLE bool getDrawingUndoFlag();
@@ -103,6 +108,9 @@ public:
     Q_INVOKABLE void clearDrawing();
     Q_INVOKABLE void undoLine();
     Q_INVOKABLE void redoLine();
+    Q_INVOKABLE void startDrawingLine(int x, int y);
+    Q_INVOKABLE void setDrawingLine(int x, int y);
+    Q_INVOKABLE void stopDrawingLine(int x, int y);
     Q_INVOKABLE void setLineColor(int color){cur_line_color = color;}
     Q_INVOKABLE void setLineWidth(int width){
         cur_line_width = width;

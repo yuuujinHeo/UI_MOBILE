@@ -187,7 +187,7 @@ Item {
         map_annot.visible = false;
         map_cur.opacity = 1;
 
-        rect_menus.width = margin_name;
+        rect_menus.width = 300;
         btn_menu.width = 120;
     }
 
@@ -210,7 +210,7 @@ Item {
 
     Rectangle{
         id: rect_menus
-        width: margin_name
+        width: 300
         height: parent.height - status_bar.height
         anchors.left: parent.left
         anchors.top: status_bar.bottom
@@ -1048,7 +1048,7 @@ Item {
                 color: "#e8e8e8"
                 Row{
                     anchors.centerIn: parent
-                    spacing: 30
+                    spacing: 20
                     Item_button{
                         id: btn_move
                         width: 80
@@ -1284,11 +1284,8 @@ Item {
                             start_point.location_text = supervisor.getPatrolLocation(0);
                         }else{
                             patrol_location_model.append({name:supervisor.getPatrolType(i),location:supervisor.getPatrolLocation(i),loc_x:supervisor.getPatrolX(i),loc_y:supervisor.getPatrolY(i),loc_th:supervisor.getPatrolTH(i)});
-
                         }
                     }
-
-
                 }
             }
 
@@ -2738,7 +2735,7 @@ Item {
 
                 Row{
                     anchors.centerIn: parent
-                    spacing: 30
+                    spacing: 20
                     Rectangle{
                         id: btn_move
                         width: 78
@@ -3245,7 +3242,7 @@ Item {
                         width: 78
                         height: width
                         radius: width
-                        border.width: map.tool=="draw"?3:0
+                        border.width: (map.tool=="draw" || map.tool == "straight")?3:0
                         border.color: "#12d27c"
                         Column{
                             anchors.centerIn: parent
@@ -3329,13 +3326,62 @@ Item {
             Rectangle{
                 id: rect_annot_boxs
                 width: parent.width - 60
-                height: 100
+                height: 150
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: rect_annot_box.bottom
+//                anchors.topMargin: 50
                 color: "#e8e8e8"
                 Column{
                     anchors.centerIn: parent
                     spacing: 2
+                    Rectangle{
+                        id: rect_annot_tline_1
+                        width: rect_annot_boxs.width
+                        height: 50
+                        visible: map.tool === "draw" || map.tool === "straight"
+                        color: "white"
+                        Row{
+                            anchors.centerIn: parent
+                            spacing: 20
+                            Rectangle{
+                                width: 80
+                                height: 40
+                                radius: 5
+                                border.width: 1
+                                color: map.tool === "draw"? color_green: color_light_gray
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    text: "자유"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        map.setTool("draw");
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 80
+                                height: 40
+                                radius: 5
+                                border.width: 1
+                                color: map.tool === "straight"? color_green: color_light_gray
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    text: "직선"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        map.setTool("straight");
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     Rectangle{
                         id: rect_annot_box3
                         width: rect_annot_boxs.width
@@ -3363,7 +3409,7 @@ Item {
                             to : 5
                             onValueChanged: {
                                 map.setDrawingWidth(value)
-                                if(map.tool !== "draw"){
+                                if(map.tool !== "draw" && map.tool !== "straight"){
                                     supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> BRUSH")
                                     map.setTool("draw");
                                     map.setDrawingColor(255);
@@ -3557,7 +3603,7 @@ Item {
                     color: "#e8e8e8"
                     Row{
                         anchors.centerIn: parent
-                        spacing: 30
+                        spacing: 20
                         Item_button{
                             id: btn_move
                             width: 80
@@ -4504,7 +4550,7 @@ Item {
                     color: "#e8e8e8"
                     Row{
                         anchors.centerIn: parent
-                        spacing: 30
+                        spacing: 20
                         Item_button{
                             id: btn_move
                             width: 80

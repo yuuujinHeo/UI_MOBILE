@@ -2,6 +2,8 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import "."
 import io.qt.Supervisor 1.0
+import QtMultimedia 5.12
+import QtGraphicalEffects 1.0
 
 Item {
     id: item_statusbar
@@ -35,7 +37,7 @@ Item {
         color: "white"
         Text{
             id: textName
-            width: margin_name
+            width: 300
             horizontalAlignment: Text.AlignHCenter
             anchors.verticalCenter: parent.verticalCenter
             font.family: font_noto_r.name
@@ -51,36 +53,36 @@ Item {
                 }
             }
         }
-        Timer{
-            running: true
-            interval: 200
-            repeat: true
-            onTriggered: {
-                temp_0.text = supervisor.getMotorTemperature(0).toFixed(0)+"("+supervisor.getMotorInsideTemperature(0).toFixed(0)+")";
-                temp_1.text = supervisor.getMotorTemperature(1).toFixed(0)+"("+supervisor.getMotorInsideTemperature(1).toFixed(0)+")";
-            }
-        }
-        Row{
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: textName.right
-            spacing: 20
-            Text{
-                id: temp_0
-                width: 100
-                horizontalAlignment: Text.AlignHCenter
-                font.family: font_noto_r.name
-                font.pixelSize: 20
-                text: "-"
-            }
-            Text{
-                id: temp_1
-                width: 100
-                horizontalAlignment: Text.AlignHCenter
-                font.family: font_noto_r.name
-                font.pixelSize: 20
-                text: "-"
-            }
-        }
+//        Timer{
+//            running: true
+//            interval: 200
+//            repeat: true
+//            onTriggered: {
+//                temp_0.text = supervisor.getMotorTemperature(0).toFixed(0)+"("+supervisor.getMotorInsideTemperature(0).toFixed(0)+")";
+//                temp_1.text = supervisor.getMotorTemperature(1).toFixed(0)+"("+supervisor.getMotorInsideTemperature(1).toFixed(0)+")";
+//            }
+//        }
+//        Row{
+//            anchors.verticalCenter: parent.verticalCenter
+//            anchors.left: textName.right
+//            spacing: 20
+//            Text{
+//                id: temp_0
+//                width: 100
+//                horizontalAlignment: Text.AlignHCenter
+//                font.family: font_noto_r.name
+//                font.pixelSize: 20
+//                text: "-"
+//            }
+//            Text{
+//                id: temp_1
+//                width: 100
+//                horizontalAlignment: Text.AlignHCenter
+//                font.family: font_noto_r.name
+//                font.pixelSize: 20
+//                text: "-"
+//            }
+//        }
 
         Text{
             id: textTime
@@ -254,25 +256,38 @@ Item {
         topPadding: 0
         leftPadding: 0
         rightPadding: 0
-        y: parent.height
-        Rectangle{
+        y: parent.height - 10
+        z: -1
+        background: Rectangle{
             anchors.fill: parent
-            color: "#e8e8e8"
+            color: "transparent"
+        }
+
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 10
+            color: "white"
             Row{
                 anchors.centerIn: parent
-                spacing: 30
-
+                spacing: 15
                 Rectangle{
                     id: btn_minimize
                     width: 78
                     height: 78
                     radius: width
+                    color: color_navy
                     Column{
                         anchors.centerIn: parent
                         Image{
                             id: image_charge
                             source:"icon/btn_minimize.png"
                             anchors.horizontalCenter: parent.horizontalCenter
+                            ColorOverlay{
+                                source: parent
+                                anchors.fill: parent
+                                color: "white"
+                            }
                         }
                     }
                     MouseArea{
@@ -288,12 +303,18 @@ Item {
                     width: 78
                     height: 78
                     radius: width
+                    color: color_navy
                     Column{
                         anchors.centerIn: parent
                         Image{
                             id: image_wait
                             source:"icon/icon_power.png"
                             anchors.horizontalCenter: parent.horizontalCenter
+                            ColorOverlay{
+                                source: parent
+                                anchors.fill: parent
+                                color: "white"
+                            }
                         }
                     }
                     MouseArea{
@@ -307,12 +328,18 @@ Item {
                 Rectangle{
                     width: 78
                     height: 78
+                    color: color_navy
                     radius: width
                     Column{
                         anchors.centerIn: parent
                         Image{
                             source:"icon/icon_run.png"
                             anchors.horizontalCenter: parent.horizontalCenter
+                            ColorOverlay{
+                                source: parent
+                                anchors.fill: parent
+                                color: "white"
+                            }
                         }
                     }
                     MouseArea{
