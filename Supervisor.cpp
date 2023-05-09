@@ -127,6 +127,10 @@ Supervisor::Supervisor(QObject *parent)
 //            }
 //        }
 //    }
+
+
+
+    readWifi();
 }
 
 Supervisor::~Supervisor(){
@@ -585,7 +589,7 @@ void Supervisor::requestCamera(){
 void Supervisor::setCamera(QString left, QString right){
     setSetting("SENSOR/left_camera",left);
     setSetting("SENSOR/right_camera",right);
-    readSetting();
+//    readSetting();
 }
 QString Supervisor::getLeftCamera(){
     return pmap->left_camera;
@@ -2926,6 +2930,8 @@ void Supervisor::onTimer(){
     }
 
 
+
+
     if(flag_excuseme){
         if(count_excuseme++ > 5000/MAIN_THREAD){
             flag_excuseme = false;
@@ -3529,5 +3535,69 @@ void Supervisor::zip_failed(){
 }
 
 void Supervisor::unzip_failed(){
+    qDebug() << "STATE CHANGED : " << temp_wifi->state();
+}
 
+void Supervisor::readWifi(){
+    wifi_list.clear();
+    qDebug() << "READ WIFI : " <<  QNetworkConfiguration::Active;
+
+    QNetworkConfigurationManager ncm;
+    QList<QNetworkConfiguration> nc_list;
+
+    nc_list = ncm.allConfigurations();
+    for (auto &x : nc_list){
+        if(x.bearerType() == QNetworkConfiguration::BearerWLAN){
+            if(x.name() == ""){
+
+            }else{
+                wifi_list << x.name();
+                qDebug() << x.name() << x.type();
+            }
+        }
+    }
+}
+
+int Supervisor::getWifiNum(){
+    return wifi_list.size();
+}
+
+QString Supervisor::getWifiSSD(int num){
+    if(num < wifi_list.size() && num > -1){
+        return wifi_list[num];
+    }else
+        return "unknown";
+}
+
+void Supervisor::connectWifi(QString ssd, QString passwd){
+    qDebug() << ssd << passwd;
+    QNetworkConfigurationManager ncm;
+    QList<QNetworkConfiguration> nc_list;
+    QNetworkConfiguration cf;
+    nc_list = ncm.allConfigurations();
+    for (auto &x : nc_list){
+        if(x.bearerType() == QNetworkConfiguration::BearerWLAN){
+            qDebug() << x.name();
+            if(x.name() == ssd){
+                cf = x;
+            }
+        }
+    }
+
+    bool canStartIAP = (ncm.capabilities() & QNetworkConfigurationManager::CanStartAndStopInterfaces);
+    cf = ncm.defaultConfiguration();
+    if(!cf.isValid() || (!canStartIAP && cf.state() != QNetworkConfiguration::Active))
+        qDebug() << "cf is not valid";
+    qDebug() << "cf name : " << cf.name();
+    temp_wifi = new QNetworkSession(cf, this);
+    connect(temp_wifi, SIGNAL(stateChanged(QNetworkSession::State)),this, SLOT(unzip_failed()));
+    temp_wifi->open();
+    if(temp_wifi->waitForOpened(3000))
+        qDebug("open temp wifi");
+    else
+        qDebug() << temp_wifi->errorString();
+
+//    qDebug() << temp_wifi->state();
+
+//    qDebug() << temp_wifi->interface().
 }

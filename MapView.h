@@ -87,7 +87,7 @@ public:
 
     //---------------------------------------------------Drawing
     void initDrawing(){
-        qDebug() << "init drawing";
+//        qDebug() << "init drawing";
         map_drawing = cv::Mat(map_orin.rows, map_orin.cols, CV_8UC4, cv::Scalar::all(0));
         map_drawing_mask = cv::Mat(map_orin.rows, map_orin.cols, CV_8UC4, cv::Scalar::all(0));
     }

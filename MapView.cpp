@@ -216,7 +216,7 @@ void MapView::setFullScreen(){
     }else{
         scale = max_ws;
     }
-    qDebug() << "setFullScreen " << object_name << max_ws << max_hs;
+//    qDebug() << "setFullScreen " << object_name << max_ws << max_hs;
 }
 
 void MapView::setMap(QObject *pixmapContainer){
@@ -633,7 +633,7 @@ void MapView::setMapCurrent(){
 }
 void MapView::setMapDrawing(){
     initDrawing();
-    qDebug() << "setmapdrawing" << lines.size() << straight[0].x << straight[1].x;
+//    qDebug() << "setmapdrawing" << lines.size() << straight[0].x << straight[1].x;
     for(int line=0; line<lines.size(); line++){
         for(int i=0; i<lines[line].points.size()-1; i++){
             cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar(lines[line].color,lines[line].color,lines[line].color),lines[line].width,8,0);

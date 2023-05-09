@@ -17,6 +17,9 @@ Item {
     property bool is_debug: false
     property int motor_left_id: 1
     property int motor_right_id: 0
+
+    property bool is_reset_slam: false
+
     function update_camera(){
         if(popup_camera.opened)
             popup_camera.update();
@@ -24,6 +27,7 @@ Item {
 
     Component.onCompleted: {
         is_admin = false;
+        is_reset_slam = false;
         init();
     }
 
@@ -32,7 +36,6 @@ Item {
     }
 
     function set_call_done(){
-//        init();
         model_callbell.clear();
         for(var i=0; i<combo_call_num.currentIndex; i++){
             model_callbell.append({name:supervisor.getSetting("CALLING","call_"+Number(i))});
@@ -263,11 +266,18 @@ Item {
                                 id: platform_name
                                 anchors.fill: parent
                                 text:supervisor.getSetting("ROBOT_HW","model");
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                }
                                 onFocusChanged: {
                                     keyboard.owner = platform_name;
                                     if(focus){
                                         keyboard.open();
                                     }else{
+                                        if(ischanged){
+                                            is_reset_slam = true;
+                                        }
                                         keyboard.close();
                                     }
                                 }
@@ -304,6 +314,11 @@ Item {
                             ComboBox{
                                 id: combo_platform_serial
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
                                 model:[0,1,2,3,4,5,6,7,8,9,10]
                             }
                         }
@@ -338,6 +353,11 @@ Item {
                             ComboBox{
                                 id: combo_platform_id
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
                                 model:[0,1,2,3,4,5,6,7,8,9,10]
                             }
                         }
@@ -372,9 +392,66 @@ Item {
                             ComboBox{
                                 id: combo_platform_type
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
                                 model:["서빙용","호출용"]
                             }
                         }
+                    }
+                }
+                Rectangle{
+                    id: set_tray_num
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"트레이 개수"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_tray_num
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:[1,2,3,4,5]
+                            }
+                        }
+                    }
+
+                }
+
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"로봇 설정"
+                        color: "white"
+                        font.pixelSize: 20
                     }
                 }
                 Rectangle{
@@ -390,7 +467,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"preset"
+                                text:"속도 프리셋"
                                 font.pixelSize: 20
                             }
                         }
@@ -475,7 +552,7 @@ Item {
                                     visible: is_admin
                                     Text{
                                         anchors.centerIn: parent
-                                        text: "edit"
+                                        text: "변경"
                                         color: "white"
                                     }
                                     MouseArea{
@@ -489,55 +566,7 @@ Item {
                         }
                     }
                 }
-                Rectangle{
-                    id: set_tray_num
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"트레이 개수"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_tray_num
-                                anchors.fill: parent
-                                model:[1,2,3,4,5]
-                            }
-                        }
-                    }
 
-                }
-
-                Rectangle{
-                    width: 1100
-                    height: 40
-                    color: "black"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_b.name
-                        text:"로봇 설정"
-                        color: "white"
-                        font.pixelSize: 20
-                    }
-                }
                 Rectangle{
                     id: set_velocity
                     width: 840
@@ -586,6 +615,17 @@ Item {
                                     height: 40
                                     from: 0
                                     to: 1
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        if(pressed){
+                                            ischanged = true;
+                                            is_reset_slam = true;
+                                        }else{
+
+                                        }
+                                    }
+
+
                                     value: supervisor.getVelocity()
                                 }
                             }
@@ -646,6 +686,10 @@ Item {
                                     height: 40
                                     from: 0
                                     to: 100
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                    }
                                     value: supervisor.getSetting("ROBOT_SW","volume_bgm")
                                 }
 
@@ -723,6 +767,10 @@ Item {
                                     height: 40
                                     from: 0
                                     to: 100
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                    }
                                     value: supervisor.getSetting("ROBOT_SW","volume_voice")
                                 }
                                 Image{
@@ -737,6 +785,44 @@ Item {
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_use_help
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"도움말 표시"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_use_help
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["사용안함", "사용"]
                             }
                         }
                     }
@@ -780,23 +866,111 @@ Item {
                             height: parent.height
                             color: "#d0d0d0"
                         }
-//                        Rectangle{
-//                            width: parent.width - 351
-//                            height: parent.height
-//                            TextField{
-//                                id: radius
-//                                anchors.fill: parent
-//                                text:supervisor.getSetting("ROBOT_HW","radius");
-//                                onFocusChanged: {
-//                                    keyboard.owner = radius;
-//                                    if(focus){
-//                                        keyboard.open();
-//                                    }else{
-//                                        keyboard.close();
-//                                    }
-//                                }
-//                            }
-//                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                anchors.fill: parent
+                                TextField{
+                                    id: wifi_ssd
+                                    height: parent.height
+                                    width: parent.width*0.8
+                                    text:supervisor.getSetting("ROBOT_SW","wifi_ssd");
+                                }
+                                Rectangle{
+                                    height: parent.height
+                                    width: parent.width*0.2
+                                    radius: 5
+                                    color: "black"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        color: "white"
+                                        font.family: font_noto_r.name
+                                        text: "변경"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            popup_wifi.open();
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_wifi_passwd
+                    width: 840
+                    visible: is_admin
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"WIFI Password"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                anchors.fill: parent
+                                TextField{
+                                    id: wifi_passwd
+                                    height: parent.height
+                                    width: parent.width*0.8
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    text:supervisor.getSetting("ROBOT_SW","wifi_passwd");
+                                    onFocusChanged: {
+                                        keyboard.owner = wifi_passwd;
+                                        wifi_passwd.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            keyboard.close();
+                                            wifi_passwd.select(0,0);
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    height: parent.height
+                                    width: parent.width*0.2
+                                    radius: 5
+                                    color: "black"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        color: "white"
+                                        font.family: font_noto_r.name
+                                        text: "변경"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            wifi_passwd.ischanged = false;
+                                            supervisor.setSetting("ROBOT_SW/wifi_passwd",wifi_passwd.text);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 Rectangle{
@@ -832,8 +1006,8 @@ Item {
                                 anchors.centerIn: parent
                                 TextField{
                                     id: ip_1
-                                    width: 50
-                                    height: 30
+                                    width: 70
+                                    height: 40
                                     onFocusChanged: {
                                         keyboard.owner = ip_1;
                                         ip_1.selectAll();
@@ -844,7 +1018,10 @@ Item {
                                             ip_1.select(0,0);
                                         }
                                     }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
                                     onTextChanged: {
+                                        ischanged = true;
                                         if(ip_1.text.split(".").length > 1){
                                             ip_1.text = ip_1.text.split(".")[0];
                                             ip_1.focus = false;
@@ -863,8 +1040,8 @@ Item {
 
                                 TextField{
                                     id: ip_2
-                                    width: 50
-                                    height: 30
+                                    width: 70
+                                    height: 40
                                     onFocusChanged: {
                                         keyboard.owner = ip_2;
                                         ip_2.selectAll();
@@ -875,7 +1052,10 @@ Item {
                                             ip_2.select(0,0);
                                         }
                                     }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
                                     onTextChanged: {
+                                        ischanged = true;
                                         if(ip_2.text == "."){
                                             ip_2.text = ip_2.text.split(".")[0]
                                         }
@@ -897,8 +1077,8 @@ Item {
                                 }
                                 TextField{
                                     id: ip_3
-                                    width: 50
-                                    height: 30
+                                    width: 70
+                                    height: 40
                                     onFocusChanged: {
                                         keyboard.owner = ip_3;
                                         ip_3.selectAll();
@@ -909,7 +1089,10 @@ Item {
                                             keyboard.close();
                                         }
                                     }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
                                     onTextChanged: {
+                                        ischanged = true;
                                         if(ip_3.text == "."){
                                             ip_3.text = ip_3.text.split(".")[0]
                                         }
@@ -931,8 +1114,8 @@ Item {
                                 }
                                 TextField{
                                     id: ip_4
-                                    width: 50
-                                    height: 30
+                                    width: 70
+                                    height: 40
                                     onFocusChanged: {
                                         keyboard.owner = ip_4;
                                         ip_4.selectAll();
@@ -943,7 +1126,10 @@ Item {
                                             keyboard.close();
                                         }
                                     }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
                                     onTextChanged: {
+                                        ischanged = true;
                                         if(ip_4.text == "."){
                                             ip_4.text = ip_4.text.split(".")[0]
                                         }
@@ -957,11 +1143,625 @@ Item {
                                         }
                                     }
                                 }
+
+                                Rectangle{
+                                    height: parent.height
+                                    width: parent.width*0.2
+                                    radius: 5
+                                    color: "black"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        color: "white"
+                                        font.family: font_noto_r.name
+                                        text: "변경"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            ip_1.ischanged = false;
+                                            ip_2.ischanged = false;
+                                            ip_3.ischanged = false;
+                                            ip_4.ischanged = false;
+                                            var ip_str = ip_1.text + "." + ip_2.text + "." + ip_3.text + "." + ip_4.text;
+                                            supervisor.setSetting("ROBOT_SW/wifi_ip",ip_str);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                Rectangle{
+                    id: set_gateway
+                    width: 840
+                    height: 40
+                    visible: is_admin
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"Gateway"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
 
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                TextField{
+                                    id: gateway_1
+                                    width: 70
+                                    height: 40
+                                    onFocusChanged: {
+                                        keyboard.owner = gateway_1;
+                                        gateway_1.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            keyboard.close();
+                                            gateway_1.select(0,0);
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(gateway_1.text.split(".").length > 1){
+                                            gateway_1.text = gateway_1.text.split(".")[0];
+                                            gateway_1.focus = false;
+                                            gateway_2.focus = true;
+                                        }
+                                        if(gateway_1.text.length == 3){
+                                            gateway_1.focus = false;
+                                            gateway_2.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+
+                                TextField{
+                                    id: gateway_2
+                                    width: 70
+                                    height: 40
+                                    onFocusChanged: {
+                                        keyboard.owner = gateway_2;
+                                        gateway_2.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            keyboard.close();
+                                            gateway_2.select(0,0);
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(gateway_2.text == "."){
+                                            gateway_2.text = gateway_2.text.split(".")[0]
+                                        }
+
+                                        if(gateway_2.text.split(".").length > 1){
+                                            gateway_2.text = gateway_2.text.split(".")[0];
+                                            gateway_2.focus = false;
+                                            gateway_3.focus = true;
+                                        }
+                                        if(gateway_2.text.length == 3){
+                                            gateway_2.focus = false;
+                                            gateway_3.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+                                TextField{
+                                    id: gateway_3
+                                    width: 70
+                                    height: 40
+                                    onFocusChanged: {
+                                        keyboard.owner = gateway_3;
+                                        gateway_3.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            gateway_3.select(0,0);
+                                            keyboard.close();
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(gateway_3.text == "."){
+                                            gateway_3.text = gateway_3.text.split(".")[0]
+                                        }
+
+                                        if(gateway_3.text.split(".").length > 1){
+                                            gateway_3.text = gateway_3.text.split(".")[0];
+                                            gateway_3.focus = false;
+                                            gateway_4.focus = true;
+                                        }
+                                        if(gateway_3.text.length == 3){
+                                            gateway_3.focus = false;
+                                            gateway_4.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+                                TextField{
+                                    id: gateway_4
+                                    width: 70
+                                    height: 40
+                                    onFocusChanged: {
+                                        keyboard.owner = gateway_4;
+                                        gateway_4.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            gateway_4.select(0,0);
+                                            keyboard.close();
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(gateway_4.text == "."){
+                                            gateway_4.text = gateway_4.text.split(".")[0]
+                                        }
+
+                                        if(gateway_4.text.split(".").length > 1){
+                                            gateway_4.text = gateway_4.text.split(".")[0];
+                                            gateway_4.focus = false;
+                                        }
+                                        if(gateway_4.text.length == 3){
+                                            gateway_4.focus = false;
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    height: parent.height
+                                    width: parent.width*0.2
+                                    radius: 5
+                                    color: "black"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        color: "white"
+                                        font.family: font_noto_r.name
+                                        text: "변경"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            gateway_1.ischanged = false;
+                                            gateway_2.ischanged = false;
+                                            gateway_3.ischanged = false;
+                                            gateway_4.ischanged = false;
+                                            var ip_str = gateway_1.text + "." + gateway_2.text + "." + gateway_3.text + "." + gateway_4.text;
+                                            supervisor.setSetting("ROBOT_SW/wifi_gateway",ip_str);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_dnsmain
+                    width: 840
+                    height: 40
+                    visible: is_admin
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"DNS(Main)"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                TextField{
+                                    id: dnsmain_1
+                                    width: 70
+                                    height: 40
+                                    onFocusChanged: {
+                                        keyboard.owner = dnsmain_1;
+                                        dnsmain_1.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            keyboard.close();
+                                            dnsmain_1.select(0,0);
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(dnsmain_1.text.split(".").length > 1){
+                                            dnsmain_1.text = dnsmain_1.text.split(".")[0];
+                                            dnsmain_1.focus = false;
+                                            dnsmain_2.focus = true;
+                                        }
+                                        if(dnsmain_1.text.length == 3){
+                                            dnsmain_1.focus = false;
+                                            dnsmain_2.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+
+                                TextField{
+                                    id: dnsmain_2
+                                    width: 70
+                                    height: 40
+                                    onFocusChanged: {
+                                        keyboard.owner = dnsmain_2;
+                                        dnsmain_2.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            keyboard.close();
+                                            dnsmain_2.select(0,0);
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(dnsmain_2.text == "."){
+                                            dnsmain_2.text = dnsmain_2.text.split(".")[0]
+                                        }
+
+                                        if(dnsmain_2.text.split(".").length > 1){
+                                            dnsmain_2.text = dnsmain_2.text.split(".")[0];
+                                            dnsmain_2.focus = false;
+                                            dnsmain_3.focus = true;
+                                        }
+                                        if(dnsmain_2.text.length == 3){
+                                            dnsmain_2.focus = false;
+                                            dnsmain_3.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+                                TextField{
+                                    id: dnsmain_3
+                                    width: 70
+                                    height: 40
+                                    onFocusChanged: {
+                                        keyboard.owner = dnsmain_3;
+                                        dnsmain_3.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            dnsmain_3.select(0,0);
+                                            keyboard.close();
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(dnsmain_3.text == "."){
+                                            dnsmain_3.text = dnsmain_3.text.split(".")[0]
+                                        }
+
+                                        if(dnsmain_3.text.split(".").length > 1){
+                                            dnsmain_3.text = dnsmain_3.text.split(".")[0];
+                                            dnsmain_3.focus = false;
+                                            dnsmain_4.focus = true;
+                                        }
+                                        if(dnsmain_3.text.length == 3){
+                                            dnsmain_3.focus = false;
+                                            dnsmain_4.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+                                TextField{
+                                    id: dnsmain_4
+                                    width: 70
+                                    height: 40
+                                    onFocusChanged: {
+                                        keyboard.owner = dnsmain_4;
+                                        dnsmain_4.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            dnsmain_4.select(0,0);
+                                            keyboard.close();
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(dnsmain_4.text == "."){
+                                            dnsmain_4.text = dnsmain_4.text.split(".")[0]
+                                        }
+
+                                        if(dnsmain_4.text.split(".").length > 1){
+                                            dnsmain_4.text = dnsmain_4.text.split(".")[0];
+                                            dnsmain_4.focus = false;
+                                        }
+                                        if(dnsmain_4.text.length == 3){
+                                            dnsmain_4.focus = false;
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    height: parent.height
+                                    width: parent.width*0.2
+                                    radius: 5
+                                    color: "black"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        color: "white"
+                                        font.family: font_noto_r.name
+                                        text: "변경"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            dnsmain_1.ischanged = false;
+                                            dnsmain_2.ischanged = false;
+                                            dnsmain_3.ischanged = false;
+                                            dnsmain_4.ischanged = false;
+                                            var ip_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
+                                            supervisor.setSetting("ROBOT_SW/wifi_dnsmain",ip_str);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_dnsserve
+                    width: 840
+                    height: 40
+                    visible: is_admin
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"DNS(Serv)"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                TextField{
+                                    id: dnsserv_1
+                                    width: 70
+                                    height: 40
+                                    onFocusChanged: {
+                                        keyboard.owner = dnsserv_1;
+                                        dnsserv_1.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            keyboard.close();
+                                            dnsserv_1.select(0,0);
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(dnsserv_1.text.split(".").length > 1){
+                                            dnsserv_1.text = dnsserv_1.text.split(".")[0];
+                                            dnsserv_1.focus = false;
+                                            dnsserv_2.focus = true;
+                                        }
+                                        if(dnsserv_1.text.length == 3){
+                                            dnsserv_1.focus = false;
+                                            dnsserv_2.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+
+                                TextField{
+                                    id: dnsserv_2
+                                    width: 70
+                                    height: 40
+                                    onFocusChanged: {
+                                        keyboard.owner = dnsserv_2;
+                                        dnsserv_2.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            keyboard.close();
+                                            dnsserv_2.select(0,0);
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(dnsserv_2.text == "."){
+                                            dnsserv_2.text = dnsserv_2.text.split(".")[0]
+                                        }
+
+                                        if(dnsserv_2.text.split(".").length > 1){
+                                            dnsserv_2.text = dnsserv_2.text.split(".")[0];
+                                            dnsserv_2.focus = false;
+                                            dnsserv_3.focus = true;
+                                        }
+                                        if(dnsserv_2.text.length == 3){
+                                            dnsserv_2.focus = false;
+                                            dnsserv_3.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+                                TextField{
+                                    id: dnsserv_3
+                                    width: 70
+                                    height: 40
+                                    onFocusChanged: {
+                                        keyboard.owner = dnsserv_3;
+                                        dnsserv_3.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            dnsserv_3.select(0,0);
+                                            keyboard.close();
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(dnsserv_3.text == "."){
+                                            dnsserv_3.text = dnsserv_3.text.split(".")[0]
+                                        }
+
+                                        if(dnsserv_3.text.split(".").length > 1){
+                                            dnsserv_3.text = dnsserv_3.text.split(".")[0];
+                                            dnsserv_3.focus = false;
+                                            dnsserv_4.focus = true;
+                                        }
+                                        if(dnsserv_3.text.length == 3){
+                                            dnsserv_3.focus = false;
+                                            dnsserv_4.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+                                TextField{
+                                    id: dnsserv_4
+                                    width: 70
+                                    height: 40
+                                    onFocusChanged: {
+                                        keyboard.owner = dnsserv_4;
+                                        dnsserv_4.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            dnsserv_4.select(0,0);
+                                            keyboard.close();
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(dnsserv_4.text == "."){
+                                            dnsserv_4.text = dnsserv_4.text.split(".")[0]
+                                        }
+
+                                        if(dnsserv_4.text.split(".").length > 1){
+                                            dnsserv_4.text = dnsserv_4.text.split(".")[0];
+                                            dnsserv_4.focus = false;
+                                        }
+                                        if(dnsserv_4.text.length == 3){
+                                            dnsserv_4.focus = false;
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    height: parent.height
+                                    width: parent.width*0.2
+                                    radius: 5
+                                    color: "black"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        color: "white"
+                                        font.family: font_noto_r.name
+                                        text: "변경"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            dnsserv_1.ischanged = false;
+                                            dnsserv_2.ischanged = false;
+                                            dnsserv_3.ischanged = false;
+                                            dnsserv_4.ischanged = false;
+                                            var ip_str = dnsserv_1.text + "." + dnsserv_2.text + "." + dnsserv_3.text + "." + dnsserv_4.text;
+                                            supervisor.setSetting("ROBOT_SW/wifi_dnsserv",ip_str);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 Rectangle{
                     id: set_robot_radius
                     width: 840
@@ -977,7 +1777,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"로봇 반지름 반경"
+                                text:"로봇 반지름 반경 [m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -992,6 +1792,12 @@ Item {
                             TextField{
                                 id: radius
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                color: ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_HW","radius");
                                 onFocusChanged: {
                                     keyboard.owner = radius;
@@ -1020,7 +1826,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"wheel_base"
+                                text:"휠 베이스 반경 [m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -1035,6 +1841,12 @@ Item {
                             TextField{
                                 id: wheel_base
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                color: ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT","wheel_base");
                                 onFocusChanged: {
                                     keyboard.owner = wheel_base;
@@ -1063,7 +1875,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"wheel_radius"
+                                text:"휠 반지름 반경 [m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -1078,6 +1890,12 @@ Item {
                             TextField{
                                 id: wheel_radius
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                color: ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT","wheel_radius");
                                 onFocusChanged: {
                                     keyboard.owner = wheel_radius;
@@ -1121,6 +1939,12 @@ Item {
                             ComboBox{
                                 id: combo_autoinit
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                font.family: font_noto_r.name
                                 model:["사용안함","사용"]
                             }
                         }
@@ -1155,6 +1979,11 @@ Item {
                             height: parent.height
                             ComboBox{
                                 id: combo_avoid
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
                                 anchors.fill: parent
                                 model:["사용안함","사용"]
                             }
@@ -1191,6 +2020,11 @@ Item {
                             ComboBox{
                                 id: combo_multirobot
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
                                 model:["사용안함","사용"]
                             }
                         }
@@ -1226,6 +2060,11 @@ Item {
                             ComboBox{
                                 id: combo_use_uicmd
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
                                 model:["비활성화","활성화"]
                             }
                         }
@@ -1414,6 +2253,12 @@ Item {
                                 id: map_size
                                 anchors.fill: parent
                                 text:supervisor.getSetting("ROBOT_SW","map_size");
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                color: ischanged?color_red:"black"
                                 onFocusChanged: {
                                     keyboard.owner = map_size;
                                     if(focus){
@@ -1458,6 +2303,12 @@ Item {
                                 id: grid_size
                                 anchors.fill: parent
                                 text:supervisor.getSetting("ROBOT_SW","grid_size");
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                color: ischanged?color_red:"black"
                                 onFocusChanged: {
                                     keyboard.owner = grid_size;
                                     if(focus){
@@ -1499,10 +2350,12 @@ Item {
                             height: parent.height
                             ComboBox{
                                 id: combo_table_num
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
                                 anchors.fill: parent
                                 model:30
-//                                model:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
-
                             }
                         }
                     }
@@ -1535,6 +2388,10 @@ Item {
                             height: parent.height
                             ComboBox{
                                 id: combo_call_max
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
                                 anchors.fill: parent
                                 model:[1,2,3,4,5]
                             }
@@ -1571,7 +2428,9 @@ Item {
                                 id: combo_call_num
                                 anchors.fill: parent
                                 model:20
+                                property bool ischanged: false
                                 onCurrentIndexChanged: {
+                                    ischanged = true;
                                     model_callbell.clear();
                                     for(var i=0; i<combo_call_num.currentIndex; i++){
                                         model_callbell.append({name:supervisor.getSetting("CALLING","call_"+Number(i))});
@@ -1616,7 +2475,7 @@ Item {
                                         id: call_id
                                         width: 300
                                         height: parent.height
-                                        text: name//supervisor.getSetting("CALLING","call_"+Number(index))
+                                        text: name
                                     }
                                     Rectangle{
                                         width: 100
@@ -1832,6 +2691,12 @@ Item {
                             height: parent.height
                             ComboBox{
                                 id: combo_baudrate
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+
                                 anchors.fill: parent
                                 model:[115200,256000]
                             }
@@ -1873,6 +2738,7 @@ Item {
                                     Text{
                                         id: text_mask
                                         anchors.centerIn: parent
+                                        color: slider_mask.ischanged?color_red:"black"
                                         text: slider_mask.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -1880,6 +2746,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_mask
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -1926,6 +2797,7 @@ Item {
                                     Text{
                                         id: text_max_range
                                         anchors.centerIn: parent
+                                        color: slider_max_range.ischanged?color_red:"black"
                                         text: slider_max_range.value.toFixed(2)
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -1933,6 +2805,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_max_range
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -1978,6 +2855,7 @@ Item {
                                     height: 40
                                     Text{
                                         id: text_cam_exposure
+                                        color: slider_cam_exposure.ischanged?color_red:"black"
                                         anchors.centerIn: parent
                                         text: slider_cam_exposure.value.toFixed(2)
                                         font.pixelSize: 15
@@ -1986,6 +2864,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_cam_exposure
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -2026,6 +2909,12 @@ Item {
                             TextField{
                                 id: offset_x
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("SENSOR","offset_x");
                                 onFocusChanged: {
                                     keyboard.owner = offset_x;
@@ -2068,6 +2957,12 @@ Item {
                             TextField{
                                 id: offset_y
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("SENSOR","offset_y");
                                 onFocusChanged: {
                                     keyboard.owner = offset_y;
@@ -2241,6 +3136,7 @@ Item {
                                     Text{
                                         id: text_limit_pivot
                                         anchors.centerIn: parent
+                                        color: slider_limit_pivot.ischanged?color_red:"black"
                                         text: slider_limit_pivot.value.toFixed(2) + " [deg/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -2248,6 +3144,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_limit_pivot
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -2294,6 +3195,7 @@ Item {
                                     Text{
                                         id: text_limit_pivot_acc
                                         anchors.centerIn: parent
+                                        color: slider_limit_pivot_acc.ischanged?color_red:"black"
                                         text: slider_limit_pivot_acc.value.toFixed(2) + " [deg/s^2]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -2301,6 +3203,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_limit_pivot_acc
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -2347,6 +3254,7 @@ Item {
                                     Text{
                                         id: text_limit_v
                                         anchors.centerIn: parent
+                                        color: slider_limit_v.ischanged?color_red:"black"
                                         text: slider_limit_v.value.toFixed(2) + " [m/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -2354,6 +3262,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_limit_v
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -2400,6 +3313,13 @@ Item {
                                     Text{
                                         id: text_limit_v_acc
                                         anchors.centerIn: parent
+
+
+
+                                        color: slider_limit_v_acc.ischanged?color_red:"black"
+
+
+
                                         text: slider_limit_v_acc.value.toFixed(2) + " [m/s^2]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -2407,6 +3327,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_limit_v_acc
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -2453,6 +3378,7 @@ Item {
                                     Text{
                                         id: text_limit_w
                                         anchors.centerIn: parent
+                                        color: slider_limit_w.ischanged?color_red:"black"
                                         text: slider_limit_w.value.toFixed(2) + " [deg/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -2460,6 +3386,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_limit_w
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -2506,6 +3437,7 @@ Item {
                                     Text{
                                         id: text_limit_w_acc
                                         anchors.centerIn: parent
+                                        color: slider_limit_w_acc.ischanged?color_red:"black"
                                         text: slider_limit_w_acc.value.toFixed(2) + " [deg/s^2]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -2513,6 +3445,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_limit_w_acc
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -2559,6 +3496,7 @@ Item {
                                     Text{
                                         id: text_limit_manual_v
                                         anchors.centerIn: parent
+                                        color: slider_limit_manual_v.ischanged?color_red:"black"
                                         text: slider_limit_manual_v.value.toFixed(2) + " [m/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -2566,6 +3504,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_limit_manual_v
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -2612,6 +3555,7 @@ Item {
                                     Text{
                                         id: text_limit_manual_w
                                         anchors.centerIn: parent
+                                        color: slider_limit_manual_w.ischanged?color_red:"black"
                                         text: slider_limit_manual_w.value.toFixed(2) + " [deg/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -2619,6 +3563,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_limit_manual_w
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -2666,6 +3615,7 @@ Item {
                                     Text{
                                         id: text_st_v
                                         anchors.centerIn: parent
+                                        color: slider_st_v.ischanged?color_red:"black"
                                         text: slider_st_v.value.toFixed(2) + " [m/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -2673,6 +3623,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_st_v
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -2729,6 +3684,11 @@ Item {
                             height: parent.height
                             ComboBox{
                                 id: combo_wheel_dir
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
                                 anchors.fill: parent
                                 model: [-1,1]
                             }
@@ -2764,6 +3724,11 @@ Item {
                             height: parent.height
                             ComboBox{
                                 id: combo_left_id
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
                                 anchors.fill: parent
                                 model:[0,1]
                             }
@@ -2799,6 +3764,11 @@ Item {
                             height: parent.height
                             ComboBox{
                                 id: combo_right_id
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
                                 anchors.fill: parent
                                 model:[0,1]
                             }
@@ -2835,6 +3805,12 @@ Item {
                             TextField{
                                 id: gear_ratio
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                color: ischanged?color_red:"black"
                                 text: supervisor.getSetting("MOTOR","gear_ratio");
                                 onFocusChanged: {
                                     keyboard.owner = gear_ratio;
@@ -2878,6 +3854,12 @@ Item {
                             TextField{
                                 id: k_p
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                color: ischanged?color_red:"black"
                                 text: supervisor.getSetting("MOTOR","k_p");
                                 onFocusChanged: {
                                     keyboard.owner = k_p;
@@ -2921,6 +3903,12 @@ Item {
                             TextField{
                                 id: k_i
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                color: ischanged?color_red:"black"
                                 text: supervisor.getSetting("MOTOR","k_i");
                                 onFocusChanged: {
                                     keyboard.owner = k_i;
@@ -2964,6 +3952,12 @@ Item {
                             TextField{
                                 id: k_d
                                 anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                color: ischanged?color_red:"black"
                                 text: supervisor.getSetting("MOTOR","k_d");
                                 onFocusChanged: {
                                     keyboard.owner = k_d;
@@ -3012,6 +4006,7 @@ Item {
                                     height: 40
                                     Text{
                                         id: text_motor_limit_v
+                                        color: slider_motor_limit_v.ischanged?color_red:"black"
                                         anchors.centerIn: parent
                                         text: slider_motor_limit_v.value.toFixed(2) + " [m/s]"
                                         font.pixelSize: 15
@@ -3020,6 +4015,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_motor_limit_v
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3067,6 +4067,7 @@ Item {
                                     Text{
                                         id: text_motor_limit_v_acc
                                         anchors.centerIn: parent
+                                        color: slider_motor_limit_v_acc.ischanged?color_red:"black"
                                         text: slider_motor_limit_v_acc.value.toFixed(2) + " [m/s^2]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3074,6 +4075,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_motor_limit_v_acc
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3121,6 +4127,8 @@ Item {
                                     Text{
                                         id: text_motor_limit_w
                                         anchors.centerIn: parent
+                                        color: slider_motor_limit_w.ischanged?color_red:"black"
+
                                         text: slider_motor_limit_w.value.toFixed(2) + " [deg/s]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3128,6 +4136,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_motor_limit_w
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3175,6 +4188,8 @@ Item {
                                     Text{
                                         id: text_motor_limit_w_acc
                                         anchors.centerIn: parent
+                                        color: slider_motor_limit_w_acc.ischanged?color_red:"black"
+
                                         text: slider_motor_limit_w_acc.value.toFixed(2) + " [deg/s^2]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3182,6 +4197,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_motor_limit_w_acc
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3245,6 +4265,8 @@ Item {
                                     Text{
                                         id: text_k_v
                                         anchors.centerIn: parent
+                                        color: slider_k_v.ischanged?color_red:"black"
+
                                         text: slider_k_v.value.toFixed(2) + " [gain]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3252,6 +4274,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_k_v
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3298,6 +4325,8 @@ Item {
                                     Text{
                                         id: text_k_w
                                         anchors.centerIn: parent
+                                        color: slider_k_w.ischanged?color_red:"black"
+
                                         text: slider_k_w.value.toFixed(2) + " [gain]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3305,6 +4334,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_k_w
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3351,6 +4385,7 @@ Item {
                                     Text{
                                         id: text_look_ahead_dist
                                         anchors.centerIn: parent
+                                        color: slider_look_ahead_dist.ischanged?color_red:"black"
                                         text: slider_look_ahead_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3358,6 +4393,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_look_ahead_dist
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3404,6 +4444,7 @@ Item {
                                     Text{
                                         id: text_min_look_ahead_dist
                                         anchors.centerIn: parent
+                                        color: slider_min_look_ahead_dist.ischanged?color_red:"black"
                                         text: slider_min_look_ahead_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3411,6 +4452,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_min_look_ahead_dist
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3457,6 +4503,7 @@ Item {
                                     Text{
                                         id: text_narrow_decel_ratio
                                         anchors.centerIn: parent
+                                        color: slider_narrow_decel_ratio.ischanged?color_red:"black"
                                         text: slider_narrow_decel_ratio.value.toFixed(2) + " [ratio, %]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3464,6 +4511,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_narrow_decel_ratio
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3512,11 +4564,17 @@ Item {
                                         anchors.centerIn: parent
                                         text: slider_obs_deadzone.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
+                                        color: slider_obs_deadzone.ischanged?color_red:"black"
                                         font.family: font_noto_r.name
                                     }
                                 }
                                 Slider{
                                     id: slider_obs_deadzone
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3563,6 +4621,8 @@ Item {
                                     Text{
                                         id: text_obs_wait_time
                                         anchors.centerIn: parent
+                                        color: slider_obs_wait_time.ischanged?color_red:"black"
+
                                         text: slider_obs_wait_time.value.toFixed(2) + " [sec]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3570,6 +4630,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_obs_wait_time
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3616,6 +4681,7 @@ Item {
                                     Text{
                                         id: text_path_out_dist
                                         anchors.centerIn: parent
+                                        color: slider_path_out_dist.ischanged?color_red:"black"
                                         text: slider_path_out_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3623,6 +4689,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_path_out_dist
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3684,11 +4755,18 @@ Item {
                                         anchors.centerIn: parent
                                         text: slider_icp_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
+                                        color: slider_icp_dist.ischanged?color_red:"black"
+
                                         font.family: font_noto_r.name
                                     }
                                 }
                                 Slider{
                                     id: slider_icp_dist
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3735,6 +4813,8 @@ Item {
                                     Text{
                                         id: text_icp_error
                                         anchors.centerIn: parent
+                                        color: slider_icp_error.ischanged?color_red:"black"
+
                                         text: slider_icp_error.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3742,6 +4822,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_icp_error
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3788,6 +4873,8 @@ Item {
                                     Text{
                                         id: text_icp_near
                                         anchors.centerIn: parent
+                                        color: slider_icp_near.ischanged?color_red:"black"
+
                                         text: slider_icp_near.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3795,6 +4882,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_icp_near
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3841,6 +4933,8 @@ Item {
                                     Text{
                                         id: text_icp_odometry_weight
                                         anchors.centerIn: parent
+                                        color: slider_icp_odometry_weight.ischanged?color_red:"black"
+
                                         text: slider_icp_odometry_weight.value.toFixed(2) + " [ratio, %]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3848,6 +4942,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_icp_odometry_weight
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3894,6 +4993,8 @@ Item {
                                     Text{
                                         id: text_icp_ratio
                                         anchors.centerIn: parent
+                                        color: slider_icp_ratio.ischanged?color_red:"black"
+
                                         text: slider_icp_ratio.value.toFixed(2) + " [ratio, %]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -3901,6 +5002,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_icp_ratio
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -3949,11 +5055,18 @@ Item {
                                         anchors.centerIn: parent
                                         text: slider_icp_repeat_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
+                                        color: slider_icp_repeat_dist.ischanged?color_red:"black"
+
                                         font.family: font_noto_r.name
                                     }
                                 }
                                 Slider{
                                     id: slider_icp_repeat_dist
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -4000,6 +5113,8 @@ Item {
                                     Text{
                                         id: text_icp_repeat_time
                                         anchors.centerIn: parent
+                                        color: slider_icp_repeat_time.ischanged?color_red:"black"
+
                                         text: slider_icp_repeat_time.value.toFixed(2) + " [sec]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -4007,6 +5122,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_icp_repeat_time
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -4068,11 +5188,19 @@ Item {
                                         anchors.centerIn: parent
                                         text: slider_goal_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
+                                        color: slider_goal_dist.ischanged?color_red:"black"
+
+
                                         font.family: font_noto_r.name
                                     }
                                 }
                                 Slider{
                                     id: slider_goal_dist
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -4118,6 +5246,8 @@ Item {
                                     height: 40
                                     Text{
                                         id: text_goal_v
+                                        color: slider_goal_v.ischanged?color_red:"black"
+
                                         anchors.centerIn: parent
                                         text: slider_goal_v.value.toFixed(2) + " [m/s]"
                                         font.pixelSize: 15
@@ -4126,6 +5256,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_goal_v
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -4172,6 +5307,8 @@ Item {
                                     Text{
                                         id: text_goal_th
                                         anchors.centerIn: parent
+                                        color: slider_goal_th.ischanged?color_red:"black"
+
                                         text: slider_goal_th.value.toFixed(2) + " [deg]"
                                         font.pixelSize: 15
                                         font.family: font_noto_r.name
@@ -4179,6 +5316,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_goal_th
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -4225,6 +5367,8 @@ Item {
                                     height: 40
                                     Text{
                                         id: text_goal_near_dist
+                                        color: slider_goal_near_dist.ischanged?color_red:"black"
+
                                         anchors.centerIn: parent
                                         text: slider_goal_near_dist.value.toFixed(2) + " [m]"
                                         font.pixelSize: 15
@@ -4233,6 +5377,11 @@ Item {
                                 }
                                 Slider{
                                     id: slider_goal_near_dist
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -4281,11 +5430,18 @@ Item {
                                         anchors.centerIn: parent
                                         text: slider_goal_near_th.value.toFixed(2) + " [deg]"
                                         font.pixelSize: 15
+                                        color: slider_goal_near_th.ischanged?color_red:"black"
+
                                         font.family: font_noto_r.name
                                     }
                                 }
                                 Slider{
                                     id: slider_goal_near_th
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: rr.width*0.7
                                     height: 40
@@ -4855,7 +6011,12 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     supervisor.writelog("[USER INPUT] SETTING PAGE -> BACKPAGE");
-                    backPage();
+                    if(check_update()){
+                        popup_changed.open();
+                    }else{
+                        backPage();
+                    }
+
                 }
             }
         }
@@ -4932,127 +6093,340 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
-                        supervisor.writelog("[USER INPUT] SETTING PAGE -> SETTING CHANGE");
-                        supervisor.setSetting("ROBOT_HW/model",platform_name.text);
-                        supervisor.setSetting("ROBOT_HW/serial_num",combo_platform_serial.currentText);
-                        supervisor.setSetting("ROBOT_SW/robot_id",combo_platform_id.currentText);
-                        supervisor.setSetting("ROBOT_HW/radius",radius.text);
-                        supervisor.setSetting("ROBOT_HW/tray_num",combo_tray_num.currentText);
-
-                        if(combo_platform_type.currentIndex == 0){
-                            supervisor.setSetting("ROBOT_HW/type","SERVING");
-                        }else if(combo_platform_type.currentIndex == 1){
-                            supervisor.setSetting("ROBOT_HW/type","CALLING");
-                        }
-
-                        supervisor.setSetting("ROBOT_HW/wheel_base",wheel_base.text);
-                        supervisor.setSetting("ROBOT_HW/wheel_radius",wheel_radius.text);
-
-//                        supervisor.setSetting("ROBOT_SW/k_curve",text_k_curve.text);
-                        supervisor.setSetting("ROBOT_SW/k_v"                    ,slider_k_v.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/k_w"                    ,slider_k_w.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/limit_pivot"            ,slider_limit_pivot.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/limit_pivot_acc"        ,slider_limit_pivot_acc.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/limit_v"                ,slider_limit_v.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/limit_w"                ,slider_limit_w.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/limit_v_acc"            ,slider_limit_v_acc.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/limit_w_acc"            ,slider_limit_w_acc.value.toFixed(2));
-
-                        supervisor.setSetting("ROBOT_SW/limit_manual_v"          ,slider_limit_manual_v.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/limit_manual_w"          ,slider_limit_manual_w.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/look_ahead_dist"         ,slider_look_ahead_dist.value.toFixed(2));
-
-                        supervisor.setSetting("ROBOT_SW/icp_dist"               ,slider_icp_dist.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/icp_error"              ,slider_icp_error.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/icp_near"               ,slider_icp_near.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/icp_odometry_weight"    ,slider_icp_odometry_weight.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/icp_ratio"              ,slider_icp_ratio.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/icp_repeat_dist"        ,slider_icp_repeat_dist.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/icp_repeat_time"        ,slider_icp_repeat_time.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/obs_deadzone"           ,slider_obs_deadzone.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/narrow_decel_ratio"     ,slider_narrow_decel_ratio.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/obs_wait_time"          ,slider_obs_wait_time.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/path_out_dist"          ,slider_path_out_dist.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/st_v"                   ,slider_st_v.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/min_look_ahead_dist"    ,slider_min_look_ahead_dist.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/goal_dist"              ,slider_goal_dist.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/goal_th"                ,slider_goal_th.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/goal_v"                 ,slider_goal_v.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/goal_near_dist"         ,slider_goal_near_dist.value.toFixed(2));
-                        supervisor.setSetting("ROBOT_SW/goal_near_th"           ,slider_goal_near_th.value.toFixed(2));
-
-                        supervisor.setSetting("ROBOT_SW/grid_size",grid_size.text);
-
-                        supervisor.setSetting("ROBOT_SW/map_size",map_size.text);
-
-                        supervisor.setSetting("ROBOT_SW/volume_bgm",slider_volume_bgm.value.toFixed(0));
-                        supervisor.setSetting("ROBOT_SW/volume_voice",slider_volume_voice.value.toFixed(0));
-
-                        if(combo_use_uicmd.currentIndex == 0)
-                            supervisor.setSetting("ROBOT_SW/use_uicmd","false");
-                        else
-                            supervisor.setSetting("ROBOT_SW/use_uicmd","true");
-
-                        if(combo_multirobot.currentIndex == 0)
-                            supervisor.setSetting("ROBOT_SW/use_multirobot","false");
-                        else
-                            supervisor.setSetting("ROBOT_SW/use_multirobot","true");
-
-
-                        supervisor.setSetting("ROBOT_SW/velocity",text_velocity.text);
-
-                        if(combo_autoinit.currentIndex == 0)
-                            supervisor.setSetting("ROBOT_SW/use_autoinit","false");
-                        else
-                            supervisor.setSetting("ROBOT_SW/use_autoinit","true");
-
-                        if(combo_avoid.currentIndex == 0)
-                            supervisor.setSetting("ROBOT_SW/use_avoid","false");
-                        else
-                            supervisor.setSetting("ROBOT_SW/use_avoid","true");
-
-                        supervisor.setSetting("SENSOR/baudrate",combo_baudrate.currentText);
-                        supervisor.setSetting("SENSOR/mask",text_mask.text);
-                        supervisor.setSetting("SENSOR/max_range",text_max_range.text);
-                        supervisor.setSetting("SENSOR/offset_x",offset_x.text);
-                        supervisor.setSetting("SENSOR/offset_y",offset_y.text);
-                        supervisor.setSetting("SENSOR/right_camera",right_camera.text);
-                        supervisor.setSetting("SENSOR/left_camera",left_camera.text);
-                        supervisor.setSetting("SENSOR/left_camera_tf",left_camera_tf.text);
-                        supervisor.setSetting("SENSOR/right_camera_tf",right_camera_tf.text);
-                        supervisor.setSetting("SENSOR/cam_exposure",text_cam_exposure.text);
-
-
-                        supervisor.setSetting("MOTOR/gear_ratio",gear_ratio.text);
-                        supervisor.setSetting("MOTOR/k_d",k_d.text);
-                        supervisor.setSetting("MOTOR/k_i",k_i.text);
-                        supervisor.setSetting("MOTOR/k_p",k_p.text);
-
-                        supervisor.setSetting("MOTOR/limit_v",slider_motor_limit_v.value.toFixed(2));
-                        supervisor.setSetting("MOTOR/limit_v_acc",slider_motor_limit_v_acc.value.toFixed(2));
-                        supervisor.setSetting("MOTOR/limit_w",slider_motor_limit_w.value.toFixed(2));
-                        supervisor.setSetting("MOTOR/limit_w_acc",slider_motor_limit_w_acc.value.toFixed(2));
-
-                        supervisor.setSetting("MOTOR/left_id",combo_left_id.currentText);
-                        supervisor.setSetting("MOTOR/right_id",combo_right_id.currentText);
-                        supervisor.setSetting("MOTOR/wheel_dir",combo_wheel_dir.currentText);
-                        supervisor.setTableNum(combo_table_num.currentIndex);
-
-                        supervisor.setSetting("CALLING/call_num",combo_call_num.currentText);
-                        supervisor.setSetting("CALLING/call_maximum",combo_call_max.currentText);
-
-                        supervisor.readSetting();
-                        supervisor.restartSLAM();
-                        init();
+                        save();
                     }
                 }
             }
         }
     }
 
+    function save(){
+        supervisor.writelog("[USER INPUT] SETTING PAGE -> SETTING CHANGE");
+        if(platform_name.ischanged){
+            supervisor.setSetting("ROBOT_HW/model",platform_name.text);
+        }
+
+        if(combo_platform_serial.ischanged){
+            supervisor.setSetting("ROBOT_HW/serial_num",combo_platform_serial.currentText);
+        }
+
+        if(combo_platform_id.ischanged){
+            supervisor.setSetting("ROBOT_SW/robot_id",combo_platform_id.currentText);
+        }
+
+        if(combo_platform_type.ischanged){
+            if(combo_platform_type.currentIndex == 0){
+                supervisor.setSetting("ROBOT_HW/type","SERVING");
+            }else if(combo_platform_type.currentIndex == 1){
+                supervisor.setSetting("ROBOT_HW/type","CALLING");
+            }
+        }
+
+        if(combo_tray_num.ischanged){
+            supervisor.setSetting("ROBOT_HW/tray_num",combo_tray_num.currentText);
+        }
+
+        if(slider_vxy.ischanged){
+            supervisor.setSetting("ROBOT_SW/velocity",slider_vxy.value.toFixed(2));
+        }
+
+        if(slider_volume_bgm.ischanged){
+            supervisor.setSetting("ROBOT_SW/volume_bgm",slider_volume_bgm.value.toFixed(0));
+        }
+
+        if(slider_volume_voice.ischanged){
+            supervisor.setSetting("ROBOT_SW/volume_voice",slider_volume_voice.value.toFixed(0));
+        }
+
+        if(combo_use_help.ischanged){
+            if(combo_use_help.currentIndex == 0)
+                supervisor.setSetting("ROBOT_SW/use_help","false");
+            else
+                supervisor.setSetting("ROBOT_SW/use_help","true");
+        }
+
+        if(wifi_passwd.ischanged){
+            supervisor.setSetting("ROBOT_SW/wifi_passwd",wifi_passwd.text);
+        }
+
+        if(ip_1.ischanged||ip_2.ischanged||ip_3.ischanged||ip_4.ischanged){
+            var ip_str = ip_1.text + "." + ip_2.text + "." + ip_3.text + "." + ip_4.text;
+            supervisor.setSetting("ROBOT_SW/wifi_ip",ip_str);
+        }
+
+        if(gateway_1.ischanged||gateway_2.ischanged||gateway_3.ischanged||gateway_4.ischanged){
+            var ip_str = gateway_1.text + "." + gateway_2.text + "." + gateway_3.text + "." + gateway_4.text;
+            supervisor.setSetting("ROBOT_SW/wifi_gateway",ip_str);
+        }
+
+        if(dnsmain_1.ischanged||dnsmain_2.ischanged||dnsmain_3.ischanged||dnsmain_4.ischanged){
+            var ip_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
+            supervisor.setSetting("ROBOT_SW/wifi_dnsmain",ip_str);
+        }
+
+        if(dnsserv_1.ischanged||dnsserv_2.ischanged||dnsserv_3.ischanged||dnsserv_4.ischanged){
+            var ip_str = dnsserv_1.text + "." + dnsserv_2.text + "." + dnsserv_3.text + "." + dnsserv_4.text;
+            supervisor.setSetting("ROBOT_SW/wifi_dnsserv",ip_str);
+
+        }
+
+        if(wheel_base.ischanged){
+            supervisor.setSetting("ROBOT_HW/wheel_base",wheel_base.text);
+        }
+        if(wheel_radius.ischanged){
+            supervisor.setSetting("ROBOT_HW/wheel_radius",wheel_radius.text);
+        }
+        if(radius.ischanged){
+            supervisor.setSetting("ROBOT_HW/radius",radius.text);
+        }
+
+        if(combo_autoinit.ischanged){
+            if(combo_autoinit.currentIndex == 0)
+                supervisor.setSetting("ROBOT_SW/use_autoinit","false");
+            else
+                supervisor.setSetting("ROBOT_SW/use_autoinit","true");
+        }
+
+        if(combo_avoid.ischanged){
+            if(combo_avoid.currentIndex == 0)
+                supervisor.setSetting("ROBOT_SW/use_avoid","false");
+            else
+                supervisor.setSetting("ROBOT_SW/use_avoid","true");
+        }
+
+        if(combo_multirobot.ischanged){
+            if(combo_multirobot.currentIndex == 0)
+                supervisor.setSetting("ROBOT_SW/use_multirobot","false");
+            else
+                supervisor.setSetting("ROBOT_SW/use_multirobot","true");
+        }
+
+        if(combo_use_uicmd.ischanged){
+            if(combo_use_uicmd.currentIndex == 0)
+                supervisor.setSetting("ROBOT_SW/use_uicmd","false");
+            else
+                supervisor.setSetting("ROBOT_SW/use_uicmd","true");
+        }
+
+        if(map_size.ischanged){
+            supervisor.setSetting("ROBOT_SW/map_size",map_size.text);
+        }
+
+        if(grid_size.ischanged){
+            supervisor.setSetting("ROBOT_SW/grid_size",grid_size.text);
+        }
+
+        if(combo_table_num.ischanged){
+            supervisor.setTableNum(combo_table_num.currentIndex);
+        }
+
+        if(combo_call_max.ischanged){
+            supervisor.setSetting("CALLING/call_maximum",combo_call_max.currentText);
+        }
+
+        if(combo_call_num.ischanged){
+            supervisor.setSetting("CALLING/call_num",combo_call_num.currentText);
+        }
+
+        if(combo_baudrate.ischanged){
+            supervisor.setSetting("SENSOR/baudrate",combo_baudrate.currentText);
+        }
+
+        if(slider_mask.ischanged){
+            supervisor.setSetting("SENSOR/mask",slider_mask.value.toFixed(2));
+        }
+
+        if(slider_max_range.ischanged){
+            supervisor.setSetting("SENSOR/max_range",slider_max_range.value.toFixed(2));
+        }
+
+        if(slider_cam_exposure.ischanged){
+            supervisor.setSetting("SENSOR/cam_exposure",slider_cam_exposure.value.toFixed(2));
+        }
+
+        if(offset_x.ischanged){
+            supervisor.setSetting("SENSOR/offset_x",offset_x.text);
+        }
+
+        if(offset_y.ischanged){
+            supervisor.setSetting("SENSOR/offset_y",offset_y.text);
+        }
+
+        if(slider_limit_pivot.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_pivot"            ,slider_limit_pivot.value.toFixed(2));
+        }
+
+        if(slider_limit_pivot_acc.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_pivot_acc"        ,slider_limit_pivot_acc.value.toFixed(2));
+        }
+
+        if(slider_limit_v.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_v"                ,slider_limit_v.value.toFixed(2));
+        }
+
+        if(slider_limit_v_acc.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_v_acc"            ,slider_limit_v_acc.value.toFixed(2));
+        }
+
+        if(slider_limit_w.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_w"                ,slider_limit_w.value.toFixed(2));
+        }
+
+        if(slider_limit_w_acc.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_w_acc"            ,slider_limit_w_acc.value.toFixed(2));
+        }
+
+        if(slider_limit_manual_v.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_manual_v"          ,slider_limit_manual_v.value.toFixed(2));
+        }
+
+        if(slider_limit_manual_w.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_manual_w"          ,slider_limit_manual_w.value.toFixed(2));
+        }
+
+        if(slider_st_v.ischanged){
+            supervisor.setSetting("ROBOT_SW/st_v"                   ,slider_st_v.value.toFixed(2));
+        }
+
+        if(combo_wheel_dir.ischanged){
+            supervisor.setSetting("MOTOR/wheel_dir",combo_wheel_dir.currentText);
+        }
+
+        if(combo_left_id.ischanged){
+            supervisor.setSetting("MOTOR/left_id",combo_left_id.currentText);
+        }
+
+        if(combo_right_id.ischanged){
+            supervisor.setSetting("MOTOR/right_id",combo_right_id.currentText);
+        }
+
+        if(gear_ratio.ischanged){
+            supervisor.setSetting("MOTOR/gear_ratio",gear_ratio.text);
+        }
+
+        if(k_p.ischanged){
+            supervisor.setSetting("MOTOR/k_p",k_p.text);
+        }
+
+        if(k_i.ischanged){
+            supervisor.setSetting("MOTOR/k_i",k_i.text);
+        }
+
+        if(k_d.ischanged){
+            supervisor.setSetting("MOTOR/k_d",k_d.text);
+        }
+
+        if(slider_motor_limit_v.ischanged){
+            supervisor.setSetting("MOTOR/limit_v",slider_motor_limit_v.value.toFixed(2));
+        }
+
+        if(slider_motor_limit_v_acc.ischanged){
+            supervisor.setSetting("MOTOR/limit_v_acc",slider_motor_limit_v_acc.value.toFixed(2));
+        }
+
+        if(slider_motor_limit_w.ischanged){
+            supervisor.setSetting("MOTOR/limit_w",slider_motor_limit_w.value.toFixed(2));
+        }
+
+        if(slider_motor_limit_w_acc.ischanged){
+            supervisor.setSetting("MOTOR/limit_w_acc",slider_motor_limit_w_acc.value.toFixed(2));
+        }
+
+        if(slider_k_v.ischanged){
+            supervisor.setSetting("ROBOT_SW/k_v"                    ,slider_k_v.value.toFixed(2));
+        }
+
+        if(slider_k_w.ischanged){
+            supervisor.setSetting("ROBOT_SW/k_w"                    ,slider_k_w.value.toFixed(2));
+        }
+
+        if(slider_look_ahead_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/look_ahead_dist"         ,slider_look_ahead_dist.value.toFixed(2));
+        }
+
+        if(slider_min_look_ahead_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/min_look_ahead_dist"    ,slider_min_look_ahead_dist.value.toFixed(2));
+        }
+
+        if(slider_narrow_decel_ratio.ischanged){
+            supervisor.setSetting("ROBOT_SW/narrow_decel_ratio"     ,slider_narrow_decel_ratio.value.toFixed(2));
+        }
+
+        if(slider_obs_deadzone.ischanged){
+            supervisor.setSetting("ROBOT_SW/obs_deadzone"           ,slider_obs_deadzone.value.toFixed(2));
+        }
+
+        if(slider_obs_wait_time.ischanged){
+            supervisor.setSetting("ROBOT_SW/obs_wait_time"          ,slider_obs_wait_time.value.toFixed(2));
+        }
+
+        if(slider_path_out_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/path_out_dist"          ,slider_path_out_dist.value.toFixed(2));
+        }
+
+        if(slider_icp_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/icp_dist"               ,slider_icp_dist.value.toFixed(2));
+        }
+
+        if(slider_icp_error.ischanged){
+            supervisor.setSetting("ROBOT_SW/icp_error"              ,slider_icp_error.value.toFixed(2));
+        }
+
+        if(slider_icp_near.ischanged){
+            supervisor.setSetting("ROBOT_SW/icp_near"               ,slider_icp_near.value.toFixed(2));
+
+        }
+
+        if(slider_icp_odometry_weight.ischanged){
+            supervisor.setSetting("ROBOT_SW/icp_odometry_weight"    ,slider_icp_odometry_weight.value.toFixed(2));
+
+        }
+
+        if(slider_icp_ratio.ischanged){
+
+            supervisor.setSetting("ROBOT_SW/icp_ratio"              ,slider_icp_ratio.value.toFixed(2));
+        }
+
+        if(slider_icp_repeat_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/icp_repeat_dist"        ,slider_icp_repeat_dist.value.toFixed(2));
+
+        }
+
+        if(slider_icp_repeat_time.ischanged){
+            supervisor.setSetting("ROBOT_SW/icp_repeat_time"        ,slider_icp_repeat_time.value.toFixed(2));
+
+        }
+
+        if(slider_goal_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/goal_dist"              ,slider_goal_dist.value.toFixed(2));
+        }
+
+        if(slider_goal_v.ischanged){
+            supervisor.setSetting("ROBOT_SW/goal_v"                 ,slider_goal_v.value.toFixed(2));
+        }
+
+        if(slider_goal_th.ischanged){
+            supervisor.setSetting("ROBOT_SW/goal_th"                ,slider_goal_th.value.toFixed(2));
+        }
+
+        if(slider_goal_near_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/goal_near_dist"         ,slider_goal_near_dist.value.toFixed(2));
+        }
+
+        if(slider_goal_near_th.ischanged){
+            supervisor.setSetting("ROBOT_SW/goal_near_th"           ,slider_goal_near_th.value.toFixed(2));
+        }
+
+        if(is_reset_slam)
+            supervisor.restartSLAM();
+
+        init();
+
+    }
 
     function init(){
         supervisor.writelog("[QML] SETTING PAGE init");
+
         platform_name.text = supervisor.getSetting("ROBOT_HW","model");
         combo_platform_serial.currentIndex = parseInt(supervisor.getSetting("ROBOT_HW","serial_num"))
         combo_platform_id.currentIndex = parseInt(supervisor.getSetting("ROBOT_SW","robot_id"))
@@ -5071,7 +6445,6 @@ Item {
         map_name.text = supervisor.getMapname();
         grid_size.text = supervisor.getSetting("ROBOT_SW","grid_size");
         map_size.text = supervisor.getSetting("ROBOT_SW","map_size");
-
 
         left_camera_tf.text = supervisor.getSetting("SENSOR","left_camera_tf");
         right_camera_tf.text = supervisor.getSetting("SENSOR","right_camera_tf");
@@ -5140,7 +6513,8 @@ Item {
         k_i.text = supervisor.getSetting("MOTOR","k_i");
         k_p.text = supervisor.getSetting("MOTOR","k_p");
 
-
+        wifi_ssd.text = supervisor.getSetting("ROBOT_SW","wifi_ssd");
+        wifi_passwd.text = supervisor.getSetting("ROBOT_SW","wifi_passwd");
 
         combo_left_id.currentIndex = parseInt(supervisor.getSetting("MOTOR","left_id"));
         combo_right_id.currentIndex = parseInt(supervisor.getSetting("MOTOR","right_id"));
@@ -5155,6 +6529,12 @@ Item {
             combo_autoinit.currentIndex = 1;
         }else{
             combo_autoinit.currentIndex = 0;
+        }
+
+        if(supervisor.getSetting("ROBOT_SW","use_help") === "true"){
+            combo_use_help.currentIndex = 1;
+        }else{
+            combo_use_help.currentIndex = 0;
         }
 
         if(supervisor.getSetting("ROBOT_SW","use_avoid") === "true"){
@@ -5185,6 +6565,224 @@ Item {
         offset_y.text = supervisor.getSetting("SENSOR","offset_y");
         right_camera.text = supervisor.getSetting("SENSOR","right_camera");
         left_camera.text = supervisor.getSetting("SENSOR","left_camera");
+
+        var ip = supervisor.getSetting("ROBOT_SW","wifi_ip").split(".");
+        if(ip.length >3){
+            ip_1.text = ip[0];
+            ip_2.text = ip[1];
+            ip_3.text = ip[2];
+            ip_4.text = ip[3];
+        }
+
+        ip = supervisor.getSetting("ROBOT_SW","wifi_gateway").split(".");
+        if(ip.length >3){
+            gateway_1.text = ip[0];
+            gateway_2.text = ip[1];
+            gateway_3.text = ip[2];
+            gateway_4.text = ip[3];
+        }
+        ip = supervisor.getSetting("ROBOT_SW","wifi_dnsmain").split(".");
+        if(ip.length >3){
+            dnsmain_1.text = ip[0];
+            dnsmain_2.text = ip[1];
+            dnsmain_3.text = ip[2];
+            dnsmain_4.text = ip[3];
+        }
+        ip = supervisor.getSetting("ROBOT_SW","wifi_dnsserv").split(".");
+        if(ip.length >3){
+            dnsserv_1.text = ip[0];
+            dnsserv_2.text = ip[1];
+            dnsserv_3.text = ip[2];
+            dnsserv_4.text = ip[3];
+        }
+
+
+        //변수 초기화
+        is_reset_slam = false;
+
+        platform_name.ischanged = false;
+        combo_platform_serial.ischanged = false;
+        combo_platform_id.ischanged = false;
+        combo_platform_type.ischanged = false;
+        combo_tray_num.ischanged = false;
+
+        slider_vxy.ischanged = false;
+        slider_volume_bgm.ischanged = false;
+        slider_volume_voice.ischanged = false;
+        combo_use_help.ischanged = false;
+
+
+        wifi_passwd.ischanged = false;
+        ip_1.ischanged = false;
+        ip_2.ischanged = false;
+        ip_3.ischanged = false;
+        ip_4.ischanged = false;
+        gateway_1.ischanged = false;
+        gateway_2.ischanged = false;
+        gateway_3.ischanged = false;
+        gateway_4.ischanged = false;
+        dnsmain_1.ischanged = false;
+        dnsmain_2.ischanged = false;
+        dnsmain_3.ischanged = false;
+        dnsmain_4.ischanged = false;
+        dnsserv_1.ischanged = false;
+        dnsserv_2.ischanged = false;
+        dnsserv_3.ischanged = false;
+        dnsserv_4.ischanged = false;
+
+        wheel_base.ischanged = false;
+        wheel_radius.ischanged = false;
+        radius.ischanged = false;
+        combo_autoinit.ischanged = false;
+        combo_avoid.ischanged = false;
+        combo_multirobot.ischanged = false;
+        combo_use_uicmd.ischanged = false;
+
+        map_size.ischanged = false;
+        grid_size.ischanged = false;
+        combo_table_num.ischanged = false;
+        combo_call_max.ischanged = false;
+        combo_call_num.ischanged = false;
+
+        combo_baudrate.ischanged = false;
+        slider_mask.ischanged = false;
+        slider_max_range.ischanged = false;
+        slider_cam_exposure.ischanged = false;
+        offset_x.ischanged = false;
+        offset_y.ischanged = false;
+
+        slider_limit_pivot.ischanged = false;
+        slider_limit_pivot_acc.ischanged = false;
+        slider_limit_v.ischanged = false;
+        slider_limit_v_acc.ischanged = false;
+        slider_limit_w.ischanged = false;
+        slider_limit_w_acc.ischanged = false;
+        slider_limit_manual_v.ischanged = false;
+        slider_limit_manual_w.ischanged = false;
+        slider_st_v.ischanged = false;
+
+        combo_wheel_dir.ischanged = false;
+        combo_left_id.ischanged = false;
+        combo_right_id.ischanged = false;
+        gear_ratio.ischanged = false;
+        k_p.ischanged = false;
+        k_i.ischanged = false;
+        k_d.ischanged = false;
+        slider_motor_limit_v.ischanged = false;
+        slider_motor_limit_v_acc.ischanged = false;
+        slider_motor_limit_w.ischanged = false;
+        slider_motor_limit_w_acc.ischanged = false;
+        slider_k_v.ischanged = false;
+        slider_k_w.ischanged = false;
+        slider_look_ahead_dist.ischanged = false;
+        slider_min_look_ahead_dist.ischanged = false;
+        slider_narrow_decel_ratio.ischanged = false;
+        slider_obs_deadzone.ischanged = false;
+        slider_obs_wait_time.ischanged = false;
+        slider_path_out_dist.ischanged = false;
+        slider_icp_dist.ischanged = false;
+        slider_icp_error.ischanged = false;
+        slider_icp_near.ischanged = false;
+        slider_icp_odometry_weight.ischanged = false;
+        slider_icp_ratio.ischanged = false;
+        slider_icp_repeat_dist.ischanged = false;
+        slider_icp_repeat_time.ischanged = false;
+        slider_goal_dist.ischanged = false;
+        slider_goal_v.ischanged = false;
+        slider_goal_th.ischanged = false;
+        slider_goal_near_dist.ischanged = false;
+        slider_goal_near_th.ischanged = false;
+    }
+
+    function check_update(){
+        var is_changed = false;
+
+        if(platform_name.ischanged) is_changed = true;
+        if(combo_platform_serial.ischanged) is_changed = true;
+        if(combo_platform_id.ischanged) is_changed = true;
+        if(combo_platform_type.ischanged) is_changed = true;
+        if(combo_tray_num.ischanged) is_changed = true;
+        if(slider_vxy.ischanged) is_changed = true;
+        if(slider_volume_bgm.ischanged) is_changed = true;
+        if(slider_volume_voice.ischanged) is_changed = true;
+        if(combo_use_help.ischanged) is_changed = true;
+        if(wifi_passwd.ischanged) is_changed = true;
+        if(ip_1.ischanged) is_changed = true;
+        if(ip_2.ischanged) is_changed = true;
+        if(ip_3.ischanged) is_changed = true;
+        if(ip_4.ischanged) is_changed = true;
+        if(gateway_1.ischanged) is_changed = true;
+        if(gateway_2.ischanged) is_changed = true;
+        if(gateway_3.ischanged) is_changed = true;
+        if(gateway_4.ischanged) is_changed = true;
+        if(dnsmain_1.ischanged) is_changed = true;
+        if(dnsmain_2.ischanged) is_changed = true;
+        if(dnsmain_3.ischanged) is_changed = true;
+        if(dnsmain_4.ischanged) is_changed = true;
+        if(dnsserv_1.ischanged) is_changed = true;
+        if(dnsserv_2.ischanged) is_changed = true;
+        if(dnsserv_3.ischanged) is_changed = true;
+        if(dnsserv_4.ischanged) is_changed = true;
+        if(wheel_base.ischanged) is_changed = true;
+        if(wheel_radius.ischanged) is_changed = true;
+        if(radius.ischanged) is_changed = true;
+        if(combo_autoinit.ischanged) is_changed = true;
+        if(combo_avoid.ischanged) is_changed = true;
+        if(combo_multirobot.ischanged) is_changed = true;
+        if(combo_use_uicmd.ischanged) is_changed = true;
+        if(map_size.ischanged) is_changed = true;
+        if(grid_size.ischanged) is_changed = true;
+        if(combo_table_num.ischanged) is_changed = true;
+        if(combo_call_max.ischanged) is_changed = true;
+        if(combo_call_num.ischanged) is_changed = true;
+        if(combo_baudrate.ischanged) is_changed = true;
+        if(slider_mask.ischanged) is_changed = true;
+        if(slider_max_range.ischanged) is_changed = true;
+        if(slider_cam_exposure.ischanged) is_changed = true;
+        if(offset_x.ischanged) is_changed = true;
+        if(offset_y.ischanged) is_changed = true;
+        if(slider_limit_pivot.ischanged) is_changed = true;
+        if(slider_limit_pivot_acc.ischanged) is_changed = true;
+        if(slider_limit_v.ischanged) is_changed = true;
+        if(slider_limit_v_acc.ischanged) is_changed = true;
+        if(slider_limit_w.ischanged) is_changed = true;
+        if(slider_limit_w_acc.ischanged) is_changed = true;
+        if(slider_limit_manual_v.ischanged) is_changed = true;
+        if(slider_limit_manual_w.ischanged) is_changed = true;
+        if(slider_st_v.ischanged) is_changed = true;
+        if(combo_wheel_dir.ischanged) is_changed = true;
+        if(combo_left_id.ischanged) is_changed = true;
+        if(combo_right_id.ischanged) is_changed = true;
+        if(gear_ratio.ischanged) is_changed = true;
+        if(k_p.ischanged) is_changed = true;
+        if(k_i.ischanged) is_changed = true;
+        if(k_d.ischanged) is_changed = true;
+        if(slider_motor_limit_v.ischanged) is_changed = true;
+        if(slider_motor_limit_v_acc.ischanged) is_changed = true;
+        if(slider_motor_limit_w.ischanged) is_changed = true;
+        if(slider_motor_limit_w_acc.ischanged) is_changed = true;
+        if(slider_k_v.ischanged) is_changed = true;
+        if(slider_k_w.ischanged) is_changed = true;
+        if(slider_look_ahead_dist.ischanged) is_changed = true;
+        if(slider_min_look_ahead_dist.ischanged) is_changed = true;
+        if(slider_narrow_decel_ratio.ischanged) is_changed = true;
+        if(slider_obs_deadzone.ischanged) is_changed = true;
+        if(slider_obs_wait_time.ischanged) is_changed = true;
+        if(slider_path_out_dist.ischanged) is_changed = true;
+        if(slider_icp_dist.ischanged) is_changed = true;
+        if(slider_icp_error.ischanged) is_changed = true;
+        if(slider_icp_near.ischanged) is_changed = true;
+        if(slider_icp_odometry_weight.ischanged) is_changed = true;
+        if(slider_icp_ratio.ischanged) is_changed = true;
+        if(slider_icp_repeat_dist.ischanged) is_changed = true;
+        if(slider_icp_repeat_time.ischanged) is_changed = true;
+        if(slider_goal_dist.ischanged) is_changed = true;
+        if(slider_goal_v.ischanged) is_changed = true;
+        if(slider_goal_th.ischanged) is_changed = true;
+        if(slider_goal_near_dist.ischanged) is_changed = true;
+        if(slider_goal_near_th.ischanged) is_changed = true;
+
+        return is_changed;
     }
 
     Timer{
@@ -6090,12 +7688,10 @@ Item {
         rightPadding: 0
         property var callid: 0
         onOpened: {
-//            timer_popup_call.start();
             supervisor.setCallbell(callid);
         }
         onClosed: {
             supervisor.setCallbell(-1);
-//            timer_popup_call.stop();
         }
 
         Rectangle{
@@ -6105,15 +7701,6 @@ Item {
                 text: "변경하실 호출벨을 눌러주세요."
                 font.family: font_noto_r.name
                 font.pixelSize: 25
-            }
-        }
-        Timer{
-            id: timer_popup_call
-            interval: 300
-            running: false
-            repeat: true
-            onTriggered: {
-                print("hello " + Number(popup_change_call.callid))
             }
         }
     }
@@ -6531,11 +8118,12 @@ Item {
                                     anchors.fill: parent
                                     onClicked: {
                                         if(popup_camera.is_switched){
+                                            is_reset_slam = true;
                                             supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA SWITCH LEFT("+text_camera_1.text+") RIGHT("+text_camera_2.text+")");
                                             supervisor.setCamera(text_camera_1.text,text_camera_2.text);
                                         }
-                                        supervisor.readSetting();
-                                        init();
+                                        left_camera.text = supervisor.getSetting("SENSOR","left_camera");
+                                        right_camera.text = supervisor.getSetting("SENSOR","right_camera");
                                         popup_camera.close();
                                     }
                                 }
@@ -6586,10 +8174,7 @@ Item {
                             }
                         }
                     }
-
                 }
-
-
             }
         }
     }
@@ -6704,10 +8289,8 @@ Item {
                                                 supervisor.setSetting("PRESET1/name",text_preset_1.text);
                                             }else if(popup_preset.select_preset === 2){
                                                 supervisor.setSetting("PRESET2/name",text_preset_2.text);
-
                                             }else if(popup_preset.select_preset === 3){
                                                 supervisor.setSetting("PRESET3/name",text_preset_3.text);
-
                                             }
 
                                             supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_pivot",text_preset_limit_pivot.text);
@@ -7139,10 +8722,18 @@ Item {
 
     Popup{
         id: popup_preset_set
-        width: 400
-        height: 300
         anchors.centerIn: parent
+        leftPadding: 0
+        rightPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        width: 450
+        height: 300
         property var preset_num: 0
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
         onOpened:{
             if(preset_num === 1){
                 text_preset_name_set.text = "(  "+supervisor.getSetting("PRESET1","name") + "   )";
@@ -7152,79 +8743,94 @@ Item {
                 text_preset_name_set.text = "(  "+supervisor.getSetting("PRESET3","name") + "   )";
             }
         }
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 10
+            color: color_dark_navy
+            Column{
+                anchors.centerIn: parent
+                spacing: 30
 
-        background:Rectangle{
-            anchors.fill: parent
-        }
-        Column{
-            anchors.centerIn: parent
-            spacing: 10
-            Text{
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: "선택하신 프리셋으로 세팅을 변경하시겠습니까?"
-                font.family: font_noto_r.name
-                font.pixelSize: 25
-            }
-            Text{
-                id: text_preset_name_set
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: "(        )"
-                font.family: font_noto_r.name
-                font.pixelSize: 20
-            }
-            Row{
-                spacing: 20
-                anchors.horizontalCenter: parent.horizontalCenter
-                Rectangle{
-                    width: 100
-                    height: 60
-                    color: color_navy
-                    Text{
-                        anchors.centerIn: parent
-                        text: "취소"
-                        font.family: font_noto_r.name
-                        font.pixelSize: 20
-                        color: "white"
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked:{
-                            popup_preset_set.close();
+                Text{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "선택하신 프리셋으로 세팅을 변경하시겠습니까?"
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                }
+                Text{
+                    id: text_preset_name_set
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                }
+
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 30
+                    Rectangle{
+                        width: 150
+                        height: 50
+                        radius: 5
+                        color: "transparent"
+                        border.width: 2
+                        border.color: "white"
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            text: "취소"
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_preset_set.close();
+                            }
                         }
                     }
-            }
-
-                Rectangle{
-                    width: 100
-                    height: 60
-                    color: color_navy
-                    Text{
-                        anchors.centerIn: parent
-                        text: "확인"
-                        font.family: font_noto_r.name
-                        font.pixelSize: 20
+                    Rectangle{
+                        width: 150
+                        height: 50
+                        radius: 5
                         color: "white"
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked:{
-                            var name = "PRESET"+Number(popup_preset_set.preset_num);
-                            print("setting! ",name,supervisor.getSetting(name,"limit_pivot"))
-                            supervisor.setSetting("ROBOT_SW/limit_pivot",supervisor.getSetting(name,"limit_pivot"));
-                            supervisor.setSetting("ROBOT_SW/limit_v",supervisor.getSetting(name,"limit_v"));
-                            supervisor.setSetting("ROBOT_SW/limit_v_acc",supervisor.getSetting(name,"limit_v_acc"));
-                            supervisor.setSetting("ROBOT_SW/limit_w",supervisor.getSetting(name,"limit_w"));
-                            supervisor.setSetting("ROBOT_SW/limit_w_acc",supervisor.getSetting(name,"limit_w_acc"));
-                            popup_preset_set.close();
-                            init();
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            text: "확인"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                var name = "PRESET"+Number(popup_preset_set.preset_num);
+                                supervisor.setSetting("ROBOT_SW/limit_pivot",supervisor.getSetting(name,"limit_pivot"));
+                                supervisor.setSetting("ROBOT_SW/limit_v",supervisor.getSetting(name,"limit_v"));
+                                supervisor.setSetting("ROBOT_SW/limit_v_acc",supervisor.getSetting(name,"limit_v_acc"));
+                                supervisor.setSetting("ROBOT_SW/limit_w",supervisor.getSetting(name,"limit_w"));
+                                supervisor.setSetting("ROBOT_SW/limit_w_acc",supervisor.getSetting(name,"limit_w_acc"));
+
+                                slider_limit_pivot.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_pivot"));
+                                slider_limit_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_v"));
+                                slider_limit_v_acc.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_v_acc"));
+                                slider_limit_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_w"));
+                                slider_limit_w_acc.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_w_acc"));
+                                slider_limit_pivot.ischanged = false;
+                                slider_limit_v.ischanged = false;
+                                slider_limit_v_acc.ischanged = false;
+                                slider_limit_w.ischanged = false;
+                                slider_limit_w_acc.ischanged = false;
+                                is_reset_slam = true;
+                                popup_preset_set.close();
+                            }
                         }
                     }
                 }
             }
         }
-
-
     }
+
 
     Popup{
         id: popup_password
@@ -7796,8 +9402,8 @@ Item {
                         onClicked:{
                             supervisor.writelog("[USER INPUT] SETTING CAMERA TF CHANGED");
 
-                            var left_str = tf_left_x.text + ", " + tf_left_y.text + ", " + tf_left_z.text + ", " + tf_left_rx.text + ", " + tf_left_ry.text  + ", " + tf_left_rz;
-                            var right_str = tf_right_x.text + ", " + tf_right_y.text + ", " + tf_right_z.text + ", " + tf_right_rx.text + ", " + tf_right_ry.text  + ", " + tf_right_rz;
+                            var left_str = tf_left_x.text + "," + tf_left_y.text + "," + tf_left_z.text + "," + tf_left_rx.text + "," + tf_left_ry.text  + "," + tf_left_rz.text;
+                            var right_str = tf_right_x.text + "," + tf_right_y.text + "," + tf_right_z.text + "," + tf_right_rx.text + "," + tf_right_ry.text  + "," + tf_right_rz.text;
 
                             supervisor.setSetting("SENSOR/left_camera_tf",left_str);
                             supervisor.setSetting("SENSOR/right_camera_tf",right_str);
@@ -7810,6 +9416,251 @@ Item {
         }
     }
 
+    Popup{
+        id: popup_wifi
+        anchors.centerIn: parent
+        leftPadding: 0
+        rightPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        width: 400
+        height: 500
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+        onOpened:{
+            supervisor.readWifi();
+            model_wifis.clear();
+            for(var i=0; i<supervisor.getWifiNum(); i++){
+                model_wifis.append({"ssd":supervisor.getWifiSSD(i)});
+            }
+        }
+
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 10
+            color: color_dark_navy
+            Text{
+                id: text_wifi
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 30
+                text: "WIFI 설정"
+                color: "white"
+                font.family: font_noto_r.name
+                font.pixelSize: 20
+            }
+
+            Text{
+                id: text_wifi2
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: text_wifi.bottom
+                anchors.topMargin: 20
+                text: "하단의 리스트에서 연결할 WIFI를 선택해주세요."
+                color: "white"
+                font.family: font_noto_r.name
+                font.pixelSize: 15
+            }
+            Flickable{
+                width: parent.width
+                height: 250
+                clip: true
+                contentHeight: col_wifis.height
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: text_wifi2.bottom
+                anchors.topMargin: 15
+
+                Column{
+                    id: col_wifis
+                    anchors.centerIn: parent
+                    property var select_wifi: -1
+                    spacing: 10
+                    Repeater{
+                        model : ListModel{id: model_wifis}
+                        Rectangle{
+                            width: 330
+                            height: 40
+                            radius: 5
+                            color: col_wifis.select_wifi===index?color_green:"white"
+                            Text{
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text: ssd
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked:{
+                                    col_wifis.select_wifi = index;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Row{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 30
+                spacing: 30
+                Rectangle{
+                    width: 150
+                    height: 50
+                    radius: 5
+                    color: "transparent"
+                    border.width: 2
+                    border.color: "white"
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        text: "취소"
+                        color: "white"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            popup_wifi.close();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 150
+                    height: 50
+                    radius: 5
+                    color: "white"
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        text: "확인"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            supervisor.setSetting("ROBOT_SW/wifi_ssd",model_wifis.get(col_wifis.select_wifi).ssd);
+//                            popup_wifi_passwd.ssd = model_wifis.get(col_wifis.select_wifi).ssd;
+//                            popup_wifi_passwd.open();
+                            wifi_ssd.text = supervisor.getSetting("ROBOT_SW","wifi_ssd");
+                            popup_wifi.close();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Popup{
+        id: popup_wifi_passwd
+        anchors.centerIn: parent
+        width: 200
+        height: 150
+        property string ssd: ""
+
+        TextField{
+            id: passwd_wifi
+            anchors.centerIn: parent
+            width: 100
+            height: 50
+            onFocusChanged: {
+                keyboard.owner = passwd_wifi;
+                passwd_wifi.selectAll();
+                if(focus){
+                    keyboard.open();
+                }else{
+                    keyboard.close();
+                    passwd_wifi.select(0,0);
+                    print("check connect", popup_wifi_passwd.ssd, passwd_wifi.text);
+                    supervisor.connectWifi(popup_wifi_passwd.ssd, passwd_wifi.text)
+                }
+            }
+        }
+    }
+
+    Popup{
+        id: popup_changed
+        anchors.centerIn: parent
+        leftPadding: 0
+        rightPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        width: 450
+        height: 300
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 10
+            color: color_dark_navy
+            Column{
+                anchors.centerIn: parent
+                spacing: 30
+
+                Text{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "세팅값 변경 감지"
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                }
+
+                Text{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "변경한 값으로 저장하시려면 확인 버튼을 눌러주세요.\n취소하시면 저장되지 않습니다."
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                    font.family: font_noto_r.name
+                    font.pixelSize: 15
+                }
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 30
+                    Rectangle{
+                        width: 150
+                        height: 50
+                        radius: 5
+                        color: "transparent"
+                        border.width: 2
+                        border.color: "white"
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            text: "취소"
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                backPage();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 150
+                        height: 50
+                        radius: 5
+                        color: "white"
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            text: "확인"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                save();
+                                backPage();
+                            }
+                        }
+                    }
+                }
+
+            }
+
+
+        }
+    }
     Popup_map_list{
         id: popup_maplist
     }

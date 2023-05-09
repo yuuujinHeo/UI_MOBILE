@@ -343,7 +343,7 @@ Popup {
                             }
                             Repeater{
                                 id: keys_4
-                                model: ["z","x","c","v","b","n","m","_","."]
+                                model: ["z","x","c","v","b","n","m","_","!"]
                                 Rectangle{
                                     width: keysize
                                     height: width

@@ -519,7 +519,9 @@ Item {
             Component.onCompleted: {
                 btn_menu.is_restart = false;
                 help_image.source = "video/slam_help.gif"
-                popup_help.open();
+                if(supervisor.getSetting("ROBOT_SW","use_help") === "true"){
+                    popup_help.open();
+                }
             }
 
             Rectangle{
@@ -2296,7 +2298,9 @@ Item {
             Component.onCompleted: {
 
                 help_image.source = "video/rotate_help.gif"
-                popup_help.open();
+                if(supervisor.getSetting("ROBOT_SW","use_help") === "true"){
+                    popup_help.open();
+                }
             }
 
             Rectangle{
@@ -2639,7 +2643,9 @@ Item {
 
             Component.onCompleted: {
                 help_image.source = "video/draw_help.gif"
-                popup_help.open();
+                if(supervisor.getSetting("ROBOT_SW","use_help") === "true"){
+                    popup_help.open();
+                }
             }
             Rectangle{
                 anchors.fill: parent
@@ -3039,7 +3045,9 @@ Item {
                     btn_load_map.activated = false;
                 }
                 help_image.source = "video/tline_help.gif"
-                popup_help.open();
+                if(supervisor.getSetting("ROBOT_SW","use_help") === "true"){
+                    popup_help.open();
+                }
 //                map.brush_size = slider_brush.value;
             }
             Component.onDestruction: {
@@ -3964,7 +3972,9 @@ Item {
 
             Component.onCompleted: {
                 help_image.source = "video/obj_help.gif"
-                popup_help.open();
+                if(supervisor.getSetting("ROBOT_SW","use_help") === "true"){
+                    popup_help.open();
+                }
                 var ob_num = supervisor.getObjectNum();
                 list_object.model.clear();
                 for(var i=0; i<ob_num; i++){
@@ -4409,7 +4419,9 @@ Item {
 
             Component.onCompleted: {
                 help_image.source = "video/loc_help.gif"
-                popup_help.open();
+                if(supervisor.getSetting("ROBOT_SW","use_help") === "true"){
+                    popup_help.open();
+                }
                 map.sel
                 var loc_num = supervisor.getLocationNum();
                 list_location.model.clear();
@@ -7207,6 +7219,7 @@ Item {
 
         AnimatedImage{
             id: help_image
+            enabled: supervisor.getSetting("ROBOT_SW","use_help")==="true"
             anchors.centerIn : parent
             source: "video/slam_help.gif"
             cache: false

@@ -143,6 +143,14 @@ public:
     Q_INVOKABLE QString getLocalVersionMessage();
     Q_INVOKABLE QString getServerVersionMessage();
 
+    QNetworkSession *temp_wifi;
+    QStringList wifi_list;
+    Q_INVOKABLE void readWifi();
+    Q_INVOKABLE int getWifiNum();
+    Q_INVOKABLE QString getWifiSSD(int num);
+    Q_INVOKABLE void connectWifi(QString ssd, QString passwd);
+
+
     QStringList curLog;
     QString log_folder = "ui_log";
     Q_INVOKABLE void setLog(int num){
