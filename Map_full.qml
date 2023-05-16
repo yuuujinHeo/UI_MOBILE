@@ -64,6 +64,20 @@ Item {
         mapview.setEnable(en);
     }
 
+    function checkLocCollision(){
+        return mapview.checkLocationCollision()
+    }
+
+    function checkLocCol(num){
+        return mapview.checkLocationCollision(num)
+    }
+    function checkCollision(x,y){
+        return mapview.isCollision(x,y);
+    }
+    function checkRobotCollision(){
+        return mapview.checkRobotCollision();
+    }
+
     function setViewer(mode){
         supervisor.writelog("[QML MAP] SET Viewer "+objectName+" to "+mode);
         mapview.setMode(mode);
@@ -82,6 +96,8 @@ Item {
             show_button_location = true;
             show_button_following = false;
             show_button_lidar = false;
+        }else if(mode === "annot_location"){
+            mapview.setCostMap();
         }
     }
 
@@ -150,6 +166,7 @@ Item {
                 mapview.initTline(name);
                 mapview.setCostMap(name);
             }else if(type === "OBJECT"){
+                mapview.setCostMap();
                 mapview.setObjectMap(name);
             }
         }else{
@@ -168,6 +185,11 @@ Item {
         mapview.setMapping();
     }
 
+    function setcostmap(){
+
+        mapview.setCostMap();
+    }
+
     function loadobjecting(){
         mapview.setObjecting();
     }
@@ -180,8 +202,8 @@ Item {
         mapview.selectObject(num);
     }
 
-    function setCurrentLocation(num){
-        mapview.selectLocation(num);
+    function setCurrentLocation(num, type){
+        mapview.selectLocation(num, type);
     }
 
     function setTool(name){
@@ -210,15 +232,18 @@ Item {
     function clear(mode){
         if(mode==="obj"){
 
-        }else if(mode === "loc"){
-
+        }else if(mode === "location"){
+            mapview.clearLocation();
         }else if(mode==="all"){
             mapview.clearDrawing();
             mapview.clearObject();
             mapview.clearLocation();
+            mapview.clearInitPose();
         }else if(mode==="tline"){
             mapview.clearDrawing();
 
+        }else if(mode==="spline"){
+            mapview.endSpline(false);
         }
     }
     function rotate(dir){
@@ -237,7 +262,7 @@ Item {
         mapview.saveObject(type);
     }
 
-    function save(mode){
+    function save(mode, type, name){
         if(mode==="obj"){
             mapview.saveObject();
         }else if(mode==="raw"){
@@ -251,11 +276,14 @@ Item {
             last_robot_th = supervisor.getlastRobotth();
             print(last_robot_x,last_robot_y,last_robot_th);
             mapview.addLocation(last_robot_x,last_robot_y,last_robot_th);
-            mapview.saveLocation(select_location_type,tfield_location.text);
+            mapview.saveLocation(type,name);
         }else if(mode==="location"){
-            mapview.saveLocation(select_location_type,tfield_location.text);
+            mapview.saveLocation(type,name);
         }else if(mode==="tline"){
+            mapview.endSpline(true);
             mapview.saveTline();
+        }else if(mode==="spline"){
+            mapview.endSpline(true);
         }
     }
 
@@ -447,6 +475,9 @@ Item {
             }else if(tool == "straight"){
                 mapview.showBrush(true);
                 mapview.startDrawingLine(firstX, firstY);
+            }else if(tool == "dot_spline"){
+//                mapview.startSpline(firstX, firstY);
+                mapview.addSpline(firstX,firstY);
             }else if(tool == "erase"){
                 mapview.showBrush(true);
                 mapview.setLineColor(-1);
@@ -461,6 +492,8 @@ Item {
                 mapview.addLocation(firstX, firstY,0);
             }else if( tool === "edit_location"){
                 mapview.editLocation(firstX, firstY,0);
+            }else if(tool === "edit_location_new"){
+                mapview.addLocation(firstX, firstY,0);
             }else if( tool === "slam_init"){
                 print("Pressed : ",firstX,firstY,0);
                 mapview.setInitPose(firstX,firstY,0);
@@ -468,15 +501,23 @@ Item {
         }
         onReleased: {
             mapview.showBrush(false);
-//            double_touch = false;
             var newX = mapview.getX() + point1.x*mapview.getScale();
             var newY = mapview.getY() + point1.y*mapview.getScale();
             if(!point1.pressed && !point2.pressed){
                 if(tool == "move"){
                     if(mapview.getMode() === "annot_object"){
-                        loader_menu.item.setcur(mapview.getObjectNum(newX, newY))
-                    }else if(mapview.getMode() === "annot_location"){
-                        loader_menu.item.setcur(mapview.getLocationNum(newX, newY))
+                        var objnum = mapview.getObjectNum(newX, newY);
+                        if(objnum > -1){
+                            loader_menu.item.setcategory(2);
+                            loader_menu.item.setobjcur(objnum);
+                        }else{
+                            var locnum = mapview.getLocationNum(newX, newY);
+                            if(locnum > -1){
+                                loader_menu.item.setcategory(1);
+                            }
+
+                            loader_menu.item.setloccur(locnum);
+                        }
                     }
                 }else if(tool == "draw"){
                     mapview.endDrawing(newX, newY);
@@ -485,24 +526,26 @@ Item {
                 }else if(tool == "erase"){
                     mapview.endDrawing(newX, newY);
                 }else if( tool === "add_object"){
-
+                    map.setcostmap();
+                    update();
                 }else if( tool === "edit_object"){
                     supervisor.setObjPose();
+                    map.setcostmap();
+                    update();
                 }else if( tool === "add_point"){
 
                 }else if( tool === "edit_location"){
-                    var angle = Math.atan2((newX-firstX),(newY-firstY));
-                    mapview.editLocation(firstX, firstY,angle);
+//                    var angle = Math.atan2((newX-firstX),(newY-firstY));
+//                    mapview.editLocation(firstX, firstY,angle);
                 }else if( tool === "add_location"){
 
                 }else if( tool === "slam_init"){
-                    angle = Math.atan2((newY-firstY),(newX-firstX));
+                    var angle = Math.atan2((newY-firstY),(newX-firstX));
                     print("Released : ",firstX,firstY,angle);
                     supervisor.setInitPos(firstX, firstY, angle);
                     supervisor.slam_setInit();
                 }
             }
-
         }
         onTouchUpdated: {
             if(point1.pressed || point2.pressed){
@@ -557,10 +600,14 @@ Item {
                     mapview.setObject(newX, newY);
                 }else if( tool === "edit_object"){
                     mapview.editObject(newX, newY);
+                }else if(tool === "dot_spline"){
                 }else if( tool === "add_point"){
                     mapview.setObject(newX, newY);
-                }else if( tool === "add_location"){
+                }else if( tool === "edit_location_new"){
                     var angle = Math.atan2((newY-firstY),(newX-firstX));
+                    mapview.addLocation(firstX, firstY,angle);
+                }else if( tool === "add_location"){
+                    angle = Math.atan2((newY-firstY),(newX-firstX));
                     mapview.addLocation(firstX, firstY,angle);
                 }else if( tool === "edit_location"){
                     angle = Math.atan2((newY-firstY),(newX-firstX));
@@ -762,6 +809,11 @@ Item {
                     }else if(!is_slam_running && mapview.getMode() !== "mapping"){
                         rect_notice.visible = true;
                         rect_notice.msg =  "주행 활성화 안됨";
+                        rect_notice.color = color_red;
+                        rect_notice.show_icon = true;
+                    }else if(supervisor.getObsState() === 1 || mapview.checkRobotCollision()){
+                        rect_notice.visible = true;
+                        rect_notice.msg =  "장애물 겹침";
                         rect_notice.color = color_red;
                         rect_notice.show_icon = true;
                     }else{

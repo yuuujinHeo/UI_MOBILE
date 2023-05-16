@@ -1,9 +1,11 @@
 #ifndef KEYEMITTER_H
 #define KEYEMITTER_H
 #include <QObject>
+#include <QTimer>
 #include <QDebug>
 #include <QCoreApplication>
 #include <QKeyEvent>
+#include "automata.h"
 class KeyEmitter : public QObject
 {
     Q_OBJECT
@@ -20,6 +22,23 @@ public:
         QKeyEvent keyPressEvent = QKeyEvent(QEvent::Type::KeyPress, QKeySequence(k).count(), Qt::NoModifier, k);
         QCoreApplication::sendEvent(tf, &keyPressEvent);
     }
+    Q_INVOKABLE void setHangul(QObject* tf, QString k){
+        hangul.InputString(k);
+        if(hangul.changed == 1){
+            QKeyEvent keyPressEvent = QKeyEvent(QEvent::Type::KeyPress, 0x01000003, Qt::NoModifier, QKeySequence(0x01000003).toString());
+            QCoreApplication::sendEvent(tf, &keyPressEvent);
+        }
+        QKeyEvent keyPressEvent = QKeyEvent(QEvent::Type::KeyPress, QKeySequence(hangul.outString).count(), Qt::NoModifier, hangul.outString);
+        QCoreApplication::sendEvent(tf, &keyPressEvent);
+    }
+    Q_INVOKABLE void initHangul(){
+        hangul.Reset();
+    }
+
+    Automata hangul;
+
 };
+
+
 #endif // KEYEMITTER_H
 

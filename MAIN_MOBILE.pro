@@ -29,6 +29,7 @@ SOURCES += \
     ServerHandler.cpp \
     SoundHandler.cpp \
     ZIPHandler.cpp \
+    automata.cpp \
     cv_to_qt.cpp \
     Logger.cpp \
     Supervisor.cpp \
@@ -82,6 +83,7 @@ HEADERS += \
     Logger.h \
     MapHeader.h \
     MapView.h \
+    automata.h \
     ServerHandler.h \
     SoundHandler.h \
     ZIPHandler.h \

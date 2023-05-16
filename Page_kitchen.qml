@@ -59,6 +59,7 @@ Item {
     property int traybox_margin: 150
 
     property bool tray_empty: true
+    property bool robot_ready: false
     property int cur_table: 0
     property bool go_wait: false
     property bool go_charge: false
@@ -473,7 +474,7 @@ Item {
         visible: robot_type=="SERVING"?true:false
         height: 100
         radius: 100
-        enabled: !tray_empty
+        enabled: !tray_empty && robot_ready
         anchors.horizontalCenter: rect_tray_box.horizontalCenter
         anchors.top: rect_tray_box.bottom
         anchors.topMargin: 40
@@ -606,6 +607,12 @@ Item {
             for(var i=0; i<traymodel.count; i++){
                 if(traymodel.get(i).set_table !== 0)
                     tray_empty = false;
+            }
+
+            if(supervisor.getLCMConnection() && !supervisor.getEmoStatus() && supervisor.getPowerStatus() && supervisor.getMotorState() === 1 && supervisor.getLocalizationState() === 2){
+                robot_ready = true;
+            }else{
+                robot_ready = false;
             }
         }
     }
@@ -773,7 +780,14 @@ Item {
         }
         Image{
             id: image_location
-            source:"image/image_location.png"
+            source:{
+                if(robot_ready){
+                    "image/image_location.png"
+                }else{
+                    "image/icon_warning.png"
+                }
+
+            }
             width: 160
             height: 160
             anchors.horizontalCenter: parent.horizontalCenter
@@ -789,7 +803,9 @@ Item {
             font.pixelSize: 40
             color: "#12d27c"
             text: {
-                if(go_wait){
+                if(!robot_ready){
+                    "<font color=\"#e7584d\">로봇이 준비상태가 아닙니다.</font>"
+                }else if(go_wait){
                     "대기 장소로 이동<font color=\"white\">하시겠습니까?</font>"
                 }else if(go_charge){
                     "충전기로 이동<font color=\"white\">하시겠습니까?</font>"
@@ -807,11 +823,18 @@ Item {
             width: 250
             height: 90
             radius: 20
-            visible: !go_charge&&!go_wait&&!go_patrol
+            visible: !robot_ready || (!go_charge&&!go_wait&&!go_patrol)
             color: "#d0d0d0"
             anchors.top: text_quest.bottom
             anchors.topMargin: 50
             anchors.horizontalCenter: parent.horizontalCenter
+            Rectangle{
+                color:"white"
+                width: 240
+                height: 80
+                radius: 19
+                anchors.centerIn: parent
+            }
             Image{
                 id: image_confirm
                 source: "icon/btn_yes.png"
@@ -832,21 +855,28 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    count_resting = 0;
-                    if(go_wait){
-                        supervisor.moveToWait();
-                    }else if(go_charge){
-                        supervisor.moveToCharge();
-                    }else if(go_patrol){
+                    if(robot_ready){
+                        count_resting = 0;
+                        if(go_wait){
+                            supervisor.moveToWait();
+                        }else if(go_charge){
+                            supervisor.moveToCharge();
+                        }else if(go_patrol){
 
+                        }else{
+
+                        }
+                        go_wait = false;
+                        go_charge = false;
+                        go_patrol = false;
+                        popup_question.visible = false;
                     }else{
-
+                        count_resting = 0;
+                        go_wait = false;
+                        go_charge = false;
+                        go_patrol = false;
+                        popup_question.visible = false;
                     }
-
-                    go_wait = false;
-                    go_charge = false;
-                    go_patrol = false;
-                    popup_question.visible = false;
                 }
             }
         }
@@ -855,7 +885,7 @@ Item {
             width: 250
             height: 90
             radius: 20
-            visible: go_charge||go_wait||go_patrol
+            visible: robot_ready&&(go_charge||go_wait||go_patrol)
             color: "#d0d0d0"
             anchors.top: text_quest.bottom
             anchors.topMargin: 50
@@ -894,7 +924,7 @@ Item {
             width: 250
             height: 90
             radius: 20
-            visible: go_charge||go_wait||go_patrol
+            visible: (go_charge||go_wait||go_patrol)&&robot_ready
             color: "#d0d0d0"
             anchors.top: text_quest.bottom
             anchors.topMargin: 50

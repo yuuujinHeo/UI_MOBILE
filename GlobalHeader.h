@@ -75,6 +75,8 @@ typedef struct{
     bool map_loaded;
 
     POSE init_pose;
+
+    bool annotation_edited;
 }ST_MAP;
 extern ST_MAP *pmap;
 

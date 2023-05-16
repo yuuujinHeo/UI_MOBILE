@@ -25,6 +25,17 @@ Item {
         init_mode = 0;
         update_timer.start();
         statusbar.visible = false;
+
+        supervisor.clearSharedMemory();
+
+    }
+    Component.onDestruction: {
+        timer_usb_check.stop();
+        timer_usb_new.stop();
+        timer_wait_lcm.stop();
+        failload_timer.stop();
+        update_timer.stop();
+
     }
 
     function init(){

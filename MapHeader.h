@@ -50,6 +50,7 @@ typedef struct{
     QString name;
     cv::Point2f point;
     float angle;
+    int number;
 }LOCATION;
 
 

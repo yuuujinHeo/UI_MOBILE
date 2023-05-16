@@ -81,7 +81,7 @@ Window {
             }else if(supervisor.getMotorState() === 0){
                 loader_page.item.setNotice(4);
                 voice_all_stop();
-                voice_motor_error.play();
+//                voice_motor_error.play();
                 print("movefail motor")
             }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
                 loader_page.item.setNotice(1);

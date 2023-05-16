@@ -24,7 +24,18 @@ Item {
 
     function init(){
         supervisor.writelog("[QML] MOVING PAGE init")
+
         popup_pause.visible = false;
+        if(supervisor.getSetting("ROBOT_SW","moving_face")==="true"){
+            resting_image.visible = true;
+            image_robot.visible = false;
+            text_moving.visible = false;
+        }else{
+            resting_image.visible = false;
+            image_robot.visible = true;
+            text_moving.visible = true;
+        }
+
         robot_paused = false;
         playMusic.play();
     }
@@ -52,6 +63,12 @@ Item {
         id: rect_background
         anchors.fill: parent
         color: "#282828"
+    }
+    AnimatedImage{
+        id: resting_image
+        visible: false
+        source: "image/temp.gif"
+        anchors.fill: parent
     }
     Image{
         id: image_robot

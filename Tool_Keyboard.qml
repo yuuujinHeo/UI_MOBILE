@@ -23,7 +23,7 @@ Popup {
     property bool is_ko: false
     property bool is_shift: false
     property bool is_capslock: false
-    property bool only_en: true
+    property bool only_en: false
 
     property var keysize: 55
     property var keytopmargin: 15
@@ -47,12 +47,12 @@ Popup {
             text_ko_en.text = "영어";
             keys_2.model = ["ㅂ","ㅈ","ㄷ","ㄱ","ㅅ","ㅛ","ㅕ","ㅑ","ㅐ","ㅔ"];
             keys_3.model = ["ㅁ","ㄴ","ㅇ","ㄹ","ㅎ","ㅗ","ㅓ","ㅏ","ㅣ"];
-            keys_4.model = ["ㅋ","ㅌ","ㅊ","ㅍ","ㅠ","ㅜ","ㅡ","_","."];
+            keys_4.model = ["ㅋ","ㅌ","ㅊ","ㅍ","ㅠ","ㅜ","ㅡ","_","!"];
         }else{
             text_ko_en.text = "한글";
             keys_2.model = ["q","w","e","r","t","y","u","i","o","p"];
             keys_3.model = ["a","s","d","f","g","h","j","k","l"];
-            keys_4.model = ["z","x","c","v","b","n","m","_","."];
+            keys_4.model = ["z","x","c","v","b","n","m","_","!"];
         }
     }
     onIs_shiftChanged: {
@@ -78,11 +78,11 @@ Popup {
             if(is_ko){
                 keys_2.model = ["ㅂ","ㅈ","ㄷ","ㄱ","ㅅ","ㅛ","ㅕ","ㅑ","ㅐ","ㅔ"];
                 keys_3.model = ["ㅁ","ㄴ","ㅇ","ㄹ","ㅎ","ㅗ","ㅓ","ㅏ","ㅣ"];
-                keys_4.model = ["ㅋ","ㅌ","ㅊ","ㅍ","ㅠ","ㅜ","ㅡ","_","."];
+                keys_4.model = ["ㅋ","ㅌ","ㅊ","ㅍ","ㅠ","ㅜ","ㅡ","_","!"];
             }else{
                 keys_2.model = ["q","w","e","r","t","y","u","i","o","p"];
                 keys_3.model = ["a","s","d","f","g","h","j","k","l"];
-                keys_4.model = ["z","x","c","v","b","n","m","_","."];
+                keys_4.model = ["z","x","c","v","b","n","m","_","!"];
             }
         }
     }
@@ -108,6 +108,7 @@ Popup {
         }
     }
     onOpened: {
+        emitter.initHangul();
         rect_keyboard.height = 300;
         is_ko = false;
     }
@@ -156,23 +157,14 @@ Popup {
                         height: keysize
                         visible: !only_en
                         radius: 5
-                        color: "white"
+                        color: "transparent"
                         Text{
                             id: text_ko_en
                             anchors.centerIn: parent
+                            color: "white"
                             text: "한글"
                             font.family: font_noto_r.name
                             font.pixelSize: textsize
-                        }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked:{
-                                if(is_ko){
-                                    is_ko = false;
-                                }else{
-                                    is_ko = true;
-                                }
-                            }
                         }
                     }
                 }
@@ -218,7 +210,12 @@ Popup {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            emitter.keyPressed(owner,modelData);
+                                            if(is_ko){
+                                                emitter.setHangul(owner, modelData);
+                                            }else{
+                                                emitter.keyPressed(owner,modelData);
+                                            }
+
                                             if(!is_capslock)
                                                 is_shift = false;
                                         }
@@ -283,7 +280,11 @@ Popup {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            emitter.keyPressed(owner,modelData);
+                                            if(is_ko){
+                                                emitter.setHangul(owner, modelData);
+                                            }else{
+                                                emitter.keyPressed(owner,modelData);
+                                            }
                                             if(!is_capslock)
                                                 is_shift = false;
                                         }
@@ -306,6 +307,7 @@ Popup {
                                     onClicked:{
                                         owner.focus = false;
                                         tool_keyboard.close();
+                                        emitter.initHangul();
                                     }
                                 }
                             }
@@ -358,7 +360,14 @@ Popup {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            emitter.keyPressed(owner,modelData);
+                                            if(is_ko && (modelData != "_" && modelData != "!" && modelData != "&" && modelData != "|")){
+                                                emitter.setHangul(owner,modelData);
+                                            }else{
+                                                emitter.keyPressed(owner,modelData);
+                                                emitter.initHangul();
+                                            }
+                                            if(!is_capslock)
+                                                is_shift = false;
                                         }
                                     }
                                 }
@@ -383,6 +392,7 @@ Popup {
                                     anchors.fill: parent
                                     onClicked:{
                                         emitter.keyPressed(owner,Qt.Key_Left);
+                                        emitter.initHangul();
                                         if(!is_capslock)
                                             is_shift = false;
                                     }
@@ -407,7 +417,7 @@ Popup {
                             }
                             Rectangle{
                                 id: btn_spacebar
-                                width: keysize*7 + keyrightmargin*6
+                                width: keysize*5 + keyrightmargin*4
                                 height: keysize
                                 radius: 5
                                 color: "#D0D0D0"
@@ -415,8 +425,31 @@ Popup {
                                     anchors.fill: parent
                                     onClicked:{
                                         emitter.keyPressed(owner,Qt.Key_Space);
+                                        emitter.initHangul();
                                         if(!is_capslock)
                                             is_shift = false;
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                id: btn_hangul
+                                width: keysize*2 + keyrightmargin*1
+                                height: keysize
+                                radius: 5
+                                color: "#D0D0D0"
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "한/영"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: textsize
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        if(is_ko)
+                                            is_ko = false;
+                                        else
+                                            is_ko  = true;
                                     }
                                 }
                             }
@@ -436,6 +469,7 @@ Popup {
                                     anchors.fill: parent
                                     onClicked:{
                                         emitter.keyPressed(owner,Qt.Key_Right);
+                                        emitter.initHangul();
                                         if(!is_capslock)
                                             is_shift = false;
                                     }
@@ -484,6 +518,7 @@ Popup {
                                         anchors.fill: parent
                                         onClicked:{
                                             emitter.keyPressed(owner,modelData);
+                                            emitter.initHangul();
                                             if(!is_capslock)
                                                 is_shift = false;
                                         }
@@ -512,6 +547,7 @@ Popup {
                                         anchors.fill: parent
                                         onClicked:{
                                             emitter.keyPressed(owner,modelData);
+                                            emitter.initHangul();
                                             if(!is_capslock)
                                                 is_shift = false;
                                         }
@@ -540,6 +576,7 @@ Popup {
                                         anchors.fill: parent
                                         onClicked:{
                                             emitter.keyPressed(owner,modelData);
+                                            emitter.initHangul();
                                             if(!is_capslock)
                                                 is_shift = false;
                                         }
@@ -566,6 +603,7 @@ Popup {
                                     anchors.fill: parent
                                     onClicked:{
                                         emitter.keyPressed(owner,"0");
+                                        emitter.initHangul();
                                         if(!is_capslock)
                                             is_shift = false;
                                     }
@@ -586,6 +624,7 @@ Popup {
                                     anchors.fill: parent
                                     onClicked:{
                                         emitter.keyPressed(owner,".");
+                                        emitter.initHangul();
                                         if(!is_capslock)
                                             is_shift = false;
                                     }

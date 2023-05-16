@@ -708,9 +708,9 @@ Item {
                                 onClicked: {
                                     supervisor.slam_stop();
                                     if(supervisor.getGridWidth() > 0){
-                                        var init_x = supervisor.getRestingLocationx();
-                                        var init_y = supervisor.getRestingLocationy();
-                                        var init_th  = supervisor.getRestingLocationth();
+                                        var init_x = supervisor.getLocationX("Resting");
+                                        var init_y = supervisor.getLocationY("Resting");
+                                        var init_th  = supervisor.getLocationTH("Resting");
                                         map.setAutoInit(init_x,init_y,init_th);
                                     }
                                     supervisor.writelog("[QML] MAP PAGE (LOCAL) -> LOCALIZATION MANUAL ")
@@ -981,15 +981,24 @@ Item {
         interval: 100
         running: true
         repeat: true
+        property bool prev_emo_state: supervisor.getEmoStatus()
         onTriggered: {
             //0: no path /1: local fail /2: emergency /3: user stop /4: motor error
             if(notice_num === 0){
                 if(supervisor.getEmoStatus()){
-                    if(notice.y === 0)
+                    if(prev_emo_state !== supervisor.getEmoStatus()){
+                        //Auto Swipe
+                        notice.y = -800;
+                        area_swipe.enabled = false;
+                        password = 0;
+                    }else if(notice.y === 0){
                         area_swipe.enabled = true;
+                    }
                 }else{
                     area_swipe.enabled = false;
                 }
+
+                prev_emo_state = supervisor.getEmoStatus();
             }else if(notice_num === 1){
                 if(notice.y === 0)
                     area_swipe.enabled = true;

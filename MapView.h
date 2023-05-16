@@ -23,6 +23,10 @@ public:
 
     cv::Point2f curPoint;
 
+    Q_INVOKABLE bool checkRobotCollision();
+    Q_INVOKABLE bool checkLocationCollision();
+    Q_INVOKABLE bool isCollision(int x, int y);
+    Q_INVOKABLE bool checkLocationCollision(int num);
     Q_INVOKABLE void setEnable(bool en){enable = en;}
     Q_INVOKABLE void setName(QString name){object_name = name;}
     Q_INVOKABLE void setTool(QString name){tool = name;}
@@ -63,6 +67,7 @@ public:
     Q_INVOKABLE void setObjecting();
     Q_INVOKABLE void setRawMap(QString filename);
     Q_INVOKABLE void setEditedMap(QString filename);
+    Q_INVOKABLE void setCostMap();
     Q_INVOKABLE void setCostMap(QString filename);
     Q_INVOKABLE void setObjectMap(QString filename);
     Q_INVOKABLE void setFullScreen();
@@ -92,6 +97,9 @@ public:
         map_drawing_mask = cv::Mat(map_orin.rows, map_orin.cols, CV_8UC4, cv::Scalar::all(0));
     }
     QVector<cv::Point2f> line;
+    QVector<cv::Point2f> line_spline;
+    QVector<cv::Point2f> spline_dot;
+    QVector<cv::Point2f> dot_trash;
     QVector<LINE> lines;
     QVector<LINE> lines_trash;
     int cur_line_color=255;
@@ -105,9 +113,14 @@ public:
     Q_INVOKABLE void startDrawing(int x, int y);
     Q_INVOKABLE void addLinePoint(int x, int y);
     Q_INVOKABLE void endDrawing(int x, int y);
+
     Q_INVOKABLE void clearDrawing();
     Q_INVOKABLE void undoLine();
     Q_INVOKABLE void redoLine();
+    Q_INVOKABLE void startSpline(int x, int y);
+    Q_INVOKABLE void addSpline(int x, int y);
+    Q_INVOKABLE void drawSpline();
+    Q_INVOKABLE void endSpline(bool save);
     Q_INVOKABLE void startDrawingLine(int x, int y);
     Q_INVOKABLE void setDrawingLine(int x, int y);
     Q_INVOKABLE void stopDrawingLine(int x, int y);
@@ -140,13 +153,14 @@ public:
     QVector<LOCATION> locations;
     LOCATION new_location;
     int select_location = -1;
+    QString select_location_type = "";
     bool new_location_flag;
     bool edit_location_flag;
     LOCATION orin_location;
     Q_INVOKABLE bool getLocationFlag(){return new_location_flag;}
     Q_INVOKABLE void saveLocation(QString type, QString name);
     Q_INVOKABLE void clearLocation();
-    Q_INVOKABLE void selectLocation(int num);
+    Q_INVOKABLE void selectLocation(int num, QString type="");
     Q_INVOKABLE void addLocation(int x, int y,float th);
     Q_INVOKABLE void addLocationCur(int x, int y,float th);
     Q_INVOKABLE void setLocation(int x, int y, float th);
@@ -160,6 +174,7 @@ public:
     Q_INVOKABLE void setTlineMode(bool is_edit){is_edited_tline = is_edit;}
     Q_INVOKABLE void setMapTline();
 
+    Q_INVOKABLE int getLocationNum(QString type);
     //---------------------------------------------------Save
     void initLocation();
     Q_INVOKABLE void saveMap();
@@ -198,6 +213,7 @@ private:
     PixmapContainer pixmap_current;
     cv::Mat map_orin;
     cv::Mat map_tline;
+    cv::Mat map_cost;
     cv::Mat map_objecting;
     cv::Mat map_map;
     cv::Mat map_drawing;

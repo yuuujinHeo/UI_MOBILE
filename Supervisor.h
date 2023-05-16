@@ -25,6 +25,12 @@
 #define MOTOR_PS_ERROR(x)       ((x>>6)&0x01)
 #define MOTOR_COL_ERROR(x)      ((x>>7)&0x01)
 
+enum{
+    PATROL_NONE = 0,
+    PATROL_RANDOM,
+    PATROL_SEQUENCE
+};
+
 class Supervisor : public QObject
 {
     Q_OBJECT
@@ -38,7 +44,8 @@ public:
     bool flag_read_ini = false;
     bool isaccepted;
     bool flag_clear;
-    bool flag_patrol_serving = false;
+    int patrol_mode = PATROL_NONE;
+    bool patrol_use_pickup = false;
     int state_rotate_tables;
 
     ////*********************************************  STRUCT   ***************************************************////
@@ -58,11 +65,11 @@ public:
 
     int count_excuseme = 0;
     bool flag_excuseme = false;
-    bool annotation_edit = false;
 
     QVector<QString> call_list;
     int setting_call_id = -1;
 
+    QString cur_location;
 
     ////*********************************************  CLASS   ***************************************************////
     LCMHandler *lcm;
@@ -272,16 +279,17 @@ public:
 
     Q_INVOKABLE void setObjPose();
 
-    Q_INVOKABLE int getLocationNum();
+
+    Q_INVOKABLE int getLocationNum(QString type="");
+    Q_INVOKABLE QString getLocationName(int num, QString type="");
+    Q_INVOKABLE QString getLocationType(int num);
+    Q_INVOKABLE int getLocationNumber(int num);
+    Q_INVOKABLE void setLocationNumber(QString name, int num);
     Q_INVOKABLE int getLocationSize(QString type);
-    Q_INVOKABLE QString getLocationName(int num);
-    Q_INVOKABLE QString getLocationTypes(int num);
-    Q_INVOKABLE float getLocationx(int num);
-    Q_INVOKABLE float getLocationy(int num);
-    Q_INVOKABLE float getLocationth(int num);
-    Q_INVOKABLE float getRestingLocationx();
-    Q_INVOKABLE float getRestingLocationy();
-    Q_INVOKABLE float getRestingLocationth();
+
+    Q_INVOKABLE float getLocationX(int num, QString type="");
+    Q_INVOKABLE float getLocationY(int num, QString type="");
+    Q_INVOKABLE float getLocationTH(int num, QString type="");
 
     Q_INVOKABLE bool isExistLocation(int num);
     Q_INVOKABLE float getLidar(int num);
@@ -289,6 +297,7 @@ public:
     Q_INVOKABLE bool getAnnotEditFlag();
     Q_INVOKABLE void setAnnotEditFlag(bool flag);
 
+    Q_INVOKABLE void clearSharedMemory();
 
     //***********************************************************************Object(INI)..
     Q_INVOKABLE int getObjectNum();
@@ -402,6 +411,12 @@ public:
     ////*********************************************  PATROL 관련   ***************************************************////
     Q_INVOKABLE void runRotateTables();
     Q_INVOKABLE void stopRotateTables();
+
+    QStringList patrol_list;
+    Q_INVOKABLE void clearRotateList();
+    Q_INVOKABLE void setRotateList(QString name);
+    Q_INVOKABLE void startPatrol(QString mode, bool pickup);
+
     Q_INVOKABLE void startServingTest();
     Q_INVOKABLE void stopServingTest();
 

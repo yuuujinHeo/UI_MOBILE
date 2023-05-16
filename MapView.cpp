@@ -169,6 +169,7 @@ void MapView::setMode(QString name){
         show_location = false;
         show_location_icon = false;
         robot_following = true;
+        pmap->annotation_edited = false;
         setFullScreen();
     }
     updateMap();
@@ -265,6 +266,11 @@ void MapView::moveMap(){
     }
 }
 void MapView::updateMap(){
+    initObject();
+//    initTline();
+    initDrawing();
+    initLocation();
+
 //    /*setMapTline*/();
     setMapDrawing();
     setMapMap();
@@ -282,6 +288,7 @@ void MapView::setMapMap(){
         cv::Mat temp_orin;
         cv::Mat temp_drawing;
         cv::Mat temp_drawing_mask;
+        cv::Mat temp_tline;
         if(rotate_angle != 0){
             cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(map_orin.cols/2, map_orin.rows/2),-rotate_angle,1.0);
             cv::warpAffine(map_orin,temp_orin,rot,map_orin.size(),cv::INTER_NEAREST);
@@ -292,6 +299,7 @@ void MapView::setMapMap(){
             map_drawing.copyTo(temp_drawing);
             map_drawing_mask.copyTo(temp_drawing_mask);
         }
+        map_tline.copyTo(temp_tline);
 
         //Merge Layer
         if(temp_orin.channels() == 3)
@@ -301,17 +309,17 @@ void MapView::setMapMap(){
         if(temp_drawing_mask.channels() == 4)
             cv::cvtColor(temp_drawing_mask,temp_drawing_mask,cv::COLOR_BGRA2GRAY);
 
-        if(mode == "annot_tline" && map_tline.cols > 0 && map_tline.rows > 0){
-            cv::multiply(cv::Scalar::all(1.0)-temp_drawing_mask,map_tline,map_tline);
-            cv::add(map_tline,temp_drawing,map_tline);
+        if(mode == "annot_tline" && temp_tline.cols > 0 && temp_tline.rows > 0){
+            cv::multiply(cv::Scalar::all(1.0)-temp_drawing_mask,temp_tline,temp_tline);
+            cv::add(temp_tline,temp_drawing,temp_tline);
             temp_orin.copyTo(map_map);
         }else{
             cv::multiply(cv::Scalar::all(1.0)-temp_drawing_mask,temp_orin,temp_orin);
             cv::add(temp_orin,temp_drawing,map_map);
         }
 
-        if(mode == "annot_tline" && map_tline.cols > 0 && map_tline.rows > 0){
-            cv::addWeighted(map_map,0.5,map_tline,1,0,map_map);
+        if(mode == "annot_tline" && temp_tline.cols > 0 && temp_tline.rows > 0){
+            cv::addWeighted(map_map,0.5,temp_tline,1,0,map_map);
         }else if(mode == "annot_object" && map_objecting.cols > 0 && map_objecting.rows > 0){
             if(show_object){
                 cv::addWeighted(map_map,1,map_objecting,0.7,0,map_map);
@@ -362,6 +370,36 @@ void MapView::setObjecting(){
     update();
 }
 
+bool MapView::checkRobotCollision(){
+    POSE temp = setAxis(probot->lastPose);
+    return isCollision(temp.point.x, temp.point.y);
+}
+bool MapView::checkLocationCollision(int num){
+    if(num > -1 && num < locations.size()){
+        return isCollision(locations[num].point.x, locations[num].point.y);
+    }
+}
+bool MapView::checkLocationCollision(){
+    if(new_location_flag){
+        return isCollision(new_location.point.x, new_location.point.y);
+    }else{
+        return checkRobotCollision();
+    }
+}
+bool MapView::isCollision(int _x, int _y){
+    if(map_cost.cols > 0 && map_cost.rows > 0){
+        if(map_cost.at<uchar>(_y,_x) > 180 || map_orin.at<uchar>(_y,_x) == 0){
+//            qDebug() << _x << _y << " is collision!!" ;
+            return true;
+        }else{
+//            qDebug() << _x << _y << " is not collision!! " << map_orin.at<uchar>(_y,_x);
+            return false;
+        }
+    }else{
+        return false;
+    }
+}
+
 void MapView::setRawMap(QString filename){
     PixmapContainer *pc = new PixmapContainer();
     QString file_path = QDir::homePath() + "/maps/"+filename + "/map_raw.png";
@@ -386,6 +424,96 @@ void MapView::setRawMap(QString filename){
     }
     delete pc;
     reloadMap();
+}
+void MapView::setCostMap(){
+    QString file_path_edited = QDir::homePath() + "/maps/"+ map_name + "/map_edited.png";
+    QString file_path_cost = QDir::homePath() + "/maps/"+ map_name + "/map_cost.png";
+    QString file_path_obs = QDir::homePath() + "/maps/" + map_name + "/map_obs.png";
+
+    map_cost.release();
+    if(map_name == ""){
+        return;
+    }else{
+        if(QFile::exists(file_path_cost)){
+            map_cost = cv::imread(file_path_cost.toStdString(),cv::IMREAD_GRAYSCALE);
+        }else if(QFile::exists(file_path_edited)){
+            map_cost = cv::imread(file_path_edited.toStdString(),cv::IMREAD_GRAYSCALE);
+        }else{
+            return;
+        }
+        cv::flip(map_cost,map_cost,0);
+        cv::rotate(map_cost,map_cost,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+
+        //Make Objecting Margin
+        int robot_radius = std::ceil(pmap->robot_radius/pmap->gridwidth);
+        if(QFile::exists(file_path_obs)){
+            map_objecting.release();
+            map_objecting = cv::imread(file_path_obs.toStdString(), cv::IMREAD_GRAYSCALE);
+            cv::flip(map_objecting,map_objecting,0);
+            cv::rotate(map_objecting,map_objecting,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+
+
+            for(int i = 0; i<map_objecting.rows; i++){
+                for(int j=0; j<map_objecting.cols; j++){
+                    if(map_objecting.ptr<uchar>(i)[j] > 100){
+                        cv::circle(map_cost, cv::Point(j,i),robot_radius, cv::Scalar(190), -1, 8, 0);
+                    }
+                }
+            }
+        }
+
+        //Make Object Margin
+        std::vector<std::vector<cv::Point>> _poly2;
+        for(int obj=0; obj<objects.size(); obj++){
+            if(objects[obj].is_rect){
+//                qDebug() << objects.size() << objects[obj].points[0].x << objects[obj].points[0].y << objects[obj].points[2].x << objects[obj].points[2].y;
+                for(int i=objects[obj].points[0].x; i<objects[obj].points[2].x; i++){
+                    cv::circle(map_cost, cv::Point(i,objects[obj].points[0].y),robot_radius, cv::Scalar(190), -1, 8, 0);
+                    cv::circle(map_cost, cv::Point(i,objects[obj].points[2].y),robot_radius, cv::Scalar(190), -1, 8, 0);
+                }
+                for(int i=objects[obj].points[2].x; i<objects[obj].points[0].x; i++){
+                    cv::circle(map_cost, cv::Point(i,objects[obj].points[0].y),robot_radius, cv::Scalar(190), -1, 8, 0);
+                    cv::circle(map_cost, cv::Point(i,objects[obj].points[2].y),robot_radius, cv::Scalar(190), -1, 8, 0);
+                }
+                for(int i=objects[obj].points[0].y; i<objects[obj].points[2].y; i++){
+                    cv::circle(map_cost, cv::Point(objects[obj].points[0].x,i),robot_radius, cv::Scalar(190), -1, 8, 0);
+                    cv::circle(map_cost, cv::Point(objects[obj].points[2].x,i),robot_radius, cv::Scalar(190), -1, 8, 0);
+                }
+                for(int i=objects[obj].points[2].y; i<objects[obj].points[0].y; i++){
+                    cv::circle(map_cost, cv::Point(objects[obj].points[0].x,i),robot_radius, cv::Scalar(190), -1, 8, 0);
+                    cv::circle(map_cost, cv::Point(objects[obj].points[2].x,i),robot_radius, cv::Scalar(190), -1, 8, 0);
+                }
+                cv::rectangle(map_cost, cv::Point(objects[obj].points[0].x, objects[obj].points[0].y),cv::Point(objects[obj].points[2].x, objects[obj].points[2].y),
+                        cv::Scalar(255), -1, 8, 0);
+            }else{
+                std::vector<cv::Point> _poly;
+                if(objects[obj].points.size() > 0){
+                    _poly.push_back(cv::Point(objects[obj].points[0].x, objects[obj].points[0].y));
+                    for(int i=1; i<objects[obj].points.size(); i++){
+                        _poly.push_back(cv::Point(objects[obj].points[i].x, objects[obj].points[i].y));
+
+
+                        cv::line(map_cost, objects[obj].points[i-1], objects[obj].points[i],cv::Scalar(190),robot_radius*2,8,0);
+
+                    }
+                    cv::line(map_cost, objects[obj].points[objects[obj].points.size()-1], objects[obj].points[0],cv::Scalar(190),robot_radius*2,8,0);
+                    _poly2.push_back(_poly);
+                    if(_poly2.size() > 0)
+                        cv::fillPoly(map_cost, _poly2, cv::Scalar(255));
+                }
+            }
+
+        }
+
+        cv::addWeighted(map_cost, 1, map_objecting, 1, 0, map_cost);
+        cv::rotate(map_cost,map_cost,cv::ROTATE_90_CLOCKWISE);
+        cv::flip(map_cost,map_cost,0);
+        QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_cost_ui.png";
+        plog->write("[MAPVIEW] SAVE MAP "+path);
+        cv::imwrite(path.toStdString(),map_cost);
+    }
 }
 void MapView::setEditedMap(QString filename){
     PixmapContainer *pc = new PixmapContainer();
@@ -413,7 +541,7 @@ void MapView::setEditedMap(QString filename){
 }
 void MapView::setCostMap(QString filename){
     PixmapContainer *pc = new PixmapContainer();
-    QString file_path = QDir::homePath() + "/maps/"+filename + "/map_cost.png";
+    QString file_path = QDir::homePath() + "/maps/"+filename + "/map_cost_ui.png";
     map_name = filename;
     map_orin.release();
 
@@ -535,7 +663,7 @@ void MapView::setMapCurrent(){
             QPainterPath path;
             path.addRoundedRect((pose.x-rad/2)*res,(pose.y-rad/2)*res,rad,rad,rad,rad);
             painter.setPen(QPen(QColor("white"),2));
-            painter.fillPath(path,QBrush(QColor(hex_color_pink)));
+            painter.fillPath(path,QBrush(QColor(hex_color_green)));
             painter.drawPath(path);
             painter.drawLine(QLine(x1,y1,x,y));
             painter.drawLine(QLine(x2,y2,x,y));
@@ -767,7 +895,12 @@ void MapView::setMapLocation(){
                     if(locations[i].type == "Serving"){
                         path.addRoundedRect((locations[i].point.x-rad/2)*res,(locations[i].point.y-rad/2)*res,rad,rad,rad,rad);
                         painter.setPen(QPen(Qt::white,3));
-                        painter.fillPath(path,QBrush(QColor(hex_color_blue)));
+
+                        if(isCollision(locations[i].point.x*res, locations[i].point.y*res)){
+                            painter.fillPath(path,QBrush(QColor(hex_color_red)));
+                        }else{
+                            painter.fillPath(path,QBrush(QColor(hex_color_blue)));
+                        }
                         painter.drawPath(path);
                         painter.drawLine(x1,y1,x,y);
                         painter.drawLine(x,y,x2,y2);
@@ -778,7 +911,12 @@ void MapView::setMapLocation(){
                     if(locations[i].type == "Serving"){
                         path.addRoundedRect((locations[i].point.x-rad/2)*res,(locations[i].point.y-rad/2)*res,rad,rad,rad,rad);
                         painter.setPen(QPen(Qt::white,1));
-                        painter.fillPath(path,QBrush(QColor(hex_color_pink)));
+
+                        if(isCollision(locations[i].point.x*res, locations[i].point.y*res)){
+                            painter.fillPath(path,QBrush(QColor(hex_color_red)));
+                        }else{
+                            painter.fillPath(path,QBrush(QColor(hex_color_pink)));
+                        }
                         painter.drawPath(path);
                         painter.setPen(QPen(Qt::white,1.5));
                         painter.drawLine(QLine(x1,y1,x,y));
@@ -803,7 +941,11 @@ void MapView::setMapLocation(){
                 QPainterPath path;
                 path.addRoundedRect((new_location.point.x-rad/2)*res,(new_location.point.y-rad/2)*res,rad,rad,rad,rad);
                 painter.setPen(QPen(Qt::white,3));
-                painter.fillPath(path,QBrush(QColor(hex_color_blue)));
+                if(isCollision(new_location.point.x*res, new_location.point.y*res)){
+                    painter.fillPath(path,QBrush(QColor(hex_color_red)));
+                }else{
+                    painter.fillPath(path,QBrush(QColor(hex_color_blue)));
+                }
                 painter.drawPath(path);
                 painter.drawLine(QLine(x1,y1,x,y));
                 painter.drawLine(QLine(x2,y2,x,y));
@@ -828,7 +970,12 @@ void MapView::setMapLocation(){
                 if(locations[i].type == "Resting"){
                     if(select_location == i){
                         path.addRoundedRect((locations[i].point.x-rad/2)*res,(locations[i].point.y-rad/2)*res,rad,rad,rad,rad);
-                        painter.setPen(QPen(Qt::yellow,3));
+
+                        if(isCollision(locations[i].point.x*res, locations[i].point.y*res)){
+                            painter.setPen(QPen(Qt::red,3));
+                        }else{
+                            painter.setPen(QPen(Qt::yellow,3));
+                        }
                         painter.drawPath(path);
                         painter.drawLine(x1,y1,x,y);
                         painter.drawLine(x,y,x2,y2);
@@ -836,7 +983,12 @@ void MapView::setMapLocation(){
                         painter.drawImage(QRectF((locations[i].point.x-rad/2)*res,(locations[i].point.y-rad/2)*res,rad,rad),image,QRectF(0,0,image.width(),image.height()));
                     }else{
                         path.addRoundedRect((locations[i].point.x-rad/2)*res,(locations[i].point.y-rad/2)*res,rad,rad,rad,rad);
-                        painter.setPen(QPen(Qt::white,1));
+
+                        if(isCollision(locations[i].point.x*res, locations[i].point.y*res)){
+                            painter.setPen(QPen(Qt::red,1));
+                        }else{
+                            painter.setPen(QPen(Qt::white,1));
+                        }
                         painter.drawPath(path);
                         QImage image(":/icon/icon_home_2.png");
                         painter.drawImage(QRectF((locations[i].point.x-rad/2)*res,(locations[i].point.y-rad/2)*res,rad,rad),image,QRectF(0,0,image.width(),image.height()));
@@ -844,7 +996,12 @@ void MapView::setMapLocation(){
                 }else if(locations[i].type == "Charging"){
                     if(select_location == i){
                         path.addRoundedRect((locations[i].point.x-rad/2)*res,(locations[i].point.y-rad/2)*res,rad,rad,rad,rad);
-                        painter.setPen(QPen(Qt::yellow,3));
+
+                        if(isCollision(locations[i].point.x*res, locations[i].point.y*res)){
+                            painter.setPen(QPen(Qt::red,3));
+                        }else{
+                            painter.setPen(QPen(Qt::yellow,3));
+                        }
                         painter.drawPath(path);
                         painter.drawLine(x1,y1,x,y);
                         painter.drawLine(x,y,x2,y2);
@@ -852,7 +1009,12 @@ void MapView::setMapLocation(){
                         painter.drawImage(QRectF((locations[i].point.x-rad/2)*res,(locations[i].point.y-rad/2)*res,rad,rad),image,QRectF(0,0,image.width(),image.height()));
                     }else{
                         path.addRoundedRect((locations[i].point.x-rad/2)*res,(locations[i].point.y-rad/2)*res,rad,rad,rad,rad);
-                        painter.setPen(QPen(Qt::white,1));
+
+                        if(isCollision(locations[i].point.x*res, locations[i].point.y*res)){
+                            painter.setPen(QPen(Qt::red,1));
+                        }else{
+                            painter.setPen(QPen(Qt::white,1));
+                        }
                         painter.drawPath(path);
                         QImage image(":/icon/icon_charge_2.png");
                         painter.drawImage(QRectF((locations[i].point.x-rad/2)*res,(locations[i].point.y-rad/2)*res,rad,rad),image,QRectF(0,0,image.width(),image.height()));
@@ -1040,7 +1202,7 @@ bool MapView::getDrawingFlag(){
     }
 }
 bool MapView::getDrawingUndoFlag(){
-    if(lines_trash.size() > 0){
+    if(dot_trash.size() > 0 || lines_trash.size() > 0){
         return true;
     }else{
         return false;
@@ -1050,17 +1212,117 @@ bool MapView::getDrawingUndoFlag(){
 void MapView::startDrawingLine(int x, int y){
     qDebug() << "startDrawingLine";
     new_straight_flag = true;
+    spline_dot.clear();
     straight[0].x = x;
     straight[0].y = y;
     straight[1].x = x;
     straight[1].y = y;
     setMapDrawing();
 }
+void MapView::startSpline(int x, int y){
+    line.clear();
+    spline_dot.clear();
+    lines_trash.clear();
+    curPoint.x = x;
+    curPoint.y = y;
+    line.push_back(curPoint);
+    spline_dot.push_back(curPoint);
+}
+void MapView::endSpline(bool save){
+    if(save){
+        LINE temp_line;
+        temp_line.color = cur_line_color;
+        temp_line.width = cur_line_width;
+        temp_line.points = line;
+        lines.push_back(temp_line);
+    }
+    line.clear();
+    spline_dot.clear();
+    lines_trash.clear();
+    setMapDrawing();
+    setMapMap();
+}
+void MapView::drawSpline(){
+    line.clear();
+    setMapDrawing();
+    if(spline_dot.size() > 2){
+        std::vector<double> x_list;
+        std::vector<double> y_list;
+        std::vector<double> d_list;
+
+        double sum_d = 0;
+        d_list.push_back(sum_d);
+        x_list.push_back(spline_dot[0].x);
+        y_list.push_back(spline_dot[0].y);
+        for(size_t p = 1; p<spline_dot.toStdVector().size(); p++){
+            double x0 = spline_dot[p-1].x;
+            double y0 = spline_dot[p-1].y;
+            double x1 = spline_dot[p].x;
+            double y1 = spline_dot[p].y;
+
+            double dx = x1-x0;
+            double dy = y1-y0;
+
+            if(std::sqrt(dx*dx + dy*dy) > 0){
+                sum_d += std::sqrt(dx*dx + dy*dy);
+                d_list.push_back(sum_d);
+                x_list.push_back(spline_dot[p].x);
+                y_list.push_back(spline_dot[p].y);
+            }
+        }
+
+        tk::spline::spline_type type = tk::spline::cspline_hermite;
+        tk::spline sx, sy;
+        if(d_list.size() > 2 && x_list.size() > 2 && y_list.size() > 2){
+            sx.set_points(d_list, x_list, type);
+            sx.make_monotonic();
+            sy.set_points(d_list, y_list, type);
+            sy.make_monotonic();
+
+            for(double d = 0; d<=sum_d; d+= pmap->gridwidth){
+                line.push_back(cv::Point2f(sx(d),sy(d)));
+            }
+            qDebug() <<"spline done" << line.size();
+            for(int i=0; i<line.size()-1; i++){
+                cv::line(map_drawing,line[i],line[i+1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
+                cv::line(map_drawing_mask,line[i],line[i+1],cv::Scalar::all(255),cur_line_width,8,0);
+            }
+
+        }else{
+            qDebug() <<"spline faile";
+            line = spline_dot;
+        }
+//        setMapDrawing();
+    }else{
+        if(spline_dot.size() == 1){
+            qDebug() <<"spline dot";
+            line.push_back(spline_dot[0]);
+            line.push_back(spline_dot[0]);
+            cv::circle(map_drawing, spline_dot[0], 1, cv::Scalar(cur_line_color,cur_line_color,cur_line_color),-1,8,0);
+            cv::circle(map_drawing_mask, spline_dot[0], 1, cv::Scalar::all(255),-1,8,0);
+        }else if(spline_dot.size() == 2){
+            qDebug() <<"spline line";
+            line.push_back(spline_dot[0]);
+            line.push_back(spline_dot[1]);
+            cv::line(map_drawing,spline_dot[0],spline_dot[1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
+            cv::line(map_drawing_mask,spline_dot[0],spline_dot[1],cv::Scalar::all(255),cur_line_width,8,0);
+        }
+    }
+    setMapMap();
+}
+void MapView::addSpline(int x, int y){
+    curPoint.x = x;
+    curPoint.y = y;
+    spline_dot.push_back(curPoint);
+    dot_trash.clear();
+    drawSpline();
+}
 void MapView::setDrawingLine(int x, int y){
     qDebug() << "setDrawingLine" << x << y;
     straight[1].x = x;
     straight[1].y = y;
-    initTline(map_name);
+//    initTline(map_name);
+    initDrawing();
     setMapDrawing();
     setMapMap();
 }
@@ -1086,6 +1348,7 @@ void MapView::stopDrawingLine(int x, int y){
 void MapView::startDrawing(int x, int y){
     qDebug() << "startDrawing";
     line.clear();
+    spline_dot.clear();
     lines_trash.clear();
     curPoint.x = x;
     curPoint.y = y;
@@ -1110,53 +1373,58 @@ void MapView::endDrawing(int x, int y){
     line.push_back(curPoint);
 
 
-
-    //SPLINE
-    std::vector<double> x_list;
-    std::vector<double> y_list;
-
-    for(int i=0; i<line.size(); i++){
-        x_list.push_back(line[i].x);
-        y_list.push_back(line[i].y);
-    }
-
-    std::vector<double> d_list(x_list.size(), 0);
-
-    double sum_d = 0;
-    for(size_t p = 1; p< x_list.size(); p++){
-        double x0 = x_list[p-1];
-        double y0 = y_list[p-1];
-        double x1 = x_list[p];
-        double y1 = y_list[p];
-
-        double dx = x1-x0;
-        double dy = y1-y0;
-
-        sum_d += std::sqrt(dx*dx + dy*dy);
-        d_list[p] = sum_d;
-    }
-    tk::spline::spline_type type = tk::spline::cspline_hermite;
-    tk::spline sx, sy;
-    sx.set_points(d_list, x_list, type);
-    sx.make_monotonic();
-    sy.set_points(d_list, y_list, type);
-    sy.make_monotonic();
-
-
-
     LINE temp_line;
     temp_line.color = cur_line_color;
     temp_line.width = cur_line_width;
 
-    for(double d = 0; d<=sum_d; d+= 0.03){
-        temp_line.points.push_back(cv::Point2f(sx(d),sy(d)));
+    //SPLINE
+    if(tool != "erase"){
+        std::vector<double> x_list;
+        std::vector<double> y_list;
+        std::vector<double> d_list;
+
+        double sum_d = 0;
+        d_list.push_back(sum_d);
+        x_list.push_back(line[0].x);
+        y_list.push_back(line[0].y);
+        for(size_t p = 1; p<line.toStdVector().size(); p++){
+            double x0 = line[p-1].x;
+            double y0 = line[p-1].y;
+            double x1 = line[p].x;
+            double y1 = line[p].y;
+
+            double dx = x1-x0;
+            double dy = y1-y0;
+
+            if(std::sqrt(dx*dx + dy*dy) > 0){
+                sum_d += std::sqrt(dx*dx + dy*dy);
+                d_list.push_back(sum_d);
+                x_list.push_back(line[p].x);
+                y_list.push_back(line[p].y);
+            }
+        }
+        tk::spline::spline_type type = tk::spline::cspline_hermite;
+        tk::spline sx, sy;
+        if(d_list.size() > 2 && x_list.size() > 2 && y_list.size() > 2){
+            sx.set_points(d_list, x_list, type);
+            sx.make_monotonic();
+            sy.set_points(d_list, y_list, type);
+            sy.make_monotonic();
+
+            for(double d = 0; d<=sum_d; d+= pmap->gridwidth){
+                temp_line.points.push_back(cv::Point2f(sx(d),sy(d)));
+            }
+        }else{
+            temp_line.points = line;
+        }
+    }else{
+        temp_line.points = line;
     }
-//    temp_line.points = line;
-
-
-
 
     lines.push_back(temp_line);
+    line.clear();
+//    initTline(map_name);
+    initDrawing();
     setMapDrawing();
     setMapMap();
 }
@@ -1164,6 +1432,7 @@ void MapView::endDrawing(int x, int y){
 void MapView::clearDrawing(){
     line.clear();
     lines.clear();
+    spline_dot.clear();
     initTline(map_name);
     initDrawing();
     setMapDrawing();
@@ -1172,7 +1441,12 @@ void MapView::clearDrawing(){
 
 void MapView::undoLine(){
     line.clear();
-    if(lines.size() > 0 || line.size() > 0){
+    if(spline_dot.size() > 0){
+        qDebug() << "undoLine(Spline)";
+        dot_trash.push_back(spline_dot[spline_dot.size()-1]);
+        spline_dot.pop_back();
+        drawSpline();
+    }else if(lines.size() > 0 || line.size() > 0){
         qDebug() << "undoLine";
         lines_trash.push_back(lines[lines.size()-1]);
         lines.pop_back();
@@ -1251,7 +1525,12 @@ void MapView::saveTline(){
 }
 
 void MapView::redoLine(){
-    if(lines_trash.size() > 0){
+    if(dot_trash.size() > 0){
+        qDebug() << "redoLine(Spline)";
+        spline_dot.push_back(dot_trash[dot_trash.size()-1]);
+        dot_trash.pop_back();
+        drawSpline();
+    }else if(lines_trash.size() > 0){
         qDebug() << "redoLine";
         lines.push_back(lines_trash[lines_trash.size()-1]);
         lines_trash.pop_back();
@@ -1264,7 +1543,6 @@ void MapView::redoLine(){
 int MapView::getObjectNum(int x, int y){
     cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
     for(int i=0; i<pmap->list_obj_uL.size(); i++){
-//        qDebug() << pos.x << pos.y << pmap->list_obj_uL[i].x << pmap->list_obj_uL[i].y << pmap->list_obj_dR[i].x << pmap->list_obj_dR[i].y;
         if(pos.x<pmap->list_obj_uL[i].x && pos.x>pmap->list_obj_dR[i].x){
             if(pos.y<pmap->list_obj_uL[i].y && pos.y>pmap->list_obj_dR[i].y){
                 return i;
@@ -1373,6 +1651,8 @@ void MapView::editObject(int x, int y){
                 plog->write("[ANNOTATION - ERROR] editObject " + QString().sprintf("(%d, %d, %d, %d)",num,point,x,y) + " but pose size error");
             }
         }
+
+        pmap->annotation_edited = true;
     }
     initObject();
     setMapObject();
@@ -1390,6 +1670,7 @@ void MapView::saveObject(QString type){
     for(int i=0; i<new_object.points.size(); i++){
         temp.points.push_back(setAxisBack(new_object.points[i]));
     }
+    pmap->annotation_edited = true;
     pmap->objects.push_back(temp);
     clearObject();
     setMapObject();
@@ -1404,6 +1685,7 @@ void MapView::clearObject(){
     initObject();
     setMapObject();
 }
+
 void MapView::undoObject(){
     new_object.points.pop_back();
     if(new_object.points.size() > 0){
@@ -1414,25 +1696,79 @@ void MapView::undoObject(){
     initObject();
     setMapObject();
 }
+
 void MapView::selectObject(int num){
-    plog->write("[MAPVIEW] SELECT OBJECT : "+QString::number(num));
+//    plog->write("[MAPVIEW] SELECT OBJECT : "+QString::number(num));
     select_object = num;
     setMapObject();
 }
 
-void MapView::selectLocation(int num){
-    plog->write("[MAPVIEW] SELECT LOCATION : "+QString::number(num));
-    select_location = num;
+void MapView::selectLocation(int num, QString type){
+//    plog->write("[MAPVIEW] SELECT LOCATION : "+QString::number(num));
+
+    int charging_num = 0;
+    int resting_num = 0;
+    for(int i=0; i<locations.size(); i++){
+        if(locations[i].type == "Charging"){
+            charging_num++;
+        }else if(locations[i].type == "Resting"){
+            resting_num++;
+        }
+    }
+
+    if(type == "Resting"){
+        if(charging_num == 0) num--;
+        if(resting_num > 0)
+            select_location = num;
+        else
+            select_location = -1;
+    }else if(type == "Serving"){
+        if(charging_num == 0) num--;
+        if(resting_num == 0) num--;
+        select_location = num;
+    }else if(type == "Charging"){
+        if(charging_num > 0)
+            select_location = num;
+        else
+            select_location = -1;
+    }else{
+        select_location = num;
+    }
+    select_location_type = type;
+//    qDebug() << select_location << type;
     setMapLocation();
 }
+
 void MapView::saveLocation(QString type, QString name){
     LOCATION temp;
     temp.type = type;
     temp.name = name;
     temp.point = setAxisBack(new_location.point);
     temp.angle = setAxisBack(new_location.angle);
-    plog->write("[ANNOTATION] ADD Location : "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
-    pmap->locations.push_back(temp);
+    temp.number = getLocationNum("Serving") + 1;
+
+    if(type == "Serving"){
+        plog->write("[ANNOTATION] ADD Location : "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
+        pmap->locations.push_back(temp);
+        pmap->annotation_edited = true;
+    }else if(getLocationNum(type) > 0){
+        for(int i=0; i<pmap->locations.size(); i++){
+            if(pmap->locations[i].type == type){
+                plog->write("[ANNOTATION] ADD Location(Overwrite): "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
+                pmap->locations[i] = temp;
+                break;
+            }
+        }
+    }else{
+        plog->write("[ANNOTATION] ADD Location : "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
+        if(type == "Charging"){
+            pmap->locations.insert(0,temp);
+        }else if(type == "Resting"){
+            pmap->locations.insert(getLocationNum("Charging"),temp);
+        }
+        pmap->annotation_edited = true;
+    }
+
     initLocation();
 }
 
@@ -1469,22 +1805,38 @@ void MapView::setLocation(int x, int y, float th){
         pmap->locations[num].point = setAxisBack(cv::Point2f(x,y));
         pmap->locations[num].angle = setAxisBack(th);
 //        qDebug() << pmap->locations[num].angle;
-
+        pmap->annotation_edited = true;
     }
     initLocation();
     setMapLocation();
 }
 
 int MapView::getLocationNum(int x, int y){
+    int loc_id = -1;
     for(int i=0; i<pmap->locations.size(); i++){
         cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
         if(fabs(pmap->locations[i].point.x - pos.x) < probot->radius*1.2){
             if(fabs(pmap->locations[i].point.y - pos.y) < probot->radius*1.2){
-                return i;
+                loc_id = i;
+                break;
             }
         }
     }
+
+    if(loc_id > 0){
+
+    }
     return -1;
+}
+
+int MapView::getLocationNum(QString type){
+    int count = 0;
+    for(int i=0; i<locations.size(); i++){
+        if(locations[i].type == type)
+            count++;
+    }
+    return count;
+
 }
 
 void MapView::editLocation(int x, int y, float th){
@@ -1494,9 +1846,10 @@ void MapView::editLocation(int x, int y, float th){
             edit_location_flag = true;
             orin_location = pmap->locations[num];
         }
-//        qDebug() <<"1            " <<  orin_location.point.x  << setAxisBack(cv::Point2f(x,y)).x;
+        qDebug() <<"1            " <<  orin_location.point.x  << setAxisBack(cv::Point2f(x,y)).x;
         pmap->locations[num].point = setAxisBack(cv::Point2f(x,y));
         pmap->locations[num].angle = setAxisBack(th);
+        pmap->annotation_edited = true;
 //        qDebug() << pmap->locations[num].angle;
     }
     initLocation();
@@ -1509,6 +1862,7 @@ void MapView::redoLocation(){
 //        qDebug() <<"1            " <<  orin_location.point.x  << locations[num].point.x;
         pmap->locations[num].point = orin_location.point;
         pmap->locations[num].angle = orin_location.angle;
+        pmap->annotation_edited = true;
 //        qDebug() << pmap->locations[num].angle;
     }
     initLocation();
@@ -1521,6 +1875,7 @@ void MapView::editLocation(){
         if(pmap->locations.size() > num && num > -1){
             pmap->locations[num].point = setAxisBack(new_location.point);
             pmap->locations[num].angle = setAxisBack(new_location.angle);
+            pmap->annotation_edited = true;
         }
         edit_location_flag = false;
         initLocation();

@@ -397,11 +397,28 @@ void IPCHandler::set_cmd(int cmd, QString log){
 
 ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
 void IPCHandler::moveTo(QString target_loc){
-    IPCHandler::CMD send_msg;
-    send_msg.cmd = ROBOT_CMD_MOVE_LOCATION;
-    memcpy(send_msg.params,target_loc.toUtf8(),sizeof(char)*255);
+    bool match = false;
+    float pose[3];
+    for(int i=0; i<pmap->locations.size(); i++){
+        if(target_loc == pmap->locations[i].name){
+            match = true;
+            pose[0] = pmap->locations[i].point.x;
+            pose[1] = pmap->locations[i].point.y;
+            pose[2] = pmap->locations[i].angle;
+        }
+    }
+    if(match){
+        plog->write("[IPC] MOVE TO COMMAND : "+target_loc);
+        moveTo(pose[0],pose[1],pose[2]);
+    }else{
+        plog->write("[IPC] MOVE TO COMMAND (UNMATCHED): "+target_loc);
+//        IPCHandler::CMD send_msg;
+//        send_msg.cmd = ROBOT_CMD_MOVE_LOCATION;
+    }
     probot->curLocation = target_loc;
-    set_cmd(send_msg,"Move Location to "+target_loc);
+
+//    memcpy(send_msg.params,target_loc.toUtf8(),sizeof(char)*255);
+//    set_cmd(send_msg,"Move Location to "+target_loc);
 }
 void IPCHandler::moveTo(float x, float y, float th){
     IPCHandler::CMD send_msg;

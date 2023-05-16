@@ -16,6 +16,7 @@ Item {
     property bool highlight: false
     height: width
     property color shadow_color: color_light_gray
+    property color btn_color: "white"
 
     function show_ani(){
         ani_radial_shape_once.start();
@@ -23,15 +24,21 @@ Item {
 
     property bool running: false
     onRunningChanged: {
-//        if(running){
+        if(running){
 //            highlight = true;
 ////            ani_radial_shape_once.start();
-////            ani_radial_shape.start();
-//        }else{
+            ani_radial_shape.start();
+        }else{
 //            highlight = false;
-////            ani_radial_shape.stop();
+            ani_radial_shape.stop();
 
-//        }
+        }
+    }
+    function pressed(){
+        btn_color = color_light_gray;
+    }
+    function released(){
+        btn_color = "white";
     }
 
     Rectangle{
@@ -43,7 +50,8 @@ Item {
             width: parent.width
             height: width
             radius: width
-            border.width: running||highlight?3:0
+            color: item_Button.enabled?btn_color:color_gray
+            border.width: highlight?3:0
             border.color: "#12d27c"
             Column{
                 anchors.centerIn: parent
@@ -60,6 +68,7 @@ Item {
                 }
                 Text{
                     text: name
+                    color: item_Button.enabled?"black":"white"
                     horizontalAlignment: Text.AlignHCenter
                     font.family: font_noto_r.name
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -114,7 +123,7 @@ Item {
             property: "sweepAngle"
             from: 0
             to: 360
-            duration: 5000
+            duration: 500
         }
         ParallelAnimation{
             PropertyAnimation{
@@ -122,7 +131,7 @@ Item {
                 property: "startAngle"
                 from: -90
                 to: 270
-                duration: 5000
+                duration: 500
                 easing.type: Easing.InOutQuad
             }
             PropertyAnimation{
@@ -130,7 +139,7 @@ Item {
                 property: "sweepAngle"
                 from: 360
                 to: 0
-                duration: 5000
+                duration: 500
                 easing.type: Easing.InOutQuad
             }
         }
