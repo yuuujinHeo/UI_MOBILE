@@ -750,15 +750,29 @@ void MapView::setMapCurrent(){
             cv::Point2f pose = setAxis(probot->curPose.point);
             float angle = setAxis(probot->curPose.angle);
             if(mode == "local_view"){
-                for(int i=1; i<360; i++){
-                    painter.setPen(QPen(QColor("red"),3*res*scale));
-                    if(probot->lidar_data[i] > pmap->gridwidth){
-                        float x = (pose.x + (probot->lidar_data[i-1]/pmap->gridwidth)*cos((-M_PI*(i-1))/180 + angle))*res;
-                        float y = (pose.y + (probot->lidar_data[i-1]/pmap->gridwidth)*sin((-M_PI*(i-1))/180 + angle))*res;
-                        float xx = (pose.x + (probot->lidar_data[i]/pmap->gridwidth)*cos((-M_PI*i)/180 + angle))*res;
-                        float yy = (pose.y + (probot->lidar_data[i]/pmap->gridwidth)*sin((-M_PI*i)/180 + angle))*res;
-                        painter.drawLine((int)x, (int)y, (int)xx, (int)yy);
-//                        painter.drawPoint((int)x,(int)y);
+                painter.setPen(QPen(QColor("red"),3*res*scale));
+                float x1, y1;
+                int num;
+
+                for(int i=0; i<360; i++){
+                    x1 = (pose.x + (probot->lidar_data[i-1]/pmap->gridwidth)*cos((-M_PI*(i-1))/180 + angle))*res;
+                    y1 = (pose.y + (probot->lidar_data[i-1]/pmap->gridwidth)*sin((-M_PI*(i-1))/180 + angle))*res;
+                    num = i;
+                    if(x1 == 0 && y1 == 0){
+
+                    }else{
+                        break;
+                    }
+                }
+                for(int i=num; i<360; i++){
+                    float x2 = (pose.x + (probot->lidar_data[i]/pmap->gridwidth)*cos((-M_PI*i)/180 + angle))*res;
+                    float y2 = (pose.y + (probot->lidar_data[i]/pmap->gridwidth)*sin((-M_PI*i)/180 + angle))*res;
+                    if(x2 == 0 && y2 == 0){
+
+                    }else{
+                        painter.drawLine((int)x1, (int)y1, (int)x2, (int)y2);
+                        x1 = x2;
+                        y1 = y2;
                     }
                 }
             }else{
