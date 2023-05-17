@@ -1751,6 +1751,7 @@ int Supervisor::getLocationNumber(int num){
             }
         }
     }
+    return -1;
 }
 void Supervisor::setLocationNumber(QString name, int num){
     for(int i=0; i<pmap->locations.size(); i++){
