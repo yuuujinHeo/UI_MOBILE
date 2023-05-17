@@ -71,6 +71,7 @@ public:
     Q_INVOKABLE void setCostMap(QString filename);
     Q_INVOKABLE void setObjectMap(QString filename);
     Q_INVOKABLE void setFullScreen();
+    Q_INVOKABLE void setLocalizationMap(QString filename);
     void setMapCurrent();
     void setMapDrawing();
     void setMapObject();

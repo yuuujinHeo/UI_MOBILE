@@ -177,5 +177,6 @@
         <file>bgm/voice_pickup_calling.mp3</file>
         <file>bgm/battery.mp3</file>
         <file>Page_log.qml</file>
+        <file>video/loading_row.gif</file>
     </qresource>
 </RCC>

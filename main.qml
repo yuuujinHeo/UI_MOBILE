@@ -36,9 +36,11 @@ Window {
     Component.onDestruction: {
     }
 
+    property color color_dark_gray: "#999999";
     property color color_red: "#E7584D"
     property color color_mid_gray: "#BEBEBE"
     property color color_green: "#12d27c"
+    property color color_mid_green: "#0FB168"
     property color color_yellow: "#F7DB0D"
     property color color_dark_black: "#282828"
     property color color_gray: "#d8d8d8"
