@@ -663,6 +663,7 @@ Item {
                     }
                     onClicked: {
                         supervisor.writelog("[USER INPUT] INIT PAGE : DO LOCALIZATION")
+                        update_timer.stop();
                         popup_localization_start.open();
                     }
                 }
@@ -790,6 +791,7 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 popup_localization_done.close();
+                                update_timer.start();
                                 //localization done
                             }
                         }
@@ -932,6 +934,37 @@ Item {
                 anchors.fill: parent
                 color: "#f4f4f4"
             }
+
+            SequentialAnimation{
+                id: ani_logo_up
+                running: true
+                ParallelAnimation{
+                    NumberAnimation{
+                        target: image_logo4;
+                        property: "anchors.topMargin";
+                        to: 100
+                        duration: 500
+                        easing.type: Easing.InCurve
+                    }
+                }
+                ParallelAnimation{
+                    NumberAnimation{
+                        target: text_notice4;
+                        property: "opacity";
+                        to: 1
+                        duration: 500
+                        easing.type: Easing.InCurve
+                    }
+                    NumberAnimation{
+                        target: btn_slam_do_init;
+                        property: "opacity";
+                        to: 1
+                        duration: 500
+                        easing.type: Easing.InCurve
+                    }
+                }
+            }
+
             Image{
                 id: image_logo4
                 sourceSize.width: 2245/6
@@ -946,11 +979,12 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: image_logo4.bottom
                 anchors.topMargin: 80
+                opacity: 0
                 horizontalAlignment: Text.AlignHCenter
-                color: "#7e7e7e"
-                font.family: font_noto_r.name
+                color: color_dark_gray
+                font.family: font_noto_b.name
                 text: "모터가 초기화되지 않았습니다. 비상 스위치를 확인해주세요."
-                font.pixelSize: 20
+                font.pixelSize: 50
             }
             Rectangle{
                 id: btn_slam_pass
@@ -959,6 +993,7 @@ Item {
                 radius: 60
                 color: "transparent"
                 border.width: 3
+                visible: show_debug
                 border.color: "#e5e5e5"
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: text_notice4.bottom
@@ -975,7 +1010,7 @@ Item {
                     }
                     Text{
                         id: text_slam_pass
-                        text: "넘어가기 (디버그 용)"
+                        text: "넘어가기 (DEBUG)"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
                     }
@@ -986,6 +1021,22 @@ Item {
                         supervisor.writelog("[USER INPUT] INIT PAGE : PASS ROBOT INIT")
                         loadPage(pkitchen);
     //                    update_timer.stop();
+                    }
+                }
+            }
+            MouseArea{
+                id: area_debug
+                width: 150
+                height: 150
+                anchors.right: parent.right
+                anchors.bottom : parent.bottom
+                z: 99
+                property var password: 0
+                onClicked: {
+                    password++;
+                    if(password > 4){
+                        password = 0;
+                        show_debug = true;
                     }
                 }
             }
