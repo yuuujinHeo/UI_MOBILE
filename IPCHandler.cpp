@@ -198,7 +198,7 @@ void IPCHandler::onTimer(){
     temp3 = get_obs();
     if(temp3.tick != prev_tick_obs){
         flag_rx = true;
-//        qDebug() << "obs " << temp3.tick;
+        qDebug() << "obs " << temp3.tick;
         read_count = 0;
 
         cv::Mat map1(temp3.height, temp3.width, CV_8U, cv::Scalar::all(0));

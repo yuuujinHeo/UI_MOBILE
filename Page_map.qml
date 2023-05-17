@@ -2463,7 +2463,7 @@ Item {
     Component{
         id: menu_patrol
         Item{
-            objectName: "menu_tline"
+            objectName: "menu_patrol"
             width: rect_menus.width
             height: rect_menus.height
 
@@ -2575,11 +2575,11 @@ Item {
         clip: true
         onOpened:{
             model_number.clear();
-            model_number.append({"value":"지정 안됨"});
+            model_number.append({"number":"지정 안됨"});
             model_loc_name.clear();
             model_loc_num.clear();
             for(var i=0; i<supervisor.getLocationNum("Serving"); i++){
-                model_number.append({"value":(i+1).toString()});
+                model_number.append({"number":(i+1).toString()});
                 model_loc_name.append({"name":supervisor.getLocationName(i,"Serving")});
                 model_loc_num.append({"number":supervisor.getLocationNumber(i),"error":false});
             }
@@ -3855,7 +3855,7 @@ Item {
 
                 var loc_num = supervisor.getLocationNum("Serving");
                 for(var i=0; i<loc_num; i++){
-                    list_location.model.append({"type":"Serving","name":supervisor.getLocationName(i,"Serving"),"iscol":map.checkCollision(supervisor.getLocationX(i,"Serving"),supervisor.getLocationY(i,"Serving")),"empty":false, "number":supervisor.getLocationNumber(i)});
+                    list_location.model.append({"type":"Serving","name":supervisor.getLocationName(i,"Serving"),"iscol":map.checkCollision(supervisor.getLocationX(i,"Serving"),supervisor.getLocationY(i,"Serving")),"empty":false, "number":supervisor.getLocationNumber(i).toString()});
                 }
                 var ob_num = supervisor.getObjectNum();
                 for(var i=0; i<ob_num; i++){
@@ -4742,6 +4742,7 @@ Item {
                     if(menu_object.obj_category === 1 || menu_object.obj_category === 0){
                         if(supervisor.is_slam_running()){
                             btn_3.enabled = true;
+                            print("auto init running false");
                             btn_auto_init.running = false;
                             if(menu_object.checkInit){
                                 map.setTool("move");
@@ -4818,7 +4819,7 @@ Item {
                             color: iscol?color_red:color_light_gray
                             Text {
                                 anchors.centerIn: parent
-                                text: number
+                                text: number=="undefined"?"-":number
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
                                 color: iscol?"white":"black"
@@ -5662,10 +5663,21 @@ Item {
                             onClicked:{
                                 supervisor.stopObjecting();
                                 show_loading();
+
+                                timer_save_objecting.start();
+                            }
+                        }
+                        Timer{
+                            id: timer_save_objecting
+                            interval: 500
+                            repeat: false
+                            running: false
+                            onTriggered:{
                                 supervisor.writelog("[QML] MAP PAGE : SAVE OBJECTING ");
                                 supervisor.saveObjecting();
                                 unshow_loading();
                                 popup_save_objecting.close();
+
                             }
                         }
                     }
@@ -6429,14 +6441,26 @@ Item {
             curpose_mode = false;
             select_location_type = "Serving";
             tfield_location.text = select_location_type + "_" + Number(supervisor.getLocationSize(select_location_type))
-            if(supervisor.getObsState() || map.checkLocCollision()){
-                btn_next_000.enabled = false;
-                popup_location_warning.open();
-                popup_location_warning.set_obs();
-                supervisor.writelog("[QML] MAP PAGE : SAVE LOCATION -> BUT OBS CLOSE");
+            if(curpose_mode){
+                if(supervisor.getObsState() || map.checkLocCollision()){
+                    btn_next_000.enabled = false;
+                    popup_location_warning.open();
+                    popup_location_warning.set_obs();
+                    supervisor.writelog("[QML] MAP PAGE : SAVE LOCATION -> BUT OBS CLOSE");
+                }else{
+                    btn_next_000.enabled = true;
+                }
             }else{
-                btn_next_000.enabled = true;
+                if(map.checkLocCollision()){
+                    btn_next_000.enabled = false;
+                    popup_location_warning.open();
+                    popup_location_warning.set_obs();
+                    supervisor.writelog("[QML] MAP PAGE : SAVE LOCATION -> BUT OBS CLOSE");
+                }else{
+                    btn_next_000.enabled = true;
+                }
             }
+
         }
 
         Rectangle{

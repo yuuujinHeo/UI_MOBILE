@@ -439,6 +439,7 @@ void MapView::setCostMap(){
         }else if(QFile::exists(file_path_edited)){
             map_cost = cv::imread(file_path_edited.toStdString(),cv::IMREAD_GRAYSCALE);
         }else{
+            map_cost = cv::Mat(map_orin.rows, map_orin.cols, CV_8UC4,cv::Scalar::all(0));
             return;
         }
         cv::flip(map_cost,map_cost,0);
@@ -462,6 +463,9 @@ void MapView::setCostMap(){
                     }
                 }
             }
+        }else{
+            map_objecting = cv::Mat(map_orin.rows, map_orin.cols, CV_8U,cv::Scalar::all(0));
+            qDebug() << map_objecting.rows, map_objecting.cols;
         }
 
         //Make Object Margin

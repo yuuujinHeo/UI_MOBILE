@@ -147,8 +147,11 @@ Item {
         if(typeof(name) === 'undefined'){
             name = supervisor.getMapname();
         }
-        supervisor.readSetting(name);
-        map_name = name;
+        if(map_name !== name){
+            supervisor.readSetting(name);
+            map_name = name;
+        }
+
         if(typeof(type) !== 'undefined'){
             map_type = type;
             if(type === "MINIMAP"){
