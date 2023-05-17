@@ -53,6 +53,7 @@ void MapView::onTimer(){
 
         if(probot->ipc_use){
             setMapCurrent();
+            setMapMap();
         }else{
             if(probot->lcmconnection){
                 setMapCurrent();
