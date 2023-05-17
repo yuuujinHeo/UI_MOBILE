@@ -717,6 +717,46 @@ void MapView::setMapCurrent(){
             painter.drawLine(QLine(x2,y2,x,y));
         }
 
+        if(show_lidar){
+            cv::Point2f pose = setAxis(probot->curPose.point);
+            float angle = setAxis(probot->curPose.angle);
+            if(mode == "local_view"){
+                painter.setPen(QPen(QColor(hex_color_blue),res*scale));
+                float x1, y1;
+                int num;
+                float limit = pmap->robot_radius;
+                for(int i=0; i<360; i++){
+                    if(probot->lidar_data[i] <limit){
+
+                    }else{
+                        x1 = (pose.x + (probot->lidar_data[i]/pmap->gridwidth)*cos((-M_PI*(i))/180 + angle))*res;
+                        y1 = (pose.y + (probot->lidar_data[i]/pmap->gridwidth)*sin((-M_PI*(i))/180 + angle))*res;
+                        num = i;
+                        break;
+                    }
+                }
+                for(int i=num+1; i<360; i++){
+                    if(probot->lidar_data[i] <limit){
+
+                    }else{
+                        float x2 = (pose.x + (probot->lidar_data[i]/pmap->gridwidth)*cos((-M_PI*i)/180 + angle))*res;
+                        float y2 = (pose.y + (probot->lidar_data[i]/pmap->gridwidth)*sin((-M_PI*i)/180 + angle))*res;
+                        painter.drawLine((int)x1, (int)y1, (int)x2, (int)y2);
+                        x1 = x2;
+                        y1 = y2;
+                    }
+                }
+            }else{
+                for(int i=0; i<360; i++){
+                    painter.setPen(QPen(QColor("red"),1.5*res*scale));
+                    if(probot->lidar_data[i] > pmap->gridwidth){
+                        float x = (pose.x + (probot->lidar_data[i]/pmap->gridwidth)*cos((-M_PI*i)/180 + angle))*res;
+                        float y = (pose.y + (probot->lidar_data[i]/pmap->gridwidth)*sin((-M_PI*i)/180 + angle))*res;
+                        painter.drawPoint((int)x,(int)y);
+                    }
+                }
+            }
+        }
         if(show_robot){
 //            qDebug() << "robot";
             if(probot->localization_state == LOCAL_READY || mode == "mapping"){
@@ -746,46 +786,7 @@ void MapView::setMapCurrent(){
                 painter.fillPath(direction,QBrush(QColor("red")));
             }
         }
-        if(show_lidar){
-            cv::Point2f pose = setAxis(probot->curPose.point);
-            float angle = setAxis(probot->curPose.angle);
-            if(mode == "local_view"){
-                painter.setPen(QPen(QColor("red"),3*res*scale));
-                float x1, y1;
-                int num;
 
-                for(int i=0; i<360; i++){
-                    x1 = (pose.x + (probot->lidar_data[i-1]/pmap->gridwidth)*cos((-M_PI*(i-1))/180 + angle))*res;
-                    y1 = (pose.y + (probot->lidar_data[i-1]/pmap->gridwidth)*sin((-M_PI*(i-1))/180 + angle))*res;
-                    num = i;
-                    if(x1 == 0 && y1 == 0){
-
-                    }else{
-                        break;
-                    }
-                }
-                for(int i=num; i<360; i++){
-                    float x2 = (pose.x + (probot->lidar_data[i]/pmap->gridwidth)*cos((-M_PI*i)/180 + angle))*res;
-                    float y2 = (pose.y + (probot->lidar_data[i]/pmap->gridwidth)*sin((-M_PI*i)/180 + angle))*res;
-                    if(x2 == 0 && y2 == 0){
-
-                    }else{
-                        painter.drawLine((int)x1, (int)y1, (int)x2, (int)y2);
-                        x1 = x2;
-                        y1 = y2;
-                    }
-                }
-            }else{
-                for(int i=0; i<360; i++){
-                    painter.setPen(QPen(QColor("red"),1*res*scale));
-                    if(probot->lidar_data[i] > pmap->gridwidth){
-                        float x = (pose.x + (probot->lidar_data[i]/pmap->gridwidth)*cos((-M_PI*i)/180 + angle))*res;
-                        float y = (pose.y + (probot->lidar_data[i]/pmap->gridwidth)*sin((-M_PI*i)/180 + angle))*res;
-                        painter.drawPoint((int)x,(int)y);
-                    }
-                }
-            }
-        }
         QPixmap temp_pixmap = map_current.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
         pixmap_current.pixmap = temp_pixmap;
         update();

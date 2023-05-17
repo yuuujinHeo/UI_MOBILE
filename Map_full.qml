@@ -103,6 +103,12 @@ Item {
             show_button_lidar = false;
             show_button_object = false;
             show_button_location = false;
+        }else if(mode === "local_view"){
+            show_connection = false;
+            show_button_following = false;
+            show_button_lidar = false;
+            show_button_object = false;
+            show_button_location = false;
         }
     }
 
@@ -176,6 +182,8 @@ Item {
             }else if(type === "OBJECT"){
                 mapview.setCostMap();
                 mapview.setObjectMap(name);
+            }else if(type === "local"){
+                mapview.setLocalizationMap(name);
             }
         }else{
             if(supervisor.isExistAnnotation(name)){

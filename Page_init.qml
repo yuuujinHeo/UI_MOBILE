@@ -740,34 +740,38 @@ Item {
             color: "transparent"
         }
         onOpened:{
-            mapview_localization.setMode("local_view");
-            mapview_localization.setLocalizationMap(supervisor.getMapname());
+            mapview_localization.setEnable(true);
+            mapview_localization.setViewer("local_view");
+            mapview_localization.loadmap(supervisor.getMapname(),"local");
         }
+        onClosed: {
+            mapview_localization.setEnable(false);
+        }
+
         Rectangle{
             anchors.centerIn: parent
-            width: 800
-            height: 600
+            width: 1000
+            height: 800
             radius: 20
-
-//            color: color_dark_navy
+            color: color_dark_navy
             Column{
                 anchors.centerIn: parent
-                spacing: 20
+                spacing: 10
                 Text{
-                    id: local_text
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.family: font_noto_r.name
                     font.pixelSize: 25
                     horizontalAlignment: Text.AlignHCenter
                     color: "white"
-                    text: "로봇의 위치를 찾았습니다. 맵과 로봇 라이다맵(붉은 선)이 일치하는 지 확인해주세요.\n"
+                    text: "로봇의 위치를 찾았습니다.\n맵과 로봇 라이다맵(푸른 선)이 일치하는 지 확인해주세요."
                 }
-                MapView{
+                Map_full{
                     id: mapview_localization
-                    width: 400
+                    width: 550
                     height: width
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
+
                 Row{
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 30
@@ -785,6 +789,27 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                popup_localization_done.close();
+                                //localization done
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 150
+                        height: 80
+                        radius: 10
+                        border.width: 1
+                        Text{
+                            anchors.centerIn: parent
+                            text: "재시도"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 20
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_localization_start.open();
+                                popup_localization_done.close();
                                 //localization done
                             }
                         }
@@ -803,7 +828,7 @@ Item {
             onClicked: {
                 password++;
                 if(password > 4){
-                    popup_localization_start.close();
+                    popup_localization_done.close();
                 }
             }
         }
@@ -828,6 +853,11 @@ Item {
             supervisor.slam_autoInit();
             timer_check_localization.start();
         }
+        onClosed: {
+
+            timer_check_localization.stop();
+        }
+
         Timer{
             id: timer_check_localization
             running: false
@@ -837,6 +867,8 @@ Item {
                 if(supervisor.getLocalizationState() === 2){
                     popup_localization_done.open();
                     local_loading.visible = false;
+                    timer_check_localization.stop();
+                    popup_localization_start.close();
                 }else if(supervisor.getLocalizationState() === 3){
                     local_loading.visible = false;
                     local_text.text = "로봇의 위치를 찾을 수 없습니다\n로봇이 바라보는 방향에 유의하여 대기위치로 이동시켜주세요."
@@ -856,6 +888,7 @@ Item {
             Column{
                 anchors.centerIn: parent
                 Text{
+                    id: local_text
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.family: font_noto_r.name
                     font.pixelSize: 25
