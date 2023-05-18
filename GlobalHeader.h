@@ -133,6 +133,7 @@ typedef struct{
     float velocity = 1.0;
 
     QVector<int> trays;
+    int cur_preset;
     QVector<QString> call_list;
 
     POSE targetPose;

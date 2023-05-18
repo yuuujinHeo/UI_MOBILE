@@ -186,7 +186,7 @@ public:
     IMG get_cam1();
 
     bool getConnection(){
-        if(read_count == -1 || read_count > 10){
+        if(read_count > 10){
             return false;
         }else{
             return true;
@@ -197,8 +197,10 @@ public:
     void set_cmd(int cmd, QString log="");
 
     ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
-    void moveTo(QString target_loc);
-    void moveTo(float x, float y, float th);
+//    void moveTo(QString target_loc, int flag_back);
+    void moveToLocation(QString target_loc, int preset);
+    void moveToServing(QString target_loc, int preset);
+    void moveTo(float x, float y, float th, int preset);
     void movePause();
     void moveResume();
     void moveJog();
@@ -219,7 +221,7 @@ public:
     void set_velocity(float vel);
 
     QString tempstr = "";
-    int read_count = 0;
+    int read_count = 20;
     unsigned int prev_tick_status = 0;
     unsigned int prev_tick_path = 0;
     unsigned int prev_tick_map = 0;

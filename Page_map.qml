@@ -4819,7 +4819,7 @@ Item {
                             color: iscol?color_red:color_light_gray
                             Text {
                                 anchors.centerIn: parent
-                                text: number=="undefined"?"-":number
+                                text: typeof(number)=="undefined"?"-":number
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
                                 color: iscol?"white":"black"

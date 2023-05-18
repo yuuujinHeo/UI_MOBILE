@@ -396,7 +396,7 @@ void IPCHandler::set_cmd(int cmd, QString log){
 }
 
 ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
-void IPCHandler::moveTo(QString target_loc){
+void IPCHandler::moveToServing(QString target_loc, int preset){
     bool match = false;
     float pose[3];
     for(int i=0; i<pmap->locations.size(); i++){
@@ -409,18 +409,40 @@ void IPCHandler::moveTo(QString target_loc){
     }
     if(match){
         plog->write("[IPC] MOVE TO COMMAND : "+target_loc);
-        moveTo(pose[0],pose[1],pose[2]);
+        moveTo(pose[0],pose[1],pose[2],preset);
+
     }else{
         plog->write("[IPC] MOVE TO COMMAND (UNMATCHED): "+target_loc);
 //        IPCHandler::CMD send_msg;
 //        send_msg.cmd = ROBOT_CMD_MOVE_LOCATION;
     }
     probot->curLocation = target_loc;
-
-//    memcpy(send_msg.params,target_loc.toUtf8(),sizeof(char)*255);
-//    set_cmd(send_msg,"Move Location to "+target_loc);
 }
-void IPCHandler::moveTo(float x, float y, float th){
+
+void IPCHandler::moveToLocation(QString target_loc, int preset){
+    bool match = false;
+    float pose[3];
+    for(int i=0; i<pmap->locations.size(); i++){
+        if(target_loc == pmap->locations[i].name){
+            match = true;
+            pose[0] = pmap->locations[i].point.x;
+            pose[1] = pmap->locations[i].point.y;
+            pose[2] = pmap->locations[i].angle;
+        }
+    }
+    if(match){
+        plog->write("[IPC] MOVE TO COMMAND : "+target_loc);
+        moveTo(pose[0],pose[1],pose[2], preset);
+
+    }else{
+        plog->write("[IPC] MOVE TO COMMAND (UNMATCHED): "+target_loc);
+//        IPCHandler::CMD send_msg;
+//        send_msg.cmd = ROBOT_CMD_MOVE_LOCATION;
+    }
+    probot->curLocation = target_loc;
+}
+
+void IPCHandler::moveTo(float x, float y, float th, int preset){
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_MOVE_TARGET;
     uint8_t *array;
@@ -440,10 +462,12 @@ void IPCHandler::moveTo(float x, float y, float th){
     send_msg.params[10]= array[2];
     send_msg.params[11]= array[3];
 
+    send_msg.params[12] = (uint8_t)preset;
+
     probot->curTarget.point.x = x;
     probot->curTarget.point.y = y;
     probot->curTarget.angle = th;
-    set_cmd(send_msg,"Move Target to "+QString().sprintf("%f, %f, %f",x,y,th));
+    set_cmd(send_msg,"Move Target to "+QString().sprintf("%f, %f, %f, %d",x,y,th,preset));
 }
 void IPCHandler::movePause(){
     IPCHandler::CMD send_msg;

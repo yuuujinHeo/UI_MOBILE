@@ -326,13 +326,16 @@ public:
 
     ////*********************************************  SCHEDULER(SERVING) 관련   ***************************************************////
     Q_INVOKABLE void setTray(int tray_num, int table_num);
+    Q_INVOKABLE void setPreset(int preset);
     Q_INVOKABLE void confirmPickup();
     Q_INVOKABLE QVector<int> getPickuptrays();
 
 
 
     ////*********************************************  ROBOT MOVE 관련   ***************************************************////
-    Q_INVOKABLE void moveTo(QString target_num);
+//    Q_INVOKABLE void moveTo(QString target_num);
+    Q_INVOKABLE void moveToServing(QString target, int preset);
+    Q_INVOKABLE void moveTo(QString target, int preset);
     Q_INVOKABLE void moveTo(float x, float y, float th);
     Q_INVOKABLE void moveToLast();
     Q_INVOKABLE void movePause();
@@ -349,6 +352,9 @@ public:
     Q_INVOKABLE float getJoyXY();
     Q_INVOKABLE float getJoyR();
     Q_INVOKABLE void resetHomeFolders();
+
+    Q_INVOKABLE bool issetLocation(int number);
+    Q_INVOKABLE QString getServingName(int number);
 
 
     ////*********************************************  ROBOT STATUS 관련   ***************************************************////
@@ -413,6 +419,7 @@ public:
     Q_INVOKABLE void stopRotateTables();
 
     QStringList patrol_list;
+    int patrol_num;
     Q_INVOKABLE void clearRotateList();
     Q_INVOKABLE void setRotateList(QString name);
     Q_INVOKABLE void startPatrol(QString mode, bool pickup);

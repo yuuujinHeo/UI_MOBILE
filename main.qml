@@ -123,11 +123,11 @@ Window {
         cur_location = supervisor.getcurLoc();
         var str_target;
         supervisor.writelog("[QML - MAIN] MOVE TO "+cur_location);
-        if(cur_location.slice(0,4) == "Char"){
+        if(cur_location == "Charging"){
             supervisor.writelog("[QML - MOVING] MOVE TO CHARGING LOCATION");
             str_target = "충전 장소";
             voice_movecharge.play();
-        }else if(cur_location.slice(0,4) == "Rest"){
+        }else if(cur_location == "Resting"){
             supervisor.writelog("[QML - MOVING] MOVE TO RESTING LOCATION");
             str_target = "대기 장소";
             voice_movewait.play();
@@ -141,6 +141,7 @@ Window {
             supervisor.writelog("[QML - MOVING] MOVE TO " + str_target);
         }
         loadPage(pmoving)
+        loader_page.item.pos_name = cur_location;
         loader_page.item.pos = str_target;
     }
     function play_movefailmsg(){
@@ -335,7 +336,7 @@ Window {
             supervisor.writelog("[QML] Load Page : "+source);
             timer_update.start();
         }
-        source: pinit
+        source: pkitchen// pinit
     }
 
     Timer{

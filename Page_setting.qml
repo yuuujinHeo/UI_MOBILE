@@ -828,6 +828,44 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_use_tray
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"트레이별 지정"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_use_tray
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["사용안함", "사용"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
                     id: set_use_help
                     width: 840
                     height: 40
@@ -6188,6 +6226,12 @@ Item {
             else
                 supervisor.setSetting("ROBOT_SW/moving_face","true");
         }
+        if(combo_use_tray.ischanged){
+            if(combo_use_tray.currentIndex == 0)
+                supervisor.setSetting("ROBOT_SW/use_tray","false");
+            else
+                supervisor.setSetting("ROBOT_SW/use_tray","true");
+        }
 
         if(wifi_passwd.ischanged){
             supervisor.setSetting("ROBOT_SW/wifi_passwd",wifi_passwd.text);
@@ -6584,6 +6628,11 @@ Item {
             combo_movingpage.currentIndex = 1;
         }else{
             combo_movingpage.currentIndex = 0;
+        }
+        if(supervisor.getSetting("ROBOT_SW","use_tray") === "true"){
+            combo_use_tray.currentIndex = 1;
+        }else{
+            combo_use_tray.currentIndex = 0;
         }
 
 

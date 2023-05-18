@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import "."
-import QtGraphicalEffects 1.0
 import io.qt.Supervisor 1.0
 Item {
     id: page_kitchen
@@ -58,8 +57,6 @@ Item {
     property int rect_size: 70
     property int traybox_margin: 150
 
-    property bool tray_empty: true
-    property bool robot_ready: false
     property int cur_table: 0
     property bool go_wait: false
     property bool go_charge: false
@@ -96,33 +93,6 @@ Item {
     }
 
     Rectangle{
-        width: 40
-        height: 40
-        color: "#e8e8e8"
-        radius: 5
-        visible: robot_type==="SERVING"?true:false
-        anchors.bottom: rect_tray_box.top
-        anchors.bottomMargin: -5
-        anchors.rightMargin: 20
-        anchors.right: rect_tray_box.right
-        Image{
-            anchors.centerIn: parent
-            source: "icon/icon_remove.png"
-            ColorOverlay{
-                anchors.fill: parent
-                source: parent
-                color: "white"
-            }
-        }
-        MouseArea{
-            anchors.fill: parent
-            onClicked:{
-                init();
-            }
-        }
-    }
-
-    Rectangle{
         id: rect_tray_box
         visible: robot_type=="SERVING"?true:false
         width: 500
@@ -139,7 +109,6 @@ Item {
             Repeater{
                 id: repeat_tray
                 model: traymodel
-
                 Rectangle{
                     id: rect_tray
                     width: tray_width
@@ -204,6 +173,7 @@ Item {
                                     model.set_table = cur_table;
                                     model.color =  "#12d27c"
                                 }
+
                             }
                             rect_tray_fill.width = rect_tray.width;
                             text_cancel.visible = false;
@@ -244,19 +214,12 @@ Item {
     Rectangle{
         id: rect_table_box
         visible: robot_type=="SERVING"?true:false
-        width: {
-            if(table_col_num < 3){
-                (table_col_num)*100 - 20 + 160
-            }else{
-                450
-            }
-        }
+        width: (table_col_num)*100 - 20 + 160
         height: parent.height - statusbar.height
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.topMargin: statusbar.height
         color: "#282828"
-
         Text{
             id: text_tables
             color:"white"
@@ -436,7 +399,7 @@ Item {
                     anchors.fill: parent
                     onClicked: {
                         count_resting = 0;
-                        if(table_col_num < 4)
+                        if(table_col_num < 3)
                             supervisor.setTableColNum(++table_col_num);
                     }
                 }
@@ -474,11 +437,10 @@ Item {
         visible: robot_type=="SERVING"?true:false
         height: 100
         radius: 100
-        enabled: !tray_empty && robot_ready
         anchors.horizontalCenter: rect_tray_box.horizontalCenter
         anchors.top: rect_tray_box.bottom
         anchors.topMargin: 40
-        color: enabled?color_blue:color_mid_gray
+        color: "#24a9f7"
         Text{
             id: text_go
             anchors.centerIn: parent
@@ -495,12 +457,141 @@ Item {
                 count_resting = 0;
                 print("serving start button");
                 cur_table = 0;
+                supervisor.setPreset(0);
                 for(var i=0; i<tray_num; i++){
                     supervisor.setTray(i,traymodel.get(i).set_table);
                 }
             }
         }
     }
+    Rectangle{
+        id: rect_go_safe
+        width: 80
+        visible: robot_type=="SERVING"?true:false
+        height: 80
+        radius: 80
+        anchors.verticalCenter: rect_go.verticalCenter
+        anchors.left: rect_go.right
+        anchors.leftMargin : 20
+        color: "#24a9f7"
+        Text{
+            id: text_go_Safe
+            anchors.centerIn: parent
+            text: "+"
+            font.family: font_noto_r.name
+            font.pixelSize: 35
+            font.bold: true
+            color: "white"
+        }
+        MouseArea{
+            id: btn_go_safe
+            anchors.fill: parent
+            onClicked: {
+                popup_preset_menu.open();
+            }
+        }
+        Popup{
+            id: popup_preset_menu
+//            anchors.centerIn: parent
+            width: 200
+            height: 80
+            leftPadding: 0
+            rightPadding: 0
+            topPadding: 0
+            bottomPadding: 0
+            background: Rectangle{
+                anchors.fill: parent
+                color: "transparent"
+            }
+            onOpened: {
+                ani_open.start();
+            }
+            ParallelAnimation{
+                id: ani_open
+                onStarted: {
+                    row_preset.opacity = 0;
+                }
+
+                SequentialAnimation{
+                    NumberAnimation{
+                        target: rect_preset
+                        duration: 500
+                        to: popup_preset_menu.width
+                        from: popup_preset_menu.height
+                        property: "width"
+                    }
+                    NumberAnimation{
+                        target: row_preset
+                        duration: 100
+                        to: 1
+                        from: 0
+                        property: "opacity"
+                    }
+                }
+            }
+            Rectangle{
+                id: rect_preset
+                width: parent.width
+                height: parent.height
+                radius: width
+                color: color_blue
+
+                Row{
+                    id: row_preset
+                    opacity: 0
+                    anchors.centerIn: parent
+                    spacing: 20
+                    Rectangle{
+                        width: 70
+                        height: width
+                        radius: width
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: "천천히"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onPressed:{
+                                parent.color = color_mid_gray
+                            }
+                            onReleased: {
+                                parent.color = "white"
+                            }
+                            onClicked:{
+
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 70
+                        height: width
+                        radius: width
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: "빠르게"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onPressed:{
+                                parent.color = color_mid_gray
+                            }
+                            onReleased: {
+                                parent.color = "white"
+                            }
+                            onClicked:{
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     Rectangle{
         id: rect_patrol_box
         visible: robot_type=="CALLING"?true:false
@@ -597,25 +688,6 @@ Item {
         }
     }
 
-
-    Timer{
-        interval: 500
-        running: true
-        repeat: true
-        onTriggered: {
-            tray_empty = true;
-            for(var i=0; i<traymodel.count; i++){
-                if(traymodel.get(i).set_table !== 0)
-                    tray_empty = false;
-            }
-
-            if(supervisor.getLCMConnection() && !supervisor.getEmoStatus() && supervisor.getPowerStatus() && supervisor.getMotorState() === 1 && supervisor.getLocalizationState() === 2){
-                robot_ready = true;
-            }else{
-                robot_ready = false;
-            }
-        }
-    }
 
     Rectangle{
         id: rect_go_patrol
@@ -780,14 +852,7 @@ Item {
         }
         Image{
             id: image_location
-            source:{
-                if(robot_ready){
-                    "image/image_location.png"
-                }else{
-                    "image/icon_warning.png"
-                }
-
-            }
+            source:"image/image_location.png"
             width: 160
             height: 160
             anchors.horizontalCenter: parent.horizontalCenter
@@ -803,9 +868,7 @@ Item {
             font.pixelSize: 40
             color: "#12d27c"
             text: {
-                if(!robot_ready){
-                    "<font color=\"#e7584d\">로봇이 준비상태가 아닙니다.</font>"
-                }else if(go_wait){
+                if(go_wait){
                     "대기 장소로 이동<font color=\"white\">하시겠습니까?</font>"
                 }else if(go_charge){
                     "충전기로 이동<font color=\"white\">하시겠습니까?</font>"
@@ -823,18 +886,11 @@ Item {
             width: 250
             height: 90
             radius: 20
-            visible: !robot_ready || (!go_charge&&!go_wait&&!go_patrol)
+            visible: !go_charge&&!go_wait&&!go_patrol
             color: "#d0d0d0"
             anchors.top: text_quest.bottom
             anchors.topMargin: 50
             anchors.horizontalCenter: parent.horizontalCenter
-            Rectangle{
-                color:"white"
-                width: 240
-                height: 80
-                radius: 19
-                anchors.centerIn: parent
-            }
             Image{
                 id: image_confirm
                 source: "icon/btn_yes.png"
@@ -855,28 +911,21 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    if(robot_ready){
-                        count_resting = 0;
-                        if(go_wait){
-                            supervisor.moveToWait();
-                        }else if(go_charge){
-                            supervisor.moveToCharge();
-                        }else if(go_patrol){
+                    count_resting = 0;
+                    if(go_wait){
+                        supervisor.moveToWait();
+                    }else if(go_charge){
+                        supervisor.moveToCharge();
+                    }else if(go_patrol){
 
-                        }else{
-
-                        }
-                        go_wait = false;
-                        go_charge = false;
-                        go_patrol = false;
-                        popup_question.visible = false;
                     }else{
-                        count_resting = 0;
-                        go_wait = false;
-                        go_charge = false;
-                        go_patrol = false;
-                        popup_question.visible = false;
+
                     }
+
+                    go_wait = false;
+                    go_charge = false;
+                    go_patrol = false;
+                    popup_question.visible = false;
                 }
             }
         }
@@ -885,7 +934,7 @@ Item {
             width: 250
             height: 90
             radius: 20
-            visible: robot_ready&&(go_charge||go_wait||go_patrol)
+            visible: go_charge||go_wait||go_patrol
             color: "#d0d0d0"
             anchors.top: text_quest.bottom
             anchors.topMargin: 50
@@ -924,7 +973,7 @@ Item {
             width: 250
             height: 90
             radius: 20
-            visible: (go_charge||go_wait||go_patrol)&&robot_ready
+            visible: go_charge||go_wait||go_patrol
             color: "#d0d0d0"
             anchors.top: text_quest.bottom
             anchors.topMargin: 50

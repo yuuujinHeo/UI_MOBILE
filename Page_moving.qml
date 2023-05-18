@@ -10,6 +10,7 @@ Item {
     width: 1280
     height: 800
 
+    property string pos_name: ""
     property string pos: "1번 테이블"
     property bool robot_paused: false
     property bool move_fail: false
@@ -17,6 +18,8 @@ Item {
 
     Component.onCompleted: {
         init();
+        print(statusbar.height);
+        statusbar.visible = false;
     }
     Component.onDestruction:  {
         playMusic.stop();
@@ -88,25 +91,37 @@ Item {
         anchors.topMargin: 200
     }
 
-    Row{
-        id: text_moving
-        anchors.horizontalCenter: parent.horizontalCenter
+    Text{
+        id: target_pos
+        text: pos
+        font.pixelSize: 40
+        font.family: font_noto_b.name
+        anchors.right: parent.horizontalCenter
         anchors.top: image_robot.bottom
         anchors.topMargin: 80
-        Text{
-            id: target_pos
-            text: pos
-            font.pixelSize: 40
-            font.family: font_noto_b.name
-            color: "#12d27c"
-        }
-        Text{
-            id: text_mention
-            text: "(으)로 이동 중입니다."
-            font.pixelSize: 40
-            font.family: font_noto_r.name
-            color: "white"
-        }
+        anchors.rightMargin: 40
+        color: "#12d27c"
+    }
+    Text{
+        id: text_mention
+        text: "(으)로 이동 중입니다."
+        font.pixelSize: 40
+        font.family: font_noto_r.name
+        anchors.left: parent.horizontalCenter
+        anchors.top: image_robot.bottom
+        anchors.topMargin: 80
+        anchors.leftMargin: 40
+        color: "white"
+    }
+    Text{
+        id: target_posname
+        text: pos_name
+        font.pixelSize: 40
+        font.family: font_noto_b.name
+        color: "#12d27c"
+        anchors.horizontalCenter: target_pos.horizontalCenter
+        anchors.top: target_pos.bottom
+        anchors.topMargin: 10
     }
 
     Item{
@@ -114,6 +129,14 @@ Item {
         width: parent.width
         height: parent.height
         anchors.centerIn: parent
+        onVisibleChanged: {
+            if(visible){
+                statusbar.visible = true;
+            }else{
+                statusbar.visible = false;
+            }
+        }
+
         Rectangle{
             anchors.fill: parent
             visible: robot_paused
@@ -138,24 +161,109 @@ Item {
             color: "#e2574c"
             text: move_fail?"경로를 찾을 수 없습니다.":"일시정지 됨"
         }
-        MouseArea{
-            id: btn_page_popup
-            anchors.fill: parent
-            onClicked: {
-                password = 0;
-                if(robot_paused){
-                    move_fail = false;
-                    supervisor.writelog("[USER INPUT] MOVING RESUME")
-                    supervisor.moveResume();
-                    timer_check_pause.start();
-                }else{
-                    move_fail = false;
-                    supervisor.writelog("[USER INPUT] MOVING PAUSE")
-                    supervisor.movePaused();
-                    timer_check_pause.start();
+
+        Row{
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 80
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 100
+            Rectangle{
+                width: 180
+                height: 120
+                radius: 20
+                color: "transparent"
+                border.color: color_red
+                border.width: 6
+                Text{
+                    anchors.centerIn: parent
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                    text: "수동 이동"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    z: 99
+                    onClicked:{
+                        supervisor.writelog("[USER INPUT] MOVING PAUSED : MOTOR LOCK DISABLE");
+                    }
+                }
+            }
+            Rectangle{
+                width: 180
+                height: 120
+                radius: 20
+                color: "transparent"
+                border.color: color_red
+                border.width: 6
+                Text{
+                    anchors.centerIn: parent
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                    text: "경로 취소"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    z: 99
+                    propagateComposedEvents: true
+                    onPressed:{
+                        parent.color = color_dark_navy
+                    }
+                    onReleased:{
+                        parent.color = "transparent"
+                    }
+
+                    onClicked:{
+                        supervisor.writelog("[USER INPUT] MOVING PAUSED : PATH CANCELED");
+                        supervisor.moveStop();
+                    }
+                }
+            }
+            Rectangle{
+                width: 180
+                height: 120
+                radius: 20
+                color: "transparent"
+                border.color: color_red
+                border.width: 6
+                Text{
+                    anchors.centerIn: parent
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                    text: "경로 재개"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    z: 99
+                    onClicked:{
+                        supervisor.writelog("[USER INPUT] MOVING PAUSED : RESUME");
+                        supervisor.moveResume();
+                        timer_check_pause.start();
+                    }
                 }
             }
         }
+//        MouseArea{
+//            id: btn_page_popup
+//            anchors.fill: parent
+//            onClicked: {
+//                print(btn_page_popup.enabled, btn_page_popup.visible);
+//                password = 0;
+//                if(robot_paused){
+//                    move_fail = false;
+//                    supervisor.writelog("[USER INPUT] MOVING RESUME")
+//                    supervisor.moveResume();
+//                    timer_check_pause.start();
+//                }else{
+//                    move_fail = false;
+//                    supervisor.writelog("[USER INPUT] MOVING PAUSE")
+//                    supervisor.movePaused();
+//                    timer_check_pause.start();
+//                }
+//            }
+//        }
     }
 
 
@@ -208,6 +316,7 @@ Item {
     MouseArea{
         id: btn_page
         anchors.fill: parent
+        visible: !robot_paused
         onClicked: {
             if(robot_paused){
                 supervisor.writelog("[USER INPUT] MOVING RESUME 2")
