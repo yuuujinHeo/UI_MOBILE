@@ -476,7 +476,6 @@ Item {
                     id: row_menu3
                     spacing: 30
                     anchors.horizontalCenter: parent.horizontalCenter
-
                     Rectangle{
                         id: btn_minimize
                         width: 188
@@ -1118,6 +1117,7 @@ Item {
             }else if(init_mode == 2){
                 if(supervisor.getLCMConnection()){
                     init_mode = 3;
+                    print("WHAIT????????????????????",supervisor.getLCMConnection())
                     timer_wait_lcm.stop();
                 }else{
                     if(loader_init.item.objectName != "init_lcm" && !timer_wait_lcm.running){

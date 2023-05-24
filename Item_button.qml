@@ -17,6 +17,7 @@ Item {
     height: width
     property color shadow_color: color_light_gray
     property color btn_color: "white"
+    property bool overcolor: false
 
     function show_ani(){
         ani_radial_shape_once.start();
@@ -63,6 +64,12 @@ Item {
 
                         if(sourceSize.height > 30)
                             sourceSize.height = 30
+                    }
+                    ColorOverlay{
+                        anchors.fill: parent
+                        source: parent
+                        visible: overcolor
+                        color: color_mid_gray
                     }
                     anchors.horizontalCenter: parent.horizontalCenter
                 }

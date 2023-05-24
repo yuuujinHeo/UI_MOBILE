@@ -9,61 +9,101 @@ Item {
     width: 1280
     height: 800
 
+    property var view_mode: 0
     Component.onCompleted: {
         init();
     }
     function init(){
-        table_num = supervisor.getTableNum();
+        statusbar.visible = true;
+
+        cur_table = 0;
+        cur_group = 0;
+        cur_page = 0;
+
+        view_mode = parseInt(supervisor.getSetting("ROBOT_SW","table_view"));
+        group_num = supervisor.getLocationGroupNum();
+        robot_type = supervisor.getSetting("ROBOT_HW","type");
+        table_num = supervisor.getLocationGroupSize(cur_group);
         tray_num = supervisor.getTrayNum();
-        table_col_num = supervisor.getTableColNum();
+
+        use_tray = JSON.parse(supervisor.getSetting("ROBOT_SW","use_tray"));
+        if(use_tray){
+            col_num = parseInt(supervisor.getSetting("FLOOR","table_col_num"));
+            row_num = parseInt(supervisor.getSetting("FLOOR","table_row_num"));
+        }else{
+            col_num = parseInt(supervisor.getSetting("FLOOR","group_col_num"));
+            row_num = parseInt(supervisor.getSetting("FLOOR","group_row_num"));
+        }
+
+        if(view_mode == 0){
+            max_col = 8
+            max_row = 4
+        }else{
+            max_col = 5
+            max_row = 4
+        }
+
         traymodel.clear();
-        robot_type = supervisor.getRobotType();
         for(var i=0; i<tray_num; i++){
             traymodel.append({x:0,y:0,tray_num:i+1,set_table:0,color:"white"});
         }
-        if(robot_type == "CALLING"){
-            if(pbefore != pmenu)
-                popup_question.visible = true;
-            supervisor.loadPatrolFile(supervisor.getPatrolFileName());
-            var num=supervisor.getPatrolNum();
 
-            repeat_patrol.model.clear();
-            repeat_patrol.model.append({type:0,name:"Start"});
+//        if(robot_type == "CALLING"){
+//            if(pbefore != pmenu)
+//                popup_question.visible = true;
+//            supervisor.loadPatrolFile(supervisor.getPatrolFileName());
+//            var num=supervisor.getPatrolNum();
 
-            for(var i=0; i<num; i++){
-                repeat_patrol.model.append({type:2,name:""});
-                print(supervisor.getPatrolLocation(i));
-                if(supervisor.getPatrolLocation(i) == ""){
-                    var text="x:"+supervisor.getPatrolX(i)+", y:"+supervisor.getPatrolY(i)+", th:"+supervisor.getPatrolTH(i);
-                    repeat_patrol.model.append({type:1,name:text});
-                    print(text);
-                }else{
-                    repeat_patrol.model.append({type:1,name:supervisor.getPatrolLocation(i)});
-                }
-            }
-        }
-        statusbar.visible = true;
+//            repeat_patrol.model.clear();
+//            repeat_patrol.model.append({type:0,name:"Start"});
+
+//            for(var i=0; i<num; i++){
+//                repeat_patrol.model.append({type:2,name:""});
+//                print(supervisor.getPatrolLocation(i));
+//                if(supervisor.getPatrolLocation(i) == ""){
+//                    var text="x:"+supervisor.getPatrolX(i)+", y:"+supervisor.getPatrolY(i)+", th:"+supervisor.getPatrolTH(i);
+//                    repeat_patrol.model.append({type:1,name:text});
+//                    print(text);
+//                }else{
+//                    repeat_patrol.model.append({type:1,name:supervisor.getPatrolLocation(i)});
+//                }
+//            }
+//        }
+        update_group();
     }
     property int tray_num: 3
     property int table_num: 5
-    property int table_col_num: 1
+    property int group_num: 1
+    property int row_num: 5
+    property int col_num: 1
+
+    property int max_row: 5
+    property int max_col: 5
+
+    property bool use_tray: false
 
     property int tray_width: 400
     property int tray_height: 80
     property int spacing_tray : 10
-
-    property int cur_table_num: 0
-    property bool flag_moving: false
-
     property int rect_size: 70
     property int traybox_margin: 150
 
-    property bool tray_empty: true
-    property bool robot_ready: false
     property int cur_table: 0
+    property int cur_group: 0
+    property int cur_page: 0
+
     property bool go_wait: false
     property bool go_charge: false
     property bool go_patrol: false
+
+    property var cur_preset: 3
+    onCur_groupChanged: {
+        cur_table = 0;
+        update_group();
+    }
+    onCur_tableChanged: {
+        print("cur table : " ,cur_table);
+    }
 
     Rectangle{
         anchors.fill : parent
@@ -84,8 +124,28 @@ Item {
         id: patrolmodel
     }
 
+    function update_group(){
+        model_group.clear();
+        for(var i=0; i<supervisor.getLocationGroupNum(); i++){
+            model_group.append({"name":supervisor.getLocGroupname(i)});
+        }
+        table_num = supervisor.getLocationGroupSize(cur_group);
+        update_table();
+    }
+    function update_table(){
+//        print(col_num*row_num*cur_page,col_num*row_num*(cur_page+1), table_num)
+        model_group_table.clear();
+        for(var i=col_num*row_num*cur_page; i<col_num*row_num*(cur_page+1); i++){
+            if(i>=table_num)
+                break;
+//            print("append : ",i);
+            model_group_table.append({"num":supervisor.getLocationNumber(cur_group,i),"name":supervisor.getServingName(cur_group, i)});
+        }
+    }
+
     Image{
         id: image_head
+        visible: (robot_type!="SERVING" || use_tray)?true:false
         anchors.horizontalCenter: robot_type=="SERVING"?rect_tray_box.horizontalCenter:rect_calling_box.horizontalCenter
         anchors.bottom: rect_tray_box.top
         anchors.bottomMargin: 10
@@ -96,35 +156,8 @@ Item {
     }
 
     Rectangle{
-        width: 40
-        height: 40
-        color: "#e8e8e8"
-        radius: 5
-        visible: robot_type==="SERVING"?true:false
-        anchors.bottom: rect_tray_box.top
-        anchors.bottomMargin: -5
-        anchors.rightMargin: 20
-        anchors.right: rect_tray_box.right
-        Image{
-            anchors.centerIn: parent
-            source: "icon/icon_remove.png"
-            ColorOverlay{
-                anchors.fill: parent
-                source: parent
-                color: "white"
-            }
-        }
-        MouseArea{
-            anchors.fill: parent
-            onClicked:{
-                init();
-            }
-        }
-    }
-
-    Rectangle{
         id: rect_tray_box
-        visible: robot_type=="SERVING"?true:false
+        visible: (robot_type=="SERVING" && use_tray)?true:false
         width: 500
         height: tray_num*tray_height + (tray_num - 1)*spacing_tray + 50
         color: "#e8e8e8"
@@ -139,7 +172,6 @@ Item {
             Repeater{
                 id: repeat_tray
                 model: traymodel
-
                 Rectangle{
                     id: rect_tray
                     width: tray_width
@@ -204,6 +236,7 @@ Item {
                                     model.set_table = cur_table;
                                     model.color =  "#12d27c"
                                 }
+
                             }
                             rect_tray_fill.width = rect_tray.width;
                             text_cancel.visible = false;
@@ -243,20 +276,20 @@ Item {
 
     Rectangle{
         id: rect_table_box
-        visible: robot_type=="SERVING"?true:false
+        visible: (robot_type=="SERVING" && use_tray)?true:false
+//        visible: robot_type=="SERVING"?true:false
         width: {
-            if(table_col_num < 3){
-                (table_col_num)*100 - 20 + 160
-            }else{
-                450
-            }
+            if(col_num > 2){
+               300 - 20 + 160
+           }else{
+               (col_num)*100 - 20 + 160
+           }
         }
         height: parent.height - statusbar.height
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.topMargin: statusbar.height
         color: "#282828"
-
         Text{
             id: text_tables
             color:"white"
@@ -278,30 +311,29 @@ Item {
             anchors.bottomMargin: 100
             Repeater{
                 id: page_table
-                model: Math.ceil((table_num/(table_col_num*5)))
+                model: Math.ceil((table_num/(col_num*row_num)))
 
                 onModelChanged: {
                     swipeview_tables.currentIndex = 0;
                 }
-
                 Item{
-                    property int pageNum: index
+                    property int cur_page: index
                     Grid{
-                        rows: 5
-                        columns: table_num-(table_col_num*5*(pageNum+1))>0?table_col_num:((table_num-(table_col_num*5*pageNum))/5 + 1).toFixed(0)
+                        rows: row_num
+                        columns: table_num-(col_num*row_num*(cur_page+1))>0?col_num:((table_num-(col_num*row_num*cur_page))/row_num + 1).toFixed(0)
                         spacing: 20
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
                         flow: Grid.TopToBottom
                         Repeater{
                             id: column_table
-                            model: table_num-(table_col_num*5*pageNum)>(table_col_num*5)?table_col_num*5:table_num-(table_col_num*5*pageNum)
+                            model: table_num-(col_num*row_num*cur_page)>(col_num*row_num)?col_num*row_num:table_num-(col_num*row_num*cur_page)
                             Rectangle{
                                 id: rect_table
                                 width:80
                                 height:80
                                 radius:80
-                                color: ((table_col_num*5*pageNum)+index+1 == cur_table)?"#12d27c":"#d0d0d0"
+                                color: ((col_num*row_num*cur_page)+index+1 == cur_table)?"#12d27c":"#d0d0d0"
                                 Rectangle{
                                     width:68
                                     height:68
@@ -310,8 +342,8 @@ Item {
                                     anchors.centerIn: parent
                                     Text{
                                         anchors.centerIn: parent
-                                        text: (table_col_num*5*pageNum)+index+1
-                                        color: supervisor.isExistLocation((table_col_num*5*pageNum)+index)?"#525252":color_red
+                                        text: (col_num*row_num*cur_page)+index+1
+                                        color: supervisor.isExistLocation(cur_group,(col_num*row_num*cur_page)+index)?"#525252":color_red
                                         font.family: font_noto_r.name
                                         font.pixelSize: 25
                                     }
@@ -320,11 +352,11 @@ Item {
                                     anchors.fill:parent
                                     onClicked: {
                                         count_resting = 0;
-                                        if(cur_table == (table_col_num*5*pageNum)+index+1){
+                                        if(cur_table == (col_num*row_num*cur_page)+index+1){
                                             cur_table = 0;
                                         }else{
-                                            if(supervisor.isExistLocation((table_col_num*5*pageNum)+index)){
-                                                cur_table = (table_col_num*5*pageNum)+index+1;
+                                            if(supervisor.isExistLocation((col_num*row_num*cur_page)+index)){
+                                                cur_table = (col_num*row_num*cur_page)+index+1;
                                             }else{
 
                                             }
@@ -365,7 +397,7 @@ Item {
             width: 50
             radius: 50
             height: 50
-            visible: table_num>5?true:false
+            visible: table_num>row_num?true:false
             Image{
                 anchors.fill: parent
                 source: "icon/btn_lock.png"
@@ -374,7 +406,7 @@ Item {
                 anchors.fill: parent
                 onPressAndHold: {
                     count_resting = 0;
-                    supervisor.writelog("[USER INPUT] TABLE NUM CHANGED DONE : "+Number(table_col_num));
+                    supervisor.writelog("[USER INPUT] TABLE NUM CHANGED DONE : "+Number(col_num));
                     btn_lock.visible = false;
                     btns_table.visible = true;
                 }
@@ -393,7 +425,7 @@ Item {
                 width: 40
                 height: 40
                 radius: 40
-                enabled: table_num>5?true:false
+                enabled: table_num>row_num?true:false
                 border.color: "#e8e8e8"
                 border.width: 1
                 Text{
@@ -409,8 +441,8 @@ Item {
                     anchors.fill: parent
                     onClicked: {
                         count_resting = 0;
-                        if(table_col_num > 1)
-                            supervisor.setTableColNum(--table_col_num);
+                        if(col_num > 1)
+                            supervisor.setTableColNum(--col_num);
                     }
                 }
             }
@@ -420,7 +452,7 @@ Item {
                 width: 40
                 height: 40
                 radius: 40
-                enabled: table_num>table_col_num*5?true:false
+                enabled: table_num>col_num*row_num?true:false
                 border.color: "#e8e8e8"
                 border.width: 1
                 Text{
@@ -436,8 +468,8 @@ Item {
                     anchors.fill: parent
                     onClicked: {
                         count_resting = 0;
-                        if(table_col_num < 4)
-                            supervisor.setTableColNum(++table_col_num);
+                        if(col_num < max_col)
+                            supervisor.setTableColNum(++col_num);
                     }
                 }
             }
@@ -469,16 +501,449 @@ Item {
     }
 
     Rectangle{
+        id: rect_table_group
+        width: 1280
+        height: 580
+        anchors.top: parent.top
+        anchors.topMargin: statusbar.height;// (parent.height - statusbar.height - height - rect_go.height)/2
+//        anchors.topMargin: statusbar.height + (parent.height - statusbar.height - height - rect_go.height - rect_go.anchors.topMargin)/2
+        anchors.left: parent.left
+        color: color_dark_navy
+        visible: robot_type == "SERVING" && !use_tray
+        ListModel{
+            id: model_group
+        }
+        ListModel{
+            id: model_group_table
+        }
+        Component{
+            id: tableNumCompo
+            Rectangle{
+                id: rect_table_groups
+                width:80
+                height:80
+                radius:80
+                color: (num == cur_table)?"#12d27c":"#d0d0d0"
+                Rectangle{
+                    width:68
+                    height:68
+                    radius:68
+                    color: "#f4f4f4"
+                    anchors.centerIn: parent
+                    Text{
+                        anchors.centerIn: parent
+                        text: num
+                        color: supervisor.isExistLocation(cur_group,(col_num*row_num*cur_page)+index)?"#525252":color_red
+                        font.family: font_noto_r.name
+                        font.pixelSize: 25
+                    }
+                }
+                MouseArea{
+                    anchors.fill:parent
+                    onClicked: {
+                        count_resting = 0;
+                        cur_table = num;
+                    }
+                }
+            }
+
+        }
+        Component{
+            id: tableNameCompo
+            Rectangle{
+                id: rect_table_groups
+                width:130
+                height:80
+                radius:20
+                color: (num == cur_table)?"#12d27c":"#d0d0d0"
+                Rectangle{
+                    width:120
+                    height:70
+                    radius:15
+                    color: "#f4f4f4"
+                    anchors.centerIn: parent
+                    Text{
+                        anchors.centerIn: parent
+                        text: name
+                        color: supervisor.isExistLocation(cur_group,(col_num*row_num*cur_page)+index)?"#525252":color_red
+                        font.family: font_noto_r.name
+                        Component.onCompleted: {
+                            scale = 1;
+                            while(width*scale > 115){
+                                scale=scale-0.01;
+                            }
+                        }
+                        font.pixelSize: 30
+                    }
+                }
+                MouseArea{
+                    anchors.fill:parent
+                    onClicked: {
+                        count_resting = 0;
+                        cur_table = num;
+                    }
+                }
+            }
+
+        }
+
+        Rectangle{
+            id: rect_group
+            height: parent.height
+            width: 900
+            color: "transparent"
+            anchors.left: parent.left
+            anchors.leftMargin: (rect_menu_box.x - width)/2
+            Rectangle{
+                id: rect_group_category
+                width: rect_group.width
+                height: 70
+                color: "transparent"
+                anchors.top: parent.top
+                anchors.topMargin: 10
+                anchors.horizontalCenter: parent.horizontalCenter
+                Row{
+                    spacing: 5
+                    Repeater{
+                        model: model_group
+                        Rectangle{
+                            width: 150
+                            height: 65
+                            radius: 10
+                            color: "transparent"
+                            border.color: cur_group==index?color_green:"white"
+                            border.width: cur_group==index?5:2
+                            Text{
+                                anchors.centerIn: parent
+                                font.family: font_noto_b.name
+                                font.pixelSize: 20
+                                text: name
+                                color: cur_group==index?color_green:color_light_gray
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked:{
+                                    cur_group = index;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Rectangle{
+                width: rect_group.width
+                anchors.top: rect_group_category.bottom
+                anchors.topMargin: - 20
+                border.color: color_green
+                border.width: 5
+                radius: 10
+                clip: true
+                anchors.horizontalCenter: parent.horizontalCenter
+                height: rect_group.height - rect_group_category.height
+                color: color_dark_navy
+                Row{
+                    anchors.left: parent.left
+                    anchors.leftMargin: 5
+                    spacing: 15
+                    Repeater{
+                        model:model_group
+                        Rectangle{
+                            width: 140
+                            height: 30
+                            color: color_dark_navy
+                            opacity: cur_group === index?1:0
+                        }
+                    }
+                }
+                SwipeView{
+                    id: swipeview_group
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    width: parent.width*0.9
+                    height: parent.height*0.9
+                    currentIndex: 0
+                    clip: true
+                    onCurrentIndexChanged: {
+                        if(currentIndex > -1)
+                            cur_page = currentIndex;
+                        update_table();
+                    }
+                    Repeater{
+                        id: page_group
+                        model: Math.ceil((table_num/(col_num*row_num)))
+                        Item{
+                            Grid{
+                                rows: row_num
+                                columns: col_num//table_num-(col_num*row_num*(cur_page+1))>0?col_num:((table_num-(col_num*row_num*cur_page))/row_num + 1).toFixed(0)
+                                spacing: 20
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.verticalCenter: parent.verticalCenter
+//                                flow: Grid.TopToBottom
+                                Repeater{
+                                    id: column_table_group
+                                    delegate: {
+                                        if(supervisor.getSetting("ROBOT_SW","table_view") === "1"){
+                                            tableNameCompo
+                                        }else{
+                                            tableNumCompo
+                                        }
+                                    }
+                                    model: model_group_table
+                                }
+
+                            }
+                        }
+                    }
+                }
+                PageIndicator{
+                    id: indicator_tables_group
+                    count: swipeview_group.count
+                    currentIndex: swipeview_group.currentIndex
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 20
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    delegate: Rectangle{
+                        implicitWidth: 15
+                        implicitHeight: 15
+                        radius: width
+                        color: index===swipeview_group.currentIndex?"#12d27c":"#525252"
+                        Behavior on color{
+                            ColorAnimation {
+                                duration: 200
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: btn_lock_group
+                    color: "transparent"
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 20
+                    anchors.right: parent.right
+                    anchors.rightMargin: 20
+                    width: 50
+                    radius: 50
+                    height: 50
+                    visible: true;//group_num>row_num?true:false
+                    Image{
+                        anchors.fill: parent
+                        source: "icon/btn_lock.png"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onPressAndHold: {
+                            count_resting = 0;
+                            supervisor.writelog("[USER INPUT] TABLE NUM CHANGED DONE : "+Number(col_num));
+                            btn_lock_group.visible = false;
+                            btns_table_group.visible = true;
+                        }
+                    }
+                }
+                Row{
+                    id: btns_table_group
+                    visible: false
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 10
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    spacing: 10
+                    Grid{
+                        rows: 2
+                        columns: 4
+                        horizontalItemAlignment: Grid.AlignHCenter
+                        verticalItemAlignment: Grid.AlignVCenter
+                        spacing: 5
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            color: "white"
+                            text: "row"
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            color: "white"
+                            text: ":"
+                        }
+                        Rectangle{
+                            width: 32
+                            height: 32
+                            radius: 32
+                            enabled: row_num > 1
+                            color: enabled?color_dark_black:color_dark_gray
+                            border.color: "#e8e8e8"
+                            border.width: 1
+                            Text{
+                                anchors.centerIn: parent
+                                text:"-"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                font.family: font_noto_b.name
+                                font.pixelSize: 32
+                                color: "#e8e8e8"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    count_resting = 0;
+                                    supervisor.setSetting("FLOOR/group_row_num",row_num-1);
+                                    row_num--;
+                                    update_table();
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 32
+                            height: 32
+                            radius: 32
+                            enabled: row_num < max_row
+                            color: enabled?color_dark_black:color_dark_gray
+                            border.color: "#e8e8e8"
+                            border.width: 1
+                            Text{
+                                anchors.centerIn: parent
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                text:"+"
+                                font.family: font_noto_b.name
+                                font.pixelSize: 32
+                                color: "#e8e8e8"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    count_resting = 0;
+                                    supervisor.setSetting("FLOOR/group_row_num",row_num+1);
+                                    row_num++;
+                                    update_table();
+                                }
+                            }
+                        }
+
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            color: "white"
+                            text: "col"
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            color: "white"
+                            text: ":"
+                        }
+                        Rectangle{
+                            width: 32
+                            height: 32
+                            radius: 32
+                            enabled: col_num > 1
+                            color: enabled?color_dark_black:color_dark_gray
+                            border.color: "#e8e8e8"
+                            border.width: 1
+                            Text{
+                                anchors.centerIn: parent
+                                text:"-"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                font.family: font_noto_b.name
+                                font.pixelSize: 32
+                                color: "#e8e8e8"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    count_resting = 0;
+                                    supervisor.setSetting("FLOOR/group_col_num",col_num-1);
+                                    col_num--;
+                                    update_table();
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 32
+                            height: 32
+                            radius: 32
+                            enabled: col_num < max_col
+                            color: enabled?color_dark_black:color_dark_gray
+                            border.color: "#e8e8e8"
+                            border.width: 1
+                            Text{
+                                anchors.centerIn: parent
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                text:"+"
+                                font.family: font_noto_b.name
+                                font.pixelSize: 32
+                                color: "#e8e8e8"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    count_resting = 0;
+                                    supervisor.setSetting("FLOOR/group_col_num",col_num+1);
+                                    col_num++;
+                                    update_table();
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle{
+                        id: btn_confirm_tables_group
+                        color: "#282828"
+                        width: 40
+                        height: 40
+                        radius: 40
+                        anchors.verticalCenter: parent.verticalCenter
+                        border.color: "#e8e8e8"
+                        border.width: 1
+                        Image{
+                            anchors.fill: parent
+                            source: "icon/btn_yes.png"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                count_resting = 0;
+                                supervisor.writelog("[USER INPUT] TABLE NUM CHANGED");
+                                btn_lock_group.visible = true;
+                                btns_table_group.visible = false;
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+    Rectangle{
         id: rect_go
         width: 300
         visible: robot_type=="SERVING"?true:false
-        height: 100
+        height: 120
         radius: 100
-        enabled: !tray_empty && robot_ready
-        anchors.horizontalCenter: rect_tray_box.horizontalCenter
-        anchors.top: rect_tray_box.bottom
-        anchors.topMargin: 40
-        color: enabled?color_blue:color_mid_gray
+        anchors.horizontalCenter: {
+            if(use_tray){
+                rect_tray_box.horizontalCenter
+            }else{
+                rect_table_group.horizontalCenter
+            }
+        }
+        anchors.top: {
+            if(use_tray){
+                rect_tray_box.bottom
+            }else{
+                rect_table_group.bottom
+            }
+        }
+        anchors.topMargin: {
+            if(use_tray)
+                40
+            else
+                20
+        }
+
+        color: "#24a9f7"
         Text{
             id: text_go
             anchors.centerIn: parent
@@ -495,6 +960,7 @@ Item {
                 count_resting = 0;
                 print("serving start button");
                 cur_table = 0;
+                supervisor.setPreset(0);
                 for(var i=0; i<tray_num; i++){
                     supervisor.setTray(i,traymodel.get(i).set_table);
                 }
@@ -502,9 +968,155 @@ Item {
         }
     }
     Rectangle{
+        id: rect_go_safe
+        width: 80
+        visible: robot_type=="SERVING"?true:false
+        height: 80
+        radius: 80
+        anchors.verticalCenter: rect_go.verticalCenter
+        anchors.left: rect_go.right
+        anchors.leftMargin : 20
+        color: "#24a9f7"
+        Text{
+            id: text_go_Safe
+            anchors.centerIn: parent
+            text: "+"
+            font.family: font_noto_r.name
+            font.pixelSize: 35
+            font.bold: true
+            color: "white"
+        }
+        MouseArea{
+            id: btn_go_safe
+            anchors.fill: parent
+            onClicked: {
+                popup_preset_menu.open();
+            }
+        }
+        Popup{
+            id: popup_preset_menu
+//            anchors.centerIn: parent
+            width: 200
+            height: 80
+            leftPadding: 0
+            rightPadding: 0
+            topPadding: 0
+            bottomPadding: 0
+            background: Rectangle{
+                anchors.fill: parent
+                color: "transparent"
+            }
+            onOpened: {
+                ani_open.start();
+            }
+            ParallelAnimation{
+                id: ani_open
+                onStarted: {
+                    row_preset.opacity = 0;
+                }
+
+                SequentialAnimation{
+                    NumberAnimation{
+                        target: rect_preset
+                        duration: 500
+                        to: popup_preset_menu.width
+                        from: popup_preset_menu.height
+                        property: "width"
+                    }
+                    NumberAnimation{
+                        target: row_preset
+                        duration: 100
+                        to: 1
+                        from: 0
+                        property: "opacity"
+                    }
+                }
+            }
+            Rectangle{
+                id: rect_preset
+                width: parent.width
+                height: parent.height
+                radius: width
+                color: color_blue
+                Row{
+                    id: row_preset
+                    opacity: 0
+                    anchors.centerIn: parent
+                    spacing: 20
+                    Rectangle{
+                        color: "transparent"
+                        width: 20
+                        height: 25
+                        anchors.verticalCenter: parent.verticalCenter
+                        Image{
+                            anchors.fill: parent
+                            enabled:cur_preset > 1
+                            source:"icon/keyboard_left.png"
+                            ColorOverlay{
+                                anchors.fill: parent
+                                color: parent.enabled?"white":color_dark_gray
+                                source: parent
+                            }
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                if(cur_preset > 1)
+                                    cur_preset--;
+                            }
+                        }
+                    }
+                    Column{
+                        spacing: 1
+                        Text{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.family: font_noto_b.name
+                            font.pixelSize: 15
+                            font.bold: true
+                            text: "현재 속도"
+                            color: "white"
+                        }
+                        Text{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            text: supervisor.getSetting("PRESET"+cur_preset.toString(),"name");
+                        }
+                    }
+
+                    Rectangle{
+                        color: "transparent"
+                        width: 20
+                        height: 25
+                        anchors.verticalCenter: parent.verticalCenter
+                        Image{
+                            anchors.fill: parent
+                            enabled:cur_preset < 5
+                            source:"icon/keyboard_right.png"
+                            ColorOverlay{
+                                anchors.fill: parent
+                                color: parent.enabled?"white":color_dark_gray
+                                source: parent
+                            }
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                if(cur_preset < 5)
+                                    cur_preset++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Rectangle{
         id: rect_patrol_box
         visible: robot_type=="CALLING"?true:false
-        width: (table_num/5).toFixed(0)*100 - 20 + 160
+        width: (table_num/row_num).toFixed(0)*100 - 20 + 160
         height: parent.height - statusbar.height
         anchors.left: parent.left
         anchors.top: parent.top
@@ -597,25 +1209,6 @@ Item {
         }
     }
 
-
-    Timer{
-        interval: 500
-        running: true
-        repeat: true
-        onTriggered: {
-            tray_empty = true;
-            for(var i=0; i<traymodel.count; i++){
-                if(traymodel.get(i).set_table !== 0)
-                    tray_empty = false;
-            }
-
-            if(supervisor.getLCMConnection() && !supervisor.getEmoStatus() && supervisor.getPowerStatus() && supervisor.getMotorState() === 1 && supervisor.getLocalizationState() === 2){
-                robot_ready = true;
-            }else{
-                robot_ready = false;
-            }
-        }
-    }
 
     Rectangle{
         id: rect_go_patrol
@@ -733,10 +1326,12 @@ Item {
                 width: size_menu
                 height: size_menu
                 anchors.horizontalCenter: parent.horizontalCenter
+                color: "transparent"
                 Rectangle{
                     width: size_menu
                     height: image_wait.height+text_wait.height
                     anchors.centerIn: parent
+                    color: "transparent"
                     Image{
                         id: image_wait
                         scale: 1.3
@@ -780,14 +1375,7 @@ Item {
         }
         Image{
             id: image_location
-            source:{
-                if(robot_ready){
-                    "image/image_location.png"
-                }else{
-                    "image/icon_warning.png"
-                }
-
-            }
+            source:"image/image_location.png"
             width: 160
             height: 160
             anchors.horizontalCenter: parent.horizontalCenter
@@ -803,9 +1391,7 @@ Item {
             font.pixelSize: 40
             color: "#12d27c"
             text: {
-                if(!robot_ready){
-                    "<font color=\"#e7584d\">로봇이 준비상태가 아닙니다.</font>"
-                }else if(go_wait){
+                if(go_wait){
                     "대기 장소로 이동<font color=\"white\">하시겠습니까?</font>"
                 }else if(go_charge){
                     "충전기로 이동<font color=\"white\">하시겠습니까?</font>"
@@ -823,18 +1409,11 @@ Item {
             width: 250
             height: 90
             radius: 20
-            visible: !robot_ready || (!go_charge&&!go_wait&&!go_patrol)
+            visible: !go_charge&&!go_wait&&!go_patrol
             color: "#d0d0d0"
             anchors.top: text_quest.bottom
             anchors.topMargin: 50
             anchors.horizontalCenter: parent.horizontalCenter
-            Rectangle{
-                color:"white"
-                width: 240
-                height: 80
-                radius: 19
-                anchors.centerIn: parent
-            }
             Image{
                 id: image_confirm
                 source: "icon/btn_yes.png"
@@ -855,28 +1434,21 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    if(robot_ready){
-                        count_resting = 0;
-                        if(go_wait){
-                            supervisor.moveToWait();
-                        }else if(go_charge){
-                            supervisor.moveToCharge();
-                        }else if(go_patrol){
+                    count_resting = 0;
+                    if(go_wait){
+                        supervisor.moveToWait();
+                    }else if(go_charge){
+                        supervisor.moveToCharge();
+                    }else if(go_patrol){
 
-                        }else{
-
-                        }
-                        go_wait = false;
-                        go_charge = false;
-                        go_patrol = false;
-                        popup_question.visible = false;
                     }else{
-                        count_resting = 0;
-                        go_wait = false;
-                        go_charge = false;
-                        go_patrol = false;
-                        popup_question.visible = false;
+
                     }
+
+                    go_wait = false;
+                    go_charge = false;
+                    go_patrol = false;
+                    popup_question.visible = false;
                 }
             }
         }
@@ -885,7 +1457,7 @@ Item {
             width: 250
             height: 90
             radius: 20
-            visible: robot_ready&&(go_charge||go_wait||go_patrol)
+            visible: go_charge||go_wait||go_patrol
             color: "#d0d0d0"
             anchors.top: text_quest.bottom
             anchors.topMargin: 50
@@ -924,7 +1496,7 @@ Item {
             width: 250
             height: 90
             radius: 20
-            visible: (go_charge||go_wait||go_patrol)&&robot_ready
+            visible: go_charge||go_wait||go_patrol
             color: "#d0d0d0"
             anchors.top: text_quest.bottom
             anchors.topMargin: 50
@@ -973,5 +1545,4 @@ Item {
             }
         }
     }
-
 }

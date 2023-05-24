@@ -25,7 +25,7 @@ Item {
     property bool robot_rx: false
 
     Component.onCompleted: {
-        statusbar.visible = true;
+//        statusbar.visible = true;
     }
 
     Rectangle{

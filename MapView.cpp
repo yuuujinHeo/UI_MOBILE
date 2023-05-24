@@ -171,6 +171,10 @@ void MapView::setMode(QString name){
         show_location_icon = false;
         robot_following = true;
         pmap->annotation_edited = false;
+        pmap->annot_edit_object = false;
+        pmap->annot_edit_drawing = false;
+        pmap->annot_edit_location = false;
+        pmap->annot_edit_tline = false;
         setFullScreen();
     }else if(mode == "local_view"){
         show_robot = true;
@@ -192,6 +196,7 @@ void MapView::initObject(){
     QString file_path = QDir::homePath() + "/maps/" + map_name + "/map_obs.png";;
     objects.clear();
     map_objecting.release();
+    pmap->annot_edit_object = false;
     map_objecting = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
     cv::flip(map_objecting,map_objecting,0);
     cv::rotate(map_objecting,map_objecting,cv::ROTATE_90_COUNTERCLOCKWISE);
@@ -210,6 +215,7 @@ void MapView::initObject(){
 void MapView::initLocation(){
     //Read annotation.ini
     locations.clear();
+    pmap->annot_edit_location = false;
     for(int i=0; i<pmap->locations.size(); i++){
         LOCATION temp;
         temp.type = pmap->locations[i].type;
@@ -393,6 +399,7 @@ bool MapView::checkLocationCollision(int num){
 }
 bool MapView::checkLocationCollision(){
     if(new_location_flag){
+        qDebug() << "FUNCTION : " << new_location.point.x << new_location.point.y;
         return isCollision(new_location.point.x, new_location.point.y);
     }else{
         return checkRobotCollision();
@@ -401,10 +408,10 @@ bool MapView::checkLocationCollision(){
 bool MapView::isCollision(int _x, int _y){
     if(map_cost.cols > 0 && map_cost.rows > 0){
         if(map_cost.at<uchar>(_y,_x) > 180 || map_orin.at<uchar>(_y,_x) == 0){
-//            qDebug() << _x << _y << " is collision!!" ;
+//            qDebug() << _x << _y << " is collision!!" <<map_cost.at<uchar>(_x,_y)<<map_cost.at<uchar>(_y,_x);
             return true;
         }else{
-//            qDebug() << _x << _y << " is not collision!! " << map_orin.at<uchar>(_y,_x);
+//            qDebug() << _x << _y << " is not collision!! " <<map_cost.at<uchar>(_x,_y)<<map_cost.at<uchar>(_y,_x);
             return false;
         }
     }else{
@@ -456,7 +463,6 @@ void MapView::setCostMap(){
         }
         cv::flip(map_cost,map_cost,0);
         cv::rotate(map_cost,map_cost,cv::ROTATE_90_COUNTERCLOCKWISE);
-
 
         //Make Objecting Margin
         int robot_radius = std::ceil(pmap->robot_radius/pmap->gridwidth);
@@ -524,11 +530,13 @@ void MapView::setCostMap(){
         }
 
         cv::addWeighted(map_cost, 1, map_objecting, 1, 0, map_cost);
-        cv::rotate(map_cost,map_cost,cv::ROTATE_90_CLOCKWISE);
-        cv::flip(map_cost,map_cost,0);
+        cv::Mat map_cost_ui;
+        map_cost.copyTo(map_cost_ui);
+        cv::rotate(map_cost_ui,map_cost_ui,cv::ROTATE_90_CLOCKWISE);
+        cv::flip(map_cost_ui,map_cost_ui,0);
         QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_cost_ui.png";
         plog->write("[MAPVIEW] SAVE MAP "+path);
-        cv::imwrite(path.toStdString(),map_cost);
+        cv::imwrite(path.toStdString(),map_cost_ui);
     }
 }
 void MapView::setLocalizationMap(QString filename){
@@ -604,8 +612,11 @@ void MapView::setCostMap(QString filename){
         QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
     }else{
         map_orin = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+        map_cost = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
         cv::flip(map_orin,map_orin,0);
         cv::rotate(map_orin,map_orin,cv::ROTATE_90_COUNTERCLOCKWISE);
+        cv::flip(map_cost,map_cost,0);
+        cv::rotate(map_cost,map_cost,cv::ROTATE_90_COUNTERCLOCKWISE);
         plog->write("[MAPVIEW] SET COST MAP " + object_name + ": "+file_path+QString().sprintf(" (size = %d x %d)",map_orin.rows,map_orin.cols));
     }
     delete pc;
@@ -1018,6 +1029,7 @@ void MapView::setMapLocation(){
                 QPainterPath path;
                 path.addRoundedRect((new_location.point.x-rad/2)*res,(new_location.point.y-rad/2)*res,rad,rad,rad,rad);
                 painter.setPen(QPen(Qt::white,3));
+                qDebug() << "NEW LOCATION CHECK COLLISION : " << new_location.point.x*res << new_location.point.y*res;
                 if(isCollision(new_location.point.x*res, new_location.point.y*res)){
                     painter.fillPath(path,QBrush(QColor(hex_color_red)));
                 }else{
@@ -1067,6 +1079,9 @@ void MapView::setMapLocation(){
                             painter.setPen(QPen(Qt::white,1));
                         }
                         painter.drawPath(path);
+                        painter.drawLine(x1,y1,x,y);
+                        painter.drawLine(x,y,x2,y2);
+                        painter.drawPath(path);
                         QImage image(":/icon/icon_home_2.png");
                         painter.drawImage(QRectF((locations[i].point.x-rad/2)*res,(locations[i].point.y-rad/2)*res,rad,rad),image,QRectF(0,0,image.width(),image.height()));
                     }
@@ -1092,6 +1107,9 @@ void MapView::setMapLocation(){
                         }else{
                             painter.setPen(QPen(Qt::white,1));
                         }
+                        painter.drawPath(path);
+                        painter.drawLine(x1,y1,x,y);
+                        painter.drawLine(x,y,x2,y2);
                         painter.drawPath(path);
                         QImage image(":/icon/icon_charge_2.png");
                         painter.drawImage(QRectF((locations[i].point.x-rad/2)*res,(locations[i].point.y-rad/2)*res,rad,rad),image,QRectF(0,0,image.width(),image.height()));
@@ -1729,7 +1747,7 @@ void MapView::editObject(int x, int y){
             }
         }
 
-        pmap->annotation_edited = true;
+        pmap->annot_edit_object = true;
     }
     initObject();
     setMapObject();
@@ -1747,7 +1765,7 @@ void MapView::saveObject(QString type){
     for(int i=0; i<new_object.points.size(); i++){
         temp.points.push_back(setAxisBack(new_object.points[i]));
     }
-    pmap->annotation_edited = true;
+    pmap->annot_edit_object = true;
     pmap->objects.push_back(temp);
     clearObject();
     setMapObject();
@@ -1757,6 +1775,7 @@ void MapView::clearObject(){
     qDebug() << "clearobject";
     new_object_flag = false;
     new_object.points.clear();
+    pmap->annot_edit_object = false;
     select_object = -1;
     select_object_point = -1;
     initObject();
@@ -1816,23 +1835,27 @@ void MapView::selectLocation(int num, QString type){
     setMapLocation();
 }
 
-void MapView::saveLocation(QString type, QString name){
+
+void MapView::saveLocation(QString type, int groupnum, QString name){
     LOCATION temp;
     temp.type = type;
     temp.name = name;
+    temp.group = groupnum;
     temp.point = setAxisBack(new_location.point);
     temp.angle = setAxisBack(new_location.angle);
-    temp.number = getLocationNum("Serving") + 1;
+    temp.number = getLocGroupNum(groupnum)+1;
+//    temp.number = getLocationNum("Serving") + 1;
 
     if(type == "Serving"){
         plog->write("[ANNOTATION] ADD Location : "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
         pmap->locations.push_back(temp);
-        pmap->annotation_edited = true;
+        pmap->annot_edit_location = true;
     }else if(getLocationNum(type) > 0){
         for(int i=0; i<pmap->locations.size(); i++){
             if(pmap->locations[i].type == type){
                 plog->write("[ANNOTATION] ADD Location(Overwrite): "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
                 pmap->locations[i] = temp;
+                pmap->annot_edit_location = true;
                 break;
             }
         }
@@ -1840,11 +1863,16 @@ void MapView::saveLocation(QString type, QString name){
         plog->write("[ANNOTATION] ADD Location : "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
         if(type == "Charging"){
             pmap->locations.insert(0,temp);
+            pmap->annot_edit_location = true;
         }else if(type == "Resting"){
             pmap->locations.insert(getLocationNum("Charging"),temp);
+            pmap->annot_edit_location = true;
         }
-        pmap->annotation_edited = true;
+        pmap->annot_edit_location = true;
     }
+
+    std::sort(pmap->locations.begin(),pmap->locations.end(),sortLocation2);
+    pmap->annot_edit_location = true;
 
     initLocation();
 }
@@ -1853,6 +1881,7 @@ void MapView::clearLocation(){
     new_location_flag = false;
     new_location.name = "";
     edit_location_flag = false;
+    pmap->annot_edit_location = false;
     new_location.type = "";
     select_location = -1;
     initLocation();
@@ -1882,7 +1911,7 @@ void MapView::setLocation(int x, int y, float th){
         pmap->locations[num].point = setAxisBack(cv::Point2f(x,y));
         pmap->locations[num].angle = setAxisBack(th);
 //        qDebug() << pmap->locations[num].angle;
-        pmap->annotation_edited = true;
+        pmap->annot_edit_location = true;
     }
     initLocation();
     setMapLocation();
@@ -1900,8 +1929,21 @@ int MapView::getLocationNum(int x, int y){
         }
     }
 
-    if(loc_id > 0){
+    if(loc_id > -1){
+        if(pmap->locations[loc_id].type == "Resting"){
+            if(getLocationNum("Charging") == 0)
+                loc_id++;
 
+            return loc_id;
+        }else if(pmap->locations[loc_id].type == "Serving"){
+            if(getLocationNum("Resting") == 0)
+                loc_id++;
+            if(getLocationNum("Charging") == 0)
+                loc_id++;
+
+            return loc_id;
+        }
+        return loc_id;
     }
     return -1;
 }
@@ -1913,7 +1955,15 @@ int MapView::getLocationNum(QString type){
             count++;
     }
     return count;
-
+}
+int MapView::getLocGroupNum(int num){
+    int count = 0;
+    for(int i=0; i<pmap->locations.size(); i++){
+        if(pmap->locations[i].type == "Serving" && pmap->locations[i].group == num){
+            count++;
+        }
+    }
+    return count;
 }
 
 void MapView::editLocation(int x, int y, float th){
@@ -1926,7 +1976,7 @@ void MapView::editLocation(int x, int y, float th){
         qDebug() <<"1            " <<  orin_location.point.x  << setAxisBack(cv::Point2f(x,y)).x;
         pmap->locations[num].point = setAxisBack(cv::Point2f(x,y));
         pmap->locations[num].angle = setAxisBack(th);
-        pmap->annotation_edited = true;
+        pmap->annot_edit_location = true;
 //        qDebug() << pmap->locations[num].angle;
     }
     initLocation();
@@ -1939,7 +1989,7 @@ void MapView::redoLocation(){
 //        qDebug() <<"1            " <<  orin_location.point.x  << locations[num].point.x;
         pmap->locations[num].point = orin_location.point;
         pmap->locations[num].angle = orin_location.angle;
-        pmap->annotation_edited = true;
+        pmap->annot_edit_location = true;
 //        qDebug() << pmap->locations[num].angle;
     }
     initLocation();
@@ -1952,7 +2002,7 @@ void MapView::editLocation(){
         if(pmap->locations.size() > num && num > -1){
             pmap->locations[num].point = setAxisBack(new_location.point);
             pmap->locations[num].angle = setAxisBack(new_location.angle);
-            pmap->annotation_edited = true;
+            pmap->annot_edit_location = true;
         }
         edit_location_flag = false;
         initLocation();
