@@ -15,93 +15,75 @@ Item {
 
     property date currentDate: new Date()
     property string today: ""
-    property var year: -1
-    property var month: -1
-    property var date: -1
+    property var year: 2023
+    property var month: 40
+    property var date: 24
     property string week: ""
     property var date_end: 30
     property var select_category: 1
-
     Component.onCompleted: {
-        select_category = 1;
         setdateToday();
+        update();
     }
-
-    onSelect_categoryChanged: {
-        supervisor.setLog(select_category);
-        supervisor.readLog(currentDate)
-//        setdateToday();
-        setdate(currentDate);
-    }
-
     function setdateToday(){
-        currentDate = new Date();
-
-        if(model_date.count > 0){
-            if(model_date.get(0).month !== currentDate.getMonth()+1){
-                set_datelist();
-            }
-        }else{
-            set_datelist();
+        today = currentDate.toLocaleDateString();
+        var list = today.split(" ");
+        week = list[0].split(",")[0];
+        date = list[1];
+        if(list[2] === "January"){
+            date = 1;
+        }else if(list[2] === "February"){
+            date = 2;
+        }else if(list[2] === "March"){
+            date = 3;
+        }else if(list[2] === "April"){
+            date = 4;
+        }else if(list[2] === "May"){
+            date = 5;
+        }else if(list[2] === "June"){
+            date = 6;
+        }else if(list[2] === "July"){
+            date = 7;
+        }else if(list[2] === "August"){
+            date = 8;
+        }else if(list[2] === "September"){
+            date = 9;
+        }else if(list[2] === "October"){
+            date = 10;
+        }else if(list[2] === "November"){
+            date = 11;
+        }else if(list[2] === "December"){
+            date = 12;
         }
-        date_list.enabled = true;
-        date_list.currentIndex = currentDate.getDate()-1;
-        update_log();
-    }
 
-    function update_log(){
-        show_loading();
-        supervisor.readLog(currentDate);
-        model_log.clear();
-        for(var i=0;i<supervisor.getLogLineNum(); i++){
-            model_log.append({"date":supervisor.getLogDate(i),"auth":supervisor.getLogAuth(i),"message":supervisor.getLogMessage(i)})
-        }
-        unshow_loading();
-    }
+        month = list[2];
+        year = list[3];
 
-    function set_datelist(){
-        var tempstr = supervisor.getLocaleDate(currentDate.getFullYear(),currentDate.getMonth()+1,1);
-        var temp_date = Date.fromLocaleString(Qt.locale(),tempstr, "yyyy-MM-dd");
+        var tempStr = "2023-04-11";
 
-        date_list.enabled = false;
+        print(Date.fromLocaleString(Qt.locale(),tempStr,"yyyy-MM-dd").toLocaleDateString())
         model_date.clear();
-        while(temp_date.getMonth() === currentDate.getMonth()){
-            var tempWeek = temp_date.toLocaleDateString().split(" ")[3];
-
-            model_date.append({"year":temp_date.getFullYear(),"month":temp_date.getMonth()+1,"date":temp_date.getDate(),"week":tempWeek})
-
-            var newdate = temp_date;
-            newdate.setDate(temp_date.getDate() + 1);
-            temp_date = newdate;
+        for(var i=1; i<date_end+1; i++){
+            tempStr = year+"-0"+month+"-"+Number(i);
+//            print(tempStr,Date.fromLocaleString(Qt.locale(),tempStr,"yyyy-MM-dd").toLocaleDateString())
+            var tempWeek = Date.fromLocaleString(Qt.locale(),tempStr,"yyyy-MM-dd").toLocaleDateString().split(" ")[3];
+            model_date.append({"date":month+"월 "+Number(i)+"일 ("+tempWeek+")"});
         }
-        date_list.currentIndex = currentDate.getDate() - 1;
-        date_list.enabled = true;
+        date_list.currentIndex = parseInt(date);
     }
-
     function setdate(new_date){
-        currentDate = new_date;
-        if(model_date.count > 0){
-            if(model_date.get(0).month !== currentDate.getMonth()+1){
-                set_datelist();
-            }
-        }else{
-            set_datelist();
+        model_date.clear();
+        for(var i=1; i<date_end+1; i++){
+            var tempStr = year+"-0"+month+"-"+Number(i);
+            print(tempStr,Date.fromLocaleString(Qt.locale(),tempStr,"yyyy-MM-dd").toLocaleDateString())
+            var tempWeek = Date.fromLocaleString(Qt.locale(),tempStr,"yyyy-MM-dd").toLocaleDateString().split(" ")[3];
+            model_date.append({"date":month+"월 "+Number(i)+"일 ("+tempWeek+")"});
         }
-        date_list.enabled = true;
-        date_list.currentIndex = currentDate.getDate()-1;
-        update_log();
+        date_list.currentIndex = parseInt(date);
+    }
+    function update(){
     }
 
-    function getyesterday(){
-        var newdate = currentDate;
-        newdate.setDate(currentDate.getDate() - 1);
-        return newdate;
-    }
-    function gettomorrow(){
-        var newdate = currentDate;
-        newdate.setDate(currentDate.getDate() + 1);
-        return newdate;
-    }
 
     Rectangle{
         width: parent.width
@@ -115,6 +97,7 @@ Item {
             Row{
                 id: rows_category
                 spacing: 5
+
                 Rectangle{
                     width: 250
                     height: 40
@@ -189,20 +172,14 @@ Item {
                 clip: false
                 anchors.top: rows_category.bottom
                 anchors.topMargin: 30
-                enabled: false
                 onCurrentIndexChanged: {
-                    if(enabled){
-//                        print("current index changed ", currentIndex, model_date.count);
-                        if(model_date.count > currentIndex && currentIndex > -1){
-                            if(model_date.get(currentIndex).date > 0){
-                                var tempStr = supervisor.getLocaleDate(model_date.get(currentIndex).year, model_date.get(currentIndex).month, model_date.get(currentIndex).date);
-                                setdate(Date.fromLocaleString(Qt.locale(),tempStr,"yyyy-MM-dd"));
-                            }
-                        }
-                    }else{
-//                        print("current index changed ff", currentIndex, model_date.count);
+                    if(currentIndex < 0)
+                        currentIndex = 0;
+                    else if(currentIndex > model_date.count-1){
+                        currentIndex = model_date.count-1;
                     }
                 }
+
                 anchors.horizontalCenter: parent.horizontalCenter
                 Repeater{
                     model : ListModel{id: model_date}
@@ -211,7 +188,7 @@ Item {
                         height: 40
                         color: "transparent"
                         Text{
-                            text: Number(month)+"월 "+Number(date)+"일 ("+week+")";
+                            text: date
                             font.family: font_noto_b.name
                             font.pixelSize: 30
                             anchors.centerIn: parent
@@ -235,7 +212,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        setdate(getyesterday());
+                        date_list.currentIndex--;
                     }
                 }
             }
@@ -255,7 +232,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        setdate(gettomorrow());
+                        date_list.currentIndex++;
                     }
                 }
             }
@@ -278,92 +255,6 @@ Item {
                     }
                 }
             }
-            Flickable{
-                id: area_log
-                width: parent.width
-                anchors.top: date_list.bottom
-                anchors.topMargin: 50
-                anchors.bottom: parent.bottom
-                contentHeight: column_log.height
-                ScrollBar.vertical: ScrollBar{
-                    width: 20
-                    anchors.right: parent.right
-                    policy: ScrollBar.AlwaysOn
-                }
-                clip: true
-                Column{
-                    id: column_log
-                    spacing: 5
-                    Repeater{
-                        model: ListModel{id: model_log}
-                        Rectangle{
-                            width: area_log.width
-                            height: 40
-                            Row{
-                                anchors.fill: parent
-                                Rectangle{
-                                    width: 200
-                                    height: parent.height
-                                    Text{
-                                        anchors.centerIn: parent
-                                        text: date
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 15
-                                    }
-                                }
-
-                                Rectangle{
-                                    height: parent.height
-                                    width: 3
-                                    color: color_light_gray
-                                }
-
-                                Rectangle{
-                                    width: 100
-                                    height: parent.height
-                                    Text{
-                                        anchors.centerIn: parent
-                                        text: auth
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 15
-                                    }
-                                }
-
-                                Rectangle{
-                                    height: parent.height
-                                    width: 3
-                                    color: color_light_gray
-                                }
-
-                                Rectangle{
-                                    width: parent.width - 306
-                                    height: parent.height
-                                    Text{
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        anchors.left: parent.left
-                                        anchors.leftMargin: 10
-                                        font.pixelSize: {
-                                            if(message.length > 80)
-                                                12
-                                            else
-                                                15
-                                        }
-
-                                        text: message
-                                        font.family: font_noto_r.name
-                                    }
-                                }
-                            }
-                            Rectangle{
-                                width: parent.width
-                                anchors.bottom: parent.bottom
-                                height: 1
-                            }
-                        }
-                    }
-                }
-            }
-
         }
 
         Rectangle{
@@ -415,70 +306,8 @@ Item {
             selectedDate: currentDate
             minimumDate: new Date(2023, 1, 1)
             maximumDate: new Date()
-            style: CalendarStyle{
-                dayDelegate: Rectangle{
-                    color:{
-                        if(styleData.valid && styleData.visibleMonth){
-                            "white"
-                        }else{
-                            color_light_gray
-                        }
-                    }
+            onSelectedDateChanged: {
 
-                    Label {
-                        text: styleData.date.getDate()
-                        anchors.centerIn: parent
-                        color: {
-                            if(styleData.valid && styleData.visibleMonth){
-                                if(supervisor.isHasLog(styleData.date)){
-                                     "black"
-                                }else{
-                                    "grey"
-                                }
-                            }else{
-                                "grey"
-                            }
-                        }
-                    }
-
-                    Image{
-                        source: "icon/icon_point_1.png"
-                        anchors.top: parent.top
-                        anchors.left: parent.left
-                        width: 18
-                        height: 20
-                        visible: {
-                            if(styleData.valid){
-                                if(supervisor.isHasLog(styleData.date)){
-                                     true
-                                }else{
-                                    false
-                                }
-                            }else{
-                                false
-                            }
-                        }
-                        ColorOverlay{
-                            source: parent
-                            anchors.fill: parent
-                            color: color_green
-                            visible: {
-                                if(styleData.valid && styleData.visibleMonth){
-                                    true
-                                }else{
-                                    false
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            onClicked: {
-                if(supervisor.isHasLog(selectedDate)){
-                    setdate(selectedDate);
-                    popup_calendar.close();
-                }
             }
         }
     }

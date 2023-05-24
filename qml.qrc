@@ -178,5 +178,14 @@
         <file>bgm/battery.mp3</file>
         <file>Page_log.qml</file>
         <file>video/loading_row.gif</file>
+        <file>icon/icon_bookmark.png</file>
+        <file>icon/icon_location.png</file>
+        <file>icon/icon_trashcan.png</file>
+        <file>icon/icon-drawing-curve.png</file>
+        <file>icon/icon-drawing-free drawing.png</file>
+        <file>icon/icon-drawing-polygon.png</file>
+        <file>icon/icon-drawing-square.png</file>
+        <file>icon/icon-wall.png</file>
+        <file>Tool_KeyPad.qml</file>
     </qresource>
 </RCC>

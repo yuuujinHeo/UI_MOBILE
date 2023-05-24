@@ -10,7 +10,9 @@ Item {
     objectName: "page_setting"
     width: 1280
     height: 800
+
     property bool is_admin: false
+
     property int select_category: 4
     property string platform_name: supervisor.getRobotName()
     property string debug_platform_name: ""
@@ -26,7 +28,8 @@ Item {
     }
 
     Component.onCompleted: {
-        is_admin = false;
+        //DEBUG 230523 세팅 빠른 확인 위해서 admin true
+        is_admin = true;
         is_reset_slam = false;
         init();
     }
@@ -41,6 +44,10 @@ Item {
             model_callbell.append({name:supervisor.getSetting("CALLING","call_"+Number(i))});
         }
         popup_change_call.close();
+    }
+
+    Tool_KeyPad{
+        id: keypad
     }
 
     Tool_Keyboard{
@@ -481,9 +488,9 @@ Item {
                             height: parent.height
                             Row{
                                 anchors.centerIn: parent
-                                spacing: 25
+                                spacing: 10
                                 Rectangle{
-                                    width:80
+                                    width:70
                                     height: 40
                                     radius: 5
                                     border.width: 1
@@ -491,6 +498,8 @@ Item {
                                         id: text_preset_name_1
                                         anchors.centerIn: parent
                                         text: "preset 1"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
                                     }
                                     MouseArea{
                                         anchors.fill: parent
@@ -504,7 +513,7 @@ Item {
                                     }
                                 }
                                 Rectangle{
-                                    width:80
+                                    width:70
                                     height: 40
                                     radius: 5
                                     border.width: 1
@@ -512,6 +521,8 @@ Item {
                                         id: text_preset_name_2
                                         anchors.centerIn: parent
                                         text: "preset 2"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
                                     }
                                     MouseArea{
                                         anchors.fill: parent
@@ -525,7 +536,7 @@ Item {
                                     }
                                 }
                                 Rectangle{
-                                    width:80
+                                    width:70
                                     height: 40
                                     radius: 5
                                     border.width: 1
@@ -533,6 +544,8 @@ Item {
                                         id: text_preset_name_3
                                         anchors.centerIn: parent
                                         text: "preset 3"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
                                     }
                                     MouseArea{
                                         anchors.fill: parent
@@ -541,6 +554,52 @@ Item {
                                                 popup_preset_set.preset_num = 3;
                                                 popup_preset_set.open();
                                             }
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width:70
+                                    height: 40
+                                    radius: 5
+                                    border.width: 1
+                                    Text{
+                                        id: text_preset_name_4
+                                        anchors.centerIn: parent
+                                        text: "preset 4"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            if(text_preset_name_4.text !== ""){
+                                                popup_preset_set.preset_num = 4;
+                                                popup_preset_set.open();
+                                            }
+
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width:70
+                                    height: 40
+                                    radius: 5
+                                    border.width: 1
+                                    Text{
+                                        id: text_preset_name_5
+                                        anchors.centerIn: parent
+                                        text: "preset 5"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            if(text_preset_name_5.text !== ""){
+                                                popup_preset_set.preset_num = 5;
+                                                popup_preset_set.open();
+                                            }
+
                                         }
                                     }
                                 }
@@ -554,6 +613,8 @@ Item {
                                         anchors.centerIn: parent
                                         text: "변경"
                                         color: "white"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
                                     }
                                     MouseArea{
                                         anchors.fill: parent
@@ -861,6 +922,44 @@ Item {
                                     ischanged = true;
                                 }
                                 model:["사용안함", "사용"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_tableview
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"테이블 표시"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_tableview
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["테이블 번호로 표시", "테이블 별칭으로 표시", "테이블 맵으로 표시(설정 필요)"]
                             }
                         }
                     }
@@ -2805,34 +2904,28 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_mask
-                                        anchors.centerIn: parent
-                                        color: slider_mask.ischanged?color_red:"black"
-                                        text: slider_mask.value.toFixed(2)
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
+                            TextField{
+                                id: mask
+                                anchors.fill: parent
+                                objectName: "mask"
+                                text:supervisor.getSetting("SENSOR","mask");
+                                property bool ischanged: false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = mask;
+                                    mask.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        mask.select(0,0);
                                     }
                                 }
-                                Slider{
-                                    id: slider_mask
-                                    property bool ischanged: false
-                                    onValueChanged: {
+                                onTextChanged: {
+                                    if(focus){
                                         ischanged = true;
                                         is_reset_slam = true;
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0
-                                    to: 15.0
-                                    value: 10.0
                                 }
                             }
                         }
@@ -2864,34 +2957,27 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_max_range
-                                        anchors.centerIn: parent
-                                        color: slider_max_range.ischanged?color_red:"black"
-                                        text: slider_max_range.value.toFixed(2)
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
+                            TextField{
+                                id: max_range
+                                anchors.fill: parent
+                                text:supervisor.getSetting("SENSOR","max_range");
+                                property bool ischanged: false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = max_range;
+                                    max_range.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        max_range.select(0,0);
                                     }
                                 }
-                                Slider{
-                                    id: slider_max_range
-                                    property bool ischanged: false
-                                    onValueChanged: {
+                                onTextChanged: {
+                                    if(focus){
                                         ischanged = true;
                                         is_reset_slam = true;
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 10.0
-                                    to: 50.0
-                                    value: 40.0
                                 }
                             }
                         }
@@ -2923,34 +3009,27 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_cam_exposure
-                                        color: slider_cam_exposure.ischanged?color_red:"black"
-                                        anchors.centerIn: parent
-                                        text: slider_cam_exposure.value.toFixed(2)
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
+                            TextField{
+                                id: cam_exposure
+                                anchors.fill: parent
+                                text:supervisor.getSetting("SENSOR","cam_exposure");
+                                property bool ischanged: false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = cam_exposure;
+                                    cam_exposure.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        cam_exposure.select(0,0);
                                     }
                                 }
-                                Slider{
-                                    id: slider_cam_exposure
-                                    property bool ischanged: false
-                                    onValueChanged: {
+                                onTextChanged: {
+                                    if(focus){
                                         ischanged = true;
                                         is_reset_slam = true;
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 500
-                                    to: 8000
-                                    value: 2000
                                 }
                             }
                         }
@@ -2993,11 +3072,13 @@ Item {
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("SENSOR","offset_x");
                                 onFocusChanged: {
-                                    keyboard.owner = offset_x;
+                                    keypad.owner = offset_x;
+                                    offset_x.selectAll();
                                     if(focus){
-                                        keyboard.open();
+                                        keypad.open();
                                     }else{
-                                        keyboard.close();
+                                        keypad.close();
+                                        offset_x.select(0,0);
                                     }
                                 }
                             }
@@ -3041,11 +3122,13 @@ Item {
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("SENSOR","offset_y");
                                 onFocusChanged: {
-                                    keyboard.owner = offset_y;
+                                    keypad.owner = offset_y;
+                                    offset_y.selectAll();
                                     if(focus){
-                                        keyboard.open();
+                                        keypad.open();
                                     }else{
-                                        keyboard.close();
+                                        keypad.close();
+                                        offset_y.select(0,0);
                                     }
                                 }
                             }
@@ -3191,7 +3274,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_pivot"
+                                text:"limit_pivot [deg/s]"
                                 font.pixelSize: 20
                             }
                         }
@@ -3206,31 +3289,26 @@ Item {
                             Row{
                                 spacing: 10
                                 anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_limit_pivot
-                                        anchors.centerIn: parent
-                                        color: slider_limit_pivot.ischanged?color_red:"black"
-                                        text: slider_limit_pivot.value.toFixed(2) + " [deg/s]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
-                                }
-                                Slider{
-                                    id: slider_limit_pivot
+                                TextField{
+                                    id: limit_pivot
+                                    anchors.fill: parent
                                     property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
+                                    onTextChanged: {
                                         is_reset_slam = true;
+                                        ischanged = true;
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 1.0
-                                    to: 360.0
-                                    value: 30.0
+                                    color:ischanged?color_red:"black"
+                                    text:supervisor.getSetting("ROBOT_SW","limit_pivot");
+                                    onFocusChanged: {
+                                        keypad.owner = limit_pivot;
+                                        limit_pivot.selectAll();
+                                        if(focus){
+                                            keypad.open();
+                                        }else{
+                                            keypad.close();
+                                            limit_pivot.select(0,0);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -3250,7 +3328,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_pivot_acc"
+                                text:"limit_pivot_acc [deg/s^2]"
                                 font.pixelSize: 20
                             }
                         }
@@ -3262,34 +3340,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_limit_pivot_acc
-                                        anchors.centerIn: parent
-                                        color: slider_limit_pivot_acc.ischanged?color_red:"black"
-                                        text: slider_limit_pivot_acc.value.toFixed(2) + " [deg/s^2]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: limit_pivot_acc
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_limit_pivot_acc
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_pivot_acc");
+                                onFocusChanged: {
+                                    keypad.owner = limit_pivot_acc;
+                                    limit_pivot_acc.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        limit_pivot_acc.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 1.0
-                                    to: 360.0
-                                    value: 10.0
                                 }
                             }
                         }
@@ -3309,7 +3378,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_v"
+                                text:"limit_v [m/s]"
                                 font.pixelSize: 20
                             }
                         }
@@ -3321,34 +3390,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_limit_v
-                                        anchors.centerIn: parent
-                                        color: slider_limit_v.ischanged?color_red:"black"
-                                        text: slider_limit_v.value.toFixed(2) + " [m/s]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: limit_v
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_limit_v
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_v");
+                                onFocusChanged: {
+                                    keypad.owner = limit_v;
+                                    limit_v.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        limit_v.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.1
-                                    to: 2.0
-                                    value: 1.0
                                 }
                             }
                         }
@@ -3368,7 +3428,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_v_acc"
+                                text:"limit_v_acc [m/s^2]"
                                 font.pixelSize: 20
                             }
                         }
@@ -3380,40 +3440,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_limit_v_acc
-                                        anchors.centerIn: parent
-
-
-
-                                        color: slider_limit_v_acc.ischanged?color_red:"black"
-
-
-
-                                        text: slider_limit_v_acc.value.toFixed(2) + " [m/s^2]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: limit_v_acc
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_limit_v_acc
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_v_acc");
+                                onFocusChanged: {
+                                    keypad.owner = limit_v_acc;
+                                    limit_v_acc.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        limit_v_acc.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.01
-                                    to: 2.0
-                                    value: 0.5
                                 }
                             }
                         }
@@ -3433,7 +3478,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_w"
+                                text:"limit_w [deg/s]"
                                 font.pixelSize: 20
                             }
                         }
@@ -3445,34 +3490,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_limit_w
-                                        anchors.centerIn: parent
-                                        color: slider_limit_w.ischanged?color_red:"black"
-                                        text: slider_limit_w.value.toFixed(2) + " [deg/s]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: limit_w
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_limit_w
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_w");
+                                onFocusChanged: {
+                                    keypad.owner = limit_w;
+                                    limit_w.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        limit_w.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 1.0
-                                    to: 360.0
-                                    value: 120.0
                                 }
                             }
                         }
@@ -3492,7 +3528,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_w_acc"
+                                text:"limit_w_acc [deg/s^2]"
                                 font.pixelSize: 20
                             }
                         }
@@ -3504,34 +3540,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_limit_w_acc
-                                        anchors.centerIn: parent
-                                        color: slider_limit_w_acc.ischanged?color_red:"black"
-                                        text: slider_limit_w_acc.value.toFixed(2) + " [deg/s^2]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: limit_w_acc
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_limit_w_acc
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_w_acc");
+                                onFocusChanged: {
+                                    keypad.owner = limit_w_acc;
+                                    limit_w_acc.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        limit_w_acc.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 1.0
-                                    to: 360.0
-                                    value: 360.0
                                 }
                             }
                         }
@@ -3551,7 +3578,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_manual_v"
+                                text:"limit_manual_v [m/s]"
                                 font.pixelSize: 20
                             }
                         }
@@ -3563,34 +3590,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_limit_manual_v
-                                        anchors.centerIn: parent
-                                        color: slider_limit_manual_v.ischanged?color_red:"black"
-                                        text: slider_limit_manual_v.value.toFixed(2) + " [m/s]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: limit_manual_v
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_limit_manual_v
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_manual_v");
+                                onFocusChanged: {
+                                    keypad.owner = limit_manual_v;
+                                    limit_manual_v.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        limit_manual_v.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.1
-                                    to: 2.0
-                                    value: 0.3
                                 }
                             }
                         }
@@ -3610,7 +3628,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_manual_w"
+                                text:"limit_manual_w [deg/s]"
                                 font.pixelSize: 20
                             }
                         }
@@ -3622,34 +3640,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_limit_manual_w
-                                        anchors.centerIn: parent
-                                        color: slider_limit_manual_w.ischanged?color_red:"black"
-                                        text: slider_limit_manual_w.value.toFixed(2) + " [deg/s]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: limit_manual_w
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_limit_manual_w
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_manual_w");
+                                onFocusChanged: {
+                                    keypad.owner = limit_manual_w;
+                                    limit_manual_w.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        limit_manual_w.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 1.0
-                                    to: 360.0
-                                    value: 120.0
                                 }
                             }
                         }
@@ -3670,7 +3679,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"st_v"
+                                text:"st_v [m/s]"
                                 font.pixelSize: 20
                             }
                         }
@@ -3682,34 +3691,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_st_v
-                                        anchors.centerIn: parent
-                                        color: slider_st_v.ischanged?color_red:"black"
-                                        text: slider_st_v.value.toFixed(2) + " [m/s]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: st_v
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_st_v
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","st_v");
+                                onFocusChanged: {
+                                    keypad.owner = st_v;
+                                    st_v.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        st_v.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.1
-                                    to: 2.0
-                                    value: 0.3
                                 }
                             }
                         }
@@ -3883,17 +3883,19 @@ Item {
                                 anchors.fill: parent
                                 property bool ischanged: false
                                 onTextChanged: {
-                                    ischanged = true;
                                     is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                color: ischanged?color_red:"black"
-                                text: supervisor.getSetting("MOTOR","gear_ratio");
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","gear_ratio");
                                 onFocusChanged: {
-                                    keyboard.owner = gear_ratio;
+                                    keypad.owner = gear_ratio;
+                                    gear_ratio.selectAll();
                                     if(focus){
-                                        keyboard.open();
+                                        keypad.open();
                                     }else{
-                                        keyboard.close();
+                                        keypad.close();
+                                        gear_ratio.select(0,0);
                                     }
                                 }
                             }
@@ -3932,17 +3934,19 @@ Item {
                                 anchors.fill: parent
                                 property bool ischanged: false
                                 onTextChanged: {
-                                    ischanged = true;
                                     is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                color: ischanged?color_red:"black"
-                                text: supervisor.getSetting("MOTOR","k_p");
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","k_p");
                                 onFocusChanged: {
-                                    keyboard.owner = k_p;
+                                    keypad.owner = k_p;
+                                    k_p.selectAll();
                                     if(focus){
-                                        keyboard.open();
+                                        keypad.open();
                                     }else{
-                                        keyboard.close();
+                                        keypad.close();
+                                        k_p.select(0,0);
                                     }
                                 }
                             }
@@ -3981,17 +3985,19 @@ Item {
                                 anchors.fill: parent
                                 property bool ischanged: false
                                 onTextChanged: {
-                                    ischanged = true;
                                     is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                color: ischanged?color_red:"black"
-                                text: supervisor.getSetting("MOTOR","k_i");
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","k_i");
                                 onFocusChanged: {
-                                    keyboard.owner = k_i;
+                                    keypad.owner = k_i;
+                                    k_i.selectAll();
                                     if(focus){
-                                        keyboard.open();
+                                        keypad.open();
                                     }else{
-                                        keyboard.close();
+                                        keypad.close();
+                                        k_i.select(0,0);
                                     }
                                 }
                             }
@@ -4030,17 +4036,19 @@ Item {
                                 anchors.fill: parent
                                 property bool ischanged: false
                                 onTextChanged: {
-                                    ischanged = true;
                                     is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                color: ischanged?color_red:"black"
-                                text: supervisor.getSetting("MOTOR","k_d");
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","k_d");
                                 onFocusChanged: {
-                                    keyboard.owner = k_d;
+                                    keypad.owner = k_d;
+                                    k_d.selectAll();
                                     if(focus){
-                                        keyboard.open();
+                                        keypad.open();
                                     }else{
-                                        keyboard.close();
+                                        keypad.close();
+                                        k_d.select(0,0);
                                     }
                                 }
                             }
@@ -4062,7 +4070,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_v"
+                                text:"limit_v [m/s]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4074,34 +4082,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_motor_limit_v
-                                        color: slider_motor_limit_v.ischanged?color_red:"black"
-                                        anchors.centerIn: parent
-                                        text: slider_motor_limit_v.value.toFixed(2) + " [m/s]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: motor_limit_v
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_motor_limit_v
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","limit_v");
+                                onFocusChanged: {
+                                    keypad.owner = motor_limit_v;
+                                    motor_limit_v.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        motor_limit_v.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.10
-                                    to: 2.00
-                                    value: 1.00
                                 }
                             }
                         }
@@ -4122,7 +4121,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_v_acc"
+                                text:"limit_v_acc [m/s^2]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4134,34 +4133,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_motor_limit_v_acc
-                                        anchors.centerIn: parent
-                                        color: slider_motor_limit_v_acc.ischanged?color_red:"black"
-                                        text: slider_motor_limit_v_acc.value.toFixed(2) + " [m/s^2]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: motor_limit_v_acc
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_motor_limit_v_acc
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","limit_v_acc");
+                                onFocusChanged: {
+                                    keypad.owner = motor_limit_v_acc;
+                                    motor_limit_v_acc.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        motor_limit_v_acc.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.01
-                                    to: 2.00
-                                    value: 1.00
                                 }
                             }
                         }
@@ -4182,7 +4172,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_w"
+                                text:"limit_w [deg/s]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4194,35 +4184,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_motor_limit_w
-                                        anchors.centerIn: parent
-                                        color: slider_motor_limit_w.ischanged?color_red:"black"
-
-                                        text: slider_motor_limit_w.value.toFixed(2) + " [deg/s]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: motor_limit_w
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_motor_limit_w
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","limit_w");
+                                onFocusChanged: {
+                                    keypad.owner = motor_limit_w;
+                                    motor_limit_w.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        motor_limit_w.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 1.0
-                                    to: 360.0
-                                    value: 180.00
                                 }
                             }
                         }
@@ -4243,7 +4223,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_w_acc"
+                                text:"limit_w_acc [deg/s^2]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4255,44 +4235,30 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_motor_limit_w_acc
-                                        anchors.centerIn: parent
-                                        color: slider_motor_limit_w_acc.ischanged?color_red:"black"
-
-                                        text: slider_motor_limit_w_acc.value.toFixed(2) + " [deg/s^2]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: motor_limit_w_acc
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_motor_limit_w_acc
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","limit_w_acc");
+                                onFocusChanged: {
+                                    keypad.owner = motor_limit_w_acc;
+                                    motor_limit_w_acc.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        motor_limit_w_acc.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 1.0
-                                    to: 360.0
-                                    value: 180.00
                                 }
                             }
                         }
                     }
                 }
-
-
-
-
                 Rectangle{
                     width: 1100
                     height: 40
@@ -4332,35 +4298,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_k_v
-                                        anchors.centerIn: parent
-                                        color: slider_k_v.ischanged?color_red:"black"
-
-                                        text: slider_k_v.value.toFixed(2) + " [gain]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: k_v
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_k_v
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","k_v");
+                                onFocusChanged: {
+                                    keypad.owner = k_v;
+                                    k_v.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        k_v.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.0
-                                    to: 10.0
-                                    value: 1.0
                                 }
                             }
                         }
@@ -4392,35 +4348,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_k_w
-                                        anchors.centerIn: parent
-                                        color: slider_k_w.ischanged?color_red:"black"
-
-                                        text: slider_k_w.value.toFixed(2) + " [gain]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: k_w
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_k_w
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","k_w");
+                                onFocusChanged: {
+                                    keypad.owner = k_w;
+                                    k_w.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        k_w.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.0
-                                    to: 10.0
-                                    value: 2.5
                                 }
                             }
                         }
@@ -4440,7 +4386,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"look_ahead_dist"
+                                text:"look_ahead_dist [m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4452,34 +4398,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_look_ahead_dist
-                                        anchors.centerIn: parent
-                                        color: slider_look_ahead_dist.ischanged?color_red:"black"
-                                        text: slider_look_ahead_dist.value.toFixed(2) + " [m]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: look_ahead_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_look_ahead_dist
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","look_ahead_dist");
+                                onFocusChanged: {
+                                    keypad.owner = look_ahead_dist;
+                                    look_ahead_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        look_ahead_dist.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.0
-                                    to: 2.0
-                                    value: 0.5
                                 }
                             }
                         }
@@ -4499,7 +4436,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"min_look_ahead_dist"
+                                text:"min_look_ahead_dist [m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4511,34 +4448,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_min_look_ahead_dist
-                                        anchors.centerIn: parent
-                                        color: slider_min_look_ahead_dist.ischanged?color_red:"black"
-                                        text: slider_min_look_ahead_dist.value.toFixed(2) + " [m]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: min_look_ahead_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_min_look_ahead_dist
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","min_look_ahead_dist");
+                                onFocusChanged: {
+                                    keypad.owner = min_look_ahead_dist;
+                                    min_look_ahead_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        min_look_ahead_dist.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.0
-                                    to: 2.0
-                                    value: 0.1
                                 }
                             }
                         }
@@ -4558,7 +4486,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"narrow_decel_ratio"
+                                text:"narrow_decel_ratio [ratio, %]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4570,34 +4498,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_narrow_decel_ratio
-                                        anchors.centerIn: parent
-                                        color: slider_narrow_decel_ratio.ischanged?color_red:"black"
-                                        text: slider_narrow_decel_ratio.value.toFixed(2) + " [ratio, %]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: narrow_decel_ratio
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_narrow_decel_ratio
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","narrow_decel_ratio");
+                                onFocusChanged: {
+                                    keypad.owner = narrow_decel_ratio;
+                                    narrow_decel_ratio.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        narrow_decel_ratio.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.00
-                                    to: 1.00
-                                    value: 0.7
                                 }
                             }
                         }
@@ -4617,7 +4536,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"obs_deadzone"
+                                text:"obs_deadzone [m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4629,34 +4548,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_obs_deadzone
-                                        anchors.centerIn: parent
-                                        text: slider_obs_deadzone.value.toFixed(2) + " [m]"
-                                        font.pixelSize: 15
-                                        color: slider_obs_deadzone.ischanged?color_red:"black"
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: obs_deadzone
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_obs_deadzone
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","obs_deadzone");
+                                onFocusChanged: {
+                                    keypad.owner = obs_deadzone;
+                                    obs_deadzone.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        obs_deadzone.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.1
-                                    to: 2.0
-                                    value: 0.4
                                 }
                             }
                         }
@@ -4676,7 +4586,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"obs_wait_time"
+                                text:"obs_wait_time [sec]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4688,35 +4598,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_obs_wait_time
-                                        anchors.centerIn: parent
-                                        color: slider_obs_wait_time.ischanged?color_red:"black"
-
-                                        text: slider_obs_wait_time.value.toFixed(2) + " [sec]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: obs_wait_time
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_obs_wait_time
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","obs_wait_time");
+                                onFocusChanged: {
+                                    keypad.owner = obs_wait_time;
+                                    obs_wait_time.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        obs_wait_time.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.0
-                                    to: 5.0
-                                    value: 5.0
                                 }
                             }
                         }
@@ -4736,7 +4636,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"path_out_dist"
+                                text:"path_out_dist [m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4748,34 +4648,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_path_out_dist
-                                        anchors.centerIn: parent
-                                        color: slider_path_out_dist.ischanged?color_red:"black"
-                                        text: slider_path_out_dist.value.toFixed(2) + " [m]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: path_out_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_path_out_dist
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","path_out_dist");
+                                onFocusChanged: {
+                                    keypad.owner = path_out_dist;
+                                    path_out_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        path_out_dist.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.1
-                                    to: 2.0
-                                    value: 1.0
                                 }
                             }
                         }
@@ -4808,7 +4699,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_dist"
+                                text:"icp_dist [m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4820,35 +4711,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_icp_dist
-                                        anchors.centerIn: parent
-                                        text: slider_icp_dist.value.toFixed(2) + " [m]"
-                                        font.pixelSize: 15
-                                        color: slider_icp_dist.ischanged?color_red:"black"
-
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: icp_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_icp_dist
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_dist");
+                                onFocusChanged: {
+                                    keypad.owner = icp_dist;
+                                    icp_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_dist.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.30
-                                    to: 1.00
-                                    value: 0.3
                                 }
                             }
                         }
@@ -4868,7 +4749,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_error"
+                                text:"icp_error [m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4880,35 +4761,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_icp_error
-                                        anchors.centerIn: parent
-                                        color: slider_icp_error.ischanged?color_red:"black"
-
-                                        text: slider_icp_error.value.toFixed(2) + " [m]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: icp_error
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_icp_error
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_error");
+                                onFocusChanged: {
+                                    keypad.owner = icp_error;
+                                    icp_error.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_error.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.00
-                                    to: 0.50
-                                    value: 0.2
                                 }
                             }
                         }
@@ -4928,7 +4799,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_near"
+                                text:"icp_near [m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4940,35 +4811,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_icp_near
-                                        anchors.centerIn: parent
-                                        color: slider_icp_near.ischanged?color_red:"black"
-
-                                        text: slider_icp_near.value.toFixed(2) + " [m]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: icp_near
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_icp_near
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_near");
+                                onFocusChanged: {
+                                    keypad.owner = icp_near;
+                                    icp_near.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_near.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.10
-                                    to: 2.00
-                                    value: 1.0
                                 }
                             }
                         }
@@ -4988,7 +4849,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_odometry_weight"
+                                text:"icp_odometry_weight [ratio, %]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5000,35 +4861,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_icp_odometry_weight
-                                        anchors.centerIn: parent
-                                        color: slider_icp_odometry_weight.ischanged?color_red:"black"
-
-                                        text: slider_icp_odometry_weight.value.toFixed(2) + " [ratio, %]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: icp_odometry_weight
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_icp_odometry_weight
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_odometry_weight");
+                                onFocusChanged: {
+                                    keypad.owner = icp_odometry_weight;
+                                    icp_odometry_weight.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_odometry_weight.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.00
-                                    to: 1.00
-                                    value: 0.75
                                 }
                             }
                         }
@@ -5048,7 +4899,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_ratio"
+                                text:"icp_ratio [ratio, %]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5060,35 +4911,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_icp_ratio
-                                        anchors.centerIn: parent
-                                        color: slider_icp_ratio.ischanged?color_red:"black"
-
-                                        text: slider_icp_ratio.value.toFixed(2) + " [ratio, %]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: icp_ratio
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_icp_ratio
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_ratio");
+                                onFocusChanged: {
+                                    keypad.owner = icp_ratio;
+                                    icp_ratio.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_ratio.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.0
-                                    to: 1.0
-                                    value: 0.5
                                 }
                             }
                         }
@@ -5108,7 +4949,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_repeat_dist"
+                                text:"icp_repeat_dist [m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5120,35 +4961,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_icp_repeat_dist
-                                        anchors.centerIn: parent
-                                        text: slider_icp_repeat_dist.value.toFixed(2) + " [m]"
-                                        font.pixelSize: 15
-                                        color: slider_icp_repeat_dist.ischanged?color_red:"black"
-
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: icp_repeat_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_icp_repeat_dist
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_repeat_dist");
+                                onFocusChanged: {
+                                    keypad.owner = icp_repeat_dist;
+                                    icp_repeat_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_repeat_dist.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.00
-                                    to: 1.00
-                                    value: 0.15
                                 }
                             }
                         }
@@ -5168,7 +4999,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_repeat_time"
+                                text:"icp_repeat_time [sec]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5180,35 +5011,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_icp_repeat_time
-                                        anchors.centerIn: parent
-                                        color: slider_icp_repeat_time.ischanged?color_red:"black"
-
-                                        text: slider_icp_repeat_time.value.toFixed(2) + " [sec]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: icp_repeat_time
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_icp_repeat_time
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_repeat_time");
+                                onFocusChanged: {
+                                    keypad.owner = icp_repeat_time;
+                                    icp_repeat_time.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_repeat_time.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.0
-                                    to: 5.0
-                                    value: 0.5
                                 }
                             }
                         }
@@ -5241,7 +5062,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"goal_dist"
+                                text:"goal_dist [m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5253,36 +5074,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_goal_dist
-                                        anchors.centerIn: parent
-                                        text: slider_goal_dist.value.toFixed(2) + " [m]"
-                                        font.pixelSize: 15
-                                        color: slider_goal_dist.ischanged?color_red:"black"
-
-
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: goal_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_goal_dist
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_dist");
+                                onFocusChanged: {
+                                    keypad.owner = goal_dist;
+                                    goal_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        goal_dist.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.0
-                                    to: 1.0
-                                    value: 0.03
                                 }
                             }
                         }
@@ -5302,7 +5112,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"goal_v"
+                                text:"goal_v [m/s]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5314,35 +5124,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_goal_v
-                                        color: slider_goal_v.ischanged?color_red:"black"
-
-                                        anchors.centerIn: parent
-                                        text: slider_goal_v.value.toFixed(2) + " [m/s]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: goal_v
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_goal_v
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_v");
+                                onFocusChanged: {
+                                    keypad.owner = goal_v;
+                                    goal_v.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        goal_v.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.0
-                                    to: 2.0
-                                    value: 0.05
                                 }
                             }
                         }
@@ -5362,7 +5162,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"goal_th"
+                                text:"goal_th [deg]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5374,35 +5174,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_goal_th
-                                        anchors.centerIn: parent
-                                        color: slider_goal_th.ischanged?color_red:"black"
-
-                                        text: slider_goal_th.value.toFixed(2) + " [deg]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: goal_th
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_goal_th
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_th");
+                                onFocusChanged: {
+                                    keypad.owner = goal_th;
+                                    goal_th.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        goal_th.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.0
-                                    to: 30.0
-                                    value: 2.0
                                 }
                             }
                         }
@@ -5423,7 +5213,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"goal_near_dist"
+                                text:"goal_near_dist [m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5435,35 +5225,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_goal_near_dist
-                                        color: slider_goal_near_dist.ischanged?color_red:"black"
-
-                                        anchors.centerIn: parent
-                                        text: slider_goal_near_dist.value.toFixed(2) + " [m]"
-                                        font.pixelSize: 15
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: goal_near_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_goal_near_dist
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_near_dist");
+                                onFocusChanged: {
+                                    keypad.owner = goal_near_dist;
+                                    goal_near_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        goal_near_dist.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.0
-                                    to: 1.0
-                                    value: 0.5
                                 }
                             }
                         }
@@ -5483,7 +5263,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"goal_near_th"
+                                text:"goal_near_th [deg]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5495,35 +5275,25 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
-                                    Text{
-                                        id: text_goal_near_th
-                                        anchors.centerIn: parent
-                                        text: slider_goal_near_th.value.toFixed(2) + " [deg]"
-                                        font.pixelSize: 15
-                                        color: slider_goal_near_th.ischanged?color_red:"black"
-
-                                        font.family: font_noto_r.name
-                                    }
+                            TextField{
+                                id: goal_near_th
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
                                 }
-                                Slider{
-                                    id: slider_goal_near_th
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        ischanged = true;
-                                        is_reset_slam = true;
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_near_th");
+                                onFocusChanged: {
+                                    keypad.owner = goal_near_th;
+                                    goal_near_th.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        goal_near_th.select(0,0);
                                     }
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0.0
-                                    to: 30.0
-                                    value: 10.0
                                 }
                             }
                         }
@@ -6220,6 +5990,9 @@ Item {
             else
                 supervisor.setSetting("ROBOT_SW/use_help","true");
         }
+        if(combo_tableview.ischanged){
+            supervisor.setSetting("ROBOT_SW/table_view",combo_tableview.currentIndex);
+        }
         if(combo_movingpage.ischanged){
             if(combo_movingpage.currentIndex == 0)
                 supervisor.setSetting("ROBOT_SW/moving_face","false");
@@ -6320,16 +6093,16 @@ Item {
             supervisor.setSetting("SENSOR/baudrate",combo_baudrate.currentText);
         }
 
-        if(slider_mask.ischanged){
-            supervisor.setSetting("SENSOR/mask",slider_mask.value.toFixed(2));
+        if(mask.ischanged){
+            supervisor.setSetting("SENSOR/mask",mask.text);
         }
 
-        if(slider_max_range.ischanged){
-            supervisor.setSetting("SENSOR/max_range",slider_max_range.value.toFixed(2));
+        if(max_range.ischanged){
+            supervisor.setSetting("SENSOR/max_range",max_range.text);
         }
 
-        if(slider_cam_exposure.ischanged){
-            supervisor.setSetting("SENSOR/cam_exposure",slider_cam_exposure.value.toFixed(2));
+        if(cam_exposure.ischanged){
+            supervisor.setSetting("SENSOR/cam_exposure",cam_exposure.text);
         }
 
         if(offset_x.ischanged){
@@ -6340,40 +6113,40 @@ Item {
             supervisor.setSetting("SENSOR/offset_y",offset_y.text);
         }
 
-        if(slider_limit_pivot.ischanged){
-            supervisor.setSetting("ROBOT_SW/limit_pivot"            ,slider_limit_pivot.value.toFixed(2));
+        if(limit_pivot.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_pivot"            ,limit_pivot.text);
         }
 
-        if(slider_limit_pivot_acc.ischanged){
-            supervisor.setSetting("ROBOT_SW/limit_pivot_acc"        ,slider_limit_pivot_acc.value.toFixed(2));
+        if(limit_pivot_acc.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_pivot_acc"        ,limit_pivot_acc.text);
         }
 
-        if(slider_limit_v.ischanged){
-            supervisor.setSetting("ROBOT_SW/limit_v"                ,slider_limit_v.value.toFixed(2));
+        if(limit_v.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_v"                ,limit_v.text);
         }
 
-        if(slider_limit_v_acc.ischanged){
-            supervisor.setSetting("ROBOT_SW/limit_v_acc"            ,slider_limit_v_acc.value.toFixed(2));
+        if(limit_v_acc.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_v_acc"            ,limit_v_acc.text);
         }
 
-        if(slider_limit_w.ischanged){
-            supervisor.setSetting("ROBOT_SW/limit_w"                ,slider_limit_w.value.toFixed(2));
+        if(limit_w.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_w"                ,limit_w.text);
         }
 
-        if(slider_limit_w_acc.ischanged){
-            supervisor.setSetting("ROBOT_SW/limit_w_acc"            ,slider_limit_w_acc.value.toFixed(2));
+        if(limit_w_acc.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_w_acc"            ,limit_w_acc.text);
         }
 
-        if(slider_limit_manual_v.ischanged){
-            supervisor.setSetting("ROBOT_SW/limit_manual_v"          ,slider_limit_manual_v.value.toFixed(2));
+        if(limit_manual_v.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_manual_v"          ,limit_manual_v.text);
         }
 
-        if(slider_limit_manual_w.ischanged){
-            supervisor.setSetting("ROBOT_SW/limit_manual_w"          ,slider_limit_manual_w.value.toFixed(2));
+        if(limit_manual_w.ischanged){
+            supervisor.setSetting("ROBOT_SW/limit_manual_w"          ,limit_manual_w.text);
         }
 
-        if(slider_st_v.ischanged){
-            supervisor.setSetting("ROBOT_SW/st_v"                   ,slider_st_v.value.toFixed(2));
+        if(st_v.ischanged){
+            supervisor.setSetting("ROBOT_SW/st_v"                   ,st_v.text);
         }
 
         if(combo_wheel_dir.ischanged){
@@ -6404,105 +6177,105 @@ Item {
             supervisor.setSetting("MOTOR/k_d",k_d.text);
         }
 
-        if(slider_motor_limit_v.ischanged){
-            supervisor.setSetting("MOTOR/limit_v",slider_motor_limit_v.value.toFixed(2));
+        if(motor_limit_v.ischanged){
+            supervisor.setSetting("MOTOR/limit_v",motor_limit_v.text);
         }
 
-        if(slider_motor_limit_v_acc.ischanged){
-            supervisor.setSetting("MOTOR/limit_v_acc",slider_motor_limit_v_acc.value.toFixed(2));
+        if(motor_limit_v_acc.ischanged){
+            supervisor.setSetting("MOTOR/limit_v_acc",motor_limit_v_acc.text);
         }
 
-        if(slider_motor_limit_w.ischanged){
-            supervisor.setSetting("MOTOR/limit_w",slider_motor_limit_w.value.toFixed(2));
+        if(motor_limit_w.ischanged){
+            supervisor.setSetting("MOTOR/limit_w",motor_limit_w.text);
         }
 
-        if(slider_motor_limit_w_acc.ischanged){
-            supervisor.setSetting("MOTOR/limit_w_acc",slider_motor_limit_w_acc.value.toFixed(2));
+        if(motor_limit_w_acc.ischanged){
+            supervisor.setSetting("MOTOR/limit_w_acc",motor_limit_w_acc.text);
         }
 
-        if(slider_k_v.ischanged){
-            supervisor.setSetting("ROBOT_SW/k_v"                    ,slider_k_v.value.toFixed(2));
+        if(k_v.ischanged){
+            supervisor.setSetting("ROBOT_SW/k_v"                    ,k_v.text);
         }
 
-        if(slider_k_w.ischanged){
-            supervisor.setSetting("ROBOT_SW/k_w"                    ,slider_k_w.value.toFixed(2));
+        if(k_w.ischanged){
+            supervisor.setSetting("ROBOT_SW/k_w"                    ,k_w.text);
         }
 
-        if(slider_look_ahead_dist.ischanged){
-            supervisor.setSetting("ROBOT_SW/look_ahead_dist"         ,slider_look_ahead_dist.value.toFixed(2));
+        if(look_ahead_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/look_ahead_dist"         ,look_ahead_dist.text);
         }
 
-        if(slider_min_look_ahead_dist.ischanged){
-            supervisor.setSetting("ROBOT_SW/min_look_ahead_dist"    ,slider_min_look_ahead_dist.value.toFixed(2));
+        if(min_look_ahead_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/min_look_ahead_dist"    ,min_look_ahead_dist.text);
         }
 
-        if(slider_narrow_decel_ratio.ischanged){
-            supervisor.setSetting("ROBOT_SW/narrow_decel_ratio"     ,slider_narrow_decel_ratio.value.toFixed(2));
+        if(narrow_decel_ratio.ischanged){
+            supervisor.setSetting("ROBOT_SW/narrow_decel_ratio"     ,narrow_decel_ratio.text);
         }
 
-        if(slider_obs_deadzone.ischanged){
-            supervisor.setSetting("ROBOT_SW/obs_deadzone"           ,slider_obs_deadzone.value.toFixed(2));
+        if(obs_deadzone.ischanged){
+            supervisor.setSetting("ROBOT_SW/obs_deadzone"           ,obs_deadzone.text);
         }
 
-        if(slider_obs_wait_time.ischanged){
-            supervisor.setSetting("ROBOT_SW/obs_wait_time"          ,slider_obs_wait_time.value.toFixed(2));
+        if(obs_wait_time.ischanged){
+            supervisor.setSetting("ROBOT_SW/obs_wait_time"          ,obs_wait_time.text);
         }
 
-        if(slider_path_out_dist.ischanged){
-            supervisor.setSetting("ROBOT_SW/path_out_dist"          ,slider_path_out_dist.value.toFixed(2));
+        if(path_out_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/path_out_dist"          ,path_out_dist.text);
         }
 
-        if(slider_icp_dist.ischanged){
-            supervisor.setSetting("ROBOT_SW/icp_dist"               ,slider_icp_dist.value.toFixed(2));
+        if(icp_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/icp_dist"               ,icp_dist.text);
         }
 
-        if(slider_icp_error.ischanged){
-            supervisor.setSetting("ROBOT_SW/icp_error"              ,slider_icp_error.value.toFixed(2));
+        if(icp_error.ischanged){
+            supervisor.setSetting("ROBOT_SW/icp_error"              ,icp_error.text);
         }
 
-        if(slider_icp_near.ischanged){
-            supervisor.setSetting("ROBOT_SW/icp_near"               ,slider_icp_near.value.toFixed(2));
-
-        }
-
-        if(slider_icp_odometry_weight.ischanged){
-            supervisor.setSetting("ROBOT_SW/icp_odometry_weight"    ,slider_icp_odometry_weight.value.toFixed(2));
+        if(icp_near.ischanged){
+            supervisor.setSetting("ROBOT_SW/icp_near"               ,icp_near.text);
 
         }
 
-        if(slider_icp_ratio.ischanged){
-
-            supervisor.setSetting("ROBOT_SW/icp_ratio"              ,slider_icp_ratio.value.toFixed(2));
-        }
-
-        if(slider_icp_repeat_dist.ischanged){
-            supervisor.setSetting("ROBOT_SW/icp_repeat_dist"        ,slider_icp_repeat_dist.value.toFixed(2));
+        if(icp_odometry_weight.ischanged){
+            supervisor.setSetting("ROBOT_SW/icp_odometry_weight"    ,icp_odometry_weight.text);
 
         }
 
-        if(slider_icp_repeat_time.ischanged){
-            supervisor.setSetting("ROBOT_SW/icp_repeat_time"        ,slider_icp_repeat_time.value.toFixed(2));
+        if(icp_ratio.ischanged){
+
+            supervisor.setSetting("ROBOT_SW/icp_ratio"              ,icp_ratio.text);
+        }
+
+        if(icp_repeat_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/icp_repeat_dist"        ,icp_repeat_dist.text);
 
         }
 
-        if(slider_goal_dist.ischanged){
-            supervisor.setSetting("ROBOT_SW/goal_dist"              ,slider_goal_dist.value.toFixed(2));
+        if(icp_repeat_time.ischanged){
+            supervisor.setSetting("ROBOT_SW/icp_repeat_time"        ,icp_repeat_time.text);
+
         }
 
-        if(slider_goal_v.ischanged){
-            supervisor.setSetting("ROBOT_SW/goal_v"                 ,slider_goal_v.value.toFixed(2));
+        if(goal_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/goal_dist"              ,goal_dist.text);
         }
 
-        if(slider_goal_th.ischanged){
-            supervisor.setSetting("ROBOT_SW/goal_th"                ,slider_goal_th.value.toFixed(2));
+        if(goal_v.ischanged){
+            supervisor.setSetting("ROBOT_SW/goal_v"                 ,goal_v.text);
         }
 
-        if(slider_goal_near_dist.ischanged){
-            supervisor.setSetting("ROBOT_SW/goal_near_dist"         ,slider_goal_near_dist.value.toFixed(2));
+        if(goal_th.ischanged){
+            supervisor.setSetting("ROBOT_SW/goal_th"                ,goal_th.text);
         }
 
-        if(slider_goal_near_th.ischanged){
-            supervisor.setSetting("ROBOT_SW/goal_near_th"           ,slider_goal_near_th.value.toFixed(2));
+        if(goal_near_dist.ischanged){
+            supervisor.setSetting("ROBOT_SW/goal_near_dist"         ,goal_near_dist.text);
+        }
+
+        if(goal_near_th.ischanged){
+            supervisor.setSetting("ROBOT_SW/goal_near_th"           ,goal_near_th.text);
         }
 
         if(is_reset_slam)
@@ -6536,43 +6309,43 @@ Item {
 
         left_camera_tf.text = supervisor.getSetting("SENSOR","left_camera_tf");
         right_camera_tf.text = supervisor.getSetting("SENSOR","right_camera_tf");
-        slider_cam_exposure.value = parseFloat(supervisor.getSetting("SENSOR","cam_exposure"));
+        cam_exposure.text = supervisor.getSetting("SENSOR","cam_exposure");
 
-        slider_icp_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_dist"));
-        slider_icp_error.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_error"));
-        slider_icp_near.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_near"));
-        slider_icp_odometry_weight.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_odometry_weight"));
-        slider_icp_ratio.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_ratio"));
-        slider_icp_repeat_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_repeat_dist"));
-        slider_icp_repeat_time.value = parseFloat(supervisor.getSetting("ROBOT_SW","icp_repeat_time"));
-        slider_narrow_decel_ratio.value = parseFloat(supervisor.getSetting("ROBOT_SW","narrow_decel_ratio"));
-        slider_obs_deadzone.value = parseFloat(supervisor.getSetting("ROBOT_SW","obs_deadzone"));
-        slider_obs_wait_time.value = parseFloat(supervisor.getSetting("ROBOT_SW","obs_wait_time"));
-        slider_path_out_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","path_out_dist"));
-        slider_st_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","st_v"));
-        slider_min_look_ahead_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","min_look_ahead_dist"));
-        slider_goal_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_dist"));
-        slider_goal_th.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_th"));
-        slider_goal_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_v"));
-        slider_goal_near_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_near_dist"));
-        slider_goal_near_th.value = parseFloat(supervisor.getSetting("ROBOT_SW","goal_near_th"));
+        icp_dist.text = supervisor.getSetting("ROBOT_SW","icp_dist");
+        icp_error.text = supervisor.getSetting("ROBOT_SW","icp_error");
+        icp_near.text = supervisor.getSetting("ROBOT_SW","icp_near");
+        icp_odometry_weight.text = supervisor.getSetting("ROBOT_SW","icp_odometry_weight");
+        icp_ratio.text = supervisor.getSetting("ROBOT_SW","icp_ratio");
+        icp_repeat_dist.text = supervisor.getSetting("ROBOT_SW","icp_repeat_dist");
+        icp_repeat_time.text = supervisor.getSetting("ROBOT_SW","icp_repeat_time");
+        narrow_decel_ratio.text = supervisor.getSetting("ROBOT_SW","narrow_decel_ratio");
+        obs_deadzone.text = supervisor.getSetting("ROBOT_SW","obs_deadzone");
+        obs_wait_time.text = supervisor.getSetting("ROBOT_SW","obs_wait_time");
+        path_out_dist.text = supervisor.getSetting("ROBOT_SW","path_out_dist");
+        st_v.text = supervisor.getSetting("ROBOT_SW","st_v");
+        min_look_ahead_dist.text = supervisor.getSetting("ROBOT_SW","min_look_ahead_dist");
+        goal_dist.text = supervisor.getSetting("ROBOT_SW","goal_dist");
+        goal_th.text = supervisor.getSetting("ROBOT_SW","goal_th");
+        goal_v.text = supervisor.getSetting("ROBOT_SW","goal_v");
+        goal_near_dist.text = supervisor.getSetting("ROBOT_SW","goal_near_dist");
+        goal_near_th.text = supervisor.getSetting("ROBOT_SW","goal_near_th");
 
-        slider_motor_limit_v.value = parseFloat(supervisor.getSetting("MOTOR","limit_v"));
-        slider_motor_limit_v_acc.value = parseFloat(supervisor.getSetting("MOTOR","limit_v_acc"));
-        slider_motor_limit_w.value = parseFloat(supervisor.getSetting("MOTOR","limit_w"));
-        slider_motor_limit_w_acc.value = parseFloat(supervisor.getSetting("MOTOR","limit_w_acc"));
-//        slider_k_curve.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_curve"));
-        slider_k_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_v"));
-        slider_k_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","k_w"));
-        slider_limit_pivot.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_pivot"));
-        slider_limit_pivot_acc.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_pivot_acc"));
-        slider_limit_manual_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_manual_v"));
-        slider_limit_manual_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_manual_w"));
-        slider_limit_v.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_v"));
-        slider_limit_w.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_w"));
-        slider_limit_v_acc.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_v_acc"));
-        slider_limit_w_acc.value = parseFloat(supervisor.getSetting("ROBOT_SW","limit_w_acc"));
-        slider_look_ahead_dist.value = parseFloat(supervisor.getSetting("ROBOT_SW","look_ahead_dist"));
+        motor_limit_v.text = supervisor.getSetting("MOTOR","limit_v");
+        motor_limit_v_acc.text = supervisor.getSetting("MOTOR","limit_v_acc");
+        motor_limit_w.text = supervisor.getSetting("MOTOR","limit_w");
+        motor_limit_w_acc.text = supervisor.getSetting("MOTOR","limit_w_acc");
+//        slider_k_curve.text = supervisor.getSetting("ROBOT_SW","k_curve"));
+        k_v.text = supervisor.getSetting("ROBOT_SW","k_v");
+        k_w.text = supervisor.getSetting("ROBOT_SW","k_w");
+        limit_pivot.text = supervisor.getSetting("ROBOT_SW","limit_pivot");
+        limit_pivot_acc.text = supervisor.getSetting("ROBOT_SW","limit_pivot_acc");
+        limit_manual_v.text = supervisor.getSetting("ROBOT_SW","limit_manual_v");
+        limit_manual_w.text = supervisor.getSetting("ROBOT_SW","limit_manual_w");
+        limit_v.text = supervisor.getSetting("ROBOT_SW","limit_v");
+        limit_w.text = supervisor.getSetting("ROBOT_SW","limit_w");
+        limit_v_acc.text = supervisor.getSetting("ROBOT_SW","limit_v_acc");
+        limit_w_acc.text = supervisor.getSetting("ROBOT_SW","limit_w_acc");
+        look_ahead_dist.text = supervisor.getSetting("ROBOT_SW","look_ahead_dist");
 
         slider_volume_bgm.value = Number(supervisor.getSetting("ROBOT_SW","volume_bgm"));
         slider_volume_voice.value = Number(supervisor.getSetting("ROBOT_SW","volume_voice"));
@@ -6581,6 +6354,8 @@ Item {
         text_preset_name_1.text = supervisor.getSetting("PRESET1","name");
         text_preset_name_2.text = supervisor.getSetting("PRESET2","name");
         text_preset_name_3.text = supervisor.getSetting("PRESET3","name");
+        text_preset_name_4.text = supervisor.getSetting("PRESET4","name");
+        text_preset_name_5.text = supervisor.getSetting("PRESET5","name");
 
         if(supervisor.getSetting("ROBOT_SW","use_uicmd") === "true"){
             combo_use_uicmd.currentIndex = 1;
@@ -6624,6 +6399,7 @@ Item {
         }else{
             combo_use_help.currentIndex = 0;
         }
+        combo_tableview.currentIndex = parseInt(supervisor.getSetting("ROBOT_SW","table_view"));
         if(supervisor.getSetting("ROBOT_SW","moving_face") === "true"){
             combo_movingpage.currentIndex = 1;
         }else{
@@ -6657,9 +6433,8 @@ Item {
         }
 
 
-
-        slider_mask.value = parseFloat(supervisor.getSetting("SENSOR","mask"));
-        slider_max_range.value = parseFloat(supervisor.getSetting("SENSOR","max_range"));
+        mask.text = supervisor.getSetting("SENSOR","mask");
+        max_range.text = supervisor.getSetting("SENSOR","max_range");
         offset_x.text = supervisor.getSetting("SENSOR","offset_x");
         offset_y.text = supervisor.getSetting("SENSOR","offset_y");
         right_camera.text = supervisor.getSetting("SENSOR","right_camera");
@@ -6744,21 +6519,21 @@ Item {
         combo_call_num.ischanged = false;
 
         combo_baudrate.ischanged = false;
-        slider_mask.ischanged = false;
-        slider_max_range.ischanged = false;
-        slider_cam_exposure.ischanged = false;
+        mask.ischanged = false;
+        max_range.ischanged = false;
+        cam_exposure.ischanged = false;
         offset_x.ischanged = false;
         offset_y.ischanged = false;
 
-        slider_limit_pivot.ischanged = false;
-        slider_limit_pivot_acc.ischanged = false;
-        slider_limit_v.ischanged = false;
-        slider_limit_v_acc.ischanged = false;
-        slider_limit_w.ischanged = false;
-        slider_limit_w_acc.ischanged = false;
-        slider_limit_manual_v.ischanged = false;
-        slider_limit_manual_w.ischanged = false;
-        slider_st_v.ischanged = false;
+        limit_pivot.ischanged = false;
+        limit_pivot_acc.ischanged = false;
+        limit_v.ischanged = false;
+        limit_v_acc.ischanged = false;
+        limit_w.ischanged = false;
+        limit_w_acc.ischanged = false;
+        limit_manual_v.ischanged = false;
+        limit_manual_w.ischanged = false;
+        st_v.ischanged = false;
 
         combo_wheel_dir.ischanged = false;
         combo_left_id.ischanged = false;
@@ -6767,30 +6542,30 @@ Item {
         k_p.ischanged = false;
         k_i.ischanged = false;
         k_d.ischanged = false;
-        slider_motor_limit_v.ischanged = false;
-        slider_motor_limit_v_acc.ischanged = false;
-        slider_motor_limit_w.ischanged = false;
-        slider_motor_limit_w_acc.ischanged = false;
-        slider_k_v.ischanged = false;
-        slider_k_w.ischanged = false;
-        slider_look_ahead_dist.ischanged = false;
-        slider_min_look_ahead_dist.ischanged = false;
-        slider_narrow_decel_ratio.ischanged = false;
-        slider_obs_deadzone.ischanged = false;
-        slider_obs_wait_time.ischanged = false;
-        slider_path_out_dist.ischanged = false;
-        slider_icp_dist.ischanged = false;
-        slider_icp_error.ischanged = false;
-        slider_icp_near.ischanged = false;
-        slider_icp_odometry_weight.ischanged = false;
-        slider_icp_ratio.ischanged = false;
-        slider_icp_repeat_dist.ischanged = false;
-        slider_icp_repeat_time.ischanged = false;
-        slider_goal_dist.ischanged = false;
-        slider_goal_v.ischanged = false;
-        slider_goal_th.ischanged = false;
-        slider_goal_near_dist.ischanged = false;
-        slider_goal_near_th.ischanged = false;
+        motor_limit_v.ischanged = false;
+        motor_limit_v_acc.ischanged = false;
+        motor_limit_w.ischanged = false;
+        motor_limit_w_acc.ischanged = false;
+        k_v.ischanged = false;
+        k_w.ischanged = false;
+        look_ahead_dist.ischanged = false;
+        min_look_ahead_dist.ischanged = false;
+        narrow_decel_ratio.ischanged = false;
+        obs_deadzone.ischanged = false;
+        obs_wait_time.ischanged = false;
+        path_out_dist.ischanged = false;
+        icp_dist.ischanged = false;
+        icp_error.ischanged = false;
+        icp_near.ischanged = false;
+        icp_odometry_weight.ischanged = false;
+        icp_ratio.ischanged = false;
+        icp_repeat_dist.ischanged = false;
+        icp_repeat_time.ischanged = false;
+        goal_dist.ischanged = false;
+        goal_v.ischanged = false;
+        goal_th.ischanged = false;
+        goal_near_dist.ischanged = false;
+        goal_near_th.ischanged = false;
     }
 
     function check_update(){
@@ -6835,20 +6610,20 @@ Item {
         if(combo_call_max.ischanged) is_changed = true;
         if(combo_call_num.ischanged) is_changed = true;
         if(combo_baudrate.ischanged) is_changed = true;
-        if(slider_mask.ischanged) is_changed = true;
-        if(slider_max_range.ischanged) is_changed = true;
-        if(slider_cam_exposure.ischanged) is_changed = true;
+        if(mask.ischanged) is_changed = true;
+        if(max_range.ischanged) is_changed = true;
+        if(cam_exposure.ischanged) is_changed = true;
         if(offset_x.ischanged) is_changed = true;
         if(offset_y.ischanged) is_changed = true;
-        if(slider_limit_pivot.ischanged) is_changed = true;
-        if(slider_limit_pivot_acc.ischanged) is_changed = true;
-        if(slider_limit_v.ischanged) is_changed = true;
-        if(slider_limit_v_acc.ischanged) is_changed = true;
-        if(slider_limit_w.ischanged) is_changed = true;
-        if(slider_limit_w_acc.ischanged) is_changed = true;
-        if(slider_limit_manual_v.ischanged) is_changed = true;
-        if(slider_limit_manual_w.ischanged) is_changed = true;
-        if(slider_st_v.ischanged) is_changed = true;
+        if(limit_pivot.ischanged) is_changed = true;
+        if(limit_pivot_acc.ischanged) is_changed = true;
+        if(limit_v.ischanged) is_changed = true;
+        if(limit_v_acc.ischanged) is_changed = true;
+        if(limit_w.ischanged) is_changed = true;
+        if(limit_w_acc.ischanged) is_changed = true;
+        if(limit_manual_v.ischanged) is_changed = true;
+        if(limit_manual_w.ischanged) is_changed = true;
+        if(st_v.ischanged) is_changed = true;
         if(combo_wheel_dir.ischanged) is_changed = true;
         if(combo_left_id.ischanged) is_changed = true;
         if(combo_right_id.ischanged) is_changed = true;
@@ -6856,30 +6631,30 @@ Item {
         if(k_p.ischanged) is_changed = true;
         if(k_i.ischanged) is_changed = true;
         if(k_d.ischanged) is_changed = true;
-        if(slider_motor_limit_v.ischanged) is_changed = true;
-        if(slider_motor_limit_v_acc.ischanged) is_changed = true;
-        if(slider_motor_limit_w.ischanged) is_changed = true;
-        if(slider_motor_limit_w_acc.ischanged) is_changed = true;
-        if(slider_k_v.ischanged) is_changed = true;
-        if(slider_k_w.ischanged) is_changed = true;
-        if(slider_look_ahead_dist.ischanged) is_changed = true;
-        if(slider_min_look_ahead_dist.ischanged) is_changed = true;
-        if(slider_narrow_decel_ratio.ischanged) is_changed = true;
-        if(slider_obs_deadzone.ischanged) is_changed = true;
-        if(slider_obs_wait_time.ischanged) is_changed = true;
-        if(slider_path_out_dist.ischanged) is_changed = true;
-        if(slider_icp_dist.ischanged) is_changed = true;
-        if(slider_icp_error.ischanged) is_changed = true;
-        if(slider_icp_near.ischanged) is_changed = true;
-        if(slider_icp_odometry_weight.ischanged) is_changed = true;
-        if(slider_icp_ratio.ischanged) is_changed = true;
-        if(slider_icp_repeat_dist.ischanged) is_changed = true;
-        if(slider_icp_repeat_time.ischanged) is_changed = true;
-        if(slider_goal_dist.ischanged) is_changed = true;
-        if(slider_goal_v.ischanged) is_changed = true;
-        if(slider_goal_th.ischanged) is_changed = true;
-        if(slider_goal_near_dist.ischanged) is_changed = true;
-        if(slider_goal_near_th.ischanged) is_changed = true;
+        if(motor_limit_v.ischanged) is_changed = true;
+        if(motor_limit_v_acc.ischanged) is_changed = true;
+        if(motor_limit_w.ischanged) is_changed = true;
+        if(motor_limit_w_acc.ischanged) is_changed = true;
+        if(k_v.ischanged) is_changed = true;
+        if(k_w.ischanged) is_changed = true;
+        if(look_ahead_dist.ischanged) is_changed = true;
+        if(min_look_ahead_dist.ischanged) is_changed = true;
+        if(narrow_decel_ratio.ischanged) is_changed = true;
+        if(obs_deadzone.ischanged) is_changed = true;
+        if(obs_wait_time.ischanged) is_changed = true;
+        if(path_out_dist.ischanged) is_changed = true;
+        if(icp_dist.ischanged) is_changed = true;
+        if(icp_error.ischanged) is_changed = true;
+        if(icp_near.ischanged) is_changed = true;
+        if(icp_odometry_weight.ischanged) is_changed = true;
+        if(icp_ratio.ischanged) is_changed = true;
+        if(icp_repeat_dist.ischanged) is_changed = true;
+        if(icp_repeat_time.ischanged) is_changed = true;
+        if(goal_dist.ischanged) is_changed = true;
+        if(goal_v.ischanged) is_changed = true;
+        if(goal_th.ischanged) is_changed = true;
+        if(goal_near_dist.ischanged) is_changed = true;
+        if(goal_near_th.ischanged) is_changed = true;
 
         return is_changed;
     }
@@ -8280,12 +8055,12 @@ Item {
 
     Popup{
         id: popup_preset
-        anchors.centerIn: parent
-        width: 900
-        height: 500
+        width: 1280
+        height: 800
         background: Rectangle{
             anchors.fill: parent
-            color: "transparent"
+            color: color_dark_black
+            opacity: 0.7
         }
         property var select_preset: 1
         onOpened:{
@@ -8299,22 +8074,27 @@ Item {
             text_preset_1.text = supervisor.getSetting("PRESET1","name");
             text_preset_2.text = supervisor.getSetting("PRESET2","name");
             text_preset_3.text = supervisor.getSetting("PRESET3","name");
-            slider_preset_limit_pivot.value = parseFloat(supervisor.getSetting("PRESET"+Number(select_preset),"limit_pivot"));
-            slider_preset_limit_v.value = parseFloat(supervisor.getSetting("PRESET"+Number(select_preset),"limit_v"));
-            slider_preset_limit_vacc.value = parseFloat(supervisor.getSetting("PRESET"+Number(select_preset),"limit_v_acc"));
-            slider_preset_limit_w.value = parseFloat(supervisor.getSetting("PRESET"+Number(select_preset),"limit_w"));
-            slider_preset_limit_wacc.value = parseFloat(supervisor.getSetting("PRESET"+Number(select_preset),"limit_w_acc"));
+            text_preset_4.text = supervisor.getSetting("PRESET4","name");
+            text_preset_5.text = supervisor.getSetting("PRESET5","name");
+            preset_limit_pivot.text = supervisor.getSetting("PRESET"+Number(select_preset),"limit_pivot");
+            preset_limit_v.text = supervisor.getSetting("PRESET"+Number(select_preset),"limit_v");
+            preset_limit_vacc.text = supervisor.getSetting("PRESET"+Number(select_preset),"limit_v_acc");
+            preset_limit_w.text = supervisor.getSetting("PRESET"+Number(select_preset),"limit_w");
+            preset_limit_wacc.text = supervisor.getSetting("PRESET"+Number(select_preset),"limit_w_acc");
         }
 
         Rectangle{
-            width: parent.width
-            height: parent.height
-            radius: 10
+            id: rect_preset
+            width: 900
+            height: 600
+            anchors.centerIn: parent
+            radius: 20
             Column{
                 Rectangle{
                     id: rect_preset_t
-                    width: popup_preset.width
+                    width: rect_preset.width
                     height: 80
+                    radius: 20
                     color: color_dark_navy
                     Text{
                         anchors.centerIn: parent
@@ -8324,21 +8104,40 @@ Item {
                         font.bold: true
                         text: "로봇 프리셋 설정"
                     }
+                    Rectangle{
+                        anchors.bottom: parent.bottom
+                        width: parent.width
+                        height: parent.radius
+                        color: color_dark_navy
+                    }
                 }
                 Row{
                     Rectangle{
                         id: rect_preset_l
                         width: 300
-                        height: popup_preset.height - rect_preset_t.height
+                        radius: 20
+                        height: rect_preset.height - rect_preset_t.height
                         color: color_gray
+                        Rectangle{
+                            anchors.top: parent.top
+                            width: parent.width
+                            height: parent.radius
+                            color: parent.color
+                        }
+                        Rectangle{
+                            anchors.right: parent.right
+                            width: parent.radius
+                            height: parent.height
+                            color: parent.color
+                        }
                         Column{
                             anchors.centerIn: parent
-                            spacing: 40
+                            spacing: 16
                             Row{
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                spacing: 10
+                                spacing: 30
                                 Rectangle{
-                                    width: 80
+                                    width: 90
                                     height: 50
                                     radius: 10
                                     Text{
@@ -8355,7 +8154,7 @@ Item {
                                     }
                                 }
                                 Rectangle{
-                                    width: 80
+                                    width: 90
                                     height: 50
                                     radius: 10
                                     Text{
@@ -8368,36 +8167,6 @@ Item {
                                         anchors.fill: parent
                                         onClicked:{
                                             popup_preset_name.open();
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    width: 80
-                                    height: 50
-                                    radius: 10
-                                    Text{
-                                        anchors.centerIn: parent
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 15
-                                        text: "저장"
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            if(popup_preset.select_preset === 1){
-                                                supervisor.setSetting("PRESET1/name",text_preset_1.text);
-                                            }else if(popup_preset.select_preset === 2){
-                                                supervisor.setSetting("PRESET2/name",text_preset_2.text);
-                                            }else if(popup_preset.select_preset === 3){
-                                                supervisor.setSetting("PRESET3/name",text_preset_3.text);
-                                            }
-
-                                            supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_pivot",text_preset_limit_pivot.text);
-                                            supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_v",text_preset_limit_v.text);
-                                            supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_v_acc",text_preset_limit_vacc.text);
-                                            supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_w",text_preset_limit_w.text);
-                                            supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_w_acc",text_preset_limit_wacc.text);
-                                            popup_preset.close();
                                         }
                                     }
                                 }
@@ -8471,272 +8240,264 @@ Item {
                                     }
                                 }
                             }
+                            Rectangle{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                width: rect_preset_l.width*0.8
+                                height: 70
+                                radius: 5
+                                border.width: popup_preset.select_preset===4?3:1
+                                border.color: popup_preset.select_preset===4?color_green:"black"
+                                Text{
+                                    id: text_preset_4
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 20
+                                    font.bold: true
+                                    text: "프리셋 4"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        popup_preset.select_preset = 4;
+                                        popup_preset.update();
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                width: rect_preset_l.width*0.8
+                                height: 70
+                                radius: 5
+                                border.width: popup_preset.select_preset===5?3:1
+                                border.color: popup_preset.select_preset===5?color_green:"black"
+                                Text{
+                                    id: text_preset_5
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 20
+                                    font.bold: true
+                                    text: "프리셋 5"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        popup_preset.select_preset = 5;
+                                        popup_preset.update();
+                                    }
+                                }
+                            }
                         }
+
                     }
                     Rectangle{
                         id: rect_preset_r
-                        width: popup_preset.width - rect_preset_l.width
+                        radius: 20
+                        width: rect_preset.width - rect_preset_l.width
                         height:rect_preset_l.height
-                        Column{
+                        Rectangle{
+                            anchors.top: parent.top
+                            width: parent.width
+                            height: parent.radius
+                            color: parent.color
+                        }
+                        Row{
+                            spacing: 30
+                            anchors.bottom: parent.bottom
+                            anchors.right: parent.right
+                            anchors.rightMargin: 60
+                            anchors.bottomMargin: 50
+                            Rectangle{
+                                width: 120
+                                height: 60
+                                radius: 10
+                                border.width: 1
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                    text: "나가기"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        popup_preset.close();
+                                    }
+                                }
+                            }
+
+                            Rectangle{
+                                width: 120
+                                height: 60
+                                radius: 10
+                                border.width: 1
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                    text: "저장"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        if(popup_preset.select_preset === 1){
+                                            supervisor.setSetting("PRESET1/name",text_preset_1.text);
+                                        }else if(popup_preset.select_preset === 2){
+                                            supervisor.setSetting("PRESET2/name",text_preset_2.text);
+                                        }else if(popup_preset.select_preset === 3){
+                                            supervisor.setSetting("PRESET3/name",text_preset_3.text);
+                                        }else if(popup_preset.select_preset === 4){
+                                            supervisor.setSetting("PRESET4/name",text_preset_4.text);
+                                        }else if(popup_preset.select_preset === 5){
+                                            supervisor.setSetting("PRESET5/name",text_preset_5.text);
+                                        }
+
+                                        supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_pivot",preset_limit_pivot.text);
+                                        supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_v",preset_limit_v.text);
+                                        supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_v_acc",preset_limit_vacc.text);
+                                        supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_w",preset_limit_w.text);
+                                        supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_w_acc",preset_limit_wacc.text);
+                                        popup_preset.close();
+                                    }
+                                }
+                            }
+                        }
+
+                        Grid{
                             spacing: 15
-                            anchors.centerIn: parent
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.verticalCenterOffset: -50
+                            rows: 5
+                            columns: 3
+                            horizontalItemAlignment: Grid.AlignHCenter
+                            verticalItemAlignment: Grid.AlignVCenter
+                            Text{
+                                font.family: font_noto_r.name
+                                text:"limit_pivot"
+                                font.pixelSize: 20
+                            }
                             Rectangle{
-                                width: rect_preset_r.width*0.9
+                                width: 1
                                 height: 40
-                                Row{
-                                    anchors.fill: parent
-                                    Rectangle{
-                                        width: 200
-                                        height: parent.height
-                                        Text{
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.left: parent.left
-                                            anchors.leftMargin: 50
-                                            font.family: font_noto_r.name
-                                            text:"limit_pivot"
-                                            font.pixelSize: 20
-                                        }
-                                    }
-                                    Rectangle{
-                                        width: 1
-                                        height: parent.height
-                                        color: "#d0d0d0"
-                                    }
-                                    Rectangle{
-                                        width: parent.width - 200
-                                        height: parent.height
-                                        Row{
-                                            spacing: 10
-                                            anchors.centerIn: parent
-                                            Rectangle{
-                                                width: rr.width*0.2
-                                                height: 40
-                                                Text{
-                                                    id: text_preset_limit_pivot
-                                                    anchors.centerIn: parent
-                                                    text: slider_preset_limit_pivot.value.toFixed(2)
-                                                    font.pixelSize: 15
-                                                    font.family: font_noto_r.name
-                                                }
-                                            }
-                                            Slider{
-                                                id: slider_preset_limit_pivot
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                width: rr.width*0.6
-                                                height: 40
-                                                from: 5.0
-                                                to: 90.0
-                                                value: 45.0
-                                            }
-                                        }
+                                color: "#d0d0d0"
+                            }
+                            TextField{
+                                id: preset_limit_pivot
+                                width: 200
+                                height: 40
+                                text:"";
+                                onFocusChanged: {
+                                    keypad.owner = preset_limit_pivot;
+                                    preset_limit_pivot.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        preset_limit_pivot.select(0,0);
                                     }
                                 }
                             }
+                            Text{
+                                font.family: font_noto_r.name
+                                text:"limit_v"
+                                font.pixelSize: 20
+                            }
                             Rectangle{
-                                width: rect_preset_r.width*0.9
+                                width: 1
                                 height: 40
-                                Row{
-                                    anchors.fill: parent
-                                    Rectangle{
-                                        width: 200
-                                        height: parent.height
-                                        Text{
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.left: parent.left
-                                            anchors.leftMargin: 50
-                                            font.family: font_noto_r.name
-                                            text:"limit_v"
-                                            font.pixelSize: 20
-                                        }
-                                    }
-                                    Rectangle{
-                                        width: 1
-                                        height: parent.height
-                                        color: "#d0d0d0"
-                                    }
-                                    Rectangle{
-                                        width: parent.width - 200
-                                        height: parent.height
-                                        Row{
-                                            spacing: 10
-                                            anchors.centerIn: parent
-                                            Rectangle{
-                                                width: rr.width*0.2
-                                                height: 40
-                                                Text{
-                                                    id: text_preset_limit_v
-                                                    anchors.centerIn: parent
-                                                    text: slider_preset_limit_v.value.toFixed(2)
-                                                    font.pixelSize: 15
-                                                    font.family: font_noto_r.name
-                                                }
-                                            }
-                                            Slider{
-                                                id: slider_preset_limit_v
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                width: rr.width*0.6
-                                                height: 40
-                                                from: 0.1
-                                                to: 2.0
-                                                value: 1.0
-                                            }
-                                        }
+                                color: "#d0d0d0"
+                            }
+                            TextField{
+                                id: preset_limit_v
+                                width: 200
+                                height: 40
+                                text:"";
+                                onFocusChanged: {
+                                    keypad.owner = preset_limit_v;
+                                    preset_limit_v.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        preset_limit_v.select(0,0);
                                     }
                                 }
                             }
+                            Text{
+                                font.family: font_noto_r.name
+                                text:"limit_v_acc"
+                                font.pixelSize: 20
+                            }
                             Rectangle{
-                                width: rect_preset_r.width*0.9
+                                width: 1
                                 height: 40
-                                Row{
-                                    anchors.fill: parent
-                                    Rectangle{
-                                        width: 200
-                                        height: parent.height
-                                        Text{
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.left: parent.left
-                                            anchors.leftMargin: 50
-                                            font.family: font_noto_r.name
-                                            text:"limit_v_acc"
-                                            font.pixelSize: 20
-                                        }
-                                    }
-                                    Rectangle{
-                                        width: 1
-                                        height: parent.height
-                                        color: "#d0d0d0"
-                                    }
-                                    Rectangle{
-                                        width: parent.width - 200
-                                        height: parent.height
-                                        Row{
-                                            spacing: 10
-                                            anchors.centerIn: parent
-                                            Rectangle{
-                                                width: rr.width*0.2
-                                                height: 40
-                                                Text{
-                                                    id: text_preset_limit_vacc
-                                                    anchors.centerIn: parent
-                                                    text: slider_preset_limit_vacc.value.toFixed(2)
-                                                    font.pixelSize: 15
-                                                    font.family: font_noto_r.name
-                                                }
-                                            }
-                                            Slider{
-                                                id: slider_preset_limit_vacc
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                width: rr.width*0.6
-                                                height: 40
-                                                from: 0.1
-                                                to: 2.0
-                                                value: 1.0
-                                            }
-                                        }
+                                color: "#d0d0d0"
+                            }
+                            TextField{
+                                id: preset_limit_vacc
+                                width: 200
+                                height: 40
+                                text:"";
+                                onFocusChanged: {
+                                    keypad.owner = preset_limit_vacc;
+                                    preset_limit_vacc.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        preset_limit_vacc.select(0,0);
                                     }
                                 }
                             }
+                            Text{
+                                font.family: font_noto_r.name
+                                text:"limit_w"
+                                font.pixelSize: 20
+                            }
                             Rectangle{
-                                width: rect_preset_r.width*0.9
+                                width: 1
                                 height: 40
-                                Row{
-                                    anchors.fill: parent
-                                    Rectangle{
-                                        width: 200
-                                        height: parent.height
-                                        Text{
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.left: parent.left
-                                            anchors.leftMargin: 50
-                                            font.family: font_noto_r.name
-                                            text:"limit_w"
-                                            font.pixelSize: 20
-                                        }
-                                    }
-                                    Rectangle{
-                                        width: 1
-                                        height: parent.height
-                                        color: "#d0d0d0"
-                                    }
-                                    Rectangle{
-                                        width: parent.width - 200
-                                        height: parent.height
-                                        Row{
-                                            spacing: 10
-                                            anchors.centerIn: parent
-                                            Rectangle{
-                                                width: rr.width*0.2
-                                                height: 40
-                                                Text{
-                                                    id: text_preset_limit_w
-                                                    anchors.centerIn: parent
-                                                    text: slider_preset_limit_w.value.toFixed(2)
-                                                    font.pixelSize: 15
-                                                    font.family: font_noto_r.name
-                                                }
-                                            }
-                                            Slider{
-                                                id: slider_preset_limit_w
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                width: rr.width*0.6
-                                                height: 40
-                                                from: 5.0
-                                                to: 120.0
-                                                value: 120.0
-                                            }
-                                        }
+                                color: "#d0d0d0"
+                            }
+                            TextField{
+                                id: preset_limit_w
+                                width: 200
+                                height: 40
+                                text:"";
+                                onFocusChanged: {
+                                    keypad.owner = preset_limit_w;
+                                    preset_limit_w.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        preset_limit_w.select(0,0);
                                     }
                                 }
                             }
+                            Text{
+                                font.family: font_noto_r.name
+                                text:"limit_w_acc"
+                                font.pixelSize: 20
+                            }
                             Rectangle{
-                                width: rect_preset_r.width*0.9
+                                width: 1
                                 height: 40
-                                Row{
-                                    anchors.fill: parent
-                                    Rectangle{
-                                        width: 200
-                                        height: parent.height
-                                        Text{
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.left: parent.left
-                                            anchors.leftMargin: 50
-                                            font.family: font_noto_r.name
-                                            text:"limit_wacc"
-                                            font.pixelSize: 20
-                                        }
-                                    }
-                                    Rectangle{
-                                        width: 1
-                                        height: parent.height
-                                        color: "#d0d0d0"
-                                    }
-                                    Rectangle{
-                                        width: parent.width - 200
-                                        height: parent.height
-                                        Row{
-                                            spacing: 10
-                                            anchors.centerIn: parent
-                                            Rectangle{
-                                                width: rr.width*0.2
-                                                height: 40
-                                                Text{
-                                                    id: text_preset_limit_wacc
-                                                    anchors.centerIn: parent
-                                                    text: slider_preset_limit_wacc.value.toFixed(2)
-                                                    font.pixelSize: 15
-                                                    font.family: font_noto_r.name
-                                                }
-                                            }
-                                            Slider{
-                                                id: slider_preset_limit_wacc
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                width: rr.width*0.6
-                                                height: 40
-                                                from: 5.0
-                                                to: 360.0
-                                                value: 360.0
-                                            }
-                                        }
+                                color: "#d0d0d0"
+                            }
+                            TextField{
+                                id: preset_limit_wacc
+                                width: 200
+                                height: 40
+                                text:"";
+                                onFocusChanged: {
+                                    keypad.owner = preset_limit_wacc;
+                                    preset_limit_wacc.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        preset_limit_wacc.select(0,0);
                                     }
                                 }
                             }
@@ -8840,6 +8601,10 @@ Item {
                 text_preset_name_set.text = "(  "+supervisor.getSetting("PRESET2","name") + "   )";
             }else if(preset_num === 3){
                 text_preset_name_set.text = "(  "+supervisor.getSetting("PRESET3","name") + "   )";
+            }else if(preset_num === 4){
+                text_preset_name_set.text = "(  "+supervisor.getSetting("PRESET4","name") + "   )";
+            }else if(preset_num === 5){
+                text_preset_name_set.text = "(  "+supervisor.getSetting("PRESET5","name") + "   )";
             }
         }
         Rectangle{

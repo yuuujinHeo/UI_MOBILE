@@ -39,6 +39,9 @@ POSE setAxisBack(POSE _pose);
 POSE setAxis(cv::Point2f _point, float _angle);
 POSE setAxisBack(cv::Point2f _point, float _angle);
 
+bool sortLocation2(const LOCATION &l1, const LOCATION &l2);
+
+
 typedef struct{
     int chunkSize = 0;
     int imageSize = 0;
@@ -61,7 +64,8 @@ typedef struct{
     int origin[2] = {0,};
     float robot_radius = 0.3;
 
-    QVector<LOCATION> locations;
+    QStringList location_groups;
+    QList<LOCATION> locations;
     QVector<QVector<cv::Point2f>> tlines;
     QVector<OBJECT> objects;
 
@@ -77,6 +81,10 @@ typedef struct{
     POSE init_pose;
 
     bool annotation_edited;
+    bool annot_edit_object;
+    bool annot_edit_drawing;
+    bool annot_edit_location;
+    bool annot_edit_tline;
 }ST_MAP;
 extern ST_MAP *pmap;
 
@@ -181,7 +189,6 @@ typedef struct{
     bool useTravelline;
     bool useServerCMD;
 }ST_SETTING;
-
 
 enum ROBOT_CMD{
     ROBOT_CMD_NONE = 0,

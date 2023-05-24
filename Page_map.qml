@@ -22,6 +22,7 @@ Item {
     property var joy_axis_left_ud: 0
     property var joy_axis_right_rl: 0
 
+    property bool edit_flag: false
     property int state_meta: 0
     property int state_annot: 0
     property int state_map: 0
@@ -450,6 +451,7 @@ Item {
                                 }else if(modelData == "현재맵 수정하기"){
                                     map_mode = 2;
                                     supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO ANNOTATION")
+                                    edit_flag = true;
                                     supervisor.setAnnotEditFlag(true);
                                 }else if(modelData == "위치 초기화"){
                                     supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO LOCALIZATION")
@@ -1294,6 +1296,7 @@ Item {
                 map.show_button_following = false;
                 map.show_button_lidar = false;
                 map.show_button_object = false;
+                map.show_button_location = false;
                 loader_menu.sourceComponent = menu_annot_state;
             }
 
@@ -1859,7 +1862,6 @@ Item {
                     property var angle_init: 0
                     onValueChanged: {
                         if(pressed){
-
                             map.rotate(value - angle_init);
                             print("slider rotate : ",value,angle_init,value-angle_init);
 
@@ -2047,6 +2049,7 @@ Item {
                                 //변경한게 있으면(drawing or rotate)
                                 if(slider_rotate.value != 0){
                                     supervisor.writelog("[QML] MAP PAGE (ANNOT) -> NEXT (DRAWING) ROTATE CHANGED : "+Number(slider_rotate.value.toFixed(1)))
+                                    edit_flag = true;
                                     supervisor.setAnnotEditFlag(true);
                                     popup_save_rotated.open();
                                 }else if(map.map_type == "RAW"){
@@ -2440,6 +2443,7 @@ Item {
                                 if(map.is_edited){
                                     supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEXT (OBJECT) -> CANVAS SIZE > 0")
                                     supervisor.setAnnotEditFlag(true);
+                                    edit_flag = true;
                                     popup_save_edited.open();
                                 }else if(map.map_type == "RAW"){
                                     //raw파일이었으면
@@ -2568,208 +2572,392 @@ Item {
         bottomPadding: 0
         background: Rectangle{
             anchors.fill: parent
-            color: "transparent"
+            color: color_dark_gray
+            opacity: 0.7
         }
-        width: 400
-        height: 500
+        width: 1280
+        height: 800
         clip: true
+        property bool usegroup : false
         onOpened:{
-            model_number.clear();
-            model_number.append({"number":"지정 안됨"});
-            model_loc_name.clear();
-            model_loc_num.clear();
+            readSetting();
+        }
+        function readSetting(){
+            print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!");
+            groups.clear();
+            for(var i=0; i<supervisor.getLocationGroupNum(); i++){
+                groups.append({"value":supervisor.getLocGroupname(i)});
+                print("groups append : ", supervisor.getLocGroupname(i))
+            }
+
+            if(supervisor.getLocationGroupNum() > 1)
+                usegroup = true;
+            else
+                usegroup = false;
+
+            locations.clear();
             for(var i=0; i<supervisor.getLocationNum("Serving"); i++){
-                model_number.append({"number":(i+1).toString()});
-                model_loc_name.append({"name":supervisor.getLocationName(i,"Serving")});
-                model_loc_num.append({"number":supervisor.getLocationNumber(i),"error":false});
+                locations.append({"name": supervisor.getLocationName(i,"Serving"),
+                               "group":supervisor.getLocationGroupNum(i),
+                               "number": supervisor.getLocationNumber(supervisor.getLocationGroupNum(i),i),
+                                "number_table" : supervisor.getLocationGroupSize(supervisor.getLocationGroupNum(i)),
+                               "error":false});
+                print("locations append : ",i,supervisor.getLocationGroupNum(i),supervisor.getLocationGroupNum(i),supervisor.getLocationNumber(supervisor.getLocationGroupNum(i),i))
+            }
+            update();
+        }
+
+        function update(){
+            if(supervisor.getLocationGroupNum() > 1)
+                usegroup = true;
+            else
+                usegroup = false;
+
+            details.clear();
+            for(var i=0; i<locations.count; i++){
+                details.append({"name":locations.get(i).name,
+                               "group":locations.get(i).group,
+                               "number":locations.get(i).number,
+                               "number_table":getgroupsize(locations.get(i).group),
+                               "error":locations.get(i).error});
+                print("detail append : ",i, locations.get(i).group, locations.get(i).number, getgroupsize(locations.get(i).group))
             }
             checkLocationNumber();
+
+            if(isError()){
+                rect_title_pop.color = color_red
+                btn_confirm_location.enabled = false;
+            }else{
+                btn_confirm_location.enabled = true;
+                rect_title_pop.color = color_dark_navy
+
+            }
         }
+        function isError(){
+            for(var i=0; i<details.count; i++){
+                if(details.get(i).error)
+                    return true;
+            }
+            return false;
+        }
+
+        function getgroupsize(group){
+            var count = 0;
+            for(var i=0; i<locations.count; i++){
+                if(locations.get(i).group === group)
+                    count++
+            }
+            return count
+        }
+
+        function groupchange(number, group){
+            print(" group change ",number,group,locations.count);
+            if(number > -1 && number < locations.count){
+                locations.get(number).group = group;
+                locations.get(number).number = 0;
+            }
+            update();
+        }
+
+        function tablechange(number, table){
+            print("table change ",number,table)
+            if(number > -1 && number < locations.count){
+                locations.get(number).number = table;
+            }
+            update();
+        }
+
         function checkLocationNumber(){
-            for(var i=0; i<model_loc_num.count; i++){
-                if(model_loc_num.get(i).number === -1)
-                    model_loc_num.get(i).error = true;
-                else
-                    model_loc_num.get(i).error = false;
+            for(var i=0; i<details.count; i++){
+                if(details.get(i).number < 1){
+                    details.get(i).error = true;
+                }else if(details.get(i).number > details.get(i).number_table){
+                    tablechange(i,0);
+                    details.get(i).error = true;
+                    details.get(i).number = 0;
+                }else
+                    details.get(i).error = false;
             }
 
 
-            for(var i=0; i<model_loc_num.count; i++){
-                for(var j=i+1; j<model_loc_num.count; j++){
-                    if(model_loc_num.get(i).number === model_loc_num.get(j).number){
-                        model_loc_num.get(i).error = true;
-                        model_loc_num.get(j).error = true;
+//            for(i=0; i<details.count; i++){
+//                if(details.get(i).number > details.get(i).number_table){
+//                    print("error ",i,details.get(i).number,details.get(i).number_table);
+//                    details.get(i).error= true;
+//                }
+//            }
+
+            for(var i=0; i<details.count; i++){
+                for(var j=i+1; j<details.count; j++){
+                    if(details.get(i).number === details.get(j).number && details.get(i).group===details.get(j).group){
+                        details.get(i).error = true;
+                        details.get(j).error = true;
                     }
                 }
             }
         }
+//        ListModel{
+//            id: tables_temp
+//        }
+        ListModel{
+            id: locations
+        }
 
+        ListModel{
+            id: groups
+        }
         Rectangle{
-            width: parent.width
-            height: parent.height
+            width: 700
+            height: 500
             radius: 20
-            clip: true
+            anchors.centerIn: parent
+            color: "transparent"
             Rectangle{
-                id: rect_title_pop
                 width: parent.width
-                height: 60
+                height: parent.height
+                radius: 20
                 clip: true
-                color: "#323744"
-                Text{
-                    anchors.centerIn: parent
-                    text: "서빙위치 번호 지정"
-                    font.pixelSize: 20
-                    font.family: font_noto_r.name
-                    color: "white"
-                }
-            }
-            Row{
-                id: row_ttle_popu
-                spacing: 2
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: rect_title_pop.bottom
-                anchors.topMargin: 10
                 Rectangle{
-                    width: 159
-                    height: 30
-                    color: color_navy
+                    id: rect_title_pop
+                    width: parent.width
+                    height: 60
+                    radius: parent.radius
+                    clip: true
+                    color: color_dark_navy
+                    Rectangle{
+                        width: parent.width
+                        height: parent.radius
+                        anchors.bottom: parent.bottom
+                        color: parent.color
+                    }
                     Text{
                         anchors.centerIn: parent
-                        text: "이름"
+                        text: "서빙위치 상세 지정"
+                        font.pixelSize: 20
                         font.family: font_noto_r.name
                         color: "white"
                     }
                 }
-                Rectangle{
-                    width: 209
-                    height: 30
-                    color: color_navy
-                    Text{
-                        anchors.centerIn: parent
-                        text: "테이블 번호(중복x)"
-                        font.family: font_noto_r.name
-                        color: "white"
-                    }
-                }
-            }
-
-            ListModel{
-                id: model_number
-            }
-
-            Flickable{
-                anchors.top: row_ttle_popu.bottom
-                anchors.topMargin: 2
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width
-                height: 300
-                clip: true
-                contentHeight: grid_locations.height
                 Row{
-                    id: grid_locations
-                    spacing: 20
-                    anchors.centerIn: parent
-                    Column{
-                        spacing: 20
-                        Repeater{
-                            model: ListModel{id: model_loc_name}
-                            Rectangle{
-                                width: 150
-                                height: 40
-                                color: "transparent"
-                                Text{
-                                    anchors.centerIn: parent
-                                    text: name
-                                    font.family: font_noto_r.name
-                                    font.pixelSize: 20
-                                }
-                            }
+                    id: row_ttle_popu
+                    spacing: 2
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: rect_title_pop.bottom
+                    anchors.topMargin: 10
+                    Rectangle{
+                        width: 200
+                        height: 30
+                        color: color_navy
+                        visible: popup_location_number.usegroup
+                        Text{
+                            anchors.centerIn: parent
+                            text: "그룹"
+                            font.family: font_noto_r.name
+                            color: "white"
                         }
                     }
-                    Column{
-                        spacing: 20
-                        Repeater{
-                            model: ListModel{id: model_loc_num}
-                            Rectangle{
+                    Rectangle{
+                        width: 200
+                        height: 30
+                        color: color_navy
+                        Text{
+                            anchors.centerIn: parent
+                            text: "이름"
+                            font.family: font_noto_r.name
+                            color: "white"
+                        }
+                    }
+                    Rectangle{
+                        width: 200
+                        height: 30
+                        color: color_navy
+                        Text{
+                            anchors.centerIn: parent
+                            text: "테이블 번호(중복x)"
+                            font.family: font_noto_r.name
+                            color: "white"
+                        }
+                    }
+                }
+
+
+                Component{
+                    id: detaillocCompo
+                    Item{
+                        width: parent.width
+                        height: 40
+                        Component.onCompleted: {
+                            combo_number.model.append({"value":"지정 안됨"})
+                            for(var i=0; i<number_table; i++){
+                               combo_number.model.append({"value":(i+1).toString()});
+                            }
+                            print("COMPO UPDATE : ",index,combo_number.model.count);
+                        }
+
+                        Row{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 2
+                            ComboBox{
+                                id: combo_group
+                                visible: popup_location_number.usegroup
                                 width: 200
                                 height: 40
-                                color: "transparent"
-                                Image{
-                                    visible: error
-                                    anchors.left: parent.left
-                                    source: "icon/icon_error.png"
-                                    width: 40
-                                    height: 38
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                ComboBox{
-                                    width : 150
-                                    height: 40
-                                    anchors.right: parent.right
-                                    model: model_number
-                                    currentIndex: number==-1?0:number
-                                    onCurrentIndexChanged: {
-                                        number = currentIndex;
-                                        popup_location_number.checkLocationNumber();
+                                model: groups
+                                currentIndex: group
+                                onCurrentIndexChanged: {
+                                    if(focus){
+                                        print("focus change")
+                                        popup_location_number.groupchange(index,currentIndex);
+                                    }else{
+                                        print("no focus change")
                                     }
                                 }
+                            }
+                            TextField{
+                                id: tx_name
+                                text: name
+                                width:200
+                                height: 40
+                                font.family: font_noto_r.name
+                                font.pixelSize: 20
+                                horizontalAlignment: Text.AlignHCenter
+                                onFocusChanged: {
+                                    keyboard.owner = tx_name;
+                                    tx_name.selectAll();
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                        tx_name.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    name = text;
+                                }
+                            }
+                            Image{
+                                visible: error
+                                source: "icon/icon_error.png"
+                                width: 40
+                                height: 38
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            ComboBox{
+                                id: combo_number
+                                width : error?200-42:200
+                                height: 40
+                                model: ListModel{}
+                                currentIndex: number==-1?0:number
+                                onCurrentIndexChanged: {
+                                    if(focus){
+                                        print("table focus change ",index,currentIndex)
+                                        popup_location_number.tablechange(index,currentIndex);
+//                                        number = currentIndex;
+//                                        popup_location_number.checkLocationNumber();
+                                    }
+                                }
+                            }
+                        }
 
+                    }
+                }
 
+                Flickable{
+                    anchors.top: row_ttle_popu.bottom
+                    anchors.topMargin: 2
+                    width: parent.width
+                    height: 300
+                    clip: true
+                    contentHeight: list_location_detail.height
+                    ScrollBar.vertical: ScrollBar{
+                        width: 25
+                        anchors.right: parent.right
+                        anchors.rightMargin: 10
+                        policy: ScrollBar.AlwaysOn
+                    }
+                    ListView{
+                        id: list_location_detail
+                        width: parent.width
+                        height: parent.height
+                        spacing: 2
+                        clip: true
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        delegate: detaillocCompo
+                        model:ListModel{id:details}
+                    }
+                }
+
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 30
+                    spacing: 30
+                    Rectangle{
+                        width: 180
+                        height: 60
+                        radius: 5
+                        border.width: 1
+                        color: "black"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "그룹 추가"
+                            color: "white"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 20
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_add_location_group.open();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 180
+                        height: 60
+                        radius: 5
+                        border.width: 1
+                        Text{
+                            anchors.centerIn: parent
+                            text: "취소"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 20
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_location_number.close();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: btn_confirm_location
+                        width: 180
+                        height: 60
+                        radius: 5
+                        enabled: false
+                        color: enabled?color_green:color_red
+                        Text{
+                            anchors.centerIn: parent
+                            text: btn_confirm_location.enabled?"확인":"오류가 있습니다"
+                            color: "white"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 20
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                for(var i=0; i<details.count; i++){
+                                    supervisor.setLocation(i,details.get(i).name,details.get(i).group,details.get(i).number);
+                                }
+                                loader_menu.item.update();
+                                popup_location_number.close();
                             }
                         }
                     }
                 }
             }
 
-            Row{
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 30
-                spacing: 30
-                Rectangle{
-                    width: 150
-                    height: 50
-                    radius: 5
-                    border.width: 1
-                    Text{
-                        anchors.centerIn: parent
-                        text: "취소"
-                        font.family: font_noto_r.name
-                        font.pixelSize: 20
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked:{
-                            popup_location_number.close();
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 150
-                    height: 50
-                    radius: 5
-                    color: "black"
-                    Text{
-                        anchors.centerIn: parent
-                        text: "확인"
-                        color: "white"
-                        font.family: font_noto_r.name
-                        font.pixelSize: 20
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked:{
-                            //save serving number
-                            for(var i=0; i<supervisor.getLocationNum("Serving"); i++){
-                                supervisor.setLocationNumber(model_loc_name.get(i).name,model_loc_num.get(i).number);
-                            }
-                            loader_menu.item.update();
-                            popup_location_number.close();
-                        }
-                    }
-                }
-            }
         }
 
     }
@@ -2800,10 +2988,10 @@ Item {
 //                map.brush_size = slider_brush.value;
             }
             Component.onDestruction: {
-                map.setViewer("none");
-                map.init();
-                map.loadmap(supervisor.getMapname(),"EDITED");
-                map.show_connection = false;
+//                map.setViewer("none");
+//                map.init();
+//                map.loadmap(supervisor.getMapname(),"EDITED");
+//                map.show_connection = false;
             }
 
             Rectangle{
@@ -2855,6 +3043,7 @@ Item {
                             supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> SET RAW FILE")
                             map.loadmap(supervisor.getMapname(),"T_RAW");
                             map.clear("spline");
+                            map.clear("all");
                             btn_load_raw_map.activated = true;
                             btn_load_map.activated = false;
                         }
@@ -2883,6 +3072,7 @@ Item {
                             supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> SET EDITED FILE")
                             map.loadmap(supervisor.getMapname(),"T_EDIT");
                             map.clear("spline");
+                            map.clear("all");
                             btn_load_raw_map.activated = false;
                             btn_load_map.activated = true;
                         }
@@ -3387,6 +3577,7 @@ Item {
                                 map.init();
                                 map.setTool("move");
                                 map.setViewer("current")
+                                map.loadmap(supervisor.getMapname(),"EDITED");
                                 map.show_connection = false;
                                 loader_menu.sourceComponent = menu_annot_save;
 
@@ -3854,8 +4045,9 @@ Item {
                 }
 
                 var loc_num = supervisor.getLocationNum("Serving");
+                var group_num = supervisor.getLocationGroupNum();
                 for(var i=0; i<loc_num; i++){
-                    list_location.model.append({"type":"Serving","name":supervisor.getLocationName(i,"Serving"),"iscol":map.checkCollision(supervisor.getLocationX(i,"Serving"),supervisor.getLocationY(i,"Serving")),"empty":false, "number":supervisor.getLocationNumber(i).toString()});
+                    list_location.model.append({"type":"Serving", "name":supervisor.getLocationName(i,"Serving"), "iscol":map.checkCollision(supervisor.getLocationX(i,"Serving"), supervisor.getLocationY(i,"Serving")), "empty":false, "number":supervisor.getLocationNumber(-1,i).toString(), "group":supervisor.getLocationGroup(i)});
                 }
                 var ob_num = supervisor.getObjectNum();
                 for(var i=0; i<ob_num; i++){
@@ -3876,6 +4068,7 @@ Item {
                 list_object.currentIndex = num;
             }
             function setloccur(num){
+                print("setloccur ",num)
                 list_location.currentIndex = num;
             }
 
@@ -4261,8 +4454,9 @@ Item {
                             Item_button{
                                 width: 78
                                 shadow_color: color_gray
-                                icon: "icon/icon_erase.png"
-                                name: "번호지정"
+                                icon: "icon/icon_bookmark.png"
+                                name: "상세지정"
+                                overcolor: true
                                 MouseArea{
                                     anchors.fill: parent
                                     onPressed: {
@@ -4271,7 +4465,6 @@ Item {
                                     onReleased:{
                                         parent.released();
                                     }
-
                                     onClicked: {
                                         popup_location_number.open();
                                     }
@@ -4602,7 +4795,7 @@ Item {
                         width: row_small_menu.width
                         visible: menu_object.obj_category === 1
                         enabled: menu_object.obj_category === 1
-                        height: (row_location.visible)?160:220
+                        height: (row_location.visible)?200:260
                         clip: true
                         model: ListModel{}
                         delegate: locationCompo
@@ -4800,7 +4993,13 @@ Item {
                             Text {
                                 id: text_loc_type
                                 anchors.centerIn: parent
-                                text: type
+                                text: {
+                                    if(type === "Serving"){
+                                        supervisor.getLocationGroupNum() > 1?group:type
+                                    }else{
+                                        type
+                                    }
+                                }
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
                                 color: {
@@ -4936,7 +5135,7 @@ Item {
                     state_text_annot.anchors.rightMargin = 20
                     btn_add1.border.width = 0
                 }else if(state_annot === 1){
-                    if(supervisor.getAnnotEditFlag()){
+                    if(supervisor.getAnnotEditFlag() || edit_flag){
                         supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEED SAVE (EDITED)")
                         rect_state_annot.color = "#EE9D44"
                         state_text_annot.text = "저장이 필요합니다."
@@ -6164,7 +6363,7 @@ Item {
                                 //save temp Image
                                 supervisor.writelog("[QML] MAP PAGE : SAVE TRAVELLINE ");
                                 map.save("tline");
-                                map.loadmap(supervisor.getMapname(),"EDITED");
+                                map.loadmap(supervisor.getMapname(),"T_EDIT");
 
                                 popup_save_travelline.close();
                             }
@@ -6461,6 +6660,13 @@ Item {
                 }
             }
 
+            update();
+        }
+        function update(){
+            model_loc_group.clear();
+            for(var i=0; i<supervisor.getLocationGroupNum(); i++){
+                model_loc_group.append({"name":supervisor.getLocGroupname(i)});
+            }
         }
 
         Rectangle{
@@ -6477,194 +6683,375 @@ Item {
             }
         }
         Rectangle{
-            id: rect_loc_menu
-            anchors.top: rect_loc_title.bottom
-            anchors.topMargin: 40
-            anchors.horizontalCenter: rect_loc_title.horizontalCenter
-            height: 100
+            color: "transparent"
             width: parent.width
-            color: "#e8e8e8"
-            Row{
-                spacing: 20
+            height: parent.height - rect_loc_title.height
+            anchors.top: rect_loc_title.bottom
+            Column{
                 anchors.centerIn: parent
-                Rectangle{
-                    id: btn_serving
-                    width: 78
-                    height: width
-                    radius: width
-                    border.width: select_location_type=="Serving"?3:0
-                    border.color: "#12d27c"
-                    Column{
-                        anchors.centerIn: parent
-                        Image{
-                            source: "icon/icon_move.png"
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                        Text{
-                            text: "서빙위치"
-                            font.family: font_noto_r.name
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            select_location_type = "Serving";
-                            tfield_location.text = select_location_type + "_" + Number(supervisor.getLocationSize(select_location_type))
-                        }
-                    }
-                }
-                Rectangle{
-                    id: btn_charging
-                    width: 78
-                    height: width
-                    radius: width
-                    border.width: select_location_type=="Charging"?3:0
-                    border.color: "#12d27c"
-                    Column{
-                        anchors.centerIn: parent
-                        Image{
-                            source: "icon/icon_move.png"
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                        Text{
-                            text: "충전위치"
-                            font.family: font_noto_r.name
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            if(supervisor.getLocationNum("Charging") > 0){
-                                popup_location_warning.open();
-                                popup_location_warning.set_overwrite();
+                spacing: 20
+                Column{
+                    id: column_loc
+                    width: 500
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Row{
+                        width: parent.width
+                        Rectangle{
+                            id: btn_serving
+                            width: parent.width/3
+                            height: 55
+                            color: select_location_type=="Serving"?color_green:"white"
+                            border.width: 1
+                            border.color: color_mid_gray
+                            Text{
+                                text: "서빙위치"
+                                font.pixelSize: 20
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                anchors.horizontalCenter: parent.horizontalCenter
                             }
-                            select_location_type = "Charging";
-                            tfield_location.text = select_location_type
-                        }
-                    }
-                }
-                Rectangle{
-                    id: btn_resting
-                    width: 78
-                    height: width
-                    radius: width
-                    border.width: select_location_type=="Resting"?3:0
-                    border.color: "#12d27c"
-                    Column{
-                        anchors.centerIn: parent
-                        Image{
-                            source: "icon/icon_move.png"
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                        Text{
-                            text: "대기위치"
-                            font.family: font_noto_r.name
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            if(supervisor.getLocationNum("Resting") > 0){
-                                popup_location_warning.open();
-                                popup_location_warning.set_overwrite();
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    select_location_type = "Serving";
+                                    tfield_location.text = select_location_type + "_" + Number(supervisor.getLocationSize(select_location_type))
+                                }
                             }
-                            select_location_type = "Resting";
-                            tfield_location.text = select_location_type
+                        }
+                        Rectangle{
+                            id: btn_charging
+                            width: parent.width/3
+                            height: 55
+                            color: select_location_type=="Charging"?color_green:"white"
+                            border.width: 1
+                            border.color: color_mid_gray
+                            Text{
+                                text: "충전위치"
+                                font.pixelSize: 20
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    if(supervisor.getLocationNum("Charging") > 0){
+                                        popup_location_warning.open();
+                                        popup_location_warning.set_overwrite();
+                                    }
+                                    select_location_type = "Charging";
+                                    tfield_location.text = select_location_type
+                                }
+                            }
+                        }
+                        Rectangle{
+                            id: btn_resting
+                            width: parent.width/3
+                            height: 55
+                            color: select_location_type=="Resting"?color_green:"white"
+                            border.width: 1
+                            border.color: color_mid_gray
+                            Text{
+                                text: "대기위치"
+                                font.pixelSize: 20
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    if(supervisor.getLocationNum("Resting") > 0){
+                                        popup_location_warning.open();
+                                        popup_location_warning.set_overwrite();
+                                    }
+                                    select_location_type = "Resting";
+                                    tfield_location.text = select_location_type
+                                }
+                            }
                         }
                     }
-                }
-            }
-        }
-        TextField{
-            id: tfield_location
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: rect_loc_menu.bottom
-            anchors.topMargin: 30
-            width: parent.width*0.9
-            height: 50
-            placeholderText: "(loc_name)"
-            font.family: font_noto_r.name
-            horizontalAlignment: Text.AlignHCenter
-            font.pointSize: 20
-            onFocusChanged: {
-                keyboard.owner = tfield_location;
-                tfield_location.selectAll();
-                if(focus){
-                    keyboard.open();
-                }else{
-                    tfield_location.select(0,0)
-                    keyboard.close();
-                }
-            }
-        }
-        Row{
-            anchors.top: tfield_location.bottom
-            anchors.topMargin: 30
-            anchors.horizontalCenter: tfield_location.horizontalCenter
-            spacing: 20
-            Rectangle{
-                id: btn_prev_000
-                width: 180
-                height: 60
-                radius: 10
-                color:"transparent"
-                border.width: 1
-                border.color: "#7e7e7e"
-                Text{
-                    anchors.centerIn: parent
-                    text: "취소"
-                    font.family: font_noto_r.name
-                    font.pixelSize: 25
 
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked:{
-                        popup_add_location.close();
+
+                    Rectangle{
+                        id: rect_loc_menu2
+                        property var select_group: 0
+                        height: 80
+                        width: parent.width
+                        color: "#e8e8e8"
+                        visible: select_location_type=="Serving"
+                        Rectangle{
+                            id:rect_plus
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 30
+                            width: 50
+                            height: 50
+                            radius: 50
+                            color: "black"
+                            Text{
+                                anchors.centerIn: parent
+                                text: "+"
+                                color: "white"
+                                font.family: font_noto_b.name
+                                font.pixelSize: 40
+                                font.bold : true
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked:{
+                                    popup_add_location_group.open();
+                                }
+                            }
+                        }
+                        Flickable{
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: rect_plus.right
+                            anchors.leftMargin: 20
+                            width: parent.width - 80 - rect_plus.width
+                            height: parent.height
+                            clip: true
+                            contentWidth: row_group.width
+                            Row{
+                                id: row_group
+                                spacing: 20
+                                anchors.verticalCenter: parent.verticalCenter
+                                Repeater{
+                                    model:ListModel{id:model_loc_group}
+                                    Rectangle{
+                                        width: 70
+                                        height: 60
+                                        radius: 10
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        border.width: 1
+                                        color: rect_loc_menu2.select_group === index ? color_green : "white"
+                                        Text{
+                                            anchors.centerIn: parent
+                                            font.family: font_noto_r.name
+                                            font.pixelSize: 15
+                                            text: name
+                                        }
+                                        MouseArea{
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                rect_loc_menu2.select_group = index
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-            }
-            Rectangle{
-                id: btn_next_000
-                width: 180
-                height: 60
-                radius: 10
-                enabled: false
-                color: enabled?"black":color_gray
-                border.width: 1
-                border.color: "#7e7e7e"
-                Text{
-                    anchors.centerIn: parent
-                    text: "확인"
+
+                TextField{
+                    id: tfield_location
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: parent.width*0.9
+                    height: 50
+                    placeholderText: "(loc_name)"
                     font.family: font_noto_r.name
-                    font.pixelSize: 25
-                    color: "white"
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked:{
-                        if(tfield_location.text == ""){
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pointSize: 20
+                    onFocusChanged: {
+                        keyboard.owner = tfield_location;
+                        tfield_location.selectAll();
+                        if(focus){
+                            keyboard.open();
                         }else{
-                            if(popup_add_location.curpose_mode){
-                                map.save("location_cur",select_location_type, tfield_location.text);
-                            }else{
-                                map.save("location",select_location_type,tfield_location.text)
+                            tfield_location.select(0,0)
+                            keyboard.close();
+                        }
+                    }
+                }
+                Row{
+                    anchors.horizontalCenter: tfield_location.horizontalCenter
+                    spacing: 20
+                    Rectangle{
+                        id: btn_prev_000
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color:"transparent"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "취소"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_add_location.close();
                             }
-                            supervisor.writelog("[QML] MAP PAGE : SAVE LOCATION -> "+tfield_location.text);
-                            map.setTool("move");
-                            map.init();
-//                            map.update();
-                            popup_add_location.close();
+                        }
+                    }
+                    Rectangle{
+                        id: btn_next_000
+                        width: 180
+                        height: 60
+                        radius: 10
+                        enabled: false
+                        color: enabled?"black":color_gray
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "확인"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                if(tfield_location.text == ""){
+                                }else{
+                                    if(popup_add_location.curpose_mode){
+                                        map.savelocation("location_cur",select_location_type, rect_loc_menu2.select_group, tfield_location.text);
+                                    }else{
+                                        map.savelocation("location",select_location_type,rect_loc_menu2.select_group, tfield_location.text)
+                                    }
+                                    supervisor.writelog("[QML] MAP PAGE : SAVE LOCATION -> ",select_location_type,rect_loc_menu2.select_group, tfield_location.text);
+                                    map.setTool("move");
+                                    map.init();
+                                    popup_add_location.close();
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+            }
+        }
+
+        Rectangle{
+            anchors.fill:parent
+            color: "transparent"
+            border.width: 3
+            border.color: "#323744"
+        }
+    }
+
+    Popup{
+        id: popup_add_location_group
+        anchors.centerIn: parent
+        width: 400
+        height: 250
+        bottomPadding: 0
+        topPadding: 0
+        leftPadding: 0
+        rightPadding: 0
+        background: Rectangle{
+            anchors.fill:parent
+            color: "white"
+        }
+        onOpened:{
+            tfield_group.text = "";
+        }
+
+        Rectangle{
+            id: rect_add_loc_group_1
+            width: parent.width
+            height: 45
+            color: "#323744"
+            Text{
+                anchors.centerIn: parent
+                text: "그룹 추가"
+                font.pixelSize: 20
+                font.family: font_noto_r.name
+                color: "white"
+            }
+        }
+        Rectangle{
+            color: "transparent"
+            width: parent.width
+            height: 250 - rect_add_loc_group_1.height
+            anchors.bottom: parent.bottom
+            Column{
+                anchors.centerIn: parent
+                spacing: 20
+
+                TextField{
+                    id: tfield_group
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: popup_add_location_group.width*0.9
+                    height: 50
+                    placeholderText: "(group_name)"
+                    font.family: font_noto_r.name
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pointSize: 20
+                    onFocusChanged: {
+                        keyboard.owner = tfield_group;
+                        tfield_group.selectAll();
+                        if(focus){
+                            keyboard.open();
+                        }else{
+                            tfield_group.select(0,0)
+                            keyboard.close();
+                        }
+                    }
+                }
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 20
+                    Rectangle{
+                        width: 150
+                        height: 60
+                        radius: 10
+                        color:"transparent"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "취소"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                popup_add_location_group.close();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 150
+                        height: 60
+                        radius: 10
+                        color: "black"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "확인"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                if(tfield_group.text == ""){
+                                }else{
+                                    supervisor.addLocationGroup(tfield_group.text);
+                                    supervisor.writelog("[QML] MAP PAGE : ADD LOCATION GROUP -> "+tfield_group.text);
+                                    popup_add_location.update();
+                                    popup_location_number.readSetting();
+                                    rect_loc_menu2.select_group = supervisor.getLocationGroupNum()-1;
+                                    popup_add_location_group.close();
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-
-
         Rectangle{
             anchors.fill:parent
             color: "transparent"

@@ -127,7 +127,6 @@ public:
     Q_INVOKABLE int getTrayNum();
     Q_INVOKABLE int getTableNum();
     Q_INVOKABLE void setTableNum(int table_num);
-    Q_INVOKABLE int getTableColNum();
     Q_INVOKABLE void setTableColNum(int col_num);
 
 
@@ -140,6 +139,8 @@ public:
     Q_INVOKABLE int getCameraNum();
     Q_INVOKABLE QList<int> getCamera(int num);
     Q_INVOKABLE QString getCameraSerial(int num);
+
+    Q_INVOKABLE
 
     Q_INVOKABLE void pullGit();
     Q_INVOKABLE bool isNewVersion();
@@ -278,20 +279,27 @@ public:
     ////*********************************************  ANNOTATION 관련   ***************************************************////
 
     Q_INVOKABLE void setObjPose();
-
-
+    Q_INVOKABLE QString getServingName(int group, int num);
+//    Q_INVOKABLE int getLocation
     Q_INVOKABLE int getLocationNum(QString type="");
     Q_INVOKABLE QString getLocationName(int num, QString type="");
     Q_INVOKABLE QString getLocationType(int num);
-    Q_INVOKABLE int getLocationNumber(int num);
+    Q_INVOKABLE int getLocationNumber(int group, int num);
     Q_INVOKABLE void setLocationNumber(QString name, int num);
     Q_INVOKABLE int getLocationSize(QString type);
+    Q_INVOKABLE QString getLocationGroup(int num);
+    Q_INVOKABLE int getLocationGroupNum();
+    Q_INVOKABLE int getLocationGroupSize(int num);
+    Q_INVOKABLE int getLocationGroupNum(int num);
+    Q_INVOKABLE void addLocationGroup(QString name);
+    Q_INVOKABLE QString getLocGroupname(int num);
+    Q_INVOKABLE void setLocation(int num, QString name, int group, int tablenum);
 
     Q_INVOKABLE float getLocationX(int num, QString type="");
     Q_INVOKABLE float getLocationY(int num, QString type="");
     Q_INVOKABLE float getLocationTH(int num, QString type="");
 
-    Q_INVOKABLE bool isExistLocation(int num);
+    Q_INVOKABLE bool isExistLocation(int group, int num);
     Q_INVOKABLE float getLidar(int num);
 
     Q_INVOKABLE bool getAnnotEditFlag();

@@ -24,6 +24,7 @@ Item {
     property bool show_button_object: false
     property bool show_button_following: false
     property bool show_button_location: false
+    property bool show_costmap: false
     property bool show_brush: false
 
     property int obj_sequence: 0
@@ -85,12 +86,14 @@ Item {
         show_button_following = true;
         show_button_lidar = true;
         show_button_object = true;
-        show_button_location = false;
+        show_button_location = true;
+        show_costmap = false;
         if(mode === "annot_drawing"){
             show_connection = false;
             show_button_following = false;
             show_button_lidar = false;
             show_button_object = false;
+            show_button_location = false;
         }else if(mode === "annot_tline"){
             show_connection = false;
             show_button_location = true;
@@ -109,6 +112,15 @@ Item {
             show_button_lidar = false;
             show_button_object = false;
             show_button_location = false;
+        }else if(mode === "annot_object"){
+            show_connection = true;
+            show_button_following = false;
+            show_button_lidar = true;
+            show_button_object = true;
+            show_button_location = true;
+            show_costmap = true;
+        }else if(mode === "current"){
+
         }
     }
 
@@ -251,6 +263,7 @@ Item {
         }else if(mode === "location"){
             mapview.clearLocation();
         }else if(mode==="all"){
+            mapview.endSpline(false);
             mapview.clearDrawing();
             mapview.clearObject();
             mapview.clearLocation();
@@ -292,15 +305,28 @@ Item {
             last_robot_th = supervisor.getlastRobotth();
             print(last_robot_x,last_robot_y,last_robot_th);
             mapview.addLocation(last_robot_x,last_robot_y,last_robot_th);
-            mapview.saveLocation(type,name);
+            mapview.saveLocation(type,0,name);
         }else if(mode==="location"){
-            mapview.saveLocation(type,name);
+            mapview.saveLocation(type,0,name);
         }else if(mode==="tline"){
             mapview.endSpline(true);
             mapview.saveTline();
         }else if(mode==="spline"){
             mapview.endSpline(true);
         }
+    }
+
+    function savelocation(mode, type, group, name){
+        if(mode==="location_cur"){
+           last_robot_x = supervisor.getlastRobotx();
+           last_robot_y = supervisor.getlastRoboty();
+           last_robot_th = supervisor.getlastRobotth();
+           print(last_robot_x,last_robot_y,last_robot_th);
+           mapview.addLocation(last_robot_x,last_robot_y,last_robot_th);
+           mapview.saveLocation(type,group, name);
+       }else if(mode==="location"){
+           mapview.saveLocation(type,group, name);
+       }
     }
 
     function editLocation(){
@@ -531,7 +557,6 @@ Item {
                             if(locnum > -1){
                                 loader_menu.item.setcategory(1);
                             }
-
                             loader_menu.item.setloccur(locnum);
                         }
                     }
@@ -542,11 +567,11 @@ Item {
                 }else if(tool == "erase"){
                     mapview.endDrawing(newX, newY);
                 }else if( tool === "add_object"){
-                    map.setcostmap();
+                    setcostmap();
                     update();
                 }else if( tool === "edit_object"){
                     supervisor.setObjPose();
-                    map.setcostmap();
+                    setcostmap();
                     update();
                 }else if( tool === "add_point"){
 
@@ -690,7 +715,6 @@ Item {
                 }
             }
         }
-
         Rectangle{
             id: btn_show_objecting
             width: 40
@@ -726,7 +750,9 @@ Item {
             color:  active?"#12d27c":"#e8e8e8"
             Image{
                 anchors.centerIn: parent
-                source: parent.active?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
+                width: 33
+                height: 33
+                source: "icon/icon-wall.png"// parent.active?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
             }
             MouseArea{
                 anchors.fill: parent
@@ -750,7 +776,9 @@ Item {
             color:  active?"#12d27c":"#e8e8e8"
             Image{
                 anchors.centerIn: parent
-                source: "icon/icon_point_1.png"
+                width: 32
+                height: 30
+                source: "icon/icon_location.png"
             }
             MouseArea{
                 anchors.fill: parent
@@ -759,6 +787,35 @@ Item {
                         mapview.setLocationView(false);
                     }else{
                         mapview.setLocationView(true);
+                    }
+                }
+            }
+        }
+
+        Rectangle{
+            id: btn_show_costmap
+            width: 40
+            height: 40
+            radius: 40
+            visible: show_costmap
+            property bool active: false
+            color: active?"#12d27c":"#e8e8e8"
+            Image{
+                anchors.centerIn: parent
+                source: {
+                     parent.active?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
+                }
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    if(btn_show_costmap.active){
+                        btn_show_costmap.active = false;
+                        mapview.setEditedMap(map_name);
+                    }else{
+                        btn_show_costmap.active = true;
+                        mapview.setCostMap(map_name);
+//                        mapview.setobjectView(true);
                     }
                 }
             }

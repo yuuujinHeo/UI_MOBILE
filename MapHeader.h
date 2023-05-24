@@ -46,6 +46,7 @@ typedef struct{
 }OBJECT;
 
 typedef struct{
+    int group;
     QString type;
     QString name;
     cv::Point2f point;

@@ -159,7 +159,7 @@ public:
     bool edit_location_flag;
     LOCATION orin_location;
     Q_INVOKABLE bool getLocationFlag(){return new_location_flag;}
-    Q_INVOKABLE void saveLocation(QString type, QString name);
+    Q_INVOKABLE void saveLocation(QString type, int groupnum, QString name);
     Q_INVOKABLE void clearLocation();
     Q_INVOKABLE void selectLocation(int num, QString type="");
     Q_INVOKABLE void addLocation(int x, int y,float th);
@@ -176,11 +176,11 @@ public:
     Q_INVOKABLE void setMapTline();
 
     Q_INVOKABLE int getLocationNum(QString type);
+    Q_INVOKABLE int getLocGroupNum(int num);
     //---------------------------------------------------Save
     void initLocation();
     Q_INVOKABLE void saveMap();
     Q_INVOKABLE void saveTline();
-
     //---------------------------------------------------Map Scale, Move
     int map_width;
     int map_height;

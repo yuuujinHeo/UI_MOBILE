@@ -336,7 +336,7 @@ Window {
             supervisor.writelog("[QML] Load Page : "+source);
             timer_update.start();
         }
-        source: pkitchen// pinit
+        source:  pinit
     }
 
     Timer{
