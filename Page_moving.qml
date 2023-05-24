@@ -32,11 +32,9 @@ Item {
         if(supervisor.getSetting("ROBOT_SW","moving_face")==="true"){
             resting_image.visible = true;
             image_robot.visible = false;
-            text_moving.visible = false;
         }else{
             resting_image.visible = false;
             image_robot.visible = true;
-            text_moving.visible = true;
         }
 
         robot_paused = false;

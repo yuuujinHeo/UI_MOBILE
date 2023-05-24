@@ -62,9 +62,6 @@ void ServerHandler::onTextMessageReceived(QString message){
             float y = json["y"].toDouble();
             float th = json["th"].toDouble();
 
-            probot->targetPose.point.x = x;
-            probot->targetPose.point.y = y;
-            probot->targetPose.angle = th;
             emit server_new_target();
         }else if(cmd == "NEW_CALL"){
             probot->targetLocation = json["location"].toString();

@@ -399,35 +399,39 @@ void IPCHandler::set_cmd(int cmd, QString log){
 void IPCHandler::moveToServing(QString target_loc, int preset){
     bool match = false;
     float pose[3];
+    LOCATION temp_loc;
     for(int i=0; i<pmap->locations.size(); i++){
         if(target_loc == pmap->locations[i].name){
             match = true;
             pose[0] = pmap->locations[i].point.x;
             pose[1] = pmap->locations[i].point.y;
             pose[2] = pmap->locations[i].angle;
+            temp_loc = pmap->locations[i];
         }
     }
+
     if(match){
         plog->write("[IPC] MOVE TO COMMAND : "+target_loc);
         moveTo(pose[0],pose[1],pose[2],preset);
-
     }else{
         plog->write("[IPC] MOVE TO COMMAND (UNMATCHED): "+target_loc);
 //        IPCHandler::CMD send_msg;
 //        send_msg.cmd = ROBOT_CMD_MOVE_LOCATION;
     }
-    probot->curLocation = target_loc;
+    probot->curLocation = temp_loc;
 }
 
 void IPCHandler::moveToLocation(QString target_loc, int preset){
     bool match = false;
     float pose[3];
+    LOCATION temp_loc;
     for(int i=0; i<pmap->locations.size(); i++){
         if(target_loc == pmap->locations[i].name){
             match = true;
             pose[0] = pmap->locations[i].point.x;
             pose[1] = pmap->locations[i].point.y;
             pose[2] = pmap->locations[i].angle;
+            temp_loc = pmap->locations[i];
         }
     }
     if(match){
@@ -439,7 +443,7 @@ void IPCHandler::moveToLocation(QString target_loc, int preset){
 //        IPCHandler::CMD send_msg;
 //        send_msg.cmd = ROBOT_CMD_MOVE_LOCATION;
     }
-    probot->curLocation = target_loc;
+    probot->curLocation = temp_loc;
 }
 
 void IPCHandler::moveTo(float x, float y, float th, int preset){

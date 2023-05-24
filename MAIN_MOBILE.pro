@@ -26,7 +26,6 @@ SOURCES += \
     LCMHandler.cpp \
     Loading.cpp \
     MapView.cpp \
-    ServerHandler.cpp \
     SoundHandler.cpp \
     ZIPHandler.cpp \
     automata.cpp \
@@ -84,7 +83,6 @@ HEADERS += \
     MapHeader.h \
     MapView.h \
     automata.h \
-    ServerHandler.h \
     SoundHandler.h \
     ZIPHandler.h \
     cv_to_qt.h \

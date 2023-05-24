@@ -51,12 +51,14 @@ void MapView::onTimer(){
             setZoomCenter();
         }
 
-        if(probot->ipc_use){
-            setMapCurrent();
-            setMapMap();
-        }else{
-            if(probot->lcmconnection){
+        if(mode != "mapping" && mode != "annot_objecting"){
+            if(probot->ipc_use){
                 setMapCurrent();
+                setMapMap();
+            }else{
+                if(probot->lcmconnection){
+                    setMapCurrent();
+                }
             }
         }
     }
@@ -263,6 +265,23 @@ void MapView::moveMap(){
         temp_pixmap = map_current.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
         pixmap_current.pixmap = temp_pixmap;
         update();
+    }else if(mode == "annot_objecting"){
+        //Crop Show Rect
+        cv::Mat source;
+        if(pmap->map_objecting.rows > 0 && pmap->map_objecting.cols > 0){
+            pmap->map_objecting(cv::Rect(map_x*1000/pmap->width,map_y*1000/pmap->width,map_width*scale*1000/pmap->width,map_height*scale*1000/pmap->width)).copyTo(source);
+        }else{
+            map_map(cv::Rect(map_x,map_y,map_width*scale,map_height*scale)).copyTo(source);
+        }
+        pixmap_map.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(source));
+
+        QPixmap temp_pixmap = map_object.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
+        pixmap_object.pixmap = temp_pixmap;
+        temp_pixmap = map_location.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
+        pixmap_location.pixmap = temp_pixmap;
+        temp_pixmap = map_current.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
+        pixmap_current.pixmap = temp_pixmap;
+        update();
     }else if(map_orin.cols > 0 && map_orin.rows > 0){
         //Crop Show Rect
         cv::Mat source;
@@ -373,7 +392,7 @@ void MapView::reloadMap(){
 }
 void MapView::setMapping(){
     cv::Mat source;
-//    qDebug() << map_x << map_y << scale << map_width << map_height << pmap->map_mapping.rows;
+    qDebug() << "setMapping";
     pmap->map_mapping(cv::Rect(map_x*1000/pmap->width,map_y*1000/pmap->width,map_width*scale*1000/pmap->width,map_height*scale*1000/pmap->width)).copyTo(source);
     pixmap_map.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(source));
     Q_ASSERT(!pixmap_map.pixmap.isNull());
@@ -381,7 +400,7 @@ void MapView::setMapping(){
 }
 void MapView::setObjecting(){
     cv::Mat source;
-
+    qDebug() << "setObjecting";
     pmap->map_objecting(cv::Rect(map_x*1000/pmap->width,map_y*1000/pmap->width,map_width*scale*1000/pmap->width,map_height*scale*1000/pmap->width)).copyTo(source);
     pixmap_map.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(source));
     Q_ASSERT(!pixmap_map.pixmap.isNull());

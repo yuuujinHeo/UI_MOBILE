@@ -50,7 +50,6 @@ Supervisor::Supervisor(QObject *parent)
     zip = new ZIPHandler();
     ipc = new IPCHandler();
     lcm = new LCMHandler();
-    server = new ServerHandler();
     joystick = new JoystickHandler();
     call = new CallbellHandler();
     git = new HTTPHandler();
@@ -75,12 +74,6 @@ Supervisor::Supervisor(QObject *parent)
     readSetting();
     ui_state = UI_STATE_NONE;
 
-    connect(server,SIGNAL(server_pause()),this,SLOT(server_cmd_pause()));
-    connect(server,SIGNAL(server_resume()),this,SLOT(server_cmd_resume()));
-    connect(server,SIGNAL(server_new_target()),this,SLOT(server_cmd_newtarget()));
-    connect(server,SIGNAL(server_new_call()),this,SLOT(server_cmd_newcall()));
-    connect(server,SIGNAL(server_set_ini()),this,SLOT(server_cmd_setini()));
-    connect(server,SIGNAL(server_get_map()),this,SLOT(server_get_map()));
     connect(lcm, SIGNAL(pathchanged()),this,SLOT(path_changed()));
     connect(lcm, SIGNAL(mappingin()),this,SLOT(mapping_update()));
     connect(lcm, SIGNAL(objectingin()),this,SLOT(objecting_update()));
@@ -372,7 +365,6 @@ void Supervisor::readSetting(QString map_name){
     setting_robot.beginGroup("FLOOR");
     pmap->margin = setting_robot.value("margin").toFloat();
     pmap->use_server = setting_robot.value("map_server").toBool();
-    server->acceptCmd = pmap->use_server;
     pmap->map_loaded = setting_robot.value("map_load").toBool();
     pmap->map_name = setting_robot.value("map_name").toString();
     pmap->map_path = setting_robot.value("map_path").toString();
@@ -563,7 +555,8 @@ void Supervisor::readSetting(QString map_name){
     //Set Variable
     probot->trays.clear();
     for(int i=0; i<setting.tray_num; i++){
-        probot->trays.push_back(0);
+        ST_TRAY temp;
+        probot->trays.push_back(temp);
     }
 
     if(probot->ipc_use){
@@ -660,7 +653,7 @@ QString Supervisor::getCameraSerial(int num){
 
 ////*********************************************  INIT PAGE 관련   ***************************************************////
 bool Supervisor::isConnectServer(){
-    return server->isconnect;
+    return false;
 }
 
 void Supervisor::deleteAnnotation(){
@@ -771,17 +764,6 @@ bool Supervisor::isExistMap(){
     }
     return false;
 }
-bool Supervisor::loadMaptoServer(){
-    if(server->isconnect){
-        plog->write("[USER INPUT] load map to server : request");
-        server->requestMap();
-        return true;
-    }else{
-        plog->write("[USER INPUT - ERROR] load map to server : server not connected");
-        QMetaObject::invokeMethod(mMain, "loadmap_server_fail");
-        return false;
-    }
-}
 
 bool Supervisor::isUSBFile(){
     return false;
@@ -792,24 +774,7 @@ QString Supervisor::getUSBFilename(){
 bool Supervisor::loadMaptoUSB(){
     return false;
 }
-bool Supervisor::isuseServerMap(){
-    return pmap->use_server;
-}
-void Supervisor::setuseServerMap(bool use){
-    QString ini_path = QDir::homePath()+"/robot_config.ini";
-    QSettings settings(ini_path, QSettings::IniFormat);
-    settings.setValue("FLOOR/map_server",use);
-    if(use){
-//        settings.setValue("FLOOR/map_load",true);
-        settings.setValue("FLOOR/map_name",server->server_map_name);
-        settings.setValue("FLOOR/map_path",QDir::homePath()+"/maps/"+server->server_map_name);
-        readSetting();
-        plog->write("[SETTING] USE SERVER MAP Changed : True");
-    }else{
-        plog->write("[SETTING] USE SERVER MAP Changed : False");
-    }
-    readSetting();
-}
+
 void Supervisor::removeMap(QString filename){
     plog->write("[USER INPUT] Remove Map : "+filename);
 //    QFile *file = new QFile(QDir::homePath()+"/maps/"+filename);
@@ -2234,9 +2199,6 @@ bool Supervisor::saveAnnotation(QString filename){
     pmap->annotation_edited = false;
     return true;
 }
-void Supervisor::sendMaptoServer(){
-    server->sendMap(pmap->map_name);
-}
 
 
 
@@ -2250,7 +2212,9 @@ void Supervisor::acceptCall(bool yes){
 ////*********************************************  SCHEDULER(SERVING) 관련   ***************************************************////
 void Supervisor::setTray(int tray_num, int table_num){
     if(tray_num > -1 && tray_num < setting.tray_num){
-        probot->trays[tray_num] = table_num;
+        probot->trays[tray_num].empty = false;
+        probot->trays[tray_num].group = 0;
+        probot->trays[tray_num].number = table_num;
         plog->write("[USER INPUT] SERVING START : tray("+QString::number(tray_num)+") = table "+QString::number(table_num));
     }
     ui_cmd = UI_CMD_MOVE_TABLE;
@@ -2602,12 +2566,7 @@ QString Supervisor::getMapname(){
 QString Supervisor::getMappath(){
     return pmap->map_path;
 }
-QString Supervisor::getServerMappath(){
-    return QDir::homePath() + "/maps/"+server->server_map_name;
-}
-QString Supervisor::getServerMapname(){
-    return server->server_map_name;
-}
+
 int Supervisor::getMapWidth(){
     return pmap->width;
 }
@@ -2849,13 +2808,6 @@ void Supervisor::startPatrol(QString mode, bool pickup){
 }
 
 //// *********************************** SLOTS *********************************** ////
-void Supervisor::server_cmd_setini(){
-    readSetting();
-}
-void Supervisor::server_get_map(){
-    readSetting(server->server_map_name);
-    QMetaObject::invokeMethod(mMain, "loadmap_server_success");
-}
 void Supervisor::path_changed(){
     QMetaObject::invokeMethod(mMain, "updatepath");
 }
@@ -2869,26 +2821,6 @@ void Supervisor::mapping_update(){
 void Supervisor::objecting_update(){
     QMetaObject::invokeMethod(mMain, "updateobjecting");
 }
-void Supervisor::server_cmd_pause(){
-    plog->write("[SERVER] PAUSE");
-    lcm->movePause();
-    QMetaObject::invokeMethod(mMain, "pausedcheck");
-}
-void Supervisor::server_cmd_resume(){
-    plog->write("[SERVER] RESUME");
-    lcm->moveResume();
-    QMetaObject::invokeMethod(mMain, "pausedcheck");
-}
-void Supervisor::server_cmd_newtarget(){
-//    plog->write("[SERVER] NEW TARGET !!" + QString().sprintf("%f, %f, %f",probot->targetPose.x, probot->targetPose.y, probot->targetPose.th));
-    if(ui_state == UI_STATE_PATROLLING)
-        state_rotate_tables = 4;
-}
-void Supervisor::server_cmd_newcall(){
-    ui_cmd = UI_CMD_MOVE_CALLING;
-//    QMetaObject::invokeMethod(mMain,"newcall");
-}
-
 void Supervisor::checkShellFiles(){
 //파일확인!
     QString file_path;
@@ -3372,14 +3304,19 @@ void Supervisor::onTimer(){
             if(isaccepted){
                 count_pass = 0;
                 ui_state = UI_STATE_PICKUP;
-                int curNum = 0;
+                LOCATION curLoc;
                 //트레이 클리어
                 probot->pickupTrays.clear();
                 for(int i=0; i<setting.tray_num; i++){
-                    if(probot->trays[i] == curNum){
-                        probot->trays[i] = 0;
-                        if(curNum != 0)
-                            probot->pickupTrays.push_back(i+1);
+                    //
+                    if(probot->trays[i].empty){
+
+                    }else{
+
+                    }
+                    if(!probot->trays[i].empty && probot->trays[i].location == curLoc)
+                        probot->trays[i].empty = true;
+                        probot->pickupTrays.push_back(i+1);
                     }else if(curNum == 0){
                         curNum = probot->trays[i];
                         probot->pickupTrays.push_back(i+1);
@@ -3431,7 +3368,7 @@ void Supervisor::onTimer(){
                     bool serveDone = true;
                     if(timer_cnt%5==0){
                         for(int i=0; i<setting.tray_num; i++){
-                            if(probot->trays[i] != 0){
+                            if(!probot->trays[i].empty){
                                 if(count_moveto++ > 5){
                                     if(probot->ipc_use){
                                         ipc->moveStop();
@@ -3441,7 +3378,7 @@ void Supervisor::onTimer(){
                                     ui_state = UI_STATE_MOVEFAIL;
                                     plog->write("[SCHEDULER] SERVING MOVE FAILED");
                                 }else{
-                                    cur_location = getServingName(probot->trays[i]);
+                                    cur_location = getServingName(probot->trays[i].group, probot->trays[i].number);
                                     plog->write("[SCHEDULER] SERVING : MOVE TO (Table"+QString::number(probot->trays[i])+") "+cur_location);
                                     if(probot->ipc_use){
                                         ipc->moveToLocation(cur_location, probot->cur_preset);
@@ -3755,6 +3692,28 @@ void Supervisor::readLog(QDateTime date){
     }
 }
 
+void Supervisor::goSerivng(int group, int table){
+    LOCATION target;
+    int target_num = -1;
+    int count = 0;
+    for(int i=0; i<pmap->locations.size(); i++){
+        if(pmap->locations[i].type == "Serving"){
+            if(pmap->locations[i].group == group && pmap->locations[i].number == table){
+                target = pmap->locations[i];
+                target_num = count;
+            }
+            count++;
+        }
+    }
+    if(target_num > -1){
+        plog->write("[USER INPUT] SERVING START : "+target.name+QString().sprintf(" (group : %d, table : %d)", group, table));
+        for(int i=0; i<probot->trays.size(); i++)
+            probot->trays[i] = target_num;
+        ui_cmd = UI_CMD_MOVE_TABLE;
+    }else{
+        plog->write("[USER INPUT] SERVING START : TARGET NOT FOUND "+QString().sprintf(" (group : %d, table : %d)", group, table));
+    }
+}
 int Supervisor::getLogLineNum(){
     return curLog.size();
 }
