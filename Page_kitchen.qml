@@ -959,11 +959,16 @@ Item {
             onClicked: {
                 count_resting = 0;
                 print("serving start button");
-                cur_table = 0;
-                supervisor.setPreset(0);
-                for(var i=0; i<tray_num; i++){
-                    supervisor.setTray(i,traymodel.get(i).set_table);
+                if(supervisor.getSetting("ROBOT_SW","use_tray") === "true"){
+                    for(var i=0; i<tray_num; i++){
+                        supervisor.setTray(i,traymodel.get(i).set_table);
+                    }
+                }else{
+                    supervisor.goSerivng(cur_group,cur_table);
                 }
+                supervisor.setPreset(0);
+                cur_table = 0;
+
             }
         }
     }

@@ -198,7 +198,9 @@ public:
 
     ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
 //    void moveTo(QString target_loc, int flag_back);
-    void moveToLocation(QString target_loc, int preset);
+    void moveToLocation(LOCATION target_loc, int preset);
+    void moveToResting(int preset);
+    void moveToCharging(int preset);
     void moveToServing(QString target_loc, int preset);
     void moveTo(float x, float y, float th, int preset);
     void movePause();

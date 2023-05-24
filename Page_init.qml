@@ -954,13 +954,6 @@ Item {
                         duration: 500
                         easing.type: Easing.InCurve
                     }
-                    NumberAnimation{
-                        target: btn_slam_do_init;
-                        property: "opacity";
-                        to: 1
-                        duration: 500
-                        easing.type: Easing.InCurve
-                    }
                 }
             }
 
@@ -982,7 +975,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 color: color_dark_gray
                 font.family: font_noto_b.name
-                text: "모터가 초기화되지 않았습니다. 비상 스위치를 확인해주세요."
+                text: "모터가 초기화되지 않았습니다.\n비상 스위치를 눌렀다가 풀어주세요."
                 font.pixelSize: 50
             }
             Rectangle{

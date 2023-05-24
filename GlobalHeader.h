@@ -97,6 +97,11 @@ typedef struct{
 }ST_MOTOR;
 
 typedef struct{
+    bool empty=true;
+    LOCATION location;
+}ST_TRAY;
+
+typedef struct{
     bool lcmconnection = false;
     bool ipc_use = false;
     //from Robot
@@ -123,7 +128,6 @@ typedef struct{
 
     POSE curPose;
     POSE lastPose;
-    QString curLocation = "";
     QVector<int> pickupTrays;
     POSE curTarget;
 
@@ -140,12 +144,10 @@ typedef struct{
     QString type = "SERVING";
     float velocity = 1.0;
 
-    QVector<int> trays;
+    QVector<ST_TRAY> trays;
+    LOCATION curLocation;
     int cur_preset;
     QVector<QString> call_list;
-
-    POSE targetPose;
-    QString targetLocation;
 
     int call_moving_count;
     int max_moving_count;

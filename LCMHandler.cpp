@@ -93,16 +93,16 @@ void LCMHandler::sendCommand(int cmd, QString msg){
 void LCMHandler::moveToLast(){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_MOVE_LOCATION;
-    memcpy(send_msg.params,probot->curLocation.toUtf8(),sizeof(char)*255);
+    memcpy(send_msg.params,probot->curLocation.name.toUtf8(),sizeof(char)*255);
 
-    sendCommand(send_msg, "MOVE LOCATION TO"+probot->curLocation);
+    sendCommand(send_msg, "MOVE LOCATION TO"+probot->curLocation.name);
 }
 void LCMHandler::moveTo(QString target_loc){
     command send_msg;
     send_msg.cmd = ROBOT_CMD_MOVE_LOCATION;
     memcpy(send_msg.params,target_loc.toUtf8(),sizeof(char)*255);
 
-    probot->curLocation = target_loc;
+//    probot->curLocation = target_loc;
     sendCommand(send_msg, "MOVE LOCATION TO"+target_loc);
 }
 

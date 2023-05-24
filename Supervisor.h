@@ -8,7 +8,6 @@
 #include "GlobalHeader.h"
 #include "LCMHandler.h"
 #include "JoystickHandler.h"
-#include "ServerHandler.h"
 #include "CallbellHandler.h"
 #include "HTTPHandler.h"
 #include "ZIPHandler.h"
@@ -69,12 +68,11 @@ public:
     QVector<QString> call_list;
     int setting_call_id = -1;
 
-    QString cur_location;
+//    QString cur_location;
 
     ////*********************************************  CLASS   ***************************************************////
     LCMHandler *lcm;
     ZIPHandler *zip;
-    ServerHandler *server;
     JoystickHandler *joystick;
     HTTPHandler *git;
     CallbellHandler *call;
@@ -140,7 +138,6 @@ public:
     Q_INVOKABLE QList<int> getCamera(int num);
     Q_INVOKABLE QString getCameraSerial(int num);
 
-    Q_INVOKABLE
 
     Q_INVOKABLE void pullGit();
     Q_INVOKABLE bool isNewVersion();
@@ -168,6 +165,7 @@ public:
             log_folder = "sn_log";
         }
     }
+    Q_INVOKABLE void goSerivng(int group, int table);
     Q_INVOKABLE int getLogLineNum();
     Q_INVOKABLE QString getLogLine(int num){return curLog[num];}
     Q_INVOKABLE QString getLogDate(int num);
@@ -208,12 +206,9 @@ public:
     Q_INVOKABLE bool isExistTravelEdited(QString name);
     Q_INVOKABLE bool isExistAnnotation(QString name);
     Q_INVOKABLE void deleteAnnotation();
-    Q_INVOKABLE bool loadMaptoServer();
     Q_INVOKABLE bool isUSBFile();
     Q_INVOKABLE QString getUSBFilename();
     Q_INVOKABLE bool loadMaptoUSB();
-    Q_INVOKABLE bool isuseServerMap();
-    Q_INVOKABLE void setuseServerMap(bool use);
     Q_INVOKABLE void removeMap(QString filename);
     Q_INVOKABLE bool isloadMap();
     Q_INVOKABLE void setloadMap(bool load);
@@ -267,6 +262,13 @@ public:
     Q_INVOKABLE void removeCall(int id);
     Q_INVOKABLE void removeCallAll();
 
+    LOCATION getloc(QString name){
+        for(int i=0; i<pmap->locations.size(); i++){
+            if(pmap->locations[i].name == name)
+                return pmap->locations[i];
+        }
+        return LOCATION();
+    }
 
     ////*********************************************  JOYSTICK 관련   ***************************************************////
     Q_INVOKABLE bool isconnectJoy();
@@ -276,6 +278,12 @@ public:
     Q_INVOKABLE QString getJoystick(int mode);
 
 
+    bool isSameLocation(LOCATION l1, LOCATION l2){
+        if(l1.group == l2.group && l1.number == l2.number && l1.name == l2.name){
+            return true;
+        }
+        return false;
+    }
     ////*********************************************  ANNOTATION 관련   ***************************************************////
 
     Q_INVOKABLE void setObjPose();
@@ -326,7 +334,7 @@ public:
 
     //******************************************************************Travel line
     Q_INVOKABLE bool saveAnnotation(QString filename);
-    Q_INVOKABLE void sendMaptoServer();
+
 
 
 
@@ -413,8 +421,6 @@ public:
     ////*********************************************  MAP IMAGE 관련   ***************************************************////
     Q_INVOKABLE QString getMapname();
     Q_INVOKABLE QString getMappath();
-    Q_INVOKABLE QString getServerMapname();
-    Q_INVOKABLE QString getServerMappath();
     Q_INVOKABLE int getMapWidth();
     Q_INVOKABLE int getMapHeight();
     Q_INVOKABLE float getGridWidth();
@@ -441,12 +447,6 @@ public:
     Q_INVOKABLE void usbsave(QString usb="", bool _ui=true, bool _slam=true, bool _config=true, bool _map=true, bool _log=true);
 public slots:
     void onTimer();
-    void server_cmd_pause();
-    void server_cmd_resume();
-    void server_cmd_newtarget();
-    void server_cmd_newcall();
-    void server_cmd_setini();
-    void server_get_map();
     void path_changed();
     void camera_update();
     void mapping_update();

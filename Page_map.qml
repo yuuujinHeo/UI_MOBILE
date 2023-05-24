@@ -6775,7 +6775,6 @@ Item {
 
                     Rectangle{
                         id: rect_loc_menu2
-                        property var select_group: 0
                         height: 80
                         width: parent.width
                         color: "#e8e8e8"
@@ -6824,7 +6823,7 @@ Item {
                                         radius: 10
                                         anchors.verticalCenter: parent.verticalCenter
                                         border.width: 1
-                                        color: rect_loc_menu2.select_group === index ? color_green : "white"
+                                        color: cur_group === index ? color_green : "white"
                                         Text{
                                             anchors.centerIn: parent
                                             font.family: font_noto_r.name
@@ -6834,7 +6833,7 @@ Item {
                                         MouseArea{
                                             anchors.fill: parent
                                             onClicked: {
-                                                rect_loc_menu2.select_group = index
+                                                cur_group = index
                                             }
                                         }
                                     }
@@ -6911,11 +6910,11 @@ Item {
                                 if(tfield_location.text == ""){
                                 }else{
                                     if(popup_add_location.curpose_mode){
-                                        map.savelocation("location_cur",select_location_type, rect_loc_menu2.select_group, tfield_location.text);
+                                        map.savelocation("location_cur",select_location_type, cur_group, tfield_location.text);
                                     }else{
-                                        map.savelocation("location",select_location_type,rect_loc_menu2.select_group, tfield_location.text)
+                                        map.savelocation("location",select_location_type,cur_group, tfield_location.text)
                                     }
-                                    supervisor.writelog("[QML] MAP PAGE : SAVE LOCATION -> ",select_location_type,rect_loc_menu2.select_group, tfield_location.text);
+                                    supervisor.writelog("[QML] MAP PAGE : SAVE LOCATION -> ",select_location_type,cur_group, tfield_location.text);
                                     map.setTool("move");
                                     map.init();
                                     popup_add_location.close();
@@ -6924,8 +6923,6 @@ Item {
                         }
                     }
                 }
-
-
             }
         }
 
@@ -7043,7 +7040,7 @@ Item {
                                     supervisor.writelog("[QML] MAP PAGE : ADD LOCATION GROUP -> "+tfield_group.text);
                                     popup_add_location.update();
                                     popup_location_number.readSetting();
-                                    rect_loc_menu2.select_group = supervisor.getLocationGroupNum()-1;
+                                    cur_group = supervisor.getLocationGroupNum()-1;
                                     popup_add_location_group.close();
                                 }
                             }
