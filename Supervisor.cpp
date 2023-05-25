@@ -69,7 +69,7 @@ Supervisor::Supervisor(QObject *parent)
     connect(FSwatcher, SIGNAL(directoryChanged(QString)),this,SLOT(usb_detect()));
     usb_detect();
 
-    makeRobotINI();
+//    makeRobotINI();
     isaccepted = false;
     readSetting();
     ui_state = UI_STATE_NONE;
@@ -808,6 +808,16 @@ void Supervisor::setloadMap(bool load){
 bool Supervisor::isExistRobotINI(){
     QString file = getIniPath();
     return QFile::exists(file);
+}
+bool Supervisor::checkINI(){
+    QString file = getIniPath();
+    if(QFile::exists(file)){
+        if(getSetting("SENSOR","right_camera")=="" || getSetting("SENSOR","left_camera")==""){
+
+        }
+    }else{
+        return false;
+    }
 }
 void Supervisor::makeRobotINI(){
     QString ini_path = getIniPath();
@@ -2240,7 +2250,8 @@ void Supervisor::moveTo(QString target, int preset){
 }
 void Supervisor::moveToServing(QString target, int preset){
     if(probot->ipc_use){
-        ipc->moveToServing(target, preset);
+        ipc->moveToLocation(getloc(target),preset);
+//        ipc->moveToServing(target, preset);
     }else{
         lcm->moveTo(target);
     }
@@ -3144,7 +3155,7 @@ void Supervisor::onTimer(){
 
 
     if(flag_excuseme){
-        if(count_excuseme++ > 5000/MAIN_THREAD){
+        if(count_excuseme++ > 15000/MAIN_THREAD){
             flag_excuseme = false;
             count_excuseme = 0;
         }

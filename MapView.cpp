@@ -51,7 +51,7 @@ void MapView::onTimer(){
             setZoomCenter();
         }
 
-        if(mode != "mapping" && mode != "annot_objecting"){
+        if(mode != "mapping"){
             if(probot->ipc_use){
                 setMapCurrent();
                 setMapMap();
@@ -183,12 +183,13 @@ void MapView::setMode(QString name){
         show_global_path = false;
         show_local_path = false;
         show_lidar = true;
-        show_object = false;
+        show_object = true;
         show_object_box = false;
         show_location = false;
-        show_location_icon = false;
+        show_location_icon = true;
         robot_following = true;
-        setFullScreen();
+        scale = 0.7;
+        setZoomCenter(0,0);
     }
     updateMap();
 }
@@ -210,7 +211,6 @@ void MapView::initObject(){
         for(int j=0; j<pmap->objects[i].points.size(); j++){
             temp.points.push_back(setAxis(pmap->objects[i].points[j]));
         }
-//        qDebug() << i << temp.type;
         objects.push_back(temp);
     }
 }
@@ -237,7 +237,6 @@ void MapView::setFullScreen(){
     }else{
         scale = max_ws;
     }
-//    qDebug() << "setFullScreen " << object_name << max_ws << max_hs;
 }
 
 void MapView::setMap(QObject *pixmapContainer){
@@ -253,23 +252,6 @@ void MapView::moveMap(){
         cv::Mat source;
         if(pmap->map_mapping.rows > 0 && pmap->map_mapping.cols > 0){
             pmap->map_mapping(cv::Rect(map_x*1000/pmap->width,map_y*1000/pmap->width,map_width*scale*1000/pmap->width,map_height*scale*1000/pmap->width)).copyTo(source);
-        }else{
-            map_map(cv::Rect(map_x,map_y,map_width*scale,map_height*scale)).copyTo(source);
-        }
-        pixmap_map.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(source));
-
-        QPixmap temp_pixmap = map_object.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
-        pixmap_object.pixmap = temp_pixmap;
-        temp_pixmap = map_location.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
-        pixmap_location.pixmap = temp_pixmap;
-        temp_pixmap = map_current.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
-        pixmap_current.pixmap = temp_pixmap;
-        update();
-    }else if(mode == "annot_objecting"){
-        //Crop Show Rect
-        cv::Mat source;
-        if(pmap->map_objecting.rows > 0 && pmap->map_objecting.cols > 0){
-            pmap->map_objecting(cv::Rect(map_x*1000/pmap->width,map_y*1000/pmap->width,map_width*scale*1000/pmap->width,map_height*scale*1000/pmap->width)).copyTo(source);
         }else{
             map_map(cv::Rect(map_x,map_y,map_width*scale,map_height*scale)).copyTo(source);
         }
@@ -304,11 +286,9 @@ void MapView::moveMap(){
 }
 void MapView::updateMap(){
     initObject();
-//    initTline();
     initDrawing();
     initLocation();
 
-//    /*setMapTline*/();
     setMapDrawing();
     setMapMap();
     setMapCurrent();
@@ -392,7 +372,7 @@ void MapView::reloadMap(){
 }
 void MapView::setMapping(){
     cv::Mat source;
-    qDebug() << "setMapping";
+//    qDebug() << map_x << map_y << scale << map_width << map_height << pmap->map_mapping.rows;
     pmap->map_mapping(cv::Rect(map_x*1000/pmap->width,map_y*1000/pmap->width,map_width*scale*1000/pmap->width,map_height*scale*1000/pmap->width)).copyTo(source);
     pixmap_map.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(source));
     Q_ASSERT(!pixmap_map.pixmap.isNull());
@@ -400,7 +380,7 @@ void MapView::setMapping(){
 }
 void MapView::setObjecting(){
     cv::Mat source;
-    qDebug() << "setObjecting";
+
     pmap->map_objecting(cv::Rect(map_x*1000/pmap->width,map_y*1000/pmap->width,map_width*scale*1000/pmap->width,map_height*scale*1000/pmap->width)).copyTo(source);
     pixmap_map.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(source));
     Q_ASSERT(!pixmap_map.pixmap.isNull());
@@ -751,7 +731,7 @@ void MapView::setMapCurrent(){
             cv::Point2f pose = setAxis(probot->curPose.point);
             float angle = setAxis(probot->curPose.angle);
             if(mode == "local_view"){
-                painter.setPen(QPen(QColor(hex_color_blue),res*scale));
+                painter.setPen(QPen(QColor(hex_color_blue),3));
                 float x1, y1;
                 int num;
                 float limit = pmap->robot_radius;
@@ -778,7 +758,7 @@ void MapView::setMapCurrent(){
                 }
             }else{
                 for(int i=0; i<360; i++){
-                    painter.setPen(QPen(QColor("red"),1.5*res*scale));
+                    painter.setPen(QPen(QColor("red"),3));
                     if(probot->lidar_data[i] > pmap->gridwidth){
                         float x = (pose.x + (probot->lidar_data[i]/pmap->gridwidth)*cos((-M_PI*i)/180 + angle))*res;
                         float y = (pose.y + (probot->lidar_data[i]/pmap->gridwidth)*sin((-M_PI*i)/180 + angle))*res;

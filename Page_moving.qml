@@ -15,7 +15,7 @@ Item {
     property bool robot_paused: false
     property bool move_fail: false
     property int password: 0
-
+    property bool show_face: false
     Component.onCompleted: {
         init();
         print(statusbar.height);
@@ -32,7 +32,9 @@ Item {
         if(supervisor.getSetting("ROBOT_SW","moving_face")==="true"){
             resting_image.visible = true;
             image_robot.visible = false;
+            show_face = true;
         }else{
+            show_face = false;
             resting_image.visible = false;
             image_robot.visible = true;
         }
@@ -92,6 +94,7 @@ Item {
     Text{
         id: target_pos
         text: pos
+        visible: !show_face
         font.pixelSize: 40
         font.family: font_noto_b.name
         anchors.right: parent.horizontalCenter
@@ -102,6 +105,7 @@ Item {
     }
     Text{
         id: text_mention
+        visible: !show_face
         text: "(으)로 이동 중입니다."
         font.pixelSize: 40
         font.family: font_noto_r.name
@@ -114,6 +118,7 @@ Item {
     Text{
         id: target_posname
         text: pos_name
+        visible: !show_face
         font.pixelSize: 40
         font.family: font_noto_b.name
         color: "#12d27c"

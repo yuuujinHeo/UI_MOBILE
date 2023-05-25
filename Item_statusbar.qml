@@ -3,6 +3,7 @@ import QtQuick.Controls 2.12
 import "."
 import io.qt.Supervisor 1.0
 import QtMultimedia 5.12
+import QtQuick.Shapes 1.12
 import QtGraphicalEffects 1.0
 
 Item {
@@ -247,16 +248,180 @@ Item {
     }
 
 
+    Popup{
+        id: popup_terminate
+        width: 1280
+        height: 800
+        background: Rectangle{
+            anchors.fill: parent
+            color: color_dark_black
+            opacity: 0.8
+        }
+        Column{
+            anchors.centerIn: parent
+            spacing: 40
+            Image{
+                source:"image/robot_head_sleep.png"
+                scale: 0.8
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+            Text{
+                id: text_quest
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.family: font_noto_b.name
+                font.pixelSize: 50
+                color: "#12d27c"
+                text: "프로그램을 종료<font color=\"white\">하시겠습니까?</font>"
+            }
+            Row{
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 50
+                Rectangle{
+                    width: 250
+                    height: 90
+                    radius: 20
+                    color: "#d0d0d0"
+                    Row{
+                        anchors.verticalCenter: parent.verticalCenter
+                        Rectangle{
+                            width: 90
+                            height: width
+                            color: "transparent"
+                            Image{
+                                source: "icon/btn_no.png"
+                                width: 50
+                                height: 50
+                                anchors.centerIn : parent
+                            }
+                        }
+                        Rectangle{
+                            width: 250 - 90
+                            height: 90
+                            color: "transparent"
+                            Text{
+                                text:"취소"
+                                font.family: font_noto_b.name
+                                font.pixelSize: 30
+                                color:"#282828"
+                                anchors.centerIn : parent
+                            }
+                        }
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_terminate.close();
+                            popup_menu.close();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 250
+                    height: 90
+                    radius: 20
+                    color: "#d0d0d0"
+                    Rectangle{
+                        color:"white"
+                        width: 240
+                        height: 80
+                        radius: 19
+                        anchors.centerIn: parent
+                    }
+                    Row{
+                        anchors.verticalCenter: parent.verticalCenter
+                        Rectangle{
+                            width: 90
+                            height: width
+                            color: "transparent"
+                            Image{
+                                source: "icon/btn_reset.png"
+                                width: 50
+                                height: 50
+                                anchors.centerIn : parent
+                            }
+                        }
+                        Rectangle{
+                            width: 250 - 90
+                            height: 90
+                            color: "transparent"
+                            Text{
+                                text:"다시시작"
+                                font.family: font_noto_b.name
+                                font.pixelSize: 30
+                                color:"#282828"
+                                anchors.centerIn : parent
+                            }
+                        }
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.writelog("[USER INPUT] STATUS BAR : PROGRAM RESTART")
+                            supervisor.programRestart();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 250
+                    height: 90
+                    radius: 20
+                    color: "#d0d0d0"
+                    Rectangle{
+                        color:"white"
+                        width: 240
+                        height: 80
+                        radius: 19
+                        anchors.centerIn: parent
+                    }
+                    Row{
+                        anchors.verticalCenter: parent.verticalCenter
+                        Rectangle{
+                            width: 90
+                            height: width
+                            color: "transparent"
+                            Image{
+                                source: "icon/btn_yes.png"
+                                width: 50
+                                height: 50
+                                anchors.centerIn : parent
+                            }
+                        }
+                        Rectangle{
+                            width: 250 - 90
+                            height: 90
+                            color: "transparent"
+                            Text{
+                                text:"종료"
+                                font.family: font_noto_b.name
+                                font.pixelSize: 30
+                                color:"#282828"
+                                anchors.centerIn : parent
+                            }
+                        }
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.writelog("[USER INPUT] STATUS BAR : PROGRAM EXIT")
+                            supervisor.programExit();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     Popup{
         id: popup_menu
-        width: 300
+        width: 240
         height: 100
         bottomPadding: 0
         topPadding: 0
         leftPadding: 0
         rightPadding: 0
-        y: parent.height - 10
+        x: textName.x + textName.width/2 - width/2
+        y: parent.height
         z: -1
         background: Rectangle{
             anchors.fill: parent
@@ -264,10 +429,16 @@ Item {
         }
 
         Rectangle{
+            id: rree
             width: parent.width
             height: parent.height
-            radius: 10
+            radius: 30
             color: "white"
+
+            Rectangle{
+                width: parent.width
+                height: rree.radius
+            }
             Row{
                 anchors.centerIn: parent
                 spacing: 15
@@ -320,43 +491,34 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            supervisor.writelog("[USER INPUT] STATUS BAR : PROGRAM EXIT")
-                            supervisor.programExit();
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 78
-                    height: 78
-                    color: color_navy
-                    radius: width
-                    Column{
-                        anchors.centerIn: parent
-                        Image{
-                            source:"icon/icon_run.png"
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            ColorOverlay{
-                                source: parent
-                                anchors.fill: parent
-                                color: "white"
-                            }
-                        }
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            supervisor.writelog("[USER INPUT] STATUS BAR : PROGRAM RESTART")
-                            supervisor.programRestart();
+                            popup_terminate.open();
                         }
                     }
                 }
             }
         }
+
+        DropShadow{
+            anchors.fill: parent
+            radius: 10
+            color: color_gray
+            source: rree
+        }
+        Rectangle{
+            width: parent.width+20
+            x: -10
+            y: -10
+            height: 10
+        }
     }
 
     SequentialAnimation{
         id: ani_popup_show
+        onStarted: {
+            col_details.opacity = 0;
+        }
         NumberAnimation{target: popup_status_detail; property: "height"; from: 0; to: model_details.count * 40; duration: 300; easing.type: Easing.OutBack}
+        NumberAnimation{target: col_details; property: "opacity"; from: 0; to: 1; duration: 100; easing.type: Easing.OutBack}
     }
 
     ListModel{
@@ -403,6 +565,14 @@ Item {
         height: 0
         x: parent.width - width
         y: parent.height
+        bottomPadding: 0
+        topPadding: 0
+        leftPadding: 0
+        rightPadding: 0
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
 
         onOpened: {
             if(model_details.count == 0){
@@ -413,33 +583,53 @@ Item {
         }
 
         Rectangle{
+            id: rre
+            width: parent.width
+            height: parent.height
+            radius: 30
             color: "white"
-            anchors.fill: parent
-        }
-
-        Column{
-            id: col_details
-            anchors.centerIn: parent
-            spacing: 10
-            Repeater{
-                model: model_details
-                Row{
-                    spacing: 10
-                    Image{
-                        source: icon
-                        width: 25
-                        height: 25
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                    Text{
-                        text: detail
-                        anchors.verticalCenter: parent.verticalCenter
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        color: error===true?"red":"green"
+            Rectangle{
+                width: parent.width
+                height: rre.radius
+            }
+            Column{
+                id: col_details
+                anchors.centerIn: parent
+                spacing: 10
+                Repeater{
+                    model: model_details
+                    Row{
+                        spacing: 10
+                        Image{
+                            source: icon
+                            width: 25
+                            height: 25
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        Text{
+                            text: detail
+                            anchors.verticalCenter: parent.verticalCenter
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            color: error===true?"red":"green"
+                        }
                     }
                 }
             }
+
+        }
+
+        DropShadow{
+            anchors.fill: parent
+            radius: 10
+            color: color_gray
+            source: rre
+        }
+        Rectangle{
+            width: parent.width+20
+            x: -10
+            y: -10
+            height: 10
         }
     }
 

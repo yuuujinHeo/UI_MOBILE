@@ -81,6 +81,8 @@ public:
 
 
 
+    Q_INVOKABLE bool checkINI();
+    Q_INVOKABLE bool issetCamera();
     void checkShellFiles();
     void makeKillShell();
     void makeKillSlam();

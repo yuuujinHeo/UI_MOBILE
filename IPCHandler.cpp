@@ -422,7 +422,7 @@ void IPCHandler::moveToServing(QString target_loc, int preset){
 }
 
 void IPCHandler::moveToLocation(LOCATION target_loc, int preset){
-    if(target_loc.name != "" && target_loc.group != 0 && target_loc.number != 0){
+    if(target_loc.name != "" && target_loc.number != 0){
         plog->write("[IPC] MOVE TO COMMAND : "+target_loc.name);
         moveTo(target_loc.point.x, target_loc.point.y, target_loc.angle, preset);
     }else{
@@ -434,6 +434,7 @@ void IPCHandler::moveToResting(int preset){
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == "Resting"){
             plog->write("[IPC] MOVE TO COMMAND : "+pmap->locations[i].name);
+            probot->curLocation = pmap->locations[i];
             moveTo(pmap->locations[i].point.x, pmap->locations[i].point.y, pmap->locations[i].angle, preset);
             return;
         }
@@ -444,6 +445,7 @@ void IPCHandler::moveToCharging(int preset){
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == "Charging"){
             plog->write("[IPC] MOVE TO COMMAND : "+pmap->locations[i].name);
+            probot->curLocation = pmap->locations[i];
             moveTo(pmap->locations[i].point.x, pmap->locations[i].point.y, pmap->locations[i].angle, preset);
             return;
         }
