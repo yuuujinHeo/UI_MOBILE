@@ -68,6 +68,18 @@ Item {
         color: "#282828"
     }
     AnimatedImage{
+        id: face_cry
+        visible: false
+        source: "image/face_cry.gif"
+        anchors.fill: parent
+    }
+    AnimatedImage{
+        id: face_surprise
+        visible: false
+        source: "image/face_surprise.gif"
+        anchors.fill: parent
+    }
+    AnimatedImage{
         id: resting_image
         visible: false
         source: "image/temp.gif"
@@ -312,6 +324,17 @@ Item {
                 robot_paused = false;
                 supervisor.writelog("[QML] CHECK MOVING STATE : "+Number(supervisor.getStateMoving()));
                 timer_check_pause.stop();
+            }
+        }
+    }
+    Timer{
+        id: update_timer
+        interval: 500
+        running: true
+        repeat: true
+        onTriggered: {
+            if(show_face){
+
             }
         }
     }

@@ -277,7 +277,6 @@ Item {
     Rectangle{
         id: rect_table_box
         visible: (robot_type=="SERVING" && use_tray)?true:false
-//        visible: robot_type=="SERVING"?true:false
         width: {
             if(col_num > 2){
                300 - 20 + 160
@@ -365,7 +364,6 @@ Item {
                                 }
                             }
                         }
-
                     }
                 }
             }

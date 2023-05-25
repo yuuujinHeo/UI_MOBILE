@@ -187,5 +187,9 @@
         <file>icon/icon-drawing-square.png</file>
         <file>icon/icon-wall.png</file>
         <file>Tool_KeyPad.qml</file>
+        <file>image/face_cry.gif</file>
+        <file>image/face_surprise.GIF</file>
+        <file>image/loading_rb.gif</file>
+        <file>image/robot_manual.gif</file>
     </qresource>
 </RCC>

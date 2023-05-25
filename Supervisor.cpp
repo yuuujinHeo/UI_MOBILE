@@ -813,8 +813,9 @@ bool Supervisor::checkINI(){
     QString file = getIniPath();
     if(QFile::exists(file)){
         if(getSetting("SENSOR","right_camera")=="" || getSetting("SENSOR","left_camera")==""){
-
+            return false;
         }
+        return true;
     }else{
         return false;
     }

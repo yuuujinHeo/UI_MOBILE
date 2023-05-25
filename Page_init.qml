@@ -5,6 +5,7 @@ import io.qt.Supervisor 1.0
 import io.qt.MapView 1.0
 import QtGraphicalEffects 1.0
 import io.qt.Supervisor 1.0
+import io.qt.CameraView 1.0
 
 
 Item {
@@ -23,6 +24,10 @@ Item {
 //            loader_init.item.startreturn();
 //        }
 //    }
+
+    Tool_Keyboard{
+        id: keyboard
+    }
 
     property bool show_debug: false
 
@@ -114,143 +119,682 @@ Item {
         Item{
             objectName: "init_init"
             anchors.fill: parent
-            Component.onCompleted: {
-                statusbar.visible = true;
-            }
             Rectangle{
                 anchors.fill: parent
                 color: "#f4f4f4"
             }
             Component.onCompleted: {
+                statusbar.visible = true;
                 supervisor.makeRobotINI();
             }
-            Column{
-                anchors.top: parent.top
-                anchors.topMargin: 200
-                anchors.horizontalCenter: parent.horizontalCenter
-                spacing:80
-                Image{
-                    id: image_logo
-                    sourceSize.width: 2245/6
-                    sourceSize.height: 1004/6
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    source: Qt.resolvedUrl("qrc:/image/rainbow3.png")
+            SwipeView{
+                id: swipeview_wizard
+                anchors.fill: parent
+                currentIndex: 0
+                interactive: false
+
+                clip: true
+                Item{
+
+                    Column{
+                        anchors.top: parent.top
+                        anchors.topMargin: 200
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        spacing:80
+                        Row{
+                            spacing: 60
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            Image{
+                                width: 150
+                                height: 220
+                                source: "image/robot_callme.png"
+                            }
+                            Column{
+                                anchors.bottom: parent.bottom
+                                anchors.bottomMargin: 30
+                                Text{
+                                    text: "로봇이 처음 시작된 것 같습니다.";
+                                    color: color_dark_black
+                                    font.pixelSize: 40
+                                    font.family: font_noto_b.name
+                                }
+                                Text{
+                                    text: "<font color=\"#12d27c\">첫 실행 마법사</font>를 시작할까요?";
+                                    color: color_dark_black
+                                    font.pixelSize: 50
+                                    font.family: font_noto_b.name
+                                }
+                            }
+                        }
+                        Row{
+                            spacing: 50
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            Rectangle{
+                                id: btn_usb_load
+                                width: 230
+                                height: 100
+                                radius: 60
+                                border.width: 3
+                                border.color: enabled?color_green:color_gray
+                                enabled: supervisor.getusbsize()>0?true:false
+                                color: "transparent"
+                                Text{
+                                    text: "USB에서 가져오기"
+                                    font.pixelSize: 23
+                                    font.family: font_noto_r.name
+                                    color:btn_usb_load.enabled?color_dark_black:color_gray
+                                    anchors.centerIn: parent
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        supervisor.writelog("[USER INPUT] INIT PAGE : LOAD MAP FROM USB")
+                                        popup_usb_download.open();
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                id: btn_yes
+                                width: 230
+                                height: 100
+                                radius: 60
+                                color: color_green
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "시작"
+                                    font.pixelSize: 35
+                                    font.family: font_noto_r.name
+                                    color: "white"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        supervisor.writelog("[USER INPUT] INIT PAGE : NEXT")
+                                        swipeview_wizard.currentIndex++;
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                id: btn_lcm_pass
+                                width: 188
+                                height: 100
+                                radius: 60
+                                color: "transparent"
+                                border.width: 3
+                                border.color: "#e5e5e5"
+                                visible: show_debug
+                                Column{
+                                    spacing: 5
+                                    anchors.centerIn: parent
+                                    Image{
+                                        id: image_charge1
+                                        width: 30
+                                        height: 30
+                                        source:"icon/icon_remove.png"
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+                                    Text{
+                                        id: text_slam_pass
+                                        text: "넘어가기 (DEBUG)"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        supervisor.writelog("[USER INPUT] INIT PAGE : PASS CONNECTION")
+                                        loadPage(pkitchen);
+                                        update_timer.stop();
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                 }
-                Text{
-                    id: text_notice
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    text: "맵 파일을 찾을 수 없습니다.";
-                    color: "#7e7e7e"
-                    font.family: font_noto_r.name
+                Item{
+                    Column{
+                        anchors.centerIn: parent
+                        spacing:80
+                        Text{
+                            text: "이 로봇은 어떤 목적으로 사용됩니까?";
+                            color: color_dark_black
+                            font.pixelSize: 50
+                            font.family: font_noto_b.name
+                        }
+                        Row{
+                            spacing: 80
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            Rectangle{
+                                width: 230
+                                height: 110
+                                radius: 60
+                                color: "transparent"
+                                border.width: 3
+                                border.color : color_green
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "서빙용"
+                                    font.pixelSize: 35
+                                    font.family: font_noto_r.name
+                                    color: color_dark_black
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        supervisor.writelog("[USER INPUT] INIT PAGE : SET ROBOT TYPE TO Serving")
+                                        supervisor.setSetting("ROBOT_HW/type","SERVING");
+                                        swipeview_wizard.currentIndex++;
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 230
+                                height: 110
+                                radius: 60
+                                color: "transparent"
+                                border.width: 3
+                                border.color : color_green
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "호출용"
+                                    font.pixelSize: 35
+                                    font.family: font_noto_r.name
+                                    color: color_dark_black
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        supervisor.writelog("[USER INPUT] INIT PAGE : SET ROBOT TYPE TO CALLING")
+                                        supervisor.setSetting("ROBOT_HW/type","CALLING");
+                                        swipeview_wizard.currentIndex++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                 }
 
-                Row{
-                    spacing: 50
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Rectangle{
-                        id: btn_slam_start
-                        width: 188
-                        height: 100
-                        radius: 60
-                        border.width: 3
-                        border.color: "#e5e5e5"
-                        enabled: supervisor.getLCMConnection()
-                        color: enabled?"transparent":"#e5e5e5"
-                        Column{
-                            anchors.centerIn: parent
-                            spacing: 5
-                            Image{
-                                source: "icon/icon_add.png"
-                                width: 30
-                                height: 30
-                                anchors.horizontalCenter: parent.horizontalCenter
+                Item{
+                    Column{
+                        anchors.centerIn: parent
+                        spacing:80
+                        Grid{
+                            columns:3
+                            rows:3
+                            horizontalItemAlignment: Grid.AlignHCenter
+                            verticalItemAlignment: Grid.AlignVCenter
+                            spacing: 40
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            Text{
+                                text: "로봇의 이름"
+                                color: color_dark_black
+                                font.pixelSize: 30
+                                font.family: font_noto_b.name
+                            }
+                            Rectangle{
+                                width: 2
+                                height: 80
+                                radius: 2
+                                color: color_dark_black
+                            }
+                            TextField{
+                                id: textfield_name
+                                width: 400
+                                height: 80
+                                font.family: font_noto_r.name
+                                font.pixelSize: 25
+                                horizontalAlignment: TextField.AlignHCenter
+                                text: supervisor.getSetting("ROBOT_HW","model")
+                                background: Rectangle{
+                                    radius: 10
+                                    border.width: 2
+                                    border.color: color_dark_black
+                                }
+
+                                onFocusChanged: {
+                                    keyboard.owner = textfield_name;
+                                    textfield_name.selectAll();
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        textfield_name.select(0,0)
+                                        keyboard.close();
+                                    }
+                                }
                             }
                             Text{
-                                text: "맵 새로만들기"
-                                font.pixelSize: 15
-                                font.family: font_noto_r.name
-                                color:enabled?"black":"white"
+                                text: "로봇의 번호"
+                                color: color_dark_black
+                                font.pixelSize: 30
+                                font.family: font_noto_b.name
+                            }
+                            Rectangle{
+                                width: 2
+                                height: 80
+                                radius: 2
+                                color: color_dark_black
+                            }
+                            ComboBox{
+                                width: 400
+                                height: 80
+                                id: combobox_serialnum
+
+                                background: Rectangle{
+                                    radius: 10
+                                    border.width: 2
+                                    border.color: color_dark_black
+                                }
+                                contentItem: Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 25
+                                    text:combobox_serialnum.displayText
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                delegate: ItemDelegate{
+                                    contentItem: Rectangle{
+                                        width: parent.implicitWidth
+                                        height: 60
+                                        Text{
+                                            anchors.centerIn: parent
+                                            font.family: font_noto_r.name
+                                            font.pixelSize: 20
+                                            text:modelData
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                    }
+                                }
+
+                                currentIndex: parseInt(supervisor.getSetting("ROBOT_HW","serial_num"))-1
+                                model:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
                             }
                         }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                supervisor.writelog("[USER INPUT] INIT PAGE : MAKE NEW MAP")
-                                loadPage(pmap);
-                                loader_page.item.map_mode = 1;
-                            }
-                        }
+
                     }
+
                     Rectangle{
-                        id: btn_usb_load
-                        width: 188
-                        height: 100
-                        radius: 60
-                        border.width: 3
-                        border.color: "#e5e5e5"
-                        enabled: supervisor.getusbsize()>0?true:false
-                        color: enabled?"transparent":"#e5e5e5"
-                        Column{
-                            anchors.centerIn: parent
-                            spacing: 5
-                            Image{
-                                scale: 0.8
-                                source: "icon/icon_open.png"
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                            Text{
-                                text: "USB에서\n가져오기"
-                                font.pixelSize: 15
-                                horizontalAlignment: Text.AlignHCenter
-                                font.family: font_noto_r.name
-                                color:enabled?"black":"white"
-                            }
-                        }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                supervisor.writelog("[USER INPUT] INIT PAGE : LOAD MAP FROM USB")
-                                popup_usb_download.open();
-                            }
-                        }
-                    }
-                    Rectangle{
-                        id: btn_lcm_pass
-                        width: 188
+                        width: 230
                         height: 100
                         radius: 60
                         color: "transparent"
-                        border.width: 3
-                        border.color: "#e5e5e5"
-                        visible: show_debug
-                        Column{
-                            spacing: 5
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 50
+                        anchors.left: parent.left
+                        anchors.leftMargin: 50
+                        border.width: 2
+                        border.color: color_green
+                        Text{
                             anchors.centerIn: parent
-                            Image{
-                                id: image_charge1
-                                width: 30
-                                height: 30
-                                source:"icon/icon_remove.png"
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                            Text{
-                                id: text_slam_pass
-                                text: "넘어가기 (DEBUG)"
-                                font.family: font_noto_r.name
-                                font.pixelSize: 15
-                            }
+                            text: "이전"
+                            font.pixelSize: 35
+                            font.family: font_noto_r.name
+                            color: color_dark_black
                         }
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                supervisor.writelog("[USER INPUT] INIT PAGE : PASS CONNECTION")
-                                loadPage(pkitchen);
-                                update_timer.stop();
+                                supervisor.writelog("[USER INPUT] INIT PAGE : PREV")
+                                swipeview_wizard.currentIndex--;
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 230
+                        height: 100
+                        radius: 60
+                        color: color_green
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 50
+                        anchors.right: parent.right
+                        anchors.rightMargin: 50
+                        Text{
+                            anchors.centerIn: parent
+                            text: "다음"
+                            font.pixelSize: 35
+                            font.family: font_noto_r.name
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                supervisor.writelog("[USER INPUT] INIT PAGE : NEXT")
+                                swipeview_wizard.currentIndex++;
                             }
                         }
                     }
                 }
+
+                Item{
+                    id: popup_camera
+                    function update(){
+                        //카메라 대수에 따라 UI 업데이트
+                        if(supervisor.getCameraNum() === 2){
+                            print(supervisor.getCameraNum(),supervisor.getCameraSerial(left_id));
+                            is_load = true;
+                            if(is_switched){
+                                cameraview_1.setCamera(left_id);
+                                cameraview_2.setCamera(right_id);
+                                text_camera_1.text = supervisor.getCameraSerial(left_id);
+                                text_camera_2.text = supervisor.getCameraSerial(right_id);
+                            }else{
+                                if(supervisor.getLeftCamera()===supervisor.getCameraSerial(0)){
+                                    left_id = 0;
+                                    right_id = 1;
+                                }else if(supervisor.getLeftCamera() === supervisor.getCameraSerial(1)){
+                                    left_id = 1;
+                                    right_id = 0;
+                                }else{
+                                    if(supervisor.getRightCamera()===supervisor.getCameraSerial(0)){
+                                        left_id = 1;
+                                        right_id = 0;
+                                    }else if(supervisor.getRightCamera() === supervisor.getCameraSerial(1)){
+                                        left_id = 0;
+                                        right_id = 1;
+                                    }else{
+                                        left_id = 0;
+                                        right_id = 1;
+                                    }
+                                }
+                                cameraview_1.setCamera(left_id);
+                                cameraview_2.setCamera(right_id);
+                                text_camera_1.text = supervisor.getCameraSerial(left_id);
+                                text_camera_2.text = supervisor.getCameraSerial(right_id);
+                            }
+                        }else{
+                            is_load = false;
+                            text_camera_1.text = "";
+                            text_camera_2.text = "";
+                            rect_no_camera.visible = true;
+                        }
+                    }
+                    Component.onCompleted: {
+                        timer_load.start();
+                    }
+                    Component.onDestruction: {
+                        timer_load.stop();
+                    }
+
+                    property bool is_load: false
+                    property bool is_switched: false
+                    property var left_id: 0
+                    property var right_id: 1
+                    Timer{
+                        id: timer_load
+                        interval: 500
+                        repeat: true
+                        running: false
+                        onTriggered:{
+                            //카메라 정보 요청
+                            supervisor.requestCamera();
+                            popup_camera.update();
+                        }
+                    }
+                    Column{
+                        spacing: 10
+                        anchors.top: parent.top
+                        anchors.topMargin: 50 + statusbar.height
+                        Text{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: color_dark_black
+                            font.family: font_noto_r.name
+                            font.pixelSize: 40
+                            text: "카메라의 왼/오른쪽(로봇 기준)이 일치하도록 위치를 지정해주세요."
+                        }
+                        Rectangle{
+                            width: 1280
+                            height: 450
+                            color: color_dark_navy
+                            Row{
+                                anchors.centerIn: parent
+                                spacing: 20
+                                Column{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 30
+                                    Text{
+                                        id: text_left
+                                        text: "왼쪽"
+                                        color: "white"
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        font.family: font_noto_b.name
+                                        font.pixelSize: 30
+//                                        color: color_dark_black
+                                    }
+                                    CameraView{
+                                        id: cameraview_1
+                                        width: 250
+                                        height: 250
+                                    }
+                                    Rectangle{
+                                        width: 350
+                                        height: 50
+                                        color: "white"
+        //                                radius: 5
+                                        Row{
+                                            spacing: 10
+                                            anchors.centerIn: parent
+                                            Text{
+                                                text: "Serial : "
+                                                font.family: font_noto_r.name
+
+                                            }
+                                            Text{
+                                                id: text_camera_1
+                                                text: {
+                                                    if(supervisor.getCameraNum() > 0){
+                                                        supervisor.getCameraSerial(0);
+                                                    }else{
+                                                        ""
+                                                    }
+                                                }
+                                                font.family: font_noto_r.name
+                                            }
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width: 150
+                                    height: 100
+                                    radius: 10
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    color:"transparent"
+                                    Row{
+                                        spacing: 20
+                                        anchors.centerIn: parent
+                                        Image{
+                                            source: "icon/joy_left.png"
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            ColorOverlay{
+                                                anchors.fill: parent
+                                                source: parent
+                                                color: "white"
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: "위치\n바꾸기"
+                                            color: "white"
+                                            horizontalAlignment: Text.AlignHCenter
+                                            font.family: font_noto_r.name
+                                            font.pixelSize: 25
+                                        }
+                                        Image{
+                                            source: "icon/joy_right.png"
+                                            anchors.verticalCenter: parent.verticalCenter
+//                                            ColorOverlay{
+//                                                anchors.fill: parent
+//                                                source: parent
+//                                                color: "white"
+//                                            }
+                                        }
+                                    }
+
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA Position Switch")
+                                            popup_camera.is_switched = true;
+                                            var temp_id = popup_camera.left_id;
+                                            popup_camera.left_id = popup_camera.right_id;
+                                            popup_camera.right_id = temp_id;
+                                        }
+                                    }
+                                }
+                                Column{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 20
+                                    Text{
+                                        id: text_right
+                                        text: "오른쪽"
+                                        color: "white"
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        font.family: font_noto_b.name
+                                        font.pixelSize: 30
+//                                        color: color_dark_black
+                                    }
+                                    CameraView{
+                                        id: cameraview_2
+                                        width: 250
+                                        height: 250
+                                    }
+                                    Rectangle{
+                                        width: 350
+                                        height: 50
+                                        color: "white"
+                                        Row{
+                                            spacing: 10
+                                            anchors.centerIn: parent
+                                            Text{
+                                                text: "Serial : "
+                                                font.family: font_noto_r.name
+                                            }
+                                            Text{
+                                                id: text_camera_2
+                                                text: {
+                                                    if(supervisor.getCameraNum() > 0){
+                                                        supervisor.getCameraSerial(1);
+                                                    }else{
+                                                        ""
+                                                    }
+                                                }
+                                                font.family: font_noto_r.name
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+                    Rectangle{
+                        id: rect_no_camera
+                        visible: false
+                        anchors.centerIn: parent
+                        width: 1280
+                        height: 300
+                        color: color_red
+                        Text{
+                            anchors.top: parent.top
+                            anchors.topMargin: 30
+                            font.pixelSize: 30
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            font.family: font_noto_b.name
+                            text: "카메라를 찾을 수 없습니다.\n건너뛰기를 누르시면 로봇이 제대로 동작하지 않을 수도 있습니다."
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        Row{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: 30
+                            spacing: 30
+                            Rectangle{
+                                width: 150
+                                height: 80
+                                radius: 20
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 20
+                                    text: "건너뛰기"
+
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        supervisor.writelog("[USER INPUT] INIT PAGE : PASS SETTING CAMERA");
+                                        swipeview_wizard.currentIndex++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle{
+                        width: 230
+                        height: 100
+                        radius: 60
+                        color: "transparent"
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 50
+                        anchors.left: parent.left
+                        anchors.leftMargin: 50
+                        border.width: 2
+                        border.color: color_green
+                        Text{
+                            anchors.centerIn: parent
+                            text: "이전"
+                            font.pixelSize: 35
+                            font.family: font_noto_r.name
+                            color: color_dark_black
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                supervisor.writelog("[USER INPUT] INIT PAGE : PREV")
+                                swipeview_wizard.currentIndex--;
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 230
+                        height: 100
+                        radius: 60
+                        color: color_green
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 50
+                        anchors.right: parent.right
+                        anchors.rightMargin: 50
+                        Text{
+                            anchors.centerIn: parent
+                            text: "다음"
+                            font.pixelSize: 35
+                            font.family: font_noto_r.name
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                if(!rect_no_camera.visible){
+
+                                    supervisor.writelog("[USER INPUT] INIT PAGE : NEXT")
+                                    if(popup_camera.is_switched){
+                                        is_reset_slam = true;
+                                        supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA SWITCH LEFT("+text_camera_1.text+") RIGHT("+text_camera_2.text+")");
+                                        supervisor.setCamera(text_camera_1.text,text_camera_2.text);
+                                    }
+                                    swipeview_wizard.currentIndex++;
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
             MouseArea{
                 id: area_debug
@@ -1374,12 +1918,12 @@ Item {
         onTriggered: {
             //체크 : robot.ini 존재여부
             if(init_mode == 0){
-                if(supervisor.isExistRobotINI()){
+                if(supervisor.checkINI()){
                     init_mode = 1;
                 }else{
                     if(loader_init.item.objectName != "init_init"){
                         loader_init.sourceComponent = item_init
-                        supervisor.writelog("[QML - ERROR] robot_config.ini not found.");
+                        supervisor.writelog("[QML - ERROR] robot_config not set.");
                     }
                 }
             //체크 : 맵 파일 존재여부 및 설정
