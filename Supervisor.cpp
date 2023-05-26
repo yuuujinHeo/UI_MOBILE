@@ -1825,6 +1825,7 @@ int Supervisor::getLocationNumber(int group, int num){
 //                        qDebug() << num << i << " get number is " << pmap->locations[i].number;
                         return pmap->locations[i].number;
                     }
+                    count++;
                 }else if(pmap->locations[i].group == group){
                     if(count == num){
 //                        qDebug() << num << i << " get number is " << pmap->locations[i].number;
@@ -1835,7 +1836,6 @@ int Supervisor::getLocationNumber(int group, int num){
             }
         }
     }
-//    qDebug() << num << " get number failed" << group;
     return -1;
 }
 void Supervisor::setLocation(int num, QString name, int group, int tablenum){
