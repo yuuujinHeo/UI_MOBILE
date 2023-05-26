@@ -2601,10 +2601,10 @@ Item {
             for(var i=0; i<supervisor.getLocationNum("Serving"); i++){
                 locations.append({"name": supervisor.getLocationName(i,"Serving"),
                                "group":supervisor.getLocationGroupNum(i),
-                               "number": supervisor.getLocationNumber(supervisor.getLocationGroupNum(i),i),
+                               "number": supervisor.getLocationNumber(-1,i),
                                 "number_table" : supervisor.getLocationGroupSize(supervisor.getLocationGroupNum(i)),
                                "error":false});
-                print("locations append : ",i,supervisor.getLocationGroupNum(i),supervisor.getLocationGroupNum(i),supervisor.getLocationNumber(supervisor.getLocationGroupNum(i),i))
+                print("locations append : ",i,supervisor.getLocationGroupNum(i),supervisor.getLocationGroupNum(i),supervisor.getLocationNumber(-1,i))
             }
             update();
         }
@@ -6916,7 +6916,7 @@ Item {
                                     }else{
                                         map.savelocation("location",select_location_type,cur_group, tfield_location.text)
                                     }
-                                    supervisor.writelog("[QML] MAP PAGE : SAVE LOCATION -> ",select_location_type,cur_group, tfield_location.text);
+                                    supervisor.writelog("[QML] MAP PAGE : SAVE LOCATION -> "+select_location_type + ", "+cur_group+", "+tfield_location.text);
                                     map.setTool("move");
                                     map.init();
                                     popup_add_location.close();
