@@ -51,6 +51,8 @@ Item {
     property int select_tline_category: -1
     property int select_patrol_num: -1
 
+    property var cur_group: 0
+
     Tool_Keyboard{
         id: keyboard
     }
