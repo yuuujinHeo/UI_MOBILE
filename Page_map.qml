@@ -183,6 +183,9 @@ Item {
             map_cur.visible = false;
         }
     }
+    function init(){
+
+    }
 
     function modeinit(){
         init_map();
@@ -1650,7 +1653,7 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 7
+                    count: 8
                     currentIndex: 0
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
@@ -1985,7 +1988,7 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 7
+                    count: 8
                     currentIndex: 1
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
@@ -2376,7 +2379,7 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 7
+                    count: 8
                     currentIndex: 2
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
@@ -2584,6 +2587,10 @@ Item {
         onOpened:{
             readSetting();
         }
+        function init(){
+            readSetting();
+        }
+
         function readSetting(){
             print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!");
             groups.clear();
@@ -2962,6 +2969,511 @@ Item {
 
         }
 
+    }
+
+    Component{
+        id: menu_annot_velmap
+        Item{
+            objectName: "menu_velmap"
+            width: rect_menus.width
+            height: rect_menus.height
+
+            Component.onCompleted: {
+                map.loadmap(supervisor.getMapname(),"mapvel");
+            }
+            Component.onDestruction: {
+
+            }
+
+            Rectangle{
+                anchors.fill: parent
+                color: "#f4f4f4"
+            }
+            Rectangle{
+                id: rect_annot_state
+                width: parent.width
+                height: 50
+                anchors.top: parent.top
+                anchors.topMargin: 2
+                color: "#4F5666"
+                Text{
+                    anchors.centerIn: parent
+                    color: "white"
+                    font.family: font_noto_b.name
+                    font.pixelSize: 20
+                    text: "속도구간 설정"
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+            Row{
+                id: row_redo
+                spacing: 30
+                anchors.top: rect_annot_state.bottom
+                anchors.topMargin: 30
+                anchors.right: parent.right
+                anchors.rightMargin: 30
+                Rectangle{
+                    id: btn_undo
+                    width: 40
+                    height: 40
+                    radius: 40
+                    color: enabled?"#282828":"#D0D0D0"
+                    Image{
+                        anchors.centerIn: parent
+                        source: "icon/icon_undo.png"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> UNDO")
+                            map.drawing_undo();
+                        }
+                    }
+                }
+                Rectangle{
+                    id: btn_redo
+                    width: 40
+                    height: 40
+                    radius: 40
+                    color: enabled?"#282828":"#D0D0D0"
+                    Image{
+                        anchors.centerIn: parent
+                        source: "icon/icon_redo.png"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> REDO")
+                            map.drawing_redo();
+                        }
+                    }
+                }
+            }
+            Timer{
+                running: true
+                repeat: true
+                interval: 500
+                triggeredOnStart: true
+                onTriggered: {
+                    map.checkEdit();
+                    if(map.is_drawing_undo)
+                        btn_undo.enabled = true;
+                    else
+                        btn_undo.enabled = false;
+
+                    if(map.is_drawing_redo)
+                        btn_redo.enabled = true;
+                    else
+                        btn_redo.enabled = false;
+
+                }
+            }
+
+            Rectangle{
+                id: rect_annot_box
+                width: parent.width - 60
+                height: 100
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: row_redo.bottom
+                anchors.topMargin: 15
+                color: "#e8e8e8"
+                Row{
+                    anchors.centerIn: parent
+                    spacing: 20
+                    Item_button{
+                        id: btn_move
+                        width: 80
+                        shadow_color: color_gray
+                        highlight: map.tool=="move"
+                        icon: "icon/icon_move.png"
+                        name: "이동"
+                        MouseArea{
+                            anchors.fill: parent
+                            onPressed: {
+                                parent.pressed();
+                            }
+                            onReleased:{
+                                parent.released();
+                            }
+
+                            onClicked: {
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> MOVE")
+                                map.setTool("move");
+                                map.clear("spline");
+                            }
+                        }
+                    }
+                    Item_button{
+                        id: btn_draw
+                        width: 80
+                        shadow_color: color_gray
+                        highlight: map.tool=="draw"
+                        icon: "icon/icon_draw.png"
+                        name: "수정"
+                        MouseArea{
+                            anchors.fill: parent
+                            onPressed: {
+                                parent.pressed();
+                            }
+                            onReleased:{
+                                parent.released();
+                            }
+                            onClicked: {
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> BRUSH")
+                                map.setTool("draw");
+                                map.setDrawingColor(255);
+                                map.setDrawingWidth(slider_brush.value);
+                            }
+                        }
+                    }
+                    Item_button{
+                        id: btn_erase
+                        width: 80
+                        shadow_color: color_gray
+                        highlight: map.tool=="erase"
+                        icon: "icon/icon_erase.png"
+                        name: "초기화"
+                        MouseArea{
+                            anchors.fill: parent
+                            onPressed: {
+                                parent.pressed();
+                            }
+                            onReleased:{
+                                parent.released();
+                            }
+                            onClicked: {
+                                map.clearall();
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> ERASE")
+                                map.setDrawingWidth(slider_erase.value);
+                                map.setTool("erase");
+                            }
+                        }
+                    }
+                }
+            }
+            Rectangle{
+                id: rect_annot_boxs
+                width: parent.width - 60
+                height: 150
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: rect_annot_box.bottom
+//                anchors.topMargin: 50
+                color: "#e8e8e8"
+                Column{
+                    anchors.centerIn: parent
+                    spacing: 2
+                    Rectangle{
+                        id: rect_annot_tline_1
+                        width: rect_annot_boxs.width
+                        height: 50
+                        visible: map.tool === "draw" || map.tool === "straight"
+                        color: "white"
+                        Row{
+                            anchors.centerIn: parent
+                            spacing: 20
+                            Rectangle{
+                                width: 80
+                                height: 40
+                                radius: 5
+                                border.width: 1
+                                color: map.tool === "draw"? color_green: color_light_gray
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    text: "자유"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        map.clear("spline");
+                                        map.setTool("draw");
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 80
+                                height: 40
+                                radius: 5
+                                border.width: 1
+                                color: map.tool === "straight"? color_green: color_light_gray
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    text: "직선"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        map.clear("spline");
+                                        map.setTool("straight");
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 80
+                                height: 40
+                                radius: 5
+                                border.width: 1
+                                color: map.tool === "dot_spline"? color_green: color_light_gray
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    text: "곡선"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        map.clear("spline");
+                                        map.setTool("dot_spline");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: rect_annot_tline_2
+                        width: rect_annot_boxs.width
+                        height: 50
+                        visible: map.tool === "dot_spline"
+                        color: "white"
+                        Row{
+                            anchors.centerIn: parent
+                            spacing: 20
+                            Rectangle{
+                                width: 80
+                                height: 40
+                                radius: 5
+                                border.width: 1
+                                color: color_light_gray
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    text: "취소"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        map.clear("spline");
+                                        map.setTool("draw");
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 80
+                                height: 40
+                                radius: 5
+                                border.width: 1
+                                color: color_light_gray
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    text: "저장"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        map.save("spline");
+                                        map.setTool("draw");
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle{
+                        id: rect_annot_box3
+                        width: rect_annot_boxs.width
+                        height: 50
+                        color: "white"
+                        Text{
+                            text: "브러시 사이즈"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 30
+                        }
+                        Slider {
+                            id: slider_brush
+                            x: 300
+                            y: 330
+                            value: 1
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: parent.right
+                            anchors.rightMargin: 30
+                            width: 170
+                            height: 18
+                            from: 1
+                            to : 5
+                            onValueChanged: {
+                                map.setDrawingWidth(value)
+                                if(map.tool !== "draw" && map.tool !== "straight"){
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> BRUSH")
+                                    map.setTool("draw");
+                                    map.setDrawingColor(255);
+                                }
+                            }
+                            onPressedChanged: {
+                                if(slider_brush.pressed){
+                                    map.show_brush = true;
+//                                    map.brushchanged();
+                                }else{
+                                    map.show_brush = false;
+//                                    map.brushdisappear();
+                                }
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: rect_annot_boxs.width
+                        height: 50
+                        color: "white"
+                        Text{
+                            text: "지우개 사이즈"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 15
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 30
+                        }
+                        Slider {
+                            id: slider_erase
+                            x: 300
+                            y: 330
+                            value: 10
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: parent.right
+                            anchors.rightMargin: 30
+                            width: 170
+                            height: 18
+                            from: 10
+                            to : 100
+                            onValueChanged: {
+                                map.setDrawingWidth(value);
+                                if(map.tool !== "erase"){
+                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> ERASE")
+                                    map.setTool("erase");
+                                    map.clear("spline");
+                                }
+                            }
+                            onPressedChanged: {
+                                if(slider_erase.pressed){
+                                    map.show_brush = true;
+//                                    map.brushchanged();
+                                }else{
+                                    map.show_brush = false;
+//                                    map.brushdisappear();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Rectangle{
+                id: btn_save_map
+                width: 200
+                height: 80
+                radius: 5
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: rect_annot_boxs.bottom
+                anchors.topMargin : 30
+                color: "black"
+                Text{
+                    anchors.centerIn: parent
+                    text: "저장"
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked:{
+                        popup_save_travelline.save_mode = "velmap";
+                        popup_save_travelline.open();
+                    }
+                }
+            }
+            Column{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 30
+                spacing: 30
+                PageIndicator{
+                    id: indicator_annot
+                    count: 8
+                    currentIndex: 5
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 10
+                    delegate: Rectangle{
+                        implicitWidth: index===indicator_annot.currentIndex?10:8
+                        implicitHeight: implicitWidth
+                        anchors.verticalCenter: parent.verticalCenter
+                        radius: width
+                        color: index===indicator_annot.currentIndex?"black":"#d0d0d0"
+                        Behavior on color{
+                            ColorAnimation {
+                                duration: 200
+                            }
+                        }
+                    }
+                }
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 20
+                    Rectangle{
+                        id: btn_prev_0
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color:"transparent"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "이전"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : PREV (OBJECT/LOCATION)")
+                                map.init();
+                                map.setViewer("annot_object");
+                                loader_menu.sourceComponent = menu_annot_object;
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: btn_next_0
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color: "black"
+                        border.width: 1
+                        border.color: "#7e7e7e"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "다음"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PASS TO TRAVELLINE")
+                                map.init();
+                                map.setViewer("annot_tline");
+                                map.show_connection = false;
+                                loader_menu.sourceComponent = menu_annot_tline;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     Component{
@@ -3496,6 +4008,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
+                        popup_save_travelline.save_mode = "tline";
                         popup_save_travelline.open();
                         if(btn_load_map.activated){
                             popup_save_travelline.edited_mode = true;
@@ -3512,8 +4025,8 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 7
-                    currentIndex: 5
+                    count: 8
+                    currentIndex: 6
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
                     delegate: Rectangle{
@@ -3550,10 +4063,10 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
-                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : PREV (OBJECT/LOCATION)")
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEXT (VELMAP)")
                                 map.init();
-                                map.setViewer("annot_object");
-                                loader_menu.sourceComponent = menu_annot_object;
+                                map.setViewer("annot_velmap");
+                                loader_menu.sourceComponent = menu_annot_velmap;
                             }
                         }
                     }
@@ -3938,7 +4451,7 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 7
+                    count: 8
                     currentIndex: 3
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
@@ -4853,7 +5366,7 @@ Item {
                  spacing: 30
                  PageIndicator{
                      id: indicator_annot
-                     count: 7
+                     count: 8
                      currentIndex: 4
                      anchors.horizontalCenter: parent.horizontalCenter
                      spacing: 10
@@ -4916,11 +5429,10 @@ Item {
                          MouseArea{
                              anchors.fill: parent
                              onClicked:{
-                                 supervisor.writelog("[QML] MAP PAGE (ANNOT) -> PASS TO TRAVELLINE")
+                                 supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEXT (VELMAP)")
                                  map.init();
-                                 map.setViewer("annot_tline");
-                                 map.show_connection = false;
-                                 loader_menu.sourceComponent = menu_annot_tline;
+                                 map.setViewer("annot_velmap");
+                                 loader_menu.sourceComponent = menu_annot_velmap;
                              }
                          }
                      }
@@ -5359,8 +5871,8 @@ Item {
                 spacing: 30
                 PageIndicator{
                     id: indicator_annot
-                    count: 7
-                    currentIndex: 6
+                    count: 8
+                    currentIndex: 7
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 10
                     delegate: Rectangle{
@@ -6295,6 +6807,7 @@ Item {
             color: "#282828"
             opacity: 0.7
         }
+        property string save_mode: "tline"
         property bool edited_mode: false
         Rectangle{
             anchors.centerIn: parent
@@ -6363,10 +6876,14 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 //save temp Image
-                                supervisor.writelog("[QML] MAP PAGE : SAVE TRAVELLINE ");
-                                map.save("tline");
-                                map.loadmap(supervisor.getMapname(),"T_EDIT");
-
+                                if(popup_save_travelline.save_mode === "tline"){
+                                    supervisor.writelog("[QML] MAP PAGE : SAVE TRAVELLINE ");
+                                    map.save("tline");
+                                    map.loadmap(supervisor.getMapname(),"T_EDIT");
+                                }else if(popup_save_travelline.save_mode === "velmap"){
+                                    supervisor.writelog("[QML] MAP PAGE : SAVE VELOCITY MAP ");
+                                    map.save("velmap");
+                                }
                                 popup_save_travelline.close();
                             }
                         }
@@ -6837,12 +7354,121 @@ Item {
                                             onClicked: {
                                                 cur_group = index
                                             }
+                                            onDoubleClicked: {
+                                                cur_group = index
+                                                popup_remove_group.open();
+                                            }
+                                            onPressAndHold: {
+                                                cur_group = index
+                                                popup_remove_group.open();
+
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                }
+                Popup{
+                    id: popup_remove_group
+                    anchors.centerIn: parent
+                    width: 500
+                    height: 250
+                    background: Rectangle{
+                        anchors.fill: parent
+                        color: "transparent"
+                    }
+                    property bool alright: true
+                    onOpened: {
+                        if(supervisor.getLocationGroupSize(cur_group) > 0){
+                            alright = false;
+                        }else{
+                            alright = true;
+                        }
+                    }
+
+                    Rectangle{
+                        width: parent.width
+                        height: parent.height
+                        radius: 20
+                        color: color_dark_navy
+                        Column{
+                            anchors.centerIn: parent
+                            spacing: 10
+                            Text{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                font.family: font_noto_b.name
+                                font.pixelSize: 30
+                                visible: popup_remove_group.alright
+                                text: "선택하신 그룹을 삭제하시겠습니까?"
+                                color: "white"
+                            }
+                            Text{
+                                visible: !popup_remove_group.alright
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                font.family: font_noto_r.name
+                                font.pixelSize: 20
+                                color: color_red
+                                horizontalAlignment: Text.AlignHCenter
+                                text: "그룹 지정된 위치가 존재합니다.\n삭제하려면 그룹을 전부 비워주세요."
+                            }
+                            Text{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                font.family: font_noto_r.name
+                                font.pixelSize: 18
+                                color: "white"
+                                text: "( " + supervisor.getLocGroupname(cur_group) + " )"
+                            }
+                            Row{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: 30
+                                Rectangle{
+                                    width: 120
+                                    height: 50
+                                    radius: 10
+                                    border.width: 1
+                                    Text{
+                                        anchors.centerIn: parent
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                        text: "취소"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            popup_remove_group.close();
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width: 120
+                                    height: 50
+                                    radius: 10
+                                    enabled: popup_remove_group.alright
+                                    border.width: 1
+                                    color: popup_remove_group.alright?"white":color_dark_gray
+                                    Text{
+                                        anchors.centerIn: parent
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                        text: "삭제"
+                                        color: popup_remove_group.alright?"black":"white"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            supervisor.removeLocationGroup(cur_group);
+                                            popup_remove_group.close();
+                                            cur_group = 0;
+                                            popup_add_location.update();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                 }
 
                 TextField{

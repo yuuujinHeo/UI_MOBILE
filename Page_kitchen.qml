@@ -48,27 +48,6 @@ Item {
             traymodel.append({x:0,y:0,tray_num:i+1,set_table:0,color:"white"});
         }
 
-//        if(robot_type == "CALLING"){
-//            if(pbefore != pmenu)
-//                popup_question.visible = true;
-//            supervisor.loadPatrolFile(supervisor.getPatrolFileName());
-//            var num=supervisor.getPatrolNum();
-
-//            repeat_patrol.model.clear();
-//            repeat_patrol.model.append({type:0,name:"Start"});
-
-//            for(var i=0; i<num; i++){
-//                repeat_patrol.model.append({type:2,name:""});
-//                print(supervisor.getPatrolLocation(i));
-//                if(supervisor.getPatrolLocation(i) == ""){
-//                    var text="x:"+supervisor.getPatrolX(i)+", y:"+supervisor.getPatrolY(i)+", th:"+supervisor.getPatrolTH(i);
-//                    repeat_patrol.model.append({type:1,name:text});
-//                    print(text);
-//                }else{
-//                    repeat_patrol.model.append({type:1,name:supervisor.getPatrolLocation(i)});
-//                }
-//            }
-//        }
         update_group();
     }
     property int tray_num: 3
@@ -964,7 +943,7 @@ Item {
                 }else{
                     supervisor.goSerivng(cur_group,cur_table);
                 }
-                supervisor.setPreset(0);
+                supervisor.setPreset(cur_preset);
                 cur_table = 0;
 
             }
@@ -1061,13 +1040,6 @@ Item {
                                 source: parent
                             }
                         }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked:{
-                                if(cur_preset > 1)
-                                    cur_preset--;
-                            }
-                        }
                     }
                     Column{
                         spacing: 1
@@ -1103,13 +1075,24 @@ Item {
                             }
 
                         }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked:{
-                                if(cur_preset < 5)
-                                    cur_preset++;
-                            }
-                        }
+                    }
+                }
+                MouseArea{
+                    width: parent.width/2
+                    height: parent.height
+                    anchors.left: parent.left
+                    onClicked:{
+                        if(cur_preset > 1)
+                            cur_preset--;
+                    }
+                }
+                MouseArea{
+                    width: parent.width/2
+                    height: parent.height
+                    anchors.right: parent.right
+                    onClicked:{
+                        if(cur_preset < 5)
+                            cur_preset++;
                     }
                 }
             }

@@ -140,6 +140,17 @@ void MapView::setMode(QString name){
         show_location_icon = false;
         robot_following = false;
         setFullScreen();
+    }else if(mode == "annot_velmap"){
+        show_robot = false;
+        show_global_path = false;
+        show_local_path = false;
+        show_lidar = false;
+        show_object = false;
+        show_object_box = false;
+        show_location = false;
+        show_location_icon = false;
+        robot_following = false;
+        setFullScreen();
     }else if(mode == "annot_location"){
         show_robot = true;
         show_global_path = false;
@@ -306,6 +317,7 @@ void MapView::setMapMap(){
         cv::Mat temp_drawing;
         cv::Mat temp_drawing_mask;
         cv::Mat temp_tline;
+        cv::Mat temp_velmap;
         if(rotate_angle != 0){
             cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(map_orin.cols/2, map_orin.rows/2),-rotate_angle,1.0);
             cv::warpAffine(map_orin,temp_orin,rot,map_orin.size(),cv::INTER_NEAREST);
@@ -317,6 +329,7 @@ void MapView::setMapMap(){
             map_drawing_mask.copyTo(temp_drawing_mask);
         }
         map_tline.copyTo(temp_tline);
+        map_velmap.copyTo(temp_velmap);
 
         //Merge Layer
         if(temp_orin.channels() == 3)
@@ -325,10 +338,19 @@ void MapView::setMapMap(){
             cv::cvtColor(temp_drawing,temp_drawing,cv::COLOR_BGRA2GRAY);
         if(temp_drawing_mask.channels() == 4)
             cv::cvtColor(temp_drawing_mask,temp_drawing_mask,cv::COLOR_BGRA2GRAY);
+        if(temp_tline.channels() == 4)
+            cv::cvtColor(temp_tline,temp_tline,cv::COLOR_BGRA2GRAY);
+        if(temp_velmap.channels() == 4)
+            cv::cvtColor(temp_velmap,temp_velmap,cv::COLOR_BGRA2GRAY);
 
         if(mode == "annot_tline" && temp_tline.cols > 0 && temp_tline.rows > 0){
             cv::multiply(cv::Scalar::all(1.0)-temp_drawing_mask,temp_tline,temp_tline);
             cv::add(temp_tline,temp_drawing,temp_tline);
+            temp_orin.copyTo(map_map);
+        }else if(mode == "annot_velmap" && temp_velmap.cols > 0 && temp_velmap.rows > 0){
+            qDebug() << temp_velmap.cols << temp_velmap.rows ;
+            cv::multiply(cv::Scalar::all(1.0)-temp_drawing_mask,temp_velmap,temp_velmap);
+            cv::add(temp_velmap,temp_drawing,temp_velmap);
             temp_orin.copyTo(map_map);
         }else{
             cv::multiply(cv::Scalar::all(1.0)-temp_drawing_mask,temp_orin,temp_orin);
@@ -341,6 +363,8 @@ void MapView::setMapMap(){
             if(show_object){
                 cv::addWeighted(map_map,1,map_objecting,0.7,0,map_map);
             }
+        }else if(mode == "annot_velmap" && temp_velmap.cols > 0 && temp_velmap.rows > 0){
+            cv::addWeighted(map_map,1,temp_velmap,0.5,0,map_map);
         }
 
         //Cur Brush View
@@ -1527,6 +1551,7 @@ void MapView::clearDrawing(){
     line.clear();
     lines.clear();
     spline_dot.clear();
+    initVelmap(map_name);
     initTline(map_name);
     initDrawing();
     setMapDrawing();
@@ -1544,6 +1569,7 @@ void MapView::undoLine(){
         qDebug() << "undoLine";
         lines_trash.push_back(lines[lines.size()-1]);
         lines.pop_back();
+        initVelmap(map_name);
         initTline(map_name);
         setMapDrawing();
         setMapMap();
@@ -1592,6 +1618,33 @@ void MapView::saveMap(){
     cv::imwrite(path.toStdString(),rotated);
 }
 
+void MapView::saveVelmap(){
+    cv::Mat temp_orin;
+    cv::Mat temp_draw;
+    cv::Mat temp_mask;
+    cv::Mat map_merge;
+
+    if(map_drawing.channels() == 4)
+        cv::cvtColor(map_drawing,temp_draw,cv::COLOR_BGRA2GRAY);
+    if(map_drawing_mask.channels() == 4)
+        cv::cvtColor(map_drawing_mask,temp_mask,cv::COLOR_BGRA2GRAY);
+
+    if(map_velmap.channels() == 4)
+        cv::cvtColor(map_velmap,temp_orin,cv::COLOR_BGRA2GRAY);
+    else if(map_velmap.channels() == 1)
+        map_velmap.copyTo(temp_orin);
+
+
+    cv::multiply(cv::Scalar::all(1.0)-temp_mask,temp_orin,temp_orin);
+    cv::add(temp_orin,temp_draw,map_merge);
+
+    cv::rotate(map_merge,map_merge,cv::ROTATE_90_CLOCKWISE);
+    cv::flip(map_merge,map_merge,0);
+
+    QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_velocity.png";
+    plog->write("[MAPVIEW] SAVE MAP "+path);
+    cv::imwrite(path.toStdString(),map_merge);
+}
 void MapView::saveTline(){
     cv::Mat temp_orin;
     cv::Mat temp_draw;
@@ -1628,6 +1681,7 @@ void MapView::redoLine(){
         qDebug() << "redoLine";
         lines.push_back(lines_trash[lines_trash.size()-1]);
         lines_trash.pop_back();
+        initVelmap(map_name);
         initTline(map_name);
         setMapDrawing();
         setMapMap();
@@ -2009,6 +2063,21 @@ void MapView::editLocation(){
     }
 }
 
+void MapView::initVelmap(QString filename){
+    QString file_path = QDir::homePath() + "/maps/" + filename + "/map_velocity.png";
+
+    map_velmap.release();
+    if(filename == "" || !QFile::exists(file_path)){
+        plog->write("[MAPVIEW] INIT VELMAP NO FOUND : "+filename+", "+file_path);
+        map_velmap = cv::Mat(map_orin.rows, map_orin.cols, CV_8UC4,cv::Scalar::all(0));
+    }else{
+        map_name = filename;
+        map_velmap = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+        cv::flip(map_velmap,map_velmap,0);
+        cv::rotate(map_velmap,map_velmap,cv::ROTATE_90_COUNTERCLOCKWISE);
+        plog->write("[MAPVIEW] INIT VELMAP SUCCESS : "+filename+", "+QString().sprintf("size(%d, %d)",map_velmap.rows,map_velmap.cols));
+    }
+}
 void MapView::initTline(QString filename){
     QString file_path;
     if(is_edited_tline){
@@ -2029,6 +2098,20 @@ void MapView::initTline(QString filename){
     }
 }
 
+void MapView::setMapVelmap(){
+    setMapDrawing();
+    if(map_orin.cols > 0 && map_orin.rows > 0 ){
+        if(mode == "annot_velmap" && map_velmap.cols > 0 && map_velmap.rows > 0){
+            cv::Mat temp_orin;
+            map_velmap(cv::Rect(map_x,map_y,map_width*scale,map_height*scale)).copyTo(temp_orin);
+            pixmap_velmap.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(temp_orin));
+        }else{
+            QPixmap pixmap(map_orin.cols*res,map_orin.rows*res);
+            pixmap.fill(Qt::transparent);
+        }
+    }
+    update();
+}
 void MapView::setMapTline(){
     setMapDrawing();
     if(map_orin.cols > 0 && map_orin.rows > 0){
@@ -2045,23 +2128,13 @@ void MapView::setMapTline(){
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
 void MapView::paint(QPainter *painter){
 //    qDebug() << width() << height();
     painter->drawPixmap(0,0,width(),height(),pixmap_map.pixmap);
     painter->drawPixmap(0,0,width(),height(),pixmap_object.pixmap);
     painter->drawPixmap(0,0,width(),height(),pixmap_location.pixmap);
     painter->drawPixmap(0,0,width(),height(),pixmap_tline.pixmap);
+    painter->drawPixmap(0,0,width(),height(),pixmap_velmap.pixmap);
     painter->drawPixmap(0,0,width(),height(),pixmap_current.pixmap);
 }
 

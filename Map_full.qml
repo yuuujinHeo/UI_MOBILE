@@ -196,6 +196,9 @@ Item {
                 mapview.setObjectMap(name);
             }else if(type === "local"){
                 mapview.setLocalizationMap(name);
+            }else if(type === "velmap"){
+                mapview.initVelmap(name);
+                mapview.setEditedMap(name);
             }
         }else{
             if(supervisor.isExistAnnotation(name)){
@@ -313,6 +316,8 @@ Item {
             mapview.saveTline();
         }else if(mode==="spline"){
             mapview.endSpline(true);
+        }else if(mode==="velmap"){
+            mapview.saveVelmap();
         }
     }
 

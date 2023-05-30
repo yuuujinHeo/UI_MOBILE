@@ -300,6 +300,8 @@ public:
     Q_INVOKABLE int getLocationGroupNum();
     Q_INVOKABLE int getLocationGroupSize(int num);
     Q_INVOKABLE int getLocationGroupNum(int num);
+
+    Q_INVOKABLE void removeLocationGroup(int num);
     Q_INVOKABLE void addLocationGroup(QString name);
     Q_INVOKABLE QString getLocGroupname(int num);
     Q_INVOKABLE void setLocation(int num, QString name, int group, int tablenum);

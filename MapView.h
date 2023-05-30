@@ -175,12 +175,17 @@ public:
     Q_INVOKABLE void setTlineMode(bool is_edit){is_edited_tline = is_edit;}
     Q_INVOKABLE void setMapTline();
 
+    //---------------------------------------------------Velocity Map
+    Q_INVOKABLE void initVelmap(QString filename);
+    Q_INVOKABLE void setMapVelmap();
+
     Q_INVOKABLE int getLocationNum(QString type);
     Q_INVOKABLE int getLocGroupNum(int num);
     //---------------------------------------------------Save
     void initLocation();
     Q_INVOKABLE void saveMap();
     Q_INVOKABLE void saveTline();
+    Q_INVOKABLE void saveVelmap();
     //---------------------------------------------------Map Scale, Move
     int map_width;
     int map_height;
@@ -211,9 +216,11 @@ private:
     PixmapContainer pixmap_object;
     PixmapContainer pixmap_location;
     PixmapContainer pixmap_tline;
+    PixmapContainer pixmap_velmap;
     PixmapContainer pixmap_current;
     cv::Mat map_orin;
     cv::Mat map_tline;
+    cv::Mat map_velmap;
     cv::Mat map_cost;
     cv::Mat map_objecting;
     cv::Mat map_map;

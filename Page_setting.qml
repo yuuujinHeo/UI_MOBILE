@@ -11,6 +11,9 @@ Item {
     width: 1280
     height: 800
 
+    property bool debug_use_ip: false
+    property bool debug_test_1: false
+
     property bool is_admin: false
 
     property int select_category: 4
@@ -26,7 +29,6 @@ Item {
         if(popup_camera.opened)
             popup_camera.update();
     }
-
     Component.onCompleted: {
         //DEBUG 230523 세팅 빠른 확인 위해서 admin true
         is_admin = true;
@@ -1020,7 +1022,7 @@ Item {
                 Rectangle{
                     id: set_wifi_ssd
                     width: 840
-                    visible: is_admin
+                    visible: is_admin && debug_use_ip
                     height: 40
                     Row{
                         anchors.fill: parent
@@ -1078,7 +1080,7 @@ Item {
                 Rectangle{
                     id: set_wifi_passwd
                     width: 840
-                    visible: is_admin
+                    visible: is_admin && debug_use_ip
                     height: 40
                     Row{
                         anchors.fill: parent
@@ -1152,7 +1154,7 @@ Item {
                     id: set_ip
                     width: 840
                     height: 40
-                    visible: is_admin
+                    visible: is_admin && debug_use_ip
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -1350,7 +1352,7 @@ Item {
                     id: set_gateway
                     width: 840
                     height: 40
-                    visible: is_admin
+                    visible: is_admin && debug_use_ip
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -1547,7 +1549,7 @@ Item {
                     id: set_dnsmain
                     width: 840
                     height: 40
-                    visible: is_admin
+                    visible: is_admin && debug_use_ip
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -1744,7 +1746,7 @@ Item {
                     id: set_dnsserve
                     width: 840
                     height: 40
-                    visible: is_admin
+                    visible: is_admin && debug_use_ip
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -2249,7 +2251,7 @@ Item {
                     id: init_
                     width: 840
                     height: 40
-                    visible: is_admin
+                    visible: is_admin && debug_test_1
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -3286,28 +3288,24 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                TextField{
-                                    id: limit_pivot
-                                    anchors.fill: parent
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        is_reset_slam = true;
-                                        ischanged = true;
-                                    }
-                                    color:ischanged?color_red:"black"
-                                    text:supervisor.getSetting("ROBOT_SW","limit_pivot");
-                                    onFocusChanged: {
-                                        keypad.owner = limit_pivot;
-                                        limit_pivot.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            keypad.close();
-                                            limit_pivot.select(0,0);
-                                        }
+                            TextField{
+                                id: limit_pivot
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_pivot");
+                                onFocusChanged: {
+                                    keypad.owner = limit_pivot;
+                                    limit_pivot.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        limit_pivot.select(0,0);
                                     }
                                 }
                             }

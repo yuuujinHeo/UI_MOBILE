@@ -1756,6 +1756,10 @@ void Supervisor::addLocationGroup(QString name){
     plog->write("[SUPERVISOR] Add Location Group : "+name + "(size = "+QString::number(pmap->location_groups.size())+")");
 
 }
+void Supervisor::removeLocationGroup(int num){
+    plog->write("[SUPERVISOR] Remove Location Group :"+QString::number(num)+"(size = "+QString::number(pmap->location_groups.size())+")");
+    pmap->location_groups.removeAt(num);
+}
 int Supervisor::getLocationGroupNum(){
     return pmap->location_groups.size();
 }
@@ -2431,7 +2435,7 @@ int Supervisor::getMotorInsideTemperature(int id){
     return probot->motor[id].motor_temp;
 }
 int Supervisor::getMotorWarningTemperature(){
-    return 50;
+    return 55;
 }
 int Supervisor::getMotorCurrent(int id){
     return probot->motor[id].current;
