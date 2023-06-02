@@ -465,7 +465,7 @@ Window {
         }
         AnimatedImage{
             id: loading_image
-            source: "image/loading.gif"
+            source: "image/loading_rb.gif"
             anchors.centerIn: parent
         }
     }

@@ -583,7 +583,7 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 supervisor.setSetting("ROBOT_HW/model",textfield_name.text);
-                                supervisor.setSetting("ROBOT_HW/serial_num",combobox_serialnum.get(combobox_serialnum.currentIndex).modelData);
+                                supervisor.setSetting("ROBOT_HW/serial_num",combobox_serialnum.currentText);
                                 supervisor.writelog("[USER INPUT] INIT PAGE : NEXT")
                                 swipeview_wizard.currentIndex++;
                             }
@@ -693,6 +693,7 @@ Item {
                                         id: cameraview_1
                                         width: 250
                                         height: 250
+                                        anchors.horizontalCenter: parent.horizontalCenter
                                     }
                                     Rectangle{
                                         width: 350
@@ -784,6 +785,7 @@ Item {
                                     CameraView{
                                         id: cameraview_2
                                         width: 250
+                                        anchors.horizontalCenter: parent.horizontalCenter
                                         height: 250
                                     }
                                     Rectangle{
@@ -906,13 +908,8 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 if(!rect_no_camera.visible){
-
                                     supervisor.writelog("[USER INPUT] INIT PAGE : NEXT")
-                                    if(wizard_camera.is_switched){
-                                        is_reset_slam = true;
-                                        supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA SWITCH LEFT("+text_camera_1.text+") RIGHT("+text_camera_2.text+")");
-                                        supervisor.setCamera(text_camera_1.text,text_camera_2.text);
-                                    }
+                                    supervisor.setCamera(text_camera_1.text,text_camera_2.text);
                                     swipeview_wizard.currentIndex++;
                                 }
                             }
@@ -2140,6 +2137,7 @@ Item {
                                     supervisor.getWifiIP();
                                     wizard_ip.setting_step++;
                                 }else{
+                                    supervisor.save
                                     supervisor.writelog("[USER INPUT] INIT PAGE : SETTING DONE");
                                     swipeview_wizard.currentIndex++;
                                 }

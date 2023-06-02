@@ -26,6 +26,7 @@ Item {
     property bool show_button_location: false
     property bool show_costmap: false
     property bool show_brush: false
+    property bool show_grid: false
 
     property int obj_sequence: 0
 
@@ -88,6 +89,7 @@ Item {
         show_button_object = true;
         show_button_location = true;
         show_costmap = false;
+        show_grid = false;
         if(mode === "annot_drawing"){
             show_connection = false;
             show_button_following = false;
@@ -126,6 +128,13 @@ Item {
             show_costmap = true;
         }else if(mode === "current"){
 
+        }else if(mode === "annot_rotate"){
+            show_grid = true;
+            show_connection = false;
+            show_button_following = false;
+            show_button_lidar = false;
+            show_button_object = false;
+            show_button_location = false;
         }
     }
 
@@ -475,6 +484,29 @@ Item {
             }
         }
 
+        Canvas{
+            anchors.fill: parent
+            property int wgrid: 30
+            visible: show_grid
+            onPaint: {
+                var ctx = getContext("2d");
+                ctx.lineWidth = 0.5;
+                ctx.strokeStyle = "black"
+                ctx.beginPath();
+                var nrows = height/wgrid;
+                for(var i=0; i<nrows+1; i++){
+                    ctx.moveTo(0,wgrid*i);
+                    ctx.lineTo(width, wgrid*i);
+                }
+                var ncols = width/wgrid;
+                for(var j=0; j<ncols+1; j++){
+                    ctx.moveTo(wgrid*j,0);
+                    ctx.lineTo(wgrid*j,height);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+        }
     }
     MouseArea{
         enabled: parent.enabled

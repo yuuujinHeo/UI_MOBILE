@@ -54,12 +54,13 @@ void MapView::onTimer(){
         if(mode != "mapping"){
             if(probot->ipc_use){
                 setMapCurrent();
-                setMapMap();
             }else{
                 if(probot->lcmconnection){
                     setMapCurrent();
                 }
             }
+        }else{
+            setMapCurrent();
         }
     }
 }
@@ -336,19 +337,6 @@ void MapView::setMapMap(){
         map_tline.copyTo(temp_tline);
         map_velmap.copyTo(temp_velmap);
 
-        //Merge Layer
-//        if(temp_orin.channels() == 3)
-//            cv::cvtColor(temp_orin,temp_orin,cv::COLOR_BGR2GRAY);
-//        if(temp_drawing.channels() == 4)
-//            cv::cvtColor(temp_drawing,temp_drawing,cv::COLOR_BGRA2GRAY);
-//        if(temp_drawing_mask.channels() == 4)
-//            cv::cvtColor(temp_drawing_mask,temp_drawing_mask,cv::COLOR_BGRA2GRAY);
-//        if(temp_tline.channels() == 4)
-//            cv::cvtColor(temp_tline,temp_tline,cv::COLOR_BGRA2GRAY);
-//        if(temp_velmap.channels() == 4)
-//            cv::cvtColor(temp_velmap,temp_velmap,cv::COLOR_BGRA2GRAY);
-
-
         if(temp_orin.channels() == 3)
             cv::cvtColor(temp_orin,temp_orin,cv::COLOR_BGR2BGRA);
         if(temp_tline.channels() == 3 && temp_tline.rows > 0)
@@ -369,6 +357,7 @@ void MapView::setMapMap(){
             cv::cvtColor(temp_velmap,temp_velmap,cv::COLOR_GRAY2BGRA);
         if(temp_velmap.channels() == 3 && temp_velmap.rows > 0)
             cv::cvtColor(temp_velmap,temp_velmap,cv::COLOR_BGR2BGRA);
+
 
 
 
@@ -700,7 +689,50 @@ void MapView::setObjectMap(QString filename){
     reloadMap();
 }
 void MapView::setMapCurrent(){
-    if(map_orin.cols > 0 && map_orin.rows > 0){
+    if(mode == "mapping"){
+            map_current=QPixmap(pmap->width*res,pmap->height*res);
+            map_current.fill(Qt::transparent);
+            QPainter painter(&map_current);
+            painter.setRenderHint(QPainter::Antialiasing, true);
+            painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+
+            cv::Point2f pose = setAxis(probot->curPose.point);
+            float angle = setAxis(probot->curPose.angle);
+            float distance = (pmap->robot_radius/pmap->gridwidth)*2;
+            float distance2 = distance*0.8;
+            float th_dist = M_PI/8;
+
+            float x =   (pose.x + distance    * qCos(angle))*res;
+            float y =   (pose.y + distance    * qSin(angle))*res;
+            float x1 =  (pose.x + distance2   * qCos(angle-th_dist))*res;
+            float y1 =  (pose.y + distance2   * qSin(angle-th_dist))*res;
+            float x2 =  (pose.x + distance2   * qCos(angle+th_dist))*res;
+            float y2 =  (pose.y + distance2   * qSin(angle+th_dist))*res;
+
+            float rad = pmap->robot_radius*2*res/pmap->gridwidth;
+            QPainterPath path;
+            QPolygonF polygon;
+            polygon << QPointF(x1,y1) << QPointF(x2,y2) << QPointF(x,y) << QPointF(x1,y1);
+            path.addRoundedRect((pose.x-rad/2)*res,(pose.y-rad/2)*res,rad,rad,rad,rad);
+            painter.setPen(QPen(QColor("white"),2));
+            painter.fillPath(path,QBrush(QColor("red")));
+            painter.drawPath(path);
+            QPainterPath direction;
+            direction.addPolygon(polygon);
+            painter.fillPath(direction,QBrush(QColor("red")));
+
+            for(int i=0; i<360; i++){
+                painter.setPen(QPen(QColor("red"),1*res*scale));
+                if(probot->lidar_data[i] > pmap->gridwidth){
+                    float x = (pose.x + (probot->lidar_data[i]/pmap->gridwidth)*cos((-M_PI*i)/180 + angle))*res;
+                    float y = (pose.y + (probot->lidar_data[i]/pmap->gridwidth)*sin((-M_PI*i)/180 + angle))*res;
+                    painter.drawPoint((int)x,(int)y);
+                }
+            }
+            QPixmap temp_pixmap = map_current.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
+            pixmap_current.pixmap = temp_pixmap;
+            update();
+    }else if(map_orin.cols > 0 && map_orin.rows > 0){
         map_current=QPixmap(map_orin.cols*res,map_orin.rows*res);
         map_current.fill(Qt::transparent);
         QPainter painter(&map_current);
@@ -853,49 +885,6 @@ void MapView::setMapCurrent(){
         QPixmap temp_pixmap = map_current.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
         pixmap_current.pixmap = temp_pixmap;
         update();
-    }else if(mode == "mapping"){
-        map_current=QPixmap(pmap->width*res,pmap->height*res);
-        map_current.fill(Qt::transparent);
-        QPainter painter(&map_current);
-        painter.setRenderHint(QPainter::Antialiasing, true);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
-
-        cv::Point2f pose = setAxis(probot->curPose.point);
-        float angle = setAxis(probot->curPose.angle);
-        float distance = (pmap->robot_radius/pmap->gridwidth)*2;
-        float distance2 = distance*0.8;
-        float th_dist = M_PI/8;
-
-        float x =   (pose.x + distance    * qCos(angle))*res;
-        float y =   (pose.y + distance    * qSin(angle))*res;
-        float x1 =  (pose.x + distance2   * qCos(angle-th_dist))*res;
-        float y1 =  (pose.y + distance2   * qSin(angle-th_dist))*res;
-        float x2 =  (pose.x + distance2   * qCos(angle+th_dist))*res;
-        float y2 =  (pose.y + distance2   * qSin(angle+th_dist))*res;
-
-        float rad = pmap->robot_radius*2*res/pmap->gridwidth;
-        QPainterPath path;
-        QPolygonF polygon;
-        polygon << QPointF(x1,y1) << QPointF(x2,y2) << QPointF(x,y) << QPointF(x1,y1);
-        path.addRoundedRect((pose.x-rad/2)*res,(pose.y-rad/2)*res,rad,rad,rad,rad);
-        painter.setPen(QPen(QColor("white"),2));
-        painter.fillPath(path,QBrush(QColor("red")));
-        painter.drawPath(path);
-        QPainterPath direction;
-        direction.addPolygon(polygon);
-        painter.fillPath(direction,QBrush(QColor("red")));
-
-        for(int i=0; i<360; i++){
-            painter.setPen(QPen(QColor("red"),1*res*scale));
-            if(probot->lidar_data[i] > pmap->gridwidth){
-                float x = (pose.x + (probot->lidar_data[i]/pmap->gridwidth)*cos((-M_PI*i)/180 + angle))*res;
-                float y = (pose.y + (probot->lidar_data[i]/pmap->gridwidth)*sin((-M_PI*i)/180 + angle))*res;
-                painter.drawPoint((int)x,(int)y);
-            }
-        }
-        QPixmap temp_pixmap = map_current.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
-        pixmap_current.pixmap = temp_pixmap;
-        update();
     }
 }
 void MapView::setMapDrawing(){
@@ -952,11 +941,9 @@ void MapView::setMapDrawing(){
     }
     if(temp_rect.size() > 3){
         if(cur_line_color == 100){
-            qDebug() << "100";
             cv::rectangle(map_drawing,temp_rect[0],temp_rect[2],color_yellow,-1,8,0);
             cv::rectangle(map_drawing_mask,temp_rect[0],temp_rect[2],cv::Scalar::all(255),-1,8,0);
         }else if(cur_line_color == 200){
-            qDebug() << "200";
             cv::rectangle(map_drawing,temp_rect[0],temp_rect[2],color_red,-1,8,0);
             cv::rectangle(map_drawing_mask,temp_rect[0],temp_rect[2],cv::Scalar::all(255),-1,8,0);
         }
@@ -1588,6 +1575,7 @@ void MapView::addLinePoint(int x, int y){
     }else{
         cv::line(map_drawing,line[line.size()-2],line[line.size()-1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
         cv::line(map_drawing_mask,line[line.size()-2],line[line.size()-1],cv::Scalar::all(255),cur_line_width,8,0);
+        qDebug() << cur_line_color;
     }
 
 //    setMapDrawing();

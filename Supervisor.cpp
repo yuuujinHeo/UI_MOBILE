@@ -530,7 +530,7 @@ void Supervisor::readSetting(QString map_name){
         //DEBUG 230504 임시로 table개수 늘려보려고 주석처리함
 //        setting.table_num = total_serv_num;
     }
-    setting_anot.endGroup();
+//    setting_anot.endGroup();
 
     qDebug() << pmap->locations.size() << map_name;
 
