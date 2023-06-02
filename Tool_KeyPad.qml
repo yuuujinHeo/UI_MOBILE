@@ -10,7 +10,7 @@ Popup {
     rightPadding: 0
     topPadding: 0
     bottomPadding: 0
-    y: 400 - height/2 + statusbar.height
+    y: 400 - height/2 + statusbar.height/2
     x: 880 + width/2
 
     background:Rectangle{
@@ -75,9 +75,6 @@ Popup {
                                 anchors.fill: parent
                                 onClicked:{
                                     emitter.keyPressed(owner,modelData);
-
-                                    if(!is_capslock)
-                                        is_shift = false;
                                 }
                             }
                         }
@@ -131,7 +128,6 @@ Popup {
                                 anchors.fill: parent
                                 onClicked:{
                                     emitter.keyPressed(owner,modelData);
-
                                 }
                             }
                         }

@@ -68,9 +68,9 @@ Item {
         color: "#282828"
     }
     AnimatedImage{
-        id: face_cry
+        id: resting_image
         visible: false
-        source: "image/face_cry.gif"
+        source: "image/temp.gif"
         anchors.fill: parent
     }
     AnimatedImage{
@@ -80,9 +80,9 @@ Item {
         anchors.fill: parent
     }
     AnimatedImage{
-        id: resting_image
+        id: face_cry
         visible: false
-        source: "image/temp.gif"
+        source: "image/face_cry.gif"
         anchors.fill: parent
     }
     Image{
@@ -165,18 +165,27 @@ Item {
             height: 160
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
-            anchors.topMargin: 250
+            anchors.topMargin: 200
         }
         Text{
+            id: teee
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top:image_warning.bottom
             anchors.topMargin: 30
             font.family: font_noto_b.name
-            font.pixelSize: 40
+            font.pixelSize: 50
             color: "#e2574c"
             text: move_fail?"경로를 찾을 수 없습니다.":"일시정지 됨"
         }
-
+        Text{
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top:teee.bottom
+            anchors.topMargin: 10
+            font.family: font_noto_b.name
+            font.pixelSize: 40
+            color: "#e2574c"
+            text: "( 목적지 : "+pos+" )"
+        }
         Row{
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: 80

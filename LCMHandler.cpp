@@ -416,83 +416,83 @@ void LCMHandler::bLoop()
     */
 
     // lcm init
-    if(!lcm.good())
-    {
-        plog->write("[LCM ERROR] LCM CONNECT FAILED");
-        isconnect = false;
-    }
+//    if(!lcm.good())
+//    {
+//        plog->write("[LCM ERROR] LCM CONNECT FAILED");
+//        isconnect = false;
+//    }
 
-    while(bFlag)
-    {
-        lcm.handleTimeout(1);
-    }
+//    while(bFlag)
+//    {
+//        lcm.handleTimeout(1);
+//    }
 }
 
 void LCMHandler::subscribe(){
-    lcm.unsubscribe(sub_status);
-    lcm.unsubscribe(sub_path);
-    lcm.unsubscribe(sub_localpath);
-    lcm.unsubscribe(sub_mapping);
-    lcm.unsubscribe(sub_objecting);
-    lcm.unsubscribe(sub_camera);
-    lcm.unsubscribe(sub_test_cmd);
-    if(is_debug){
-        qDebug() << "Change Subscribe " << probot->name_debug;
-        sub_mapping = lcm.subscribe("MAP_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_mapping_callback, this);
-        sub_objecting = lcm.subscribe("OBS_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_objecting_callback, this);
-        sub_status = lcm.subscribe("STATUS_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_status_callback, this);
-        sub_path = lcm.subscribe("ROBOT_PATH_"+probot->name_debug.toStdString(), &LCMHandler::robot_path_callback, this);
-        sub_localpath = lcm.subscribe("ROBOT_LOCAL_PATH_"+probot->name_debug.toStdString(), &LCMHandler::robot_local_path_callback, this);
-        sub_camera = lcm.subscribe("CAMERA_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_camera_callback, this);
-    }else{
-        qDebug() << "Change Subscribe " << probot->name;
-        sub_mapping = lcm.subscribe("MAP_DATA_"+probot->name.toStdString(), &LCMHandler::robot_mapping_callback, this);
-        sub_objecting = lcm.subscribe("OBS_DATA_"+probot->name.toStdString(), &LCMHandler::robot_objecting_callback, this);
-        sub_status = lcm.subscribe("STATUS_DATA_"+probot->name.toStdString(), &LCMHandler::robot_status_callback, this);
-        sub_path = lcm.subscribe("ROBOT_PATH_"+probot->name.toStdString(), &LCMHandler::robot_path_callback, this);
-        sub_localpath = lcm.subscribe("ROBOT_LOCAL_PATH_"+probot->name.toStdString(), &LCMHandler::robot_local_path_callback, this);
-        sub_camera = lcm.subscribe("CAMERA_DATA_"+probot->name.toStdString(), &LCMHandler::robot_camera_callback, this);
-        sub_test_cmd = lcm.subscribe("COMMAND_"+probot->name.toStdString(), &LCMHandler::robot_command_callback, this);
-    }
+//    lcm.unsubscribe(sub_status);
+//    lcm.unsubscribe(sub_path);
+//    lcm.unsubscribe(sub_localpath);
+//    lcm.unsubscribe(sub_mapping);
+//    lcm.unsubscribe(sub_objecting);
+//    lcm.unsubscribe(sub_camera);
+//    lcm.unsubscribe(sub_test_cmd);
+//    if(is_debug){
+//        qDebug() << "Change Subscribe " << probot->name_debug;
+//        sub_mapping = lcm.subscribe("MAP_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_mapping_callback, this);
+//        sub_objecting = lcm.subscribe("OBS_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_objecting_callback, this);
+//        sub_status = lcm.subscribe("STATUS_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_status_callback, this);
+//        sub_path = lcm.subscribe("ROBOT_PATH_"+probot->name_debug.toStdString(), &LCMHandler::robot_path_callback, this);
+//        sub_localpath = lcm.subscribe("ROBOT_LOCAL_PATH_"+probot->name_debug.toStdString(), &LCMHandler::robot_local_path_callback, this);
+//        sub_camera = lcm.subscribe("CAMERA_DATA_"+probot->name_debug.toStdString(), &LCMHandler::robot_camera_callback, this);
+//    }else{
+//        qDebug() << "Change Subscribe " << probot->name;
+//        sub_mapping = lcm.subscribe("MAP_DATA_"+probot->name.toStdString(), &LCMHandler::robot_mapping_callback, this);
+//        sub_objecting = lcm.subscribe("OBS_DATA_"+probot->name.toStdString(), &LCMHandler::robot_objecting_callback, this);
+//        sub_status = lcm.subscribe("STATUS_DATA_"+probot->name.toStdString(), &LCMHandler::robot_status_callback, this);
+//        sub_path = lcm.subscribe("ROBOT_PATH_"+probot->name.toStdString(), &LCMHandler::robot_path_callback, this);
+//        sub_localpath = lcm.subscribe("ROBOT_LOCAL_PATH_"+probot->name.toStdString(), &LCMHandler::robot_local_path_callback, this);
+//        sub_camera = lcm.subscribe("CAMERA_DATA_"+probot->name.toStdString(), &LCMHandler::robot_camera_callback, this);
+//        sub_test_cmd = lcm.subscribe("COMMAND_"+probot->name.toStdString(), &LCMHandler::robot_command_callback, this);
+//    }
 }
 void LCMHandler::onTimer(){
     //10ms 조이스틱 값 읽어오기
-    if(flagJoystick){
-        moveJog();
-        flagJoystick = false;
-    }else{
-        if(probot->joystick[0] != 0 || probot->joystick[1] != 0 ){
-            moveJog();
-        }
-    }
+//    if(flagJoystick){
+//        moveJog();
+//        flagJoystick = false;
+//    }else{
+//        if(probot->joystick[0] != 0 || probot->joystick[1] != 0 ){
+//            moveJog();
+//        }
+//    }
 
-    if(is_mapping){
+//    if(is_mapping){
 
-    }else{
-        if(flagMapping){
-            sendCommand(ROBOT_CMD_MAPPING_STOP, "MAPPING STOP");
-        }
-        flagMapping = false;
-    }
+//    }else{
+//        if(flagMapping){
+//            sendCommand(ROBOT_CMD_MAPPING_STOP, "MAPPING STOP");
+//        }
+//        flagMapping = false;
+//    }
 
-    if(is_objecting){
+//    if(is_objecting){
 
-    }else{
-        flagObjecting = false;
-    }
+//    }else{
+//        flagObjecting = false;
+//    }
 
-    static int count=0;
-    if(count++%5==0){
-        flag_rx = false;
-        flag_tx = false;
-    }
+//    static int count=0;
+//    if(count++%5==0){
+//        flag_rx = false;
+//        flag_tx = false;
+//    }
 
-    //LCM 통신 연결상태 확인(2초)
-    if(connect_count++ > 5){
-        isconnect = false;
-    }
+//    //LCM 통신 연결상태 확인(2초)
+//    if(connect_count++ > 5){
+//        isconnect = false;
+//    }
 
-    if(isconnect && probot->localization_state==LOCAL_READY){
-        probot->lastPose = probot->curPose;
-    }
+//    if(isconnect && probot->localization_state==LOCAL_READY){
+//        probot->lastPose = probot->curPose;
+//    }
 }

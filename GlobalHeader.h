@@ -145,9 +145,10 @@ typedef struct{
     float velocity = 1.0;
 
     QVector<ST_TRAY> trays;
+    bool is_calling=false;
     LOCATION curLocation;
     int cur_preset;
-    QVector<QString> call_list;
+//    QVector<QString> call_list;
 
     int call_moving_count;
     int max_moving_count;
@@ -162,6 +163,17 @@ typedef struct{
 
 }ST_ROBOT;
 extern ST_ROBOT *probot;
+
+typedef struct{
+    bool inuse;
+    QString ssid;
+    int rate;
+    int level;
+    bool security;
+    int discon_count;
+    int state;
+    int prev_state=0;
+}ST_WIFI;
 
 typedef struct{
     QString type;
@@ -183,6 +195,18 @@ typedef struct{
 
     int volumeBGM;
     int volumeVoice;
+
+    int wifi_connection=0;
+    int prev_wifi_connection = 0;
+    QString wifi_ssd = "";
+    QString wifi_passwd = "";
+    QString wifi_ip = "";
+    QString wifi_gateway = "";
+    QString wifi_dns = "";
+
+    QString cur_ip="";
+    QString cur_gateway="";
+    QString cur_dns="";
 
     bool useAvoid;
     bool useAutoInit;
@@ -216,9 +240,11 @@ enum ROBOT_CMD{
     ROBOT_CMD_MAPPING_SAVE,
     ROBOT_CMD_OBJECTING_START,
     ROBOT_CMD_OBJECTING_STOP,
-    ROBOT_CMD_OBJECTING_SAVE
-};
+    ROBOT_CMD_OBJECTING_SAVE,
 
+    ROBOT_CMD_MOTOR_LOCK_ON,//16
+    ROBOT_CMD_MOBOR_LOCK_OFF
+};
 
 enum TOOL_NUM{
     TOOL_MOUSE = 0,
@@ -251,6 +277,7 @@ enum UI_STATE{
     UI_STATE_GO_HOME,
     UI_STATE_GO_CHARGE,
 
+    UI_STATE_MOVING,
     UI_STATE_SERVING,//5
     UI_STATE_CALLING,
     UI_STATE_PICKUP,
@@ -271,13 +298,6 @@ enum LOCALIZATION_STATE{
     LOCAL_FAILED
 };
 
-//enum ROBOT_INIT_STATE{
-//    ROBOT_INIT_NOT_READY = 0,
-//    ROBOT_INIT_MOTOR_DONE,
-//    ROBOT_INIT_LOCAL_START,
-//    ROBOT_INIT_LOCAL_FAILED,
-//    ROBOT_INIT_DONE
-//};
 
 enum ROBOT_MOVING_STATE{
     ROBOT_MOVING_NOT_READY = 0,

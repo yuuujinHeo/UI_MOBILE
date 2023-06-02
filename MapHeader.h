@@ -14,11 +14,12 @@
 #define color_white     cv::Scalar(255,255,255,255)
 #define color_black     cv::Scalar(0,0,0,255)
 #define color_green     cv::Scalar(18,210,124,255)
-#define color_red       cv::Scalar(231,88,77,255)
+#define color_red       cv::Scalar(77,88,231,255)
 #define color_navy      cv::Scalar(79,86,102,255)
 #define color_gray      cv::Scalar(127,127,127,255)
 #define color_blue      cv::Scalar(131,184,249,255)
 #define color_pink      cv::Scalar(255,217,255,255)
+#define color_yellow    cv::Scalar(80,200,255,255)
 
 
 #define hex_color_green     "#12d27c"
@@ -37,6 +38,7 @@ typedef struct{
     QVector<cv::Point2f> points;
     int color;
     int width;
+    int type=0;
 }LINE;
 
 typedef struct{
@@ -52,6 +54,7 @@ typedef struct{
     cv::Point2f point;
     float angle;
     int number;
+    QString call_id;
 }LOCATION;
 
 

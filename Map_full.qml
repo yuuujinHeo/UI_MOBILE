@@ -99,6 +99,11 @@ Item {
             show_button_location = true;
             show_button_following = false;
             show_button_lidar = false;
+        }else if(mode === "annot_velmap"){
+            show_connection = false;
+            show_button_location = true;
+            show_button_following = false;
+            show_button_lidar = false;
         }else if(mode === "annot_location"){
             mapview.setCostMap();
         }else if(mode === "mapping"){
@@ -165,8 +170,8 @@ Item {
 
 
     function loadmap(name,type){
-        print(objectName);
-        supervisor.writelog("[QML MAP] LoadMap "+objectName+": "+name+" (mode = "+type+")");
+//        print(objectName);
+//        supervisor.writelog("[QML MAP] LoadMap "+objectName+": "+name+" (mode = "+type+")");
         if(typeof(name) === 'undefined'){
             name = supervisor.getMapname();
         }
@@ -197,7 +202,7 @@ Item {
             }else if(type === "local"){
                 mapview.setLocalizationMap(name);
             }else if(type === "velmap"){
-                mapview.initVelmap(name);
+                mapview.initVelmap(name,1);
                 mapview.setEditedMap(name);
             }
         }else{
@@ -279,7 +284,7 @@ Item {
         }
     }
     function rotate(dir){
-        print("rotate map : "+dir)
+//        print("rotate map : "+dir)
         if(dir === "cw"){
             mapview.rotateMapCW();
         }else if(dir === "ccw"){
@@ -306,7 +311,7 @@ Item {
             last_robot_x = supervisor.getlastRobotx();
             last_robot_y = supervisor.getlastRoboty();
             last_robot_th = supervisor.getlastRobotth();
-            print(last_robot_x,last_robot_y,last_robot_th);
+//            /*print(*/last_robot_x,last_robot_y,last_robot_th);
             mapview.addLocation(last_robot_x,last_robot_y,last_robot_th);
             mapview.saveLocation(type,0,name);
         }else if(mode==="location"){
@@ -326,7 +331,7 @@ Item {
            last_robot_x = supervisor.getlastRobotx();
            last_robot_y = supervisor.getlastRoboty();
            last_robot_th = supervisor.getlastRobotth();
-           print(last_robot_x,last_robot_y,last_robot_th);
+//           /*print(*/last_robot_x,last_robot_y,last_robot_th);
            mapview.addLocation(last_robot_x,last_robot_y,last_robot_th);
            mapview.saveLocation(type,group, name);
        }else if(mode==="location"){
@@ -361,11 +366,11 @@ Item {
     function setDrawingWidth(width){
         mapview.setLineWidth(width);
         cur_width = width/mapview.getScale() + 2;
-        print("setdrawingwidth ",width,mapview.getScale(),cur_width);
+//        print("setdrawingwidth ",width,mapview.getScale(),cur_width);
     }
 
     function setAutoInit(x,y,th){
-        print(objectName+" ?:",x,y,th);
+//        print(objectName+" ?:",x,y,th);
         mapview.setInitPose(x,y,th);
         supervisor.setInitPos(x,y,th);
     }
@@ -514,11 +519,14 @@ Item {
                     var dx = Math.abs(point1.x-point2.x);
                     var dy = Math.abs(point1.y-point2.y);
                     firstDist = Math.sqrt(dx*dx + dy*dy);
-                    print("PRESS : ",firstX,firstY,firstDist);
+//                    print("PRESS : ",firstX,firstY,firstDist);
                 }
             }else if(tool == "draw"){
                 mapview.showBrush(true);
                 mapview.startDrawing(firstX, firstY);
+            }else if(tool == "draw_rect"){
+                mapview.showBrush(false);
+                mapview.startDrawingRect(firstX,firstY);
             }else if(tool == "straight"){
                 mapview.showBrush(true);
                 mapview.startDrawingLine(firstX, firstY);
@@ -542,7 +550,7 @@ Item {
             }else if(tool === "edit_location_new"){
                 mapview.addLocation(firstX, firstY,0);
             }else if( tool === "slam_init"){
-                print("Pressed : ",firstX,firstY,0);
+//                print("Pressed : ",firstX,firstY,0);
                 mapview.setInitPose(firstX,firstY,0);
             }
         }
@@ -567,6 +575,8 @@ Item {
                     }
                 }else if(tool == "draw"){
                     mapview.endDrawing(newX, newY);
+                }else if(tool == "draw_rect"){
+                    mapview.endDrawingRect();
                 }else if(tool == "straight"){
                     mapview.stopDrawingLine(newX, newY);
                 }else if(tool == "erase"){
@@ -587,7 +597,7 @@ Item {
 
                 }else if( tool === "slam_init"){
                     var angle = Math.atan2((newY-firstY),(newX-firstX));
-                    print("Released : ",firstX,firstY,angle);
+//                    print("Released : ",firstX,firstY,angle);
                     supervisor.setInitPos(firstX, firstY, angle);
                     supervisor.slam_setInit();
                 }
@@ -638,6 +648,8 @@ Item {
                     }
                 }else if(tool == "draw"){
                     mapview.addLinePoint(newX, newY);
+                }else if(tool == "draw_rect"){
+                    mapview.setDrawingRect(newX, newY);
                 }else if(tool == "straight"){
                     mapview.setDrawingLine(newX, newY);
                 }else if(tool == "erase"){

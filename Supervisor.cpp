@@ -17,6 +17,7 @@
 #include <QFileSystemWatcher>
 #include <QtQuick/qquickimageprovider.h>
 #include <QtGui>
+#include <QStringList>
 
 
 //#include <sys/socket.h>
@@ -95,6 +96,12 @@ Supervisor::Supervisor(QObject *parent)
     process->waitForReadyRead();
     startSLAM();
 
+    wifi_process = new QProcess();
+    connect(wifi_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_con_output()));
+    connect(wifi_process,SIGNAL(readyReadStandardError()),this,SLOT(wifi_con_error()));
+    wifi_check_process = new QProcess();
+    connect(wifi_check_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_ch_output()));
+    connect(wifi_check_process,SIGNAL(readyReadStandardError()),this,SLOT(wifi_ch_error()));
 //    const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
 //    for(QHostAddress &address: QNetworkInterface::allAddresses()){
 //        if(address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost){
@@ -205,11 +212,12 @@ QString Supervisor::getIniPath(){
 
 ////*********************************************  CALLING 관련   ***************************************************////
 void Supervisor::new_call(){
-    if(setting_call_id > -1){
+    if(setting_call_num > -1){
         plog->write("[SUPERVISOR] NEW CALL ("+call->getBellID()+") SETTING");
-        setSetting("CALLING/call_"+QString::number(setting_call_id),call->getBellID());
+        pmap->locations[setting_call_num].call_id = call->getBellID();
+//        setSetting("CALLING/call_"+QString::number(setting_call_id),call->getBellID());
         QMetaObject::invokeMethod(mMain, "call_setting");
-    }else{
+    }else{/*
         bool already_in = false;
         for(int i=0; i<call_list.size(); i++){
             if(call_list[i] == call->getBellID()){
@@ -223,31 +231,31 @@ void Supervisor::new_call(){
         }else{
             call_list.push_back(call->getBellID());
             plog->write("[SUPERVISOR] NEW CALL ("+call->getBellID()+") GET -> LIST SIZE IS "+QString::number(call_list.size()));
-        }
+        }*/
     }
 }
 
 void Supervisor::setCallbell(int id){
-    setting_call_id = id;
+    setting_call_num = id;
 }
 
-QString Supervisor::getCallName(QString id){
-    for(int i=0; i<getSetting("CALLING","call_num").toInt(); i++){
-        if(getSetting("CALLING","call_"+QString::number(i)) == id){
-            return getServingName(i);
-//            return "Serving_"+QString::number(i);
-        }
+LOCATION Supervisor::getCallLocation(QString id){
+    for(int i=0; i<pmap->locations.size(); i++){
+        if(pmap->locations[i].call_id == id)
+            return pmap->locations[i];
     }
-    return id;
+    return LOCATION();
 }
 
 void Supervisor::removeCall(int id){
     plog->write("[USER INPUT] REMOVE CALL_LIST "+QString::number(id));
-    call_list.remove(id);
+    pmap->locations[id].call_id = "";
 }
 void Supervisor::removeCallAll(){
     plog->write("[USER INPUT] REMOVE CALL_LIST ALL");
-    call_list.clear();
+    for(int i=0; i<pmap->locations.size(); i++){
+        pmap->locations[i].call_id = "";
+    }
 }
 
 ////*********************************************  SETTING 관련   ***************************************************////
@@ -427,6 +435,12 @@ void Supervisor::readSetting(QString map_name){
         temp_loc.group = 0;
         temp_loc.type = "Charging";
         temp_loc.name = strlist[0];
+        if(strlist.size() > 4)
+            temp_loc.number = strlist[4].toInt();
+        if(strlist.size() > 5)
+            temp_loc.call_id = strlist[5];
+        else
+            temp_loc.call_id = "";
         pmap->locations.push_back(temp_loc);
     }
     setting_anot.endGroup();
@@ -442,6 +456,12 @@ void Supervisor::readSetting(QString map_name){
         temp_loc.type = "Other";
         temp_loc.group = 0;
         temp_loc.name = strlist[0];
+        if(strlist.size() > 4)
+            temp_loc.number = strlist[4].toInt();
+        if(strlist.size() > 5)
+            temp_loc.call_id = strlist[5];
+        else
+            temp_loc.call_id = "";
         pmap->locations.push_back(temp_loc);
     }
     setting_anot.endGroup();
@@ -457,6 +477,12 @@ void Supervisor::readSetting(QString map_name){
         temp_loc.type = "Resting";
         temp_loc.group = 0;
         temp_loc.name = strlist[0];
+        if(strlist.size() > 4)
+            temp_loc.number = strlist[4].toInt();
+        if(strlist.size() > 5)
+            temp_loc.call_id = strlist[5];
+        else
+            temp_loc.call_id = "";
         pmap->locations.push_back(temp_loc);
     }
     setting_anot.endGroup();
@@ -488,6 +514,11 @@ void Supervisor::readSetting(QString map_name){
             }else{
                 temp_loc.number = -1;
             }
+            if(strlist.size() > 5)
+                temp_loc.call_id = strlist[5];
+            else
+                temp_loc.call_id = "";
+
             temp_loc.group = i;
             pmap->locations.push_back(temp_loc);
         }
@@ -876,6 +907,12 @@ void Supervisor::makeRobotINI(){
         setSetting("ROBOT_SW/icp_ratio","0.5");
         setSetting("ROBOT_SW/icp_repeat_dist","0.15");
         setSetting("ROBOT_SW/icp_repeat_time","1.0");
+        setSetting("ROBOT_SW/use_tray","true");
+        setSetting("ROBOT_SW/use_group","false");
+        setSetting("ROBOT_SW/use_help","true");
+        setSetting("ROBOT_SW/obs_dec_margin","0.7");
+        setSetting("ROBOT_SW/obs_height_min","0.5");
+        setSetting("ROBOT_SW/obs_height_max","0.8");
 
         setSetting("FLOOR/map_load","true");
         setSetting("FLOOR/map_server","false");
@@ -1734,6 +1771,17 @@ int Supervisor::getLocationGroupNum(int num){
 
 
 }
+QString Supervisor::getLocationCallID(int num){
+    int count = 0;
+    for(int i=0; i<pmap->locations.size(); i++){
+        if(pmap->locations[i].type == "Serving"){
+            if(count == num){
+                return pmap->locations[i].call_id;
+            }
+            count++;
+        }
+    }
+}
 QString Supervisor::getLocationGroup(int num){
     int count = 0;
     for(int i=0; i<pmap->locations.size(); i++){
@@ -2377,13 +2425,6 @@ bool Supervisor::issetLocation(int number){
     return false;
 }
 
-QString Supervisor::getServingName(int number){
-    for(int i=0; i<pmap->locations.size(); i++){
-        if(pmap->locations[i].number == number)
-            return pmap->locations[i].name;
-    }
-    return "";
-}
 
 
 ////*********************************************  ROBOT STATUS 관련   ***************************************************////
@@ -3157,7 +3198,22 @@ void Supervisor::onTimer(){
     }
 
 
+    static int wifi_count = 0;
 
+    if(wifi_temp_ssd != ""){
+        if(wifi_count++ > 1000/MAIN_THREAD){
+            QMetaObject::invokeMethod(mMain,"checkwifidone");
+            wifi_check_process->close();
+            wifi_temp_ssd = "";
+        }
+    }else{
+        wifi_count = 0;
+    }
+
+    if(setting.cur_ip == "" && getWifiConnection("")){
+        qDebug() << "auto get wifi ip";
+        getWifiIP();
+    }
 
     if(flag_excuseme){
         if(count_excuseme++ > 15000/MAIN_THREAD){
@@ -3166,6 +3222,56 @@ void Supervisor::onTimer(){
         }
     }
 
+    if(wifi_cmd == WIFI_CMD_NONE && wifi_cmds.size() > 0){
+        wifi_cmd = wifi_cmds[0];
+        wifi_cmds.pop_front();
+        wifi_process->close();
+        if(setting.wifi_ssd == ""){
+            setting.wifi_ssd = getSetting("ROBOT_SW","wifi_ssd");
+        }
+        switch(wifi_cmd){
+        case WIFI_CMD_CONNECT:{
+            if(setting.wifi_passwd != ""){
+                plog->write("[SETTING] WIFI CONNECT : SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
+                wifi_process->start("nmcli --a device wifi connect "+setting.wifi_ssd+" password "+setting.wifi_passwd);
+            }else{
+                plog->write("[SETTING] WIFI CONNECT : SSD("+setting.wifi_ssd+")");
+                wifi_process->start("nmcli --a device wifi connect "+setting.wifi_ssd);
+            }
+            break;
+        }
+        case WIFI_CMD_GET_IP:{
+            wifi_process->start("nmcli con show "+setting.wifi_ssd);
+//            wifi_process->start("nmcli con show "+setting.wifi_ssd+" | grep -i ip[4]");
+            break;
+        }
+        case WIFI_CMD_SET_IP:{
+            plog->write("[SETTING] SET WIFI IP "+setting.wifi_ssd+" -> "+setting.wifi_ip+", "+setting.wifi_gateway+", "+setting.wifi_dns);
+            QString exe_str = "nmcli con mod "+setting.wifi_ssd;
+            exe_str += " ipv4.address "+setting.wifi_ip+"/24";
+            exe_str += " ipv4.dns "+setting.wifi_dns;
+            exe_str += " ipv4.gateway "+setting.wifi_gateway;
+            exe_str += " ipv4.method manual";
+
+            setting.cur_ip = "";
+            setWifiConnection(setting.wifi_ssd,0);
+            wifi_process->execute(exe_str);
+            wifi_process->waitForStarted();
+            wifi_process->start("nmcli con up "+setting.wifi_ssd);
+            wifi_process->waitForStarted();
+            break;
+        }
+        case WIFI_CMD_GET_LIST:{
+            wifi_process->start("nmcli device wifi list");
+            break;
+        }
+        default:{
+            plog->write("[SUPERVISOR] WIFI CMD WRONG : "+QString::number(wifi_cmd));
+            wifi_cmd = WIFI_CMD_NONE;
+            break;
+        }
+        }
+    }
     switch(ui_state){
     case UI_STATE_NONE:{
         if(probot->running_state == ROBOT_MOVING_PAUSED){
@@ -3230,13 +3336,13 @@ void Supervisor::onTimer(){
         if(probot->running_state == ROBOT_MOVING_READY){
             if(isaccepted){
                 ui_cmd = UI_CMD_NONE;
-                if(probot->type == "SERVING"){
-                    plog->write("[SCHEDULER] GO HOME MOVING DONE -> waitkitchen");
-                    QMetaObject::invokeMethod(mMain, "waitkitchen");
-                    ui_state = UI_STATE_READY;
-                }else{
+                if(probot->is_calling){
                     plog->write("[SCHEDULER] GO HOME MOVING DONE -> clearkitchen");
                     QMetaObject::invokeMethod(mMain, "clearkitchen");
+                    ui_state = UI_STATE_READY;
+                }else{
+                    plog->write("[SCHEDULER] GO HOME MOVING DONE -> waitkitchen");
+                    QMetaObject::invokeMethod(mMain, "waitkitchen");
                     ui_state = UI_STATE_READY;
                 }
                 isaccepted = false;
@@ -3311,150 +3417,120 @@ void Supervisor::onTimer(){
         }
         break;
     }
-    case UI_STATE_SERVING:{
+    case UI_STATE_MOVING:{
+        static int timer_cnt = 0;
         if(probot->running_state == ROBOT_MOVING_READY){
-            //Check Done Signal
             if(isaccepted){
                 count_pass = 0;
-                ui_state = UI_STATE_PICKUP;
-                LOCATION curLoc;
-                bool match = false;
-                //트레이 클리어
-                probot->pickupTrays.clear();
-                for(int i=0; i<setting.tray_num; i++){
-                    //트레이 점유됨
-                    if(!probot->trays[i].empty){
-                        if(!match){
-                            curLoc = probot->trays[i].location;
+                if(probot->is_calling){
+                    plog->write("[SCHEDULER] CALLING MOVE ARRIVED "+call_queue[0]);
+                    call_queue.pop_front();
+                    probot->call_moving_count++;
+                }else{
+                    LOCATION curLoc;
+                    bool match = false;
+                    //트레이 클리어
+                    probot->pickupTrays.clear();
+                    for(int i=0; i<setting.tray_num; i++){
+                        //트레이 점유됨
+                        if(!probot->trays[i].empty){
+                            if(!match){
+                                curLoc = probot->trays[i].location;
+                            }
+                            if(isSameLocation(probot->trays[i].location,curLoc)){
+                                probot->trays[i].empty = true;
+                                probot->pickupTrays.push_back(i+1);
+                            }
+                        }else{
+                            LOCATION clearLoc;
+                            probot->trays[i].location = clearLoc;
                         }
-                        if(isSameLocation(probot->trays[i].location,curLoc)){
-                            probot->trays[i].empty = true;
-                            probot->pickupTrays.push_back(i+1);
-                        }
-                    }else{
-                        LOCATION clearLoc;
-                        probot->trays[i].location = clearLoc;
                     }
+                    plog->write("[SCHEDULER] SERVING : PICK UP "+curLoc.name);
                 }
-                plog->write("[SCHEDULER] SERVING : PICK UP "+curLoc.name);
+                ui_state = UI_STATE_PICKUP;
                 QMetaObject::invokeMethod(mMain, "showpickup");
                 isaccepted = false;
             }else{
-                if(patrol_mode != PATROL_NONE){
-                    //시연용 가라모션
-                    if(is_set){
-                        //1초 한번마다 moveto 송신
-                        if(timer_cnt%5 == 0){
-                            if(count_moveto++ > 5){
-                                if(probot->ipc_use){
-                                    ipc->moveStop();
-                                }else{
-                                    lcm->moveStop();
-                                }
-                                ui_state = UI_STATE_MOVEFAIL;
-                                plog->write("[SCHEDULER] RANDOM SERVING MOVE FAILED");
-                            }else{
-                                probot->curLocation = getloc(patrol_list[patrol_num]);
-                                plog->write("[SCHEDULER] RANDOM SERVING : MOVE TO "+probot->curLocation.name);
-                                if(probot->ipc_use){
-                                    ipc->moveToLocation(probot->curLocation,probot->cur_preset);
-                                }else{
-                                    lcm->moveTo(probot->curLocation.name);
-                                }
-                            }
-                        }
-                    }else{
-                        count_moveto = 0;
-                        for(int i=0; i<patrol_list.size(); i++){
+                //출발
+                LOCATION cur_target;
+                probot->is_calling = false;
 
-                        }
-                        int temp = qrand();
-                        while(patrol_num == temp%(patrol_list.size())){
-                            temp = qrand();
-                            qDebug() << "Next temp = " << temp << temp%(patrol_list.size());
-                        }
-                        is_set = true;
-                        plog->write("[SCHEDULER] RANDOM SERVING : CUR ("+QString::number(temp%(patrol_list.size()))+") LAST ("+QString::number(patrol_num)+")");
-                        patrol_num = temp%(patrol_list.size());
+                //서빙 포인트 있는지 체크
+                int tray_num = -1;
+                for(int i=0; i<setting.tray_num; i++){
+                    if(!probot->trays[i].empty){
+                        tray_num = i;
                     }
+                }
+
+                if(tray_num > -1){
+                    //서빙 포인트 세팅
+                    cur_target = probot->trays[tray_num].location;
+                    plog->write("[SCHEDULER] CUR TARGET SET (SERVING) : "+cur_target.name+" ( tray num : "+QString::number(tray_num)+" )");
                 }else{
-                    bool serveDone = true;
-                    //1초에 한 번 송신하고 5초 내 경로 못 찾으면 fail
-                    if(timer_cnt%5==0){
-                        for(int i=0; i<setting.tray_num; i++){
-                            if(!probot->trays[i].empty){
-                                if(count_moveto++ > 5){
-                                    if(probot->ipc_use){
-                                        ipc->moveStop();
-                                    }else{
-                                        lcm->moveStop();
-                                    }
-                                    ui_state = UI_STATE_MOVEFAIL;
-                                    plog->write("[SCHEDULER] SERVING MOVE FAILED");
-                                }else{
-                                    plog->write("[SCHEDULER] SERVING : MOVE TO "+probot->trays[i].location.name+QString().sprintf("(group : %d, number : %d)",probot->trays[i].location.group,probot->trays[i].location.number));
-                                    if(probot->ipc_use){
-                                        ipc->moveToLocation(probot->trays[i].location, probot->cur_preset);
-                                    }else{
-                                        lcm->moveTo(probot->trays[i].location.name);
-                                    }
-                                    serveDone = false;
-                                }
-                                break;
+
+                    //최대 이동 횟수 초과 시 -> 대기장소로 이동
+                    if(probot->call_moving_count > probot->max_moving_count){
+                        plog->write("[SCHEDULER] CUR TARGET SET (ERROR) : Call Move Count is Max");
+                    }else{
+
+                        //들어온 콜 위치가 있는지 체크
+                        bool call_set = false;
+                        if(call_queue.size() > 0){
+
+                            //콜 번호가 유효한 지 체크
+                            LOCATION temp_loc = getLocation(call_queue[0]);
+                            if(temp_loc.call_id == call_queue[0]){
+
+                                //호출 포인트 세팅
+                                call_set = true;
+                                cur_target = temp_loc;
+                                plog->write("[SCHEDULER] CUR TARGET SET (CALLING) : "+temp_loc.name+" ( call id : "+temp_loc.call_id+" )");
+                                probot->is_calling = true;
+                            }else{
+                                plog->write("[SCHEDULER] CUR TARGET SET (ERROR) : Call ID Wrong ("+call_queue[0]+")");
+                                call_queue.pop_front();
                             }
-                        }
-                        if(serveDone){
-                            // move done -> move to wait
-                            plog->write("[SCHEDULER] SERVING : SERVE DONE");
-                            ui_state = UI_STATE_GO_HOME;
+                        }else{
+                            //PATROLLING
+                            if(patrol_mode != PATROL_NONE && patrol_list.size() > 0){
+
+                                //패트롤 위치 랜덤하게 지정
+                                int temp = qrand();
+                                while(patrol_num == temp%(patrol_list.size())){
+                                    temp = qrand();
+                                    qDebug() << "Next temp = " << temp << temp%(patrol_list.size());
+                                }
+                                plog->write("[SCHEDULER] RANDOM SERVING : CUR ("+QString::number(temp%(patrol_list.size()))+") LAST ("+QString::number(patrol_num)+")");
+                                patrol_num = temp%(patrol_list.size());
+
+
+                                //패트롤 위치가 유효한 지 체크
+                                LOCATION temp_loc = getloc(patrol_list[patrol_num]);
+                                if(temp_loc.name != ""){
+                                    cur_target = temp_loc;
+                                    plog->write("[SCHEDULER] CUR TARGET SET (PATROL) : "+temp_loc.name);
+                                }else{
+                                    plog->write("[SCHDULER] PATROL LIST NAME WRONG (ERROR) : "+patrol_list[patrol_num]);
+                                    patrol_mode = PATROL_NONE;
+                                }
+                            }
                         }
                     }
                 }
-            }
-        }else if(probot->running_state == ROBOT_MOVING_MOVING){
-            // moving
-            if(!isaccepted){
-                isaccepted = true;
-                count_moveto = 0;
-                is_set = false;
-                plog->write("[SCHEDULER] SERVING : MOVE START");
-                QMetaObject::invokeMethod(mMain, "movelocation");
-            }
-        }
-        break;
-    }
-    case UI_STATE_CALLING:{
-        patrol_mode = PATROL_NONE;
-        if(probot->running_state == ROBOT_MOVING_READY){
-            if(isaccepted){
-                plog->write("[SCHEDULER] CALLING MOVE ARRIVED "+call_list[0]);
-                ui_state = UI_STATE_PICKUP;
-                call_list.pop_front();
-                probot->call_moving_count++;
-                QMetaObject::invokeMethod(mMain, "showpickup");
-                isaccepted = false;
-            }else{//출발
-                static int timer_cnt = 0;
-                bool moveDone = false;
 
-                if(timer_cnt%5==0){
-                    //최대 이동 횟수 초과 시 -> 대기장소로 이동
-                    if(probot->call_moving_count > probot->max_moving_count){
-                        plog->write("[SCHEDULER] CALLING MOVE DONE(MAX MOVING)");
-                        moveDone = true;
-                    }
 
-                    //call_list 비어있으면 -> 대기장소로 이동(혹은 패트롤 재시작)
-                    if(call_list.size() == 0){
-                        plog->write("[SCHEDULER] CALLING MOVE DONE(NO LIST)");
-                        moveDone = true;
-                    }
+                if(cur_target.name == ""){
 
-                    if(moveDone){
-                        plog->write("[SCHEDULER] CALLING -> GO HOME");
-                        ui_state = UI_STATE_GO_HOME;
-                        probot->call_moving_count = 0;
-                    }else{
+                    //세팅 되지 않음 -> 고 홈
+                    plog->write("[SCHEDULER] CUR TARGET SET (DONE) : Back to Resting");
+                    ui_state = UI_STATE_GO_HOME;
+                    probot->call_moving_count = 0;
+                }else{
+
+                    if(timer_cnt%5==0){
+                        //로봇 안 움직임 -> 실패
                         if(count_moveto++ > 5){
                             if(probot->ipc_use){
                                 ipc->moveStop();
@@ -3462,15 +3538,15 @@ void Supervisor::onTimer(){
                                 lcm->moveStop();
                             }
                             ui_state = UI_STATE_MOVEFAIL;
-                            plog->write("[SCHEDULER] CALLING MOVE FAILED");
+                            plog->write("[SCHEDULER] MOVE FAILED : ROBOT NOT MOVING (Max 5)");
                         }else{
-                            //call_list에서 타겟 지정 후 move
-                            QString cur_target = getCallName(call_list[0]);
-                            plog->write("[SCHEDULER] CALLING MOVE TO "+cur_target);
+
+                            //무브 명령 보냄
+                            plog->write("[SCHEDULER] MOVE TO "+cur_target.name);
                             if(probot->ipc_use){
-                                ipc->moveToLocation(getloc(cur_target),probot->cur_preset);
+                                ipc->moveToLocation(cur_target,probot->cur_preset);
                             }else{
-                                lcm->moveTo(cur_target);
+                                lcm->moveTo(cur_target.name);
                             }
                         }
                     }
@@ -3482,7 +3558,16 @@ void Supervisor::onTimer(){
             if(!isaccepted){
                 isaccepted = true;
                 count_moveto = 0;
-                plog->write("[SCHEDULER] CALLING : MOVE START");
+                if(probot->is_calling){
+                    plog->write("[SCHEDULER] CALLING : MOVE START");
+                }else{
+                    if(patrol_mode != PATROL_NONE){
+
+                        plog->write("[SCHEDULER] PATROLIONG : MOVE START");
+                    }else{
+                        plog->write("[SCHEDULER] SERVING : MOVE START");
+                    }
+                }
                 QMetaObject::invokeMethod(mMain, "movelocation");
             }
         }
@@ -3517,6 +3602,11 @@ void Supervisor::onTimer(){
             }
         }
         if(ui_cmd == UI_CMD_PICKUP_CONFIRM){
+            if(probot->is_calling){
+
+            }else{
+
+            }
             if(probot->type == "SERVING"){
                 plog->write("[SCHEDULER] PICKUP Confirm -> Serving");
                 ui_state = UI_STATE_SERVING;
@@ -3759,6 +3849,15 @@ bool Supervisor::isHasLog(int year, int month, int date){
     return false;
 }
 
+LOCATION Supervisor::getLocation(QString name){
+    for(int i=0; i<pmap->locations.size(); i++){
+        if(pmap->locations[i].name == name){
+            return pmap->locations[i];
+        }
+    }
+    return LOCATION();
+}
+
 int Supervisor::getzipstate(){
     return zip->process;
 }
@@ -3799,27 +3898,27 @@ void Supervisor::zip_failed(){
 }
 
 void Supervisor::unzip_failed(){
-    qDebug() << "STATE CHANGED : " << temp_wifi->state();
+//    qDebug() << "STATE CHANGED : " << temp_wifi->state();
 }
 
 void Supervisor::readWifi(){
-    wifi_list.clear();
-    qDebug() << "READ WIFI : " <<  QNetworkConfiguration::Active;
+//    wifi_list.clear();
+//    qDebug() << "READ WIFI : " <<  QNetworkConfiguration::Active;
 
-    QNetworkConfigurationManager ncm;
-    QList<QNetworkConfiguration> nc_list;
+//    QNetworkConfigurationManager ncm;
+//    QList<QNetworkConfiguration> nc_list;
 
-    nc_list = ncm.allConfigurations();
-    for (auto &x : nc_list){
-        if(x.bearerType() == QNetworkConfiguration::BearerWLAN){
-            if(x.name() == ""){
+//    nc_list = ncm.allConfigurations();
+//    for (auto &x : nc_list){
+//        if(x.bearerType() == QNetworkConfiguration::BearerWLAN){
+//            if(x.name() == ""){
 
-            }else{
-                wifi_list << x.name();
-                qDebug() << x.name() << x.type();
-            }
-        }
-    }
+//            }else{
+//                wifi_list << x.name();
+//                qDebug() << x.name() << x.type();
+//            }
+//        }
+//    }
 }
 
 int Supervisor::getWifiNum(){
@@ -3828,40 +3927,370 @@ int Supervisor::getWifiNum(){
 
 QString Supervisor::getWifiSSD(int num){
     if(num < wifi_list.size() && num > -1){
-        return wifi_list[num];
+        return wifi_list[num].ssid;
     }else
         return "unknown";
 }
 
-void Supervisor::connectWifi(QString ssd, QString passwd){
-    qDebug() << ssd << passwd;
-    QNetworkConfigurationManager ncm;
-    QList<QNetworkConfiguration> nc_list;
-    QNetworkConfiguration cf;
-    nc_list = ncm.allConfigurations();
-    for (auto &x : nc_list){
-        if(x.bearerType() == QNetworkConfiguration::BearerWLAN){
-            qDebug() << x.name();
-            if(x.name() == ssd){
-                cf = x;
-            }
+int Supervisor::getWifiConnection(QString ssd){
+    if(ssd == ""){
+        if(setting.wifi_ssd == ""){
+            ssd = getSetting("ROBOT_SW","wifi_ssd");
+        }else{
+            ssd = setting.wifi_ssd;
         }
     }
-
-    bool canStartIAP = (ncm.capabilities() & QNetworkConfigurationManager::CanStartAndStopInterfaces);
-    cf = ncm.defaultConfiguration();
-    if(!cf.isValid() || (!canStartIAP && cf.state() != QNetworkConfiguration::Active))
-        qDebug() << "cf is not valid";
-    qDebug() << "cf name : " << cf.name();
-    temp_wifi = new QNetworkSession(cf, this);
-    connect(temp_wifi, SIGNAL(stateChanged(QNetworkSession::State)),this, SLOT(unzip_failed()));
-    temp_wifi->open();
-    if(temp_wifi->waitForOpened(3000))
-        qDebug("open temp wifi");
-    else
-        qDebug() << temp_wifi->errorString();
-
-//    qDebug() << temp_wifi->state();
-
-//    qDebug() << temp_wifi->interface().
+//    qDebug() << "getwificonnection" << ssd;
+    for(int i=0; i<wifi_list.size(); i++){
+        if(ssd == wifi_list[i].ssid)
+            return wifi_list[i].state;
+    }
+    return 0;
 }
+
+
+int Supervisor::getPrevWifiConnection(QString ssd){
+    for(int i=0; i<wifi_list.size(); i++){
+        if(ssd == wifi_list[i].ssid)
+            return wifi_list[i].prev_state;
+    }
+    return 0;
+}
+
+void Supervisor::setWifiConnection(QString ssd, int con){
+    for(int i=0; i<wifi_list.size(); i++){
+        if(ssd == wifi_list[i].ssid)
+            wifi_list[i].state = con;
+    }
+}
+
+void Supervisor::setPrevWifiConnection(QString ssd, int state){
+    for(int i=0; i<wifi_list.size(); i++){
+        if(ssd == wifi_list[i].ssid)
+            wifi_list[i].prev_state = state;
+    }
+}
+void Supervisor::wifi_ch_output(){
+    QString output = QString(wifi_check_process->readAllStandardOutput());
+    output.replace(" ","");
+    QStringList outputs = output.split(":");
+    int temp_state;
+    if(outputs.size() > 1 && outputs[0] == "GENERAL.STATE"){
+        if(outputs[1] == "activated\n"){
+            temp_state = 2;
+        }else if(outputs[1] == "activating\n"){
+            temp_state = 1;
+        }else{
+            temp_state = 0;
+        }
+    }else{
+        temp_state = 0;
+    }
+
+    setWifiConnection(wifi_temp_ssd,temp_state);
+
+    if(temp_state != getPrevWifiConnection(wifi_temp_ssd) || setting.cur_ip == ""){
+        getWifiIP();
+    }
+
+    setPrevWifiConnection(wifi_temp_ssd, temp_state);
+    QMetaObject::invokeMethod(mMain,"checkwifidone");
+
+    wifi_check_process->close();
+    wifi_temp_ssd = "";
+}
+void Supervisor::wifi_ch_error(){
+    wifi_check_process->close();
+    QMetaObject::invokeMethod(mMain,"checkwifidone");
+    wifi_temp_ssd = "";
+}
+void Supervisor::wifi_con_output(){
+    QString output = QString(wifi_process->readAllStandardOutput());
+    switch(wifi_cmd){
+    case WIFI_CMD_CONNECT:{
+        qDebug() << "WIFI CON OUTPUT : " << output;
+        QStringList outputs = output.split(" ");
+        for(int i=0; i<outputs.size(); i++){
+            if(outputs[i] == "successfully"){
+                plog->write("[SETTING] WIFI CONNECT SUCCESS : SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
+//                setSetting("ROBOT_SW/wifi_ssd",setting.wifi_ssd);
+//                setSetting("ROBOT_SW/wifi_passwd",setting.wifi_passwd);
+                readWifiState(setting.wifi_ssd);
+                QMetaObject::invokeMethod(mMain,"wifisuccess");
+            }
+        }
+        wifi_cmd = WIFI_CMD_NONE;
+        setting.cur_ip = "";
+        getWifiIP();
+        wifi_process->close();
+        break;
+    }
+    case WIFI_CMD_GET_LIST:{
+        QVector<ST_WIFI> wifi_all;
+        QStringList output_lines = output.split("\n");
+        for(int i=0; i<output_lines.size(); i++){
+            QStringList outputs = output_lines[i].split(" ");
+            QStringList output_final;
+            for(int j=0; j<outputs.size(); j++){
+                if(outputs[j] != ""){
+                    output_final << outputs[j];
+                }
+            }
+            //parsing
+            ST_WIFI temp;
+            if(output_final.size() > 8){
+                if(output_final[0] == "IN-USE"){
+                    continue;
+                }if(output_final[0] == "*"){
+                    temp.inuse = true;
+                    temp.state = 2;
+                    temp.prev_state = 2;
+                }else{
+                    temp.state = 0;
+                    temp.prev_state = 0;
+                    temp.inuse = false;
+                    output_final.push_front(" ");
+                }
+            }else{
+                continue;
+            }
+            temp.ssid = output_final[2];
+            temp.rate = output_final[5].toInt();
+            if(output_final[8] == "▂▄▆█"){
+                temp.level = 4;
+            }else if(output_final[8] == "▂▄▆_"){
+                temp.level = 3;
+            }else if(output_final[8] == "▂▄__"){
+                temp.level = 2;
+            }else if(output_final[8] == "▂___"){
+                temp.level = 1;
+            }else{
+                temp.level = 0;
+            }
+            if(output_final[9].left(3) == "WPA"){
+                temp.security = true;
+            }else{
+                temp.security = false;
+            }
+            temp.discon_count = 0;
+//            qDebug() << temp.ssid << temp.inuse << temp.rate << temp.level << temp.security;
+            wifi_all.push_back(temp);
+        }
+
+        QVector<ST_WIFI> temp_wifi;
+        for(int i=0; i<wifi_all.size(); i++){
+            bool already_in = false;
+            for(int k=0; k<temp_wifi.size(); k++){
+                if(wifi_all[i].ssid == temp_wifi[k].ssid){
+                    if(wifi_all[i].inuse){
+                        temp_wifi[k].inuse = true;
+                    }
+                    already_in = true;
+                }
+                if(wifi_all[i].ssid == "--")
+                    already_in = true;
+            }
+            if(!already_in){
+                if(wifi_all[i].ssid == "--"){
+
+                }else{
+                    temp_wifi.push_back(wifi_all[i]);
+                }
+            }
+        }
+
+        for(int k=0; k<wifi_list.size(); k++){
+            wifi_list[k].discon_count++;
+        }
+
+        bool is_pushed = false;
+        for(int i=0; i<temp_wifi.size(); i++){
+            bool already_in = false;
+            for(int k=0; k<wifi_list.size(); k++){
+                if(temp_wifi[i].ssid == wifi_list[k].ssid){
+                    wifi_list[k].inuse = temp_wifi[i].inuse;
+                    wifi_list[k].level = temp_wifi[i].level;
+                    wifi_list[k].discon_count = 0;
+                    already_in = true;
+                }
+            }
+            if(!already_in){
+                is_pushed = true;
+                wifi_list.push_back(temp_wifi[i]);
+            }
+        }
+
+        if(is_pushed)
+            plog->write("[SETTING] READ WIFI LIST CHANGED : "+QString::number(wifi_list.size()));
+        wifi_cmd = WIFI_CMD_NONE;
+        wifi_process->close();
+        break;
+    }
+    case WIFI_CMD_GET_IP:{
+        bool is_read = false;
+        QStringList output_lines = output.split("\n");
+//        qDebug() << output_lines;
+        for(int i=0; i<output_lines.size(); i++){
+            output_lines[i].replace(" ","");
+            QStringList line = output_lines[i].split(":");
+            qDebug() << i << line;
+            if(line.size() > 1){
+                if(line[0] == "IP4.ADDRESS[1]"){
+                    qDebug() << line;
+                    setting.cur_ip = line[1].split("/")[0];
+                }else if(line[0] == "IP4.GATEWAY"){
+                    qDebug() << line;
+                    setting.cur_gateway = line[1];
+                }else if(line[0] == "IP4.DNS[1]"){
+                    qDebug() << line;
+                    setting.cur_dns = line[1];
+                    is_read = true;
+                }
+            }
+        }
+        if(output_lines.size() > 0){
+            if(is_read){
+                plog->write("[SETTING] READ IP : "+setting.wifi_ssd+" IP("+setting.cur_ip+") GATEWAY("+setting.cur_gateway+") DNS("+setting.cur_dns+")");
+                QMetaObject::invokeMethod(mMain,"wifireset");
+                wifi_process->close();
+                wifi_cmd = WIFI_CMD_NONE;
+            }
+        }
+        break;
+    }
+    case WIFI_CMD_SET_IP:{
+        QMetaObject::invokeMethod(mMain,"wifireset");
+        setWifiConnection(setting.wifi_ssd,2);
+        wifi_cmd = WIFI_CMD_NONE;
+        wifi_process->close();
+        break;
+    }
+    }
+}
+void Supervisor::wifi_con_error(){
+    QString output = QString(wifi_process->readAllStandardError());
+    qDebug() << "WIFI CON ERROR : " << output;
+
+    switch(wifi_cmd){
+    case WIFI_CMD_CONNECT:{
+        QStringList outputs = output.split(" ");
+        for(int i=0; i<outputs.size(); i++){
+            if(outputs[i] == "invalid.\n"){
+                plog->write("[SETTING] WIFI CONNECT FAILED (PROPERTY): SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
+                QMetaObject::invokeMethod(mMain,"wififailed");
+                wifi_cmd = WIFI_CMD_NONE;
+                wifi_process->close();
+            }else if(outputs[i] == "No"){
+                plog->write("[SETTING] WIFI CONNECT FAILED (NO SSD) : SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
+                QMetaObject::invokeMethod(mMain,"wififailed");
+                wifi_cmd = WIFI_CMD_NONE;
+                wifi_process->close();
+            }
+        }
+        break;
+    }
+    case WIFI_CMD_GET_LIST:{
+        plog->write("[SETTING] WIFI GET LIST FAILED");
+        wifi_cmd = WIFI_CMD_NONE;
+        wifi_process->close();
+        break;
+    }
+    case WIFI_CMD_GET_IP:{
+        plog->write("[SETTING] WIFI GET IP FAILED "+setting.wifi_ssd);
+        wifi_cmd = WIFI_CMD_NONE;
+        wifi_process->close();
+        break;
+    }
+    }
+}
+void Supervisor::connectWifi(QString ssd, QString passwd){
+    bool match = false;
+    for(int i=0; i<wifi_cmds.size(); i++){
+        if(wifi_cmds[i] == WIFI_CMD_CONNECT){
+            plog->write("[SETTING] CONNECT WIFI CMD : OVERWRITE PREV("+setting.wifi_ssd+") NEW("+ssd+")");
+            setting.wifi_ssd = ssd;
+            setting.wifi_passwd = passwd;
+            match = true;
+        }
+    }
+    if(!match){
+        setting.wifi_ssd = ssd;
+        setting.wifi_passwd = passwd;
+        wifi_cmds.append(WIFI_CMD_CONNECT);
+    }
+}
+void Supervisor::setWifi(QString ip, QString gateway, QString dns){
+    bool match = false;
+    for(int i=0; i<wifi_cmds.size(); i++){
+        if(wifi_cmds[i] == WIFI_CMD_SET_IP){
+            plog->write("[SETTING] SET WIFI IP CMD : OVERWRITE PREV("+setting.wifi_ip+") NEW("+ip+")");
+            match = true;
+        }
+    }
+    setting.wifi_ip = ip;
+    setting.wifi_gateway = gateway;
+    setting.wifi_dns = dns;
+    if(!match)
+        wifi_cmds.append(WIFI_CMD_SET_IP);
+}
+void Supervisor::readWifiState(QString ssd){
+    if(wifi_temp_ssd == ""){
+        wifi_temp_ssd = ssd;
+        wifi_check_process->start("nmcli -f GENERAL.STATE con show "+wifi_temp_ssd);
+    }
+}
+
+void Supervisor::setWifiSSD(QString ssd){
+    setting.wifi_ssd = ssd;
+}
+void Supervisor::getWifiIP(){
+    bool match = false;
+    for(int i=0; i<wifi_cmds.size(); i++){
+        if(wifi_cmds[i] == WIFI_CMD_GET_IP){
+            match = true;
+        }
+    }
+    if(!match)
+        wifi_cmds.append(WIFI_CMD_GET_IP);
+}
+QString Supervisor::getcurIP(){
+    return setting.cur_ip;
+}
+QString Supervisor::getcurGateway(){
+    return setting.cur_gateway;
+}
+QString Supervisor::getcurDNS(){
+    return setting.cur_dns;
+}
+void Supervisor::getAllWifiList(){
+    if(wifi_cmds.size() == 0 && wifi_cmd == WIFI_CMD_NONE){
+        wifi_cmds.append(WIFI_CMD_GET_LIST);
+    }
+}
+bool Supervisor::getWifiSecurity(int num){
+    if(num > -1 && num < wifi_list.size()){
+        return wifi_list[num].security;
+    }
+    return false;
+}
+int Supervisor::getWifiLevel(int num){
+    if(num > -1 && num < wifi_list.size()){
+        return wifi_list[num].level;
+    }
+    return 0;
+}
+
+int Supervisor::getWifiRate(int num){
+    if(num > -1 && num < wifi_list.size()){
+        return wifi_list[num].rate;
+    }
+    return 0;
+}
+
+bool Supervisor::getWifiInuse(int num){
+    if(num > -1 && num < wifi_list.size()){
+        return wifi_list[num].inuse;
+    }
+    return false;
+}
+

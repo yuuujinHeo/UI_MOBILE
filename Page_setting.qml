@@ -11,7 +11,7 @@ Item {
     width: 1280
     height: 800
 
-    property bool debug_use_ip: false
+    property bool debug_use_ip: true
     property bool debug_test_1: false
 
     property bool is_admin: false
@@ -33,6 +33,8 @@ Item {
         //DEBUG 230523 세팅 빠른 확인 위해서 admin true
         is_admin = true;
         is_reset_slam = false;
+//        supervisor.getAllWifiList();
+        supervisor.getWifiIP();
         init();
     }
 
@@ -405,7 +407,7 @@ Item {
                                 onCurrentIndexChanged: {
                                     ischanged = true;
                                 }
-                                model:["서빙용","호출용"]
+                                model:["서빙용","호출용","서빙+호출용"]
                             }
                         }
                     }
@@ -1020,6 +1022,61 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_wifi_connection
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"WIFI 연결상태"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            id: wifi_connection
+                            width: parent.width - 351
+                            height: parent.height
+                            property int connection: 0
+                            color: {
+                                if(wifi_connection.connection === 1){
+                                    color_yellow
+                                }else if(wifi_connection.connection === 2){
+                                    color_green
+                                }else{
+                                    color_red
+                                }
+                            }
+                            Text{
+                                anchors.centerIn: parent
+                                font.family:font_noto_r.name
+                                font.pixelSize:20
+                                text:{
+                                    if(wifi_connection.connection === 1){
+                                        "연결중"
+                                    }else if(wifi_connection.connection === 2){
+                                        "연결됨"
+                                    }else{
+                                        "연결안됨"
+                                    }
+                                }
+                                color: "white"
+                            }
+                        }
+                    }
+                }
+                Rectangle{
                     id: set_wifi_ssd
                     width: 840
                     visible: is_admin && debug_use_ip
@@ -1068,6 +1125,8 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            //Debug
+//                                            supervisor.connectWifi("mobile_robot_test","rainbow2011");
                                             popup_wifi.open();
                                         }
                                     }
@@ -1080,7 +1139,8 @@ Item {
                 Rectangle{
                     id: set_wifi_passwd
                     width: 840
-                    visible: is_admin && debug_use_ip
+                    visible: false
+//                    visible: is_admin && debug_use_ip
                     height: 40
                     Row{
                         anchors.fill: parent
@@ -1340,7 +1400,20 @@ Item {
                                             ip_3.ischanged = false;
                                             ip_4.ischanged = false;
                                             var ip_str = ip_1.text + "." + ip_2.text + "." + ip_3.text + "." + ip_4.text;
+                                            gateway_1.ischanged = false;
+                                            gateway_2.ischanged = false;
+                                            gateway_3.ischanged = false;
+                                            gateway_4.ischanged = false;
+                                            var gateway_str = gateway_1.text + "." + gateway_2.text + "." + gateway_3.text + "." + gateway_4.text;
+                                            dnsmain_1.ischanged = false;
+                                            dnsmain_2.ischanged = false;
+                                            dnsmain_3.ischanged = false;
+                                            dnsmain_4.ischanged = false;
+                                            var dns_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
+                                            supervisor.setWifi(ip_str,gateway_str,dns_str);
                                             supervisor.setSetting("ROBOT_SW/wifi_ip",ip_str);
+                                            supervisor.setSetting("ROBOT_SW/wifi_gateway",gateway_str);
+                                            supervisor.setSetting("ROBOT_SW/wifi_dnsmain",dns_str);
                                         }
                                     }
                                 }
@@ -1532,12 +1605,25 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            ip_1.ischanged = false;
+                                            ip_2.ischanged = false;
+                                            ip_3.ischanged = false;
+                                            ip_4.ischanged = false;
+                                            var ip_str = ip_1.text + "." + ip_2.text + "." + ip_3.text + "." + ip_4.text;
                                             gateway_1.ischanged = false;
                                             gateway_2.ischanged = false;
                                             gateway_3.ischanged = false;
                                             gateway_4.ischanged = false;
-                                            var ip_str = gateway_1.text + "." + gateway_2.text + "." + gateway_3.text + "." + gateway_4.text;
-                                            supervisor.setSetting("ROBOT_SW/wifi_gateway",ip_str);
+                                            var gateway_str = gateway_1.text + "." + gateway_2.text + "." + gateway_3.text + "." + gateway_4.text;
+                                            dnsmain_1.ischanged = false;
+                                            dnsmain_2.ischanged = false;
+                                            dnsmain_3.ischanged = false;
+                                            dnsmain_4.ischanged = false;
+                                            var dns_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
+                                            supervisor.setWifi(ip_str,gateway_str,dns_str);
+                                            supervisor.setSetting("ROBOT_SW/wifi_ip",ip_str);
+                                            supervisor.setSetting("ROBOT_SW/wifi_gateway",gateway_str);
+                                            supervisor.setSetting("ROBOT_SW/wifi_dnsmain",dns_str);
                                         }
                                     }
                                 }
@@ -1729,12 +1815,25 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            ip_1.ischanged = false;
+                                            ip_2.ischanged = false;
+                                            ip_3.ischanged = false;
+                                            ip_4.ischanged = false;
+                                            var ip_str = ip_1.text + "." + ip_2.text + "." + ip_3.text + "." + ip_4.text;
+                                            gateway_1.ischanged = false;
+                                            gateway_2.ischanged = false;
+                                            gateway_3.ischanged = false;
+                                            gateway_4.ischanged = false;
+                                            var gateway_str = gateway_1.text + "." + gateway_2.text + "." + gateway_3.text + "." + gateway_4.text;
                                             dnsmain_1.ischanged = false;
                                             dnsmain_2.ischanged = false;
                                             dnsmain_3.ischanged = false;
                                             dnsmain_4.ischanged = false;
-                                            var ip_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
-                                            supervisor.setSetting("ROBOT_SW/wifi_dnsmain",ip_str);
+                                            var dns_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
+                                            supervisor.setWifi(ip_str,gateway_str,dns_str);
+                                            supervisor.setSetting("ROBOT_SW/wifi_ip",ip_str);
+                                            supervisor.setSetting("ROBOT_SW/wifi_gateway",gateway_str);
+                                            supervisor.setSetting("ROBOT_SW/wifi_dnsmain",dns_str);
                                         }
                                     }
                                 }
@@ -1746,7 +1845,8 @@ Item {
                     id: set_dnsserve
                     width: 840
                     height: 40
-                    visible: is_admin && debug_use_ip
+                    visible: false
+//                    visible: is_admin && debug_use_ip
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -2579,6 +2679,7 @@ Item {
                     id: set_call_num
                     width: 840
                     height: 40
+                    visible: false
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -2619,6 +2720,7 @@ Item {
 
                 }
                 Repeater{
+                    visible: false
                     model: ListModel{id:model_callbell}//combo_call_num.currentIndex
                     Rectangle{
                         width: 840
@@ -2835,6 +2937,165 @@ Item {
                                         }
                                     }
 
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_decmargin
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"obs_dec_margin"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_dec_margin
+                                anchors.fill: parent
+                                objectName: "obs_dec_margin"
+                                text:supervisor.getSetting("ROBOT_SW","obs_dec_margin");
+                                property bool ischanged: false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = mask;
+                                    mask.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        mask.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    if(focus){
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_obs_height_min
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"obs_height_min"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_height_min
+                                anchors.fill: parent
+                                objectName: "obs_height_min"
+                                text:supervisor.getSetting("ROBOT_SW","obs_height_min");
+                                property bool ischanged: false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = mask;
+                                    mask.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        mask.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    if(focus){
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_obsheight_max
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"obs_height_max"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_height_max
+                                anchors.fill: parent
+                                objectName: "obs_height_max"
+                                text:supervisor.getSetting("ROBOT_SW","obs_height_max");
+                                property bool ischanged: false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = mask;
+                                    mask.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        mask.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    if(focus){
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
                                 }
                             }
                         }
@@ -5963,6 +6224,8 @@ Item {
                 supervisor.setSetting("ROBOT_HW/type","SERVING");
             }else if(combo_platform_type.currentIndex == 1){
                 supervisor.setSetting("ROBOT_HW/type","CALLING");
+            }else if(combo_platform_type.currentIndex == 2){
+                supervisor.setSetting("ROBOT_HW/type","BOTH");
             }
         }
 
@@ -6093,6 +6356,18 @@ Item {
 
         if(mask.ischanged){
             supervisor.setSetting("SENSOR/mask",mask.text);
+        }
+
+        if(obs_height_min.ischanged){
+            supervisor.setSetting("ROBOT_SW/obs_height_min",obs_height_min.text);
+        }
+
+        if(obs_height_max.ischanged){
+            supervisor.setSetting("ROBOT_SW/obs_height_max",obs_height_max.text);
+        }
+
+        if(obs_dec_margin.ischanged){
+            supervisor.setSetting("ROBOT_SW/obs_dec_margin",obs_dec_margin.text);
         }
 
         if(max_range.ischanged){
@@ -6295,9 +6570,12 @@ Item {
 
         if(supervisor.getSetting("ROBOT_HW","type") === "SERVING"){
             combo_platform_type.currentIndex = 0;
-        }else{
+        }else if(supervisor.getSetting("ROBOT_HW","type") === "CALLING"){
             combo_platform_type.currentIndex = 1;
+        }else{
+            combo_platform_type.currentIndex = 2;
         }
+
         wheel_base.text = supervisor.getSetting("ROBOT_HW","wheel_base");
         wheel_radius.text = supervisor.getSetting("ROBOT_HW","wheel_radius");
 
@@ -6431,6 +6709,9 @@ Item {
         }
 
 
+        obs_dec_margin.text = supervisor.getSetting("ROBOT_SW","obs_dec_margin");
+        obs_height_min.text = supervisor.getSetting("ROBOT_SW","obs_height_min");
+        obs_height_max.text = supervisor.getSetting("ROBOT_SW","obs_height_max");
         mask.text = supervisor.getSetting("SENSOR","mask");
         max_range.text = supervisor.getSetting("SENSOR","max_range");
         offset_x.text = supervisor.getSetting("SENSOR","offset_x");
@@ -6438,7 +6719,8 @@ Item {
         right_camera.text = supervisor.getSetting("SENSOR","right_camera");
         left_camera.text = supervisor.getSetting("SENSOR","left_camera");
 
-        var ip = supervisor.getSetting("ROBOT_SW","wifi_ip").split(".");
+//        var ip = supervisor.getSetting("ROBOT_SW","wifi_ip").split(".");
+        var ip = supervisor.getcurIP().split(".");
         if(ip.length >3){
             ip_1.text = ip[0];
             ip_2.text = ip[1];
@@ -6446,27 +6728,29 @@ Item {
             ip_4.text = ip[3];
         }
 
-        ip = supervisor.getSetting("ROBOT_SW","wifi_gateway").split(".");
+//        ip = supervisor.getSetting("ROBOT_SW","wifi_gateway").split(".");
+        ip = supervisor.getcurGateway().split(".");
         if(ip.length >3){
             gateway_1.text = ip[0];
             gateway_2.text = ip[1];
             gateway_3.text = ip[2];
             gateway_4.text = ip[3];
         }
-        ip = supervisor.getSetting("ROBOT_SW","wifi_dnsmain").split(".");
+//        ip = supervisor.getSetting("ROBOT_SW","wifi_dnsmain").split(".");
+        ip = supervisor.getcurDNS().split(".");
         if(ip.length >3){
             dnsmain_1.text = ip[0];
             dnsmain_2.text = ip[1];
             dnsmain_3.text = ip[2];
             dnsmain_4.text = ip[3];
         }
-        ip = supervisor.getSetting("ROBOT_SW","wifi_dnsserv").split(".");
-        if(ip.length >3){
-            dnsserv_1.text = ip[0];
-            dnsserv_2.text = ip[1];
-            dnsserv_3.text = ip[2];
-            dnsserv_4.text = ip[3];
-        }
+//        ip = supervisor.getSetting("ROBOT_SW","wifi_dnsserv").split(".");
+//        if(ip.length >3){
+//            dnsserv_1.text = ip[0];
+//            dnsserv_2.text = ip[1];
+//            dnsserv_3.text = ip[2];
+//            dnsserv_4.text = ip[3];
+//        }
 
 
         //변수 초기화
@@ -6670,6 +6954,9 @@ Item {
                 btn_usb_download.enabled = false;
             }
 
+            wifi_connection.connection = supervisor.getWifiConnection("");
+//            print(supervisor.getWifiState());
+
             motor_left_id = parseInt(supervisor.getSetting("MOTOR","left_id"));
             motor_right_id = parseInt(supervisor.getSetting("MOTOR","right_id"));
 
@@ -6706,7 +6993,6 @@ Item {
 
             text_power.text = "Power : " + supervisor.getPower().toString();
             text_power_total.text = "Total : " + supervisor.getPowerTotal().toString();
-
         }
     }
 
@@ -9292,10 +9578,25 @@ Item {
             color: "transparent"
         }
         onOpened:{
-            supervisor.readWifi();
-            model_wifis.clear();
-            for(var i=0; i<supervisor.getWifiNum(); i++){
-                model_wifis.append({"ssd":supervisor.getWifiSSD(i)});
+            timer_update_wifi.start();
+//            supervisor.getAllWifiList();
+//            supervisor.readWifi();
+        }
+        onClosed:{
+            timer_update_wifi.stop();
+        }
+        Timer{
+            id: timer_update_wifi
+            running: false
+            repeat: true
+            interval: 1000
+            triggeredOnStart: true
+            onTriggered: {
+                supervisor.getAllWifiList();
+                model_wifis.clear();
+                for(var i=0; i<supervisor.getWifiNum(); i++){
+                    model_wifis.append({"ssd":supervisor.getWifiSSD(i),"inuse":supervisor.getWifiInuse(i),"rate":supervisor.getWifiRate(i),"level":supervisor.getWifiLevel(i),"security":supervisor.getWifiSecurity(i)});
+                }
             }
         }
 
@@ -9314,7 +9615,6 @@ Item {
                 font.family: font_noto_r.name
                 font.pixelSize: 20
             }
-
             Text{
                 id: text_wifi2
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -9326,6 +9626,7 @@ Item {
                 font.pixelSize: 15
             }
             Flickable{
+                id: flickable_wifi
                 width: parent.width
                 height: 250
                 clip: true
@@ -9345,11 +9646,114 @@ Item {
                             width: 330
                             height: 40
                             radius: 5
-                            color: col_wifis.select_wifi===index?color_green:"white"
+                            border.width:4
+                            border.color: col_wifis.select_wifi===index?color_green:"white"
                             Text{
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
                                 text: ssd
+                            }
+                            Text{
+                                font.family: font_noto_r.name
+                                text: "(사용중)"
+                                color: color_red
+                                visible: inuse
+                                font.pixelSize: 15
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 10
+                            }
+                            Image{
+                                visible: !inuse && security
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                source: "icon/icon_lock_2.png"
+                                width: 40
+                                height: 40
+                                ColorOverlay{
+                                    anchors.fill: parent
+                                    source: parent
+                                    color: color_gray
+                                }
+                            }
+
+                            Row{
+                                spacing: 1
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 10
+                                Rectangle{
+                                    width: 5
+                                    anchors.bottom: parent.bottom
+                                    height:level<1?2:5
+                                    color:{
+                                        if(level==0){
+                                            color_red
+                                        }else if(level==1){
+                                            color_red
+                                        }else if(level==2){
+                                            color_yellow
+                                        }else if(level==3){
+                                            color_green
+                                        }else if(level==4){
+                                            color_green
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width: 5
+                                    anchors.bottom: parent.bottom
+                                    height:level<2?2:10
+                                    color:{
+                                        if(level==0){
+                                            color_red
+                                        }else if(level==1){
+                                            color_red
+                                        }else if(level==2){
+                                            color_yellow
+                                        }else if(level==3){
+                                            color_green
+                                        }else if(level==4){
+                                            color_green
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width: 5
+                                    anchors.bottom: parent.bottom
+                                    height:level<3?2:15
+                                    color:{
+                                        if(level==0){
+                                            color_red
+                                        }else if(level==1){
+                                            color_red
+                                        }else if(level==2){
+                                            color_yellow
+                                        }else if(level==3){
+                                            color_green
+                                        }else if(level==4){
+                                            color_green
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width: 5
+                                    anchors.bottom: parent.bottom
+                                    height:level<4?2:20
+                                    color:{
+                                        if(level==0){
+                                            color_red
+                                        }else if(level==1){
+                                            color_red
+                                        }else if(level==2){
+                                            color_yellow
+                                        }else if(level==3){
+                                            color_green
+                                        }else if(level==4){
+                                            color_green
+                                        }
+                                    }
+                                }
                             }
                             MouseArea{
                                 anchors.fill: parent
@@ -9399,11 +9803,17 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked:{
-                            supervisor.setSetting("ROBOT_SW/wifi_ssd",model_wifis.get(col_wifis.select_wifi).ssd);
-//                            popup_wifi_passwd.ssd = model_wifis.get(col_wifis.select_wifi).ssd;
-//                            popup_wifi_passwd.open();
-                            wifi_ssd.text = supervisor.getSetting("ROBOT_SW","wifi_ssd");
-                            popup_wifi.close();
+                            timer_update_wifi.stop();
+                            if(model_wifis.get(col_wifis.select_wifi).inuse){
+                                popup_wifi.close();
+                            }else if(model_wifis.get(col_wifis.select_wifi).security){
+                                popup_wifi_passwd.ssd = model_wifis.get(col_wifis.select_wifi).ssd;
+                                popup_wifi_passwd.open();
+                            }else{
+                                print("check connect", model_wifis.get(col_wifis.select_wifi).ssd, "");
+                                supervisor.connectWifi(model_wifis.get(col_wifis.select_wifi).ssd, "")
+                                popup_loading.open();
+                            }
                         }
                     }
                 }
@@ -9411,29 +9821,226 @@ Item {
         }
     }
     Popup{
-        id: popup_wifi_passwd
+        id: popup_loading
         anchors.centerIn: parent
-        width: 200
-        height: 150
-        property string ssd: ""
-
-        TextField{
-            id: passwd_wifi
-            anchors.centerIn: parent
-            width: 100
-            height: 50
-            onFocusChanged: {
-                keyboard.owner = passwd_wifi;
-                passwd_wifi.selectAll();
-                if(focus){
-                    keyboard.open();
-                }else{
-                    keyboard.close();
-                    passwd_wifi.select(0,0);
-                    print("check connect", popup_wifi_passwd.ssd, passwd_wifi.text);
-                    supervisor.connectWifi(popup_wifi_passwd.ssd, passwd_wifi.text)
+        leftPadding: 0
+        rightPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        width: 1280
+        height: 800
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+        AnimatedImage{
+            source: "image/loading_rb.gif"
+            cache:false
+            MouseArea{
+                id: area_debug
+                width: 150
+                height: 150
+                anchors.right: parent.right
+                anchors.bottom : parent.bottom
+                z: 99
+                property var password: 0
+                onClicked: {
+                    password++;
+                    if(password > 4){
+                        password = 0;
+                        popup_loading.close();
+                    }
                 }
             }
+        }
+    }
+
+    function wifi_con_failed(){
+        print("wifi_con_failed")
+        popup_loading.close();
+        passwd_wifi.color = color_red;
+        text_wifi76788.visible = true;
+    }
+    function wifi_con_success(){
+        print("wifi_con_success")
+        popup_loading.close();
+        popup_wifi_passwd.close();
+        popup_wifi.close();
+        init();
+    }
+
+    Popup{
+        id: popup_wifi_passwd
+        property string ssd: ""
+        property bool show_passwd: false
+        anchors.centerIn: parent
+        leftPadding: 0
+        rightPadding: 0
+        topPadding: 0
+        bottomPadding: 0
+        width: 400
+        height: 500
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+        onOpened:{
+            text_wifi76788.visible = false;
+            passwd_wifi.color = "black";
+        }
+
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 10
+            color: color_dark_navy
+            Text{
+                id: text_wifi222
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 30
+                text: "WIFI 설정"
+                color: "white"
+                font.family: font_noto_r.name
+                font.pixelSize: 20
+            }
+            Text{
+                id: text_wifi555
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: text_wifi222.bottom
+                anchors.topMargin: 20
+                text: "비밀번호를 입력해주세요."
+                color: "white"
+                font.family: font_noto_r.name
+                font.pixelSize: 15
+            }
+            Rectangle{
+                width: parent.width
+                height: 250
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: text_wifi555.bottom
+                anchors.topMargin: 15
+                color: color_dark_navy
+                Column{
+                    anchors.centerIn: parent
+                    spacing: 30
+                    Text{
+                        id: text_wifi75
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: popup_wifi_passwd.ssd
+                        color: "white"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                    }
+                    Text{
+                        id: text_wifi76788
+                        visible: false
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "비밀번호가 틀렸습니다."
+                        color: color_red
+                        font.family: font_noto_r.name
+                        font.pixelSize: 17
+                    }
+                    Row{
+                        spacing: 30
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        TextField{
+                            id: passwd_wifi
+                            width: 200
+                            height: 50
+                            horizontalAlignment: Text.AlignHCenter
+                            anchors.verticalCenter: parent.verticalCenter
+                            echoMode: popup_wifi_passwd.show_passwd?TextInput.Normal:TextInput.Password
+                            onFocusChanged: {
+                                keyboard.owner = passwd_wifi;
+                                passwd_wifi.selectAll();
+                                if(focus){
+                                    keyboard.open();
+                                }else{
+                                    keyboard.close();
+                                    passwd_wifi.select(0,0);
+                                }
+                            }
+                            onTextChanged: {
+                                color = "black"
+                                text_wifi76788.visible = false;
+                            }
+                        }
+                        Rectangle{
+                            width: 50
+                            height: 50
+                            radius: 5
+                            color: "transparent"
+                            border.color: "white"
+                            border.width: 1
+                            Image{
+                                anchors.centerIn: parent
+                                width: 35
+                                height: 35
+                                source:popup_wifi_passwd.show_passwd?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked:{
+                                    if(popup_wifi_passwd.show_passwd){
+                                        popup_wifi_passwd.show_passwd = false;
+                                    }else{
+                                        popup_wifi_passwd.show_passwd = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+            }
+            Row{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 30
+                spacing: 30
+                Rectangle{
+                    width: 150
+                    height: 50
+                    radius: 5
+                    color: "transparent"
+                    border.width: 2
+                    border.color: "white"
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        text: "취소"
+                        color: "white"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            popup_wifi_passwd.close();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 150
+                    height: 50
+                    radius: 5
+                    color: "white"
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        text: "확인"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            print("check connect", popup_wifi_passwd.ssd, passwd_wifi.text);
+                            supervisor.connectWifi(popup_wifi_passwd.ssd, passwd_wifi.text);
+                            popup_loading.open();
+                        }
+                    }
+                }
+            }
+
         }
     }
 

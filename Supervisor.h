@@ -29,6 +29,15 @@ enum{
     PATROL_RANDOM,
     PATROL_SEQUENCE
 };
+enum{
+    WIFI_CMD_NONE = 0,
+    WIFI_CMD_CONNECT,
+    WIFI_CMD_GET_LIST,
+    WIFI_CMD_GET_IP,
+    WIFI_CMD_SET_IP,
+    WIFI_CMD_GET_STATE
+};
+
 
 class Supervisor : public QObject
 {
@@ -65,10 +74,38 @@ public:
     int count_excuseme = 0;
     bool flag_excuseme = false;
 
-    QVector<QString> call_list;
-    int setting_call_id = -1;
+    int setting_call_num = -1;
+    QVector<QString> call_queue;
 
-//    QString cur_location;
+    ////*********************************************  IP SETTINGs   *********************************************////
+    QVector<ST_WIFI> wifi_list;
+    QString wifi_new_ip;
+    QString wifi_new_gateway;
+    QString wifi_new_dns;
+    QList<int> wifi_cmds;
+    int wifi_cmd = WIFI_CMD_NONE;
+    QString wifi_temp_ssd = "";
+    Q_INVOKABLE void readWifi();
+    Q_INVOKABLE int getWifiNum();
+    Q_INVOKABLE int getWifiConnection(QString ssd);
+    void setPrevWifiConnection(QString ssd, int state);
+    int getPrevWifiConnection(QString ssd);
+    void setWifiConnection(QString ssd, int con);
+    Q_INVOKABLE QString getWifiSSD(int num);
+    Q_INVOKABLE void connectWifi(QString ssd, QString passwd);
+    Q_INVOKABLE bool getWifiSecurity(int num);
+    Q_INVOKABLE int getWifiLevel(int num);
+    Q_INVOKABLE int getWifiRate(int num);
+    Q_INVOKABLE bool getWifiInuse(int num);
+    Q_INVOKABLE void getAllWifiList();
+    Q_INVOKABLE void getWifiIP();
+    Q_INVOKABLE void setWifi(QString ip, QString gateway, QString dns);
+    Q_INVOKABLE QString getcurSSD(){return setting.wifi_ssd;}
+    Q_INVOKABLE QString getcurIP();
+    Q_INVOKABLE QString getcurGateway();
+    Q_INVOKABLE QString getcurDNS();
+    Q_INVOKABLE void readWifiState(QString ssd);
+    Q_INVOKABLE void setWifiSSD(QString ssd);
 
     ////*********************************************  CLASS   ***************************************************////
     LCMHandler *lcm;
@@ -149,14 +186,9 @@ public:
     Q_INVOKABLE QString getLocalVersionMessage();
     Q_INVOKABLE QString getServerVersionMessage();
 
-    QNetworkSession *temp_wifi;
-    QStringList wifi_list;
-    Q_INVOKABLE void readWifi();
-    Q_INVOKABLE int getWifiNum();
-    Q_INVOKABLE QString getWifiSSD(int num);
-    Q_INVOKABLE void connectWifi(QString ssd, QString passwd);
 
 
+    Q_INVOKABLE bool isCallingMode(){return probot->is_calling;}
     QStringList curLog;
     QString log_folder = "ui_log";
     Q_INVOKABLE void setLog(int num){
@@ -180,7 +212,7 @@ public:
     Q_INVOKABLE QString getLocaleDate(int year, int month, int date){
         return QString().sprintf("%d-%02d-%02d",year,month,date);
     }
-
+    Q_INVOKABLE LOCATION getLocation(QString name);
     void makeUSBShell();
     Q_INVOKABLE void updateUSB();
     Q_INVOKABLE int getusbsize();
@@ -255,9 +287,16 @@ public:
 
     ////*********************************************  CALLING 관련   ***************************************************////
     Q_INVOKABLE QString getLastCall(){return call->getBellID();}
-    Q_INVOKABLE int getCallSize(){return call_list.size();}
-    Q_INVOKABLE QString getCall(int id){return call_list[id];}
-    Q_INVOKABLE QString getCallName(QString id);
+    Q_INVOKABLE int getCallSize(){
+        int num = 0;
+        for(int i=0; i<pmap->locations.size(); i++){
+            if(pmap->locations[i].call_id != "")
+                num++;
+        }
+        return num;
+    }
+    Q_INVOKABLE QString getCall(int id){return pmap->locations[id].call_id;}
+    Q_INVOKABLE LOCATION getCallLocation(QString id);
     Q_INVOKABLE void setCallbell(int id);
     Q_INVOKABLE void acceptCall(bool yes);
     Q_INVOKABLE void removeCall(int id);
@@ -278,7 +317,8 @@ public:
     Q_INVOKABLE QString getKeyboard(int mode);
     Q_INVOKABLE QString getJoystick(int mode);
 
-
+    QProcess *wifi_process;
+    QProcess *wifi_check_process;
     bool isSameLocation(LOCATION l1, LOCATION l2){
         if(l1.group == l2.group && l1.number == l2.number && l1.name == l2.name){
             return true;
@@ -300,6 +340,8 @@ public:
     Q_INVOKABLE int getLocationGroupNum();
     Q_INVOKABLE int getLocationGroupSize(int num);
     Q_INVOKABLE int getLocationGroupNum(int num);
+    Q_INVOKABLE QString getLocationCallID(int num);
+
 
     Q_INVOKABLE void removeLocationGroup(int num);
     Q_INVOKABLE void addLocationGroup(QString name);
@@ -373,7 +415,6 @@ public:
     Q_INVOKABLE void resetHomeFolders();
 
     Q_INVOKABLE bool issetLocation(int number);
-    Q_INVOKABLE QString getServingName(int number);
 
 
     ////*********************************************  ROBOT STATUS 관련   ***************************************************////
@@ -462,6 +503,10 @@ public slots:
     void unzip_done();
     void zip_failed();
     void unzip_failed();
+    void wifi_con_output();
+    void wifi_con_error();
+    void wifi_ch_output();
+    void wifi_ch_error();
 
 private:
     QTimer *timer;

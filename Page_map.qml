@@ -50,6 +50,7 @@ Item {
     property int select_tline_num: -1
     property int select_tline_category: -1
     property int select_patrol_num: -1
+    property var select_preset: 1
 
     property var cur_group: 0
 
@@ -2610,6 +2611,7 @@ Item {
                                "group":supervisor.getLocationGroupNum(i),
                                "number": supervisor.getLocationNumber(-1,i),
                                 "number_table" : supervisor.getLocationGroupSize(supervisor.getLocationGroupNum(i)),
+                                "call_id" : supervisor.getLocationCallID(i),
                                "error":false});
                 print("locations append : ",i,supervisor.getLocationGroupNum(i),supervisor.getLocationGroupNum(i),supervisor.getLocationNumber(-1,i))
             }
@@ -2628,6 +2630,7 @@ Item {
                                "group":locations.get(i).group,
                                "number":locations.get(i).number,
                                "number_table":getgroupsize(locations.get(i).group),
+                                "call_id":locations.get(i).call_id,
                                "error":locations.get(i).error});
                 print("detail append : ",i, locations.get(i).group, locations.get(i).number, getgroupsize(locations.get(i).group))
             }
@@ -2687,18 +2690,17 @@ Item {
                 }else
                     details.get(i).error = false;
             }
-
-
-//            for(i=0; i<details.count; i++){
-//                if(details.get(i).number > details.get(i).number_table){
-//                    print("error ",i,details.get(i).number,details.get(i).number_table);
-//                    details.get(i).error= true;
-//                }
-//            }
-
             for(var i=0; i<details.count; i++){
                 for(var j=i+1; j<details.count; j++){
                     if(details.get(i).number === details.get(j).number && details.get(i).group===details.get(j).group){
+                        details.get(i).error = true;
+                        details.get(j).error = true;
+                    }
+                }
+            }
+            for(var i=0; i<details.count; i++){
+                for(var j=i+1; j<details.count; j++){
+                    if(details.get(i).call_id === details.get(j).call_id){
                         details.get(i).error = true;
                         details.get(j).error = true;
                     }
@@ -2787,6 +2789,17 @@ Item {
                             color: "white"
                         }
                     }
+                    Rectangle{
+                        width: 200
+                        height: 30
+                        color: color_navy
+                        Text{
+                            anchors.centerIn: parent
+                            text: "호출벨"
+                            font.family: font_noto_r.name
+                            color: "white"
+                        }
+                    }
                 }
 
 
@@ -2866,8 +2879,35 @@ Item {
                                     }
                                 }
                             }
+                            Rectangle{
+                                width : 100
+                                height: 40
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    text: call_id==""?" - ":call_id
+                                }
+                            }
+                            Rectangle{
+                                width : 100
+                                height: 40
+                                radius: 5
+                                color: "black"
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    text:"설정"
+                                    color: "white"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        popup_add_callbell.callid = index;
+                                        popup_add_callbell.open();
+                                    }
+                                }
+                            }
                         }
-
                     }
                 }
 
@@ -2967,6 +3007,37 @@ Item {
                 }
             }
 
+        }
+        Popup{
+            id: popup_add_callbell
+            anchors.centerIn: parent
+            background: Rectangle{
+                anchors.fill: parent
+                color: "transparent"
+            }
+            width : 500
+            height: 200
+            property var callid: 0
+            onOpened: {
+                supervisor.setCallbell(callid);
+            }
+            onClosed: {
+                supervisor.setCallbell(-1);
+            }
+
+            Rectangle{
+                width: parent.width
+                height: parent.height
+                radius: 20
+                color: color_dark_navy
+                Text{
+                    anchors.centerIn: parent
+                    text: "변경하실 호출벨을 눌러주세요."
+                    font.family: font_noto_r.name
+                    font.pixelSize: 25
+                    color: "white"
+                }
+            }
         }
 
     }
@@ -3097,9 +3168,8 @@ Item {
                             }
 
                             onClicked: {
-                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> MOVE")
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : VelMap -> MOVE")
                                 map.setTool("move");
-                                map.clear("spline");
                             }
                         }
                     }
@@ -3107,7 +3177,7 @@ Item {
                         id: btn_draw
                         width: 80
                         shadow_color: color_gray
-                        highlight: map.tool=="draw"
+                        highlight: map.tool=="draw" || map.tool=="erase" || map.tool=="draw_rect"
                         icon: "icon/icon_draw.png"
                         name: "수정"
                         MouseArea{
@@ -3119,9 +3189,10 @@ Item {
                                 parent.released();
                             }
                             onClicked: {
-                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> BRUSH")
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : VelMap -> BRUSH")
                                 map.setTool("draw");
-                                map.setDrawingColor(255);
+                                select_preset = 1;
+                                map.setDrawingColor(100);
                                 map.setDrawingWidth(slider_brush.value);
                             }
                         }
@@ -3130,9 +3201,9 @@ Item {
                         id: btn_erase
                         width: 80
                         shadow_color: color_gray
-                        highlight: map.tool=="erase"
-                        icon: "icon/icon_erase.png"
+                        icon: "icon/icon_trashcan.png"
                         name: "초기화"
+                        overcolor: true
                         MouseArea{
                             anchors.fill: parent
                             onPressed: {
@@ -3142,10 +3213,8 @@ Item {
                                 parent.released();
                             }
                             onClicked: {
-                                map.clearall();
-                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> ERASE")
-                                map.setDrawingWidth(slider_erase.value);
-                                map.setTool("erase");
+                                map.clear("all");
+                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : VelMap -> Clear")
                             }
                         }
                     }
@@ -3154,137 +3223,281 @@ Item {
             Rectangle{
                 id: rect_annot_boxs
                 width: parent.width - 60
-                height: 150
+                height: 200
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: rect_annot_box.bottom
 //                anchors.topMargin: 50
                 color: "#e8e8e8"
                 Column{
                     anchors.centerIn: parent
-                    spacing: 2
-                    Rectangle{
-                        id: rect_annot_tline_1
-                        width: rect_annot_boxs.width
-                        height: 50
-                        visible: map.tool === "draw" || map.tool === "straight"
-                        color: "white"
-                        Row{
-                            anchors.centerIn: parent
-                            spacing: 20
-                            Rectangle{
-                                width: 80
-                                height: 40
-                                radius: 5
-                                border.width: 1
-                                color: map.tool === "draw"? color_green: color_light_gray
-                                Text{
-                                    anchors.centerIn: parent
-                                    font.family: font_noto_r.name
-                                    text: "자유"
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked:{
-                                        map.clear("spline");
-                                        map.setTool("draw");
-                                    }
-                                }
-                            }
-                            Rectangle{
-                                width: 80
-                                height: 40
-                                radius: 5
-                                border.width: 1
-                                color: map.tool === "straight"? color_green: color_light_gray
-                                Text{
-                                    anchors.centerIn: parent
-                                    font.family: font_noto_r.name
-                                    text: "직선"
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked:{
-                                        map.clear("spline");
-                                        map.setTool("straight");
-                                    }
-                                }
-                            }
-                            Rectangle{
-                                width: 80
-                                height: 40
-                                radius: 5
-                                border.width: 1
-                                color: map.tool === "dot_spline"? color_green: color_light_gray
-                                Text{
-                                    anchors.centerIn: parent
-                                    font.family: font_noto_r.name
-                                    text: "곡선"
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked:{
-                                        map.clear("spline");
-                                        map.setTool("dot_spline");
-                                    }
-                                }
-                            }
-                        }
+                    spacing: 4
+                    Text{
+                        visible: map.tool == "move"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_b.name
+                        font.pixelSize: 20
+                        text: "   ** 속도구간 설정 안내 **   ";
                     }
                     Rectangle{
-                        id: rect_annot_tline_2
-                        width: rect_annot_boxs.width
-                        height: 50
-                        visible: map.tool === "dot_spline"
-                        color: "white"
-                        Row{
-                            anchors.centerIn: parent
-                            spacing: 20
-                            Rectangle{
-                                width: 80
-                                height: 40
-                                radius: 5
-                                border.width: 1
-                                color: color_light_gray
-                                Text{
-                                    anchors.centerIn: parent
-                                    font.family: font_noto_r.name
-                                    text: "취소"
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked:{
-                                        map.clear("spline");
-                                        map.setTool("draw");
-                                    }
-                                }
-                            }
-                            Rectangle{
-                                width: 80
-                                height: 40
-                                radius: 5
-                                border.width: 1
-                                color: color_light_gray
-                                Text{
-                                    anchors.centerIn: parent
-                                    font.family: font_noto_r.name
-                                    text: "저장"
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked:{
-                                        map.save("spline");
-                                        map.setTool("draw");
-                                    }
-                                }
-                            }
-                        }
+                        visible: map.tool == "move"
+                        width: 10
+                        height: 20
+                        color: "transparent"
+                    }
+
+                    Text{
+                        visible: map.tool == "move"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: color_red
+                        text: "로봇이 이동 중 해당 영역에 진입하면 속도가 줄어듭니다.";
+                    }
+                    Text{
+                        visible: map.tool == "move"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: color_red
+                        text: "속도는 2단계(느리게, 매우느리게)로 나뉩니다.";
+                    }
+                    Text{
+                        visible: map.tool == "move"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: color_red
+                        text: "각 단계의 속도는 SETTING에서 변경 가능합니다.";
+                    }
+                    Text{
+                        visible: map.tool == "move"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: color_red
+                        text: "구간을 더 색칠하거나 지우신 후에는 반드시 저장을 눌러주세요.";
                     }
 
                     Rectangle{
+                        id: rect_annot_tline_2
+                        width: rect_annot_boxs.width
+                        height: 60
+                        visible: map.tool === "draw" || map.tool === "draw_rect" || map.tool === "erase"
+                        color: "white"
+                        Row{
+                            anchors.centerIn: parent
+                            spacing: 20
+
+                            Rectangle{
+                                width: 100
+                                height: 50
+                                color: "transparent"
+                                Row{
+                                    anchors.centerIn: parent
+                                    spacing: 10
+                                    Rectangle{
+                                        width: 50
+                                        height: width
+                                        radius: width
+                                        color: map.tool === "draw"?color_green:color_gray
+                                        Image{
+                                            source: "icon/icon-drawing-free drawing.png"
+                                            width: 30
+                                            height: 30
+                                            anchors.centerIn: parent
+                                        }
+                                    }
+                                    Text{
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        font.family: font_noto_r.name
+                                        color: map.tool === "draw"?"black":color_gray
+                                        text: "그리기"
+                                    }
+                                }
+
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        map.setTool("draw");
+                                    }
+                                }
+                            }
+
+                            Rectangle{
+                                width: 100
+                                height: 50
+                                color: "transparent"
+                                Row{
+                                    anchors.centerIn: parent
+                                    spacing: 10
+                                    Rectangle{
+                                        width: 50
+                                        height: width
+                                        radius: width
+                                        color: map.tool==="draw_rect"? color_green: color_gray
+                                        Image{
+                                            source: "icon/icon-drawing-square.png"
+                                            width: 30
+                                            height: 30
+                                            anchors.centerIn: parent
+                                        }
+                                    }
+                                    Text{
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        font.family: font_noto_r.name
+                                        color: map.tool === "draw_rect"?"black":color_gray
+                                        text: "사각형"
+                                    }
+                                }
+
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        map.setTool("draw_rect");
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 100
+                                height: 50
+                                color: "transparent"
+                                Row{
+                                    anchors.centerIn: parent
+                                    spacing: 10
+                                    Rectangle{
+                                        width: 50
+                                        height: width
+                                        radius: width
+                                        color: map.tool === "erase"?color_green:color_gray
+                                        Image{
+                                            source: "icon/icon_erase.png"
+                                            width: 30
+                                            height: 30
+                                            anchors.centerIn: parent
+                                            ColorOverlay{
+                                                source: parent
+                                                anchors.fill: parent
+                                                color: "white"
+                                            }
+                                        }
+                                    }
+                                    Text{
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        font.family: font_noto_r.name
+                                        color: map.tool === "erase"?"black":color_gray
+                                        text: "지우개"
+                                    }
+                                }
+
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        map.setTool("erase");
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                    Rectangle{
+                        id: rect_annot_tline_1
+                        width: rect_annot_boxs.width
+                        height: 60
+                        visible: map.tool === "draw" || map.tool === "draw_rect"
+                        color: "white"
+                        Row{
+                            anchors.centerIn: parent
+                            spacing: 20
+                            Rectangle{
+                                width: 130
+                                height: 50
+                                color: "transparent"
+                                Row{
+                                    anchors.centerIn: parent
+                                    spacing: 10
+                                    Rectangle{
+                                        width: 50
+                                        height: width
+                                        radius: width
+                                        color: select_preset===1?color_yellow_rect:color_gray
+                                        Image{
+                                            source: "icon/icon_connect_error.png"
+                                            width: 28
+                                            height: 25
+                                            anchors.centerIn: parent
+                                            ColorOverlay{
+                                                source: parent
+                                                anchors.fill: parent
+                                                color: "white"
+                                            }
+                                        }
+                                    }
+                                    Text{
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        font.family: font_noto_r.name
+                                        color: select_preset===1?"black":color_gray
+                                        text: "느리게"
+                                    }
+                                }
+
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        select_preset = 1;
+                                        map.setDrawingColor(100);
+                                        map.setDrawingWidth(slider_brush.value);
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 130
+                                height: 50
+                                color: "transparent"
+                                Row{
+                                    anchors.centerIn: parent
+                                    spacing: 10
+                                    Rectangle{
+                                        width: 50
+                                        height: width
+                                        radius: width
+                                        color: select_preset===2?color_red:color_gray
+                                        Image{
+                                            source: "icon/icon_error.png"
+                                            width: 30
+                                            height: 30
+                                            anchors.centerIn: parent
+                                            ColorOverlay{
+                                                source: parent
+                                                anchors.fill: parent
+                                                color: "white"
+                                            }
+                                        }
+                                    }
+                                    Text{
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        font.family: font_noto_r.name
+                                        color: select_preset===2?"black":color_gray
+                                        text: "매우 느리게"
+                                    }
+                                }
+
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        select_preset = 2;
+                                        map.setDrawingColor(200);
+                                        map.setDrawingWidth(slider_brush.value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Rectangle{
                         id: rect_annot_box3
                         width: rect_annot_boxs.width
-                        height: 50
+                        height: 60
                         color: "white"
+                        visible: map.tool === "draw" || map.tool === "erase" || map.tool === "draw_rect"
                         Text{
                             text: "브러시 사이즈"
                             font.family: font_noto_r.name
@@ -3297,72 +3510,22 @@ Item {
                             id: slider_brush
                             x: 300
                             y: 330
-                            value: 1
+                            value: 20
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
                             anchors.rightMargin: 30
                             width: 170
                             height: 18
-                            from: 1
-                            to : 5
+                            from: 5
+                            to : 50
                             onValueChanged: {
                                 map.setDrawingWidth(value)
-                                if(map.tool !== "draw" && map.tool !== "straight"){
-                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> BRUSH")
-                                    map.setTool("draw");
-                                    map.setDrawingColor(255);
-                                }
                             }
                             onPressedChanged: {
                                 if(slider_brush.pressed){
                                     map.show_brush = true;
-//                                    map.brushchanged();
                                 }else{
                                     map.show_brush = false;
-//                                    map.brushdisappear();
-                                }
-                            }
-                        }
-                    }
-                    Rectangle{
-                        width: rect_annot_boxs.width
-                        height: 50
-                        color: "white"
-                        Text{
-                            text: "지우개 사이즈"
-                            font.family: font_noto_r.name
-                            font.pixelSize: 15
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.left
-                            anchors.leftMargin: 30
-                        }
-                        Slider {
-                            id: slider_erase
-                            x: 300
-                            y: 330
-                            value: 10
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.right: parent.right
-                            anchors.rightMargin: 30
-                            width: 170
-                            height: 18
-                            from: 10
-                            to : 100
-                            onValueChanged: {
-                                map.setDrawingWidth(value);
-                                if(map.tool !== "erase"){
-                                    supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> ERASE")
-                                    map.setTool("erase");
-                                    map.clear("spline");
-                                }
-                            }
-                            onPressedChanged: {
-                                if(slider_erase.pressed){
-                                    map.show_brush = true;
-//                                    map.brushchanged();
-                                }else{
-                                    map.show_brush = false;
-//                                    map.brushdisappear();
                                 }
                             }
                         }
@@ -3700,9 +3863,9 @@ Item {
                         id: btn_draw
                         width: 80
                         shadow_color: color_gray
-                        highlight: (map.tool=="draw" || map.tool == "straight")
+                        highlight: (map.tool=="draw" || map.tool == "straight" || map.tool == "erase")
                         icon: "icon/icon_draw.png"
-                        name: "그리기"
+                        name: "수정"
                         MouseArea{
                             anchors.fill: parent
                             onPressed: {
@@ -3711,7 +3874,6 @@ Item {
                             onReleased:{
                                 parent.released();
                             }
-
                             onClicked: {
                                 supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> BRUSH")
                                 map.setTool("draw");
@@ -3722,36 +3884,12 @@ Item {
                         }
                     }
                     Item_button{
-                        id: btn_erase
-                        width: 80
-                        shadow_color: color_gray
-                        highlight: map.tool=="erase"
-                        icon: "icon/icon_erase.png"
-                        name: "지우기"
-                        MouseArea{
-                            anchors.fill: parent
-                            onPressed: {
-                                parent.pressed();
-                            }
-                            onReleased:{
-                                parent.released();
-                            }
-
-                            onClicked: {
-                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> ERASE")
-
-                                map.clear("spline");
-                                map.setDrawingWidth(slider_erase.value);
-                                map.setTool("erase");
-                            }
-                        }
-                    }
-                    Item_button{
                         id: btn_clear
                         width: 80
                         shadow_color: color_gray
-                        icon: "icon/icon_erase.png"
+                        icon: "icon/icon_trashcan.png"
                         name: "초기화"
+                        overcolor: true
                         MouseArea{
                             anchors.fill: parent
                             onPressed: {
@@ -3764,7 +3902,9 @@ Item {
                             onClicked: {
                                 supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> CLEAR ALL")
                                 map.init();
+                                map.clear("spline");
                                 map.clear("tline");
+                                map.clear("all");
                             }
                         }
                     }
@@ -3773,77 +3913,243 @@ Item {
             Rectangle{
                 id: rect_annot_boxs
                 width: parent.width - 60
-                height: 150
+                height: cccc.height > 180? cccc.height:180
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: rect_annot_box.bottom
 //                anchors.topMargin: 50
                 color: "#e8e8e8"
                 Column{
+                    id: cccc
                     anchors.centerIn: parent
                     spacing: 2
+                    Text{
+                        visible: map.tool == "move"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_b.name
+                        font.pixelSize: 20
+                        text: "   ** 이동경로 설정 안내 **   ";
+                    }
                     Rectangle{
-                        id: rect_annot_tline_1
-                        width: rect_annot_boxs.width
-                        height: 50
-                        visible: map.tool === "draw" || map.tool === "straight"
-                        color: "white"
-                        Row{
-                            anchors.centerIn: parent
-                            spacing: 20
-                            Rectangle{
-                                width: 80
-                                height: 40
-                                radius: 5
-                                border.width: 1
-                                color: map.tool === "draw"? color_green: color_light_gray
-                                Text{
-                                    anchors.centerIn: parent
-                                    font.family: font_noto_r.name
-                                    text: "자유"
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked:{
-                                        map.clear("spline");
-                                        map.setTool("draw");
+                        visible: map.tool == "move"
+                        width: 10
+                        height: 20
+                        color: "transparent"
+                    }
+
+                    Text{
+                        visible: map.tool == "move"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: color_red
+                        text: "로봇이 이동경로를 따라 이동합니다.";
+                    }
+                    Text{
+                        visible: map.tool == "move"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: color_red
+                        text: "이동경로가 없는 부분은 최단거리로 이동합니다.";
+                    }
+                    Text{
+                        visible: map.tool == "move"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: color_red
+                        text: "로봇이 자동으로 생성한 이동경로가 이상하다면 수정해주세요.";
+                    }
+                    Text{
+                        visible: map.tool == "move"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                        color: color_red
+                        text: "수정하신 후에는 반드시 저장을 눌러주세요.";
+                    }
+
+                    Column{
+                        visible: map.tool === "draw" || map.tool === "straight" || map.tool === "dot_spline"|| map.tool === "erase"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        Rectangle{
+                            id: rect_annot_tline_1
+                            width: rect_annot_boxs.width
+                            height: 60
+                            color: "white"
+                            Row{
+                                anchors.centerIn: parent
+                                spacing: 20
+                                Rectangle{
+                                    width: 100
+                                    height: 50
+                                    color: "transparent"
+                                    Row{
+                                        anchors.centerIn: parent
+                                        spacing: 10
+                                        Rectangle{
+                                            width: 50
+                                            height: width
+                                            radius: width
+                                            color: map.tool === "draw"?color_green:color_gray
+                                            Image{
+                                                source: "icon/icon-drawing-free drawing.png"
+                                                width: 30
+                                                height: 30
+                                                anchors.centerIn: parent
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            font.family: font_noto_r.name
+                                            color: map.tool === "draw"?"black":color_gray
+                                            text: "그리기"
+                                        }
+                                    }
+
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            map.clear("spline");
+                                            map.setTool("draw");
+                                        }
                                     }
                                 }
-                            }
-                            Rectangle{
-                                width: 80
-                                height: 40
-                                radius: 5
-                                border.width: 1
-                                color: map.tool === "straight"? color_green: color_light_gray
-                                Text{
-                                    anchors.centerIn: parent
-                                    font.family: font_noto_r.name
-                                    text: "직선"
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked:{
-                                        map.clear("spline");
-                                        map.setTool("straight");
+                                Rectangle{
+                                    width: 100
+                                    height: 50
+                                    color: "transparent"
+                                    Row{
+                                        anchors.centerIn: parent
+                                        spacing: 10
+                                        Rectangle{
+                                            width: 50
+                                            height: width
+                                            radius: width
+                                            color: map.tool === "straight"?color_green:color_gray
+                                            Shape{
+                                                width: 30
+                                                height: 30
+                                                anchors.centerIn: parent
+                                                ShapePath{
+                                                    strokeColor: "white"
+                                                    fillColor: "white"
+                                                    capStyle: Qt.RoundCap
+                                                    strokeWidth:4
+                                                    startX: 30
+                                                    startY:0
+                                                    PathLine{
+                                                        x: 0
+                                                        y: 30
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            font.family: font_noto_r.name
+                                            color: map.tool === "straight"?"black":color_gray
+                                            text: "직선"
+                                        }
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            map.clear("spline");
+                                            map.setTool("straight");
+                                        }
                                     }
                                 }
+
                             }
-                            Rectangle{
-                                width: 80
-                                height: 40
-                                radius: 5
-                                border.width: 1
-                                color: map.tool === "dot_spline"? color_green: color_light_gray
-                                Text{
-                                    anchors.centerIn: parent
-                                    font.family: font_noto_r.name
-                                    text: "곡선"
+                        }
+                        Rectangle{
+                            id: rect_annot_tline_11
+                            width: rect_annot_boxs.width
+                            height: 60
+                            color: "white"
+                            Row{
+                                anchors.centerIn: parent
+                                spacing: 20
+                                Rectangle{
+                                    width: 100
+                                    height: 50
+                                    color: "transparent"
+                                    Row{
+                                        anchors.centerIn: parent
+                                        spacing: 10
+                                        Rectangle{
+                                            width: 50
+                                            height: width
+                                            radius: width
+                                            color: map.tool === "dot_spline"?color_green:color_gray
+                                            Image{
+                                                source: "icon/icon-drawing-curve.png"
+                                                width: 30
+                                                height: 30
+                                                anchors.centerIn: parent
+                                                ColorOverlay{
+                                                    source: parent
+                                                    anchors.fill: parent
+                                                    color: "white"
+                                                }
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            font.family: font_noto_r.name
+                                            color: map.tool === "dot_spline"?"black":color_gray
+                                            text: "곡선"
+                                        }
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            map.clear("spline");
+                                            map.setTool("dot_spline");
+                                        }
+                                    }
                                 }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked:{
-                                        map.clear("spline");
-                                        map.setTool("dot_spline");
+
+                                Rectangle{
+                                    width: 100
+                                    height: 50
+                                    color: "transparent"
+                                    Row{
+                                        anchors.centerIn: parent
+                                        spacing: 10
+                                        Rectangle{
+                                            width: 50
+                                            height: width
+                                            radius: width
+                                            color: map.tool === "erase"?color_green:color_gray
+                                            Image{
+                                                source: "icon/icon_erase.png"
+                                                width: 30
+                                                height: 30
+                                                anchors.centerIn: parent
+                                                ColorOverlay{
+                                                    source: parent
+                                                    anchors.fill: parent
+                                                    color: "white"
+                                                }
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            font.family: font_noto_r.name
+                                            color: map.tool === "erase"?"black":color_gray
+                                            text: "지우개"
+                                        }
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : TravelLine -> ERASE")
+                                            map.clear("spline");
+                                            map.setDrawingWidth(slider_erase.value);
+                                            map.setTool("erase");
+                                        }
                                     }
                                 }
                             }
@@ -3863,7 +4169,7 @@ Item {
                                 height: 40
                                 radius: 5
                                 border.width: 1
-                                color: color_light_gray
+                                color: color_gray
                                 Text{
                                     anchors.centerIn: parent
                                     font.family: font_noto_r.name
@@ -3882,7 +4188,7 @@ Item {
                                 height: 40
                                 radius: 5
                                 border.width: 1
-                                color: color_light_gray
+                                color: color_gray
                                 Text{
                                     anchors.centerIn: parent
                                     font.family: font_noto_r.name
@@ -3904,6 +4210,7 @@ Item {
                         width: rect_annot_boxs.width
                         height: 50
                         color: "white"
+                        visible: map.tool === "draw" || map.tool === "straight" || map.tool === "dot_spline"
                         Text{
                             text: "브러시 사이즈"
                             font.family: font_noto_r.name
@@ -3947,8 +4254,9 @@ Item {
                         width: rect_annot_boxs.width
                         height: 50
                         color: "white"
+                        visible: map.tool === "erase"
                         Text{
-                            text: "지우개 사이즈"
+                            text: "브러시 사이즈"
                             font.family: font_noto_r.name
                             font.pixelSize: 15
                             anchors.verticalCenter: parent.verticalCenter
@@ -3959,7 +4267,7 @@ Item {
                             id: slider_erase
                             x: 300
                             y: 330
-                            value: 10
+                            value: 30
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
                             anchors.rightMargin: 30
@@ -4065,6 +4373,7 @@ Item {
                             onClicked:{
                                 supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : NEXT (VELMAP)")
                                 map.init();
+                                map.loadmap(supervisor.getMapname(),"EDITED")
                                 map.setViewer("annot_velmap");
                                 loader_menu.sourceComponent = menu_annot_velmap;
                             }

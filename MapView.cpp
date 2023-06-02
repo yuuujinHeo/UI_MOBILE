@@ -231,6 +231,9 @@ void MapView::initLocation(){
     pmap->annot_edit_location = false;
     for(int i=0; i<pmap->locations.size(); i++){
         LOCATION temp;
+        temp.group = pmap->locations[i].group;
+        temp.call_id = pmap->locations[i].call_id;
+        temp.number = pmap->locations[i].number;
         temp.type = pmap->locations[i].type;
         temp.name = pmap->locations[i].name;
         temp.point = setAxis(pmap->locations[i].point);
@@ -316,6 +319,7 @@ void MapView::setMapMap(){
         cv::Mat temp_orin;
         cv::Mat temp_drawing;
         cv::Mat temp_drawing_mask;
+        cv::Mat temp_objecting;
         cv::Mat temp_tline;
         cv::Mat temp_velmap;
         if(rotate_angle != 0){
@@ -328,27 +332,52 @@ void MapView::setMapMap(){
             map_drawing.copyTo(temp_drawing);
             map_drawing_mask.copyTo(temp_drawing_mask);
         }
+        map_objecting.copyTo(temp_objecting);
         map_tline.copyTo(temp_tline);
         map_velmap.copyTo(temp_velmap);
 
         //Merge Layer
+//        if(temp_orin.channels() == 3)
+//            cv::cvtColor(temp_orin,temp_orin,cv::COLOR_BGR2GRAY);
+//        if(temp_drawing.channels() == 4)
+//            cv::cvtColor(temp_drawing,temp_drawing,cv::COLOR_BGRA2GRAY);
+//        if(temp_drawing_mask.channels() == 4)
+//            cv::cvtColor(temp_drawing_mask,temp_drawing_mask,cv::COLOR_BGRA2GRAY);
+//        if(temp_tline.channels() == 4)
+//            cv::cvtColor(temp_tline,temp_tline,cv::COLOR_BGRA2GRAY);
+//        if(temp_velmap.channels() == 4)
+//            cv::cvtColor(temp_velmap,temp_velmap,cv::COLOR_BGRA2GRAY);
+
+
         if(temp_orin.channels() == 3)
-            cv::cvtColor(temp_orin,temp_orin,cv::COLOR_BGR2GRAY);
-        if(temp_drawing.channels() == 4)
-            cv::cvtColor(temp_drawing,temp_drawing,cv::COLOR_BGRA2GRAY);
-        if(temp_drawing_mask.channels() == 4)
-            cv::cvtColor(temp_drawing_mask,temp_drawing_mask,cv::COLOR_BGRA2GRAY);
-        if(temp_tline.channels() == 4)
-            cv::cvtColor(temp_tline,temp_tline,cv::COLOR_BGRA2GRAY);
-        if(temp_velmap.channels() == 4)
-            cv::cvtColor(temp_velmap,temp_velmap,cv::COLOR_BGRA2GRAY);
+            cv::cvtColor(temp_orin,temp_orin,cv::COLOR_BGR2BGRA);
+        if(temp_tline.channels() == 3 && temp_tline.rows > 0)
+            cv::cvtColor(temp_tline,temp_tline,cv::COLOR_BGR2BGRA);
+        if(temp_orin.channels() == 1)
+            cv::cvtColor(temp_orin,temp_orin,cv::COLOR_GRAY2BGRA);
+        if(temp_tline.channels() == 1 && temp_tline.rows > 0)
+            cv::cvtColor(temp_tline,temp_tline,cv::COLOR_GRAY2BGRA);
+        if(temp_drawing.channels() == 3)
+            cv::cvtColor(temp_drawing,temp_drawing,cv::COLOR_BGR2BGRA);
+        if(temp_objecting.channels() == 3 && temp_objecting.rows > 0)
+            cv::cvtColor(temp_objecting,temp_objecting,cv::COLOR_BGR2BGRA);
+        if(temp_objecting.channels() == 1 && temp_objecting.rows > 0)
+            cv::cvtColor(temp_objecting,temp_objecting,cv::COLOR_GRAY2BGRA);
+        if(temp_drawing_mask.channels() == 3)
+            cv::cvtColor(temp_drawing_mask,temp_drawing_mask,cv::COLOR_BGR2BGRA);
+        if(temp_velmap.channels() == 1 && temp_velmap.rows > 0)
+            cv::cvtColor(temp_velmap,temp_velmap,cv::COLOR_GRAY2BGRA);
+        if(temp_velmap.channels() == 3 && temp_velmap.rows > 0)
+            cv::cvtColor(temp_velmap,temp_velmap,cv::COLOR_BGR2BGRA);
+
+
 
         if(mode == "annot_tline" && temp_tline.cols > 0 && temp_tline.rows > 0){
             cv::multiply(cv::Scalar::all(1.0)-temp_drawing_mask,temp_tline,temp_tline);
             cv::add(temp_tline,temp_drawing,temp_tline);
             temp_orin.copyTo(map_map);
         }else if(mode == "annot_velmap" && temp_velmap.cols > 0 && temp_velmap.rows > 0){
-            qDebug() << temp_velmap.cols << temp_velmap.rows ;
+            //qDebug() << temp_velmap.cols << temp_velmap.rows ;
             cv::multiply(cv::Scalar::all(1.0)-temp_drawing_mask,temp_velmap,temp_velmap);
             cv::add(temp_velmap,temp_drawing,temp_velmap);
             temp_orin.copyTo(map_map);
@@ -359,9 +388,9 @@ void MapView::setMapMap(){
 
         if(mode == "annot_tline" && temp_tline.cols > 0 && temp_tline.rows > 0){
             cv::addWeighted(map_map,0.5,temp_tline,1,0,map_map);
-        }else if(mode == "annot_object" && map_objecting.cols > 0 && map_objecting.rows > 0){
+        }else if(mode == "annot_object" && temp_objecting.cols > 0 && temp_objecting.rows > 0){
             if(show_object){
-                cv::addWeighted(map_map,1,map_objecting,0.7,0,map_map);
+                cv::addWeighted(map_map,1,temp_objecting,0.7,0,map_map);
             }
         }else if(mode == "annot_velmap" && temp_velmap.cols > 0 && temp_velmap.rows > 0){
             cv::addWeighted(map_map,1,temp_velmap,0.5,0,map_map);
@@ -396,7 +425,7 @@ void MapView::reloadMap(){
 }
 void MapView::setMapping(){
     cv::Mat source;
-//    qDebug() << map_x << map_y << scale << map_width << map_height << pmap->map_mapping.rows;
+//    //qDebug() << map_x << map_y << scale << map_width << map_height << pmap->map_mapping.rows;
     pmap->map_mapping(cv::Rect(map_x*1000/pmap->width,map_y*1000/pmap->width,map_width*scale*1000/pmap->width,map_height*scale*1000/pmap->width)).copyTo(source);
     pixmap_map.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(source));
     Q_ASSERT(!pixmap_map.pixmap.isNull());
@@ -422,7 +451,7 @@ bool MapView::checkLocationCollision(int num){
 }
 bool MapView::checkLocationCollision(){
     if(new_location_flag){
-        qDebug() << "FUNCTION : " << new_location.point.x << new_location.point.y;
+//        //qDebug() << "FUNCTION : " << new_location.point.x << new_location.point.y;
         return isCollision(new_location.point.x, new_location.point.y);
     }else{
         return checkRobotCollision();
@@ -431,10 +460,10 @@ bool MapView::checkLocationCollision(){
 bool MapView::isCollision(int _x, int _y){
     if(map_cost.cols > 0 && map_cost.rows > 0){
         if(map_cost.at<uchar>(_y,_x) > 180 || map_orin.at<uchar>(_y,_x) == 0){
-//            qDebug() << _x << _y << " is collision!!" <<map_cost.at<uchar>(_x,_y)<<map_cost.at<uchar>(_y,_x);
+//            //qDebug() << _x << _y << " is collision!!" <<map_cost.at<uchar>(_x,_y)<<map_cost.at<uchar>(_y,_x);
             return true;
         }else{
-//            qDebug() << _x << _y << " is not collision!! " <<map_cost.at<uchar>(_x,_y)<<map_cost.at<uchar>(_y,_x);
+//            //qDebug() << _x << _y << " is not collision!! " <<map_cost.at<uchar>(_x,_y)<<map_cost.at<uchar>(_y,_x);
             return false;
         }
     }else{
@@ -506,14 +535,14 @@ void MapView::setCostMap(){
             }
         }else{
             map_objecting = cv::Mat(map_orin.rows, map_orin.cols, CV_8U,cv::Scalar::all(0));
-            qDebug() << map_objecting.rows, map_objecting.cols;
+//            //qDebug() << map_objecting.rows, map_objecting.cols;
         }
 
         //Make Object Margin
         std::vector<std::vector<cv::Point>> _poly2;
         for(int obj=0; obj<objects.size(); obj++){
             if(objects[obj].is_rect){
-//                qDebug() << objects.size() << objects[obj].points[0].x << objects[obj].points[0].y << objects[obj].points[2].x << objects[obj].points[2].y;
+//                //qDebug() << objects.size() << objects[obj].points[0].x << objects[obj].points[0].y << objects[obj].points[2].x << objects[obj].points[2].y;
                 for(int i=objects[obj].points[0].x; i<objects[obj].points[2].x; i++){
                     cv::circle(map_cost, cv::Point(i,objects[obj].points[0].y),robot_radius, cv::Scalar(190), -1, 8, 0);
                     cv::circle(map_cost, cv::Point(i,objects[obj].points[2].y),robot_radius, cv::Scalar(190), -1, 8, 0);
@@ -679,7 +708,7 @@ void MapView::setMapCurrent(){
         painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
         if(show_global_path){
-//            qDebug() << "global path";
+//            //qDebug() << "global path";
             painter.setPen(QPen(QColor(hex_color_pink),2));
             cv::Point2f pose;
             cv::Point2f pose_next;
@@ -714,7 +743,7 @@ void MapView::setMapCurrent(){
 
 
                 if(show_local_path){
-//                    qDebug() << "local path";
+//                    //qDebug() << "local path";
                     QPainterPath circles;
                     for(int i=0; i<probot->localpathSize; i++){
                         int rad = 2*res;
@@ -727,9 +756,9 @@ void MapView::setMapCurrent(){
             }
         }
         if(set_init_flag){
-//            qDebug() << "init" << probot->localization_state << mode;
+//            //qDebug() << "init" << probot->localization_state << mode;
             cv::Point2f pose = set_init_pose.point;
-//                qDebug() << "DRAW INIT " << pose.x << pose.y;
+//                //qDebug() << "DRAW INIT " << pose.x << pose.y;
             float angle = set_init_pose.angle;
             float distance = (pmap->robot_radius/pmap->gridwidth)*2;
             float distance2 = distance*0.8;
@@ -792,7 +821,7 @@ void MapView::setMapCurrent(){
             }
         }
         if(show_robot){
-//            qDebug() << "robot";
+//            //qDebug() << "robot";
             if(probot->localization_state == LOCAL_READY || mode == "mapping"){
                 cv::Point2f pose = setAxis(probot->curPose.point);
                 float angle = setAxis(probot->curPose.angle);
@@ -867,22 +896,89 @@ void MapView::setMapCurrent(){
         QPixmap temp_pixmap = map_current.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
         pixmap_current.pixmap = temp_pixmap;
         update();
-
     }
 }
 void MapView::setMapDrawing(){
     initDrawing();
-//    qDebug() << "setmapdrawing" << lines.size() << straight[0].x << straight[1].x;
+//    //qDebug() << "setmapdrawing" << lines.size() << straight[0].x << straight[1].x;
     for(int line=0; line<lines.size(); line++){
-        for(int i=0; i<lines[line].points.size()-1; i++){
-            cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar(lines[line].color,lines[line].color,lines[line].color),lines[line].width,8,0);
-            cv::line(map_drawing_mask,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar::all(255),lines[line].width,8,0);
+        if(lines[line].type == 0){
+            if(mode == "annot_velmap"){
+                if(lines[line].color == 100){
+                    for(int i=0; i<lines[line].points.size()-1; i++){
+                        cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),color_yellow,lines[line].width,8,0);
+                        cv::line(map_drawing_mask,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar::all(255),lines[line].width,8,0);
+                    }
+                }else if(lines[line].color == 200){
+                    for(int i=0; i<lines[line].points.size()-1; i++){
+                        cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),color_red,lines[line].width,8,0);
+                        cv::line(map_drawing_mask,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar::all(255),lines[line].width,8,0);
+                    }
+                }else{
+                    for(int i=0; i<lines[line].points.size()-1; i++){
+                        cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar(lines[line].color,lines[line].color,lines[line].color),lines[line].width,8,0);
+                        cv::line(map_drawing_mask,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar::all(255),lines[line].width,8,0);
+                    }
+                }
+            }else{
+                for(int i=0; i<lines[line].points.size()-1; i++){
+                    cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar(lines[line].color,lines[line].color,lines[line].color),lines[line].width,8,0);
+                    cv::line(map_drawing_mask,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar::all(255),lines[line].width,8,0);
+                }
+            }
+        }else if(lines[line].type == 1){
+            if(lines[line].color == 100){
+                cv::rectangle(map_drawing,lines[line].points[0],lines[line].points[2],color_yellow,-1,8,0);
+                cv::rectangle(map_drawing_mask,lines[line].points[0],lines[line].points[2],cv::Scalar::all(255),-1,8,0);
+            }else if(lines[line].color == 200){
+                cv::rectangle(map_drawing,lines[line].points[0],lines[line].points[2],color_red,-1,8,0);
+                cv::rectangle(map_drawing_mask,lines[line].points[0],lines[line].points[2],cv::Scalar::all(255),-1,8,0);
+            }
         }
     }
     if(new_straight_flag){
-        cv::line(map_drawing,straight[0],straight[1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
-        cv::line(map_drawing_mask,straight[0],straight[1],cv::Scalar::all(255),cur_line_width,8,0);
+        if(mode == "annot_velmap"){
+            if(cur_line_color == 100){
+                cv::line(map_drawing,straight[0],straight[1],color_yellow,cur_line_width,8,0);
+                cv::line(map_drawing_mask,straight[0],straight[1],cv::Scalar::all(255),cur_line_width,8,0);
+            }else if(cur_line_color == 200){
+                cv::line(map_drawing,straight[0],straight[1],color_red,cur_line_width,8,0);
+                cv::line(map_drawing_mask,straight[0],straight[1],cv::Scalar::all(255),cur_line_width,8,0);
+            }
+        }else{
+            cv::line(map_drawing,straight[0],straight[1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
+            cv::line(map_drawing_mask,straight[0],straight[1],cv::Scalar::all(255),cur_line_width,8,0);
+        }
     }
+    if(temp_rect.size() > 3){
+        if(cur_line_color == 100){
+            qDebug() << "100";
+            cv::rectangle(map_drawing,temp_rect[0],temp_rect[2],color_yellow,-1,8,0);
+            cv::rectangle(map_drawing_mask,temp_rect[0],temp_rect[2],cv::Scalar::all(255),-1,8,0);
+        }else if(cur_line_color == 200){
+            qDebug() << "200";
+            cv::rectangle(map_drawing,temp_rect[0],temp_rect[2],color_red,-1,8,0);
+            cv::rectangle(map_drawing_mask,temp_rect[0],temp_rect[2],cv::Scalar::all(255),-1,8,0);
+        }
+    }
+//    if(mode == "annot_velmap")
+//        cv::imshow("map_drawing",map_drawing);
+}
+void MapView::setMapDrawingVel(){
+    initVelmap(map_name,0);
+    initDrawing();
+    for(int line=0; line<lines.size(); line++){
+        if(lines[line].type == 0){
+            for(int i=0; i<lines[line].points.size()-1; i++){
+                cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar(lines[line].color,lines[line].color,lines[line].color),lines[line].width,8,0);
+                cv::line(map_drawing_mask,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar::all(255),lines[line].width,8,0);
+            }
+        }else if(lines[line].type == 1){
+            cv::rectangle(map_drawing,lines[line].points[0],lines[line].points[2],cv::Scalar(lines[line].color,lines[line].color,lines[line].color),-1,8,0);
+            cv::rectangle(map_drawing_mask,lines[line].points[0],lines[line].points[2],cv::Scalar::all(255),-1,8,0);
+        }
+    }
+
 }
 void MapView::setMapObject(){
     if(map_orin.cols > 0 && map_orin.rows > 0){
@@ -946,7 +1042,7 @@ void MapView::setMapObject(){
             }
             if(new_object_flag){
                 QPainterPath path;
-                qDebug() << "new object drawing";
+//                //qDebug() << "new object drawing";
                 if(new_object.is_rect){
                     path.addRect(QRectF(QPointF(new_object.points[0].x*res,new_object.points[0].y*res),QPointF(new_object.points[2].x*res,new_object.points[2].y*res)));
                     painter.setPen(QPen(Qt::white,2));
@@ -1052,7 +1148,7 @@ void MapView::setMapLocation(){
                 QPainterPath path;
                 path.addRoundedRect((new_location.point.x-rad/2)*res,(new_location.point.y-rad/2)*res,rad,rad,rad,rad);
                 painter.setPen(QPen(Qt::white,3));
-                qDebug() << "NEW LOCATION CHECK COLLISION : " << new_location.point.x*res << new_location.point.y*res;
+//                //qDebug() << "NEW LOCATION CHECK COLLISION : " << new_location.point.x*res << new_location.point.y*res;
                 if(isCollision(new_location.point.x*res, new_location.point.y*res)){
                     painter.fillPath(path,QBrush(QColor(hex_color_red)));
                 }else{
@@ -1149,7 +1245,7 @@ void MapView::setMapLocation(){
 void MapView::setMapSize(int width, int height){
     map_width = width;
     map_height = height;
-    qDebug() << "setMapSize " << object_name << map_width <<  map_height;
+//    //qDebug() << "setMapSize " << object_name << map_width <<  map_height;
     if(robot_following){
         if(map_orin.cols > 0 && map_orin.rows > 0){
             setZoomCenter();
@@ -1166,7 +1262,7 @@ void MapView::zoomIn(int x, int y){
     if(scale < 0.1){
         scale = 0.1;
     }
-//    qDebug() << "ZOOM IN " << scale;
+//    //qDebug() << "ZOOM IN " << scale;
     setZoomCenter(x,y);
     moveMap();
 }
@@ -1181,20 +1277,20 @@ void MapView::zoomOut(int x, int y){
     }else if(scale > max_hs){
         scale = max_hs;
     }
-//    qDebug() << "ZOOM OUT " << scale;
+//    //qDebug() << "ZOOM OUT " << scale;
     setZoomCenter(x,y);
     moveMap();
 }
 
 void MapView::scaledIn(int x, int y){
-//    qDebug() << "scaledIn " << pixmap_map.pixmap.width();
+//    //qDebug() << "scaledIn " << pixmap_map.pixmap.width();
     pixmap_map.pixmap.scaled(pixmap_map.pixmap.width()*0.9,pixmap_map.pixmap.height()*0.9);
 //    prev_scale = scale;
 //    scale -= 0.05;
 //    if(scale < 0.1){
 //        scale = 0.1;
 //    }
-////    qDebug() << "ZOOM IN " << scale;
+////    //qDebug() << "ZOOM IN " << scale;
 //    setZoomCenter(x,y);
 //    moveMap();
 }
@@ -1210,7 +1306,7 @@ void MapView::scaledOut(int x, int y){
 //    }else if(scale > max_hs){
 //        scale = max_hs;
 //    }
-////    qDebug() << "ZOOM OUT " << scale;
+////    //qDebug() << "ZOOM OUT " << scale;
 //    setZoomCenter(x,y);
 //    moveMap();
 }
@@ -1219,7 +1315,7 @@ void MapView::setInitPose(int x, int y, float th){
     set_init_pose.point.x = x;
     set_init_pose.point.y = y;
     set_init_pose.angle = th;
-    qDebug() << object_name << "SET INIT " << x << y << th;
+//    //qDebug() << object_name << "SET INIT " << x << y << th;
     setMapCurrent();
 }
 
@@ -1237,14 +1333,14 @@ void MapView::rotateMap(int angle){
 void MapView::rotateMapCW(){
     dangle = 1;
     rotate_angle++;
-//    qDebug() << "rotateCW " << rotate_angle;
+//    //qDebug() << "rotateCW " << rotate_angle;
     setMapMap();
 }
 
 void MapView::rotateMapCCW(){
     rotate_angle--;
     dangle = -1;
-//    qDebug() << "rotateCCW " << rotate_angle;
+//    //qDebug() << "rotateCCW " << rotate_angle;
     setMapMap();
 
 }
@@ -1307,7 +1403,7 @@ void MapView::setZoomCenter(int x, int y){
 void MapView::setCenter(int centerx, int centery){
     int newx = centerx - (map_width/2)*scale;
     int newy = centery - (map_height/2)*scale;
-    qDebug() << centerx << centery << newx << newy;
+//    //qDebug() << centerx << centery << newx << newy;
     setX(newx);
     setY(newy);
 }
@@ -1328,7 +1424,7 @@ bool MapView::getDrawingUndoFlag(){
 }
 
 void MapView::startDrawingLine(int x, int y){
-    qDebug() << "startDrawingLine";
+//    //qDebug() << "startDrawingLine";
     new_straight_flag = true;
     spline_dot.clear();
     straight[0].x = x;
@@ -1400,26 +1496,26 @@ void MapView::drawSpline(){
             for(double d = 0; d<=sum_d; d+= pmap->gridwidth){
                 line.push_back(cv::Point2f(sx(d),sy(d)));
             }
-            qDebug() <<"spline done" << line.size();
+//            //qDebug() <<"spline done" << line.size();
             for(int i=0; i<line.size()-1; i++){
                 cv::line(map_drawing,line[i],line[i+1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
                 cv::line(map_drawing_mask,line[i],line[i+1],cv::Scalar::all(255),cur_line_width,8,0);
             }
 
         }else{
-            qDebug() <<"spline faile";
+//            //qDebug() <<"spline faile";
             line = spline_dot;
         }
 //        setMapDrawing();
     }else{
         if(spline_dot.size() == 1){
-            qDebug() <<"spline dot";
+//            //qDebug() <<"spline dot";
             line.push_back(spline_dot[0]);
             line.push_back(spline_dot[0]);
             cv::circle(map_drawing, spline_dot[0], 1, cv::Scalar(cur_line_color,cur_line_color,cur_line_color),-1,8,0);
             cv::circle(map_drawing_mask, spline_dot[0], 1, cv::Scalar::all(255),-1,8,0);
         }else if(spline_dot.size() == 2){
-            qDebug() <<"spline line";
+//            //qDebug() <<"spline line";
             line.push_back(spline_dot[0]);
             line.push_back(spline_dot[1]);
             cv::line(map_drawing,spline_dot[0],spline_dot[1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
@@ -1436,7 +1532,7 @@ void MapView::addSpline(int x, int y){
     drawSpline();
 }
 void MapView::setDrawingLine(int x, int y){
-    qDebug() << "setDrawingLine" << x << y;
+//    //qDebug() << "setDrawingLine" << x << y;
     straight[1].x = x;
     straight[1].y = y;
 //    initTline(map_name);
@@ -1445,7 +1541,7 @@ void MapView::setDrawingLine(int x, int y){
     setMapMap();
 }
 void MapView::stopDrawingLine(int x, int y){
-    qDebug() << "stopDrawingLine";
+//    //qDebug() << "stopDrawingLine";
     line.clear();
     lines_trash.clear();
     new_straight_flag = false;
@@ -1464,7 +1560,7 @@ void MapView::stopDrawingLine(int x, int y){
     setMapMap();
 }
 void MapView::startDrawing(int x, int y){
-    qDebug() << "startDrawing";
+//    //qDebug() << "startDrawing";
     line.clear();
     spline_dot.clear();
     lines_trash.clear();
@@ -1474,18 +1570,32 @@ void MapView::startDrawing(int x, int y){
 }
 
 void MapView::addLinePoint(int x, int y){
-    qDebug() << "addlinepoint";
+//    //qDebug() << "addlinepoint";
     curPoint.x = x;
     curPoint.y = y;
     line.push_back(curPoint);
-    cv::line(map_drawing,line[line.size()-2],line[line.size()-1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
-    cv::line(map_drawing_mask,line[line.size()-2],line[line.size()-1],cv::Scalar::all(255),cur_line_width,8,0);
+    if(mode == "annot_velmap"){
+        if(cur_line_color == 100){
+            cv::line(map_drawing,line[line.size()-2],line[line.size()-1],color_yellow,cur_line_width,8,0);
+            cv::line(map_drawing_mask,line[line.size()-2],line[line.size()-1],cv::Scalar::all(255),cur_line_width,8,0);
+        }else if(cur_line_color == 200){
+            cv::line(map_drawing,line[line.size()-2],line[line.size()-1],color_red,cur_line_width,8,0);
+            cv::line(map_drawing_mask,line[line.size()-2],line[line.size()-1],cv::Scalar::all(255),cur_line_width,8,0);
+        }else{
+            cv::line(map_drawing,line[line.size()-2],line[line.size()-1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
+            cv::line(map_drawing_mask,line[line.size()-2],line[line.size()-1],cv::Scalar::all(255),cur_line_width,8,0);
+        }
+    }else{
+        cv::line(map_drawing,line[line.size()-2],line[line.size()-1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
+        cv::line(map_drawing_mask,line[line.size()-2],line[line.size()-1],cv::Scalar::all(255),cur_line_width,8,0);
+    }
+
 //    setMapDrawing();
     setMapMap();
 }
 
 void MapView::endDrawing(int x, int y){
-    qDebug() << "endDrawing";
+    //qDebug() << "endDrawing";
     curPoint.x = x;
     curPoint.y = y;
     line.push_back(curPoint);
@@ -1496,7 +1606,7 @@ void MapView::endDrawing(int x, int y){
     temp_line.width = cur_line_width;
 
     //SPLINE
-    if(tool != "erase"){
+    if(tool != "erase" && mode == "annot_tline"){
         std::vector<double> x_list;
         std::vector<double> y_list;
         std::vector<double> d_list;
@@ -1551,7 +1661,7 @@ void MapView::clearDrawing(){
     line.clear();
     lines.clear();
     spline_dot.clear();
-    initVelmap(map_name);
+    initVelmap(map_name,1);
     initTline(map_name);
     initDrawing();
     setMapDrawing();
@@ -1561,15 +1671,15 @@ void MapView::clearDrawing(){
 void MapView::undoLine(){
     line.clear();
     if(spline_dot.size() > 0){
-        qDebug() << "undoLine(Spline)";
+        //qDebug() << "undoLine(Spline)";
         dot_trash.push_back(spline_dot[spline_dot.size()-1]);
         spline_dot.pop_back();
         drawSpline();
     }else if(lines.size() > 0 || line.size() > 0){
-        qDebug() << "undoLine";
+        //qDebug() << "undoLine";
         lines_trash.push_back(lines[lines.size()-1]);
         lines.pop_back();
-        initVelmap(map_name);
+        initVelmap(map_name,1);
         initTline(map_name);
         setMapDrawing();
         setMapMap();
@@ -1619,6 +1729,8 @@ void MapView::saveMap(){
 }
 
 void MapView::saveVelmap(){
+    setMapDrawingVel();
+
     cv::Mat temp_orin;
     cv::Mat temp_draw;
     cv::Mat temp_mask;
@@ -1631,6 +1743,8 @@ void MapView::saveVelmap(){
 
     if(map_velmap.channels() == 4)
         cv::cvtColor(map_velmap,temp_orin,cv::COLOR_BGRA2GRAY);
+    else if(map_velmap.channels() == 3)
+        cv::cvtColor(map_velmap,temp_orin,cv::COLOR_BGR2GRAY);
     else if(map_velmap.channels() == 1)
         map_velmap.copyTo(temp_orin);
 
@@ -1644,6 +1758,11 @@ void MapView::saveVelmap(){
     QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_velocity.png";
     plog->write("[MAPVIEW] SAVE MAP "+path);
     cv::imwrite(path.toStdString(),map_merge);
+
+    lines.clear();
+    temp_rect.clear();
+    initVelmap(map_name,1);
+    setMapDrawing();
 }
 void MapView::saveTline(){
     cv::Mat temp_orin;
@@ -1673,15 +1792,15 @@ void MapView::saveTline(){
 
 void MapView::redoLine(){
     if(dot_trash.size() > 0){
-        qDebug() << "redoLine(Spline)";
+        //qDebug() << "redoLine(Spline)";
         spline_dot.push_back(dot_trash[dot_trash.size()-1]);
         dot_trash.pop_back();
         drawSpline();
     }else if(lines_trash.size() > 0){
-        qDebug() << "redoLine";
+        //qDebug() << "redoLine";
         lines.push_back(lines_trash[lines_trash.size()-1]);
         lines_trash.pop_back();
-        initVelmap(map_name);
+        initVelmap(map_name,1);
         initTline(map_name);
         setMapDrawing();
         setMapMap();
@@ -1704,24 +1823,51 @@ int MapView::getObjectPointNum(int x, int y){
     cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
     int num = select_object;
     if(num < pmap->objects.size() && num > -1){
-//        qDebug() << "check obj" << num << pmap->objects[num].points.size();
+//        //qDebug() << "check obj" << num << pmap->objects[num].points.size();
         if(num != -1){
             for(int j=0; j<pmap->objects[num].points.size(); j++){
-//                qDebug() << pmap->objects[num].points[j].x << pmap->objects[num].points[j].y;
+//                //qDebug() << pmap->objects[num].points[j].x << pmap->objects[num].points[j].y;
                 if(fabs(pmap->objects[num].points[j].x - pos.x) < 0.2){
                     if(fabs(pmap->objects[num].points[j].y - pos.y) < 0.2){
-                        qDebug() << "Match Point !!" << num << j;
+                        //qDebug() << "Match Point !!" << num << j;
                         return j;
                     }
                 }
             }
         }
     }
-    qDebug() << "can't find obj num : " << x << y;
+    //qDebug() << "can't find obj num : " << x << y;
     return -1;
 }
+
+void MapView::startDrawingRect(int x, int y){
+    temp_rect.clear();
+    temp_rect.push_back(cv::Point2f(x,y));
+    temp_rect.push_back(cv::Point2f(x,y));
+    temp_rect.push_back(cv::Point2f(x,y));
+    temp_rect.push_back(cv::Point2f(x,y));
+    setMapDrawing();
+}
+void MapView::setDrawingRect(int x, int y){
+    if(temp_rect.size() > 3){
+        cv::Point2f orin = temp_rect[0];
+        temp_rect[1] = cv::Point2f(orin.x,y);
+        temp_rect[2] = cv::Point2f(x,y);
+        temp_rect[3] = cv::Point2f(x,orin.y);
+    }
+    setMapDrawing();
+}
+void MapView::endDrawingRect(){
+    LINE temp_line;
+    temp_line.points = temp_rect;
+    temp_line.width = cur_line_width;
+    temp_line.color = cur_line_color;
+    temp_line.type = 1;
+    lines.push_back(temp_line);
+    temp_rect.clear();
+}
 void MapView::addObject(int x, int y){
-    qDebug() << "ADD OBJECT " << x << y;
+    //qDebug() << "ADD OBJECT " << x << y;
     new_object_flag = true;
     new_object.is_rect = true;
     new_object.points.clear();
@@ -1735,14 +1881,14 @@ void MapView::addObject(int x, int y){
 //    setMapMap();
 }
 void MapView::addObjectPoint(int x, int y){
-    qDebug() << "ADD OBJECT POINT " << x << y;
+    //qDebug() << "ADD OBJECT POINT " << x << y;
     new_object_flag = true;
     new_object.is_rect = false;
     new_object.points.push_back(cv::Point2f(x,y));
     setMapObject();
 }
 void MapView::setObject(int x, int y){
-    qDebug() << "SET OBJECT " << x << y;
+    //qDebug() << "SET OBJECT " << x << y;
     if(new_object.is_rect){
         if(new_object.points.size() > 3){
             cv::Point2f orin = new_object.points[0];
@@ -1825,7 +1971,7 @@ void MapView::saveObject(QString type){
 }
 
 void MapView::clearObject(){
-    qDebug() << "clearobject";
+    //qDebug() << "clearobject";
     new_object_flag = false;
     new_object.points.clear();
     pmap->annot_edit_object = false;
@@ -1884,7 +2030,7 @@ void MapView::selectLocation(int num, QString type){
         select_location = num;
     }
     select_location_type = type;
-//    qDebug() << select_location << type;
+//    //qDebug() << select_location << type;
     setMapLocation();
 }
 
@@ -1894,6 +2040,7 @@ void MapView::saveLocation(QString type, int groupnum, QString name){
     temp.type = type;
     temp.name = name;
     temp.group = groupnum;
+    temp.call_id = "";
     temp.point = setAxisBack(new_location.point);
     temp.angle = setAxisBack(new_location.angle);
     temp.number = getLocGroupNum(groupnum)+1;
@@ -1952,7 +2099,7 @@ void MapView::addLocationCur(int x, int y, float th){
     new_location_flag = true;
     new_location.point = setAxis(cv::Point2f(x,y));
     new_location.angle = setAxis(th);
-    qDebug() << "add:ocationCur" << x << y << th << new_location.point.x << new_location.point.y << new_location.angle;
+    //qDebug() << "add:ocationCur" << x << y << th << new_location.point.x << new_location.point.y << new_location.angle;
     initLocation();
     setMapLocation();
 }
@@ -1963,7 +2110,7 @@ void MapView::setLocation(int x, int y, float th){
         plog->write("[ANNOTATION] EDIT LOCATION "+QString().sprintf("%d : %f,%f,%f -> %f,%f,%f",num,pmap->locations[num].point.x, pmap->locations[num].point.y, pmap->locations[num].angle,setAxisBack(cv::Point2f(x,y)).x,setAxisBack(cv::Point2f(x,y)).y,setAxisBack(th)));
         pmap->locations[num].point = setAxisBack(cv::Point2f(x,y));
         pmap->locations[num].angle = setAxisBack(th);
-//        qDebug() << pmap->locations[num].angle;
+//        //qDebug() << pmap->locations[num].angle;
         pmap->annot_edit_location = true;
     }
     initLocation();
@@ -2026,11 +2173,11 @@ void MapView::editLocation(int x, int y, float th){
             edit_location_flag = true;
             orin_location = pmap->locations[num];
         }
-        qDebug() <<"1            " <<  orin_location.point.x  << setAxisBack(cv::Point2f(x,y)).x;
+        //qDebug() <<"1            " <<  orin_location.point.x  << setAxisBack(cv::Point2f(x,y)).x;
         pmap->locations[num].point = setAxisBack(cv::Point2f(x,y));
         pmap->locations[num].angle = setAxisBack(th);
         pmap->annot_edit_location = true;
-//        qDebug() << pmap->locations[num].angle;
+//        //qDebug() << pmap->locations[num].angle;
     }
     initLocation();
     setMapLocation();
@@ -2039,11 +2186,11 @@ void MapView::redoLocation(){
     int num = select_location;
     edit_location_flag = false;
     if(pmap->locations.size() > num && num > -1){
-//        qDebug() <<"1            " <<  orin_location.point.x  << locations[num].point.x;
+//        //qDebug() <<"1            " <<  orin_location.point.x  << locations[num].point.x;
         pmap->locations[num].point = orin_location.point;
         pmap->locations[num].angle = orin_location.angle;
         pmap->annot_edit_location = true;
-//        qDebug() << pmap->locations[num].angle;
+//        //qDebug() << pmap->locations[num].angle;
     }
     initLocation();
     setMapLocation();
@@ -2063,7 +2210,7 @@ void MapView::editLocation(){
     }
 }
 
-void MapView::initVelmap(QString filename){
+void MapView::initVelmap(QString filename, int mode){
     QString file_path = QDir::homePath() + "/maps/" + filename + "/map_velocity.png";
 
     map_velmap.release();
@@ -2072,10 +2219,27 @@ void MapView::initVelmap(QString filename){
         map_velmap = cv::Mat(map_orin.rows, map_orin.cols, CV_8UC4,cv::Scalar::all(0));
     }else{
         map_name = filename;
-        map_velmap = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
+        map_velmap = cv::imread(file_path.toStdString(),cv::IMREAD_COLOR);
         cv::flip(map_velmap,map_velmap,0);
         cv::rotate(map_velmap,map_velmap,cv::ROTATE_90_COUNTERCLOCKWISE);
-        plog->write("[MAPVIEW] INIT VELMAP SUCCESS : "+filename+", "+QString().sprintf("size(%d, %d)",map_velmap.rows,map_velmap.cols));
+
+        if(mode == 1){
+            for(int i=0; i<map_velmap.cols; i++){
+                for(int j=0; j<map_velmap.rows; j++){
+                    if(map_velmap.at<cv::Vec3b>(i,j)[0] == 100){
+                        map_velmap.at<cv::Vec3b>(i,j)[0] = 80;
+                        map_velmap.at<cv::Vec3b>(i,j)[1] = 200;
+                        map_velmap.at<cv::Vec3b>(i,j)[2] = 255;
+                    }else if(map_velmap.at<cv::Vec3b>(i,j)[0] == 200){
+                        map_velmap.at<cv::Vec3b>(i,j)[0] = 77;
+                        map_velmap.at<cv::Vec3b>(i,j)[1] = 88;
+                        map_velmap.at<cv::Vec3b>(i,j)[2] = 231;
+                    }
+                }
+            }
+        }
+//        cv::imshow("initvel",map_velmap);
+//        plog->write("[MAPVIEW] INIT VELMAP SUCCESS : "+filename+", "+QString().sprintf("size(%d, %d)",map_velmap.rows,map_velmap.cols));
     }
 }
 void MapView::initTline(QString filename){
@@ -2094,7 +2258,7 @@ void MapView::initTline(QString filename){
         map_tline = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
         cv::flip(map_tline,map_tline,0);
         cv::rotate(map_tline,map_tline,cv::ROTATE_90_COUNTERCLOCKWISE);
-        plog->write("[MAPVIEW] INIT TRAVEL LINE SUCCESS : "+filename+", "+QString().sprintf("size(%d, %d)",map_tline.rows,map_tline.cols));
+//        plog->write("[MAPVIEW] INIT TRAVEL LINE SUCCESS : "+filename+", "+QString().sprintf("size(%d, %d)",map_tline.rows,map_tline.cols));
     }
 }
 
@@ -2129,7 +2293,7 @@ void MapView::setMapTline(){
 
 
 void MapView::paint(QPainter *painter){
-//    qDebug() << width() << height();
+//    //qDebug() << width() << height();
     painter->drawPixmap(0,0,width(),height(),pixmap_map.pixmap);
     painter->drawPixmap(0,0,width(),height(),pixmap_object.pixmap);
     painter->drawPixmap(0,0,width(),height(),pixmap_location.pixmap);

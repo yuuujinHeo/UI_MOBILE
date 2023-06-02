@@ -20,7 +20,7 @@ Window {
 
     flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
     visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
-
+//    visibility: Window.FullScreen
     onVisibilityChanged: {
         if(homePath.split("/")[2]==="odroid"){
             if(mainwindow.visibility == Window.Minimized){
@@ -33,7 +33,9 @@ Window {
             }
         }
     }
+
     Component.onDestruction: {
+
     }
 
     property color color_dark_gray: "#999999";
@@ -48,6 +50,7 @@ Window {
     property color color_navy: "#4f5666"
     property color color_dark_navy: "#323744"
     property color color_blue: "#24a9f7"
+    property color color_yellow_rect: "#ffc850"
 
     property string pbefore: pinit
     property string ploading: "qrc:/Page_loading.qml"
@@ -119,6 +122,12 @@ Window {
         voice_battery.play();
     }
 
+    function checkwifidone(){
+        if(loader_page.item.objectName == "page_init"){
+            loader_page.item.wifistatein();
+        }
+    }
+
     function movelocation(){
         cur_location = supervisor.getcurLoc();
         var str_target;
@@ -132,10 +141,11 @@ Window {
             str_target = "대기 장소";
             voice_movewait.play();
         }else{
-            if(robot_type==="SERVING")
-                voice_serving.play();
-            else
+            if(supervisor.isCallingMode()){
                 voice_calling.play();
+            }else{
+                voice_serving.play();
+            }
             var curtable = supervisor.getcurTable();
             str_target = curtable + "번 테이블";
             supervisor.writelog("[QML - MOVING] MOVE TO " + str_target);
@@ -204,31 +214,32 @@ Window {
     }
     function showpickup(){
         robot_type = supervisor.getRobotType();
-        if(robot_type == "SERVING"){
+        if(supervisor.isCallingMode()){
+            loadPage(ppickupCall);
+            loader_page.item.init();
+        }else{
             loadPage(ppickup);
             loader_page.item.init();
             var trays = supervisor.getPickuptrays();
             var tempstr = "";
             for(var i=0; i<trays.length; i++){
-                if(tempstr == ""){
+                if(tempstr === ""){
                     tempstr = Number(trays[i])+"번";
                 }else{
                     tempstr += "과 " + Number(trays[i])+"번";
                 }
-                if(trays[i] == 1){
+                if(trays[i] === 1){
                     loader_page.item.pickup_1 = true;
-                }else if(trays[i] == 2){
+                }else if(trays[i] === 2){
                     loader_page.item.pickup_2 = true;
-                }else if(trays[i] == 3){
+                }else if(trays[i] === 3){
                     loader_page.item.pickup_3 = true;
                 }
             }
 //            loader_page.item.play_voice();
             loader_page.item.pos = tempstr;
             supervisor.writelog("[QML - MAIN] Show Pickup Page : " + loader_page.item.pos);
-        }else if(robot_type == "CALLING"){
-            loadPage(ppickupCall);
-            loader_page.item.init();
+
         }
     }
     function loadmap_server_fail(){
@@ -306,6 +317,20 @@ Window {
             supervisor.acceptCall(false);
         }
     }
+    function wififailed(){
+        print("wififailed")
+        if(loader_page.item.objectName == "page_setting" || loader_page.item.objectName == "page_init")
+            loader_page.item.wifi_con_failed();
+    }
+    function wifisuccess(){
+        print("wifisuccess")
+        if(loader_page.item.objectName == "page_setting" || loader_page.item.objectName == "page_init")
+            loader_page.item.wifi_con_success();
+    }
+    function wifireset(){
+        if(loader_page.item.objectName == "page_setting" || loader_page.item.objectName == "page_init")
+            loader_page.item.init();
+    }
 
     function loadPage(page){
         pbefore = loader_page.source;
@@ -337,7 +362,7 @@ Window {
             timer_update.start();
             loader_page.item.init();
         }
-        source:  pmap//pinit
+        source:  pinit
     }
 
     Timer{

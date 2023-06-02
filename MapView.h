@@ -74,6 +74,7 @@ public:
     Q_INVOKABLE void setLocalizationMap(QString filename);
     void setMapCurrent();
     void setMapDrawing();
+    void setMapDrawingVel();
     void setMapObject();
     void setMapMap();
     void setMapLocation();
@@ -92,6 +93,7 @@ public:
     Q_INVOKABLE void rotateMapCCW();
 
     //---------------------------------------------------Drawing
+
     void initDrawing(){
 //        qDebug() << "init drawing";
         map_drawing = cv::Mat(map_orin.rows, map_orin.cols, CV_8UC4, cv::Scalar::all(0));
@@ -101,6 +103,7 @@ public:
     QVector<cv::Point2f> line_spline;
     QVector<cv::Point2f> spline_dot;
     QVector<cv::Point2f> dot_trash;
+    QVector<cv::Point2f> temp_rect;
     QVector<LINE> lines;
     QVector<LINE> lines_trash;
     int cur_line_color=255;
@@ -114,6 +117,10 @@ public:
     Q_INVOKABLE void startDrawing(int x, int y);
     Q_INVOKABLE void addLinePoint(int x, int y);
     Q_INVOKABLE void endDrawing(int x, int y);
+
+    Q_INVOKABLE void startDrawingRect(int x, int y);
+    Q_INVOKABLE void setDrawingRect(int x, int y);
+    Q_INVOKABLE void endDrawingRect();
 
     Q_INVOKABLE void clearDrawing();
     Q_INVOKABLE void undoLine();
@@ -176,7 +183,7 @@ public:
     Q_INVOKABLE void setMapTline();
 
     //---------------------------------------------------Velocity Map
-    Q_INVOKABLE void initVelmap(QString filename);
+    Q_INVOKABLE void initVelmap(QString filename, int mode);
     Q_INVOKABLE void setMapVelmap();
 
     Q_INVOKABLE int getLocationNum(QString type);

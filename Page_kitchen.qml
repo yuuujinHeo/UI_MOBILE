@@ -13,6 +13,7 @@ Item {
     Component.onCompleted: {
         init();
     }
+    property bool show_serving: true
     function init(){
         statusbar.visible = true;
 
@@ -25,6 +26,13 @@ Item {
         robot_type = supervisor.getSetting("ROBOT_HW","type");
         table_num = supervisor.getLocationGroupSize(cur_group);
         tray_num = supervisor.getTrayNum();
+
+        if(robot_type == "CALLING"){
+            show_serving = false;
+        }else{
+            show_serving = true;
+        }
+
 
         use_tray = JSON.parse(supervisor.getSetting("ROBOT_SW","use_tray"));
         if(use_tray){
@@ -59,6 +67,10 @@ Item {
     property int max_row: 5
     property int max_col: 5
 
+    property bool is_con_robot: false
+    property bool is_motor_power: false
+    property bool is_emergency: false
+
     property bool use_tray: false
 
     property int tray_width: 400
@@ -74,6 +86,7 @@ Item {
     property bool go_wait: false
     property bool go_charge: false
     property bool go_patrol: false
+    property bool calling_mode: false
 
     property var cur_preset: 3
     onCur_groupChanged: {
@@ -103,6 +116,48 @@ Item {
         id: patrolmodel
     }
 
+    Timer{
+        id: timer_update
+        interval : 500
+        running: true
+        repeat: true
+        onTriggered: {
+            is_con_robot = supervisor.getLCMConnection();
+            is_emergency = supervisor.getEmoStatus();
+            is_motor_power = supervisor.getPowerStatus();
+
+            if(is_con_robot){
+                if(is_motor_power){
+                    if(is_emergency){
+                        btn_go.enabled = false;
+                        rect_go.color = color_red;
+                        rect_go_safe.color = color_gray
+                        text_go.text = "비상스위치가 눌려있음"
+                        text_go.font.pixelSize = 25
+                    }else{
+                        btn_go.enabled = true;
+                        rect_go.color = color_blue;
+                        rect_go_safe.color = color_blue
+                        text_go.text = "서빙 시작"
+                        text_go.font.pixelSize = 35
+                    }
+                }else{
+                    btn_go.enabled = false;
+                    rect_go.color = color_gray;
+                    rect_go_safe.color = color_gray
+                    text_go.text = "로봇 전원 안켜짐"
+                    text_go.font.pixelSize = 35
+                }
+            }else{
+                btn_go.enabled = false;
+                rect_go_safe.color = color_gray
+                rect_go.color = color_gray;
+                text_go.text = "로봇 연결 안됨"
+                text_go.font.pixelSize = 35
+            }
+        }
+    }
+
     function update_group(){
         model_group.clear();
         for(var i=0; i<supervisor.getLocationGroupNum(); i++){
@@ -124,8 +179,8 @@ Item {
 
     Image{
         id: image_head
-        visible: (robot_type!="SERVING" || use_tray)?true:false
-        anchors.horizontalCenter: robot_type=="SERVING"?rect_tray_box.horizontalCenter:rect_calling_box.horizontalCenter
+        visible: (!show_serving || use_tray)?true:false
+        anchors.horizontalCenter: show_serving?rect_tray_box.horizontalCenter:rect_calling_box.horizontalCenter
         anchors.bottom: rect_tray_box.top
         anchors.bottomMargin: 10
 
@@ -136,7 +191,7 @@ Item {
 
     Rectangle{
         id: rect_tray_box
-        visible: (robot_type=="SERVING" && use_tray)?true:false
+        visible: (show_serving && use_tray)?true:false
         width: 500
         height: tray_num*tray_height + (tray_num - 1)*spacing_tray + 50
         color: "#e8e8e8"
@@ -255,7 +310,7 @@ Item {
 
     Rectangle{
         id: rect_table_box
-        visible: (robot_type=="SERVING" && use_tray)?true:false
+        visible: (show_serving && use_tray)?true:false
         width: {
             if(col_num > 2){
                300 - 20 + 160
@@ -486,7 +541,7 @@ Item {
 //        anchors.topMargin: statusbar.height + (parent.height - statusbar.height - height - rect_go.height - rect_go.anchors.topMargin)/2
         anchors.left: parent.left
         color: color_dark_navy
-        visible: robot_type == "SERVING" && !use_tray
+        visible: show_serving && !use_tray
         ListModel{
             id: model_group
         }
@@ -896,7 +951,7 @@ Item {
     Rectangle{
         id: rect_go
         width: 300
-        visible: robot_type=="SERVING"?true:false
+        visible: show_serving?true:false
         height: 120
         radius: 100
         anchors.horizontalCenter: {
@@ -933,6 +988,10 @@ Item {
         MouseArea{
             id: btn_go
             anchors.fill: parent
+            onPressed:{
+
+            }
+
             onClicked: {
                 count_resting = 0;
                 print("serving start button");
@@ -952,7 +1011,7 @@ Item {
     Rectangle{
         id: rect_go_safe
         width: 80
-        visible: robot_type=="SERVING"?true:false
+        visible: show_serving?true:false
         height: 80
         radius: 80
         anchors.verticalCenter: rect_go.verticalCenter
@@ -1101,7 +1160,7 @@ Item {
 
     Rectangle{
         id: rect_patrol_box
-        visible: robot_type=="CALLING"?true:false
+        visible: !show_serving?true:false
         width: (table_num/row_num).toFixed(0)*100 - 20 + 160
         height: parent.height - statusbar.height
         anchors.left: parent.left
@@ -1176,7 +1235,7 @@ Item {
     }
     Rectangle{
         id: rect_calling_box
-        visible: robot_type=="CALLING"?true:false
+        visible: !show_serving?true:false
         width: 500
         height: tray_num*tray_height + (tray_num - 1)*spacing_tray + 50
         color: "#e8e8e8"
@@ -1199,7 +1258,7 @@ Item {
     Rectangle{
         id: rect_go_patrol
         width: 300
-        visible: robot_type=="CALLING"?true:false
+        visible: !show_serving?true:false
         height: 100
         radius: 100
         anchors.horizontalCenter: rect_calling_box.horizontalCenter
@@ -1383,7 +1442,7 @@ Item {
                     "충전기로 이동<font color=\"white\">하시겠습니까?</font>"
                 }else if(go_patrol){
                     "패트롤을 시작 <font color=\"white\">하시겠습니까?</font>"
-                }else if(robot_type == "CALLING"){
+                }else if(calling_mode){
                     "트레이를 모두 비우고<font color=\"white\"> 확인 버튼을 눌러주세요.</font>"
                 }else{
                     ""
@@ -1521,7 +1580,8 @@ Item {
                         supervisor.moveToCharge();
                     }else if(go_patrol){
                         print("patrol start command");
-                    }else if(robot_type == "CALLING"){
+                    }else if(calling_mode){
+                        calling_mode = false;
                     }
                     go_wait = false;
                     go_charge = false;
