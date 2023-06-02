@@ -257,7 +257,7 @@ void MapView::setFullScreen(){
 void MapView::setMap(QObject *pixmapContainer){
     PixmapContainer *pc = qobject_cast<PixmapContainer*>(pixmapContainer);
     Q_ASSERT(pc);
-    pixmap_map.pixmap = pc->pixmap;
+//    pixmap_map.pixmap = pc->pixmap;
     delete pc;
     update();
 }
@@ -288,7 +288,7 @@ void MapView::moveMap(){
             map_map(cv::Rect(map_x,map_y,map_width*scale,map_height*scale)).copyTo(source);
         }
 
-        pixmap_map.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(source));
+//        pixmap_map.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(source));
 
         QPixmap temp_pixmap = map_object.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
         pixmap_object.pixmap = temp_pixmap;
@@ -359,8 +359,6 @@ void MapView::setMapMap(){
             cv::cvtColor(temp_velmap,temp_velmap,cv::COLOR_BGR2BGRA);
 
 
-
-
         if(mode == "annot_tline" && temp_tline.cols > 0 && temp_tline.rows > 0){
             cv::multiply(cv::Scalar::all(1.0)-temp_drawing_mask,temp_tline,temp_tline);
             cv::add(temp_tline,temp_drawing,temp_tline);
@@ -392,10 +390,10 @@ void MapView::setMapMap(){
             else
                 cv::circle(map_map,curPoint,cur_line_width/2,cv::Scalar(255,255,255,255),1,8,0);
         }
-
         //Crop Show Rect
         cv::Mat source;
         map_map(cv::Rect(map_x,map_y,map_width*scale,map_height*scale)).copyTo(source);
+//        cv::imshow("source",source);
         pixmap_map.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(source));
     }else{
         QPixmap blank(map_width,map_height);{
@@ -889,7 +887,7 @@ void MapView::setMapCurrent(){
 }
 void MapView::setMapDrawing(){
     initDrawing();
-//    //qDebug() << "setmapdrawing" << lines.size() << straight[0].x << straight[1].x;
+    qDebug() << "setmapdrawing" << cur_line_color;
     for(int line=0; line<lines.size(); line++){
         if(lines[line].type == 0){
             if(mode == "annot_velmap"){
@@ -905,13 +903,13 @@ void MapView::setMapDrawing(){
                     }
                 }else{
                     for(int i=0; i<lines[line].points.size()-1; i++){
-                        cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar(lines[line].color,lines[line].color,lines[line].color),lines[line].width,8,0);
+                        cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar(lines[line].color,lines[line].color,lines[line].color,255),lines[line].width,8,0);
                         cv::line(map_drawing_mask,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar::all(255),lines[line].width,8,0);
                     }
                 }
             }else{
                 for(int i=0; i<lines[line].points.size()-1; i++){
-                    cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar(lines[line].color,lines[line].color,lines[line].color),lines[line].width,8,0);
+                    cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar(lines[line].color,lines[line].color,lines[line].color,255),lines[line].width,8,0);
                     cv::line(map_drawing_mask,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar::all(255),lines[line].width,8,0);
                 }
             }
@@ -935,7 +933,7 @@ void MapView::setMapDrawing(){
                 cv::line(map_drawing_mask,straight[0],straight[1],cv::Scalar::all(255),cur_line_width,8,0);
             }
         }else{
-            cv::line(map_drawing,straight[0],straight[1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
+            cv::line(map_drawing,straight[0],straight[1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color,255),cur_line_width,8,0);
             cv::line(map_drawing_mask,straight[0],straight[1],cv::Scalar::all(255),cur_line_width,8,0);
         }
     }
@@ -948,8 +946,10 @@ void MapView::setMapDrawing(){
             cv::rectangle(map_drawing_mask,temp_rect[0],temp_rect[2],cv::Scalar::all(255),-1,8,0);
         }
     }
-//    if(mode == "annot_velmap")
-//        cv::imshow("map_drawing",map_drawing);
+
+
+    //    if(mode == "annot_velmap")
+//        cv::imshow("map_drawing555",map_map);
 }
 void MapView::setMapDrawingVel(){
     initVelmap(map_name,0);
@@ -957,11 +957,11 @@ void MapView::setMapDrawingVel(){
     for(int line=0; line<lines.size(); line++){
         if(lines[line].type == 0){
             for(int i=0; i<lines[line].points.size()-1; i++){
-                cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar(lines[line].color,lines[line].color,lines[line].color),lines[line].width,8,0);
+                cv::line(map_drawing,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar(lines[line].color,lines[line].color,lines[line].color,255),lines[line].width,8,0);
                 cv::line(map_drawing_mask,cv::Point2f(lines[line].points[i].x,lines[line].points[i].y),cv::Point2f(lines[line].points[i+1].x,lines[line].points[i+1].y),cv::Scalar::all(255),lines[line].width,8,0);
             }
         }else if(lines[line].type == 1){
-            cv::rectangle(map_drawing,lines[line].points[0],lines[line].points[2],cv::Scalar(lines[line].color,lines[line].color,lines[line].color),-1,8,0);
+            cv::rectangle(map_drawing,lines[line].points[0],lines[line].points[2],cv::Scalar(lines[line].color,lines[line].color,lines[line].color,255),-1,8,0);
             cv::rectangle(map_drawing_mask,lines[line].points[0],lines[line].points[2],cv::Scalar::all(255),-1,8,0);
         }
     }
@@ -1485,7 +1485,7 @@ void MapView::drawSpline(){
             }
 //            //qDebug() <<"spline done" << line.size();
             for(int i=0; i<line.size()-1; i++){
-                cv::line(map_drawing,line[i],line[i+1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
+                cv::line(map_drawing,line[i],line[i+1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color,255),cur_line_width,8,0);
                 cv::line(map_drawing_mask,line[i],line[i+1],cv::Scalar::all(255),cur_line_width,8,0);
             }
 
@@ -1569,13 +1569,12 @@ void MapView::addLinePoint(int x, int y){
             cv::line(map_drawing,line[line.size()-2],line[line.size()-1],color_red,cur_line_width,8,0);
             cv::line(map_drawing_mask,line[line.size()-2],line[line.size()-1],cv::Scalar::all(255),cur_line_width,8,0);
         }else{
-            cv::line(map_drawing,line[line.size()-2],line[line.size()-1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
+            cv::line(map_drawing,line[line.size()-2],line[line.size()-1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color,255),cur_line_width,8,0);
             cv::line(map_drawing_mask,line[line.size()-2],line[line.size()-1],cv::Scalar::all(255),cur_line_width,8,0);
         }
     }else{
-        cv::line(map_drawing,line[line.size()-2],line[line.size()-1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);
+        cv::line(map_drawing,line[line.size()-2],line[line.size()-1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color,255),cur_line_width,8,0);
         cv::line(map_drawing_mask,line[line.size()-2],line[line.size()-1],cv::Scalar::all(255),cur_line_width,8,0);
-        qDebug() << cur_line_color;
     }
 
 //    setMapDrawing();
@@ -2283,11 +2282,11 @@ void MapView::setMapTline(){
 void MapView::paint(QPainter *painter){
 //    //qDebug() << width() << height();
     painter->drawPixmap(0,0,width(),height(),pixmap_map.pixmap);
-    painter->drawPixmap(0,0,width(),height(),pixmap_object.pixmap);
-    painter->drawPixmap(0,0,width(),height(),pixmap_location.pixmap);
-    painter->drawPixmap(0,0,width(),height(),pixmap_tline.pixmap);
-    painter->drawPixmap(0,0,width(),height(),pixmap_velmap.pixmap);
-    painter->drawPixmap(0,0,width(),height(),pixmap_current.pixmap);
+//    painter->drawPixmap(0,0,width(),height(),pixmap_object.pixmap);
+//    painter->drawPixmap(0,0,width(),height(),pixmap_location.pixmap);
+//    painter->drawPixmap(0,0,width(),height(),pixmap_tline.pixmap);
+//    painter->drawPixmap(0,0,width(),height(),pixmap_velmap.pixmap);
+//    painter->drawPixmap(0,0,width(),height(),pixmap_current.pixmap);
 }
 
 void MapView::setWindow(QQuickWindow *Window){
