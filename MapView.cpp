@@ -697,8 +697,15 @@ void MapView::setMapCurrent(){
         QPainter painter(&map_current);
         painter.setRenderHint(QPainter::Antialiasing, true);
         painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+         cv::Point2f pose;
+        pose.x = -probot->curPose.point.y*mapping_size/(pmap->mapping_width*pmap->mapping_gridwidth) + mapping_size/2;
+        pose.y = -probot->curPose.point.x*mapping_size/(pmap->mapping_width*pmap->mapping_gridwidth) + mapping_size/2;
 
-        cv::Point2f pose = setAxisMapping(probot->curPose.point);
+        cv::Point2f temp;
+        temp = setAxis(probot->curPose.point);
+
+        qDebug() << pose.y << temp.y << probot->curPose.point.x;
+//        cv::Point2f pose = setAxisMapping(probot->curPose.point);
 //        qDebug() << "mapping " << pose.x << pose.y << mapping_size << mapping_grid;
 
         float angle = setAxis(probot->curPose.angle);
@@ -846,7 +853,13 @@ void MapView::setMapCurrent(){
                     }
                 }
             }else if(mode == "mapping"){
-                pose = setAxisMapping(probot->curPose.point);
+                pose.x = -probot->curPose.point.y*mapping_size/(pmap->mapping_width*pmap->mapping_gridwidth) + mapping_size/2;
+                pose.y = -probot->curPose.point.x*mapping_size/(pmap->mapping_width*pmap->mapping_gridwidth) + mapping_size/2;
+
+                cv::Point2f temp;
+                temp = setAxis(probot->curPose.point);
+
+                qDebug() << pose.y << temp.y << probot->curPose.point.x;
                 angle = setAxis(probot->curPose.angle);
                 painter.setPen(QPen(QColor(hex_color_blue),3));
                 float x1, y1;
@@ -1923,6 +1936,7 @@ void MapView::setDrawingRect(int x, int y){
         temp_rect[3] = cv::Point2f(x,orin.y);
     }
     setMapDrawing();
+    setMapMap();
 }
 void MapView::endDrawingRect(){
     LINE temp_line;
@@ -2320,6 +2334,7 @@ void MapView::initVelmap(QString filename, int mode){
 //        plog->write("[MAPVIEW] INIT VELMAP SUCCESS : "+filename+", "+QString().sprintf("size(%d, %d)",map_velmap.rows,map_velmap.cols));
     }
 }
+
 void MapView::initTline(QString filename){
     QString file_path;
     if(is_edited_tline){
