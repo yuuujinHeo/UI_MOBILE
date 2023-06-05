@@ -2108,8 +2108,8 @@ cv::Point2f setAxis(cv::Point2f _point){
 }
 cv::Point2f setAxisMapping(cv::Point2f _point){
     cv::Point2f temp;
-    temp.x = -_point.y/pmap->mapping_gridwidth + 500;
-    temp.y = -_point.x/pmap->mapping_gridwidth + 500;
+    temp.x = -_point.y/pmap->mapping_gridwidth + 1000/2;
+    temp.y = -_point.x/pmap->mapping_gridwidth + 1000/2;
     return temp;
 }
 cv::Point2f setAxisBack(cv::Point2f _point){
@@ -3703,6 +3703,7 @@ void Supervisor::onTimer(){
                         plog->write("[SCHEDULER] CUR TARGET SET (DONE) : Back to Resting");
                         ui_state = UI_STATE_GO_HOME;
                         probot->call_moving_count = 0;
+                        break;
                     }else{
 
                     }
@@ -3711,9 +3712,11 @@ void Supervisor::onTimer(){
 
                 }
 
-                if(current_target.name == ""){
+                if(ui_state == UI_STATE_GO_HOME){
+
+                }else if(current_target.name == ""){
                     plog->write("[SCHEDULER] CUR TARGET SET (ERROR) : TARGET NONE");
-                    ui_state = UI_STATE_MOVEFAIL;
+                    ui_state = UI_STATE_NONE;
                 }else{
                     if(timer_cnt%5==0){
                         //로봇 안 움직임 -> 실패
@@ -3908,9 +3911,9 @@ void Supervisor::onTimer(){
             }
         }else{
             //UI에 movefail 페이지 표시
-            QMetaObject::invokeMethod(mMain, "movefail");
             if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY && isaccepted){
                 plog->write("[SCHEDULER] ROBOT ERROR : NO PATH");
+                QMetaObject::invokeMethod(mMain, "movefail");
                 isaccepted = false;
             }
         }
@@ -3984,6 +3987,7 @@ void Supervisor::readLog(QDateTime date){
 
 void Supervisor::goSerivng(int group, int table){
     LOCATION target;
+    patrol_mode = PATROL_NONE;
     int target_num = -1;
     int count = 0;
     for(int i=0; i<pmap->locations.size(); i++){
