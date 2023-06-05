@@ -827,6 +827,7 @@ Item {
                                             supervisor.setSetting("ROBOT_SW/grid_size",textfield_changed.text);
                                             grid_size.text = supervisor.getSetting("ROBOT_SW","grid_size");
                                         }
+                                        supervisor.readSetting();
                                         popup_changed_mapping_variable.close();
                                     }
                                 }

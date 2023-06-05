@@ -45,6 +45,8 @@ void MapView::onTimer(){
         setWindow(qobject_cast<QQuickWindow*>(object));
     }
 
+    mapping_size = 1000;// pmap->mapping_width;
+    mapping_grid = pmap->mapping_gridwidth*pmap->mapping_width/1000;
     if(enable){
         //Robot Following
         if(robot_following){
@@ -60,8 +62,7 @@ void MapView::onTimer(){
                 }
             }
         }else{
-            mapping_size = 1000;//pmap->mapping_width;
-            mapping_grid = pmap->mapping_gridwidth;
+//            qDebug() << "set " << mapping_grid << pmap->mapping_gridwidth;
             setMapCurrent();
         }
     }
@@ -254,6 +255,7 @@ void MapView::setFullScreen(){
     }else{
         scale = max_ws;
     }
+//    qDebug() << "fullscreen" << object_name << mapping_size << scale;
 }
 
 void MapView::setMap(QObject *pixmapContainer){
@@ -697,10 +699,10 @@ void MapView::setMapCurrent(){
         painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
         cv::Point2f pose = setAxisMapping(probot->curPose.point);
-        qDebug() << "mapping " << pose.x << pose.y << mapping_size << pmap->mapping_gridwidth;
+//        qDebug() << "mapping " << pose.x << pose.y << mapping_size << mapping_grid;
 
         float angle = setAxis(probot->curPose.angle);
-        float distance = (pmap->robot_radius/pmap->mapping_gridwidth)*2;
+        float distance = (pmap->robot_radius/mapping_grid)*2;
         float distance2 = distance*0.8;
         float th_dist = M_PI/8;
 
@@ -711,7 +713,7 @@ void MapView::setMapCurrent(){
         float x2 =  (pose.x + distance2   * qCos(angle+th_dist))*res;
         float y2 =  (pose.y + distance2   * qSin(angle+th_dist))*res;
 
-        float rad = pmap->robot_radius*2*res/pmap->mapping_gridwidth;
+        float rad = pmap->robot_radius*2*res/mapping_grid;
         QPainterPath path;
         QPolygonF polygon;
         polygon << QPointF(x1,y1) << QPointF(x2,y2) << QPointF(x,y) << QPointF(x1,y1);
@@ -725,9 +727,9 @@ void MapView::setMapCurrent(){
 
         for(int i=0; i<360; i++){
             painter.setPen(QPen(QColor("red"),1*res*scale));
-            if(probot->lidar_data[i] > pmap->mapping_gridwidth){
-                float x = (pose.x + (probot->lidar_data[i]/pmap->mapping_gridwidth)*cos((-M_PI*i)/180 + angle))*res;
-                float y = (pose.y + (probot->lidar_data[i]/pmap->mapping_gridwidth)*sin((-M_PI*i)/180 + angle))*res;
+            if(probot->lidar_data[i] > mapping_grid){
+                float x = (pose.x + (probot->lidar_data[i]/mapping_grid)*cos((-M_PI*i)/180 + angle))*res;
+                float y = (pose.y + (probot->lidar_data[i]/mapping_grid)*sin((-M_PI*i)/180 + angle))*res;
                 painter.drawPoint((int)x,(int)y);
             }
         }
@@ -854,8 +856,8 @@ void MapView::setMapCurrent(){
                     if(probot->lidar_data[i] <limit){
 
                     }else{
-                        x1 = (pose.x + (probot->lidar_data[i]/pmap->mapping_gridwidth)*cos((-M_PI*(i))/180 + angle))*res;
-                        y1 = (pose.y + (probot->lidar_data[i]/pmap->mapping_gridwidth)*sin((-M_PI*(i))/180 + angle))*res;
+                        x1 = (pose.x + (probot->lidar_data[i]/mapping_grid)*cos((-M_PI*(i))/180 + angle))*res;
+                        y1 = (pose.y + (probot->lidar_data[i]/mapping_grid)*sin((-M_PI*(i))/180 + angle))*res;
                         num = i;
                         break;
                     }
@@ -864,8 +866,8 @@ void MapView::setMapCurrent(){
                     if(probot->lidar_data[i] <limit){
 
                     }else{
-                        float x2 = (pose.x + (probot->lidar_data[i]/pmap->mapping_gridwidth)*cos((-M_PI*i)/180 + angle))*res;
-                        float y2 = (pose.y + (probot->lidar_data[i]/pmap->mapping_gridwidth)*sin((-M_PI*i)/180 + angle))*res;
+                        float x2 = (pose.x + (probot->lidar_data[i]/mapping_grid)*cos((-M_PI*i)/180 + angle))*res;
+                        float y2 = (pose.y + (probot->lidar_data[i]/mapping_grid)*sin((-M_PI*i)/180 + angle))*res;
                         painter.drawLine((int)x1, (int)y1, (int)x2, (int)y2);
                         x1 = x2;
                         y1 = y2;
@@ -883,13 +885,13 @@ void MapView::setMapCurrent(){
             }
         }
         if(show_robot){
-            qDebug() << "robot" << object_name << mode;
+//            qDebug() << "robot" << object_name << mode;
             if(mode == "mapping"){
                 set_init_flag = false;
                 cv::Point2f pose = setAxisMapping(probot->curPose.point);
                 qDebug() << "robot mapping " << pose.x << pose.y;
                 float angle = setAxis(probot->curPose.angle);
-                float distance = (pmap->robot_radius/pmap->mapping_gridwidth)*2;
+                float distance = (pmap->robot_radius/mapping_grid)*2;
                 float distance2 = distance*0.8;
                 float th_dist = M_PI/8;
 
@@ -900,7 +902,7 @@ void MapView::setMapCurrent(){
                 float x2 =  (pose.x + distance2   * qCos(angle+th_dist))*res;
                 float y2 =  (pose.y + distance2   * qSin(angle+th_dist))*res;
 
-                float rad = pmap->robot_radius*2*res/pmap->mapping_gridwidth;
+                float rad = pmap->robot_radius*2*res/mapping_grid;
                 QPainterPath path;
                 QPolygonF polygon;
                 polygon << QPointF(x1,y1) << QPointF(x2,y2) << QPointF(x,y) << QPointF(x1,y1);
@@ -1309,7 +1311,7 @@ void MapView::zoomIn(int x, int y){
     if(scale < 0.1){
         scale = 0.1;
     }
-//    //qDebug() << "ZOOM IN " << scale;
+    //qDebug() << "ZOOM IN " << scale;
     setZoomCenter(x,y);
     moveMap();
 }
@@ -1328,7 +1330,7 @@ void MapView::zoomOut(int x, int y){
     }else if(scale > max_hs){
         scale = max_hs;
     }
-//    //qDebug() << "ZOOM OUT " << scale;
+//    qDebug() << "ZOOM OUT " << mapping_size << scale;
     setZoomCenter(x,y);
     moveMap();
 }
