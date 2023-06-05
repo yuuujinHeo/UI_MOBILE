@@ -69,6 +69,8 @@ Item {
         map.init();
         map.setViewer("current");
         map.setfullscreen();
+
+
     }
 
     SequentialAnimation{
@@ -700,6 +702,7 @@ Item {
                         }
                         Item_button{
                             width: 80
+                            visible: false
                             shadow_color: color_gray
                             icon: "icon/icon_local_manual.png"
                             name: "대기위치로\n초기화"
@@ -990,7 +993,7 @@ Item {
                         //Auto Swipe
                         notice.y = -800;
                         area_swipe.enabled = false;
-                        password = 0;
+                        area_swipe.password = 0;
                     }else if(notice.y === 0){
                         area_swipe.enabled = true;
                     }

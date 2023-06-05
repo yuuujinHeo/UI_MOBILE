@@ -2230,9 +2230,25 @@ Item {
             anchors.fill: parent
             color: "transparent"
         }
+        onOpened:{
+            loadi.play("image/loading_rb.gif");
+        }
+        onClosed:{
+            loadi.stop();
+        }
+
         AnimatedImage{
-            source: "image/loading_rb.gif"
-            cache:false
+            id: loadi
+            cache: false
+            function play(name){
+                source = name;
+                visible = true;
+            }
+            function stop(){
+                visible = false;
+                source = "";
+            }
+            source:  ""
             MouseArea{
                 id: area_debug
                 width: 150
@@ -2819,7 +2835,7 @@ Item {
                 source: btn_slam_do_init
             }
             Rectangle{
-                id: btn_slam_pass
+                id: btn_slam_manual_init
                 width: 188
                 height: 100
                 radius: 60
@@ -2834,6 +2850,43 @@ Item {
                     spacing: 5
                     anchors.centerIn: parent
                     Image{
+                        width: 30
+                        height: 30
+                        source:"icon/btn_wait.png"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        id: text_slam_pass
+                        text: "수동초기화 (DEBUG)"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 15
+                    }
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        supervisor.writelog("[USER INPUT] INIT PAGE : MANUAL LOCALIZATION")
+                        loadPage(pmap);
+                        loader_page.item.setLocalizationInit();
+                    }
+                }
+            }
+            Rectangle{
+                id: btn_slam_pass
+                width: 188
+                height: 100
+                radius: 60
+                color: "transparent"
+                border.width: 3
+                visible: show_debug
+                border.color: "#e5e5e5"
+                anchors.left: btn_slam_manual_init.right
+                anchors.leftMargin: 30
+                anchors.verticalCenter: btn_slam_do_init.verticalCenter
+                Column{
+                    spacing: 5
+                    anchors.centerIn: parent
+                    Image{
                         id: image_charge1
                         width: 30
                         height: 30
@@ -2841,7 +2894,6 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
                     Text{
-                        id: text_slam_pass
                         text: "넘어가기 (DEBUG)"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
@@ -2987,9 +3039,8 @@ Item {
     Popup{
         id: popup_localization_start
         anchors.centerIn: parent
-        closePolicy: Popup.NoAutoClose
-        width: 1280
-        height: 800
+        width: 500
+        height: 300
         topPadding: 0
         bottomPadding: 0
         leftPadding: 0
@@ -3001,6 +3052,9 @@ Item {
         onOpened: {
             supervisor.writelog("[QML] INIT PAGE -> LOCALIZATION AUTO ")
             supervisor.slam_autoInit();
+            local_text.text = "로봇의 위치를 찾는 중입니다."
+            local_text.font.pixelSize = 30;
+            popup_loading.open();
             timer_check_localization.start();
         }
         onClosed: {
@@ -3010,33 +3064,34 @@ Item {
         Timer{
             id: timer_check_localization
             running: false
-            interval: 500
+            interval: 1000
             repeat: true
             onTriggered: {
                 if(supervisor.getLocalizationState() === 2){
                     popup_localization_done.open();
-                    local_loading.visible = false;
+                    popup_loading.close();
                     timer_check_localization.stop();
                     popup_localization_start.close();
                 }else if(supervisor.getLocalizationState() === 3){
-                    local_loading.visible = false;
+                    popup_loading.close();
+                    local_text.font.pixelSize = 18;
                     local_text.text = "로봇의 위치를 찾을 수 없습니다\n로봇이 바라보는 방향에 유의하여 대기위치로 이동시켜주세요."
                 }else{
                     local_text.text = "로봇의 위치를 찾는 중입니다."
-                    local_loading.visible = true;
+                    local_text.font.pixelSize = 30;
                 }
             }
         }
 
         Rectangle{
             anchors.centerIn: parent
-            width: 350
+            width: 500
             height: 200
             radius: 33
             color: color_dark_navy
             Rectangle{
                 anchors.centerIn: parent
-                width: 330
+                width: 480
                 height: 180
                 radius: 30
                 Column{
@@ -3049,12 +3104,6 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                         color: color_dark_navy
                         text: "로봇의 위치를 찾는 중입니다."
-                    }
-                    AnimatedImage{
-                        id: local_loading
-                        source: "video/loading_row.gif"
-                        height: 50
-                        anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }
             }

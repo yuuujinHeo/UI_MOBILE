@@ -12,7 +12,7 @@ CallbellHandler::CallbellHandler()
     connect(m_serialPort, SIGNAL(readyRead()), this, SLOT(readData()));
     connect(m_serialPort, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(handleError(QSerialPort::SerialPortError)));
 
-    m_serialPort->setPortName("ttyCB0");
+    m_serialPort->setPortName("ttyUSB1");
     m_serialPort->setBaudRate(QSerialPort::Baud115200);
     m_serialPort->setDataBits(QSerialPort::Data8);
     m_serialPort->setParity(QSerialPort::NoParity);
@@ -79,7 +79,7 @@ void CallbellHandler::readData(){
         str += QString().sprintf("0x%02X ", uchar(data[i]));
     }
 //    qDebug() << str;
-//    qDebug() << data;
+//    qDebug() << "CALLBELL" << data;
 
     while(datas.length() > 4){
         if(uchar(datas[0]) == 0x03 && uchar(datas[1]) == 0x01){

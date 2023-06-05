@@ -137,6 +137,10 @@ void IPCHandler::onTimer(){
         if(probot->status_emo == temp1.status_emo){
             plog->write("[LCM] EMO status changed !! "+QString::number(!temp1.status_emo));
         }
+        if(probot->status_lock != temp1.ui_motor_lock_state){
+            plog->write("[IPC] MOTOR LOCK status changed !! "+QString::number(temp1.ui_motor_lock_state));
+        }
+        probot->status_lock = temp1.ui_motor_lock_state;
         probot->status_emo = !temp1.status_emo;
         probot->status_remote = temp1.status_remote;
         //DEBUG
@@ -145,6 +149,8 @@ void IPCHandler::onTimer(){
         probot->localization_state = temp1.ui_loc_state;
         probot->running_state = temp1.ui_auto_state;
         probot->obs_state = temp1.ui_obs_state;
+        probot->robot_preset = temp1.ui_cur_velocity_preset;
+        probot->obs_in_path_state = temp1.ui_obs_near_path_state;
         probot->curPose.point.x = temp1.robot_pose[0];
         probot->curPose.point.y = temp1.robot_pose[1];
 //        qDebug() << "status" << probot->localization_state;
@@ -198,7 +204,7 @@ void IPCHandler::onTimer(){
     temp3 = get_obs();
     if(temp3.tick != prev_tick_obs){
         flag_rx = true;
-        qDebug() << "obs " << temp3.tick;
+//        qDebug() << "obs " << temp3.tick;
         read_count = 0;
 
         cv::Mat map1(temp3.height, temp3.width, CV_8U, cv::Scalar::all(0));
@@ -233,7 +239,7 @@ void IPCHandler::onTimer(){
         }
         char* temp_pchar = &temp_char[0];
         temp_info.serial = QString::fromUtf8(temp_pchar);
-        qDebug() << temp_info.serial;
+//        qDebug() << temp_info.serial;
 
         temp_info.width = cam0.width;
         temp_info.height = cam0.height;
@@ -270,7 +276,7 @@ void IPCHandler::onTimer(){
         }
         char* temp_pchar = &temp_char[0];
         temp_info.serial = QString::fromUtf8(temp_pchar);
-        qDebug() << temp_info.serial;
+//        qDebug() << temp_info.serial;
 
         temp_info.width = cam1.width;
         temp_info.height = cam1.height;
@@ -385,7 +391,7 @@ void IPCHandler::set_cmd(IPCHandler::CMD val, QString log)
     val.tick = ++tick;
     memcpy((char*)shm_cmd.data(), &val, sizeof(IPCHandler::CMD));
     if(log != ""){
-        plog->write("[IPC] Set CMD "+QString::number(val.tick)+" : "+log);
+        plog->write("[IPC] Set CMD "+QString::number(val.cmd)+" : "+log);
     }
     shm_cmd.unlock();
 }
@@ -474,6 +480,7 @@ void IPCHandler::moveTo(float x, float y, float th, int preset){
     send_msg.params[11]= array[3];
 
     send_msg.params[12] = (uint8_t)preset;
+    qDebug() << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << send_msg.params[12];
 
     probot->curTarget.point.x = x;
     probot->curTarget.point.y = y;

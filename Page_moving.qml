@@ -10,11 +10,13 @@ Item {
     width: 1280
     height: 800
 
+    property bool motor_lock: false
     property string pos_name: ""
     property string pos: "1번 테이블"
     property bool robot_paused: false
     property bool move_fail: false
     property int password: 0
+    property int obs_in_path : 0
     property bool show_face: false
     Component.onCompleted: {
         init();
@@ -30,20 +32,18 @@ Item {
 
         popup_pause.visible = false;
         if(supervisor.getSetting("ROBOT_SW","moving_face")==="true"){
-            resting_image.visible = true;
+
+            face_image.play("image/temp.gif");
             image_robot.visible = false;
             show_face = true;
         }else{
             show_face = false;
-            resting_image.visible = false;
+            face_image.stop();
             image_robot.visible = true;
         }
 
         robot_paused = false;
         playMusic.play();
-    }
-    function stopMusic(){
-        playMusic.stop();
     }
     function checkPaused(){
         timer_check_pause.start();
@@ -68,21 +68,21 @@ Item {
         color: "#282828"
     }
     AnimatedImage{
-        id: resting_image
+        id: face_image
         visible: false
-        source: "image/temp.gif"
-        anchors.fill: parent
-    }
-    AnimatedImage{
-        id: face_surprise
-        visible: false
-        source: "image/face_surprise.gif"
-        anchors.fill: parent
-    }
-    AnimatedImage{
-        id: face_cry
-        visible: false
-        source: "image/face_cry.gif"
+        cache: false
+        property string cur_source: ""
+        function play(name){
+            source = name;
+            cur_source = name;
+            visible = true;
+        }
+        function stop(){
+            visible = false;
+            cur_source = "";
+            source = "";
+        }
+        source:  ""
         anchors.fill: parent
     }
     Image{
@@ -203,12 +203,13 @@ Item {
                     color: color_red
                     font.family: font_noto_r.name
                     font.pixelSize: 30
-                    text: "수동 이동"
+                    text: motor_lock?"수동 이동":"원래대로"
                 }
                 MouseArea{
                     anchors.fill: parent
                     z: 99
                     onClicked:{
+                        supervisor.setMotorLock(!motor_lock);
                         supervisor.writelog("[USER INPUT] MOVING PAUSED : MOTOR LOCK DISABLE");
                     }
                 }
@@ -218,7 +219,8 @@ Item {
                 height: 120
                 radius: 20
                 color: "transparent"
-                border.color: color_red
+                enabled: motor_lock
+                border.color: motor_lock?color_red:color_gray
                 border.width: 6
                 Text{
                     anchors.centerIn: parent
@@ -249,7 +251,8 @@ Item {
                 height: 120
                 radius: 20
                 color: "transparent"
-                border.color: color_red
+                enabled: motor_lock
+                border.color: motor_lock?color_red:color_gray
                 border.width: 6
                 Text{
                     anchors.centerIn: parent
@@ -269,25 +272,6 @@ Item {
                 }
             }
         }
-//        MouseArea{
-//            id: btn_page_popup
-//            anchors.fill: parent
-//            onClicked: {
-//                print(btn_page_popup.enabled, btn_page_popup.visible);
-//                password = 0;
-//                if(robot_paused){
-//                    move_fail = false;
-//                    supervisor.writelog("[USER INPUT] MOVING RESUME")
-//                    supervisor.moveResume();
-//                    timer_check_pause.start();
-//                }else{
-//                    move_fail = false;
-//                    supervisor.writelog("[USER INPUT] MOVING PAUSE")
-//                    supervisor.movePaused();
-//                    timer_check_pause.start();
-//                }
-//            }
-//        }
     }
 
 
@@ -342,11 +326,65 @@ Item {
         running: true
         repeat: true
         onTriggered: {
-            if(show_face){
-
+            if(supervisor.getLockStatus()===0){
+                if(motor_lock)
+                    print("MOTOR LOCK FALSE");
+                motor_lock = false;
+            }else{
+                if(!motor_lock)
+                    print("MOTOR LOCK TRUE");
+                motor_lock = true;
             }
+
+            //DEBUG 230605
+            obs_in_path =supervisor.getObsinPath();
+
+            if(show_face){
+                if(supervisor.getStateMoving() === 3){
+                    if(face_image.cur_source !== "image/face_cry.gif"){
+                        supervisor.writelog("[QML - MOVING] MOVING WAITED");
+                        face_image.play("image/face_cry.gif");
+                    }
+
+                }else if(obs_in_path){
+                    if(face_image.cur_source !== "image/face_surprise.gif"){
+                        supervisor.writelog("[QML - MOVING] ROBOT DETECT SOMETHING");
+                        face_image.play("image/face_surprise.gif");
+                    }
+                }else{
+                    if(face_image.cur_source !== "image/temp.gif"){
+                        supervisor.writelog("[QML - MOVING] ROBOT START MOVING");
+                        face_image.play("image/temp.gif");
+                    }
+                }
+            }
+
+            text_debug_1.text = "Robot Auto State : " + supervisor.getStateMoving().toString();
+            text_debug_2.text = "Robot OBS In Path State : " + supervisor.getObsinPath().toString();
         }
     }
+
+    Column{
+        visible: robot_paused
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        spacing: 20
+        anchors.leftMargin: 50
+        anchors.bottomMargin: 50
+        Text{
+            id: text_debug_1
+            color: "white"
+            text: "Robot Auto State : "
+            font.pixelSize: 20
+        }
+        Text{
+            id: text_debug_2
+            color: "white"
+            text: "Robot OBS In Path State : "
+            font.pixelSize: 20
+        }
+    }
+
 
     MouseArea{
         id: btn_page

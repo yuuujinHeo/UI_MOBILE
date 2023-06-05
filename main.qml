@@ -18,21 +18,21 @@ Window {
     height: 800
     title: qsTr("Hello World")
 
-    flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
-    visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
-//    visibility: Window.FullScreen
-    onVisibilityChanged: {
-        if(homePath.split("/")[2]==="odroid"){
-            if(mainwindow.visibility == Window.Minimized){
-                print("minimized");
-            }else if(mainwindow.visibility == Window.FullScreen){
-                print("fullscreen");
-            }else{
-                supervisor.writelog("[QML - MAIN] Window show fullscreen");
-                mainwindow.visibility = Window.FullScreen;
-            }
-        }
-    }
+//    flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
+//    visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
+////    visibility: Window.FullScreen
+//    onVisibilityChanged: {
+//        if(homePath.split("/")[2]==="odroid"){
+//            if(mainwindow.visibility == Window.Minimized){
+//                print("minimized");
+//            }else if(mainwindow.visibility == Window.FullScreen){
+//                print("fullscreen");
+//            }else{
+//                supervisor.writelog("[QML - MAIN] Window show fullscreen");
+//                mainwindow.visibility = Window.FullScreen;
+//            }
+//        }
+//    }
 
     Component.onDestruction: {
 
@@ -75,29 +75,37 @@ Window {
     property string cur_location;
 
     function movefail(){
-        if(loader_page.item.objectName != "page_movefail" && loader_page.item.objectName != "page_map"){
-            loadPage(pmovefail);
+        if(loader_page.item.objectName != "page_movefail" && loader_page.item.objectName != "page_map"&& loader_page.item.objectName != "page_setting"){
+
             //0: no path /1: local fail /2: emergency /3: user stop /4: motor error
             if(supervisor.getEmoStatus()){
+                loadPage(pmovefail);
                 loader_page.item.setNotice(2);
                 voice_all_stop();
                 voice_emergency.play();
                 print("movefail emergency")
             }else if(supervisor.getMotorState() === 0){
+
+                loadPage(pmovefail);
                 loader_page.item.setNotice(4);
                 voice_all_stop();
 //                voice_motor_error.play();
                 print("movefail motor")
             }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
+
+                loadPage(pmovefail);
                 loader_page.item.setNotice(1);
                 voice_all_stop();
                 voice_localfail.play();
                 print("movefail local")
-            }else{
+            }else if(supervisor.getStateMoving() === 0){
+                loadPage(pmovefail);
                 loader_page.item.setNotice(0);
                 voice_all_stop();
                 play_movefailmsg();
                 print("movefail no path")
+            }else{
+                supervisor.writelog()("[MOVEFAIL] WEIRED MOVEFAIL : "+supervisor.getStateMoving().toString()+","+supervisor.getLocalizationState().toString()+","+supervisor.getMotorState().toString())
             }
         }
     }
@@ -345,6 +353,7 @@ Window {
         robot_type = supervisor.getRobotType()
         robot_name = supervisor.getRobotName()
     }
+
     Supervisor{
         id:supervisor
     }
@@ -362,7 +371,7 @@ Window {
             timer_update.start();
             loader_page.item.init();
         }
-        source:  pinit
+        source: pinit
     }
 
     Timer{
@@ -457,6 +466,12 @@ Window {
         id: rect_loading
         width: parent.width
         height: parent.height
+        onOpened:{
+            loading_image.play("image/loading_rb.gif");
+        }
+        onClosed:{
+            loading_image.stop();
+        }
 
         background:Rectangle{
             anchors.fill: parent
@@ -465,14 +480,30 @@ Window {
         }
         AnimatedImage{
             id: loading_image
-            source: "image/loading_rb.gif"
-            anchors.centerIn: parent
+            source: ""
+            cache: false
+            function play(name){
+                source = name;
+                visible = true;
+            }
+            function stop(){
+                visible = false;
+                source = "";
+            }
+            anchors.fill: parent
         }
     }
     Popup{
         id: rect_resting
         width: parent.width
+
         height: parent.height
+        onOpened:{
+            resting_image.play("image/loading_rb.gif");
+        }
+        onClosed:{
+            resting_image.stop();
+        }
 
         background:Rectangle{
             anchors.fill: parent
@@ -480,7 +511,16 @@ Window {
         }
         AnimatedImage{
             id: resting_image
-            source: "image/temp.gif"
+            source: ""
+            cache: false
+            function play(name){
+                source = name;
+                visible = true;
+            }
+            function stop(){
+                visible = false;
+                source = "";
+            }
             anchors.fill: parent
         }
         MouseArea{
@@ -497,7 +537,7 @@ Window {
         visible: false
     }
 
-    Loading{
-        id: loading
-    }
+//    Loading{
+//        id: loading
+//    }
 }

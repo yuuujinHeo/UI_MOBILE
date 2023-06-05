@@ -30,8 +30,8 @@ Item {
             popup_camera.update();
     }
     Component.onCompleted: {
-        //DEBUG 230523 세팅 빠른 확인 위해서 admin true
-        is_admin = true;
+        statusbar.visible = true;
+        is_admin = false;
         is_reset_slam = false;
 //        supervisor.getAllWifiList();
         supervisor.getWifiIP();
@@ -281,6 +281,7 @@ Item {
                                 onTextChanged: {
                                     ischanged = true;
                                 }
+                                focus:false
                                 onFocusChanged: {
                                     keyboard.owner = platform_name;
                                     if(focus){
@@ -508,11 +509,8 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            if(text_preset_name_1.text !== ""){
-                                                popup_preset_set.preset_num = 1;
-                                                popup_preset_set.open();
-                                            }
-
+                                            popup_preset.open();
+                                            popup_preset.select_preset = 1;
                                         }
                                     }
                                 }
@@ -531,10 +529,8 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            if(text_preset_name_2.text !== ""){
-                                                popup_preset_set.preset_num = 2;
-                                                popup_preset_set.open();
-                                            }
+                                            popup_preset.open();
+                                            popup_preset.select_preset = 2;
 
                                         }
                                     }
@@ -554,10 +550,8 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            if(text_preset_name_3.text !== ""){
-                                                popup_preset_set.preset_num = 3;
-                                                popup_preset_set.open();
-                                            }
+                                            popup_preset.open();
+                                            popup_preset.select_preset = 3;
                                         }
                                     }
                                 }
@@ -576,10 +570,8 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            if(text_preset_name_4.text !== ""){
-                                                popup_preset_set.preset_num = 4;
-                                                popup_preset_set.open();
-                                            }
+                                            popup_preset.open();
+                                            popup_preset.select_preset = 4;
 
                                         }
                                     }
@@ -599,11 +591,8 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            if(text_preset_name_5.text !== ""){
-                                                popup_preset_set.preset_num = 5;
-                                                popup_preset_set.open();
-                                            }
-
+                                            popup_preset.open();
+                                            popup_preset.select_preset = 5;
                                         }
                                     }
                                 }
@@ -612,7 +601,7 @@ Item {
                                     height: 40
                                     radius: 5
                                     color: "black"
-                                    visible: is_admin
+                                    visible: false//is_admin
                                     Text{
                                         anchors.centerIn: parent
                                         text: "변경"
@@ -1024,6 +1013,7 @@ Item {
                 Rectangle{
                     id: set_wifi_connection
                     width: 840
+                    visible: is_admin && debug_use_ip
                     height: 40
                     Row{
                         anchors.fill: parent
@@ -1176,6 +1166,7 @@ Item {
                                     }
                                     color: ischanged?color_red:"black"
                                     text:supervisor.getSetting("ROBOT_SW","wifi_passwd");
+                                    focus:false
                                     onFocusChanged: {
                                         keyboard.owner = wifi_passwd;
                                         wifi_passwd.selectAll();
@@ -1245,6 +1236,7 @@ Item {
                                     id: ip_1
                                     width: 70
                                     height: 40
+                                    focus:false
                                     onFocusChanged: {
                                         keyboard.owner = ip_1;
                                         ip_1.selectAll();
@@ -1279,6 +1271,7 @@ Item {
                                     id: ip_2
                                     width: 70
                                     height: 40
+                                    focus:false
                                     onFocusChanged: {
                                         keyboard.owner = ip_2;
                                         ip_2.selectAll();
@@ -1316,6 +1309,7 @@ Item {
                                     id: ip_3
                                     width: 70
                                     height: 40
+                                    focus:false
                                     onFocusChanged: {
                                         keyboard.owner = ip_3;
                                         ip_3.selectAll();
@@ -1353,6 +1347,7 @@ Item {
                                     id: ip_4
                                     width: 70
                                     height: 40
+                                    focus:false
                                     onFocusChanged: {
                                         keyboard.owner = ip_4;
                                         ip_4.selectAll();
@@ -1456,6 +1451,7 @@ Item {
                                     id: gateway_1
                                     width: 70
                                     height: 40
+                                    focus:false
                                     onFocusChanged: {
                                         keyboard.owner = gateway_1;
                                         gateway_1.selectAll();
@@ -1490,6 +1486,7 @@ Item {
                                     id: gateway_2
                                     width: 70
                                     height: 40
+                                    focus:false
                                     onFocusChanged: {
                                         keyboard.owner = gateway_2;
                                         gateway_2.selectAll();
@@ -1527,6 +1524,7 @@ Item {
                                     id: gateway_3
                                     width: 70
                                     height: 40
+                                    focus:false
                                     onFocusChanged: {
                                         keyboard.owner = gateway_3;
                                         gateway_3.selectAll();
@@ -1564,6 +1562,7 @@ Item {
                                     id: gateway_4
                                     width: 70
                                     height: 40
+                                    focus:false
                                     onFocusChanged: {
                                         keyboard.owner = gateway_4;
                                         gateway_4.selectAll();
@@ -1665,6 +1664,7 @@ Item {
                                 TextField{
                                     id: dnsmain_1
                                     width: 70
+                                    focus:false
                                     height: 40
                                     onFocusChanged: {
                                         keyboard.owner = dnsmain_1;
@@ -1773,6 +1773,7 @@ Item {
                                 TextField{
                                     id: dnsmain_4
                                     width: 70
+                                    focus:false
                                     height: 40
                                     onFocusChanged: {
                                         keyboard.owner = dnsmain_4;
@@ -1876,6 +1877,7 @@ Item {
                                 TextField{
                                     id: dnsserv_1
                                     width: 70
+                                    focus:false
                                     height: 40
                                     onFocusChanged: {
                                         keyboard.owner = dnsserv_1;
@@ -1911,6 +1913,7 @@ Item {
                                     id: dnsserv_2
                                     width: 70
                                     height: 40
+                                    focus:false
                                     onFocusChanged: {
                                         keyboard.owner = dnsserv_2;
                                         dnsserv_2.selectAll();
@@ -1948,6 +1951,7 @@ Item {
                                     id: dnsserv_3
                                     width: 70
                                     height: 40
+                                    focus:false
                                     onFocusChanged: {
                                         keyboard.owner = dnsserv_3;
                                         dnsserv_3.selectAll();
@@ -1985,6 +1989,7 @@ Item {
                                     id: dnsserv_4
                                     width: 70
                                     height: 40
+                                    focus:false
                                     onFocusChanged: {
                                         keyboard.owner = dnsserv_4;
                                         dnsserv_4.selectAll();
@@ -2074,6 +2079,7 @@ Item {
                                     ischanged = true;
                                     is_reset_slam = true;
                                 }
+                                focus:false
                                 color: ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_HW","radius");
                                 onFocusChanged: {
@@ -2123,6 +2129,7 @@ Item {
                                     ischanged = true;
                                     is_reset_slam = true;
                                 }
+                                focus:false
                                 color: ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT","wheel_base");
                                 onFocusChanged: {
@@ -2172,6 +2179,7 @@ Item {
                                     ischanged = true;
                                     is_reset_slam = true;
                                 }
+                                focus:false
                                 color: ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT","wheel_radius");
                                 onFocusChanged: {
@@ -2465,6 +2473,7 @@ Item {
                                 TextField{
                                     id: map_name
                                     height: parent.height
+                                    focus:false
                                     width: 300
                                     text:supervisor.getMapname();
                                     onFocusChanged: {
@@ -2535,14 +2544,15 @@ Item {
                                     ischanged = true;
                                     is_reset_slam = true;
                                 }
+                                focus:false
                                 color: ischanged?color_red:"black"
                                 onFocusChanged: {
-                                    keyboard.owner = map_size;
+                                    keypad.owner = map_size;
                                     if(focus){
-                                        keyboard.open();
+                                        keypad.open();
                                         map_size.selectAll();
                                     }else{
-                                        keyboard.close();
+                                        keypad.close();
                                     }
                                 }
                             }
@@ -2585,6 +2595,7 @@ Item {
                                     ischanged = true;
                                     is_reset_slam = true;
                                 }
+                                focus:false
                                 color: ischanged?color_red:"black"
                                 onFocusChanged: {
                                     keyboard.owner = grid_size;
@@ -2942,6 +2953,20 @@ Item {
                         }
                     }
                 }
+
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"장애물 감지 설정"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
                 Rectangle{
                     id: set_decmargin
                     width: 840
@@ -2956,7 +2981,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"obs_dec_margin"
+                                text:"감지 거리"
                                 font.pixelSize: 20
                             }
                         }
@@ -2974,15 +2999,126 @@ Item {
                                 objectName: "obs_dec_margin"
                                 text:supervisor.getSetting("ROBOT_SW","obs_dec_margin");
                                 property bool ischanged: false
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 onFocusChanged: {
-                                    keypad.owner = mask;
-                                    mask.selectAll();
+                                    keypad.owner = obs_dec_margin;
+                                    obs_dec_margin.selectAll();
                                     if(focus){
                                         keypad.open();
                                     }else{
                                         keypad.close();
-                                        mask.select(0,0);
+                                        obs_dec_margin.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    if(focus){
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    id: set_obs_area
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"감지영역"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_detect_area
+                                anchors.fill: parent
+                                objectName: "obs_detect_area"
+                                text:supervisor.getSetting("ROBOT_SW","obs_detect_area");
+                                property bool ischanged: false
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = obs_detect_area;
+                                    obs_detect_area.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        obs_detect_area.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    if(focus){
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    id: set_obs_sensitivity
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"감지 민감도"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_detect_sensitivity
+                                anchors.fill: parent
+                                objectName: "obs_detect_sensitivity"
+                                text:supervisor.getSetting("ROBOT_SW","obs_detect_sensitivity");
+                                property bool ischanged: false
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = obs_detect_sensitivity;
+                                    obs_detect_sensitivity.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        obs_detect_sensitivity.select(0,0);
                                     }
                                 }
                                 onTextChanged: {
@@ -3027,15 +3163,16 @@ Item {
                                 objectName: "obs_height_min"
                                 text:supervisor.getSetting("ROBOT_SW","obs_height_min");
                                 property bool ischanged: false
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 onFocusChanged: {
-                                    keypad.owner = mask;
-                                    mask.selectAll();
+                                    keypad.owner = obs_height_min;
+                                    obs_height_min.selectAll();
                                     if(focus){
                                         keypad.open();
                                     }else{
                                         keypad.close();
-                                        mask.select(0,0);
+                                        obs_height_min.select(0,0);
                                     }
                                 }
                                 onTextChanged: {
@@ -3081,14 +3218,15 @@ Item {
                                 text:supervisor.getSetting("ROBOT_SW","obs_height_max");
                                 property bool ischanged: false
                                 color:ischanged?color_red:"black"
+                                focus:false
                                 onFocusChanged: {
-                                    keypad.owner = mask;
-                                    mask.selectAll();
+                                    keypad.owner = obs_height_max;
+                                    obs_height_max.selectAll();
                                     if(focus){
                                         keypad.open();
                                     }else{
                                         keypad.close();
-                                        mask.select(0,0);
+                                        obs_height_max.select(0,0);
                                     }
                                 }
                                 onTextChanged: {
@@ -3174,6 +3312,7 @@ Item {
                                 text:supervisor.getSetting("SENSOR","mask");
                                 property bool ischanged: false
                                 color:ischanged?color_red:"black"
+                                focus:false
                                 onFocusChanged: {
                                     keypad.owner = mask;
                                     mask.selectAll();
@@ -3225,6 +3364,7 @@ Item {
                                 anchors.fill: parent
                                 text:supervisor.getSetting("SENSOR","max_range");
                                 property bool ischanged: false
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 onFocusChanged: {
                                     keypad.owner = max_range;
@@ -3277,6 +3417,7 @@ Item {
                                 anchors.fill: parent
                                 text:supervisor.getSetting("SENSOR","cam_exposure");
                                 property bool ischanged: false
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 onFocusChanged: {
                                     keypad.owner = cam_exposure;
@@ -3333,6 +3474,7 @@ Item {
                                     ischanged = true;
                                 }
                                 color:ischanged?color_red:"black"
+                                focus:false
                                 text:supervisor.getSetting("SENSOR","offset_x");
                                 onFocusChanged: {
                                     keypad.owner = offset_x;
@@ -3383,6 +3525,7 @@ Item {
                                     ischanged = true;
                                 }
                                 color:ischanged?color_red:"black"
+                                focus:false
                                 text:supervisor.getSetting("SENSOR","offset_y");
                                 onFocusChanged: {
                                     keypad.owner = offset_y;
@@ -3559,6 +3702,7 @@ Item {
                                 }
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","limit_pivot");
+                                focus:false
                                 onFocusChanged: {
                                     keypad.owner = limit_pivot;
                                     limit_pivot.selectAll();
@@ -3608,6 +3752,7 @@ Item {
                                     ischanged = true;
                                 }
                                 color:ischanged?color_red:"black"
+                                focus:false
                                 text:supervisor.getSetting("ROBOT_SW","limit_pivot_acc");
                                 onFocusChanged: {
                                     keypad.owner = limit_pivot_acc;
@@ -3657,6 +3802,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","limit_v");
                                 onFocusChanged: {
@@ -3707,6 +3853,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","limit_v_acc");
                                 onFocusChanged: {
@@ -3757,6 +3904,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","limit_w");
                                 onFocusChanged: {
@@ -3807,6 +3955,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","limit_w_acc");
                                 onFocusChanged: {
@@ -3857,6 +4006,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","limit_manual_v");
                                 onFocusChanged: {
@@ -3907,6 +4057,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","limit_manual_w");
                                 onFocusChanged: {
@@ -3958,6 +4109,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","st_v");
                                 onFocusChanged: {
@@ -4145,6 +4297,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("MOTOR","gear_ratio");
                                 onFocusChanged: {
@@ -4196,6 +4349,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("MOTOR","k_p");
                                 onFocusChanged: {
@@ -4247,6 +4401,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("MOTOR","k_i");
                                 onFocusChanged: {
@@ -4298,6 +4453,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("MOTOR","k_d");
                                 onFocusChanged: {
@@ -4349,6 +4505,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("MOTOR","limit_v");
                                 onFocusChanged: {
@@ -4400,6 +4557,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("MOTOR","limit_v_acc");
                                 onFocusChanged: {
@@ -4451,6 +4609,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("MOTOR","limit_w");
                                 onFocusChanged: {
@@ -4502,6 +4661,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("MOTOR","limit_w_acc");
                                 onFocusChanged: {
@@ -4565,6 +4725,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","k_v");
                                 onFocusChanged: {
@@ -4615,6 +4776,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","k_w");
                                 onFocusChanged: {
@@ -4645,7 +4807,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"look_ahead_dist [m]"
+                                text:"앞서보기 거리[m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4665,6 +4827,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","look_ahead_dist");
                                 onFocusChanged: {
@@ -4695,7 +4858,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"min_look_ahead_dist [m]"
+                                text:"앞서보기 최소거리[m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4715,6 +4878,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","min_look_ahead_dist");
                                 onFocusChanged: {
@@ -4735,6 +4899,7 @@ Item {
                     id: set_narrow_decel_ratio
                     width: 840
                     height: 40
+                    visible: false
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -4765,6 +4930,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","narrow_decel_ratio");
                                 onFocusChanged: {
@@ -4795,7 +4961,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"obs_deadzone [m]"
+                                text:"동적장애물 정지거리[m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4815,6 +4981,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","obs_deadzone");
                                 onFocusChanged: {
@@ -4845,7 +5012,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"obs_wait_time [sec]"
+                                text:"동적장애물 대기시간[sec]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4865,6 +5032,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","obs_wait_time");
                                 onFocusChanged: {
@@ -4895,7 +5063,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"path_out_dist [m]"
+                                text:"경로이탈 마진[m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4915,6 +5083,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","path_out_dist");
                                 onFocusChanged: {
@@ -4939,7 +5108,7 @@ Item {
                     Text{
                         anchors.centerIn: parent
                         font.family: font_noto_b.name
-                        text:"ICP 설정"
+                        text:"위치추정(ICP) 설정"
                         color: "white"
                         font.pixelSize: 20
                     }
@@ -4958,7 +5127,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_dist [m]"
+                                text:"라이다 판단거리[m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4978,6 +5147,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","icp_dist");
                                 onFocusChanged: {
@@ -5008,7 +5178,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_error [m]"
+                                text:"라이다 에러 마진[m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5028,6 +5198,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","icp_error");
                                 onFocusChanged: {
@@ -5058,7 +5229,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_near [m]"
+                                text:"로봇기준 라이다 무시 거리[m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5078,6 +5249,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","icp_near");
                                 onFocusChanged: {
@@ -5108,7 +5280,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_odometry_weight [ratio, %]"
+                                text:"모터 위치추정 비율[ratio, %]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5128,6 +5300,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","icp_odometry_weight");
                                 onFocusChanged: {
@@ -5158,7 +5331,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_ratio [ratio, %]"
+                                text:"라이다 위치추정 비율[ratio, %]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5178,6 +5351,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","icp_ratio");
                                 onFocusChanged: {
@@ -5208,7 +5382,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_repeat_dist [m]"
+                                text:"위치초기화 주행간격[m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5228,6 +5402,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","icp_repeat_dist");
                                 onFocusChanged: {
@@ -5258,7 +5433,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"icp_repeat_time [sec]"
+                                text:"위치초기화 시간간격[sec]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5278,6 +5453,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","icp_repeat_time");
                                 onFocusChanged: {
@@ -5321,7 +5497,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"goal_dist [m]"
+                                text:"도착지점 마진[m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5341,6 +5517,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","goal_dist");
                                 onFocusChanged: {
@@ -5351,56 +5528,6 @@ Item {
                                     }else{
                                         keypad.close();
                                         goal_dist.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_goal_v
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"goal_v [m/s]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: goal_v
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","goal_v");
-                                onFocusChanged: {
-                                    keypad.owner = goal_v;
-                                    goal_v.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        goal_v.select(0,0);
                                     }
                                 }
                             }
@@ -5421,7 +5548,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"goal_th [deg]"
+                                text:"회전각 마진[deg]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5441,6 +5568,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","goal_th");
                                 onFocusChanged: {
@@ -5451,6 +5579,58 @@ Item {
                                     }else{
                                         keypad.close();
                                         goal_th.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    id: set_goal_v
+                    width: 840
+                    height: 40
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"도착점 도달속도[m/s]"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: goal_v
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_v");
+                                onFocusChanged: {
+                                    keypad.owner = goal_v;
+                                    goal_v.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        goal_v.select(0,0);
                                     }
                                 }
                             }
@@ -5472,7 +5652,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"goal_near_dist [m]"
+                                text:"경로생성 최소거리[m]"
                                 font.pixelSize: 20
                             }
                         }
@@ -5492,6 +5672,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","goal_near_dist");
                                 onFocusChanged: {
@@ -5511,6 +5692,7 @@ Item {
                 Rectangle{
                     id: set_goal_near_th
                     width: 840
+                    visible: false
                     height: 40
                     Row{
                         anchors.fill: parent
@@ -5542,6 +5724,7 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
+                                focus:false
                                 color:ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_SW","goal_near_th");
                                 onFocusChanged: {
@@ -6369,6 +6552,12 @@ Item {
         if(obs_dec_margin.ischanged){
             supervisor.setSetting("ROBOT_SW/obs_dec_margin",obs_dec_margin.text);
         }
+        if(obs_detect_area.ischanged){
+            supervisor.setSetting("ROBOT_SW/obs_detect_area",obs_detect_area.text);
+        }
+        if(obs_detect_sensitivity.ischanged){
+            supervisor.setSetting("ROBOT_SW/obs_detect_sensitivity",obs_detect_sensitivity.text);
+        }
 
         if(max_range.ischanged){
             supervisor.setSetting("SENSOR/max_range",max_range.text);
@@ -6710,6 +6899,8 @@ Item {
 
 
         obs_dec_margin.text = supervisor.getSetting("ROBOT_SW","obs_dec_margin");
+        obs_detect_area.text = supervisor.getSetting("ROBOT_SW","obs_detect_area");
+        obs_detect_sensitivity.text = supervisor.getSetting("ROBOT_SW","obs_detect_sensitivity");
         obs_height_min.text = supervisor.getSetting("ROBOT_SW","obs_height_min");
         obs_height_max.text = supervisor.getSetting("ROBOT_SW","obs_height_max");
         mask.text = supervisor.getSetting("SENSOR","mask");
@@ -8361,6 +8552,7 @@ Item {
             text_preset_4.text = supervisor.getSetting("PRESET4","name");
             text_preset_5.text = supervisor.getSetting("PRESET5","name");
             preset_limit_pivot.text = supervisor.getSetting("PRESET"+Number(select_preset),"limit_pivot");
+            preset_limit_pivot_acc.text = supervisor.getSetting("PRESET"+Number(select_preset),"limit_pivot_acc");
             preset_limit_v.text = supervisor.getSetting("PRESET"+Number(select_preset),"limit_v");
             preset_limit_vacc.text = supervisor.getSetting("PRESET"+Number(select_preset),"limit_v_acc");
             preset_limit_w.text = supervisor.getSetting("PRESET"+Number(select_preset),"limit_w");
@@ -8636,6 +8828,8 @@ Item {
                                         }
 
                                         supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_pivot",preset_limit_pivot.text);
+
+                                        supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_pivot_acc",preset_limit_pivot_acc.text);
                                         supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_v",preset_limit_v.text);
                                         supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_v_acc",preset_limit_vacc.text);
                                         supervisor.setSetting("PRESET"+Number(popup_preset.select_preset)+"/limit_w",preset_limit_w.text);
@@ -8651,7 +8845,7 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.verticalCenterOffset: -50
-                            rows: 5
+                            rows: 6
                             columns: 3
                             horizontalItemAlignment: Grid.AlignHCenter
                             verticalItemAlignment: Grid.AlignVCenter
@@ -8668,6 +8862,7 @@ Item {
                             TextField{
                                 id: preset_limit_pivot
                                 width: 200
+                                focus:false
                                 height: 40
                                 text:"";
                                 onFocusChanged: {
@@ -8678,6 +8873,33 @@ Item {
                                     }else{
                                         keypad.close();
                                         preset_limit_pivot.select(0,0);
+                                    }
+                                }
+                            }
+                            Text{
+                                font.family: font_noto_r.name
+                                text:"limit_pivot_acc"
+                                font.pixelSize: 20
+                            }
+                            Rectangle{
+                                width: 1
+                                height: 40
+                                color: "#d0d0d0"
+                            }
+                            TextField{
+                                id: preset_limit_pivot_acc
+                                width: 200
+                                height: 40
+                                text:"";
+                                focus:false
+                                onFocusChanged: {
+                                    keypad.owner = preset_limit_pivot_acc;
+                                    preset_limit_pivot_acc.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        preset_limit_pivot_acc.select(0,0);
                                     }
                                 }
                             }
@@ -8695,6 +8917,7 @@ Item {
                                 id: preset_limit_v
                                 width: 200
                                 height: 40
+                                focus:false
                                 text:"";
                                 onFocusChanged: {
                                     keypad.owner = preset_limit_v;
@@ -8721,6 +8944,7 @@ Item {
                                 id: preset_limit_vacc
                                 width: 200
                                 height: 40
+                                focus:false
                                 text:"";
                                 onFocusChanged: {
                                     keypad.owner = preset_limit_vacc;
@@ -8747,6 +8971,7 @@ Item {
                                 id: preset_limit_w
                                 width: 200
                                 height: 40
+                                focus:false
                                 text:"";
                                 onFocusChanged: {
                                     keypad.owner = preset_limit_w;
@@ -8773,6 +8998,7 @@ Item {
                                 id: preset_limit_wacc
                                 width: 200
                                 height: 40
+                                focus:false
                                 text:"";
                                 onFocusChanged: {
                                     keypad.owner = preset_limit_wacc;
@@ -8810,6 +9036,7 @@ Item {
                 width: 200
                 height: 70
                 horizontalAlignment: Text.AlignHCenter
+                focus:false
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: supervisor.getSetting("PRESET"+Number(popup_preset.select_preset),"name");
                 onFocusChanged: {
@@ -9258,6 +9485,7 @@ Item {
                     width: 80
                     height: 40
                     font.family: font_noto_r.name
+                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
@@ -9282,6 +9510,7 @@ Item {
                     width: 80
                     height: 40
                     font.family: font_noto_r.name
+                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
@@ -9300,6 +9529,7 @@ Item {
                     width: 80
                     height: 40
                     font.family: font_noto_r.name
+                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
@@ -9324,6 +9554,7 @@ Item {
                     width: 80
                     height: 40
                     font.family: font_noto_r.name
+                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
@@ -9342,6 +9573,7 @@ Item {
                     width: 80
                     height: 40
                     font.family: font_noto_r.name
+                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
@@ -9366,6 +9598,7 @@ Item {
                     width: 80
                     height: 40
                     font.family: font_noto_r.name
+                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
@@ -9384,6 +9617,7 @@ Item {
                     width: 80
                     height: 40
                     font.family: font_noto_r.name
+                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
@@ -9408,6 +9642,7 @@ Item {
                     width: 80
                     height: 40
                     font.family: font_noto_r.name
+                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
@@ -9426,6 +9661,7 @@ Item {
                     width: 80
                     horizontalAlignment: Text.AlignHCenter
                     height: 40
+                    focus:false
                     font.family: font_noto_r.name
                     font.pixelSize: 15
                     onFocusChanged: {
@@ -9450,6 +9686,7 @@ Item {
                     width: 80
                     height: 40
                     font.family: font_noto_r.name
+                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
@@ -9468,6 +9705,7 @@ Item {
                     width: 80
                     height: 40
                     font.family: font_noto_r.name
+                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
@@ -9492,6 +9730,7 @@ Item {
                     width: 80
                     height: 40
                     horizontalAlignment: Text.AlignHCenter
+                    focus:false
                     font.family: font_noto_r.name
                     font.pixelSize: 15
                     onFocusChanged: {
@@ -9833,9 +10072,25 @@ Item {
             anchors.fill: parent
             color: "transparent"
         }
+        onOpened:{
+            loadi.play("image/loading_rb.gif");
+        }
+        onClosed:{
+            loadi.stop();
+        }
+
         AnimatedImage{
-            source: "image/loading_rb.gif"
-            cache:false
+            id: loadi
+            cache: false
+            function play(name){
+                source = name;
+                visible = true;
+            }
+            function stop(){
+                visible = false;
+                source = "";
+            }
+            source:  ""
             MouseArea{
                 id: area_debug
                 width: 150
@@ -9948,6 +10203,7 @@ Item {
                             id: passwd_wifi
                             width: 200
                             height: 50
+                            focus:false
                             horizontalAlignment: Text.AlignHCenter
                             anchors.verticalCenter: parent.verticalCenter
                             echoMode: popup_wifi_passwd.show_passwd?TextInput.Normal:TextInput.Password

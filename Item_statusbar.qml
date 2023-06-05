@@ -255,7 +255,7 @@ Item {
         background: Rectangle{
             anchors.fill: parent
             color: color_dark_black
-            opacity: 0.8
+            opacity: 0.9
         }
         Column{
             anchors.centerIn: parent

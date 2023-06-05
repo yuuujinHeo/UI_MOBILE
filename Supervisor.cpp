@@ -72,6 +72,7 @@ Supervisor::Supervisor(QObject *parent)
 
 //    makeRobotINI();
     isaccepted = false;
+    checkRobotINI();
     readSetting();
     ui_state = UI_STATE_NONE;
 
@@ -215,23 +216,24 @@ void Supervisor::new_call(){
     if(setting_call_num > -1){
         plog->write("[SUPERVISOR] NEW CALL ("+call->getBellID()+") SETTING");
         pmap->locations[setting_call_num].call_id = call->getBellID();
+        qDebug() << setting_call_num << call->getBellID();
 //        setSetting("CALLING/call_"+QString::number(setting_call_id),call->getBellID());
         QMetaObject::invokeMethod(mMain, "call_setting");
-    }else{/*
+    }else{
         bool already_in = false;
-        for(int i=0; i<call_list.size(); i++){
-            if(call_list[i] == call->getBellID()){
+        for(int i=0; i<call_queue.size(); i++){
+            if(call_queue[i] == call->getBellID()){
                 already_in = true;
-                plog->write("[SUPERVISOR] NEW CALL ("+call_list[i]+") BUT ALREADY LIST IN");
+                plog->write("[SUPERVISOR] NEW CALL ("+call_queue[i]+") BUT ALREADY LIST IN");
                 break;
             }
         }
         if(already_in){
 
         }else{
-            call_list.push_back(call->getBellID());
-            plog->write("[SUPERVISOR] NEW CALL ("+call->getBellID()+") GET -> LIST SIZE IS "+QString::number(call_list.size()));
-        }*/
+            call_queue.push_back(call->getBellID());
+            plog->write("[SUPERVISOR] NEW CALL ("+call->getBellID()+") GET -> LIST SIZE IS "+QString::number(call_queue.size()));
+        }
     }
 }
 
@@ -358,11 +360,8 @@ void Supervisor::readSetting(QString map_name){
     setting.useAutoInit = setting_robot.value("use_autoinit").toBool();
     setting.useBGM = setting_robot.value("use_bgm").toBool();
     pmap->use_uicmd = setting_robot.value("use_uicmd").toBool();
-    pmap->width = setting_robot.value("map_size").toInt();
-    pmap->height = setting_robot.value("map_size").toInt();
-    pmap->origin[0] = pmap->width/2;
-    pmap->origin[1] = pmap->height/2;
-    pmap->gridwidth = setting_robot.value("grid_size").toFloat();
+    pmap->mapping_width = setting_robot.value("map_size").toInt();
+    pmap->mapping_gridwidth = setting_robot.value("grid_size").toFloat();
     setting_robot.endGroup();
 
 
@@ -411,11 +410,11 @@ void Supervisor::readSetting(QString map_name){
     QSettings setting_meta(ini_path, QSettings::IniFormat);
 
     setting_meta.beginGroup("map_metadata");
-//    pmap->width = setting_meta.value("map_w").toInt();
-//    pmap->height = setting_meta.value("map_h").toInt();
-//    pmap->gridwidth = setting_meta.value("map_grid_width").toFloat();
-//    pmap->origin[0] = setting_meta.value("map_origin_u").toInt();
-//    pmap->origin[1] = setting_meta.value("map_origin_v").toInt();
+    pmap->width = setting_meta.value("map_w").toInt();
+    pmap->height = setting_meta.value("map_h").toInt();
+    pmap->gridwidth = setting_meta.value("map_grid_width").toFloat();
+    pmap->origin[0] = setting_meta.value("map_origin_u").toInt();
+    pmap->origin[1] = setting_meta.value("map_origin_v").toInt();
 //    qDebug() << "Read Setting " << pmap->gridwidth;
     setting_meta.endGroup();
 
@@ -435,6 +434,7 @@ void Supervisor::readSetting(QString map_name){
         temp_loc.group = 0;
         temp_loc.type = "Charging";
         temp_loc.name = strlist[0];
+        temp_loc.number = -10;
         if(strlist.size() > 4)
             temp_loc.number = strlist[4].toInt();
         if(strlist.size() > 5)
@@ -477,6 +477,7 @@ void Supervisor::readSetting(QString map_name){
         temp_loc.type = "Resting";
         temp_loc.group = 0;
         temp_loc.name = strlist[0];
+        temp_loc.number = -5;
         if(strlist.size() > 4)
             temp_loc.number = strlist[4].toInt();
         if(strlist.size() > 5)
@@ -534,11 +535,49 @@ void Supervisor::readSetting(QString map_name){
 
     qDebug() << pmap->locations.size() << map_name;
 
-    setting_anot.beginGroup("objects");
+    setting_anot.beginGroup("object");
     int obj_num = setting_anot.value("num").toInt();
-
     pmap->objects.clear();
     cv::Point2f temp_point;
+    for(int i=0; i<obj_num; i++){
+        QString name = setting_anot.value("poly"+QString::number(i)).toString();
+        QStringList strlist = name.split(",");
+        OBJECT temp_obj;
+        temp_obj.type = "Wall";
+        QStringList templist = strlist[1].split(":");
+
+        if(templist.size() > 1){
+            temp_obj.is_rect = false;
+            for(int j=1; j<strlist.size(); j++){
+                temp_point.x = strlist[j].split(":")[0].toFloat();
+                temp_point.y = strlist[j].split(":")[1].toFloat();
+                temp_obj.points.push_back(temp_point);
+            }
+        }else{
+            if(strlist[1].toInt() == 1){
+                temp_obj.is_rect = true;
+                for(int j=2; j<strlist.size(); j++){
+                    temp_point.x = strlist[j].split(":")[0].toFloat();
+                    temp_point.y = strlist[j].split(":")[1].toFloat();
+                    temp_obj.points.push_back(temp_point);
+                }
+            }else{
+                temp_obj.is_rect = false;
+                for(int j=2; j<strlist.size(); j++){
+                    temp_point.x = strlist[j].split(":")[0].toFloat();
+                    temp_point.y = strlist[j].split(":")[1].toFloat();
+                    temp_obj.points.push_back(temp_point);
+                }
+            }
+        }
+        pmap->objects.push_back(temp_obj);
+    }
+    setting_anot.endGroup();
+
+
+    setting_anot.beginGroup("objects");
+    obj_num = setting_anot.value("num").toInt();
+
     for(int i=0; i<obj_num; i++){
         QString name = setting_anot.value("poly"+QString::number(i)).toString();
         QStringList strlist = name.split(",");
@@ -851,6 +890,63 @@ bool Supervisor::checkINI(){
         return false;
     }
 }
+
+void Supervisor::checkRobotINI(){
+    if(getSetting("FLOOR","group_row_num").toInt()==0)
+        setSetting("FLOOR/group_row_num","2");
+    if(getSetting("FLOOR","group_col_num").toInt()==0)
+        setSetting("FLOOR/group_col_num","4");
+    if(getSetting("FLOOR","table_row_num").toInt()==0)
+        setSetting("FLOOR/table_row_num","5");
+    if(getSetting("FLOOR","table_col_num").toInt()==0)
+        setSetting("FLOOR/table_col_num","1");
+
+    if(getSetting("PRESET1","name")==""){
+        setSetting("PRESET1/name","매우느리게");
+        setSetting("PRESET1/limit_pivot","30");
+        setSetting("PRESET1/limit_pivot_acc","30");
+        setSetting("PRESET1/limit_v","0.25");
+        setSetting("PRESET1/limit_v_acc","0.25");
+        setSetting("PRESET1/limit_w","30");
+        setSetting("PRESET1/limit_w_acc","45");
+    }
+    if(getSetting("PRESET2","name")==""){
+        setSetting("PRESET2/name","느리게");
+        setSetting("PRESET2/limit_pivot","30");
+        setSetting("PRESET2/limit_pivot_acc","30");
+        setSetting("PRESET2/limit_v","0.25");
+        setSetting("PRESET2/limit_v_acc","0.25");
+        setSetting("PRESET2/limit_w","30");
+        setSetting("PRESET2/limit_w_acc","45");
+    }
+    if(getSetting("PRESET3","name")==""){
+        setSetting("PRESET3/name","보통");
+        setSetting("PRESET3/limit_pivot","30");
+        setSetting("PRESET3/limit_pivot_acc","30");
+        setSetting("PRESET3/limit_v","0.25");
+        setSetting("PRESET3/limit_v_acc","0.25");
+        setSetting("PRESET3/limit_w","30");
+        setSetting("PRESET3/limit_w_acc","45");
+    }
+    if(getSetting("PRESET4","name")==""){
+        setSetting("PRESET4/name","빠르게");
+        setSetting("PRESET4/limit_pivot","30");
+        setSetting("PRESET4/limit_pivot_acc","30");
+        setSetting("PRESET4/limit_v","0.25");
+        setSetting("PRESET4/limit_v_acc","0.25");
+        setSetting("PRESET4/limit_w","30");
+        setSetting("PRESET4/limit_w_acc","45");
+    }
+    if(getSetting("PRESET5","name")==""){
+        setSetting("PRESET5/name","매우빠르게");
+        setSetting("PRESET5/limit_pivot","30");
+        setSetting("PRESET5/limit_pivot_acc","30");
+        setSetting("PRESET5/limit_v","0.25");
+        setSetting("PRESET5/limit_v_acc","0.25");
+        setSetting("PRESET5/limit_w","30");
+        setSetting("PRESET5/limit_w_acc","45");
+    }
+}
 void Supervisor::makeRobotINI(){
     QString ini_path = getIniPath();
     if(QFile::exists(ini_path)){
@@ -917,7 +1013,9 @@ void Supervisor::makeRobotINI(){
         setSetting("FLOOR/map_load","true");
         setSetting("FLOOR/map_server","false");
         setSetting("FLOOR/table_col_num","1");
-        setSetting("FLOOR/table_num","5");
+        setSetting("FLOOR/table_row_num","5");
+        setSetting("FLOOR/group_col_num","4");
+        setSetting("FLOOR/group_row_num","2");
         setSetting("FLOOR/map_name","");
         setSetting("FLOOR/map_path","");
 
@@ -944,8 +1042,8 @@ void Supervisor::makeRobotINI(){
         setSetting("SENSOR/offset_y","0.0");
         setSetting("SENSOR/left_camera","");
         setSetting("SENSOR/right_camera","");
-        setSetting("SENSOR/left_camera_tf","0,0,0,0,0,0");
-        setSetting("SENSOR/right_camera_tf","0,0,0,0,0,0");
+        setSetting("SENSOR/left_camera_tf","0.23,0.155,0.27,-90,0,-90");
+        setSetting("SENSOR/right_camera_tf","0.23,-0.155,0.27,-90,0,-90");
 
         readSetting();
         restartSLAM();
@@ -1771,10 +1869,10 @@ int Supervisor::getLocationGroupNum(int num){
 
 
 }
-QString Supervisor::getLocationCallID(int num){
+QString Supervisor::getLocationCallID(QString type, int num){
     int count = 0;
     for(int i=0; i<pmap->locations.size(); i++){
-        if(pmap->locations[i].type == "Serving"){
+        if(pmap->locations[i].type == type){
             if(count == num){
                 return pmap->locations[i].call_id;
             }
@@ -1820,7 +1918,7 @@ int Supervisor::getLocationGroupSize(int num){
                     size++;
         }
     }
-    qDebug() << "location group size " << num << size << pmap->locations.size();
+//    qDebug() << "location group size " << num << size << pmap->locations.size();
     return size;
 }
 QString Supervisor::getLocationName(int num, QString type){
@@ -1981,7 +2079,7 @@ bool Supervisor::isExistLocation(int group, int num){
     }else{
         for(int i=0; i<pmap->locations.size(); i++){
             if(pmap->locations[i].type == "Serving"){
-                if(group == pmap->locations[i].group){
+                if(group == pmap->locations[i].group || group == -1){
                     if(count == num){
                         return true;
                     }
@@ -2006,6 +2104,12 @@ cv::Point2f setAxis(cv::Point2f _point){
     cv::Point2f temp;
     temp.x = -_point.y/pmap->gridwidth + pmap->origin[1];
     temp.y = -_point.x/pmap->gridwidth + pmap->origin[0];
+    return temp;
+}
+cv::Point2f setAxisMapping(cv::Point2f _point){
+    cv::Point2f temp;
+    temp.x = -_point.y/pmap->mapping_gridwidth + 500;
+    temp.y = -_point.x/pmap->mapping_gridwidth + 500;
     return temp;
 }
 cv::Point2f setAxisBack(cv::Point2f _point){
@@ -2200,20 +2304,20 @@ bool Supervisor::saveAnnotation(QString filename){
     settings.clear();
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == "Resting"){
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle);
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number)+","+pmap->locations[i].call_id;
             settings.setValue("resting_locations/loc"+QString::number(resting_num),str_name);
             resting_num++;
         }else if(pmap->locations[i].type == "Other"){
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle);
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number)+","+pmap->locations[i].call_id;
             settings.setValue("other_locations/loc"+QString::number(other_num),str_name);
             other_num++;
         }else if(pmap->locations[i].type == "Serving"){
             QString groupname = "serving_" + QString::number(pmap->locations[i].group);
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number);
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number)+","+pmap->locations[i].call_id;
             settings.setValue(groupname+"/loc"+QString::number(group_num[pmap->locations[i].group]),str_name);
             group_num[pmap->locations[i].group]++;
         }else if(pmap->locations[i].type == "Charging"){
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle);
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number)+","+pmap->locations[i].call_id;
             settings.setValue("charging_locations/loc"+QString::number(charging_num),str_name);
             charging_num++;
         }
@@ -2280,6 +2384,7 @@ void Supervisor::setTray(int tray_num, int table_num){
     ui_cmd = UI_CMD_MOVE_TABLE;
 }
 void Supervisor::setPreset(int preset){
+    plog->write("[USER INPUT] SET PRESET : "+QString::number(preset));
     probot->cur_preset = preset;
 }
 void Supervisor::confirmPickup(){
@@ -2492,6 +2597,22 @@ int Supervisor::getChargeStatus(){
 }
 int Supervisor::getEmoStatus(){
     return probot->status_emo;
+}
+int Supervisor::getLockStatus(){
+    return probot->status_lock;
+}
+int Supervisor::getObsinPath(){
+    return probot->obs_in_path_state;
+}
+void Supervisor::setMotorLock(bool onoff){
+    if(onoff){
+        ipc->set_cmd(ROBOT_CMD_MOTOR_LOCK_ON,"ROBOT_CMD_MOTOR_LOCK_ON");
+    }else{
+        ipc->set_cmd(ROBOT_CMD_MOTOR_LOCK_OFF,"ROBOT_CMD_MOTOR_LOCK_OFF");
+    }
+}
+int Supervisor::getRobotcurPreset(){
+    return probot->robot_preset;
 }
 float Supervisor::getBatteryIn(){
     return probot->battery_in;
@@ -3043,6 +3164,7 @@ void Supervisor::onTimer(){
     static int count_pass = 0;
     // 스케줄러 변수 초기화
     static int prev_error = -1;
+    static int wifi_cmd_count = 0;
     static int prev_state = -1;
     static int prev_running_state = -1;
     static int prev_motor_state = -1;
@@ -3053,6 +3175,7 @@ void Supervisor::onTimer(){
     static bool is_set = false;
     static int table_num = -1;
     static int count_moveto = 0;
+    static int wifi_count = 0;
     // move start
     static int timer_cnt = 0;
 
@@ -3096,7 +3219,7 @@ void Supervisor::onTimer(){
                             ui_state = UI_STATE_MOVEFAIL;
                         }
                     }
-                }else if(probot->running_state == ROBOT_MOVING_WAIT){
+                }else if(probot->running_state == ROBOT_MOVING_WAIT || probot->obs_in_path_state == 1){
                     if(!flag_excuseme){
                         plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");
                         QMetaObject::invokeMethod(mMain, "excuseme");
@@ -3198,7 +3321,6 @@ void Supervisor::onTimer(){
     }
 
 
-    static int wifi_count = 0;
 
     if(wifi_temp_ssd != ""){
         if(wifi_count++ > 1000/MAIN_THREAD){
@@ -3209,6 +3331,8 @@ void Supervisor::onTimer(){
     }else{
         wifi_count = 0;
     }
+
+    getAllWifiList();
 
     if(setting.cur_ip == "" && getWifiConnection("")){
         qDebug() << "auto get wifi ip";
@@ -3224,6 +3348,7 @@ void Supervisor::onTimer(){
 
     if(wifi_cmd == WIFI_CMD_NONE && wifi_cmds.size() > 0){
         wifi_cmd = wifi_cmds[0];
+        wifi_cmd_count = 0;
         wifi_cmds.pop_front();
         wifi_process->close();
         if(setting.wifi_ssd == ""){
@@ -3262,6 +3387,7 @@ void Supervisor::onTimer(){
             break;
         }
         case WIFI_CMD_GET_LIST:{
+//            qDebug() << "get list wifi";
             wifi_process->start("nmcli device wifi list");
             break;
         }
@@ -3270,6 +3396,12 @@ void Supervisor::onTimer(){
             wifi_cmd = WIFI_CMD_NONE;
             break;
         }
+        }
+    }else if(wifi_cmd != WIFI_CMD_NONE){
+        if(wifi_cmd_count++ > 5000/MAIN_THREAD){
+            plog->write("[WIFI] COMMAND IGNORED. ",wifi_cmd);
+            wifi_cmd_count = 0;
+            wifi_cmd = WIFI_CMD_NONE;
         }
     }
     switch(ui_state){
@@ -3301,7 +3433,7 @@ void Supervisor::onTimer(){
         isaccepted = false;
         if(ui_cmd == UI_CMD_MOVE_TABLE){
             plog->write("[SUPERVISOR] UI_STATE = SERVING");
-            ui_state = UI_STATE_SERVING;
+            ui_state = UI_STATE_MOVING;
             ui_cmd = UI_CMD_NONE;
         }else if(ui_cmd == UI_CMD_MOVE_CHARGE){
             plog->write("[SUPERVISOR] UI_STATE = GO CHARGE");
@@ -3317,7 +3449,12 @@ void Supervisor::onTimer(){
             ui_cmd = UI_CMD_NONE;
         }else if(ui_cmd == UI_CMD_MOVE_CALLING){
             plog->write("[SUPERVISOR] UI_STATE = CALLING");
-            ui_state = UI_STATE_CALLING;
+            ui_state = UI_STATE_MOVING;
+            probot->call_moving_count = 0;
+            ui_cmd = UI_CMD_NONE;
+        }else if(call_queue.size() > 0){
+            plog->write("[SUPERVISOR] UI_STATE = CALLING");
+            ui_state = UI_STATE_MOVING;
             probot->call_moving_count = 0;
             ui_cmd = UI_CMD_NONE;
         }
@@ -3422,10 +3559,27 @@ void Supervisor::onTimer(){
         if(probot->running_state == ROBOT_MOVING_READY){
             if(isaccepted){
                 count_pass = 0;
+                current_target.name = "";
                 if(probot->is_calling){
                     plog->write("[SCHEDULER] CALLING MOVE ARRIVED "+call_queue[0]);
                     call_queue.pop_front();
                     probot->call_moving_count++;
+                    ui_state = UI_STATE_PICKUP;
+                    QMetaObject::invokeMethod(mMain, "showpickup");
+                    isaccepted = false;
+                }else if(probot->is_patrol){
+                    plog->write("[SCHEDULER] PATROLLING MOVE ARRIVED "+current_target.name);
+                    if(patrol_use_pickup){
+                        ui_state = UI_STATE_PICKUP;
+                        QMetaObject::invokeMethod(mMain, "showpickup");
+                        isaccepted = false;
+                    }else{
+                        ui_state = UI_STATE_MOVING;
+                        ui_cmd = UI_CMD_NONE;
+                        count_pass = 0;
+                        plog->write("[SCHEDULER] PICKUP -> AUTO PASS");
+                        isaccepted = false;
+                    }
                 }else{
                     LOCATION curLoc;
                     bool match = false;
@@ -3447,88 +3601,120 @@ void Supervisor::onTimer(){
                         }
                     }
                     plog->write("[SCHEDULER] SERVING : PICK UP "+curLoc.name);
+                    ui_state = UI_STATE_PICKUP;
+                    QMetaObject::invokeMethod(mMain, "showpickup");
+                    isaccepted = false;
                 }
-                ui_state = UI_STATE_PICKUP;
-                QMetaObject::invokeMethod(mMain, "showpickup");
-                isaccepted = false;
             }else{
-                //출발
-                LOCATION cur_target;
-                probot->is_calling = false;
+                if(current_target.name == ""){
+                    //출발
+                    LOCATION cur_target;
+                    probot->is_calling = false;
+                    probot->is_patrol = false;
 
-                //서빙 포인트 있는지 체크
-                int tray_num = -1;
-                for(int i=0; i<setting.tray_num; i++){
-                    if(!probot->trays[i].empty){
-                        tray_num = i;
+                    //서빙 포인트 있는지 체크
+                    int tray_num = -1;
+                    for(int i=0; i<setting.tray_num; i++){
+                        if(!probot->trays[i].empty){
+                            tray_num = i;
+                        }
                     }
-                }
 
-                if(tray_num > -1){
-                    //서빙 포인트 세팅
-                    cur_target = probot->trays[tray_num].location;
-                    plog->write("[SCHEDULER] CUR TARGET SET (SERVING) : "+cur_target.name+" ( tray num : "+QString::number(tray_num)+" )");
-                }else{
-
-                    //최대 이동 횟수 초과 시 -> 대기장소로 이동
-                    if(probot->call_moving_count > probot->max_moving_count){
-                        plog->write("[SCHEDULER] CUR TARGET SET (ERROR) : Call Move Count is Max");
+                    if(tray_num > -1){
+                        //서빙 포인트 세팅
+                        cur_target = probot->trays[tray_num].location;
+                        plog->write("[SCHEDULER] CUR TARGET SET (SERVING) : "+cur_target.name+" ( tray num : "+QString::number(tray_num)+" )");
                     }else{
 
-                        //들어온 콜 위치가 있는지 체크
-                        bool call_set = false;
-                        if(call_queue.size() > 0){
-
-                            //콜 번호가 유효한 지 체크
-                            LOCATION temp_loc = getLocation(call_queue[0]);
-                            if(temp_loc.call_id == call_queue[0]){
-
-                                //호출 포인트 세팅
-                                call_set = true;
-                                cur_target = temp_loc;
-                                plog->write("[SCHEDULER] CUR TARGET SET (CALLING) : "+temp_loc.name+" ( call id : "+temp_loc.call_id+" )");
-                                probot->is_calling = true;
-                            }else{
-                                plog->write("[SCHEDULER] CUR TARGET SET (ERROR) : Call ID Wrong ("+call_queue[0]+")");
-                                call_queue.pop_front();
-                            }
+                        //최대 이동 횟수 초과 시 -> 대기장소로 이동
+                        if(probot->call_moving_count > probot->max_moving_count){
+                            plog->write("[SCHEDULER] CUR TARGET SET (ERROR) : Call Move Count is Max");
                         }else{
-                            //PATROLLING
-                            if(patrol_mode != PATROL_NONE && patrol_list.size() > 0){
 
-                                //패트롤 위치 랜덤하게 지정
-                                int temp = qrand();
-                                while(patrol_num == temp%(patrol_list.size())){
-                                    temp = qrand();
-                                    qDebug() << "Next temp = " << temp << temp%(patrol_list.size());
-                                }
-                                plog->write("[SCHEDULER] RANDOM SERVING : CUR ("+QString::number(temp%(patrol_list.size()))+") LAST ("+QString::number(patrol_num)+")");
-                                patrol_num = temp%(patrol_list.size());
+                            //들어온 콜 위치가 있는지 체크
+                            bool call_set = false;
+                            if(call_queue.size() > 0){
 
+                                //콜 번호가 유효한 지 체크
+                                LOCATION temp_loc = getLocationbyCall(call_queue[0]);
+                                if(temp_loc.call_id == call_queue[0]){
 
-                                //패트롤 위치가 유효한 지 체크
-                                LOCATION temp_loc = getloc(patrol_list[patrol_num]);
-                                if(temp_loc.name != ""){
+                                    //호출 포인트 세팅
+                                    call_set = true;
                                     cur_target = temp_loc;
-                                    plog->write("[SCHEDULER] CUR TARGET SET (PATROL) : "+temp_loc.name);
+                                    plog->write("[SCHEDULER] CUR TARGET SET (CALLING) : "+temp_loc.name+" ( call id : "+temp_loc.call_id+" )");
+                                    probot->is_calling = true;
                                 }else{
-                                    plog->write("[SCHDULER] PATROL LIST NAME WRONG (ERROR) : "+patrol_list[patrol_num]);
-                                    patrol_mode = PATROL_NONE;
+                                    plog->write("[SCHEDULER] CUR TARGET SET (ERROR) : Call ID Wrong ("+call_queue[0]+")");
+                                    call_queue.pop_front();
+                                }
+                            }else{
+                                //PATROLLING
+                                if(patrol_list.size() > 0){
+                                    if(patrol_mode == PATROL_RANDOM){
+                                        //패트롤 위치 랜덤하게 지정
+                                        int temp = qrand();
+                                        while(patrol_num == temp%(patrol_list.size())){
+                                            temp = qrand();
+                                            qDebug() << "Next temp = " << temp << temp%(patrol_list.size());
+                                        }
+                                        plog->write("[SCHEDULER] RANDOM SERVING : CUR ("+QString::number(temp%(patrol_list.size()))+") LAST ("+QString::number(patrol_num)+")");
+                                        patrol_num = temp%(patrol_list.size());
+
+                                        //패트롤 위치가 유효한 지 체크
+                                        LOCATION temp_loc = getloc(patrol_list[patrol_num]);
+                                        if(temp_loc.name != ""){
+                                            cur_target = temp_loc;
+                                            probot->is_patrol = true;
+                                            plog->write("[SCHEDULER] CUR TARGET SET (PATROL) : "+temp_loc.name);
+                                        }else{
+                                            plog->write("[SCHDULER] PATROL LIST NAME WRONG (ERROR) : "+patrol_list[patrol_num]);
+                                            patrol_mode = PATROL_NONE;
+                                        }
+                                    }else if(patrol_mode == PATROL_SEQUENCE){
+                                        if(++patrol_num >= patrol_list.size())
+                                            patrol_num = 0;
+
+                                        plog->write("[SCHEDULER] SEQUENCE SERVING : CUR ("+QString::number(patrol_num)+")");
+
+                                        //패트롤 위치가 유효한 지 체크
+                                        LOCATION temp_loc = getloc(patrol_list[patrol_num]);
+                                        if(temp_loc.name != ""){
+                                            cur_target = temp_loc;
+                                            probot->is_patrol = true;
+                                            plog->write("[SCHEDULER] CUR TARGET SET (PATROL) : "+temp_loc.name);
+                                        }else{
+                                            plog->write("[SCHDULER] PATROL LIST NAME WRONG (ERROR) : "+patrol_list[patrol_num]);
+                                            patrol_mode = PATROL_NONE;
+                                        }
+                                    }else{
+                                        plog->write("[SCHEDULER] PATROL LIST IS NOT EMPTY BUT MODE IS NONE "+QString().sprintf("(mode: %d, list size : %d)",patrol_mode,patrol_list.size()));
+                                        patrol_list.clear();
+                                    }
+
                                 }
                             }
                         }
                     }
-                }
 
 
-                if(cur_target.name == ""){
+                    if(cur_target.name == ""){
+                        //세팅 되지 않음 -> 고 홈
+                        plog->write("[SCHEDULER] CUR TARGET SET (DONE) : Back to Resting");
+                        ui_state = UI_STATE_GO_HOME;
+                        probot->call_moving_count = 0;
+                    }else{
 
-                    //세팅 되지 않음 -> 고 홈
-                    plog->write("[SCHEDULER] CUR TARGET SET (DONE) : Back to Resting");
-                    ui_state = UI_STATE_GO_HOME;
-                    probot->call_moving_count = 0;
+                    }
+                    current_target = cur_target;
                 }else{
 
+                }
+
+                if(current_target.name == ""){
+                    plog->write("[SCHEDULER] CUR TARGET SET (ERROR) : TARGET NONE");
+                    ui_state = UI_STATE_MOVEFAIL;
+                }else{
                     if(timer_cnt%5==0){
                         //로봇 안 움직임 -> 실패
                         if(count_moveto++ > 5){
@@ -3542,11 +3728,11 @@ void Supervisor::onTimer(){
                         }else{
 
                             //무브 명령 보냄
-                            plog->write("[SCHEDULER] MOVE TO "+cur_target.name);
+                            plog->write("[SCHEDULER] MOVE TO "+current_target.name+QString::number(probot->cur_preset));
                             if(probot->ipc_use){
-                                ipc->moveToLocation(cur_target,probot->cur_preset);
+                                ipc->moveToLocation(current_target,probot->cur_preset);
                             }else{
-                                lcm->moveTo(cur_target.name);
+                                lcm->moveTo(current_target.name);
                             }
                         }
                     }
@@ -3589,13 +3775,13 @@ void Supervisor::onTimer(){
             if(patrol_use_pickup){
                 count_pass++;
                 if(count_pass > 30){
-                    ui_state = UI_STATE_SERVING;
+                    ui_state = UI_STATE_MOVING;
                     ui_cmd = UI_CMD_NONE;
                     count_pass = 0;
                     plog->write("[SCHEDULER] PICKUP -> AUTO PASS");
                 }
             }else{
-                ui_state = UI_STATE_SERVING;
+                ui_state = UI_STATE_MOVING;
                 ui_cmd = UI_CMD_NONE;
                 count_pass = 0;
                 plog->write("[SCHEDULER] PICKUP -> AUTO PASS");
@@ -3609,11 +3795,11 @@ void Supervisor::onTimer(){
             }
             if(probot->type == "SERVING"){
                 plog->write("[SCHEDULER] PICKUP Confirm -> Serving");
-                ui_state = UI_STATE_SERVING;
+                ui_state = UI_STATE_MOVING;
                 ui_cmd = UI_CMD_NONE;
             }else{
                 plog->write("[SCHEDULER] PICKUP Confirm -> Calling");
-                ui_state = UI_STATE_CALLING;
+                ui_state = UI_STATE_MOVING;
                 ui_cmd = UI_CMD_NONE;
             }
         }
@@ -3705,6 +3891,7 @@ void Supervisor::onTimer(){
     }
     case UI_STATE_MOVEFAIL:{
         patrol_mode = PATROL_NONE;
+        current_target.name = "";
         if(prev_motor_state != probot->motor_state){
             //UI에 movefail 페이지 표시
             QMetaObject::invokeMethod(mMain, "movefail");
@@ -3849,6 +4036,14 @@ bool Supervisor::isHasLog(int year, int month, int date){
     return false;
 }
 
+LOCATION Supervisor::getLocationbyCall(QString call){
+    for(int i=0; i<pmap->locations.size(); i++){
+        if(pmap->locations[i].call_id == call){
+            return pmap->locations[i];
+        }
+    }
+    return LOCATION();
+}
 LOCATION Supervisor::getLocation(QString name){
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].name == name){
@@ -4030,18 +4225,24 @@ void Supervisor::wifi_con_output(){
         QStringList output_lines = output.split("\n");
         for(int i=0; i<output_lines.size(); i++){
             QStringList outputs = output_lines[i].split(" ");
+
             QStringList output_final;
             for(int j=0; j<outputs.size(); j++){
                 if(outputs[j] != ""){
                     output_final << outputs[j];
                 }
             }
+//            qDebug() << output_final;
             //parsing
             ST_WIFI temp;
             if(output_final.size() > 8){
                 if(output_final[0] == "IN-USE"){
                     continue;
                 }if(output_final[0] == "*"){
+                    if(getSetting("ROBOT_SW","wifi_ssd") == ""){
+                        setSetting("ROBOT_SW/wifi_ssd",output_final[2]);
+                        setting.wifi_ssd = output_final[2];
+                    }
                     temp.inuse = true;
                     temp.state = 2;
                     temp.prev_state = 2;
@@ -4133,7 +4334,7 @@ void Supervisor::wifi_con_output(){
         for(int i=0; i<output_lines.size(); i++){
             output_lines[i].replace(" ","");
             QStringList line = output_lines[i].split(":");
-            qDebug() << i << line;
+//            qDebug() << i << line;
             if(line.size() > 1){
                 if(line[0] == "IP4.ADDRESS[1]"){
                     qDebug() << line;
@@ -4196,7 +4397,7 @@ void Supervisor::wifi_con_error(){
         break;
     }
     case WIFI_CMD_GET_IP:{
-        plog->write("[SETTING] WIFI GET IP FAILED "+setting.wifi_ssd);
+        plog->write("[SETTING] WIFI GET IP FAILED " + setting.wifi_ssd);
         wifi_cmd = WIFI_CMD_NONE;
         wifi_process->close();
         break;
@@ -4263,6 +4464,7 @@ QString Supervisor::getcurDNS(){
     return setting.cur_dns;
 }
 void Supervisor::getAllWifiList(){
+//    qDebug() << "getAllWifiList" << wifi_cmds.size() << wifi_cmd;
     if(wifi_cmds.size() == 0 && wifi_cmd == WIFI_CMD_NONE){
         wifi_cmds.append(WIFI_CMD_GET_LIST);
     }

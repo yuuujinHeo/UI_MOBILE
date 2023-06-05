@@ -196,6 +196,8 @@ public:
     //---------------------------------------------------Map Scale, Move
     int map_width;
     int map_height;
+    int mapping_size;
+    float mapping_grid;
     int map_x;
     int map_y;
     float prev_scale;

@@ -33,6 +33,7 @@ typedef struct{
 float setAxis(float _angle);
 float setAxisBack(float _angle);
 cv::Point2f setAxis(cv::Point2f _point);
+cv::Point2f setAxisMapping(cv::Point2f _point);
 cv::Point2f setAxisBack(cv::Point2f _point);
 POSE setAxis(POSE _pose);
 POSE setAxisBack(POSE _pose);
@@ -63,6 +64,9 @@ typedef struct{
     float gridwidth = 0;
     int origin[2] = {0,};
     float robot_radius = 0.3;
+
+    int mapping_width = 1000;
+    float mapping_gridwidth = 0.3;
 
     QStringList location_groups;
     QList<LOCATION> locations;
@@ -111,6 +115,7 @@ typedef struct{
     int status_emo = 0;
     int status_remote = 0;
     int status_charge = 0;
+    int status_lock = 0;
 
     float battery = 0.;
     float battery_in = 0;
@@ -123,6 +128,8 @@ typedef struct{
     int localization_state = 0;
     int running_state = 0;
     int obs_state = 0;
+    int obs_in_path_state = 0;
+    int robot_preset = 0;
 
     int err_code = 0;
 
@@ -146,8 +153,9 @@ typedef struct{
 
     QVector<ST_TRAY> trays;
     bool is_calling=false;
+    bool is_patrol = false;
     LOCATION curLocation;
-    int cur_preset;
+    int cur_preset=3;
 //    QVector<QString> call_list;
 
     int call_moving_count;
@@ -242,8 +250,8 @@ enum ROBOT_CMD{
     ROBOT_CMD_OBJECTING_STOP,
     ROBOT_CMD_OBJECTING_SAVE,
 
-    ROBOT_CMD_MOTOR_LOCK_ON,//16
-    ROBOT_CMD_MOBOR_LOCK_OFF
+    ROBOT_CMD_MOTOR_LOCK_OFF,//16
+    ROBOT_CMD_MOTOR_LOCK_ON
 };
 
 enum TOOL_NUM{
@@ -277,9 +285,7 @@ enum UI_STATE{
     UI_STATE_GO_HOME,
     UI_STATE_GO_CHARGE,
 
-    UI_STATE_MOVING,
-    UI_STATE_SERVING,//5
-    UI_STATE_CALLING,
+    UI_STATE_MOVING,//5
     UI_STATE_PICKUP,
     UI_STATE_PATROLLING,
     UI_STATE_MOVEFAIL,

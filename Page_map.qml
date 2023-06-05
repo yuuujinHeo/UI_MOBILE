@@ -58,8 +58,13 @@ Item {
         id: keyboard
     }
 
-    onSelect_patrol_numChanged: {s
-        loader_menu.item.setindex(select_patrol_num);
+    Tool_KeyPad{
+        id: keypad
+    }
+
+    function set_call_done(){
+        popup_location_number.update_callbell();
+        popup_add_callbell.close();
     }
 
     function update_mapping(){
@@ -74,6 +79,7 @@ Item {
 
     Component.onCompleted: {
         init_map();
+        statusbar.visible = true;
 
         if(supervisor.isExistAnnotation(supervisor.getMapname())){
             state_annot = 1;
@@ -97,6 +103,7 @@ Item {
         if(supervisor.getJoyR() !== 0){
             supervisor.joyMoveR(0,0);
         }
+        is_init_state = false;
     }
 
     onMap_modeChanged: {
@@ -158,7 +165,6 @@ Item {
         id: ani_mode_change
         running: false
         onStarted: {
-//            timer_get_joy.stop();
             loader_menu.item.disappear();
             map_annot.enabled = false;
             map_cur.enabled = false;
@@ -186,6 +192,10 @@ Item {
     }
     function init(){
 
+    }
+    function setLocalizationInit(){
+        map_mode = 4;
+        is_init_state = true;
     }
 
     function modeinit(){
@@ -279,11 +289,13 @@ Item {
         height: parent.height - status_bar.height
         anchors.left: rect_menus.right
         anchors.top: status_bar.bottom
-        Component.onCompleted: {
-            map_current.enabled = true;
-        }
-        Component.onDestruction: {
-            map_current.enabled = false;
+
+        onVisibleChanged: {
+            if(visible){
+                map_current.setEnable(true);
+            }else{
+                map_current.setEnable(false);
+            }
         }
 
         Rectangle{
@@ -304,6 +316,7 @@ Item {
             Map_full{
                 id: map_current
                 objectName: "CURRENT"
+                enabled: false
                 width: 600
                 height: 600
                 show_button_following: true
@@ -338,6 +351,13 @@ Item {
             map.setEnable(false);
         }
 
+        onVisibleChanged: {
+            if(visible){
+                map.setEnable(true);
+            }else{
+                map.setEnable(false);
+            }
+        }
         Rectangle{
             anchors.fill: parent
             color: "#282828"
@@ -709,8 +729,108 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked:{
-                            loadPage(psetting);
-                            loader_page.item.set_category(2);
+                            popup_changed_mapping_variable.initvalue = supervisor.getSetting("ROBOT_SW","map_size");
+                            popup_changed_mapping_variable.mode = 1;
+                            popup_changed_mapping_variable.open();
+                        }
+                    }
+                }
+            }
+            Popup{
+                id: popup_changed_mapping_variable
+                anchors.centerIn: parent
+                width: 400
+                height: 300
+                property string initvalue:""
+                property var mode:0
+                background: Rectangle{
+                    anchors.fill: parent
+                    color: "transparent"
+                }
+                onOpened:{
+                    textfield_changed.text = initvalue;
+                }
+
+                Rectangle{
+                    width: parent.width
+                    height: parent.height
+                    radius: 20
+                    color: color_dark_navy
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 20
+                        Text{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.family: font_noto_r.name
+                            text: "변경하실 값을 입력해주세요."
+                            color: "white"
+                        }
+                        TextField{
+                            id: textfield_changed
+                            width: 250
+                            height: 50
+
+                            onFocusChanged: {
+                                keyboard.owner = textfield_changed;
+                                textfield_changed.selectAll();
+                                if(focus){
+                                    keyboard.open();
+                                }else{
+                                    keyboard.close();
+                                    textfield_changed.select(0,0);
+                                }
+                            }
+                        }
+                        Row{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 20
+                            Rectangle{
+                                width: 100
+                                height: 50
+                                radius: 5
+                                color: "transparent"
+                                border.width: 5
+                                border.color: "white"
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "취소"
+                                    font.family: font_noto_r.name
+                                    color: "white"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        popup_changed_mapping_variable.close();
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 100
+                                height: 50
+                                radius: 5
+                                color: "transparent"
+                                border.width: 5
+                                border.color: "white"
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "확인"
+                                    font.family: font_noto_r.name
+                                    color: "white"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        if(popup_changed_mapping_variable.mode == 1){
+                                            supervisor.setSetting("ROBOT_SW/map_size",textfield_changed.text);
+                                            map_size.text = supervisor.getSetting("ROBOT_SW","map_size");
+                                        }else if(popup_changed_mapping_variable.mode == 2){
+                                            supervisor.setSetting("ROBOT_SW/grid_size",textfield_changed.text);
+                                            grid_size.text = supervisor.getSetting("ROBOT_SW","grid_size");
+                                        }
+                                        popup_changed_mapping_variable.close();
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -769,8 +889,9 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked:{
-                            loadPage(psetting);
-                            loader_page.item.set_category(2);
+                            popup_changed_mapping_variable.initvalue = supervisor.getSetting("ROBOT_SW","grid_size");
+                            popup_changed_mapping_variable.mode = 2;
+                            popup_changed_mapping_variable.open();
                         }
                     }
                 }
@@ -1088,6 +1209,7 @@ Item {
                     }
                     Item_button{
                         width: 80
+                        visible: false
                         shadow_color: color_gray
                         icon: "icon/icon_local_manual.png"
                         name: "대기위치로\n초기화"
@@ -2499,10 +2621,10 @@ Item {
             }
             Column{
                 anchors.centerIn: parent
-                spacing: 20
+                spacing: 40
                 Rectangle{
-                    width: 100
-                    height: 80
+                    width: 200
+                    height: 150
                     radius: 10
                     Column{
                         anchors.centerIn: parent
@@ -2527,12 +2649,15 @@ Item {
                                 popup_patrol_list.mode = "random";
 //                                supervisor.runRotateTables();
                             }
+                            supervisor.writelog("[USER INPUT] PATROL : START RANDOM")
+                            popup_patrol_list.open();
+                            popup_patrol_list.mode = "random";
                         }
                     }
                 }
                 Rectangle{
-                    width: 100
-                    height: 80
+                    width: 200
+                    height: 150
                     radius: 10
                     Column{
                         anchors.centerIn: parent
@@ -2557,6 +2682,9 @@ Item {
                                 popup_patrol_list.mode = "sequence";
 //                                supervisor.runRotateTables();
                             }
+                            supervisor.writelog("[QML] PATROL : START SEQUENCE")
+                            popup_patrol_list.open();
+                            popup_patrol_list.mode = "sequence";
                         }
                     }
                 }
@@ -2566,7 +2694,208 @@ Item {
     Popup{
         id: popup_patrol_list
         property string mode: ""
+        anchors.centerIn: parent
+        width: 500
+        height: 600
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+        onOpened:{
+            cols_patrol_bigmenu.visible = true;
+            flickable_patrol.visible = false;
+            update();
+        }
 
+        function update(){
+            model_patrols.clear();
+            print(supervisor.getLocationNum(""));
+            for(var i=0; i<supervisor.getLocationNum(""); i++){
+                model_patrols.append({"name":supervisor.getLocationName(i,""),"select":false});
+            }
+        }
+
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 10
+            color: color_dark_navy
+            Column{
+                anchors.centerIn: parent
+                spacing: 20
+                Column{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 5
+                    Text{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        text: "순회할 위치를 선택해주세요."
+                        color: "white"
+                    }
+                    Text{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        text: popup_patrol_list.mode==="random"?"(현재 선택된 모드 : 랜덤)":"(현재 선택된 모드 : 순서대로)"
+                        color: "white"
+                    }
+                }
+
+                Column{
+                    id: cols_patrol_bigmenu
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: true
+                    spacing: 20
+                    Rectangle{
+                        width: 300
+                        height: 100
+                        radius: 10
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            text: "전체 위치"
+                            font.pixelSize: 20
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                supervisor.clearRotateList();
+                                for(var i=0; i<supervisor.getLocationNum("");i++){
+                                    supervisor.setRotateList(supervisor.getLocationName(i,""));
+                                }
+                                supervisor.startPatrol(popup_patrol_list.mode,false);
+                                popup_patrol_list.close();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 300
+                        height: 100
+                        radius: 10
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            text: "서빙 위치"
+                            font.pixelSize: 20
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                supervisor.clearRotateList();
+                                for(var i=0; i<supervisor.getLocationNum("Serving");i++){
+                                    supervisor.setRotateList(supervisor.getLocationName(i,"Serving"));
+                                }
+                                supervisor.startPatrol(popup_patrol_list.mode,false);
+                                popup_patrol_list.close();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 300
+                        height: 100
+                        radius: 10
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            text: "직접 선택"
+                            font.pixelSize: 20
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                cols_patrol_bigmenu.visible = false;
+                                flickable_patrol.visible = true;
+                            }
+                        }
+                    }
+                }
+
+                Flickable{
+                    id: flickable_patrol
+                    width: popup_patrol_list.width
+                    height: 330
+                    visible: false
+                    contentHeight: col_patlist.height
+                    Column{
+                        id: col_patlist
+                        anchors.centerIn: parent
+                        spacing: 10
+                        Repeater{
+                            model: ListModel{id:model_patrols}
+                            Rectangle{
+                                width: popup_patrol_list.width*0.6
+                                height: 50
+                                radius: 5
+                                color: select?color_green:"white"
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    text: name
+                                    font.pixelSize: 20
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        if(select)
+                                            select = false;
+                                        else
+                                            select = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Row{
+                    visible: flickable_patrol.visible
+                    spacing: 20
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Rectangle{
+                        width: 150
+                        height: 100
+                        radius: 30
+                        color: "gray"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "취소"
+                            font.family: font_noto_b.name
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                popup_patrol_list.close();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 150
+                        height: 100
+                        radius: 30
+                        color: "#d0d0d0"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "확인"
+                            font.family: font_noto_b.name
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                supervisor.clearRotateList();
+                                for(var i=0; i<model_patrols.count; i++){
+                                    if(model_patrols.get(i).select)
+                                        supervisor.setRotateList(model_patrols.get(i).name);
+                                }
+                                supervisor.startPatrol(popup_patrol_list.mode,false);
+
+                                popup_patrol_list.close();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     Popup{
@@ -2611,7 +2940,7 @@ Item {
                                "group":supervisor.getLocationGroupNum(i),
                                "number": supervisor.getLocationNumber(-1,i),
                                 "number_table" : supervisor.getLocationGroupSize(supervisor.getLocationGroupNum(i)),
-                                "call_id" : supervisor.getLocationCallID(i),
+                                "call_id" : supervisor.getLocationCallID("Serving",i),
                                "error":false});
                 print("locations append : ",i,supervisor.getLocationGroupNum(i),supervisor.getLocationGroupNum(i),supervisor.getLocationNumber(-1,i))
             }
@@ -2625,8 +2954,11 @@ Item {
                 usegroup = false;
 
             details.clear();
+            details.append({"type":"Charging","name":"Charging","call_id":supervisor.getLocationCallID("Charging",0)});
+            details.append({"type":"Resting","name":"Resting","call_id":supervisor.getLocationCallID("Resting",0)});
             for(var i=0; i<locations.count; i++){
-                details.append({"name":locations.get(i).name,
+                details.append({"type":"Serving",
+                                "name":locations.get(i).name,
                                "group":locations.get(i).group,
                                "number":locations.get(i).number,
                                "number_table":getgroupsize(locations.get(i).group),
@@ -2647,8 +2979,9 @@ Item {
         }
         function isError(){
             for(var i=0; i<details.count; i++){
-                if(details.get(i).error)
-                    return true;
+                if(details.get(i).type == "Serving")
+                    if(details.get(i).error)
+                        return true;
             }
             return false;
         }
@@ -2678,33 +3011,55 @@ Item {
             }
             update();
         }
+        function update_callbell(){
+            details.get(0).call_id = supervisor.getLocationCallID("Charging",0);
+            details.get(1).call_id = supervisor.getLocationCallID("Resting",0);
+            for(var i=2; i<details.count; i++){
+                details.get(i).call_id = supervisor.getLocationCallID("Serving",i-2);
+            }
+        }
 
         function checkLocationNumber(){
             for(var i=0; i<details.count; i++){
-                if(details.get(i).number < 1){
-                    details.get(i).error = true;
-                }else if(details.get(i).number > details.get(i).number_table){
-                    tablechange(i,0);
-                    details.get(i).error = true;
-                    details.get(i).number = 0;
-                }else
-                    details.get(i).error = false;
+                if(details.get(i).type === "Serving"){
+                    if(details.get(i).number < 1){
+                        details.get(i).error = true;
+                    }else if(details.get(i).number > details.get(i).number_table){
+                        tablechange(i,0);
+                        details.get(i).error = true;
+                        details.get(i).number = 0;
+                    }else
+                        details.get(i).error = false;
+                }
             }
             for(var i=0; i<details.count; i++){
-                for(var j=i+1; j<details.count; j++){
-                    if(details.get(i).number === details.get(j).number && details.get(i).group===details.get(j).group){
-                        details.get(i).error = true;
-                        details.get(j).error = true;
+                if(details.get(i).type === "Serving"){
+                    for(var j=i+1; j<details.count; j++){
+                        if(details.get(j).type === "Serving"){
+                            if(details.get(i).number === details.get(j).number && details.get(i).group===details.get(j).group){
+                                details.get(i).error = true;
+                                details.get(j).error = true;
+                            }
+                        }
+
                     }
                 }
             }
             for(var i=0; i<details.count; i++){
-                for(var j=i+1; j<details.count; j++){
-                    if(details.get(i).call_id === details.get(j).call_id){
-                        details.get(i).error = true;
-                        details.get(j).error = true;
+                if(details.get(i).type === "Serving"){
+                    for(var j=i+1; j<details.count; j++){
+                        if(details.get(j).type === "Serving"){
+                            if(details.get(i).call_id === "")
+                                continue;
+                            if(details.get(i).call_id === details.get(j).call_id){
+                                details.get(i).error = true;
+                                details.get(j).error = true;
+                            }
+                        }
+
                     }
                 }
+
             }
         }
 //        ListModel{
@@ -2718,7 +3073,7 @@ Item {
             id: groups
         }
         Rectangle{
-            width: 700
+            width: 800
             height: 500
             radius: 20
             anchors.centerIn: parent
@@ -2756,7 +3111,7 @@ Item {
                     anchors.top: rect_title_pop.bottom
                     anchors.topMargin: 10
                     Rectangle{
-                        width: 200
+                        width: 150
                         height: 30
                         color: color_navy
                         visible: popup_location_number.usegroup
@@ -2779,7 +3134,7 @@ Item {
                         }
                     }
                     Rectangle{
-                        width: 200
+                        width: 180
                         height: 30
                         color: color_navy
                         Text{
@@ -2821,8 +3176,8 @@ Item {
                             spacing: 2
                             ComboBox{
                                 id: combo_group
-                                visible: popup_location_number.usegroup
-                                width: 200
+                                visible: popup_location_number.usegroup && type ==="Serving"
+                                width: 150
                                 height: 40
                                 model: groups
                                 currentIndex: group
@@ -2838,7 +3193,7 @@ Item {
                             TextField{
                                 id: tx_name
                                 text: name
-                                width:200
+                                width:type==="Serving"?200:popup_location_number.use_group?200+150+180:200+180
                                 height: 40
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
@@ -2858,7 +3213,7 @@ Item {
                                 }
                             }
                             Image{
-                                visible: error
+                                visible: error && type ==="Serving"
                                 source: "icon/icon_error.png"
                                 width: 40
                                 height: 38
@@ -2866,8 +3221,9 @@ Item {
                             }
                             ComboBox{
                                 id: combo_number
-                                width : error?200-42:200
+                                width : error?180-42:180
                                 height: 40
+                                visible: type ==="Serving"
                                 model: ListModel{}
                                 currentIndex: number==-1?0:number
                                 onCurrentIndexChanged: {
@@ -2997,7 +3353,12 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 for(var i=0; i<details.count; i++){
-                                    supervisor.setLocation(i,details.get(i).name,details.get(i).group,details.get(i).number);
+                                    if(details.get(i).type === "Serving"){
+                                        supervisor.setLocation(i,details.get(i).name,details.get(i).group,details.get(i).number);
+                                    }else{
+
+                                    }
+
                                 }
                                 loader_menu.item.update();
                                 popup_location_number.close();
@@ -3006,7 +3367,6 @@ Item {
                     }
                 }
             }
-
         }
         Popup{
             id: popup_add_callbell
@@ -4422,12 +4782,36 @@ Item {
             width: rect_menus.width
             height: rect_menus.height
 
+            Timer{
+                id: timer_check_localization
+                running: false
+                repeat: true
+                interval: 500
+                onTriggered:{
+                    if(supervisor.is_slam_running()){
+                        btn_auto_init.running = false;
+                        map.clear("all");
+                        timer_check_localization.stop();
+                        supervisor.writelog("[QML] CHECK LOCALIZATION -> STARTED")
+                    }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
+                        timer_check_localization.stop();
+                        btn_auto_init.running = false;
+                        supervisor.writelog("[QML] CHECK LOCALIZATION -> NOT WORKING "+Number(supervisor.getLocalizationState()));
+                    }
+                }
+            }
             Rectangle{
                 anchors.fill: parent
                 color: "#f4f4f4"
             }
 
             Component.onCompleted: {
+            }
+
+            Component.onDestruction: {
+                if(is_objecting){
+                    supervisor.stopObjecting();
+                }
             }
 
             Rectangle{
@@ -4498,6 +4882,7 @@ Item {
                         }
                         Item_button{
                             width: 80
+                            visible: false
                             shadow_color: color_gray
                             icon: "icon/icon_local_manual.png"
                             name: "대기위치로\n초기화"
@@ -4573,6 +4958,7 @@ Item {
                                     if(supervisor.getLocalizationState() !== 1){
                                         supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> LOCALIZATION AUTO ")
                                         btn_auto_init.running = true;
+                                        timer_check_localization.start();
                                         supervisor.slam_autoInit();
 //                                        menu_location.checkInit = true;
                                     }
@@ -4855,16 +5241,16 @@ Item {
                 list_object.model.clear();
                 list_location.model.clear();
                 if(supervisor.getLocationNum("Charging") === 0){
-                    list_location.model.append({"type":"Charging","name":"지정되지 않음","iscol":false,"empty":true})
+                    list_location.model.append({"number":"-10","group":"temp","type":"Charging","name":"지정되지 않음","iscol":false,"empty":true})
                 }else{
-                    list_location.model.append({"type":"Charging","name":supervisor.getLocationName(0,"Charging"),"iscol":map.checkCollision(supervisor.getLocationX(0,"Charging"),supervisor.getLocationY(0,"Charging")),"empty":false});
+                    list_location.model.append({"number":"-10","group":"temp","type":"Charging","name":supervisor.getLocationName(0,"Charging"),"iscol":map.checkCollision(supervisor.getLocationX(0,"Charging"),supervisor.getLocationY(0,"Charging")),"empty":false});
 
                 }
 
                 if(supervisor.getLocationNum("Resting") === 0){
-                    list_location.model.append({"type":"Resting","name":"지정되지 않음","iscol":false,"empty":true})
+                    list_location.model.append({"number":"-5","group":"temp","type":"Resting","name":"지정되지 않음","iscol":false,"empty":true})
                 }else{
-                    list_location.model.append({"type":"Resting","name":supervisor.getLocationName(0,"Resting"),"iscol":map.checkCollision(supervisor.getLocationX(0,"Resting"),supervisor.getLocationY(0,"Resting")),"empty":false});
+                    list_location.model.append({"number":"-5","group":"temp","type":"Resting","name":supervisor.getLocationName(0,"Resting"),"iscol":map.checkCollision(supervisor.getLocationX(0,"Resting"),supervisor.getLocationY(0,"Resting")),"empty":false});
 
                 }
 
@@ -4872,6 +5258,7 @@ Item {
                 var group_num = supervisor.getLocationGroupNum();
                 for(var i=0; i<loc_num; i++){
                     list_location.model.append({"type":"Serving", "name":supervisor.getLocationName(i,"Serving"), "iscol":map.checkCollision(supervisor.getLocationX(i,"Serving"), supervisor.getLocationY(i,"Serving")), "empty":false, "number":supervisor.getLocationNumber(-1,i).toString(), "group":supervisor.getLocationGroup(i)});
+                    print(i,supervisor.getLocationNumber(-1,i).toString(),supervisor.getLocationNumber(supervisor.getLocationGroupNum(i),i).toString())
                 }
                 var ob_num = supervisor.getObjectNum();
                 for(var i=0; i<ob_num; i++){
@@ -4896,6 +5283,24 @@ Item {
                 list_location.currentIndex = num;
             }
 
+            Timer{
+                id: timer_check_localization
+                running: false
+                repeat: true
+                interval: 500
+                onTriggered:{
+                    if(supervisor.is_slam_running()){
+                        btn_auto_init.running = false;
+                        map.clear("all");
+                        timer_check_localization.stop();
+                        supervisor.writelog("[QML] CHECK LOCALIZATION -> STARTED")
+                    }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
+                        timer_check_localization.stop();
+                        btn_auto_init.running = false;
+                        supervisor.writelog("[QML] CHECK LOCALIZATION -> NOT WORKING "+Number(supervisor.getLocalizationState()));
+                    }
+                }
+            }
             Component.onCompleted: {
                 obj_category = 0;
                 map.loadmap(supervisor.getMapname(),"OBJECT");
@@ -5021,6 +5426,7 @@ Item {
                             anchors.centerIn: parent
                             spacing: 20
                             Item_button{
+                                visible: false
                                 width: 80
                                 shadow_color: color_gray
                                 icon: "icon/icon_local_manual.png"
@@ -5107,6 +5513,7 @@ Item {
                                         if(supervisor.getLocalizationState() !== 1){
                                             supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> LOCALIZATION AUTO ")
                                             btn_auto_init.running = true;
+                                            timer_check_localization.start();
                                             supervisor.slam_autoInit();
                                             menu_object.checkInit = true;
                                         }
@@ -5245,7 +5652,6 @@ Item {
                                             map.setTool("edit_location_new");
                                         }else{
                                             map.setTool("edit_location");
-
                                         }
                                     }
                                 }
@@ -5484,14 +5890,15 @@ Item {
                                             popup_add_location.open();
                                             popup_add_location.curpose_mode = true;
                                         }else{
-                                            if(map.checkRobotCollsion()){
+                                            if(map.checkRobotCollision()){
 
                                             }else{
-                                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> EDIT" +Number(map.select_location) +" CUR POSITION")
+                                                supervisor.writelog("[USER INPUT] MAP PAGE (ANNOT) : LOCATION -> EDIT" +Number(list_location.currentIndex) +" CUR POSITION")
                                                 if(map.tool == "edit_location_new"){
                                                     map.save("location_cur",list_location.model.get(list_location.currentIndex).type,list_location.model.get(list_location.currentIndex).type);
                                                 }else{
-                                                    map.editLocation(map.robot_x/map.newscale, map.robot_y/map.newscale, supervisor.getRobotth());
+                                                    map.save("edit_location",list_location.model.get(list_location.currentIndex).type,list_location.model.get(list_location.currentIndex).name);
+//                                                    map.editLocation(map.robot_x/map.newscale, map.robot_y/map.newscale, supervisor.getRobotth());
                                                 }
                                                 list_location.currentIndex = -1;
                                                 map.setTool("move");
@@ -5758,7 +6165,6 @@ Item {
                     if(menu_object.obj_category === 1 || menu_object.obj_category === 0){
                         if(supervisor.is_slam_running()){
                             btn_3.enabled = true;
-                            print("auto init running false");
                             btn_auto_init.running = false;
                             if(menu_object.checkInit){
                                 map.setTool("move");
@@ -6683,21 +7089,20 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
-                                supervisor.stopObjecting();
+                                supervisor.saveObjecting();
                                 show_loading();
-
                                 timer_save_objecting.start();
                             }
                         }
                         Timer{
                             id: timer_save_objecting
-                            interval: 500
+                            interval: 1000
                             repeat: false
                             running: false
                             onTriggered:{
                                 supervisor.writelog("[QML] MAP PAGE : SAVE OBJECTING ");
-                                supervisor.saveObjecting();
                                 unshow_loading();
+                                supervisor.readSetting();
                                 popup_save_objecting.close();
 
                             }
@@ -8063,7 +8468,6 @@ Item {
             map.show_button_object = true;
             map.show_button_following = true;
             text_menu_title.text = "";
-            map.setViewer("current");
         }else if(map_mode == 1){
             text_menu_title.text = "맵 새로만들기";
             text_menu_title.visible = true;
@@ -8140,14 +8544,25 @@ Item {
             opacity: 0.7
         }
         onOpened: {
-            help_image.currentFrame = 0;
+            help_image.play("video/slam_help.gif")
+        }
+        onClosed:{
+            help_image.stop();
         }
 
         AnimatedImage{
             id: help_image
             enabled: supervisor.getSetting("ROBOT_SW","use_help")==="true"
             anchors.centerIn : parent
-            source: "video/slam_help.gif"
+            function play(name){
+                source = name;
+                visible = true;
+            }
+            function stop(){
+                visible = false;
+                source = "";
+            }
+            source:  ""
             cache: false
         }
 //        Rectangle{

@@ -251,6 +251,7 @@ Item {
         mapview.selectLocation(num, type);
     }
 
+
     function setTool(name){
         tool = name;
         mapview.setTool(name);
@@ -323,6 +324,12 @@ Item {
 //            /*print(*/last_robot_x,last_robot_y,last_robot_th);
             mapview.addLocation(last_robot_x,last_robot_y,last_robot_th);
             mapview.saveLocation(type,0,name);
+        }else if(mode==="edit_location"){
+            last_robot_x = supervisor.getlastRobotx();
+            last_robot_y = supervisor.getlastRoboty();
+            last_robot_th = supervisor.getlastRobotth();
+//            /*print(*/last_robot_x,last_robot_y,last_robot_th);
+            mapview.editLocation(last_robot_x,last_robot_y,last_robot_th);
         }else if(mode==="location"){
             mapview.saveLocation(type,0,name);
         }else if(mode==="tline"){
@@ -595,11 +602,13 @@ Item {
                     if(mapview.getMode() === "annot_object"){
                         var objnum = mapview.getObjectNum(newX, newY);
                         if(objnum > -1){
-                            loader_menu.item.setcategory(2);
+                            if(loader_menu.item.obj_category !== 2){
+                                loader_menu.item.setcategory(2);
+                            }
                             loader_menu.item.setobjcur(objnum);
                         }else{
                             var locnum = mapview.getLocationNum(newX, newY);
-                            if(locnum > -1){
+                            if(locnum > -1 && loader_menu.item.obj_category !== 1){
                                 loader_menu.item.setcategory(1);
                             }
                             loader_menu.item.setloccur(locnum);

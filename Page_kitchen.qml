@@ -134,12 +134,18 @@ Item {
                         rect_go_safe.color = color_gray
                         text_go.text = "비상스위치가 눌려있음"
                         text_go.font.pixelSize = 25
-                    }else{
+                    }else if(supervisor.getLocalizationState() === 2){
                         btn_go.enabled = true;
                         rect_go.color = color_blue;
                         rect_go_safe.color = color_blue
                         text_go.text = "서빙 시작"
                         text_go.font.pixelSize = 35
+                    }else{
+                        btn_go.enabled = false;
+                        rect_go.color = color_red;
+                        rect_go_safe.color = color_gray
+                        text_go.text = "로봇 위치 에러"
+                        text_go.font.pixelSize = 30
                     }
                 }else{
                     btn_go.enabled = false;
@@ -172,7 +178,7 @@ Item {
         for(var i=col_num*row_num*cur_page; i<col_num*row_num*(cur_page+1); i++){
             if(i>=table_num)
                 break;
-//            print("append : ",i);
+//            print("table append : ",i);
             model_group_table.append({"num":supervisor.getLocationNumber(cur_group,i),"name":supervisor.getServingName(cur_group, i)});
         }
     }
@@ -388,7 +394,7 @@ Item {
                                         if(cur_table == (col_num*row_num*cur_page)+index+1){
                                             cur_table = 0;
                                         }else{
-                                            if(supervisor.isExistLocation((col_num*row_num*cur_page)+index)){
+                                            if(supervisor.isExistLocation(-1,(col_num*row_num*cur_page)+index)){
                                                 cur_table = (col_num*row_num*cur_page)+index+1;
                                             }else{
 

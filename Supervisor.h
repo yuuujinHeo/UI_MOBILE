@@ -212,6 +212,7 @@ public:
     Q_INVOKABLE QString getLocaleDate(int year, int month, int date){
         return QString().sprintf("%d-%02d-%02d",year,month,date);
     }
+    Q_INVOKABLE LOCATION getLocationbyCall(QString call);
     Q_INVOKABLE LOCATION getLocation(QString name);
     void makeUSBShell();
     Q_INVOKABLE void updateUSB();
@@ -247,6 +248,7 @@ public:
     Q_INVOKABLE void setloadMap(bool load);
     Q_INVOKABLE bool isExistRobotINI();
     Q_INVOKABLE void makeRobotINI();
+    Q_INVOKABLE void checkRobotINI();
     Q_INVOKABLE bool rotate_map(QString _src, QString _dst, int mode);
     Q_INVOKABLE bool getIniRead();
     Q_INVOKABLE void saveMapfromUsb(QString path);
@@ -255,6 +257,7 @@ public:
     Q_INVOKABLE void restartSLAM();
 
     Q_INVOKABLE void startSLAM();
+
 
     ////*********************************************  SLAM(LOCALIZATION) 관련   ***************************************************////
     Q_INVOKABLE void startMapping(float grid);
@@ -310,6 +313,8 @@ public:
         return LOCATION();
     }
 
+    LOCATION current_target;
+
     ////*********************************************  JOYSTICK 관련   ***************************************************////
     Q_INVOKABLE bool isconnectJoy();
     Q_INVOKABLE float getJoyAxis(int num);
@@ -340,8 +345,7 @@ public:
     Q_INVOKABLE int getLocationGroupNum();
     Q_INVOKABLE int getLocationGroupSize(int num);
     Q_INVOKABLE int getLocationGroupNum(int num);
-    Q_INVOKABLE QString getLocationCallID(int num);
-
+    Q_INVOKABLE QString getLocationCallID(QString type, int num);
 
     Q_INVOKABLE void removeLocationGroup(int num);
     Q_INVOKABLE void addLocationGroup(QString name);
@@ -437,12 +441,16 @@ public:
     Q_INVOKABLE int getRemoteStatus();
     Q_INVOKABLE int getChargeStatus();
     Q_INVOKABLE int getEmoStatus();
+    Q_INVOKABLE int getLockStatus();
     Q_INVOKABLE float getBatteryIn();
     Q_INVOKABLE float getBatteryOut();
     Q_INVOKABLE float getBatteryCurrent();
     Q_INVOKABLE float getPower();
     Q_INVOKABLE float getPowerTotal();
+    Q_INVOKABLE int getObsinPath();
+    Q_INVOKABLE int getRobotcurPreset();
 
+    Q_INVOKABLE void setMotorLock(bool onoff);
     Q_INVOKABLE float getRobotRadius();
     Q_INVOKABLE float getRobotx();
     Q_INVOKABLE float getRoboty();
@@ -469,6 +477,8 @@ public:
     Q_INVOKABLE int getMapHeight();
     Q_INVOKABLE float getGridWidth();
     Q_INVOKABLE QVector<int> getOrigin();
+    Q_INVOKABLE int getMappingWidth(){return pmap->mapping_width;}
+    Q_INVOKABLE float getMappingGridwidth(){return pmap->mapping_gridwidth;}
 
     ////*********************************************  OBJECTING 관련   ***************************************************////
 
