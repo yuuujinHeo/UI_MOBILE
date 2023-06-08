@@ -192,5 +192,7 @@
         <file>image/robot_manual.gif</file>
         <file>image/face_surprise.gif</file>
         <file>icon/icon_lock_2.png</file>
+        <file>Page_mapping.qml</file>
+        <file>Page_annotation.qml</file>
     </qresource>
 </RCC>

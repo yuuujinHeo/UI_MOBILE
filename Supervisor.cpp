@@ -91,11 +91,11 @@ Supervisor::Supervisor(QObject *parent)
     plog->write("[BUILDER] SUPERVISOR constructed");
 
 
-    QProcess *process = new QProcess(this);
-    QString file = QDir::homePath() + "/auto_reset.sh";
-    process->start(file);
-    process->waitForReadyRead();
-    startSLAM();
+//    QProcess *process = new QProcess(this);
+//    QString file = QDir::homePath() + "/auto_reset.sh";
+//    process->start(file);
+//    process->waitForReadyRead();
+//    startSLAM();
 
     wifi_process = new QProcess();
     connect(wifi_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_con_output()));
@@ -103,34 +103,6 @@ Supervisor::Supervisor(QObject *parent)
     wifi_check_process = new QProcess();
     connect(wifi_check_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_ch_output()));
     connect(wifi_check_process,SIGNAL(readyReadStandardError()),this,SLOT(wifi_ch_error()));
-//    const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
-//    for(QHostAddress &address: QNetworkInterface::allAddresses()){
-//        if(address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost){
-//            qDebug() << "!!!!!!!!!!!!!!!!!!!!! 1 : " << address.toString();
-////            qDebug() << QNetworkInterface::type();
-//            if(address.toString() == "192.168.2.1"){
-//                qDebug() << "CHANGED";
-////                address.setAddress("192.168.2.11");
-//            }
-//        }
-//    }
-
-//    for(QNetworkInterface &interface: QNetworkInterface::allInterfaces()){
-//        if(interface.type() == QNetworkInterface::Wifi && interface.addressEntries().size()>0){
-//            QHostAddress address = interface.addressEntries().at(0).ip();
-////            address.
-////            interface.addressEntries().at(0)
-//            if(address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost){
-//                qDebug() << "!!!!!!!!!!!!!!!!!!!!!  2 : " << address.toString();
-//                if(address.toString() == "192.168.2.1"){
-//                    qDebug() << "CHANGED";
-////                    address.setAddress("192.168.2.11");
-//                }
-//            }
-//        }
-//    }
-
-
 
     readWifi();
 }

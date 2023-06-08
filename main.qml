@@ -49,6 +49,7 @@ Window {
     property color color_light_gray: "#F4F4F4"
     property color color_navy: "#4f5666"
     property color color_dark_navy: "#323744"
+    property color color_mid_navy: "#242535"
     property color color_blue: "#24a9f7"
     property color color_yellow_rect: "#ffc850"
 
@@ -65,6 +66,10 @@ Window {
     property string ppickupCall: "qrc:/Page_pickup_calling.qml"
     property string psetting: "qrc:/Page_setting.qml"
     property string plog: "qrc:/Page_log.qml"
+
+    property string pmapping: "qrc:/Page_mapping.qml"
+    property string pannotation: "qrc:/Page_annotation.qml"
+
 
     property string robot_type: supervisor.getRobotType()
     property string robot_name: supervisor.getRobotName()
@@ -371,7 +376,7 @@ Window {
             timer_update.start();
             loader_page.item.init();
         }
-        source: pinit
+        source: pmap
     }
 
     Timer{

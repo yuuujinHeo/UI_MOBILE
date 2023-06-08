@@ -472,8 +472,9 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 if(modelData == "맵 새로만들기"){
-                                    map_mode = 1;
-                                    supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO MAPPING")
+                                    loadPage(pmapping);
+//                                    map_mode = 1;
+//                                    supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO MAPPING")
                                 }else if(modelData == "현재맵 수정하기"){
                                     map_mode = 2;
                                     supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO ANNOTATION")

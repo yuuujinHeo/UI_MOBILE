@@ -62,8 +62,11 @@ void MapView::onTimer(){
                 }
             }
         }else{
+            if(probot->ipc_use){
+                setMapCurrent();
+            }
 //            qDebug() << "set " << mapping_grid << pmap->mapping_gridwidth;
-            setMapCurrent();
+
         }
     }
 }
@@ -270,17 +273,13 @@ void MapView::moveMap(){
         //Crop Show Rect
         cv::Mat source;
         if(pmap->map_mapping.rows > 0 && pmap->map_mapping.cols > 0){
-            pmap->map_mapping(cv::Rect(map_x*1000/mapping_size,map_y*1000/mapping_size,map_width*scale*1000/mapping_size,map_height*scale*1000/mapping_size)).copyTo(source);
+            pmap->map_mapping(cv::Rect(map_x,map_y,map_width*scale,map_height*scale)).copyTo(source);
         }else{
-            map_map(cv::Rect(map_x,map_y,map_width*scale,map_height*scale)).copyTo(source);
+            source = cv::Mat(1000,1000,CV_8U,cv::Scalar::all(0));
         }
         pixmap_map.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(source));
 
-        QPixmap temp_pixmap = map_object.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
-        pixmap_object.pixmap = temp_pixmap;
-        temp_pixmap = map_location.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
-        pixmap_location.pixmap = temp_pixmap;
-        temp_pixmap = map_current.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
+        QPixmap temp_pixmap = map_current.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
         pixmap_current.pixmap = temp_pixmap;
         update();
     }else if(map_orin.cols > 0 && map_orin.rows > 0){
@@ -691,15 +690,16 @@ void MapView::setObjectMap(QString filename){
     reloadMap();
 }
 void MapView::setMapCurrent(){
+
     if(mode == "mapping"){
-        map_current=QPixmap(mapping_size*res,mapping_size*res);
+        map_current=QPixmap(1000*res,1000*res);
         map_current.fill(Qt::transparent);
         QPainter painter(&map_current);
         painter.setRenderHint(QPainter::Antialiasing, true);
         painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
          cv::Point2f pose;
-        pose.x = -probot->curPose.point.y*mapping_size/(pmap->mapping_width*pmap->mapping_gridwidth) + mapping_size/2;
-        pose.y = -probot->curPose.point.x*mapping_size/(pmap->mapping_width*pmap->mapping_gridwidth) + mapping_size/2;
+        pose.x = -probot->curPose.point.y*1000/(pmap->mapping_width*pmap->mapping_gridwidth) + 1000/2;
+        pose.y = -probot->curPose.point.x*1000/(pmap->mapping_width*pmap->mapping_gridwidth) + 1000/2;
 
         cv::Point2f temp;
         temp = setAxis(probot->curPose.point);
@@ -959,6 +959,7 @@ void MapView::setMapCurrent(){
         pixmap_current.pixmap = temp_pixmap;
         update();
     }
+
 }
 void MapView::setMapDrawing(){
     initDrawing();
