@@ -2980,7 +2980,7 @@ Item {
         }
         function isError(){
             for(var i=0; i<details.count; i++){
-                if(details.get(i).type == "Serving")
+                if(details.get(i).type === "Serving")
                     if(details.get(i).error)
                         return true;
             }
@@ -2999,8 +2999,8 @@ Item {
         function groupchange(number, group){
             print(" group change ",number,group,locations.count);
             if(number > -1 && number < locations.count){
-                locations.get(number).group = group;
-                locations.get(number).number = 0;
+                locations.get(number-2).group = group;
+                locations.get(number-2).number = 0;
             }
             update();
         }
@@ -3008,7 +3008,7 @@ Item {
         function tablechange(number, table){
             print("table change ",number,table)
             if(number > -1 && number < locations.count){
-                locations.get(number).number = table;
+                locations.get(number-2).number = table;
             }
             update();
         }
@@ -3184,10 +3184,8 @@ Item {
                                 currentIndex: group
                                 onCurrentIndexChanged: {
                                     if(focus){
-                                        print("focus change")
+                                        print("group changed "+currentIndex);
                                         popup_location_number.groupchange(index,currentIndex);
-                                    }else{
-                                        print("no focus change")
                                     }
                                 }
                             }
@@ -3210,7 +3208,10 @@ Item {
                                     }
                                 }
                                 onTextChanged: {
+                                    print("set name to "+text);
                                     name = text;
+                                    if(index > 1)
+                                        locations.get(index-2).name = name;
                                 }
                             }
                             Image{
@@ -3231,8 +3232,6 @@ Item {
                                     if(focus){
                                         print("table focus change ",index,currentIndex)
                                         popup_location_number.tablechange(index,currentIndex);
-//                                        number = currentIndex;
-//                                        popup_location_number.checkLocationNumber();
                                     }
                                 }
                             }
@@ -3353,13 +3352,8 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
-                                for(var i=0; i<details.count; i++){
-                                    if(details.get(i).type === "Serving"){
-                                        supervisor.setLocation(i,details.get(i).name,details.get(i).group,details.get(i).number);
-                                    }else{
-
-                                    }
-
+                                for(var i=0; i<details.count-2; i++){
+                                    supervisor.setLocation(i,details.get(i+2).name,details.get(i+2).group,details.get(i+2).number);
                                 }
                                 loader_menu.item.update();
                                 popup_location_number.close();
