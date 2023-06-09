@@ -376,7 +376,7 @@ Window {
             timer_update.start();
             loader_page.item.init();
         }
-        source: pmap
+        source: pannotation
     }
 
     Timer{

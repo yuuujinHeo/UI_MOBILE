@@ -61,6 +61,7 @@ public:
         int8_t     ui_motor_lock_state = 0;
         float      robot_pose[3] = {0,};
         float      robot_scan[360] = {0,};
+//        float       ui_rotate_angle = 0;
 
         STATUS()
         {

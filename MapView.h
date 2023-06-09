@@ -79,6 +79,8 @@ public:
     void setMapMap();
     void setMapLocation();
 
+    void updateMeta();
+
     //---------------------------------------------------Mapping, Localization
     POSE set_init_pose;
     bool set_init_flag = false;
@@ -91,7 +93,12 @@ public:
     Q_INVOKABLE void rotateMap(int angle);
     Q_INVOKABLE void rotateMapCW();
     Q_INVOKABLE void rotateMapCCW();
-
+    cv::Point2f cut_box[2];
+    cv::Point2f orin_box[3];
+    Q_INVOKABLE void setBoxPoint(int num, int x, int y);
+    Q_INVOKABLE int getPointBox(int x, int y);
+    Q_INVOKABLE void cutMap();
+    Q_INVOKABLE void initRotate();
     //---------------------------------------------------Drawing
 
     void initDrawing(){

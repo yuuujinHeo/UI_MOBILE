@@ -291,6 +291,8 @@ Item {
 
         }else if(mode==="spline"){
             mapview.endSpline(false);
+        }else if(mode ==="rotate"){
+            mapview.initRotate();
         }
     }
     function rotate(dir){
@@ -339,6 +341,8 @@ Item {
             mapview.endSpline(true);
         }else if(mode==="velmap"){
             mapview.saveVelmap();
+        }else if(mode==="rotate"){
+            mapview.cutMap();
         }
     }
 
@@ -493,14 +497,16 @@ Item {
 
         Canvas{
             anchors.fill: parent
-            property int wgrid: 30
+            property int wgrid: 20
             visible: show_grid
             onPaint: {
                 var ctx = getContext("2d");
                 ctx.lineWidth = 0.5;
-                ctx.strokeStyle = "black"
+                ctx.strokeStyle = "white"
                 ctx.beginPath();
                 var nrows = height/wgrid;
+                ctx.setLineDash([2,5])
+
                 for(var i=0; i<nrows+1; i++){
                     ctx.moveTo(0,wgrid*i);
                     ctx.lineTo(width, wgrid*i);
@@ -537,6 +543,7 @@ Item {
         property var firstY;
         property var firstDist;
         property bool double_touch: false
+        property var select_point;
         touchPoints: [TouchPoint{id:point1},TouchPoint{id:point2}]
         onPressed:{
             double_touch = false;
@@ -591,6 +598,17 @@ Item {
             }else if( tool === "slam_init"){
 //                print("Pressed : ",firstX,firstY,0);
                 mapview.setInitPose(firstX,firstY,0);
+            }else if(tool === "cut_map"){
+                select_point = mapview.getPointBox(firstX,firstY);
+                if(select_point === -1){
+                    if(double_touch){
+                        firstX = mapview.getX() + (point1.x+point2.x)*mapview.getScale()/2;
+                        firstY = mapview.getY() + (point1.y+point2.y)*mapview.getScale()/2;
+                        var dx = Math.abs(point1.x-point2.x);
+                        var dy = Math.abs(point1.y-point2.y);
+                        firstDist = Math.sqrt(dx*dx + dy*dy);
+                    }
+                }
             }
         }
         onReleased: {
@@ -691,6 +709,50 @@ Item {
                     mapview.addLinePoint(newX, newY);
                 }else if(tool == "draw_rect"){
                     mapview.setDrawingRect(newX, newY);
+                }else if(tool == "cut_map"){
+                    if(select_point > -1){
+                        mapview.setBoxPoint(select_point,newX,newY);
+                    }else{
+
+                        if(double_touch){
+                            if(point1.pressed && point2.pressed){
+                                newX = (point1.x + point2.x)*mapview.getScale()/2;
+                                newY = (point1.y + point2.y)*mapview.getScale()/2;
+
+                                var dx = Math.abs(point1.x - point2.x)
+                                var dy = Math.abs(point1.y - point2.y)
+                                var dist = Math.sqrt(dx*dx + dy*dy);
+                                var thres = 10;
+
+                                for(var i=0; i<(firstDist-dist)/thres; i++){
+    //                                mapview.scaledOut(1,1);
+                                    mapview.zoomOut(newX,newY);
+                                }
+                                for(var i=0; i<(dist-firstDist)/thres; i++){
+    //                                mapview.scaledIn(1,1);
+                                    mapview.zoomIn(newX,newY);
+                                }
+                                firstDist = dist;
+
+    //                            print("UPDATE : ",newX,newY,dist);
+                                mapview.setRobotFollowing(false);
+                                mapview.move(firstX-newX, firstY-newY);
+                            }else{
+                                double_touch = false;
+                            }
+                        }else{
+                            if(point1.pressed){
+                                newX = point1.x*mapview.getScale();
+                                newY = point1.y*mapview.getScale();
+                            }else if(point2.pressed){
+                                newX = point2.x*mapview.getScale();
+                                newY = point2.y*mapview.getScale();
+                            }
+    //                        print("UPDATE : ",newX,newY);
+                            mapview.setRobotFollowing(false);
+                            mapview.move(firstX-newX, firstY-newY);
+                        }
+                    }
                 }else if(tool == "straight"){
                     mapview.setDrawingLine(newX, newY);
                 }else if(tool == "erase"){

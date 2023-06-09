@@ -1,6 +1,7 @@
 #include <QtMath>
 #include <QQmlApplicationEngine>
 #include <QDir>
+#include <QSettings>
 #include <iostream>
 #include <exception>
 #include <QGuiApplication>
@@ -408,10 +409,100 @@ void MapView::setMapMap(){
     update();
 }
 
+void MapView::setBoxPoint(int num, int x, int y){
+    int min,max;
+    if(x < 0) x = 0;
+    if(y < 0) y = 0;
+
+    if(x > pmap->width) x = pmap->width;
+    if(y > pmap->height) y = pmap->height;
+    if(x < y){
+        min = x;
+        max = y;
+    }else{
+        min = y;
+        max = x;
+    }
+
+    if(num == 0){
+        cut_box[0].x = orin_box[0].x - (orin_box[0].x - max);
+        cut_box[0].y = orin_box[0].y - (orin_box[0].x - max);
+    }else if(num == 1){
+        cut_box[1].x = orin_box[1].x - (orin_box[1].x - max);
+        cut_box[1].y = orin_box[1].y - (orin_box[1].x - max);
+    }else{
+        cut_box[0] = orin_box[0] + (cv::Point2f(x,y) - orin_box[2]);
+        cut_box[1] = orin_box[1] + (cv::Point2f(x,y) - orin_box[2]);
+    }
+    setMapCurrent();
+}
+int MapView::getPointBox(int x, int y){
+    for(int i=0; i<2; i++){
+        if(fabs(cut_box[i].x - x) < 50){
+            if(fabs(cut_box[i].y - y) < 50){
+                orin_box[0] = cut_box[0];
+                orin_box[1] = cut_box[1];
+                return i;
+            }
+        }
+    }
+
+    //detect line
+    for(int i=0; i<2; i++){
+        if(fabs(cut_box[i].x - x) < 30){
+            if(y>cut_box[0].y && y<cut_box[1].y){
+                orin_box[0] = cut_box[0];
+                orin_box[1] = cut_box[1];
+                orin_box[2] = cv::Point2f(x,y);
+                return 3;
+            }
+        }
+        if(fabs(cut_box[i].y - y) < 30){
+            if(x>cut_box[0].x && x<cut_box[1].x){
+                orin_box[0] = cut_box[0];
+                orin_box[1] = cut_box[1];
+                orin_box[2] = cv::Point2f(x,y);
+                return 3;
+            }
+        }
+    }
+    return -1;
+}
+void MapView::cutMap(){
+    cv::Mat map_edited_ui;
+    map_orin(cv::Rect(cut_box[0].x,cut_box[0].y,(cut_box[1].x-cut_box[0].x),(cut_box[1].y-cut_box[0].y))).copyTo(map_edited_ui);
+
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(map_edited_ui.cols/2, map_edited_ui.rows/2),-rotate_angle,1.0);
+    rotate_angle = 0;
+    cv::warpAffine(map_edited_ui,map_edited_ui,rot,map_edited_ui.size(),cv::INTER_NEAREST);
+
+
+    cv::rotate(map_edited_ui,map_edited_ui,cv::ROTATE_90_CLOCKWISE);
+    cv::flip(map_edited_ui,map_edited_ui,0);
+
+    QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_edited.png";
+    plog->write("[Annotation] Map Size Cut : "+QString().sprintf("%d,%d ~ %d,%d",cut_box[0].x,cut_box[0].y,cut_box[1].x,cut_box[1].y));
+    cv::imwrite(path.toStdString(),map_edited_ui);
+    updateMeta();
+}
 void MapView::reloadMap(){
     initLocation();
     initObject();
     updateMap();
+}
+void MapView::updateMeta(){
+    QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_meta.ini";
+    QSettings setting(path, QSettings::IniFormat);
+    pmap->width = cut_box[1].x-cut_box[0].x;
+    pmap->height = cut_box[1].y-cut_box[0].y;
+    pmap->origin[0] = (int)((cut_box[1].x-cut_box[0].x)/2.);
+    pmap->origin[1] = (int)((cut_box[1].y-cut_box[0].y)/2.);
+    setting.setValue("map_metadata/map_w",QString::number(cut_box[1].x-cut_box[0].x));
+    setting.setValue("map_metadata/map_h",QString::number(cut_box[1].y-cut_box[0].y));
+    setting.setValue("map_metadata/map_origin_u",QString::number(pmap->origin[0]));
+    setting.setValue("map_metadata/map_origin_v",QString::number(pmap->origin[1]));
+    plog->write("[Annotation] Update Meta.ini");
+    reloadMap();
 }
 void MapView::setMapping(){
     cv::Mat source;
@@ -955,11 +1046,42 @@ void MapView::setMapCurrent(){
             }
         }
 
+        if(mode == "annot_rotate"){
+            QPainterPath path;
+            painter.setPen(QPen(Qt::red,10));
+            path.addRect(QRectF(QPointF(cut_box[0].x,cut_box[0].y),QPointF(cut_box[1].x,cut_box[1].y)));
+            painter.drawPath(path);
+
+            QPainterPath circles;
+            for(int j=0; j<2; j++){
+                int rad = 30*res;
+                int xx = cut_box[j].x*res - rad;
+                int yy = cut_box[j].y*res - rad;
+                circles.addRect(xx,yy,rad*2,rad*2);
+                painter.fillPath(circles,Qt::white);
+            }
+        }
         QPixmap temp_pixmap = map_current.copy(map_x*res,map_y*res,map_width*scale*res,map_height*scale*res);
         pixmap_current.pixmap = temp_pixmap;
         update();
     }
 
+}
+void MapView::initRotate(){
+    rotate_angle = 0;
+    if(map_orin.rows > 0){
+        cut_box[0].x = 0;
+        cut_box[0].y = 0;
+        cut_box[1].x = pmap->width;
+        cut_box[1].y = pmap->height;
+    }else{
+        cut_box[0].x = 0;
+        cut_box[1].x = 0;
+        cut_box[0].y = 0;
+        cut_box[1].y = 0;
+    }
+    setMapCurrent();
+    setMapMap();
 }
 void MapView::setMapDrawing(){
     initDrawing();
