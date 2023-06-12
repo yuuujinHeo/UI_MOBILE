@@ -386,6 +386,12 @@ public:
 
 
 
+    Q_INVOKABLE void drawingRunawayStart();
+    Q_INVOKABLE void drawingRunawayStop();
+    Q_INVOKABLE int getRunawayState();
+
+    Q_INVOKABLE void SLAM_map_reload();
+    Q_INVOKABLE void SLAM_ini_reload();
 
 
 

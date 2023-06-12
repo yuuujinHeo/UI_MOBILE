@@ -39,6 +39,10 @@ Item {
         Item{
             width: mapping_pages.width
             height: mapping_pages.height
+            Component.onCompleted: {
+                supervisor.setMotorLock(false);
+            }
+
             Rectangle{
                 anchors.fill: parent
                 color: color_dark_navy
@@ -514,6 +518,7 @@ Item {
                     }
                 }
             }
+
         }
 
     }
@@ -727,6 +732,7 @@ Item {
                 color: color_dark_navy
             }
             Component.onCompleted: {
+                supervisor.setMotorLock(true);
                 loading.show();
             }
             Timer{

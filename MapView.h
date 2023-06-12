@@ -3,6 +3,7 @@
 
 #include <QTimer>
 #include <QObject>
+#include <QSettings>
 #include "MapHeader.h"
 #include "spline.h"
 #include "GlobalHeader.h"
@@ -164,6 +165,9 @@ public:
     Q_INVOKABLE void undoObject();
     Q_INVOKABLE void selectObject(int num);
 
+
+    Q_INVOKABLE void setScreen(float s, int centerx, int centery);
+
     //---------------------------------------------------Location
     QVector<LOCATION> locations;
     LOCATION new_location;
@@ -223,7 +227,20 @@ public:
     void setCenter(int centerx, int centery);
     void setZoomCenter(int x=0, int y=0);
 
-
+    int getLocationGroupSize(int num);
+    void setSetting(QString name, QString value){
+        QString ini_path = QDir::homePath()+"/robot_config.ini";
+        QSettings setting(ini_path, QSettings::IniFormat);
+        setting.setValue(name,value);
+        plog->write("[SETTING] SET "+name+" VALUE TO "+value);
+    }
+    void setAnnotation(QString filename, QString name, QString value){
+        QString ini_path = QDir::homePath()+"/maps/"+filename+"/annotation.ini";
+        QSettings setting(ini_path, QSettings::IniFormat);
+        setting.setValue(name,value);
+        plog->write("[SETTING] SET "+name+" VALUE TO "+value);
+    }
+    Q_INVOKABLE void saveAnnotation(QString filename);
 protected:
     virtual void paint(QPainter *painter) Q_DECL_OVERRIDE;
 

@@ -472,13 +472,11 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 if(modelData == "맵 새로만들기"){
+                                    supervisor.writelog("[MAP] Move to Mapping Page");
                                     loadPage(pmapping);
-//                                    map_mode = 1;
-//                                    supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO MAPPING")
                                 }else if(modelData == "현재맵 수정하기"){
-                                    map_mode = 2;
-                                    supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO ANNOTATION")
-                                    edit_flag = true;
+                                    supervisor.writelog("[MAP] Move to Annotaion Page");
+                                    loadPage(pannotation);
                                     supervisor.setAnnotEditFlag(true);
                                 }else if(modelData == "위치 초기화"){
                                     supervisor.writelog("[USER INPUT] MAP PAGE -> MOVE TO LOCALIZATION")

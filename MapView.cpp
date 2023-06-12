@@ -208,6 +208,12 @@ void MapView::setMode(QString name){
     updateMap();
 }
 
+void MapView::setScreen(float s, int centerx, int centery){
+    scale = s;
+    setZoomCenter(centerx,centery);
+    updateMap();
+}
+
 void MapView::initObject(){
     //Read annotation.ini
     QString file_path = QDir::homePath() + "/maps/" + map_name + "/map_obs.png";;
@@ -470,7 +476,8 @@ int MapView::getPointBox(int x, int y){
 }
 void MapView::cutMap(){
     cv::Mat map_edited_ui;
-    map_orin(cv::Rect(cut_box[0].x,cut_box[0].y,(cut_box[1].x-cut_box[0].x),(cut_box[1].y-cut_box[0].y))).copyTo(map_edited_ui);
+    map_orin.copyTo(map_edited_ui);
+//    map_orin(cv::Rect(cut_box[0].x,cut_box[0].y,(cut_box[1].x-cut_box[0].x),(cut_box[1].y-cut_box[0].y))).copyTo(map_edited_ui);
 
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(map_edited_ui.cols/2, map_edited_ui.rows/2),-rotate_angle,1.0);
     rotate_angle = 0;
@@ -483,7 +490,7 @@ void MapView::cutMap(){
     QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_edited.png";
     plog->write("[Annotation] Map Size Cut : "+QString().sprintf("%d,%d ~ %d,%d",cut_box[0].x,cut_box[0].y,cut_box[1].x,cut_box[1].y));
     cv::imwrite(path.toStdString(),map_edited_ui);
-    updateMeta();
+//    updateMeta();
 }
 void MapView::reloadMap(){
     initLocation();
@@ -2289,9 +2296,87 @@ void MapView::saveLocation(QString type, int groupnum, QString name){
     std::sort(pmap->locations.begin(),pmap->locations.end(),sortLocation2);
     pmap->annot_edit_location = true;
 
+
+    //ini setting
+
+    saveAnnotation(map_name);
+
+
     initLocation();
 }
 
+void MapView::saveAnnotation(QString filename){
+
+    plog->write("[SUPERVISOR] SAVE Annotation "+filename);
+    //기존 파일 백업
+    QString backup = QDir::homePath()+"/maps/"+filename+"/annotation_backup.ini";
+    QString origin = QDir::homePath()+"/maps/"+filename+"/annotation.ini";
+    if(QFile::exists(origin) == true){
+        if(QFile::copy(origin, backup)){
+            plog->write("[DEBUG] Copy annotation.ini to annotation_backup.ini");
+        }else{
+            plog->write("[DEBUG] Fail to copy annotation.ini to annotation_backup.ini");
+        }
+    }else{
+        plog->write("[DEBUG] Fail to copy annotation.ini to annotation_backup.ini (No file found)");
+    }
+    //데이터 입력(로케이션)
+    int other_num = 0;
+    int resting_num = 0;
+    int charging_num = 0;
+    int serving_num = 0;
+    int group_num[pmap->location_groups.size()];
+    for(int i=0; i<pmap->location_groups.size(); i++)
+        group_num[i] = 0;
+
+    QString str_name;
+    QSettings settings(origin, QSettings::IniFormat);
+    settings.clear();
+    for(int i=0; i<pmap->locations.size(); i++){
+        if(pmap->locations[i].type == "Resting"){
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number)+","+pmap->locations[i].call_id;
+            settings.setValue("resting_locations/loc"+QString::number(resting_num),str_name);
+            resting_num++;
+        }else if(pmap->locations[i].type == "Other"){
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number)+","+pmap->locations[i].call_id;
+            settings.setValue("other_locations/loc"+QString::number(other_num),str_name);
+            other_num++;
+        }else if(pmap->locations[i].type == "Serving"){
+            QString groupname = "serving_" + QString::number(pmap->locations[i].group);
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number)+","+pmap->locations[i].call_id;
+            settings.setValue(groupname+"/loc"+QString::number(group_num[pmap->locations[i].group]),str_name);
+            group_num[pmap->locations[i].group]++;
+        }else if(pmap->locations[i].type == "Charging"){
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number)+","+pmap->locations[i].call_id;
+            settings.setValue("charging_locations/loc"+QString::number(charging_num),str_name);
+            charging_num++;
+        }
+    }
+    settings.setValue("resting_locations/num",resting_num);
+    settings.setValue("serving_locations/group",pmap->location_groups.size());
+    settings.setValue("other_locations/num",other_num);
+    settings.setValue("charging_locations/num",charging_num);
+
+    for(int i=0; i<pmap->location_groups.size(); i++){
+        settings.setValue("serving_"+QString::number(i)+"/name",pmap->location_groups[i]);
+        settings.setValue("serving_"+QString::number(i)+"/num",getLocationGroupSize(i));
+    }
+
+    pmap->annotation_edited = false;
+}
+
+int MapView::getLocationGroupSize(int num){
+    int size = 0;
+    if(num > -1 && num < pmap->location_groups.size()){
+        for(int i=0; i<pmap->locations.size(); i++){
+            if(pmap->locations[i].type == "Serving")
+                if(pmap->locations[i].group == num)
+                    size++;
+        }
+    }
+//    qDebug() << "location group size " << num << size << pmap->locations.size();
+    return size;
+}
 void MapView::clearLocation(){
     new_location_flag = false;
     new_location.name = "";

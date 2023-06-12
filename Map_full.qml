@@ -230,6 +230,10 @@ Item {
         mapview.setMapping();
     }
 
+    function setScreen(s,x,y){
+        mapview.setScreen(s,x,y);
+    }
+
     function setcostmap(){
 
         mapview.setCostMap();
@@ -343,6 +347,8 @@ Item {
             mapview.saveVelmap();
         }else if(mode==="rotate"){
             mapview.cutMap();
+        }else if(mode==="location_all"){
+            mapview.saveAnnotation(map_name);
         }
     }
 
@@ -435,13 +441,13 @@ Item {
             }
             NumberAnimation{
                 id: show_ani
-                target: parent
+                target: rect_notice
                 property: "y"
                 from: -height
-                to: 0
+                to: -10
                 duration: 500
                 onStarted: {
-                    parent.visible = true;
+                    rect_notice.visible = true;
                 }
                 onFinished: {
 
@@ -449,15 +455,15 @@ Item {
             }
             NumberAnimation{
                 id: unshow_ani
-                target: parent
+                target: rect_notice
                 property: "y"
-                from: 0
+                from: -10
                 to: -height
                 duration: 500
                 onStarted: {
                 }
                 onFinished: {
-                    parent.visible = false;
+                    rect_notice.visible = false;
                 }
             }
             visible: false

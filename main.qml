@@ -80,8 +80,28 @@ Window {
     property string cur_location;
 
     function movefail(){
-        if(loader_page.item.objectName != "page_movefail" && loader_page.item.objectName != "page_map"&& loader_page.item.objectName != "page_setting"){
+        if(loader_page.item.objectName == "page_annotation"){
+            if(supervisor.getEmoStatus()){
+                loader_page.item.movefail(2);
+                voice_all_stop();
+                voice_emergency.play();
+            }else if(supervisor.getMotorState() === 0){
+                loader_page.item.movefail(4);
+                voice_all_stop();
+            }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
+                loader_page.item.movefail(1);
+                voice_all_stop();
+                voice_localfail.play();
+            }else if(supervisor.getStateMoving() === 0){
+                loader_page.item.movefail(0);
+                voice_all_stop();
+                play_movefailmsg();
+            }else{
+                supervisor.writelog("[MOVEFAIL] WEIRED MOVEFAIL : "+supervisor.getStateMoving().toString()+","+supervisor.getLocalizationState().toString()+","+supervisor.getMotorState().toString())
+            }
+        }else if(loader_page.item.objectName == "page_movefail" || loader_page.item.objectName == "page_map" || loader_page.item.objectName == "page_setting"){
 
+        }else{
             //0: no path /1: local fail /2: emergency /3: user stop /4: motor error
             if(supervisor.getEmoStatus()){
                 loadPage(pmovefail);
@@ -163,9 +183,14 @@ Window {
             str_target = curtable + "번 테이블";
             supervisor.writelog("[QML - MOVING] MOVE TO " + str_target);
         }
-        loadPage(pmoving)
-        loader_page.item.pos_name = cur_location;
-        loader_page.item.pos = str_target;
+
+        if(loader_page.item.objectName == "page_annotation"){
+            loader_page.item.movestart();
+        }else{
+            loadPage(pmoving)
+            loader_page.item.pos_name = cur_location;
+            loader_page.item.pos = str_target;
+        }
     }
     function play_movefailmsg(){
         print("play movefail");
@@ -181,8 +206,12 @@ Window {
         supervisor.writelog("[QML - MAIN] Do Charging");
     }
     function waitkitchen(){
-        loadPage(pkitchen)
-        supervisor.writelog("[QML - MAIN] Do Wait Kitchen");
+        if(loader_page.item.objectName == "page_annotation"){
+            loader_page.item.movedone();
+        }else{
+            loadPage(pkitchen)
+            supervisor.writelog("[QML - MAIN] Do Wait Kitchen");
+        }
     }
 
     function clearkitchen(){
@@ -376,7 +405,7 @@ Window {
             timer_update.start();
             loader_page.item.init();
         }
-        source: pannotation
+        source: pmap// pinit
     }
 
     Timer{

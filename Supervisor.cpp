@@ -679,6 +679,30 @@ QList<int> Supervisor::getCamera(int num){
 //        return temp;
 //    }
 }
+
+void Supervisor::drawingRunawayStart(){
+    IPCHandler::CMD send_msg;
+    send_msg.cmd = ROBOT_CMD_DRAW_LINE_START;
+    ipc->set_cmd(send_msg);
+}
+void Supervisor::drawingRunawayStop(){
+    IPCHandler::CMD send_msg;
+    send_msg.cmd = ROBOT_CMD_DRAW_LINE_SAVE;
+    ipc->set_cmd(send_msg);
+}
+int Supervisor::getRunawayState(){
+    return probot->drawing_state;
+}
+void Supervisor::SLAM_map_reload(){
+    IPCHandler::CMD send_msg;
+    send_msg.cmd = ROBOT_CMD_MAP_RELOAD;
+    ipc->set_cmd(send_msg);
+}
+void Supervisor::SLAM_ini_reload(){
+    IPCHandler::CMD send_msg;
+    send_msg.cmd = ROBOT_CMD_SETTING_RELOAD;
+    ipc->set_cmd(send_msg);
+}
 QString Supervisor::getCameraSerial(int num){
     try{
         if(num > -1 && num < pmap->camera_info.size()){
