@@ -405,7 +405,7 @@ Window {
             timer_update.start();
             loader_page.item.init();
         }
-        source: pmap// pinit
+        source: pinit
     }
 
     Timer{

@@ -580,6 +580,11 @@ Item {
                             timer_check_localization.stop();
                             map.setViewer("localization");
                         }
+
+                        if(!supervisor.getLCMConnection()){
+                            local_find_state = 10;
+                            timer_check_localization.stop();
+                        }
                     }
 
                 }
@@ -603,8 +608,19 @@ Item {
                 font.family: font_noto_b.name
             }
             Text{
+                id: text_failed_connection
+                visible: local_find_state===10
+                text: "로봇과 연결이 되지 않았습니다."
+                color: "white"
+                font.pixelSize: 60
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 140
+                font.family: font_noto_b.name
+            }
+            Text{
                 id: text_find
-                visible: local_find_state>1
+                visible: local_find_state===2||local_find_state===3
                 text:local_find_state===2?"로봇의 위치를 찾았습니다. 로봇의 위치가 정확합니까?":"로봇의 위치를 찾을 수 없습니다. 로봇의 위치를 맵 상에서 표시해주세요."
                 font.pixelSize: 40
                 horizontalAlignment: Text.AlignHCenter
@@ -772,6 +788,45 @@ Item {
                             annot_pages.sourceComponent = page_annot_location_charging;
                         else
                             annot_pages.sourceComponent = page_annot_menu;
+                        parent.color = "transparent";
+                    }
+                }
+            }
+            Rectangle{
+                id: btn_right3
+                visible: local_find_state===10
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.bottomMargin: 50
+                anchors.rightMargin: 50
+                width: 200
+                height: 80
+                radius: 15
+                border.width: 2
+                enabled: false
+                border.color: "white"
+                color: enabled?"transparent":color_mid_gray
+                Text{
+                    Component.onCompleted: {
+                        scale = 1;
+                        while(width*scale > 180){
+                            scale=scale-0.01;
+                        }
+                    }
+                    anchors.centerIn: parent
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                    color: "white"
+                    text: "프로그램 다시시작"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onPressed:{
+                        parent.color = color_mid_navy;
+                    }
+                    onReleased: {
+                        supervisor.writelog("[ANNOTATION] Localization : Connection Failed. Restart");
+                        supervisor.programRestart();
                         parent.color = "transparent";
                     }
                 }
