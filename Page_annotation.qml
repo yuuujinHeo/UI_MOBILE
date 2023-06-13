@@ -604,13 +604,13 @@ Item {
                             supervisor.slam_autoInit();
                         }else if(local_find_state === 2){//success
                             loading.hide();
-                            timer_check_localization.stop();
                             map.setViewer("local_view");
+                            timer_check_localization.stop();
                         }else if(local_find_state === 3){//failed
                             loading.hide();
+                            map.setViewer("localization");
                             timer_check_localization2.start();
                             timer_check_localization.stop();
-                            map.setViewer("localization");
                         }
 
                         if(!supervisor.getLCMConnection()){
@@ -726,6 +726,38 @@ Item {
                             map.setTool("slam_init");
                             supervisor.setInitCurPos();
                             supervisor.slam_setInit();
+                        }
+                    }
+                }
+                Rectangle{
+                    visible: local_find_state===3
+                    width: 200
+                    height: 80
+                    radius: 15
+                    border.width: 2
+                    border.color: "white"
+                    color: "transparent"
+                    Text{
+                        Component.onCompleted: {
+                            scale = 1;
+                            while(width*scale > 180){
+                                scale=scale-0.01;
+                            }
+                        }
+                        horizontalAlignment: Text.AlignHCenter
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 30
+                        color: "white"
+                        text: "자동위치찾기\n(1분소요)"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            print("slam auto init");
+                            map.setTool("move");
+                            supervisor.slam_fullautoInit();
+                            timer_check_localization2.start();
                         }
                     }
                 }
@@ -901,6 +933,7 @@ Item {
                     onReleased: {
                         supervisor.writelog("[ANNOTATION] Localization : Failed")
                         local_find_state = 3;
+                        map.setViewer("localization");
                         timer_check_localization2.start();
                         parent.color = "transparent";
                     }
@@ -1334,6 +1367,7 @@ Item {
             height: annot_pages.height
             Component.onCompleted: {
                 supervisor.setMotorLock(true);
+                supervisor.clearFlagStop();
             }
             Rectangle{
                 anchors.fill: parent
@@ -1582,6 +1616,7 @@ Item {
             height: annot_pages.height
             Component.onCompleted: {
                 supervisor.setMotorLock(true);
+                supervisor.clearFlagStop();
             }
 
             Timer{
@@ -1928,9 +1963,83 @@ Item {
                         parent.color = color_mid_navy;
                     }
                     onReleased: {
-                        supervisor.writelog("[ANNOTATION] LOCAION SAVE : Serving Done ");
-                        annot_pages.sourceComponent = page_annot_location_serving_done;
+                        popup_drawing_notice.open();
                         parent.color = "transparent";
+                    }
+                }
+            }
+
+            Popup{
+                id: popup_drawing_notice
+                width: 1280
+                height:800
+                y:-statusbar.height
+                background:Rectangle{
+                    anchors.fill: parent
+                    color: color_dark_black
+                    opacity: 0.8
+                }
+                Rectangle{
+                    anchors.centerIn: parent
+                    width: 1280
+                    height: 500
+                    radius: 20
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 50
+                        Text{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.family: font_noto_r.name
+                            font.pixelSize: 30
+                            horizontalAlignment: Text.AlignHCenter
+                            text: "로봇이 움직이는 대로 이동경로를 학습합니다.\n로봇이 주행가능한 길을 대기위치와 각 서빙위치 별로 가능한 여러번 학습시켜주세요.\n지금부터 로봇을 끌고 이동하시다 완료 버튼을 눌러주세요."
+                        }
+                        Row{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 50
+                            Rectangle{
+                                width:220
+                                height: 80
+                                radius: 20
+                                color: color_navy
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 20
+                                    color: "white"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    text: "창 닫기\n(학습된 기록은 유지)"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        popup_drawing_notice.close();
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width:220
+                                height: 80
+                                radius: 20
+                                color: color_navy
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 20
+                                    color: "white"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    text: "완 료"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        supervisor.writelog("[ANNOTATION] LOCAION SAVE : Serving Done ");
+                                        annot_pages.sourceComponent = page_annot_location_serving_done;
+                                        popup_drawing_notice.close();
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1960,7 +2069,7 @@ Item {
                     onTriggered:{
                         map_location.loadmap(supervisor.getMapname(),"EDITED");
                         map_location.setfullscreen();
-                        map_location.move(0,0);
+//                        map_location.move(0,0);
                     }
                 }
 
@@ -2898,6 +3007,7 @@ Item {
             Component.onCompleted: {
                 supervisor.setMotorLock(true);
                 readSetting();
+                supervisor.clearFlagStop();
             }
             Rectangle{
                 anchors.fill: parent
@@ -3074,7 +3184,7 @@ Item {
                 id: detaillocCompo
                 Item{
                     width: parent.width
-                    height: 40
+                    height: 50
                     Component.onCompleted: {
                         combo_number.model.append({"value":"지정 안됨"})
                         for(var i=0; i<number_table; i++){
@@ -3089,7 +3199,7 @@ Item {
                             id: combo_group
                             visible: use_group && type === "Serving"
                             width: 170
-                            height: 40
+                            height: 50
                             model: groups
                             currentIndex: group
                             onCurrentIndexChanged: {
@@ -3102,7 +3212,7 @@ Item {
                             id: tx_name
                             text: name
                             width:type==="Serving"?320:use_group?320+170+180:320+175
-                            height: 40
+                            height: 50
                             font.family: font_noto_r.name
                             font.pixelSize: 20
                             horizontalAlignment: Text.AlignHCenter
@@ -3133,7 +3243,7 @@ Item {
                         ComboBox{
                             id: combo_number
                             width : error?170-45:170
-                            height: 40
+                            height: 50
                             visible: type ==="Serving"
                             model: ListModel{}
                             currentIndex: number==-1?0:number
@@ -3146,7 +3256,7 @@ Item {
                         }
                         Rectangle{
                             width : 170
-                            height: 40
+                            height: 50
                             visible: use_callbell
                             Text{
                                 anchors.centerIn: parent
@@ -3156,7 +3266,7 @@ Item {
                         }
                         Rectangle{
                             width : 100
-                            height: 40
+                            height: 50
                             radius: 5
                             visible: use_callbell
                             color: "black"
@@ -3177,7 +3287,7 @@ Item {
 
                         Rectangle{
                             width : 100
-                            height: 40
+                            height: 50
                             radius: 5
                             color: "black"
                             Text{
@@ -3299,7 +3409,7 @@ Item {
                             id: list_location_detail
                             width: parent.width
                             height: parent.height
-                            spacing: 3
+                            spacing: 5
                             clip: true
                             anchors.horizontalCenter: parent.horizontalCenter
                             delegate: detaillocCompo

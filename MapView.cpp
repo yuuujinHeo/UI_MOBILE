@@ -95,7 +95,7 @@ void MapView::setMode(QString name){
         show_object_box = false;
         show_location = false;
         show_location_icon = false;
-        robot_following = false;
+        robot_following = true;
         setFullScreen();
     }else if(mode == "current"){
         show_robot = true;
@@ -320,7 +320,7 @@ void MapView::updateMap(){
     setMapLocation();
     setMapObject();
     update();
-    qDebug() << "updatemap done";
+//    qDebug() << "updatemap done";
 }
 void MapView::setMapMap(){
     if(map_orin.cols > 0 && map_orin.rows > 0 && mode != "mapping"){

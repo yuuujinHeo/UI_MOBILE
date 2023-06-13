@@ -462,12 +462,6 @@ Item {
                                 }
                             }
                         }
-//                        DropShadow{
-//                            anchors.fill: parent
-//                            radius: 15
-//                            color: "#d0d0d0"
-//                            source: rect_btn
-//                        }
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {

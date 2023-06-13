@@ -109,7 +109,7 @@ Item {
         }else if(mode === "annot_location"){
             mapview.setCostMap();
         }else if(mode === "mapping"){
-            show_button_following = false;
+            show_button_following = true;
             show_button_lidar = false;
             show_button_object = false;
             show_button_location = false;

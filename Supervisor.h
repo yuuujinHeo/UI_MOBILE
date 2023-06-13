@@ -499,6 +499,8 @@ public:
     Q_INVOKABLE void setRotateList(QString name);
     Q_INVOKABLE void startPatrol(QString mode, bool pickup);
 
+    Q_INVOKABLE void clearFlagStop();
+    Q_INVOKABLE void slam_fullautoInit();
     Q_INVOKABLE void moveToServingTest(QString name);
     Q_INVOKABLE void startServingTest();
     Q_INVOKABLE void stopServingTest();

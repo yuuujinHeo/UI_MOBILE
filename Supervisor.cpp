@@ -1361,6 +1361,14 @@ void Supervisor::slam_autoInit(){
         lcm->sendCommand(ROBOT_CMD_SLAM_AUTO, "LOCALIZATION AUTO INIT");
     }
 }
+void Supervisor::slam_fullautoInit(){
+    if(probot->ipc_use){
+        plog->write("[LOCALIZATION] FULL AUTO INIT : "+QString::number(pmap->map_rotate_angle));
+        ipc->set_cmd(ROBOT_CMD_SLAM_FULL_AUTO, "LOCALIZATION FULL AUTO INIT");
+    }else{
+        lcm->sendCommand(ROBOT_CMD_SLAM_FULL_AUTO, "LOCALIZATION FULL AUTO INIT");
+    }
+}
 bool Supervisor::is_slam_running(){
     if(probot->localization_state == LOCAL_READY){
         return true;
@@ -2454,6 +2462,11 @@ void Supervisor::moveResume(){
         lcm->moveResume();
     }
 }
+void Supervisor::clearFlagStop(){
+    ui_cmd = UI_CMD_NONE;
+//    ui_state = UI_STATE_READY;
+    ui_state = UI_STATE_INIT_DONE;
+}
 void Supervisor::moveStop(){
     if(probot->ipc_use){
         ipc->moveStop();
@@ -2966,12 +2979,15 @@ void Supervisor::startServingTest(){
     patrol_use_pickup = true;
 }
 void Supervisor::moveToServingTest(QString name){
-    probot->trays[0].empty = false;
-    probot->trays[0].location = getLocation(name);
-
-    ui_state = UI_STATE_INIT_DONE;
-    qDebug() << pmap->locations.size() << probot->trays[0].location.name << probot->trays[0].location.number;
-    ui_cmd = UI_CMD_MOVE_TABLE;
+    if(probot->trays[0].empty){
+        ui_state = UI_STATE_INIT_DONE;
+        probot->trays[0].empty = false;
+        probot->trays[0].location = getLocation(name);
+        qDebug() << pmap->locations.size() << probot->trays[0].location.name << probot->trays[0].location.number;
+        ui_cmd = UI_CMD_MOVE_TABLE;
+    }else{
+        plog->write("[USER INPUT] move serving test "+name+" but already moving");
+    }
 }
 void Supervisor::stopServingTest(){
     plog->write("[USER INPUT] STOP PATROL SERVING");

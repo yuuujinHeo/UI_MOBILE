@@ -2278,13 +2278,13 @@ Item {
                 statusbar.visible = true;
             }
             function enable_rawmap(){
-                notice_map_raw.enabled = true;
+//                notice_map_raw.enabled = true;
             }
             function disable_rawmap(){
                 notice_map_raw.enabled = false;
             }
             function enable_availablemap(){
-                notice_map_edited.enabled = true;
+//                notice_map_edited.enabled = true;
             }
             function disable_availablemap(){
                 notice_map_edited.enabled = false;
@@ -2371,8 +2371,7 @@ Item {
                             anchors.fill: parent
                             onClicked: {
                                 supervisor.writelog("[USER INPUT] INIT PAGE : MAKE NEW MAP")
-                                loadPage(pmap);
-                                loader_page.item.map_mode = 1;
+                                loadPage(pmapping);
                             }
                         }
                     }
@@ -2740,6 +2739,10 @@ Item {
             Component.onCompleted: {
                 statusbar.visible = true;
             }
+            function show_auto(){
+                btn_slam_fullauto.visible = true;
+            }
+
             Rectangle{
                 anchors.fill: parent
                 color: "#f4f4f4"
@@ -2796,6 +2799,42 @@ Item {
                 font.pixelSize: 50
             }
             Rectangle{
+                id: btn_slam_fullauto
+                width: 150
+                height: 120
+                radius: 60
+                visible: false
+                color: "white"
+                border.width: 2
+                border.color: color_mid_gray
+                anchors.right: btn_slam_do_init.left
+                anchors.rightMargin: 30
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 100
+                Text{
+                    anchors.centerIn: parent
+                    text: "자동찾기"
+                    color: color_mid_gray
+                    font.family: font_noto_r.name
+                    font.pixelSize: 40
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onPressed:{
+                        parent.color = color_mid_green;
+                    }
+                    onReleased: {
+                        parent.color = color_green;
+                    }
+                    onClicked: {
+                        supervisor.writelog("[USER INPUT] INIT PAGE : DO FULL LOCALIZATION")
+                        update_timer.stop();
+                        popup_localization_start.auto_mode = true;
+                        popup_localization_start.open();
+                    }
+                }
+            }
+            Rectangle{
                 id: btn_slam_do_init
                 width: 300
                 height: 120
@@ -2824,6 +2863,7 @@ Item {
                     onClicked: {
                         supervisor.writelog("[USER INPUT] INIT PAGE : DO LOCALIZATION")
                         update_timer.stop();
+                        popup_localization_start.auto_mode = false;
                         popup_localization_start.open();
                     }
                 }
@@ -2953,8 +2993,8 @@ Item {
 
         Rectangle{
             anchors.centerIn: parent
-            width: 900
-            height: 800
+            width: 800
+            height: 750
             radius: 20
             color: color_dark_navy
             Column{
@@ -2971,50 +3011,91 @@ Item {
                 Map_full{
                     id: mapview_localization
                     objectName: "localview"
-                    width: 500
+                    width: 550
                     height: width
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
                 Row{
                     anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 30
+                    spacing: 50
                     Rectangle{
-                        width: 130
-                        height: 80
+                        width: 150
+                        height: 70
                         radius: 20
-                        border.width: 1
+                        border.width: 2
+                        color: "transparent"
+                        border.color: "white"
                         Text{
                             anchors.centerIn: parent
                             text: "확인"
+                            color: "white"
                             font.family: font_noto_r.name
-                            font.pixelSize: 20
+                            font.pixelSize: 30
                         }
                         MouseArea{
                             anchors.fill: parent
-                            onClicked:{
-                                popup_localization_done.close();
+                            onPressed:{
+                                parent.color = color_mid_navy
+                            }
+                            onReleased:{
+                                parent.color = "transparent"
                                 update_timer.start();
-                                //localization done
+                                popup_localization_done.close();
                             }
                         }
                     }
                     Rectangle{
-                        width: 130
-                        height: 80
+                        width: 150
+                        height: 70
                         radius: 20
-                        border.width: 1
+                        color: "transparent"
+                        border.width: 2
+                        border.color: "white"
                         Text{
                             anchors.centerIn: parent
                             text: "재시도"
+                            color: "white"
                             font.family: font_noto_r.name
-                            font.pixelSize: 20
+                            font.pixelSize: 30
                         }
                         MouseArea{
                             anchors.fill: parent
-                            onClicked:{
+                            onPressed:{
+                                parent.color = color_mid_navy
+                            }
+                            onReleased:{
+                                parent.color = "transparent"
+                                popup_localization_start.auto_mode = false;
                                 popup_localization_start.open();
                                 popup_localization_done.close();
-                                //localization done
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 150
+                        height: 70
+                        radius: 20
+                        color: "transparent"
+                        border.width: 2
+                        border.color: "white"
+                        Text{
+                            anchors.centerIn: parent
+                            horizontalAlignment: Text.AlignHCenter
+                            text: "자동찾기\n(약 1분소요)"
+                            color: "white"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onPressed:{
+                                parent.color = color_mid_navy
+                            }
+                            onReleased:{
+                                parent.color = "transparent"
+                                popup_localization_start.auto_mode = true;
+                                popup_localization_start.open();
+                                popup_localization_done.close();
                             }
                         }
                     }
@@ -3046,13 +3127,19 @@ Item {
         bottomPadding: 0
         leftPadding: 0
         rightPadding: 0
+        property bool auto_mode: false
         background: Rectangle{
             anchors.fill: parent
             color: "transparent"
         }
         onOpened: {
-            supervisor.writelog("[QML] INIT PAGE -> LOCALIZATION AUTO ")
-            supervisor.slam_autoInit();
+            if(auto_mode){
+                supervisor.writelog("[QML] INIT PAGE -> FULL LOCALIZATION AUTO ")
+                supervisor.slam_fullautoInit();
+            }else{
+                supervisor.writelog("[QML] INIT PAGE -> LOCALIZATION AUTO ")
+                supervisor.slam_autoInit();
+            }
             local_text.text = "로봇의 위치를 찾는 중입니다."
             local_text.font.pixelSize = 30;
             popup_loading.open();
@@ -3076,6 +3163,7 @@ Item {
                 }else if(supervisor.getLocalizationState() === 3){
                     popup_loading.close();
                     local_text.font.pixelSize = 18;
+                    loader_init.item.show_auto();
                     local_text.text = "로봇의 위치를 찾을 수 없습니다\n로봇이 바라보는 방향에 유의하여 대기위치로 이동시켜주세요."
                 }else{
                     local_text.text = "로봇의 위치를 찾는 중입니다."
