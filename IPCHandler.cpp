@@ -9,12 +9,14 @@ IPCHandler::IPCHandler(QObject *parent)
     , shm_obs("slamnav_obs")
     , shm_cam0("slamnav_cam0")
     , shm_cam1("slamnav_cam1")
+    , shm_ui_status("slamnav_ui_status")
 {
     // msg tick clear, check for new data
     tick = 0;
 
     // create or attach
     updateSharedMemory(shm_cmd,"Command",sizeof(IPCHandler::CMD));
+    updateSharedMemory(shm_ui_status,"UiStatus",sizeof(IPCHandler::UI_STATUS));
     updateSharedMemory(shm_status,"Status",sizeof(IPCHandler::STATUS));
     updateSharedMemory(shm_path,"Path",sizeof(IPCHandler::PATH));
     updateSharedMemory(shm_map,"Map",sizeof(IPCHandler::MAP));
@@ -71,6 +73,7 @@ void IPCHandler::detachSharedMemory(QSharedMemory &mem, QString name){
 }
 void IPCHandler::update(){
     updateSharedMemory(shm_cmd,"Command",sizeof(IPCHandler::CMD));
+    updateSharedMemory(shm_ui_status,"UiStatus",sizeof(IPCHandler::UI_STATUS));
     updateSharedMemory(shm_status,"Status",sizeof(IPCHandler::STATUS));
     updateSharedMemory(shm_path,"Path",sizeof(IPCHandler::PATH));
     updateSharedMemory(shm_map,"Map",sizeof(IPCHandler::MAP));
@@ -82,6 +85,7 @@ void IPCHandler::update(){
 IPCHandler::~IPCHandler()
 {
     detachSharedMemory(shm_cmd,"Command");
+    detachSharedMemory(shm_ui_status,"UiStatus");
     detachSharedMemory(shm_status,"Status");
     detachSharedMemory(shm_path,"Path");
     detachSharedMemory(shm_map,"Map");
@@ -106,6 +110,7 @@ void IPCHandler::onTimer(){
         flag_objecting = false;
     }
 
+    set_status_ui();
     if(getConnection() && probot->localization_state==LOCAL_READY){
         probot->lastPose = probot->curPose;
     }
@@ -158,6 +163,7 @@ void IPCHandler::onTimer(){
         for(int i=0; i<360; i++){
             probot->lidar_data[i] = temp1.robot_scan[i];
         }
+//        qDebug() << probot->curPose.point.x << probot->curPose.point.y << probot->curPose.angle << probot->lidar_data[0];
         prev_tick_status = temp1.tick;
     }
 
@@ -400,7 +406,16 @@ void IPCHandler::set_cmd(int cmd, QString log){
     send_msg.cmd = cmd;
     set_cmd(send_msg,log);
 }
-
+void IPCHandler::set_status_ui(){
+    IPCHandler::UI_STATUS val;
+    val.ui_map_rotate_angle = pmap->map_rotate_angle;
+    shm_ui_status.lock();
+    flag_tx = true;
+    val.tick = ++tick;
+    memcpy((char*)shm_ui_status.data(), &val, sizeof(IPCHandler::UI_STATUS));
+//    plog->write("[IPC] SET UI Status");
+    shm_ui_status.unlock();
+}
 ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
 void IPCHandler::moveToServing(QString target_loc, int preset){
     bool match = false;
@@ -554,16 +569,21 @@ void IPCHandler::saveMapping(QString name){
     set_cmd(send_msg,"SAVE MAPPING ("+name+")");
 }
 
-void IPCHandler::startMapping(float grid_size){
+void IPCHandler::startMapping(int map_size, float grid_size){
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_MAPPING_START;
     uint8_t *array;
-    array = reinterpret_cast<uint8_t*>(&grid_size);
+    array = reinterpret_cast<uint8_t*>(&map_size);
     send_msg.params[0] = array[0];
     send_msg.params[1] = array[1];
     send_msg.params[2] = array[2];
     send_msg.params[3] = array[3];
-    set_cmd(send_msg,"START MAPPING "+QString().sprintf("(grid size = %f)",grid_size));
+    array = reinterpret_cast<uint8_t*>(&grid_size);
+    send_msg.params[4] = array[0];
+    send_msg.params[5] = array[1];
+    send_msg.params[6] = array[2];
+    send_msg.params[7] = array[3];
+    set_cmd(send_msg,"START MAPPING "+QString().sprintf("(map size = %d, grid size = %f)",map_size, grid_size));
 }
 void IPCHandler::stopMapping(){
     IPCHandler::CMD send_msg;

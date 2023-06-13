@@ -56,8 +56,8 @@ Item {
     }
 
     Component.onCompleted: {
-        mapview.setRawMap("");
         mapview.setName(objectName);
+        mapview.setRawMap("");
         mapview.setMapSize(width, height);
     }
 
@@ -135,6 +135,13 @@ Item {
             show_button_lidar = false;
             show_button_object = false;
             show_button_location = false;
+        }else if(mode === "localization"){
+            show_grid = false;
+            show_connection = true;
+            show_button_following = false;
+            show_button_lidar = false;
+            show_button_object = false;
+            show_button_location = false;
         }
     }
 
@@ -189,8 +196,10 @@ Item {
             map_name = name;
         }
 
+        print("loadmap "+objectName + " : "+ name,type);
         if(typeof(type) !== 'undefined'){
             map_type = type;
+            timer_loadmap.stop();
             if(type === "MINIMAP"){
 
             }else if(type === "RAW"){
@@ -962,7 +971,7 @@ Item {
     //최초 실행 후 맵 파일을 받아올 수 있을 때까지 1회 수행
     Timer{
         id: timer_loadmap
-        running: true
+        running: parent.enabled
         repeat: true
         interval: 500
         onTriggered: {
@@ -970,12 +979,17 @@ Item {
             if(supervisor.isloadMap()){
                 //맵 정보 받아옴(경로, 이름)
                 map_name = supervisor.getMapname();
-                loadmap(map_name,"EDITED");
+                if(supervisor.isExistMap(map_name)){
+                    loadmap(map_name,"EDITED");
+                }else{
+                    loadmap(map_name,"RAW");
+                }
+
                 setfullscreen();
 
                 //타이머 종료
                 timer_loadmap.stop();
-                supervisor.writelog("[QML] Load Map(AUTO) : "+map_name);
+                supervisor.writelog("[QML] Load Map(AUTO) "+parent.objectName+": "+map_name);
             }
         }
     }

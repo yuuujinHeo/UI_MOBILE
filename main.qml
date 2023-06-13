@@ -197,8 +197,12 @@ Window {
         voice_movefail.play();
     }
     function docharge(){
-        loadPage(pcharging)
-        supervisor.writelog("[QML - MAIN] Do Charging");
+        if(loader_page.item.objectName == "page_annotation"){
+            loader_page.item.movedone();
+        }else{
+            loadPage(pcharging)
+            supervisor.writelog("[QML - MAIN] Do Charging");
+        }
     }
     function dochargeininit(){
         loadPage(pcharging)
@@ -234,7 +238,7 @@ Window {
 
     function updatemapping(){
 //        mapview.setMap(supervisor.getMapping())
-        if(loader_page.item.objectName == "page_map"){
+        if(loader_page.item.objectName == "page_map"||loader_page.item.objectName == "page_mapping"){
             loader_page.item.update_mapping();
         }
     }
@@ -255,32 +259,37 @@ Window {
         loadPage(pkitchen);
     }
     function showpickup(){
-        robot_type = supervisor.getRobotType();
-        if(supervisor.isCallingMode()){
-            loadPage(ppickupCall);
-            loader_page.item.init();
+        if(loader_page.item.objectName == "page_annotation"){
+            loader_page.item.movedone();
         }else{
-            loadPage(ppickup);
-            loader_page.item.init();
-            var trays = supervisor.getPickuptrays();
-            var tempstr = "";
-            for(var i=0; i<trays.length; i++){
-                if(tempstr === ""){
-                    tempstr = Number(trays[i])+"번";
-                }else{
-                    tempstr += "과 " + Number(trays[i])+"번";
+
+            robot_type = supervisor.getRobotType();
+            if(supervisor.isCallingMode()){
+                loadPage(ppickupCall);
+                loader_page.item.init();
+            }else{
+                loadPage(ppickup);
+                loader_page.item.init();
+                var trays = supervisor.getPickuptrays();
+                var tempstr = "";
+                for(var i=0; i<trays.length; i++){
+                    if(tempstr === ""){
+                        tempstr = Number(trays[i])+"번";
+                    }else{
+                        tempstr += "과 " + Number(trays[i])+"번";
+                    }
+                    if(trays[i] === 1){
+                        loader_page.item.pickup_1 = true;
+                    }else if(trays[i] === 2){
+                        loader_page.item.pickup_2 = true;
+                    }else if(trays[i] === 3){
+                        loader_page.item.pickup_3 = true;
+                    }
                 }
-                if(trays[i] === 1){
-                    loader_page.item.pickup_1 = true;
-                }else if(trays[i] === 2){
-                    loader_page.item.pickup_2 = true;
-                }else if(trays[i] === 3){
-                    loader_page.item.pickup_3 = true;
-                }
+    //            loader_page.item.play_voice();
+                loader_page.item.pos = tempstr;
+                supervisor.writelog("[QML - MAIN] Show Pickup Page : " + loader_page.item.pos);
             }
-//            loader_page.item.play_voice();
-            loader_page.item.pos = tempstr;
-            supervisor.writelog("[QML - MAIN] Show Pickup Page : " + loader_page.item.pos);
 
         }
     }
@@ -568,7 +577,6 @@ Window {
 
     Item_statusbar{
         id: statusbar
-        visible: false
     }
 
 //    Loading{

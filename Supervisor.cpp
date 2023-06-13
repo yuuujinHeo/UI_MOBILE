@@ -91,11 +91,11 @@ Supervisor::Supervisor(QObject *parent)
     plog->write("[BUILDER] SUPERVISOR constructed");
 
 
-//    QProcess *process = new QProcess(this);
-//    QString file = QDir::homePath() + "/auto_reset.sh";
-//    process->start(file);
-//    process->waitForReadyRead();
-//    startSLAM();
+    QProcess *process = new QProcess(this);
+    QString file = QDir::homePath() + "/auto_reset.sh";
+    process->start(file);
+    process->waitForReadyRead();
+    startSLAM();
 
     wifi_process = new QProcess();
     connect(wifi_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_con_output()));
@@ -693,12 +693,13 @@ void Supervisor::drawingRunawayStop(){
 int Supervisor::getRunawayState(){
     return probot->drawing_state;
 }
-void Supervisor::SLAM_map_reload(){
+void Supervisor::slam_map_reload(QString filename){
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_MAP_RELOAD;
+    memcpy(send_msg.params,filename.toUtf8(),sizeof(char)*255);
     ipc->set_cmd(send_msg);
 }
-void Supervisor::SLAM_ini_reload(){
+void Supervisor::slam_ini_reload(){
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_SETTING_RELOAD;
     ipc->set_cmd(send_msg);
@@ -1042,7 +1043,8 @@ void Supervisor::makeRobotINI(){
         setSetting("SENSOR/right_camera_tf","0.23,-0.155,0.27,-90,0,-90");
 
         readSetting();
-        restartSLAM();
+        slam_ini_reload();
+//        restartSLAM();
     }
 }
 
@@ -1147,7 +1149,8 @@ void Supervisor::setMap(QString name){
     setSetting("FLOOR/map_name",name);
     setSetting("FLOOR/map_load","true");
     readSetting(name);
-    restartSLAM();
+    slam_map_reload(name);
+//    restartSLAM();
 //    lcm->restartSLAM();
 }
 
@@ -1156,7 +1159,8 @@ void Supervisor::loadMap(QString name){
     setSetting("FLOOR/map_name",name);
     setSetting("FLOOR/map_load","false");
     readSetting(name);
-    restartSLAM();
+    slam_map_reload(name);
+//    restartSLAM();
 //    readSetting()
 }
 
@@ -1235,15 +1239,17 @@ void Supervisor::startSLAM(){
 }
 
 ////*******************************************  SLAM(LOCALIZATION) 관련   ************************************************////
-void Supervisor::startMapping(float grid){
+void Supervisor::startMapping(int mapsize, float grid){
     plog->write("[USER INPUT] START MAPPING");
     pmap->width = getSetting("ROBOT_SW","map_size").toInt();
     pmap->height = getSetting("ROBOT_SW","map_size").toInt();
     pmap->gridwidth = getSetting("ROBOT_SW","grid_size").toFloat();
     pmap->origin[0] = pmap->width/2;
     pmap->origin[1] = pmap->height/2;
+    pmap->mapping_width=mapsize;
+    pmap->mapping_gridwidth=grid;
     if(probot->ipc_use){
-        ipc->startMapping(grid);
+        ipc->startMapping(mapsize, grid);
         ipc->is_mapping = true;
     }else{
         lcm->startMapping(grid);
@@ -1264,6 +1270,8 @@ void Supervisor::stopMapping(){
 }
 void Supervisor::saveMapping(QString name){
     if(probot->ipc_use){
+        ipc->flag_mapping = false;
+        ipc->is_mapping = false;
         ipc->saveMapping(name);
     }else{
         lcm->saveMapping(name);
@@ -1301,6 +1309,11 @@ void Supervisor::saveObjecting(){
 void Supervisor::setSLAMMode(int mode){
 
 }
+void Supervisor::setInitCurPos(){
+    pmap->init_pose = probot->curPose;
+    plog->write("[LOCALIZATION] SET INIT POSE : "+QString().sprintf("%f, %f, %f",pmap->init_pose.point.x, pmap->init_pose.point.y, pmap->init_pose.angle));
+}
+
 void Supervisor::setInitPos(int x, int y, float th){
     qDebug() << "INIT" << x << y << setAxisBack(cv::Point2f(x,y)).x << setAxisBack(cv::Point2f(x,y)).y;
     pmap->init_pose.point = setAxisBack(cv::Point2f(x,y));
@@ -1342,6 +1355,7 @@ void Supervisor::slam_stop(){
 }
 void Supervisor::slam_autoInit(){
     if(probot->ipc_use){
+        plog->write("[LOCALIZATION] AUTO INIT : "+QString::number(pmap->map_rotate_angle));
         ipc->set_cmd(ROBOT_CMD_SLAM_AUTO, "LOCALIZATION AUTO INIT");
     }else{
         lcm->sendCommand(ROBOT_CMD_SLAM_AUTO, "LOCALIZATION AUTO INIT");
@@ -1875,6 +1889,7 @@ QString Supervisor::getLocationCallID(QString type, int num){
             count++;
         }
     }
+    return "";
 }
 QString Supervisor::getLocationGroup(int num){
     int count = 0;
@@ -2459,9 +2474,11 @@ void Supervisor::moveManual(){
     }
 }
 void Supervisor::moveToCharge(){
+    ui_state = UI_STATE_INIT_DONE;
     ui_cmd = UI_CMD_MOVE_CHARGE;
 }
 void Supervisor::moveToWait(){
+    ui_state = UI_STATE_INIT_DONE;
     ui_cmd = UI_CMD_MOVE_WAIT;
 }
 QString Supervisor::getcurLoc(){
@@ -2944,8 +2961,17 @@ void Supervisor::startServingTest(){
     plog->write("[USER INPUT] START PATROL SERVING");
     ui_cmd = UI_CMD_MOVE_TABLE;
     patrol_mode = PATROL_RANDOM;
+    ui_state = UI_STATE_INIT_DONE;
     patrol_num = -1;
     patrol_use_pickup = true;
+}
+void Supervisor::moveToServingTest(QString name){
+    probot->trays[0].empty = false;
+    probot->trays[0].location = getLocation(name);
+
+    ui_state = UI_STATE_INIT_DONE;
+    qDebug() << pmap->locations.size() << probot->trays[0].location.name << probot->trays[0].location.number;
+    ui_cmd = UI_CMD_MOVE_TABLE;
 }
 void Supervisor::stopServingTest(){
     plog->write("[USER INPUT] STOP PATROL SERVING");

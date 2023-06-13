@@ -16,15 +16,39 @@ Item {
     width: 1280
     height: 800
     property bool test: true
-
+    property bool is_mapping: false
     property string map_name : "TEST_1"
     property var grid_width: 3
-    property var map_wdth: 1000
+    property var map_width: 1000
 
     function init(){
         mapping_pages.sourceComponent = page_mapping_start;
         map_name = "TEST_1";
         grid_width = 3;
+    }
+    function update_mapping(){
+        mapping_pages.item.update();
+    }
+
+    Timer{
+        id: update_timer
+        interval: 1000
+        running: true
+        repeat: true
+        onTriggered:{
+            if(supervisor.getMappingflag()){
+                if(!is_mapping){
+                    voice_stop_mapping.stop();
+                    voice_start_mapping.play();
+                    is_mapping = true;
+                }
+            }else{
+                if(is_mapping){
+                    voice_start_mapping.stop();
+                    is_mapping = false;
+                }
+            }
+        }
     }
     Loader{
         id: mapping_pages
@@ -149,6 +173,7 @@ Item {
                         parent.color = color_mid_navy;
                     }
                     onReleased: {
+                        backPage();
                         parent.color = "transparent";
                     }
                 }
@@ -472,10 +497,11 @@ Item {
                     }
                     onReleased: {
                         map_name = textfield_name.text;
-                        grid_width = select_grid;
+                        map_width = slider_mapsize.value;
+                        grid_width = (select_grid/100);
                         supervisor.setSetting("ROBOT_SW/map_size","1000");
-                        supervisor.setSetting("ROBOT_SW/grid_size",(grid_width/100).toString());
-                        supervisor.writelog("[MAPPING] START Mapping : set name("+map_name+") grid("+(grid_width/100).toString()+")");
+                        supervisor.setSetting("ROBOT_SW/grid_size",grid_width.toString());
+                        supervisor.writelog("[MAPPING] START Mapping : set name("+map_name+") grid("+grid_width.toString()+")");
                         mapping_pages.sourceComponent = page_mapping_view;
                         parent.color = "transparent";
                     }
@@ -529,6 +555,12 @@ Item {
             height: mapping_pages.height
             Component.onCompleted: {
                 mapping_view.setViewer("mapping");
+                mapping_view.setEnable(true)
+                supervisor.startMapping(map_width,grid_width);
+            }
+            function update(){
+//                print("update mapping");
+                mapping_view.loadmapping();
             }
 
             Rectangle{
@@ -637,6 +669,8 @@ Item {
 
             Map_full{
                 id: mapping_view
+                enabled: true
+                objectName: "mappingview"
                 width: parent.height
                 height: parent.height
                 anchors.centerIn: parent
@@ -732,17 +766,18 @@ Item {
                 color: color_dark_navy
             }
             Component.onCompleted: {
-                supervisor.setMotorLock(true);
                 loading.show();
             }
             Timer{
                 running: true
-                repeat: true
-                interval: 100
+//                repeat: true
+                interval: 1000
                 onTriggered: {
-                    if(!supervisor.getLCMConnection()){
+                    if(supervisor.getLCMConnection()){
                         supervisor.writelog("[MAPPING] START Mapping : Slam restart detected!")
                         loading.hide();
+//                        supervisor.setMotorLock(true);
+                        supervisor.setMap(map_name);
                         detect_done = true;
                         stop();
                     }
@@ -811,11 +846,25 @@ Item {
                     onReleased: {
                         supervisor.writelog("[MAPPING] START Annotation");
                         loadPage(pannotation);
+                        loader_page.item.setMappingFlag();
                         parent.color = "transparent";
                     }
                 }
             }
         }
+    }
+
+    Audio{
+        id: voice_start_mapping
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_start_mapping.mp3"
+    }
+    Audio{
+        id: voice_stop_mapping
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_stop_mapping.mp3"
     }
 
     Tool_Keyboard{

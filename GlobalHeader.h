@@ -65,6 +65,7 @@ typedef struct{
     int origin[2] = {0,};
     float robot_radius = 0.3;
 
+    float map_rotate_angle = 0;
     int mapping_width = 1000;
     float mapping_gridwidth = 0.3;
 

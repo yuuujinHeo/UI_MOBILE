@@ -46,9 +46,6 @@ void MapView::onTimer(){
         setWindow(qobject_cast<QQuickWindow*>(object));
     }
 
-    mapping_size = 1000;// pmap->mapping_width;
-    mapping_grid = pmap->mapping_gridwidth*pmap->mapping_width/1000;
-    if(enable){
         //Robot Following
         if(robot_following){
             setZoomCenter();
@@ -63,13 +60,16 @@ void MapView::onTimer(){
                 }
             }
         }else{
+            mapping_size = 1000;// pmap->mapping_width;
+            mapping_grid = pmap->mapping_gridwidth*pmap->mapping_width/1000;
+
             if(probot->ipc_use){
                 setMapCurrent();
             }
 //            qDebug() << "set " << mapping_grid << pmap->mapping_gridwidth;
 
         }
-    }
+
 }
 
 void MapView::setMode(QString name){
@@ -320,6 +320,7 @@ void MapView::updateMap(){
     setMapLocation();
     setMapObject();
     update();
+    qDebug() << "updatemap done";
 }
 void MapView::setMapMap(){
     if(map_orin.cols > 0 && map_orin.rows > 0 && mode != "mapping"){
@@ -491,10 +492,11 @@ void MapView::cutMap(){
     plog->write("[Annotation] Map Size Cut : "+QString().sprintf("%d,%d ~ %d,%d",cut_box[0].x,cut_box[0].y,cut_box[1].x,cut_box[1].y));
     cv::imwrite(path.toStdString(),map_edited_ui);
 //    updateMeta();
+
 }
 void MapView::reloadMap(){
-    initLocation();
-    initObject();
+//    initLocation();
+//    initObject();
     updateMap();
 }
 void MapView::updateMeta(){
@@ -513,11 +515,15 @@ void MapView::updateMeta(){
 }
 void MapView::setMapping(){
     cv::Mat source;
-//    //qDebug() << map_x << map_y << scale << map_width << map_height << pmap->map_mapping.rows;
-    pmap->map_mapping(cv::Rect(map_x*1000/mapping_size,map_y*1000/mapping_size,map_width*scale*1000/mapping_size,map_height*scale*1000/mapping_size)).copyTo(source);
-    pixmap_map.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(source));
-    Q_ASSERT(!pixmap_map.pixmap.isNull());
-    update();
+    if(scale < 10 && scale > -10){
+//        qDebug() << map_x << map_y << scale << map_width << map_height << pmap->map_mapping.rows;
+        pmap->map_mapping(cv::Rect(map_x,map_y,map_width*scale,map_height*scale)).copyTo(source);
+        pixmap_map.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(source));
+        Q_ASSERT(!pixmap_map.pixmap.isNull());
+        update();
+    }else{
+        qDebug() << "setMapping Fail" << scale;
+    }
 }
 void MapView::setObjecting(){
     cv::Mat source;
@@ -717,6 +723,7 @@ void MapView::setEditedMap(QString filename){
     map_name = filename;
     map_orin.release();
 
+
     if(filename == "" || !QFile::exists(file_path)){
         QPixmap blank(map_width,map_height);{
             QPainter painter(&blank);
@@ -724,6 +731,7 @@ void MapView::setEditedMap(QString filename){
         }
         pc->pixmap = blank;
         Q_ASSERT(!pc->pixmap.isNull());
+        plog->write("[MAPVIEW] setEditedMap Failed : "+filename);
         QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
     }else{
         map_orin = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
@@ -788,7 +796,6 @@ void MapView::setObjectMap(QString filename){
     reloadMap();
 }
 void MapView::setMapCurrent(){
-
     if(mode == "mapping"){
         map_current=QPixmap(1000*res,1000*res);
         map_current.fill(Qt::transparent);
@@ -802,14 +809,14 @@ void MapView::setMapCurrent(){
         cv::Point2f temp;
         temp = setAxis(probot->curPose.point);
 
-        qDebug() << pose.y << temp.y << probot->curPose.point.x;
+//        qDebug() << pose.y << temp.y << probot->curPose.point.x;
 //        cv::Point2f pose = setAxisMapping(probot->curPose.point);
-//        qDebug() << "mapping " << pose.x << pose.y << mapping_size << mapping_grid;
 
         float angle = setAxis(probot->curPose.angle);
         float distance = (pmap->robot_radius/mapping_grid)*2;
         float distance2 = distance*0.8;
         float th_dist = M_PI/8;
+//        qDebug() << "mapping " << pose.x << pose.y  <<probot->curPose.angle<< angle << mapping_size << mapping_grid;
 
         float x =   (pose.x + distance    * qCos(angle))*res;
         float y =   (pose.y + distance    * qSin(angle))*res;
@@ -899,7 +906,7 @@ void MapView::setMapCurrent(){
         if(set_init_flag){
 //            //qDebug() << "init" << probot->localization_state << mode;
             cv::Point2f pose = set_init_pose.point;
-//                //qDebug() << "DRAW INIT " << pose.x << pose.y;
+//            qDebug() << "DRAW INIT " << pose.x << pose.y;
             float angle = set_init_pose.angle;
             float distance = (pmap->robot_radius/pmap->gridwidth)*2;
             float distance2 = distance*0.8;
@@ -1076,6 +1083,7 @@ void MapView::setMapCurrent(){
 }
 void MapView::initRotate(){
     rotate_angle = 0;
+    pmap->map_rotate_angle = 0;
     if(map_orin.rows > 0){
         cut_box[0].x = 0;
         cut_box[0].y = 0;
@@ -1522,6 +1530,7 @@ void MapView::clearInitPose(){
 void MapView::rotateMap(int angle){
     dangle = angle - rotate_angle;
     rotate_angle = angle;
+    pmap->map_rotate_angle = angle;
     setMapMap();
 //    updateMap();
 }
@@ -1529,6 +1538,7 @@ void MapView::rotateMap(int angle){
 void MapView::rotateMapCW(){
     dangle = 1;
     rotate_angle++;
+    pmap->map_rotate_angle = rotate_angle;
 //    //qDebug() << "rotateCW " << rotate_angle;
     setMapMap();
 }
@@ -1536,6 +1546,7 @@ void MapView::rotateMapCW(){
 void MapView::rotateMapCCW(){
     rotate_angle--;
     dangle = -1;
+    pmap->map_rotate_angle = rotate_angle;
 //    //qDebug() << "rotateCCW " << rotate_angle;
     setMapMap();
 
@@ -1995,7 +2006,7 @@ void MapView::saveTline(){
     cv::rotate(map_merge,map_merge,cv::ROTATE_90_CLOCKWISE);
     cv::flip(map_merge,map_merge,0);
 
-    QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/travel_edited.png";
+    QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_travel_line.png";
     plog->write("[MAPVIEW] SAVE MAP "+path);
     cv::imwrite(path.toStdString(),map_merge);
 }
@@ -2307,10 +2318,15 @@ void MapView::saveLocation(QString type, int groupnum, QString name){
 
 void MapView::saveAnnotation(QString filename){
 
-    plog->write("[SUPERVISOR] SAVE Annotation "+filename);
+    if(filename == ""){
+        qDebug() << "file name set";
+        filename = pmap->map_name;
+        qDebug() << filename;
+    }
     //기존 파일 백업
     QString backup = QDir::homePath()+"/maps/"+filename+"/annotation_backup.ini";
     QString origin = QDir::homePath()+"/maps/"+filename+"/annotation.ini";
+    plog->write("[MAPVIEW] SAVE Annotation "+origin);
     if(QFile::exists(origin) == true){
         if(QFile::copy(origin, backup)){
             plog->write("[DEBUG] Copy annotation.ini to annotation_backup.ini");
@@ -2545,11 +2561,9 @@ void MapView::initVelmap(QString filename, int mode){
 
 void MapView::initTline(QString filename){
     QString file_path;
-    if(is_edited_tline){
-        file_path = QDir::homePath() + "/maps/" + filename + "/travel_edited.png";
-    }else{
-        file_path = QDir::homePath() + "/maps/" + filename + "/travel_raw.png";
-    }
+
+    file_path = QDir::homePath() + "/maps/" + filename + "/map_travel_line.png";
+
     map_tline.release();
     if(filename == "" || !QFile::exists(file_path)){
         plog->write("[MAPVIEW] INIT TRAVEL LINE ERROR : "+filename+", "+file_path);
@@ -2596,10 +2610,10 @@ void MapView::setMapTline(){
 void MapView::paint(QPainter *painter){
 //    //qDebug() << width() << height();
     painter->drawPixmap(0,0,width(),height(),pixmap_map.pixmap);
-    painter->drawPixmap(0,0,width(),height(),pixmap_object.pixmap);
-    painter->drawPixmap(0,0,width(),height(),pixmap_location.pixmap);
-    painter->drawPixmap(0,0,width(),height(),pixmap_tline.pixmap);
-    painter->drawPixmap(0,0,width(),height(),pixmap_velmap.pixmap);
+//    painter->drawPixmap(0,0,width(),height(),pixmap_object.pixmap);
+//    painter->drawPixmap(0,0,width(),height(),pixmap_location.pixmap);
+//    painter->drawPixmap(0,0,width(),height(),pixmap_tline.pixmap);
+//    painter->drawPixmap(0,0,width(),height(),pixmap_velmap.pixmap);
     painter->drawPixmap(0,0,width(),height(),pixmap_current.pixmap);
 }
 

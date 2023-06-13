@@ -41,7 +41,7 @@ Item {
     Component.onCompleted: {
         init_mode = 0;
         update_timer.start();
-        statusbar.visible = false;
+//        statusbar.visible = false;
 
         supervisor.clearSharedMemory();
 
@@ -2953,8 +2953,8 @@ Item {
 
         Rectangle{
             anchors.centerIn: parent
-            width: 800
-            height: 700
+            width: 900
+            height: 800
             radius: 20
             color: color_dark_navy
             Column{
@@ -2970,7 +2970,8 @@ Item {
                 }
                 Map_full{
                     id: mapview_localization
-                    width: 550
+                    objectName: "localview"
+                    width: 500
                     height: width
                     anchors.horizontalCenter: parent.horizontalCenter
                 }

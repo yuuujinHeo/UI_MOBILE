@@ -27,6 +27,18 @@ public:
         }
     };
 
+    struct UI_STATUS{
+        uint32_t tick = 0;
+        float       ui_map_rotate_angle = 0;
+        UI_STATUS(){
+
+        }
+        UI_STATUS(const UI_STATUS& p){
+            tick = p.tick;
+            ui_map_rotate_angle = p.ui_map_rotate_angle;
+        }
+    };
+
     struct STATUS
     {
         uint32_t   tick = 0;
@@ -62,7 +74,6 @@ public:
         float      robot_pose[3] = {0,};
         float      robot_scan[360] = {0,};
 
-        float       ui_map_rotate_angle = 0;
         int8_t      ui_drawing_state = 0;
 
         STATUS()
@@ -188,6 +199,7 @@ public:
     QSharedMemory shm_obs;
     QSharedMemory shm_cam0;
     QSharedMemory shm_cam1;
+    QSharedMemory shm_ui_status;
 
     CMD get_cmd();
     STATUS get_status();
@@ -207,6 +219,7 @@ public:
 
     void set_cmd(IPCHandler::CMD val, QString log="");
     void set_cmd(int cmd, QString log="");
+    void set_status_ui();
 
     ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
 //    void moveTo(QString target_loc, int flag_back);
@@ -226,7 +239,7 @@ public:
     void setVelocity(float vel);
     void sendMapPath(QString path);
     void saveMapping(QString name);
-    void startMapping(float grid_size);
+    void startMapping(int map_size, float grid_size);
     void stopMapping();
     void restartSLAM();
     void saveObjecting();

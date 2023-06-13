@@ -30,6 +30,7 @@ Item {
         text_hello.visible = false;
         timer_hello.stop();
         voice_pickup.play();
+        statusbar.visible = true;
     }
 
     function play_voice(){

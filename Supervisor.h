@@ -260,7 +260,7 @@ public:
 
 
     ////*********************************************  SLAM(LOCALIZATION) 관련   ***************************************************////
-    Q_INVOKABLE void startMapping(float grid);
+    Q_INVOKABLE void startMapping(int mapsize, float grid);
     Q_INVOKABLE void stopMapping();
     Q_INVOKABLE void setSLAMMode(int mode);
     Q_INVOKABLE void saveMapping(QString name);
@@ -269,6 +269,7 @@ public:
     Q_INVOKABLE void stopObjecting();
     Q_INVOKABLE void saveObjecting();
 
+    Q_INVOKABLE void setInitCurPos();
     Q_INVOKABLE void setInitPos(int x, int y, float th);
     Q_INVOKABLE float getInitPoseX();
     Q_INVOKABLE float getInitPoseY();
@@ -390,8 +391,8 @@ public:
     Q_INVOKABLE void drawingRunawayStop();
     Q_INVOKABLE int getRunawayState();
 
-    Q_INVOKABLE void SLAM_map_reload();
-    Q_INVOKABLE void SLAM_ini_reload();
+    Q_INVOKABLE void slam_map_reload(QString filename);
+    Q_INVOKABLE void slam_ini_reload();
 
 
 
@@ -498,6 +499,7 @@ public:
     Q_INVOKABLE void setRotateList(QString name);
     Q_INVOKABLE void startPatrol(QString mode, bool pickup);
 
+    Q_INVOKABLE void moveToServingTest(QString name);
     Q_INVOKABLE void startServingTest();
     Q_INVOKABLE void stopServingTest();
 

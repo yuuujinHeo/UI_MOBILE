@@ -25,6 +25,16 @@ Item {
     property bool annotation_after_mapping: false
 
 
+    onTest_move_stateChanged: {
+        print("test move state changed : ",test_move_state);
+    }
+
+    function setMappingFlag(){
+        print("setmappingflag")
+        annotation_after_mapping = true;
+        annot_pages.sourceComponent = page_annot_start;
+        loading.hide();
+    }
 
     function init(){
         test_move_state = 0;
@@ -50,8 +60,10 @@ Item {
             }else{
                 annot_pages.sourceComponent = page_annot_localization;
             }
-
         }
+
+
+//        annot_pages.sourceComponent = page_annot_travelline;
     }
 
     Loader{
@@ -359,10 +371,20 @@ Item {
             }
             Component.onCompleted: {
                 supervisor.setMotorLock(true);
-                map.loadmap(supervisor.getMapname(),"EDITED");
-                map.setViewer("annot_rotate");
-                map.setTool("cut_map");
-                map.clear("rotate")
+            }
+            Timer{
+                interval: 500
+                running: true
+                onTriggered:{
+                    map.setViewer("annot_rotate");
+                    map.setTool("move");
+                    map.clear("rotate")
+                    map.setEnable(true);
+                    if(annotation_after_mapping)
+                        map.loadmap(supervisor.getMapname(),"RAW");
+                    else
+                        map.loadmap(supervisor.getMapname(),"EDITED");
+                }
             }
             Text{
                 text: "맵을 회전하고 맵의 영역만큼 지정해주세요."
@@ -434,6 +456,8 @@ Item {
             }
             Map_full{
                 id: map
+                enabled: false
+                objectName: "annot_rotate"
                 width: 580
                 height: width
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -477,6 +501,8 @@ Item {
                             annot_pages.sourceComponent = page_annot_localization;
                         else
                             annot_pages.sourceComponent = page_annot_menu;
+
+                        supervisor.slam_map_reload(supervisor.getMapname());
                         parent.color = "transparent";
                     }
                 }
@@ -534,8 +560,14 @@ Item {
                 supervisor.setMotorLock(true);
                 loading.show();
                 text_finding.opacity = 1;
-                map.loadmap(supervisor.getMapname(),"EDITED");
-                map.setViewer("local_view");
+            }
+            Timer{
+                interval: 500
+                running: true
+                onTriggered:{
+                    map.loadmap(supervisor.getMapname(),"EDITED");
+                    map.setViewer("localization");
+                }
             }
 
             Timer{
@@ -692,6 +724,8 @@ Item {
                         onClicked: {
                             print("slam init");
                             map.setTool("slam_init");
+                            supervisor.setInitCurPos();
+                            supervisor.slam_setInit();
                         }
                     }
                 }
@@ -699,6 +733,7 @@ Item {
 
             Map_full{
                 id: map
+                objectName: "annot_local"
                 visible: local_find_state>1
                 onVisibleChanged: {
                     print("map visible changed",visible,x,y,width,height);
@@ -880,6 +915,14 @@ Item {
             height: annot_pages.height
             Component.onCompleted: {
                 supervisor.setMotorLock(false);
+            }
+
+            Timer{
+                running: true
+                interval: 500
+                onTriggered:{
+                    supervisor.drawingRunawayStart();
+                }
             }
 
             Rectangle{
@@ -1083,6 +1126,14 @@ Item {
             height: annot_pages.height
             Component.onCompleted: {
                 supervisor.setMotorLock(false);
+            }
+
+            Timer{
+                running: true
+                interval: 500
+                onTriggered:{
+                    supervisor.drawingRunawayStart();
+                }
             }
 
             Rectangle{
@@ -1372,7 +1423,7 @@ Item {
             Rectangle{
                 id: notice_moving
                 width: parent.width
-                height: 500
+                height: 250
                 anchors.centerIn: parent
                 color: "black"
                 visible: test_move_state!==0
@@ -1532,6 +1583,14 @@ Item {
             Component.onCompleted: {
                 supervisor.setMotorLock(true);
             }
+
+            Timer{
+                running: true
+                interval: 500
+                onTriggered:{
+                    supervisor.drawingRunawayStart();
+                }
+            }
             Rectangle{
                 anchors.fill: parent
                 color: color_dark_navy
@@ -1587,7 +1646,7 @@ Item {
             Rectangle{
                 id: notice_moving
                 width: parent.width
-                height: 500
+                height: 250
                 anchors.centerIn: parent
                 color: "black"
                 visible: test_move_state!==0
@@ -1668,6 +1727,14 @@ Item {
             height: annot_pages.height
             Component.onCompleted: {
                 supervisor.setMotorLock(false);
+            }
+
+            Timer{
+                running: true
+                interval: 500
+                onTriggered:{
+                    supervisor.drawingRunawayStart();
+                }
             }
 
             Rectangle{
@@ -1882,9 +1949,19 @@ Item {
                 }
                 onOpened:{
                     update();
-                    map_location.loadmap(supervisor.getMapname(),"EDITED");
                     map_location.setViewer("annot_location");
-                    map_location.setScreen(0.7,0,0);
+                    map_location.loadmap(supervisor.getMapname(),"EDITED");
+
+                    textfield_loc_name.text = "";
+                }
+                Timer{
+                    running: true
+                    interval: 500
+                    onTriggered:{
+                        map_location.loadmap(supervisor.getMapname(),"EDITED");
+                        map_location.setfullscreen();
+                        map_location.move(0,0);
+                    }
                 }
 
                 function update(){
@@ -1921,6 +1998,7 @@ Item {
                                 Map_full{
                                     id: map_location
                                     width: 500
+                                    objectName: "annot_add_Serving"
                                     height: 500
                                     enabled: popup_add_serving.opened
                                     anchors.verticalCenter: parent.verticalCenter
@@ -2115,6 +2193,7 @@ Item {
                                         anchors.fill: parent
                                         onClicked:{
                                             if(textfield_loc_name.text == ""){
+                                                textfield_loc_name.color = color_red;
                                             }else{
                                                 map_hide.savelocation("location_cur","Serving", popup_add_serving.cur_group, textfield_loc_name.text);
                                                 supervisor.writelog("[ANNOTATION] LOCAION SAVE : Serving -> "+popup_add_serving.cur_group+", "+textfield_loc_name.text);
@@ -2149,9 +2228,11 @@ Item {
                 function readSetting(){
                     print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!");
                     groups.clear();
+                    print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!");
                     for(var i=0; i<supervisor.getLocationGroupNum(); i++){
+                        print(i,supervisor.getLocationGroupNum());
                         groups.append({"value":supervisor.getLocGroupname(i)});
-//                        print("groups append : ", supervisor.getLocGroupname(i))
+                        print("groups append : ", supervisor.getLocGroupname(i))
                     }
 
                     if(supervisor.getLocationGroupNum() > 1)
@@ -2167,7 +2248,7 @@ Item {
                                         "number_table" : supervisor.getLocationGroupSize(supervisor.getLocationGroupNum(i)),
                                         "call_id" : supervisor.getLocationCallID("Serving",i),
                                        "error":false});
-//                        print("locations append : ",i,supervisor.getLocationGroupNum(i),supervisor.getLocationGroupNum(i),supervisor.getLocationNumber(-1,i))
+                        print("locations append : ",i,supervisor.getLocationGroupNum(i),supervisor.getLocationGroupNum(i),supervisor.getLocationNumber(-1,i))
                     }
                     update();
                 }
@@ -2179,8 +2260,21 @@ Item {
                         popup_serving_list.use_group = false;
 
                     details.clear();
-                    details.append({"type":"Charging","name":"Charging","call_id":supervisor.getLocationCallID("Charging",0)});
-                    details.append({"type":"Resting","name":"Resting","call_id":supervisor.getLocationCallID("Resting",0)});
+                    details.append({"type":"Charging",
+                                       "name":"Charging",
+                                       "group":0,
+                                       "number":0,
+                                       "number_table":0,
+                                       "error":false,
+                                       "call_id":supervisor.getLocationCallID("Charging",0)});
+                    details.append({"type":"Resting",
+                                       "name":"Resting",
+                                       "group":0,
+                                       "number":0,
+                                       "number_table":0,
+                                       "error":false,
+                                       "call_id":supervisor.getLocationCallID("Resting",0)});
+
                     for(var i=0; i<locations.count; i++){
                         details.append({"type":"Serving",
                                         "name":locations.get(i).name,
@@ -2189,7 +2283,7 @@ Item {
                                        "number_table":getgroupsize(locations.get(i).group),
                                         "call_id":locations.get(i).call_id,
                                        "error":locations.get(i).error});
-//                        print("detail append : ",i, locations.get(i).group, locations.get(i).number, getgroupsize(locations.get(i).group))
+                        print("detail append : ",i, locations.get(i).group, locations.get(i).number, getgroupsize(locations.get(i).group))
                     }
                     checkLocationNumber();
 
@@ -2300,7 +2394,7 @@ Item {
                             for(var i=0; i<number_table; i++){
                                combo_number.model.append({"value":(i+1).toString()});
                             }
-//                            print("COMPO UPDATE : ",index,combo_number.model.count);
+                            print("COMPO UPDATE : ",index,combo_number.model.count);
                         }
                         Row{
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -2619,11 +2713,11 @@ Item {
                     color: "transparent"
                 }
                 onOpened:{
-                    map_location_view.loadmap(supervisor.getMapname(),"EDITED");
                     map_location_view.setViewer("annot_location");
                     map_location_view.show_connection = false;
                     map_location_view.show_button_lidar = false;
                     map_location_view.show_button_object = false;
+                    map_location_view.loadmap(supervisor.getMapname(),"EDITED");
                 }
 
                 function update(){
@@ -2653,11 +2747,14 @@ Item {
                         }
                         Rectangle{
                             color: "transparent"
+                            objectName: "annot_serving_mapview"
                             width: 600
                             height: 600
                             Map_full{
                                 id: map_location_view
                                 width: 600
+                                objectName: "serving_map"
+
                                 enabled: popup_serving_map.opened
                                 height: 600
                                 anchors.centerIn: parent
@@ -2797,6 +2894,7 @@ Item {
             width: annot_pages.width
             height: annot_pages.height
             property bool use_group: false
+            property bool use_callbell : true
             Component.onCompleted: {
                 supervisor.setMotorLock(true);
                 readSetting();
@@ -2809,9 +2907,11 @@ Item {
             function readSetting(){
                 print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!");
                 groups.clear();
+                print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!",supervisor.getLocationGroupNum());
                 for(var i=0; i<supervisor.getLocationGroupNum(); i++){
+                    print(i,supervisor.getLocationGroupNum())
                     groups.append({"value":supervisor.getLocGroupname(i)});
-//                        print("groups append : ", supervisor.getLocGroupname(i))
+                        print("groups append : ", supervisor.getLocGroupname(i))
                 }
 
                 if(supervisor.getLocationGroupNum() > 1)
@@ -2820,6 +2920,7 @@ Item {
                     use_group = false;
 
                 locations.clear();
+                print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!",supervisor.getLocationNum("Serving"));
                 for(var i=0; i<supervisor.getLocationNum("Serving"); i++){
                     locations.append({"name": supervisor.getLocationName(i,"Serving"),
                                    "group":supervisor.getLocationGroupNum(i),
@@ -2827,7 +2928,7 @@ Item {
                                     "number_table" : supervisor.getLocationGroupSize(supervisor.getLocationGroupNum(i)),
                                     "call_id" : supervisor.getLocationCallID("Serving",i),
                                    "error":false});
-//                        print("locations append : ",i,supervisor.getLocationGroupNum(i),supervisor.getLocationGroupNum(i),supervisor.getLocationNumber(-1,i))
+                        print("locations append : ",i,supervisor.getLocationGroupNum(i),supervisor.getLocationGroupNum(i),supervisor.getLocationNumber(-1,i))
                 }
                 update();
             }
@@ -2839,8 +2940,21 @@ Item {
                     use_group = false;
 
                 details.clear();
-                details.append({"type":"Charging","name":"Charging","call_id":supervisor.getLocationCallID("Charging",0)});
-                details.append({"type":"Resting","name":"Resting","call_id":supervisor.getLocationCallID("Resting",0)});
+                print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!");
+                details.append({"type":"Charging",
+                                   "name":"Charging",
+                                   "group":0,
+                                   "number":0,
+                                   "number_table":0,
+                                   "error":false,
+                                   "call_id":supervisor.getLocationCallID("Charging",0)});
+                details.append({"type":"Resting",
+                                   "name":"Resting",
+                                   "group":0,
+                                   "number":0,
+                                   "number_table":0,
+                                   "error":false,
+                                   "call_id":supervisor.getLocationCallID("Resting",0)});
                 for(var i=0; i<locations.count; i++){
                     details.append({"type":"Serving",
                                     "name":locations.get(i).name,
@@ -2849,9 +2963,11 @@ Item {
                                    "number_table":getgroupsize(locations.get(i).group),
                                     "call_id":locations.get(i).call_id,
                                    "error":locations.get(i).error});
-//                        print("detail append : ",i, locations.get(i).group, locations.get(i).number, getgroupsize(locations.get(i).group))
+                        print("detail append : ",i, locations.get(i).group, locations.get(i).number, getgroupsize(locations.get(i).group))
                 }
+                print("=================================");
                 checkLocationNumber();
+                print("=================================");
 
                 if(isError()){
                     btn_right.enabled = false;
@@ -3031,6 +3147,7 @@ Item {
                         Rectangle{
                             width : 170
                             height: 40
+                            visible: use_callbell
                             Text{
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
@@ -3041,6 +3158,7 @@ Item {
                             width : 100
                             height: 40
                             radius: 5
+                            visible: use_callbell
                             color: "black"
                             Text{
                                 anchors.centerIn: parent
@@ -3053,6 +3171,26 @@ Item {
                                 onClicked:{
                                     popup_add_callbell.callid = index;
                                     popup_add_callbell.open();
+                                }
+                            }
+                        }
+
+                        Rectangle{
+                            width : 100
+                            height: 40
+                            radius: 5
+                            color: "black"
+                            Text{
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                text:"주행"
+                                color: "white"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked:{
+                                    supervisor.writelog("[ANNOTATION] TEST MOVING : "+name);
+                                    supervisor.moveToServingTest(name);
                                 }
                             }
                         }
@@ -3125,6 +3263,7 @@ Item {
                             width: 270
                             height: 30
                             color: color_navy
+                            visible: use_callbell
                             Text{
                                 anchors.centerIn: parent
                                 text: "호출벨"
@@ -3132,10 +3271,21 @@ Item {
                                 color: "white"
                             }
                         }
+                        Rectangle{
+                            width: 100
+                            height: 30
+                            color: color_navy
+                            Text{
+                                anchors.centerIn: parent
+                                text: "테스트주행"
+                                font.family: font_noto_r.name
+                                color: "white"
+                            }
+                        }
                     }
 
                     Flickable{
-                        width: 1000
+                        width: 1200
                         height: 400
                         clip: true
                         contentHeight: list_location_detail.height
@@ -3156,6 +3306,44 @@ Item {
                             model:ListModel{id:details}
                         }
                     }
+                }
+            }
+
+            Rectangle{
+                id: notice_moving
+                width: parent.width
+                height: 250
+                anchors.centerIn: parent
+                color: "black"
+                visible: test_move_state!==0
+                Text{
+                    anchors.centerIn: parent
+                    visible: test_move_state === 1
+                    text: "로봇이 이동 중 입니다."
+                    color: "white"
+                    font.pixelSize:60
+                    font.family: font_noto_b.name
+                }
+                Text{
+                    id: text_error_msg
+                    anchors.centerIn: parent
+                    visible: test_move_state === 2
+                    color: color_red
+                    text: {
+                        if(test_move_error === 0){
+                            "경로를 찾을 수 없습니다."
+                        }else if(test_move_error === 1){
+                            "로봇의 초기화가 틀어졌습니다."
+                        }else if(test_move_error === 2){
+                            "비상스위치가 눌렸습니다."
+                        }else if(test_move_error === 3){
+                            "사용자에 의해 정지되었습니다."
+                        }else if(test_move_error === 4){
+                            "모터가 초기화 되지 않았습니다."
+                        }
+                    }
+                    font.pixelSize:60
+                    font.family: font_noto_b.name
                 }
             }
 
@@ -3195,12 +3383,13 @@ Item {
                         for(var i=0; i<details.count-2; i++){
                             supervisor.setLocation(i,details.get(i+2).name,details.get(i+2).group,details.get(i+2).number);
                         }
-                        map.save("location_all");
+                        map_hide.save("location_all");
                         supervisor.writelog("[ANNOTATION] LOCAION SAVE : Check Done ");
                         if(annotation_after_mapping)
                             annot_pages.sourceComponent = page_annot_done;
                         else
                             annot_pages.sourceComponent = page_annot_menu;
+                        supervisor.drawingRunawayStop();
                         parent.color = "transparent";
                     }
                 }
@@ -3224,6 +3413,7 @@ Item {
                             scale=scale-0.01;
                         }
                     }
+                    horizontalAlignment: Text.AlignHCenter
                     anchors.centerIn: parent
                     font.family: font_noto_r.name
                     font.pixelSize: 30
@@ -3275,6 +3465,45 @@ Item {
                     onReleased: {
                         popup_add_location_group.open();
 //                        annot_pages.sourceComponent = page_annot_location_serving;
+                        parent.color = "transparent";
+                    }
+                }
+            }
+            Rectangle{
+                id: btn_left3
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.bottomMargin: 50
+                anchors.leftMargin: 490
+                width: 200
+                height: 80
+                radius: 15
+                border.width: 2
+                border.color: "white"
+                color: "transparent"
+                Text{
+                    Component.onCompleted: {
+                        scale = 1;
+                        while(width*scale > 180){
+                            scale=scale-0.01;
+                        }
+                    }
+                    anchors.centerIn: parent
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                    color: "white"
+                    text: "호출벨 사용"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onPressed:{
+                        parent.color = color_mid_navy;
+                    }
+                    onReleased: {
+                        if(use_callbell)
+                            use_callbell = false;
+                        else
+                            use_callbell = true;
                         parent.color = "transparent";
                     }
                 }
@@ -3454,6 +3683,14 @@ Item {
                 btn_right2.opacity = 1;
             }
 
+            Timer{
+                running: true
+                interval: 500
+                onTriggered:{
+                    supervisor.drawingRunawayStop();
+                }
+            }
+
             Text{
                 id: text_title1
                 text: "수고하셨습니다"
@@ -3544,6 +3781,7 @@ Item {
                     }
                     onReleased: {
                         supervisor.writelog("[ANNOTATION] Early Done");
+                        loadPage(pinit);
                         parent.color = "transparent";
                     }
                 }
@@ -3786,16 +4024,24 @@ Item {
             width: annot_pages.width
             height: annot_pages.height
             property var select_preset: 0
+            property bool is_drawing: false
             Rectangle{
                 anchors.fill: parent
                 color: color_dark_navy
             }
             Component.onCompleted: {
+                loading.hide();
                 supervisor.setMotorLock(true);
                 if(supervisor.isExistTravelEdited(supervisor.getMapname())){
                     supervisor.writelog("[ANNOTATION] Travel Line : load map")
-                    map.loadmap(supervisor.getMapname(),"T_EDIT");
+                }
+            }
+            Timer{
+                interval: 500
+                running: true
+                onTriggered:{
                     map.setViewer("annot_tline");
+                    map.loadmap(supervisor.getMapname(),"T_EDIT");
                 }
             }
             Column{
@@ -4006,6 +4252,47 @@ Item {
                                             supervisor.writelog("[ANNOTATION] Travel line : Clear")
                                         }
                                     }
+                                }
+                                Item_button{
+                                    width: 80
+                                    shadow_color: color_gray
+                                    highlight: is_drawing
+                                    icon: "icon/icon_set_init.png"
+                                    name: "경로그리기"
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onPressed: {
+                                            parent.pressed();
+                                        }
+                                        onReleased:{
+                                            parent.released();
+                                        }
+
+                                        onClicked: {
+                                            map.setTool("move");
+                                            if(is_drawing){
+                                                supervisor.writelog("[ANNOTATION] Travel Line : Drawing Stop");
+                                                supervisor.drawingRunawayStop();
+                                                is_drawing = false;
+                                            }else{
+                                                supervisor.writelog("[ANNOTATION] Travel Line : Drawing Start");
+                                                supervisor.drawingRunawayStart();
+                                                is_drawing = true;
+                                            }
+                                            timer_motor_lock.start();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Timer{
+                            id: timer_motor_lock
+                            interval: 500
+                            onTriggered:{
+                                if(is_drawing){
+                                    supervisor.setMotorLock(false);
+                                }else{
+                                    supervisor.setMotorLock(true);
                                 }
                             }
                         }
@@ -4365,6 +4652,7 @@ Item {
                     }
                     Map_full{
                         id: map
+                        objectName: "annot_tline"
                         width: height
                         height: annot_pages.height - 100
                     }
@@ -4501,8 +4789,14 @@ Item {
             }
             Component.onCompleted: {
                 supervisor.setMotorLock(true);
-                map.loadmap(supervisor.getMapname(),"mapvel");
-                map.setViewer("annot_velmap");
+            }
+            Timer{
+                interval: 500
+                running: true
+                onTriggered:{
+                    map.setViewer("annot_velmap");
+                    map.loadmap(supervisor.getMapname(),"mapvel");
+                }
             }
 
             Column{
@@ -5072,6 +5366,7 @@ Item {
                     Map_full{
                         id: map
                         width: height
+                        objectName: "annot_velmap"
                         height: annot_pages.height - 100
                     }
                 }
@@ -5147,6 +5442,7 @@ Item {
     Map_full{
         id: map_hide
         visible:false
+        objectName: "annot_hide"
         enabled:false
     }
     Tool_Keyboard{

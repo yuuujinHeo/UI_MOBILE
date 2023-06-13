@@ -667,7 +667,7 @@ Item {
                                         btn_menu.is_restart = true;
                                         supervisor.writelog("[USER INPUT] MAPPING PAGE : START MAPPING " + supervisor.getSetting("ROBOT_SW","grid_size"))
 //                                        map.grid_size = parseFloat(supervisor.getSetting("ROBOT_SW","grid_size"));
-                                        supervisor.startMapping(0);
+                                        supervisor.startMapping(parseInt(supervisor.getSetting("ROBOT_SW","map_size")),0);
                                     }
                                 }else{
                                     supervisor.writelog("[USER INPUT] MAPPING PAGE : START MAPPING -> BUT SLAM NOT CONNECTED")
@@ -8444,7 +8444,6 @@ Item {
         }
 
     }
-
 
     function loadmap(name,type){
         print("map loadmap ",name,type);
