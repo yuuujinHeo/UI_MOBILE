@@ -8,7 +8,6 @@
 #include "cv_to_qt.h"
 #include "MapHeader.h"
 
-#define NO_LCM
 
 extern Logger *plog;
 extern int ui_state;
@@ -107,7 +106,6 @@ typedef struct{
 }ST_TRAY;
 
 typedef struct{
-    bool lcmconnection = false;
     bool ipc_use = false;
     //from Robot
     ST_MOTOR motor[2];
@@ -125,7 +123,6 @@ typedef struct{
     float power = 0;
     float total_power = 0;
 
-    int motor_state = 0;
     int localization_state = 0;
     int running_state = 0;
     int obs_state = 0;
@@ -300,10 +297,6 @@ enum UI_STATE{
     UI_STATE_CLEAR
 };
 
-enum ROBOT_MOTOR_STATE{
-    MOTOR_NOT_READY = 0,
-    MOTOR_READY
-};
 
 enum LOCALIZATION_STATE{
     LOCAL_NOT_READY = 0,

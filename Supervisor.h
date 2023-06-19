@@ -6,7 +6,7 @@
 #include <QThread>
 #include <QQuickWindow>
 #include "GlobalHeader.h"
-#include "LCMHandler.h"
+
 #include "JoystickHandler.h"
 #include "CallbellHandler.h"
 #include "HTTPHandler.h"
@@ -107,8 +107,10 @@ public:
     Q_INVOKABLE void readWifiState(QString ssd);
     Q_INVOKABLE void setWifiSSD(QString ssd);
 
+
+    QProcess *wifi_process;
+    QProcess *wifi_check_process;
     ////*********************************************  CLASS   ***************************************************////
-    LCMHandler *lcm;
     ZIPHandler *zip;
     JoystickHandler *joystick;
     HTTPHandler *git;
@@ -116,24 +118,28 @@ public:
     IPCHandler *ipc;
     QProcess *slam_process;
 
+    Q_INVOKABLE void writelog(QString msg);
 
-
+    ////*********************************************  SH   ***************************************************////
     Q_INVOKABLE bool checkINI();
     void checkShellFiles();
     void makeKillShell();
     void makeKillSlam();
     void makeStartShell();
     void makeAllKillShell();
+    void makeUSBShell();
 
 
-    ////*********************************************  IPC 관련   ***************************************************////
-    Q_INVOKABLE bool isIPCused(){return probot->ipc_use;}
+    Q_INVOKABLE void makeRobotINI();
+    Q_INVOKABLE void checkRobotINI();
+    Q_INVOKABLE void restartSLAM();
+    Q_INVOKABLE void startSLAM();
 
     ////*********************************************  LCM 관련   ***************************************************////
-    Q_INVOKABLE bool getLCMConnection();
-    Q_INVOKABLE bool getLCMRX();
-    Q_INVOKABLE bool getLCMTX();
-    Q_INVOKABLE bool getLCMProcess();
+    Q_INVOKABLE bool getIPCConnection();
+    Q_INVOKABLE bool getIPCRX();
+    Q_INVOKABLE bool getIPCTX();
+
 
     ////*********************************************  WINDOW 관련   ***************************************************////
     void setWindow(QQuickWindow* Window);
@@ -143,12 +149,12 @@ public:
     Q_INVOKABLE void programRestart();
     Q_INVOKABLE void programExit();
     Q_INVOKABLE void programHide();
-    Q_INVOKABLE void writelog(QString msg);
+
+
     Q_INVOKABLE QString getRawMapPath(QString name);
     Q_INVOKABLE QString getMapPath(QString name);
     Q_INVOKABLE QString getAnnotPath(QString name);
     Q_INVOKABLE QString getMetaPath(QString name);
-    Q_INVOKABLE QString getTravelRawPath(QString name);
     Q_INVOKABLE QString getTravelPath(QString name);
     Q_INVOKABLE QString getCostPath(QString name);
     Q_INVOKABLE QString getIniPath();
@@ -157,14 +163,11 @@ public:
     Q_INVOKABLE void setSetting(QString name, QString value);
     Q_INVOKABLE void readSetting(QString map_name="");
     Q_INVOKABLE QString getSetting(QString group, QString name);
-    Q_INVOKABLE void setVelocity(float vel);
-    Q_INVOKABLE float getVelocity();
 
     Q_INVOKABLE int getTrayNum();
     Q_INVOKABLE int getTableNum();
     Q_INVOKABLE void setTableNum(int table_num);
     Q_INVOKABLE void setTableColNum(int col_num);
-
 
     Q_INVOKABLE QString getRobotType();
 
@@ -176,7 +179,7 @@ public:
     Q_INVOKABLE QList<int> getCamera(int num);
     Q_INVOKABLE QString getCameraSerial(int num);
 
-
+    ////*********************************************  GIT 관련   ***************************************************////
     Q_INVOKABLE void pullGit();
     Q_INVOKABLE bool isNewVersion();
     Q_INVOKABLE QString getLocalVersion();
@@ -187,8 +190,16 @@ public:
     Q_INVOKABLE QString getServerVersionMessage();
 
 
-
+    ////*********************************************  MOVING 관련   *************************************************////
     Q_INVOKABLE bool isCallingMode(){return probot->is_calling;}
+    Q_INVOKABLE void goSerivng(int group, int table);
+    Q_INVOKABLE LOCATION getLocationbyCall(QString call);
+    Q_INVOKABLE LOCATION getLocation(QString name);
+
+
+
+
+    ////*********************************************  LOG 관련   ***************************************************////
     QStringList curLog;
     QString log_folder = "ui_log";
     Q_INVOKABLE void setLog(int num){
@@ -198,7 +209,6 @@ public:
             log_folder = "sn_log";
         }
     }
-    Q_INVOKABLE void goSerivng(int group, int table);
     Q_INVOKABLE int getLogLineNum();
     Q_INVOKABLE QString getLogLine(int num){return curLog[num];}
     Q_INVOKABLE QString getLogDate(int num);
@@ -212,9 +222,11 @@ public:
     Q_INVOKABLE QString getLocaleDate(int year, int month, int date){
         return QString().sprintf("%d-%02d-%02d",year,month,date);
     }
-    Q_INVOKABLE LOCATION getLocationbyCall(QString call);
-    Q_INVOKABLE LOCATION getLocation(QString name);
-    void makeUSBShell();
+
+
+
+
+    ////*********************************************  USB 관련   ***************************************************////
     Q_INVOKABLE void updateUSB();
     Q_INVOKABLE int getusbsize();
     Q_INVOKABLE void readusbfile(QString name);
@@ -225,39 +237,44 @@ public:
     Q_INVOKABLE QString getusbname(int num);
     Q_INVOKABLE void readusb();
 
+    Q_INVOKABLE bool isUSBFile();
+    Q_INVOKABLE QString getUSBFilename();
+    Q_INVOKABLE void saveMapfromUsb(QString path);
+    Q_INVOKABLE bool loadMaptoUSB();
 
     ////*********************************************  INIT PAGE 관련   ***************************************************////
     Q_INVOKABLE bool isConnectServer();
-    //0:no map, 1:map_server, 2: map_edited only, 3:raw_map only
-    Q_INVOKABLE bool isExistMap(QString name);
+
+    Q_INVOKABLE bool isLoadMap();
+    Q_INVOKABLE bool isLoadINI();
+    Q_INVOKABLE bool isExistMap(QString name="");
     Q_INVOKABLE bool isExistRawMap(QString name);
-    Q_INVOKABLE bool isExistMap();
+    Q_INVOKABLE bool isExistTravelMap(QString name);
+    Q_INVOKABLE bool isExistAnnotation(QString name);
+    Q_INVOKABLE bool isExistRobotINI();
+
     Q_INVOKABLE int getAvailableMap();
     Q_INVOKABLE QString getAvailableMapPath(int num);
     Q_INVOKABLE int getMapFileSize(QString name);
     Q_INVOKABLE QString getMapFile(int num);
-    Q_INVOKABLE bool isExistTravelRaw(QString name);
-    Q_INVOKABLE bool isExistTravelEdited(QString name);
-    Q_INVOKABLE bool isExistAnnotation(QString name);
+
     Q_INVOKABLE void deleteAnnotation();
-    Q_INVOKABLE bool isUSBFile();
-    Q_INVOKABLE QString getUSBFilename();
-    Q_INVOKABLE bool loadMaptoUSB();
+
     Q_INVOKABLE void removeMap(QString filename);
     Q_INVOKABLE bool isloadMap();
     Q_INVOKABLE void setloadMap(bool load);
-    Q_INVOKABLE bool isExistRobotINI();
-    Q_INVOKABLE void makeRobotINI();
-    Q_INVOKABLE void checkRobotINI();
-    Q_INVOKABLE bool rotate_map(QString _src, QString _dst, int mode);
-    Q_INVOKABLE bool getIniRead();
-    Q_INVOKABLE void saveMapfromUsb(QString path);
+
     Q_INVOKABLE void loadMap(QString name);
     Q_INVOKABLE void setMap(QString name);
-    Q_INVOKABLE void restartSLAM();
+    Q_INVOKABLE bool rotate_map(QString _src, QString _dst, int mode);
 
-    Q_INVOKABLE void startSLAM();
 
+    bool isSameLocation(LOCATION l1, LOCATION l2){
+        if(l1.group == l2.group && l1.number == l2.number && l1.name == l2.name){
+            return true;
+        }
+        return false;
+    }
 
     ////*********************************************  SLAM(LOCALIZATION) 관련   ***************************************************////
     Q_INVOKABLE void startMapping(int mapsize, float grid);
@@ -282,7 +299,6 @@ public:
     Q_INVOKABLE bool is_slam_running();
 
     Q_INVOKABLE bool getMappingflag();
-    Q_INVOKABLE void setMappingflag(bool flag);
 
     Q_INVOKABLE bool getObjectingflag();
     Q_INVOKABLE void setObjectingflag(bool flag);
@@ -316,21 +332,6 @@ public:
 
     LOCATION current_target;
 
-    ////*********************************************  JOYSTICK 관련   ***************************************************////
-    Q_INVOKABLE bool isconnectJoy();
-    Q_INVOKABLE float getJoyAxis(int num);
-    Q_INVOKABLE int getJoyButton(int num);
-    Q_INVOKABLE QString getKeyboard(int mode);
-    Q_INVOKABLE QString getJoystick(int mode);
-
-    QProcess *wifi_process;
-    QProcess *wifi_check_process;
-    bool isSameLocation(LOCATION l1, LOCATION l2){
-        if(l1.group == l2.group && l1.number == l2.number && l1.name == l2.name){
-            return true;
-        }
-        return false;
-    }
     ////*********************************************  ANNOTATION 관련   ***************************************************////
 
     Q_INVOKABLE void setObjPose();
@@ -407,8 +408,6 @@ public:
     ////*********************************************  ROBOT MOVE 관련   ***************************************************////
 //    Q_INVOKABLE void moveTo(QString target_num);
     Q_INVOKABLE void moveToServing(QString target, int preset);
-    Q_INVOKABLE void moveTo(QString target, int preset);
-    Q_INVOKABLE void moveTo(float x, float y, float th);
     Q_INVOKABLE void moveToLast();
     Q_INVOKABLE void movePause();
     Q_INVOKABLE void moveResume();
@@ -419,10 +418,6 @@ public:
     Q_INVOKABLE QString getcurLoc();
     Q_INVOKABLE QString getcurTable();
 
-    Q_INVOKABLE void joyMoveXY(float x);
-    Q_INVOKABLE void joyMoveR(float r);
-    Q_INVOKABLE float getJoyXY();
-    Q_INVOKABLE float getJoyR();
     Q_INVOKABLE void resetHomeFolders();
 
     Q_INVOKABLE bool issetLocation(int number);

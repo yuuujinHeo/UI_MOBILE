@@ -99,7 +99,7 @@ Item {
             battery = supervisor.getBattery().toFixed(0);
 
             if(popup_question.visible){
-                if(supervisor.getLCMConnection() && supervisor.getStateMoving() !== 0){
+                if(supervisor.getIPCConnection() && supervisor.getStateMoving() !== 0){
                     text_quest.text = "대기 장소로 이동<font color=\"white\">하시겠습니까?</font>";
                     btn_yes.visible = true;
                     btn_no.visible = true;
@@ -168,7 +168,7 @@ Item {
         anchors.centerIn: parent
         visible: false
         Component.onCompleted: {
-            if(supervisor.getLCMConnection() && supervisor.getStateMoving() !== 0){
+            if(supervisor.getIPCConnection() && supervisor.getStateMoving() !== 0){
                 text_quest.text = "대기 장소로 이동<font color=\"white\">하시겠습니까?</font>";
                 btn_yes.visible = true;
                 btn_no.visible = true;

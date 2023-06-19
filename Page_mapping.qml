@@ -594,79 +594,14 @@ Item {
                 }
             }
 
-            Popup{
+            Popup_help{
                 id: popup_mapping_help
-                anchors.centerIn: parent
-                width: 800
-                height: 600
-                background: Rectangle{
-                    width: popup_mapping_help.width
-                    height: popup_mapping_help.height
-                    radius: 30
-                    color: color_dark_black
-                    opacity: 0.9
-                }
-                Column{
-                    Rectangle{
-                        width: popup_mapping_help.width
-                        height: 100
-                        color: "transparent"
-                        Text{
-                            anchors.centerIn: parent
-                            text: "도움말"
-                            font.family: font_noto_r.name
-                            font.pixelSize: 50
-                            color:"white"
-                        }
-                    }
-                    Rectangle{
-                        width: popup_mapping_help.width
-                        height: popup_mapping_help.height - 100
-                        color: "transparent"
-                        Column{
-                            anchors.centerIn: parent
-                            spacing: 50
-                            Column{
-                                spacing: 10
-                                width: 550
-                                Text{
-                                    text: "Q. 매핑을 새로 시작하고 싶어요."
-                                    font.family: font_noto_r.name
-                                    font.pixelSize: 25
-                                    color:"white"
-                                }
-                                Text{
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    text: "매핑을 새로 시작하려면 취소를 누르고 다시 시작해주세요."
-                                    font.family: font_noto_r.name
-                                    font.pixelSize: 20
-                                    color:"white"
-                                }
-                            }
-                            Column{
-                                spacing: 10
-                                width: 550
-                                Text{
-                                    text: "Q. 매핑을 새로 시작하고 싶어요."
-                                    font.family: font_noto_r.name
-                                    font.pixelSize: 25
-                                    color:"white"
-                                }
-                                Text{
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    text: "매핑을 새로 시작하려면 취소를 누르고 다시 시작해주세요."
-                                    font.family: font_noto_r.name
-                                    font.pixelSize: 20
-                                    color:"white"
-                                }
-                            }
-                        }
-
-                    }
-
+                Component.onCompleted: {
+                    clear();
+                    addTip("매핑을 새로 시작하고 싶어요.","매핑을 새로 시작하려면 취소를 누르고 다시 시작해주세요.");
+                    addTip("안녕 로봇","안녕 인간");
                 }
             }
-
             Map_full{
                 id: mapping_view
                 enabled: true
@@ -773,7 +708,7 @@ Item {
 //                repeat: true
                 interval: 1000
                 onTriggered: {
-                    if(supervisor.getLCMConnection()){
+                    if(supervisor.getIPCConnection()){
                         supervisor.writelog("[MAPPING] START Mapping : Slam restart detected!")
                         loading.hide();
 //                        supervisor.setMotorLock(true);

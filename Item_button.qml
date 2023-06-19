@@ -6,6 +6,7 @@ import QtQuick.Dialogs 1.2
 import Qt.labs.platform 1.0 as Platform
 import QtQuick.Shapes 1.12
 import QtGraphicalEffects 1.0
+import QtMultimedia 5.12
 import "."
 import io.qt.Supervisor 1.0
 
@@ -14,6 +15,7 @@ Item {
     property string icon: ""
     property string name: ""
     property bool highlight: false
+    width: 100
     height: width
     property color shadow_color: color_light_gray
     property color btn_color: "white"
@@ -26,13 +28,9 @@ Item {
     property bool running: false
     onRunningChanged: {
         if(running){
-//            highlight = true;
-////            ani_radial_shape_once.start();
             ani_radial_shape.start();
         }else{
-//            highlight = false;
             ani_radial_shape.stop();
-
         }
     }
     function pressed(){
@@ -40,6 +38,7 @@ Item {
     }
     function released(){
         btn_color = "white";
+        click_sound.play();
     }
 
     Rectangle{
@@ -59,11 +58,11 @@ Item {
                 Image{
                     source: icon
                     Component.onCompleted: {
-                        if(sourceSize.width > 30)
-                            sourceSize.width = 30
+                        if(sourceSize.width > 40)
+                            sourceSize.width = 40
 
-                        if(sourceSize.height > 30)
-                            sourceSize.height = 30
+                        if(sourceSize.height > 40)
+                            sourceSize.height = 40
                     }
                     ColorOverlay{
                         anchors.fill: parent
@@ -78,6 +77,7 @@ Item {
                     color: item_Button.enabled?"black":"white"
                     horizontalAlignment: Text.AlignHCenter
                     font.family: font_noto_r.name
+                    font.pixelSize: 20
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
@@ -112,7 +112,10 @@ Item {
         }
     }
 
-
+    SoundEffect{
+        id: click_sound
+        source: "bgm/click2.wav"
+    }
     SequentialAnimation{
         id: ani_radial_shape
         loops: -1
@@ -187,7 +190,6 @@ Item {
             print("finish")
         }
     }
-
     SequentialAnimation{
         id: ani_btn_pushed
         PropertyAnimation{
@@ -219,6 +221,4 @@ Item {
             print("finish")
         }
     }
-
-
 }

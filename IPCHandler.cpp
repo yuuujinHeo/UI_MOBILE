@@ -140,7 +140,7 @@ void IPCHandler::onTimer(){
         probot->motor[1].current = temp1.cur_m1/10;
         probot->status_power = temp1.status_power;
         if(probot->status_emo == temp1.status_emo){
-            plog->write("[LCM] EMO status changed !! "+QString::number(!temp1.status_emo));
+            plog->write("[IPC] EMO status changed !! "+QString::number(!temp1.status_emo));
         }
         if(probot->status_lock != temp1.ui_motor_lock_state){
             plog->write("[IPC] MOTOR LOCK status changed !! "+QString::number(temp1.ui_motor_lock_state));
@@ -150,7 +150,6 @@ void IPCHandler::onTimer(){
         probot->status_remote = temp1.status_remote;
         //DEBUG
         probot->status_charge = temp1.status_charge;
-        probot->motor_state = temp1.ui_motor_state;
         probot->localization_state = temp1.ui_loc_state;
         probot->running_state = temp1.ui_auto_state;
         probot->obs_state = temp1.ui_obs_state;
@@ -172,18 +171,16 @@ void IPCHandler::onTimer(){
         flag_rx = true;
         read_count = 0;
 
+        QVector<POSE> temp_path;
         probot->pathSize = temp2.num;
         for(int i=0; i<probot->pathSize; i++){
             POSE temp;
             temp.point.x = temp2.x[i];
             temp.point.y = temp2.y[i];
             temp.angle = 0;
-            if(probot->curPath.size() > i){
-                probot->curPath[i] = temp;
-            }else{
-                probot->curPath.push_back(temp);
-            }
+            temp_path.push_back(temp);
         }
+        probot->curPath = temp_path;
         prev_tick_path = temp2.tick;
         emit pathchanged();
     }

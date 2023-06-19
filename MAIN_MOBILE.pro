@@ -23,7 +23,6 @@ SOURCES += \
     CameraView.cpp \
     IPCHandler.cpp \
     JoystickHandler.cpp \
-    LCMHandler.cpp \
     Loading.cpp \
     MapView.cpp \
     SoundHandler.cpp \
@@ -77,7 +76,6 @@ HEADERS += \
     spline.h \
     JoystickHandler.h \
     Keyemitter.h \
-    LCMHandler.h \
     Loading.h \
     Logger.h \
     MapHeader.h \
@@ -131,14 +129,11 @@ contains(QT_ARCH, x86_64){
             -lboost_system \
             -lopencv_ximgproc
 
-    # LCM
     INCLUDEPATH += /usr/local/include/
     LIBS += -L/usr/local/lib/
-    INCLUDEPATH += /usr/include/lcm/
     INCLUDEPATH += /usr/local/include/QuaZip-Qt5-1.4
     LIBS += -L/usr/lib/aarch64-linux-gnu/
     LIBS += -lz
-    LIBS += -llcm
 
     # USB
     LIBS += -lusb
@@ -164,10 +159,7 @@ contains(QT_ARCH, arm64) {
             -lboost_system \
             -lopencv_ximgproc
 
-    # LCM
-    INCLUDEPATH += /usr/include/lcm/
     LIBS += -L/usr/lib/aarch64-linux-gnu/
-    LIBS += -llcm
 
 
     # USB

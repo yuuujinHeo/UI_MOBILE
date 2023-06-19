@@ -642,10 +642,9 @@ Item {
             robot_battery = supervisor.getBattery();
             curTime = Qt.formatTime(new Date(), "hh:mm");
 
-            is_con_robot = supervisor.getLCMConnection();
-            robot_rx = supervisor.getLCMRX();
-            robot_tx = supervisor.getLCMTX();
-            is_con_joystick = supervisor.isconnectJoy();
+            is_con_robot = supervisor.getIPCConnection();
+            robot_rx = supervisor.getIPCRX();
+            robot_tx = supervisor.getIPCTX();
             is_con_server = supervisor.isConnectServer();
 
             is_motor_power = supervisor.getPowerStatus();

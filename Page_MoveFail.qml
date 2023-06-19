@@ -870,7 +870,6 @@ Item {
             height: width
             show_button_following: true
             show_button_lidar: true
-            show_button_object: true
             show_connection: true
             anchors.right: parent.right
             anchors.top: parent.top

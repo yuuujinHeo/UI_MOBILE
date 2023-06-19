@@ -50,7 +50,6 @@ Supervisor::Supervisor(QObject *parent)
 
     zip = new ZIPHandler();
     ipc = new IPCHandler();
-    lcm = new LCMHandler();
     joystick = new JoystickHandler();
     call = new CallbellHandler();
     git = new HTTPHandler();
@@ -76,10 +75,6 @@ Supervisor::Supervisor(QObject *parent)
     readSetting();
     ui_state = UI_STATE_NONE;
 
-    connect(lcm, SIGNAL(pathchanged()),this,SLOT(path_changed()));
-    connect(lcm, SIGNAL(mappingin()),this,SLOT(mapping_update()));
-    connect(lcm, SIGNAL(objectingin()),this,SLOT(objecting_update()));
-    connect(lcm, SIGNAL(cameraupdate()),this,SLOT(camera_update()));
     connect(ipc, SIGNAL(pathchanged()),this,SLOT(path_changed()));
     connect(ipc, SIGNAL(mappingin()),this,SLOT(mapping_update()));
     connect(ipc, SIGNAL(objectingin()),this,SLOT(objecting_update()));
@@ -91,11 +86,15 @@ Supervisor::Supervisor(QObject *parent)
     plog->write("[BUILDER] SUPERVISOR constructed");
 
 
-    QProcess *process = new QProcess(this);
-    QString file = QDir::homePath() + "/auto_reset.sh";
-    process->start(file);
-    process->waitForReadyRead();
-    startSLAM();
+
+    QList<QString> path_home_str = QDir::homePath().split("/");
+    if(path_home_str[path_home_str.size()-1] == "odroid"){
+        QProcess *process = new QProcess(this);
+        QString file = QDir::homePath() + "/auto_reset.sh";
+        process->start(file);
+        process->waitForReadyRead();
+        startSLAM();
+    }
 
     wifi_process = new QProcess();
     connect(wifi_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_con_output()));
@@ -103,7 +102,6 @@ Supervisor::Supervisor(QObject *parent)
     wifi_check_process = new QProcess();
     connect(wifi_check_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_ch_output()));
     connect(wifi_check_process,SIGNAL(readyReadStandardError()),this,SLOT(wifi_ch_error()));
-
     readWifi();
 }
 
@@ -170,11 +168,8 @@ QString Supervisor::getAnnotPath(QString name){
 QString Supervisor::getMetaPath(QString name){
     return QDir::homePath()+"/maps/"+name+"/map_meta.ini";
 }
-QString Supervisor::getTravelRawPath(QString name){
-    return QDir::homePath()+"/maps/"+name+"/travel_raw.png";
-}
 QString Supervisor::getTravelPath(QString name){
-    return QDir::homePath()+"/maps/"+name+"/travel_edited.png";
+    return QDir::homePath()+"/maps/"+name+"/map_travel_line.png";
 }
 QString Supervisor::getCostPath(QString name){
     return QDir::homePath()+"/maps/"+name+"/map_cost.png";
@@ -189,7 +184,6 @@ void Supervisor::new_call(){
         plog->write("[SUPERVISOR] NEW CALL ("+call->getBellID()+") SETTING");
         pmap->locations[setting_call_num].call_id = call->getBellID();
         qDebug() << setting_call_num << call->getBellID();
-//        setSetting("CALLING/call_"+QString::number(setting_call_id),call->getBellID());
         QMetaObject::invokeMethod(mMain, "call_setting");
     }else{
         bool already_in = false;
@@ -601,30 +595,11 @@ void Supervisor::readSetting(QString map_name){
         probot->trays.push_back(temp);
     }
 
-    if(probot->ipc_use){
-
-    }else{
-        lcm->subscribe();
-    }
     flag_read_ini = true;
 
     QMetaObject::invokeMethod(mMain, "update_ini");
 }
 
-void Supervisor::setVelocity(float vel){
-    probot->velocity = vel;
-    setSetting("ROBOT_SW/velocity",QString::number(vel));
-    readSetting();
-    if(probot->ipc_use){
-        ipc->set_velocity(vel);
-    }else{
-        lcm->setVelocity(vel);
-    }
-}
-
-float Supervisor::getVelocity(){
-    return probot->velocity;
-}
 int Supervisor::getTrayNum(){
     return setting.tray_num;
 }
@@ -644,15 +619,9 @@ QString Supervisor::getRobotType(){
 }
 
 void Supervisor::requestCamera(){
-    if(probot->ipc_use){
-        IPCHandler::CMD send_msg;
-        send_msg.cmd = ROBOT_CMD_REQ_CAMERA;
-        ipc->set_cmd(send_msg);
-    }else{
-        command send_msg;
-        send_msg.cmd = ROBOT_CMD_REQ_CAMERA;
-        lcm->sendCommand(send_msg, "");
-    }
+    IPCHandler::CMD send_msg;
+    send_msg.cmd = ROBOT_CMD_REQ_CAMERA;
+    ipc->set_cmd(send_msg);
 }
 void Supervisor::setCamera(QString left, QString right){
     setSetting("SENSOR/left_camera",left);
@@ -739,11 +708,7 @@ bool Supervisor::isExistAnnotation(QString name){
     QString file_annot = getAnnotPath(name);
     return QFile::exists(file_annot);
 }
-bool Supervisor::isExistTravelRaw(QString name){
-    QString file = getTravelRawPath(name);
-    return QFile::exists(file);
-}
-bool Supervisor::isExistTravelEdited(QString name){
+bool Supervisor::isExistTravelMap(QString name){
     QString file = getTravelPath(name);
     return QFile::exists(file);
 }
@@ -797,6 +762,10 @@ QString Supervisor::getMapFile(int num){
     return map_detail_list[num];
 }
 bool Supervisor::isExistMap(QString name){
+    if(name==""){
+        name = getMapname();
+    }
+
     if(QFile::exists(getMapPath(name))){
         if(QFile::exists(getRawMapPath(name))){
 
@@ -817,13 +786,12 @@ bool Supervisor::isExistRawMap(QString name){
         return false;
     }
 }
-bool Supervisor::isExistMap(){
+bool Supervisor::isLoadMap(){
     //기본 설정된 맵파일 확인
     if(pmap->map_loaded){
         if(QFile::exists(getMapPath(getMapname()))){
             return true;
         }else{
-
             plog->write("[SETTING - ERROR] "+getMapname()+" not found. map unloaded.");
             setSetting("FLOOR/map_load","false");
             readSetting();
@@ -1084,28 +1052,19 @@ bool Supervisor::rotate_map(QString _src, QString _dst, int mode){
         }
     }
 }
-bool Supervisor::getLCMConnection(){
+bool Supervisor::getIPCConnection(){
     if(probot->ipc_use)
         return ipc->getConnection();
-    else
-        return lcm->isconnect;
 }
-bool Supervisor::getLCMRX(){
+bool Supervisor::getIPCRX(){
     if(probot->ipc_use)
         return ipc->flag_rx;
-    else
-        return lcm->flag_rx;
 }
-bool Supervisor::getLCMTX(){
+bool Supervisor::getIPCTX(){
     if(probot->ipc_use)
         return ipc->flag_tx;
-    else
-        return lcm->flag_tx;
 }
-bool Supervisor::getLCMProcess(){
-    return false;
-}
-bool Supervisor::getIniRead(){
+bool Supervisor::isLoadINI(){
     return flag_read_ini;
 }
 int Supervisor::getusbsize(){
@@ -1174,7 +1133,6 @@ void Supervisor::restartSLAM(){
             slam_process->kill();
             slam_process->close();
             probot->localization_state = LOCAL_NOT_READY;
-            probot->motor_state = MOTOR_NOT_READY;
             probot->status_charge = 0;
             probot->status_emo = 0;
             probot->status_power = 0;
@@ -1183,7 +1141,6 @@ void Supervisor::restartSLAM(){
             slam_process->setWorkingDirectory(QDir::homePath());
             slam_process->start(file);
             slam_process->waitForReadyRead(3000);
-            lcm->isconnect = false;
             plog->write("[SUPERVISOR] RESTART SLAM -> START SLAM "+QString::number(slam_process->pid()));
         }else if(slam_process->state() == QProcess::Starting){
             plog->write("[SUPERVISOR] RESTART SLAM -> STARTING");
@@ -1194,12 +1151,10 @@ void Supervisor::restartSLAM(){
             tempprocess->waitForReadyRead(3000);
         }
         probot->localization_state = LOCAL_NOT_READY;
-        probot->motor_state = MOTOR_NOT_READY;
         probot->status_charge = 0;
         probot->status_emo = 0;
         probot->status_power = 0;
         probot->status_remote = 0;
-        lcm->isconnect = false;
     }else{
         plog->write("[SUPERVISOR] RESTART SLAM -> SLAM PROCESS IS NEW ");
         slam_process = new QProcess(this);
@@ -1210,24 +1165,20 @@ void Supervisor::restartSLAM(){
         plog->write("[SUPERVISOR] RESTART SLAM -> START SLAM "+QString::number(slam_process->pid()));
     }
     probot->localization_state = LOCAL_NOT_READY;
-    probot->motor_state = MOTOR_NOT_READY;
     probot->status_charge = 0;
     probot->status_emo = 0;
     probot->status_power = 0;
     probot->status_remote = 0;
-    lcm->isconnect = false;
     ipc->update();
 }
 
 void Supervisor::startSLAM(){
     plog->write("[SUPERVISOR] START SLAM");
     probot->localization_state = LOCAL_NOT_READY;
-    probot->motor_state = MOTOR_NOT_READY;
     probot->status_charge = 0;
     probot->status_emo = 0;
     probot->status_power = 0;
     probot->status_remote = 0;
-    lcm->isconnect = false;
 
     slam_process = new QProcess(this);
     QString file = "xterm ./auto_test.sh";
@@ -1251,9 +1202,6 @@ void Supervisor::startMapping(int mapsize, float grid){
     if(probot->ipc_use){
         ipc->startMapping(mapsize, grid);
         ipc->is_mapping = true;
-    }else{
-        lcm->startMapping(grid);
-        lcm->is_mapping = true;
     }
 }
 void Supervisor::stopMapping(){
@@ -1262,10 +1210,6 @@ void Supervisor::stopMapping(){
         ipc->flag_mapping = false;
         ipc->is_mapping = false;
         ipc->stopMapping();
-    }else{
-        lcm->flagMapping = false;
-        lcm->is_mapping = false;
-        lcm->sendCommand(ROBOT_CMD_MAPPING_STOP, "MAPPING STOP");
     }
 }
 void Supervisor::saveMapping(QString name){
@@ -1273,8 +1217,6 @@ void Supervisor::saveMapping(QString name){
         ipc->flag_mapping = false;
         ipc->is_mapping = false;
         ipc->saveMapping(name);
-    }else{
-        lcm->saveMapping(name);
     }
 }
 void Supervisor::startObjecting(){
@@ -1282,9 +1224,6 @@ void Supervisor::startObjecting(){
     if(probot->ipc_use){
         ipc->startObjecting();
         ipc->is_objecting = true;
-    }else{
-        lcm->startObjecting();
-        lcm->is_objecting = true;
     }
 }
 void Supervisor::stopObjecting(){
@@ -1293,17 +1232,11 @@ void Supervisor::stopObjecting(){
         ipc->flag_objecting = false;
         ipc->is_objecting = false;
         ipc->stopObjecting();
-    }else{
-        lcm->flagObjecting = false;
-        lcm->is_objecting = false;
-        lcm->sendCommand(ROBOT_CMD_OBJECTING_STOP, "OBJECTING STOP");
     }
 }
 void Supervisor::saveObjecting(){
     if(probot->ipc_use){
         ipc->saveObjecting();
-    }else{
-        lcm->saveObjecting();
     }
 }
 void Supervisor::setSLAMMode(int mode){
@@ -1335,38 +1268,28 @@ void Supervisor::slam_setInit(){
     plog->write("[SLAM] SLAM SET INIT : "+QString().sprintf("%f, %f, %f",pmap->init_pose.point.x,pmap->init_pose.point.y,pmap->init_pose.angle));
     if(probot->ipc_use){
         ipc->setInitPose(pmap->init_pose.point.x, pmap->init_pose.point.y, pmap->init_pose.angle);
-    }else{
-        lcm->setInitPose(pmap->init_pose.point.x, pmap->init_pose.point.y, pmap->init_pose.angle);
     }
 }
 void Supervisor::slam_run(){
     if(probot->ipc_use){
         ipc->set_cmd(ROBOT_CMD_SLAM_RUN, "LOCALIZATION RUN");
-    }else{
-        lcm->sendCommand(ROBOT_CMD_SLAM_RUN, "LOCALIZATION RUN");
     }
 }
 void Supervisor::slam_stop(){
     if(probot->ipc_use){
         ipc->set_cmd(ROBOT_CMD_SLAM_STOP, "LOCALIZATION STOP");
-    }else{
-        lcm->sendCommand(ROBOT_CMD_SLAM_STOP, "LOCALIZATION STOP");
     }
 }
 void Supervisor::slam_autoInit(){
     if(probot->ipc_use){
         plog->write("[LOCALIZATION] AUTO INIT : "+QString::number(pmap->map_rotate_angle));
         ipc->set_cmd(ROBOT_CMD_SLAM_AUTO, "LOCALIZATION AUTO INIT");
-    }else{
-        lcm->sendCommand(ROBOT_CMD_SLAM_AUTO, "LOCALIZATION AUTO INIT");
     }
 }
 void Supervisor::slam_fullautoInit(){
     if(probot->ipc_use){
         plog->write("[LOCALIZATION] FULL AUTO INIT : "+QString::number(pmap->map_rotate_angle));
         ipc->set_cmd(ROBOT_CMD_SLAM_FULL_AUTO, "LOCALIZATION FULL AUTO INIT");
-    }else{
-        lcm->sendCommand(ROBOT_CMD_SLAM_FULL_AUTO, "LOCALIZATION FULL AUTO INIT");
     }
 }
 bool Supervisor::is_slam_running(){
@@ -1379,25 +1302,17 @@ bool Supervisor::is_slam_running(){
 bool Supervisor::getMappingflag(){
     if(probot->ipc_use){
         return ipc->flag_mapping;
-    }else{
-        return lcm->flagMapping;
     }
 }
 
-void Supervisor::setMappingflag(bool flag){
-    lcm->flagMapping = flag;
-}
 
 bool Supervisor::getObjectingflag(){
     if(probot->ipc_use){
         return ipc->flag_objecting;
-    }else{
-        return lcm->flagMapping;
     }
 }
 
 void Supervisor::setObjectingflag(bool flag){
-    lcm->flagObjecting = flag;
     ipc->flag_objecting = flag;
 }
 
@@ -1523,67 +1438,6 @@ QObject *Supervisor::getMinimap(QString filename) const{
 
 #endif
 
-
-cv::Mat map_test;
-//QObject *Supervisor::getTravelRawMap(QString filename) const{
-//    PixmapContainer *pc = new PixmapContainer();
-//    QString file_path = QDir::homePath()+"/maps/"+filename+"/travel_raw.png";
-//    if(filename == "" || !QFile::exists(file_path)){
-//        QPixmap blank(pmap->height, pmap->width);{
-//            QPainter painter(&blank);
-//            painter.fillRect(blank.rect(),"black");
-//        }
-
-//        pc->pixmap = blank;
-//        Q_ASSERT(!pc->pixmap.isNull());
-//        QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
-//        return pc;
-//    }
-
-//    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
-//    cv::flip(map,map,0);
-//    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
-
-//    cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(map.cols/2, map.rows/2),-map_rotate_angle, 1.0);
-//    cv::warpAffine(map,map,rot,map.size(),cv::INTER_NEAREST);
-
-//    cv::Mat argb_map(map.rows, map.cols, CV_8UC4, cv::Scalar::all(0));
-//    for(int i = 0; i < map.rows; i++)
-//    {
-//        for(int j = 0; j < map.cols; j++)
-//        {
-//            if(map.ptr<uchar>(i)[j] == 255)
-//            {
-//                argb_map.ptr<cv::Vec4b>(i)[j] = cv::Vec4b(0,0,255,255);
-//            }
-//        }
-//    }
-//    map_test = argb_map;
-
-//    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(map_test));
-//    Q_ASSERT(!pc->pixmap.isNull());
-//    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
-//    return pc;
-//}
-
-//QObject *Supervisor::getTravel(QList<int> canvas) const{
-//    PixmapContainer *pc = new PixmapContainer();
-//    cv::Mat argb_map;
-//    map_test.copyTo(argb_map);
-
-//    for(int i=0; i<canvas.size(); i++){
-//        if(canvas[i] == 255){
-//            argb_map.ptr<cv::Vec4b>(i/pmap->height)[i%pmap->width] = cv::Vec4b(0,0,255,255);
-//        }else if(canvas[i] == 100){
-//            argb_map.ptr<cv::Vec4b>(i/pmap->height)[i%pmap->width] = cv::Vec4b(0,0,0,0);
-//        }
-//    }
-//    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(argb_map));
-//    Q_ASSERT(!pc->pixmap.isNull());
-//    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
-//    return pc;
-//}
-
 QString Supervisor::getnewMapname(){
     int max_num = -1;
     for(int i=0; i<getAvailableMap(); i++){
@@ -1601,22 +1455,7 @@ QString Supervisor::getnewMapname(){
     }
 }
 
-////*********************************************  JOYSTICK 관련   ***************************************************////
-bool Supervisor::isconnectJoy(){
-    return joystick->connection;
-}
-float Supervisor::getJoyAxis(int num){
-    return joystick->JoyAxis[num];
-}
-int Supervisor::getJoyButton(int num){
-    return joystick->JoyButton[num];
-}
-QString Supervisor::getKeyboard(int mode){
-    return "";
-}
-QString Supervisor::getJoystick(int mode){
-    return "";
-}
+
 void Supervisor::usb_detect(){
     std::string user = getenv("USER");
     std::string path = "/media/" + user;
@@ -1652,9 +1491,6 @@ void Supervisor::usb_detect(){
                     continue;
                 }
             }
-
-
-
         }
     }
 
@@ -1746,6 +1582,7 @@ void Supervisor::updateUSB(){
     process.start("xterm ./update_dummy.sh");
     process.waitForReadyRead(-1);
 }
+
 void Supervisor::makeUSBShell(){
     QString file_name = QDir::homePath() + "/update.sh";
     QFile file(file_name);
@@ -1809,7 +1646,6 @@ void Supervisor::makeUSBShell(){
     process.waitForReadyRead(200);
 }
 
-
 ////*********************************************  ANNOTATION 관련   ***************************************************////
 void Supervisor::setObjPose(){
     pmap->list_obj_dR.clear();
@@ -1840,8 +1676,6 @@ void Supervisor::setObjPose(){
         pmap->list_obj_uL.push_back(temp_dR);
     }
 }
-
-
 
 /////Location
 QString Supervisor::getServingName(int group, int num){
@@ -2165,7 +1999,10 @@ POSE setAxisBack(cv::Point2f _point, float _angle){
 }
 
 bool sortLocation2(const LOCATION &l1, const LOCATION &l2){
-    return l1.number < l2.number;
+    if(l1.group == l2.group)
+        return l1.number < l2.number;
+    else
+        return false;
 }
 
 int Supervisor::getObjectNum(){
@@ -2418,48 +2255,26 @@ QVector<int> Supervisor::getPickuptrays(){
 
 
 ////*********************************************  ROBOT MOVE 관련   ***************************************************////
-void Supervisor::moveTo(QString target, int preset){
-//    if(probot->ipc_use){
-//        ipc->moveToLocation(target, preset);
-//    }else{
-//        lcm->moveTo(target);
-//    }
-}
+
 void Supervisor::moveToServing(QString target, int preset){
     if(probot->ipc_use){
         ipc->moveToLocation(getloc(target),preset);
 //        ipc->moveToServing(target, preset);
-    }else{
-        lcm->moveTo(target);
     }
 }
 void Supervisor::moveToLast(){
     if(probot->ipc_use){
 //        ipc->moveTo(target_num);
-    }else{
-        lcm->moveToLast();
     }
-}
-void Supervisor::moveTo(float x, float y, float th){
-    if(probot->ipc_use){
-//        ipc->moveTo(target_num);
-    }else{
-        lcm->moveToLast();
-    }
-    lcm->moveTo(x,y,th);
 }
 void Supervisor::movePause(){
     if(probot->ipc_use){
         ipc->movePause();
-    }else{
-        lcm->movePause();
     }
 }
 void Supervisor::moveResume(){
     if(probot->ipc_use){
         ipc->moveResume();
-    }else{
-        lcm->moveResume();
     }
 }
 void Supervisor::clearFlagStop(){
@@ -2470,11 +2285,8 @@ void Supervisor::clearFlagStop(){
 void Supervisor::moveStop(){
     if(probot->ipc_use){
         ipc->moveStop();
-    }else{
-        lcm->moveStop();
     }
     ui_cmd = UI_CMD_NONE;
-//    ui_state = UI_STATE_READY;
     ui_state = UI_STATE_INIT_DONE;
     isaccepted = false;
     QMetaObject::invokeMethod(mMain, "movestopped");
@@ -2482,8 +2294,6 @@ void Supervisor::moveStop(){
 void Supervisor::moveManual(){
     if(probot->ipc_use){
         ipc->moveManual();
-    }else{
-        lcm->moveManual();
     }
 }
 void Supervisor::moveToCharge(){
@@ -2505,23 +2315,6 @@ QString Supervisor::getcurTable(){
     }
     return "-";
 }
-void Supervisor::joyMoveXY(float x){
-    probot->joystick[0] = x;
-    lcm->flagJoystick = true;
-    ipc->flag_joystick = true;
-}
-void Supervisor::joyMoveR(float r){
-    probot->joystick[1] = r;
-    lcm->flagJoystick = true;
-    ipc->flag_joystick = true;
-}
-float Supervisor::getJoyXY(){
-    return probot->joystick[0];
-}
-float Supervisor::getJoyR(){
-    return probot->joystick[1];
-}
-
 void Supervisor::resetHomeFolders(){
     plog->write("[USER INPUT] RESET HOME FOLDERS");
 
@@ -2656,7 +2449,17 @@ float Supervisor::getPowerTotal(){
     return probot->total_power;
 }
 int Supervisor::getMotorState(){
-    return probot->motor_state;
+    if(probot->status_emo){
+        return 0;
+    }else if(!probot->status_lock){
+        return 1;
+    }else{
+        if(probot->motor[0].status == 0 && probot->motor[1].status == 0){
+            return 0;
+        }else{
+            return 1;
+        }
+    }
 }
 int Supervisor::getObsState(){
     return probot->obs_state;
@@ -2706,14 +2509,14 @@ float Supervisor::getlastRobotth(){
     return temp.angle;
 }
 int Supervisor::getPathNum(){
-    if(ipc->flag_path || lcm->flagPath){
+    if(ipc->flag_path){
         return 0;
     }else{
         return probot->pathSize;
     }
 }
 float Supervisor::getPathx(int num){
-    if(ipc->flag_path || lcm->flagPath){
+    if(ipc->flag_path ){
         return 0;
     }else{
         POSE temp = setAxis(probot->curPath[num]);
@@ -2721,7 +2524,7 @@ float Supervisor::getPathx(int num){
     }
 }
 float Supervisor::getPathy(int num){
-    if(ipc->flag_path || lcm->flagPath){
+    if(ipc->flag_path){
         return 0;
     }else{
         POSE temp = setAxis(probot->curPath[num]);
@@ -2729,7 +2532,7 @@ float Supervisor::getPathy(int num){
     }
 }
 float Supervisor::getPathth(int num){
-    if(ipc->flag_path || lcm->flagPath){
+    if(ipc->flag_path){
         return 0;
     }else{
         POSE temp = setAxis(probot->curPath[num]);
@@ -2783,182 +2586,6 @@ QVector<int> Supervisor::getOrigin(){
     temp.push_back(pmap->origin[1]);
     return temp;
 }
-
-////*********************************************  PATROL 관련   ***************************************************////
-
-#ifdef PATROL_USE
-QString Supervisor::getPatrolFileName(){
-    if(patrol.filename == ""){
-        return patrol.filename;
-    }else{
-        QFile *file  = new QFile(patrol.filename);
-        if(file->open(QIODevice::ReadOnly)){
-
-            QStringList namelist = patrol.filename.split("/");
-            QStringList name = namelist[namelist.size()-1].split(".");
-            return name[0];
-        }else{
-            return "";
-        }
-    }
-}
-void Supervisor::makePatrol(){
-    plog->write("[USER INPUT] Make New Patrol");
-    setSetting("PATROL/curfile","");
-    patrol.path.clear();
-    patrol.filename = "";
-}
-void Supervisor::loadPatrolFile(QString path){
-//    QStringList list1 = path.split("/");
-//    QStringList list = list1[list1.size()-1].split(".");
-//    if(list.size() == 1){
-//        path = QDir::homePath()+"/patrols/" + list1[list1.size()-1] + ".ini";
-//    }else{
-//        path = QDir::homePath()+"/patrols/" + list1[list1.size()-1];
-//    }
-//    plog->write("[USER INPUT] Load Patrol : "+path);
-//    QSettings patrols(path, QSettings::IniFormat);
-//    patrol.path.clear();
-//    patrol.filename = path;
-//    ST_PATROL temp;
-//    patrols.beginGroup("PATH");
-//    int num = patrols.value("num").toInt();
-//    patrol.mode = patrols.value("mode").toInt();
-//    for(int i=0; i<num; i++){
-//        temp.type = patrols.value("type_"+QString::number(i)).toString();
-//        temp.location = patrols.value("location_"+QString::number(i)).toString();
-//        temp.pose.x = patrols.value("x_"+QString::number(i)).toFloat();
-//        temp.pose.y = patrols.value("y_"+QString::number(i)).toFloat();
-//        temp.pose.th = patrols.value("th_"+QString::number(i)).toFloat();
-//        patrol.path.push_back(temp);
-//    }
-//    patrols.endGroup();
-//    setSetting("PATROL/curfile",path);
-}
-void Supervisor::savePatrolFile(QString path){
-//    QStringList list1 = path.split("/");
-//    QStringList list = list1[list1.size()-1].split(".");
-//    if(list.size() == 1){
-//        path = QDir::homePath()+"/patrols/" + list1[list1.size()-1] + ".ini";
-//    }else{
-//        path = QDir::homePath()+"/patrols/" + list1[list1.size()-1];
-//    }
-//    plog->write("[USER INPUT] Save Patrol : "+path);
-//    QSettings patrols(path, QSettings::IniFormat);
-//    patrols.clear();
-//    for(int i=0; i<patrol.path.size(); i++){
-//        patrols.setValue("PATH/type_"+QString::number(i),patrol.path[i].type);
-//        patrols.setValue("PATH/location_"+QString::number(i),patrol.path[i].location);
-//        patrols.setValue("PATH/x_"+QString::number(i),QString::number(patrol.path[i].pose.x));
-//        patrols.setValue("PATH/y_"+QString::number(i),QString::number(patrol.path[i].pose.y));
-//        patrols.setValue("PATH/th_"+QString::number(i),QString::number(patrol.path[i].pose.th));
-//    }
-//    patrols.setValue("PATH/num",patrol.path.size());
-//    patrols.setValue("PATH/mode",QString::number(patrol.mode));
-
-//    setSetting("PATROL/curfile",path);
-}
-void Supervisor::addPatrol(QString type, QString location, float x, float y, float th){
-    ST_PATROL temp;
-
-    temp.type = type;
-    temp.location = location;
-    qDebug() << type << location;
-
-    if(temp.location == "MANUAL"){
-        cv::Point2f temp1 = canvasTomap(x,y);
-        temp.pose.x = temp1.x;
-        temp.pose.y = temp1.y;
-        temp.pose.th = th;
-        patrol.path.push_back(temp);
-        plog->write("[USER INPUT] Add Patrol Pose : "+QString().sprintf("%f, %f, %f",temp.pose.x, temp.pose.y, temp.pose.th));
-    }else{
-        for(int i=0; i<pmap->locations.size(); i++){
-            if(pmap->locations[i].name == temp.location){
-                temp.pose.x = pmap->locations[i].pose.x;
-                temp.pose.y = pmap->locations[i].pose.y;
-                temp.pose.th = pmap->locations[i].pose.th;
-                patrol.path.push_back(temp);
-                plog->write("[USER INPUT] Add Patrol Location : "+location);
-                break;
-            }
-        }
-    }
-}
-void Supervisor::removePatrol(int num){
-    clear_all();
-    if(num > -1 && num < patrol.path.size()){
-        patrol.path.remove(num);
-        plog->write("[USER INPUT] Remove Patrol : "+QString::number(num));
-    }
-}
-void Supervisor::movePatrolUp(int num){
-    if(num > 1 && num < patrol.path.size()){
-        ST_PATROL temp = patrol.path[num];
-        patrol.path.remove(num);
-        patrol.path.insert(num-1,temp);
-        plog->write("[USER INPUT] Move Up Patrol : "+QString::number(num));
-    }
-}
-void Supervisor::movePatrolDown(int num){
-    if(num > 0 && num < patrol.path.size()-1){
-        ST_PATROL temp = patrol.path[num];
-        patrol.path.remove(num);
-        patrol.path.insert(num+1,temp);
-        plog->write("[USER INPUT] Move Down Patrol : "+QString::number(num));
-    }
-}
-int Supervisor::getPatrolMode(){
-    return patrol.mode;
-}
-void Supervisor::setPatrolMode(int mode){
-    patrol.mode = mode;
-    plog->write("[USER INPUT] SET Patrol Mode : "+QString::number(mode));
-    QMetaObject::invokeMethod(mMain, "updatepatrol");
-}
-int Supervisor::getPatrolNum(){
-    return patrol.path.size();
-}
-QString Supervisor::getPatrolType(int num){
-    if(num > -1 && num < patrol.path.size()){
-        return patrol.path[num].type;
-    }else{
-        return "";
-    }
-}
-QString Supervisor::getPatrolLocation(int num){
-    if(num > -1 && num < patrol.path.size()){
-        return patrol.path[num].location;
-    }else{
-        return "";
-    }
-}
-float Supervisor::getPatrolX(int num){
-    if(num > -1 && num < patrol.path.size()){
-        ST_POSE temp = setAxis(patrol.path[num].pose);
-        return temp.x;
-    }else{
-        return 0;
-    }
-}
-float Supervisor::getPatrolY(int num){
-//    if(num > -1 && num < patrol.path.size()){
-//        ST_POSE temp = setAxis(patrol.path[num].pose);
-//        return temp.y;
-//    }else{
-//        return 0;
-//    }
-}
-float Supervisor::getPatrolTH(int num){
-//    if(num > -1 && num < patrol.path.size()){
-//        ST_POSE temp = setAxis(patrol.path[num].pose);
-//        return temp.th;
-//    }else{
-//        return 0;
-//    }
-}
-#endif
-
 
 void Supervisor::runRotateTables(){
     plog->write("[USER INPUT] START ROTATE TABLES");
@@ -3205,8 +2832,8 @@ void Supervisor::onTimer(){
     static int wifi_cmd_count = 0;
     static int prev_state = -1;
     static int prev_running_state = -1;
-    static int prev_motor_state = -1;
     static int prev_local_state = -1;
+    static int prev_motor_state = -1;
 
     static int state_count = 0;
     static int table_num_last = 0;
@@ -3217,7 +2844,6 @@ void Supervisor::onTimer(){
     // move start
     static int timer_cnt = 0;
 
-    probot->lcmconnection = lcm->isconnect;
     if(probot->ipc_use){
         if(ipc->getConnection()){
             if(ui_state != UI_STATE_NONE){
@@ -3228,9 +2854,9 @@ void Supervisor::onTimer(){
                         ui_state = UI_STATE_CHARGING;
                         QMetaObject::invokeMethod(mMain, "docharge");
                     }
-                }else if(probot->motor_state == MOTOR_NOT_READY){
-                    if(prev_motor_state != probot->motor_state){
-                        plog->write(QString::number(probot->status_emo)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
+                }else if(getMotorState()==0){
+                    if(prev_motor_state != 0){
+                        plog->write(QString::number(probot->status_emo)+QString::number(probot->status_lock)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
                         plog->write("[LCM] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL ");
                         if(ui_state != UI_STATE_MOVEFAIL){
                             ui_state = UI_STATE_MOVEFAIL;
@@ -3264,14 +2890,14 @@ void Supervisor::onTimer(){
                         count_excuseme = 0;
                         flag_excuseme = true;
                     }
-                }else if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY){
+                }else if(getMotorState()== 1 && probot->localization_state == LOCAL_READY){
                     if(ui_state == UI_STATE_INIT_DONE){
                         plog->write("[LCM] INIT ALL DONE -> UI_STATE = UI_STATE_READY");
                         ui_state = UI_STATE_READY;
                     }
                 }
             }else{
-                if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY){
+                if(getMotorState() == 1 && probot->localization_state == LOCAL_READY){
                     if(state_count++ > 10){
                         plog->write("[LCM] INIT ALL DONE? -> UI_STATE = UI_STATE_READY");
                         ui_state = UI_STATE_READY;
@@ -3287,78 +2913,7 @@ void Supervisor::onTimer(){
                 QMetaObject::invokeMethod(mMain, "stateinit");
             }
         }
-    }else{
-        if(lcm->isconnect){
-            if(ui_state != UI_STATE_NONE){
-                state_count = 0;
-                if(probot->status_charge == 1){
-                    if(ui_state != UI_STATE_CHARGING){
-                        plog->write("[LCM] Charging Start -> UI_STATE = UI_STATE_CHARGING");
-                        ui_state = UI_STATE_CHARGING;
-                        QMetaObject::invokeMethod(mMain, "docharge");
-                    }
-                }else if(probot->motor_state == MOTOR_NOT_READY){
-                    if(prev_motor_state != probot->motor_state){
-                        plog->write(QString::number(probot->status_emo)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
-                        plog->write("[LCM] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL ");
-                        if(ui_state != UI_STATE_MOVEFAIL){
-                            ui_state = UI_STATE_MOVEFAIL;
-                        }
-                    }
-                }else if(probot->localization_state == LOCAL_NOT_READY){
-                    if(prev_local_state != probot->localization_state){
-                        plog->write("[LCM] LOCAL NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
-                        if(ui_state != UI_STATE_MOVEFAIL){
-                            ui_state = UI_STATE_MOVEFAIL;
-                        }
-                    }
-                }else if(probot->localization_state == LOCAL_FAILED){
-                    if(prev_local_state != probot->localization_state){
-                        plog->write("[LCM] LOCAL FAILED -> UI_STATE = UI_STATE_MOVEFAIL");
-                        if(ui_state != UI_STATE_MOVEFAIL){
-                            ui_state = UI_STATE_MOVEFAIL;
-                        }
-                    }
-                }else if(probot->running_state == ROBOT_MOVING_NOT_READY){
-                    if(prev_running_state != probot->running_state){
-                        if(ui_state != UI_STATE_MOVEFAIL){
-                            plog->write("[LCM] RUNNING NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
-                            ui_state = UI_STATE_MOVEFAIL;
-                        }
-                    }
-                }else if(probot->running_state == ROBOT_MOVING_WAIT){
-                    if(!flag_excuseme){
-                        plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");
-                        QMetaObject::invokeMethod(mMain, "excuseme");
-                        count_excuseme = 0;
-                        flag_excuseme = true;
-                    }
-                }else if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY){
-                    if(ui_state == UI_STATE_INIT_DONE){
-                        plog->write("[LCM] INIT ALL DONE -> UI_STATE = UI_STATE_READY");
-                        ui_state = UI_STATE_READY;
-                    }
-                }
-            }else{
-                if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY){
-                    if(state_count++ > 10){
-                        plog->write("[LCM] INIT ALL DONE? -> UI_STATE = UI_STATE_READY");
-                        ui_state = UI_STATE_READY;
-                        state_count = 0;
-                    }
-                }
-            }
-        }else{
-            // 로봇연결이 끊어졌는데 ui_state가 NONE이 아니면
-            if(ui_state != UI_STATE_NONE){
-                plog->write("[LCM] DISCONNECT -> UI_STATE = NONE");
-                ui_state = UI_STATE_NONE;
-                QMetaObject::invokeMethod(mMain, "stateinit");
-            }
-        }
     }
-
-
 
     if(wifi_temp_ssd != ""){
         if(wifi_count++ > 1000/MAIN_THREAD){
@@ -3447,8 +3002,6 @@ void Supervisor::onTimer(){
         if(probot->running_state == ROBOT_MOVING_PAUSED){
             if(probot->ipc_use){
                 ipc->moveStop();
-            }else{
-                lcm->moveStop();
             }
         }
         break;
@@ -3526,16 +3079,12 @@ void Supervisor::onTimer(){
                     if(count_moveto++ > 5){
                         if(probot->ipc_use){
                             ipc->moveStop();
-                        }else{
-                            lcm->moveStop();
                         }
                         ui_state = UI_STATE_MOVEFAIL;
                         plog->write("[SCHEDULER] GO HOME MOVE FAILED");
                     }else{
                         if(probot->ipc_use){
                             ipc->moveToResting(0);
-                        }else{
-                            lcm->moveTo("Resting");
                         }
                         plog->write("[SCHEDULER] MOVE TO Resting_0");
                     }
@@ -3566,16 +3115,12 @@ void Supervisor::onTimer(){
                     if(count_moveto++ > 5){
                         if(probot->ipc_use){
                             ipc->moveStop();
-                        }else{
-                            lcm->moveStop();
                         }
                         ui_state = UI_STATE_MOVEFAIL;
                         plog->write("[SCHEDULER] GO CHARGE MOVE FAILED");
                     }else{
                         if(probot->ipc_use){
                             ipc->moveToCharging(0);
-                        }else{
-                            lcm->moveTo("Charging_0");
                         }
                         plog->write("[SCHEDULER] MOVE TO Charging_0");
                     }
@@ -3761,8 +3306,6 @@ void Supervisor::onTimer(){
                         if(count_moveto++ > 5){
                             if(probot->ipc_use){
                                 ipc->moveStop();
-                            }else{
-                                lcm->moveStop();
                             }
                             ui_state = UI_STATE_MOVEFAIL;
                             plog->write("[SCHEDULER] MOVE FAILED : ROBOT NOT MOVING (Max 5)");
@@ -3772,8 +3315,6 @@ void Supervisor::onTimer(){
                             plog->write("[SCHEDULER] MOVE TO "+current_target.name+QString::number(probot->cur_preset));
                             if(probot->ipc_use){
                                 ipc->moveToLocation(current_target,probot->cur_preset);
-                            }else{
-                                lcm->moveTo(current_target.name);
                             }
                         }
                     }
@@ -3808,8 +3349,6 @@ void Supervisor::onTimer(){
             plog->write("[SCHEDULER] IN PICKUP BUT ROBOT PAUSED -> RESUME");
             if(probot->ipc_use){
                 ipc->moveResume();
-            }else{
-                lcm->moveResume();
             }
         }
         if(patrol_mode != PATROL_NONE){
@@ -3846,97 +3385,13 @@ void Supervisor::onTimer(){
         }
         break;
     }
-    case UI_STATE_PATROLLING:{
-//        plog->write("[SCHEDULER] Patrol State...WHY?");
-//        // 테스트용 테이블 로테이션
-//            if(ui_cmd == UI_CMD_TABLE_PATROL){
-//                state_rotate_tables = 1;
-//                ui_cmd = UI_CMD_NONE;
-//            }else if(ui_cmd == UI_CMD_PATROL_STOP){
-//                ui_cmd = UI_CMD_NONE;
-//                if(state_rotate_tables != 0){
-//                    ui_state = UI_STATE_NONE;
-//                    if(probot->ipc_use){
-//                        ipc->moveStop();
-//                    }else{
-//                        lcm->moveStop();
-//                    }
-//                    state_rotate_tables = 0;
-//                }
-//            }
-//            static int table_num_last = 0;
-//            switch(state_rotate_tables){
-//            case 1:
-//            {//Start
-//                if(probot->running_state == ROBOT_MOVING_READY){
-//                    ui_state = UI_STATE_PATROLLING;
-//                    int table_num = qrand()%5;
-//                    while(table_num_last == table_num){
-//                        table_num = qrand()%5;
-//                    }
-//                    qDebug() << "Move To " << "Serving_"+QString().sprintf("%d",table_num);
-
-//                    if(probot->ipc_use){
-//                        ipc->moveToLocation("Serving_"+QString().sprintf("%d",table_num));
-//                    }else{
-//                        lcm->moveTo("Serving_"+QString().sprintf("%d",table_num));
-//                    }
-//                    state_rotate_tables = 2;
-//                    table_num_last = table_num;
-//                }
-//                break;
-//            }
-//            case 2:
-//            {//Wait State Change
-//                static int timer_cnt = 0;
-//                if(probot->running_state == ROBOT_MOVING_MOVING){
-//                    qDebug() << "Moving Start";
-//                    state_rotate_tables = 3;
-//                }else{
-//                    if(timer_cnt%10==0){
-//                        if(probot->ipc_use){
-//                            ipc->moveToLocation("Serving_"+QString().sprintf("%d",table_num_last));
-//                        }else{
-//                            lcm->moveTo("Serving_"+QString().sprintf("%d",table_num_last));
-//                        }
-//                    }
-//                }
-//                break;
-//            }
-//            case 3:
-//            {
-//                if(probot->running_state == ROBOT_MOVING_READY){
-//                    //move done
-//                    qDebug() << "Move Done!!";
-//                    state_rotate_tables = 1;
-//                }
-//                break;
-//            }
-//            case 4:
-//            {//server new target
-//                if(probot->running_state == ROBOT_MOVING_READY){
-//                    state_rotate_tables = 5;
-//                }//confirm
-
-//                break;
-//            }
-//            case 5:{
-//                if(probot->running_state == ROBOT_MOVING_MOVING){
-//                    qDebug() << "Moving Start";
-//                    state_rotate_tables = 3;
-//                }
-//                break;
-//            }
-//        }
-        break;
-    }
     case UI_STATE_MOVEFAIL:{
         patrol_mode = PATROL_NONE;
         current_target.name = "";
-        if(prev_motor_state != probot->motor_state){
+        if(prev_motor_state != getMotorState()){
             //UI에 movefail 페이지 표시
             QMetaObject::invokeMethod(mMain, "movefail");
-            if(probot->motor_state == MOTOR_NOT_READY){
+            if(getMotorState() == 0){
                 plog->write("[SCHEDULER] ROBOT ERROR :ROBOT_INIT_NOT_READY");
             }
         }else if(prev_local_state != probot->localization_state){
@@ -3949,7 +3404,7 @@ void Supervisor::onTimer(){
             }
         }else{
             //UI에 movefail 페이지 표시
-            if(probot->motor_state == MOTOR_READY && probot->localization_state == LOCAL_READY && isaccepted){
+            if(getMotorState() == 1 && probot->localization_state == LOCAL_READY && isaccepted){
                 plog->write("[SCHEDULER] ROBOT ERROR : NO PATH");
                 QMetaObject::invokeMethod(mMain, "movefail");
                 isaccepted = false;
@@ -3961,7 +3416,7 @@ void Supervisor::onTimer(){
     timer_cnt++;
     prev_state = ui_state;
     prev_running_state = probot->running_state;
-    prev_motor_state = probot->motor_state;
+    prev_motor_state = getMotorState();
     prev_local_state = probot->localization_state;
 }
 

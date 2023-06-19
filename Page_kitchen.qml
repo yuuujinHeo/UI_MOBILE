@@ -25,7 +25,7 @@ Item {
         group_num = supervisor.getLocationGroupNum();
         robot_type = supervisor.getSetting("ROBOT_HW","type");
         table_num = supervisor.getLocationGroupSize(cur_group);
-        tray_num = supervisor.getTrayNum();
+        tray_num = supervisor.getSetting("ROBOT_HW","tray_num");
 
         if(robot_type == "CALLING"){
             show_serving = false;
@@ -122,7 +122,7 @@ Item {
         running: true
         repeat: true
         onTriggered: {
-            is_con_robot = supervisor.getLCMConnection();
+            is_con_robot = supervisor.getIPCConnection();
             is_emergency = supervisor.getEmoStatus();
             is_motor_power = supervisor.getPowerStatus();
 

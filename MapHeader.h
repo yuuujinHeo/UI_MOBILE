@@ -21,7 +21,6 @@
 #define color_pink      cv::Scalar(255,217,255,255)
 #define color_yellow    cv::Scalar(80,200,255,255)
 
-
 #define hex_color_green     "#12d27c"
 #define hex_color_red       "#e7584d"
 #define hex_color_navy      "#4f5666"

@@ -61,7 +61,6 @@ public:
         float      bat_cur = 0;
         float      power = 0;
         float      total_power = 0;
-        int8_t     ui_motor_state = 0;
         int8_t     ui_loc_state = 0;
         int8_t     ui_auto_state = 0;
         int8_t     ui_obs_state = 0;
@@ -101,7 +100,6 @@ public:
             bat_cur = p.bat_cur;
             power = p.power;
             total_power = p.total_power;
-            ui_motor_state = p.ui_motor_state;
             ui_loc_state = p.ui_loc_state;
             ui_auto_state = p.ui_auto_state;
             ui_obs_state = p.ui_obs_state;

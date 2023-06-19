@@ -122,10 +122,8 @@ Popup{
                     }else{
                         select_map_list = index;
                         btn_erase.enabled = true;
-                        map_list_view.setViewer("annot_view");
                         if(supervisor.isExistMap(name)){
                             map_list_view.loadmap(name,"EDITED");
-                            print(name, supervisor.isExistAnnotation(name))
                             if(supervisor.isExistAnnotation(name)){
                                 btn_use.enabled = true;
                                 btn_draw.enabled = true;
@@ -157,6 +155,7 @@ Popup{
 
                         supervisor.readSetting(name);
                     }
+                    map_list_view.setViewer("annot_view");
 
 //                    map_list_view.update_canvas();
                 }
@@ -202,34 +201,7 @@ Popup{
 
     }
 
-    Rectangle{
-        id: btn_menu
-        width: 120
-        height: width
-        anchors.right: parent.right
-        anchors.rightMargin: 50
-        anchors.top: parent.top
-        anchors.topMargin: 100
-        color: "white"
-        radius: 30
-        Behavior on width{
-            NumberAnimation{
-                duration: 500;
-            }
-        }
-        Image{
-            id: image_btn_menu
-            source:"icon/btn_reset2.png"
-            scale: 1-(120-parent.width)/120
-            anchors.centerIn: parent
-        }
-        MouseArea{
-            anchors.fill: parent
-            onClicked: {
-                popup_map_list.close();
-            }
-        }
-    }
+
 
     Rectangle{
         width: 900
@@ -267,29 +239,28 @@ Popup{
 
         Rectangle{
             id: rect_list_top2
-            height: 170
+            color: "transparent"
+            height: 100
             width: parent.width
             anchors.top: rect_list_top.bottom
-            Rectangle{
-                id: rect_list_top_left
-                width: parent.width
-                height: parent.height
-                color: "transparent"
+            Row{
+                anchors.centerIn: parent
+                spacing: 100
                 Rectangle{
                     id: rect_list_menus
-                    width: parent.width*0.7
+                    width: rect_list_top2.width
                     height: 100
                     radius: 5
-                    color: "#e8e8e8"
-                    anchors.centerIn: parent
+                    color: color_gray
                     Row{
                         anchors.centerIn: parent
-                        spacing: 30
+                        spacing: 50
                         Rectangle{
                             id: btn_use
                             width: 78
                             height: width
                             radius: width
+                            anchors.verticalCenter: parent.verticalCenter
                             enabled: false
                             color:enabled?"white":"#f4f4f4"
                             Column{
@@ -301,7 +272,7 @@ Popup{
                                 Text{
                                     text: "사용"
                                     font.family: font_noto_r.name
-                                    color: btn_use.enabled?"#525252":"white"
+                                    color: btn_use.enabled?color_dark_black:color_gray
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
                             }
@@ -320,6 +291,7 @@ Popup{
                         Rectangle{
                             id: btn_draw
                             width: 78
+                            anchors.verticalCenter: parent.verticalCenter
                             height: width
                             radius: width
                             Column{
@@ -330,7 +302,7 @@ Popup{
                                 }
                                 Text{
                                     text: "수정"
-                                    color: btn_draw.enabled?"#525252":"white"
+                                    color: btn_use.enabled?color_dark_black:color_gray
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
                             }
@@ -355,6 +327,7 @@ Popup{
                             id: btn_erase
                             width: 78
                             height: width
+                            anchors.verticalCenter: parent.verticalCenter
                             radius: width
                             Column{
                                 anchors.centerIn: parent
@@ -364,7 +337,7 @@ Popup{
                                 }
                                 Text{
                                     text: "삭제"
-                                    color: btn_erase.enabled?"#525252":"white"
+                                    color: btn_use.enabled?color_dark_black:color_gray
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
                             }
@@ -380,6 +353,7 @@ Popup{
                             id: btn_draw_new
                             width: 78
                             height: width
+                            anchors.verticalCenter: parent.verticalCenter
                             radius: width
                             Column{
                                 anchors.centerIn: parent
@@ -389,7 +363,7 @@ Popup{
                                 }
                                 Text{
                                     text: "새로 수정"
-                                    color: btn_draw_new.enabled?"#525252":"white"
+                                    color: btn_use.enabled?color_dark_black:color_gray
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
                             }
@@ -415,6 +389,31 @@ Popup{
                                 }
                             }
                         }
+
+                        Rectangle{
+                            id: btn_menu
+                            width: 100
+                            height: width
+                            color: color_gray
+                            radius: 30
+                            Behavior on width{
+                                NumberAnimation{
+                                    duration: 500;
+                                }
+                            }
+                            Image{
+                                id: image_btn_menu
+                                source:"icon/btn_reset2.png"
+                                scale: 1-(120-parent.width)/120
+                                anchors.centerIn: parent
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    popup_map_list.close();
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -424,21 +423,21 @@ Popup{
         Rectangle{
             id: rect_list_left
             height: parent.height - rect_list_top.height - rect_list_top2.height
-            width: 400
+            width: parent.width - map_list_view.width
             color: "transparent"
             anchors.top: rect_list_top2.bottom
             Row{
                 anchors.centerIn: parent
                 ListView {
                     id: list_map
-                    width: select_map_list==-1?400:200
+                    width: select_map_list==-1?rect_list_left.width:rect_list_left.width/2
                     Behavior on width {
                         NumberAnimation{
                             duration : 500;
                         }
                     }
 
-                    height: 300
+                    height: 500
                     clip: true
                     model: ListModel{}
                     delegate: maplistCompo
@@ -447,14 +446,14 @@ Popup{
                 ListView {
                     id: list_map_detail
 //                        visible: select_map_list==-1?false:true
-                    width: select_map_list==-1?0:200
+                    width: select_map_list==-1?0:rect_list_left.width/2
                     Behavior on width {
                         NumberAnimation{
                             duration : 500;
                         }
                     }
 //                        width: 200
-                    height: 250
+                    height: 500
                     clip: true
                     model: ListModel{}
                     delegate: mapdetaillistCompo
@@ -476,19 +475,13 @@ Popup{
             Map_full{
                 id: map_list_view
                 objectName: "POPUP"
-                width: parent.width
-                height: width
+                width: parent.height-100
+                height: parent.height-100
                 anchors.centerIn: parent
                 show_connection: false
-//                show_location: true
-//                show_object:  true
-//                show_lidar: false
-//                show_robot: false
-//                show_path: false
-//                show_buttons: false
                 Component.onCompleted: {
                     setfullscreen();
-                    setViewer("current")
+                    setViewer("annot_view")
                 }
             }
         }

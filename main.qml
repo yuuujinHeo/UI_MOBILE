@@ -20,7 +20,6 @@ Window {
 
     flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
     visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
-//    visibility: Window.FullScreen
     onVisibilityChanged: {
         if(homePath.split("/")[2]==="odroid"){
             if(mainwindow.visibility == Window.Minimized){
@@ -33,19 +32,14 @@ Window {
             }
         }
     }
-
-    Component.onDestruction: {
-
-    }
-
     property color color_dark_gray: "#999999";
     property color color_red: "#E7584D"
-    property color color_mid_gray: "#BEBEBE"
     property color color_green: "#12d27c"
     property color color_mid_green: "#0FB168"
     property color color_yellow: "#F7DB0D"
     property color color_dark_black: "#282828"
     property color color_gray: "#d8d8d8"
+    property color color_mid_gray: "#e8e8e8"
     property color color_light_gray: "#F4F4F4"
     property color color_navy: "#4f5666"
     property color color_dark_navy: "#323744"
@@ -66,36 +60,25 @@ Window {
     property string ppickupCall: "qrc:/Page_pickup_calling.qml"
     property string psetting: "qrc:/Page_setting.qml"
     property string plog: "qrc:/Page_log.qml"
-
     property string pmapping: "qrc:/Page_mapping.qml"
     property string pannotation: "qrc:/Page_annotation.qml"
-
 
     property string robot_type: supervisor.getRobotType()
     property string robot_name: supervisor.getRobotName()
     property var robot_battery: 0
-
     property var count_resting: 0
-
     property string cur_location;
 
     function movefail(){
         if(loader_page.item.objectName == "page_annotation"){
             if(supervisor.getEmoStatus()){
                 loader_page.item.movefail(2);
-//                voice_all_stop();
-//                voice_emergency.play();
             }else if(supervisor.getMotorState() === 0){
                 loader_page.item.movefail(4);
-//                voice_all_stop();
             }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
                 loader_page.item.movefail(1);
-//                voice_all_stop();
-//                voice_localfail.play();
             }else if(supervisor.getStateMoving() === 0){
                 loader_page.item.movefail(0);
-//                voice_all_stop();
-//                play_movefailmsg();
             }else{
                 supervisor.writelog("[MOVEFAIL] WEIRED MOVEFAIL : "+supervisor.getStateMoving().toString()+","+supervisor.getLocalizationState().toString()+","+supervisor.getMotorState().toString())
             }
@@ -104,36 +87,35 @@ Window {
         }else{
             //0: no path /1: local fail /2: emergency /3: user stop /4: motor error
             if(supervisor.getEmoStatus()){
+                supervisor.writelog("[UI] Force Page Change MoveFail : Emergency Switch");
                 loadPage(pmovefail);
                 loader_page.item.setNotice(2);
                 voice_all_stop();
                 voice_emergency.play();
-                print("movefail emergency")
             }else if(supervisor.getMotorState() === 0){
-
+                supervisor.writelog("[UI] Force Page Change MoveFail : Motor not ready");
                 loadPage(pmovefail);
                 loader_page.item.setNotice(4);
                 voice_all_stop();
 //                voice_motor_error.play();
-                print("movefail motor")
             }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
-
+                supervisor.writelog("[UI] Force Page Change MoveFail : Localization not ready");
                 loadPage(pmovefail);
                 loader_page.item.setNotice(1);
                 voice_all_stop();
                 voice_localfail.play();
-                print("movefail local")
             }else if(supervisor.getStateMoving() === 0){
+                supervisor.writelog("[UI] Force Page Change MoveFail : Robot not running");
                 loadPage(pmovefail);
                 loader_page.item.setNotice(0);
                 voice_all_stop();
-                play_movefailmsg();
-                print("movefail no path")
+                voice_movefail.play();
             }else{
-                supervisor.writelog("[MOVEFAIL] WEIRED MOVEFAIL : "+supervisor.getStateMoving().toString()+","+supervisor.getLocalizationState().toString()+","+supervisor.getMotorState().toString())
+                supervisor.writelog("[UI] Force Page Change MoveFail : Unknown state ("+supervisor.getStateMoving().toString()+","+supervisor.getLocalizationState().toString()+","+supervisor.getMotorState().toString()+")");
             }
         }
     }
+
     function voice_all_stop(){
         voice_avoid.stop();
         voice_emergency.stop();
@@ -148,10 +130,14 @@ Window {
     }
 
     function stateinit(){
-        if(loader_page.item.objectName != "page_map")
+        if(loader_page.item.objectName != "page_annotation" && loader_page.item.objectName != "page_mapping"){
+            supervisor.writelog("[UI] Force Page Change : Robot disconnected");
             loadPage(pinit);
+        }
     }
     function lessbattery(){
+        supervisor.writelog("[UI] Play Voice : less battery");
+        voice_all_stop();
         voice_battery.play();
     }
 
@@ -163,15 +149,12 @@ Window {
 
     function movelocation(){
         cur_location = supervisor.getcurLoc();
-        var str_target;
-        supervisor.writelog("[QML - MAIN] MOVE TO "+cur_location);
+        voice_all_stop();
         if(cur_location == "Charging"){
-            supervisor.writelog("[QML - MOVING] MOVE TO CHARGING LOCATION");
-            str_target = "충전 장소";
+            cur_location = "충전 장소";
             voice_movecharge.play();
         }else if(cur_location == "Resting"){
-            supervisor.writelog("[QML - MOVING] MOVE TO RESTING LOCATION");
-            str_target = "대기 장소";
+            cur_location = "대기 장소";
             voice_movewait.play();
         }else{
             if(supervisor.isCallingMode()){
@@ -179,55 +162,46 @@ Window {
             }else{
                 voice_serving.play();
             }
-            var curtable = supervisor.getcurTable();
-            str_target = curtable + "번 테이블";
-            supervisor.writelog("[QML - MOVING] MOVE TO " + str_target);
         }
 
         if(loader_page.item.objectName == "page_annotation"){
+            supervisor.writelog("[UI] Annotation Check : Moving Start "+cur_location);
             loader_page.item.movestart();
         }else{
             loadPage(pmoving)
+            supervisor.writelog("[UI] Force Page Change Moving : "+cur_location);
             loader_page.item.pos_name = cur_location;
-            loader_page.item.pos = str_target;
         }
     }
-    function play_movefailmsg(){
-        print("play movefail");
-        voice_movefail.play();
-    }
+
     function docharge(){
         if(loader_page.item.objectName == "page_annotation"){
+            supervisor.writelog("[UI] Annotation Check : Moving Done (Charge) ");
             loader_page.item.movedone();
         }else{
             loadPage(pcharging)
-            supervisor.writelog("[QML - MAIN] Do Charging");
+            supervisor.writelog("[UI] Force Page Change Charging");
         }
     }
     function dochargeininit(){
         loadPage(pcharging)
+        supervisor.writelog("[UI] Force Page Change Charging : Init State");
         loader_page.item.setInit();
-        supervisor.writelog("[QML - MAIN] Do Charging");
     }
+
     function waitkitchen(){
         if(loader_page.item.objectName == "page_annotation"){
+            supervisor.writelog("[UI] Annotation Check : Moving Done (Resting) ");
             loader_page.item.movedone();
         }else{
             loadPage(pkitchen)
-            supervisor.writelog("[QML - MAIN] Do Wait Kitchen");
+            supervisor.writelog("[UI] Force Page Change Kitchen");
         }
     }
 
     function clearkitchen(){
         loadPage(pkitchen)
-//        loader_page.item.clearkitchen();
-        supervisor.writelog("[QML - MAIN] Do Clear Kitchen");
-    }
-
-    function movetarget(){
-        loadPage(pmoving);
-        loader_page.pos = "지정장소";
-        supervisor.writelog("[QML - MOVING] MOVE TO " + loader_page.pos);
+        supervisor.writelog("[UI] Force Page Change Kitchen : need Clear");
     }
 
     function updatecamera(){
@@ -237,43 +211,34 @@ Window {
     }
 
     function updatemapping(){
-//        mapview.setMap(supervisor.getMapping())
-        if(loader_page.item.objectName == "page_map"||loader_page.item.objectName == "page_mapping"){
+        if(loader_page.item.objectName == "page_mapping"){
             loader_page.item.update_mapping();
         }
     }
-    function updateobjecting(){
-//        mapview.setMap(supervisor.getMapping())
-        if(loader_page.item.objectName == "page_map"){
-            loader_page.item.update_objecting();
-        }
-    }
-    function pausedcheck(){
-        supervisor.writelog("[QML - MAIN] Check Robot Paused");
-        if(loader_page.item.objectName == "page_moving"){
-            loader_page.item.checkPaused();
-        }
-    }
+
     function movestopped(){
         if(loader_page.item.objectName == "page_annotation"){
-
+            supervisor.writelog("[UI] Annotation Check : Moving Done (Stopped) ");
         }else{
-            supervisor.writelog("[QML - MAIN] Move Stopped");
+            supervisor.writelog("[UI] Force Page Change Kitchen : move stopped");
             loadPage(pkitchen);
         }
     }
+
     function showpickup(){
         if(loader_page.item.objectName == "page_annotation"){
+            supervisor.writelog("[UI] Annotation Check : Moving Done (Serving Pickup) ");
             loader_page.item.movedone();
         }else{
-
-            robot_type = supervisor.getRobotType();
             if(supervisor.isCallingMode()){
+                supervisor.writelog("[UI] Force Page Change Pickup(Calling) : "+ loader_page.item.pos_name);
                 loadPage(ppickupCall);
                 loader_page.item.init();
             }else{
+                supervisor.writelog("[UI] Force Page Change Pickup : "+ loader_page.item.pos_name);
                 loadPage(ppickup);
                 loader_page.item.init();
+
                 var trays = supervisor.getPickuptrays();
                 var tempstr = "";
                 for(var i=0; i<trays.length; i++){
@@ -290,35 +255,16 @@ Window {
                         loader_page.item.pickup_3 = true;
                     }
                 }
-    //            loader_page.item.play_voice();
                 loader_page.item.pos = tempstr;
-                supervisor.writelog("[QML - MAIN] Show Pickup Page : " + loader_page.item.pos);
             }
 
         }
     }
-    function loadmap_server_fail(){
-        loader_page.item.loadmap_server(false);
-    }
-    function loadmap_server_success(){
-        loader_page.item.loadmap_server(true);
-    }
-    function fail_localization(){
-        if(loader_page.item.objectName !== "page_init"){
-            print("main: fail_localization");
-            timer_update.start();
-            loadPage(pmap);
-            loader_page.item.is_init_state = true;
-            loader_page.item.map_mode = 4;
-            loader_page.item.init();
-        }
-    }
+
     function show_loading(){
-        supervisor.writelog("[QML] SHOW LOADING")
         rect_loading.open();
     }
     function unshow_loading(){
-        supervisor.writelog("[QML] UNSHOW LOADING")
         rect_loading.close();
     }
     function show_resting(){
@@ -332,56 +278,26 @@ Window {
         loader_page.item.set_call_done();
     }
 
-    function updatepatrol(){
-        if(loader_page.item.objectName == "page_map")
-            loader_page.item.updatepatrol();
-    }
-    function updatecanvas(){
-        if(loader_page.item !== "undefined" && loader_page.item !== null)
-            if(loader_page.item.objectName == "page_map")
-                loader_page.item.updatecanvas();
-    }
-    function updateobject(){
-        if(loader_page.item.objectName == "page_map")
-            loader_page.item.updateobject();
-    }
-    function updatelocation(){
-        if(loader_page.item.objectName == "page_map")
-            loader_page.item.updatelocation();
-    }
-    function updatetravelline(){
-        if(loader_page.item.objectName == "page_map")
-            loader_page.item.updatetravelline();
-    }
-    function updatetravelline2(){
-        if(loader_page.item.objectName == "page_map")
-            loader_page.item.updatetravelline2();
-    }
     function updatepath(){
         if(loader_page.item.objectName == "page_map")
             loader_page.item.updatepath();
     }
+
     function excuseme(){
         voice_all_stop();
         voice_avoid.play();
     }
-    function newcall(){
-        if(loader_page.item.objectName == "page_kitchen"){
 
-        }else{
-            supervisor.acceptCall(false);
-        }
-    }
     function wififailed(){
-        print("wififailed")
         if(loader_page.item.objectName == "page_setting" || loader_page.item.objectName == "page_init")
             loader_page.item.wifi_con_failed();
     }
+
     function wifisuccess(){
-        print("wifisuccess")
         if(loader_page.item.objectName == "page_setting" || loader_page.item.objectName == "page_init")
             loader_page.item.wifi_con_success();
     }
+
     function wifireset(){
         if(loader_page.item.objectName == "page_setting" || loader_page.item.objectName == "page_init")
             loader_page.item.init();
@@ -414,11 +330,10 @@ Window {
         focus: true
         anchors.fill: parent
         onLoaded: {
-            supervisor.writelog("[QML] Load Page : "+source);
             timer_update.start();
             loader_page.item.init();
         }
-        source: pinit
+        source: pmap//pinit
     }
 
     Timer{
@@ -583,7 +498,4 @@ Window {
         id: statusbar
     }
 
-//    Loading{
-//        id: loading
-//    }
 }

@@ -18,10 +18,10 @@ Item {
     property string tool: "move"
     property string map_type: ""
     property string map_name: ""
+    property bool map_loaded: false
 
     property bool show_connection: true
     property bool show_button_lidar: false
-    property bool show_button_object: false
     property bool show_button_following: false
     property bool show_button_location: false
     property bool show_costmap: false
@@ -56,8 +56,9 @@ Item {
     }
 
     Component.onCompleted: {
-        mapview.setName(objectName);
-        mapview.setRawMap("");
+//        mapview.setName(objectName);
+//        mapview.setRawMap("");
+//        mapview.setMapSize(width, height);
         mapview.setMapSize(width, height);
     }
 
@@ -82,11 +83,10 @@ Item {
 
     function setViewer(mode){
         supervisor.writelog("[QML MAP] SET Viewer "+objectName+" to "+mode);
-        mapview.setMode(mode);
+//        mapview.setMode(mode);
         show_connection = true;
         show_button_following = true;
         show_button_lidar = true;
-        show_button_object = true;
         show_button_location = true;
         show_costmap = false;
         show_grid = false;
@@ -94,7 +94,6 @@ Item {
             show_connection = false;
             show_button_following = false;
             show_button_lidar = false;
-            show_button_object = false;
             show_button_location = false;
         }else if(mode === "annot_tline"){
             show_connection = false;
@@ -111,19 +110,16 @@ Item {
         }else if(mode === "mapping"){
             show_button_following = true;
             show_button_lidar = false;
-            show_button_object = false;
             show_button_location = false;
         }else if(mode === "local_view"){
             show_connection = false;
             show_button_following = false;
             show_button_lidar = false;
-            show_button_object = false;
             show_button_location = false;
         }else if(mode === "annot_object"){
             show_connection = true;
             show_button_following = false;
             show_button_lidar = true;
-            show_button_object = true;
             show_button_location = true;
             show_costmap = true;
         }else if(mode === "current"){
@@ -133,14 +129,18 @@ Item {
             show_connection = false;
             show_button_following = false;
             show_button_lidar = false;
-            show_button_object = false;
             show_button_location = false;
         }else if(mode === "localization"){
             show_grid = false;
             show_connection = true;
             show_button_following = false;
             show_button_lidar = false;
-            show_button_object = false;
+            show_button_location = false;
+        }else if(mode === "annot_view"){
+            show_grid = false;
+            show_connection = false;
+            show_button_following = false;
+            show_button_lidar = false;
             show_button_location = false;
         }
     }
@@ -186,8 +186,6 @@ Item {
 
 
     function loadmap(name,type){
-//        print(objectName);
-//        supervisor.writelog("[QML MAP] LoadMap "+objectName+": "+name+" (mode = "+type+")");
         if(typeof(name) === 'undefined'){
             name = supervisor.getMapname();
         }
@@ -200,39 +198,112 @@ Item {
         if(typeof(type) !== 'undefined'){
             map_type = type;
             timer_loadmap.stop();
+            mapview.loadFile(name);
             if(type === "MINIMAP"){
 
             }else if(type === "RAW"){
+                map_loaded = true;
                 mapview.setRawMap(name);
             }else if(type === "EDITED"){
-                mapview.setEditedMap(name);
-            }else if(type === "T_RAW"){
-                mapview.setTlineMode(false);
-                mapview.initTline(name);
-                mapview.setCostMap(name);
+                map_loaded = true;
+//                mapview.setEditedMap(name);
             }else if(type === "T_EDIT"){
+                map_loaded = true;
                 mapview.setTlineMode(true);
                 mapview.initTline(name);
-                mapview.setCostMap(name);
+                mapview.setEditedMap(name);
+                mapview.setFullScreen();
             }else if(type === "OBJECT"){
+                map_loaded = true;
                 mapview.setCostMap();
                 mapview.setObjectMap(name);
             }else if(type === "local"){
+                map_loaded = true;
                 mapview.setLocalizationMap(name);
             }else if(type === "velmap"){
+                map_loaded = true;
                 mapview.initVelmap(name,1);
                 mapview.setEditedMap(name);
             }
         }else{
             if(supervisor.isExistAnnotation(name)){
+                map_loaded = true;
                 mapview.setEditedMap(name);
                 map_type = "EDITED";
             }else{
+                map_loaded = true;
                 mapview.setRawMap(name);
                 map_type = "RAW";
             }
         }
-        mapview.updateMap();
+        mapview.setMap();
+    }
+    function startDrawingT(){
+        mapview.startDrawingTline();
+    }
+    function stopDrawingT(){
+        mapview.stopDrawingTline();
+
+    }
+    function getTFlag(){
+        return mapview.getDrawingTline();
+    }
+
+    function loadmapsoft(name,type){
+        if(map_loaded){
+
+        }else{
+            if(typeof(name) === 'undefined'){
+                name = supervisor.getMapname();
+            }
+            if(map_name !== name){
+                supervisor.readSetting(name);
+                map_name = name;
+            }
+
+            print("loadmap "+objectName + " : "+ name,type);
+            if(typeof(type) !== 'undefined'){
+                map_type = type;
+                timer_loadmap.stop();
+                if(type === "MINIMAP"){
+
+                }else if(type === "RAW"){
+                    map_loaded = true;
+                    mapview.setRawMap(name);
+                }else if(type === "EDITED"){
+                    map_loaded = true;
+                    mapview.setEditedMap(name);
+                }else if(type === "T_EDIT"){
+                    map_loaded = true;
+                    mapview.setTlineMode(true);
+                    mapview.initTline(name);
+                    mapview.setEditedMap(name);
+                    mapview.setFullScreen();
+                }else if(type === "OBJECT"){
+                    map_loaded = true;
+                    mapview.setCostMap();
+                    mapview.setObjectMap(name);
+                }else if(type === "local"){
+                    map_loaded = true;
+                    mapview.setLocalizationMap(name);
+                }else if(type === "velmap"){
+                    map_loaded = true;
+                    mapview.initVelmap(name,1);
+                    mapview.setEditedMap(name);
+                }
+            }else{
+                if(supervisor.isExistAnnotation(name)){
+                    map_loaded = true;
+                    mapview.setEditedMap(name);
+                    map_type = "EDITED";
+                }else{
+                    mapview.setRawMap(name);
+                    map_loaded = true;
+                    map_type = "RAW";
+                }
+            }
+            mapview.updateMap();
+        }
     }
 
     function loadmapping(){
@@ -286,6 +357,13 @@ Item {
         mapview.reloadMap();
         clear("all");
         setTool("move");
+    }
+
+    function removelocation(num){
+        mapview.removeLocation(num);
+    }
+    function setTableNumberAuto(){
+        mapview.setTableNumberAuto();
     }
 
     function clear(mode){
@@ -419,11 +497,9 @@ Item {
         repeat: true
         running: true
         onTriggered: {
-            btn_show_location.active = mapview.getlocationView();
-            btn_robot_following.active = mapview.getRobotFollowing();
-            btn_show_lidar.active = mapview.getlidarView();
-            btn_show_objecting.active = mapview.getobjectView();
-            btn_show_object.active = mapview.getobjectBoxView();
+//            btn_show_location.active = mapview.getlocationView();
+//            btn_robot_following.active = mapview.getRobotFollowing();
+//            btn_show_lidar.active = mapview.getlidarView();
         }
     }
 
@@ -537,7 +613,7 @@ Item {
         }
     }
     MouseArea{
-        enabled: parent.enabled
+//        enabled: parent.enabled
         anchors.fill: parent
         hoverEnabled: true
         onWheel: {
@@ -562,21 +638,21 @@ Item {
         touchPoints: [TouchPoint{id:point1},TouchPoint{id:point2}]
         onPressed:{
             double_touch = false;
-            mapview.setRobotFollowing(false);
+//            mapview.setRobotFollowing(false);
             if(point1.pressed && point2.pressed){
                 double_touch = true;
             }else if(point1.pressed){
-                firstX = mapview.getX() + point1.x*mapview.getScale();
-                firstY = mapview.getY() + point1.y*mapview.getScale();
+                firstX = mapview.getX() + point1.x*mapview.getScale()*mapview.getFileWidth()/width;
+                firstY = mapview.getY() + point1.y*mapview.getScale()*mapview.getFileWidth()/width;
             }else if(point2.pressed){
-                firstX = mapview.getX() + point2.x*mapview.getScale();
-                firstY = mapview.getY() + point2.y*mapview.getScale();
+                firstX = mapview.getX() + point2.x*mapview.getScale()*mapview.getFileWidth()/width;
+                firstY = mapview.getY() + point2.y*mapview.getScale()*mapview.getFileWidth()/width;
             }
 
             if(tool == "move"){
                 if(double_touch){
-                    firstX = mapview.getX() + (point1.x+point2.x)*mapview.getScale()/2;
-                    firstY = mapview.getY() + (point1.y+point2.y)*mapview.getScale()/2;
+                    firstX = mapview.getX() + (point1.x+point2.x)*mapview.getScale()*mapview.getFileWidth()/width/2;
+                    firstY = mapview.getY() + (point1.y+point2.y)*mapview.getScale()*mapview.getFileWidth()/width/2;
                     var dx = Math.abs(point1.x-point2.x);
                     var dy = Math.abs(point1.y-point2.y);
                     firstDist = Math.sqrt(dx*dx + dy*dy);
@@ -617,8 +693,8 @@ Item {
                 select_point = mapview.getPointBox(firstX,firstY);
                 if(select_point === -1){
                     if(double_touch){
-                        firstX = mapview.getX() + (point1.x+point2.x)*mapview.getScale()/2;
-                        firstY = mapview.getY() + (point1.y+point2.y)*mapview.getScale()/2;
+                        firstX = mapview.getX() + (point1.x+point2.x)*mapview.getScale()*mapview.getFileWidth()/width/2;
+                        firstY = mapview.getY() + (point1.y+point2.y)*mapview.getScale()*mapview.getFileWidth()/width/2;
                         var dx = Math.abs(point1.x-point2.x);
                         var dy = Math.abs(point1.y-point2.y);
                         firstDist = Math.sqrt(dx*dx + dy*dy);
@@ -628,8 +704,8 @@ Item {
         }
         onReleased: {
             mapview.showBrush(false);
-            var newX = mapview.getX() + point1.x*mapview.getScale();
-            var newY = mapview.getY() + point1.y*mapview.getScale();
+            var newX = mapview.getX() + point1.x*mapview.getScale()*mapview.getFileWidth()/width;
+            var newY = mapview.getY() + point1.y*mapview.getScale()*mapview.getFileWidth()/width;
             if(!point1.pressed && !point2.pressed){
                 if(tool == "move"){
                     if(mapview.getMode() === "annot_object"){
@@ -679,8 +755,8 @@ Item {
         }
         onTouchUpdated: {
             if(point1.pressed || point2.pressed){
-                var newX = mapview.getX() + point1.x*mapview.getScale();
-                var newY = mapview.getY() + point1.y*mapview.getScale();
+                var newX = mapview.getX() + point1.x*mapview.getScale()*mapview.getFileWidth()/width;
+                var newY = mapview.getY() + point1.y*mapview.getScale()*mapview.getFileWidth()/width;
                 if(tool == "move"){
                     if(double_touch){
                         if(point1.pressed && point2.pressed){
@@ -710,13 +786,13 @@ Item {
                         }
                     }else{
                         if(point1.pressed){
-                            newX = point1.x*mapview.getScale();
-                            newY = point1.y*mapview.getScale();
+                            newX = point1.x*mapview.getScale()*mapview.getFileWidth()/width;
+                            newY = point1.y*mapview.getScale()*mapview.getFileWidth()/width;
                         }else if(point2.pressed){
-                            newX = point2.x*mapview.getScale();
-                            newY = point2.y*mapview.getScale();
+                            newX = point2.x*mapview.getScale()*mapview.getFileWidth()/width;
+                            newY = point2.y*mapview.getScale()*mapview.getFileWidth()/width;
                         }
-//                        print("UPDATE : ",newX,newY);
+                        print("UPDATE : ",point1.x,point1.y,newX,newY,mapview.getScale());
                         mapview.setRobotFollowing(false);
                         mapview.move(firstX-newX, firstY-newY);
                     }
@@ -731,8 +807,8 @@ Item {
 
                         if(double_touch){
                             if(point1.pressed && point2.pressed){
-                                newX = (point1.x + point2.x)*mapview.getScale()/2;
-                                newY = (point1.y + point2.y)*mapview.getScale()/2;
+                                newX = (point1.x + point2.x)*mapview.getScale()*mapview.getFileWidth()/width/2;
+                                newY = (point1.y + point2.y)*mapview.getScale()*mapview.getFileWidth()/width/2;
 
                                 var dx = Math.abs(point1.x - point2.x)
                                 var dy = Math.abs(point1.y - point2.y)
@@ -757,11 +833,11 @@ Item {
                             }
                         }else{
                             if(point1.pressed){
-                                newX = point1.x*mapview.getScale();
-                                newY = point1.y*mapview.getScale();
+                                newX = point1.x*mapview.getScale()*mapview.getFileWidth()/width;
+                                newY = point1.y*mapview.getScale()*mapview.getFileWidth()/width;
                             }else if(point2.pressed){
-                                newX = point2.x*mapview.getScale();
-                                newY = point2.y*mapview.getScale();
+                                newX = point2.x*mapview.getScale()*mapview.getFileWidth()/width;
+                                newY = point2.y*mapview.getScale()*mapview.getFileWidth()/width;
                             }
     //                        print("UPDATE : ",newX,newY);
                             mapview.setRobotFollowing(false);
@@ -851,57 +927,6 @@ Item {
             }
         }
         Rectangle{
-            id: btn_show_objecting
-            width: 40
-            height: 40
-            radius: 40
-            visible: show_button_object
-            property bool active: false
-            color: active?"#12d27c":"#e8e8e8"
-            Image{
-                anchors.centerIn: parent
-                source: {
-                     parent.active?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
-                }
-            }
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
-                    if(parent.active){
-                        mapview.setobjectView(false);
-                    }else{
-                        mapview.setobjectView(true);
-                    }
-                }
-            }
-        }
-        Rectangle{
-            id: btn_show_object
-            width: 40
-            height: 40
-            radius: 40
-            visible: show_button_object
-            property bool active: false
-            color:  active?"#12d27c":"#e8e8e8"
-            Image{
-                anchors.centerIn: parent
-                width: 33
-                height: 33
-                source: "icon/icon-wall.png"// parent.active?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
-            }
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
-                    if(parent.active){
-                        mapview.setobjectBoxView(false);
-                    }else{
-                        mapview.setobjectBoxView(true);
-                    }
-                }
-            }
-        }
-
-        Rectangle{
             id: btn_show_location
             width: 40
             height: 40
@@ -926,37 +951,7 @@ Item {
                 }
             }
         }
-
-        Rectangle{
-            id: btn_show_costmap
-            width: 40
-            height: 40
-            radius: 40
-            visible: show_costmap
-            property bool active: false
-            color: active?"#12d27c":"#e8e8e8"
-            Image{
-                anchors.centerIn: parent
-                source: {
-                     parent.active?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
-                }
-            }
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
-                    if(btn_show_costmap.active){
-                        btn_show_costmap.active = false;
-                        mapview.setEditedMap(map_name);
-                    }else{
-                        btn_show_costmap.active = true;
-                        mapview.setCostMap(map_name);
-//                        mapview.setobjectView(true);
-                    }
-                }
-            }
-        }
     }
-
     Rectangle{
         id: brushview
         visible: show_brush
@@ -1001,7 +996,7 @@ Item {
         repeat: true
         interval: 500
         onTriggered: {
-            if(supervisor.isIPCused() || supervisor.getLCMConnection()){
+            if(supervisor.getIPCConnection()){
                 is_slam_running = supervisor.is_slam_running();
                 if(show_connection){
                     if(supervisor.getMappingflag()){
