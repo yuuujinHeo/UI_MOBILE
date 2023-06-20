@@ -44,6 +44,30 @@ Item {
         test_move_error = errnum;
     }
 
+    Timer{
+        running: test_move_state === 2
+        interval: 1000
+        onTriggered:{
+            if(test_move_error === 0){//경로 찾지 못 함
+                test_move_state = 0;
+            }else if(test_move_error === 1){//"로봇의 초기화가 틀어졌습니다."
+                if(supervisor.getLocalizationState() === 2){
+                    test_move_state = 0;
+                }
+            }else if(test_move_error === 2){//"비상스위치가 눌렸습니다."
+                if(supervisor.getEmoStatus()===0){
+                    test_move_state = 0;
+                }
+            }else if(test_move_error === 3){//"사용자에 의해 정지되었습니다."
+                test_move_state = 0;
+            }else if(test_move_error === 4){//"모터가 초기화 되지 않았습니다."
+                if(supervisor.getMotorState() === 1){
+                    test_move_state = 0;
+                }
+            }
+        }
+    }
+
     Component.onCompleted: {
         if(annotation_after_mapping){
             annot_pages.sourceComponent = page_annot_start;
