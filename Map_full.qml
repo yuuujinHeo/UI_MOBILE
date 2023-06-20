@@ -241,7 +241,7 @@ Item {
     }
 
     function loadmapping(){
-        mapview.setMapping();
+        mapview.setMap();
     }
 
     function setfullscreen(){
@@ -890,11 +890,6 @@ Item {
                     }else if(!is_slam_running && mapview.getMode() !== "mapping"){
                         rect_notice.visible = true;
                         rect_notice.msg =  "주행 활성화 안됨";
-                        rect_notice.color = color_red;
-                        rect_notice.show_icon = true;
-                    }else if(supervisor.getObsState() === 1 || mapview.checkRobotCollision()){
-                        rect_notice.visible = true;
-                        rect_notice.msg =  "장애물 겹침";
                         rect_notice.color = color_red;
                         rect_notice.show_icon = true;
                     }else{

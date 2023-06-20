@@ -283,7 +283,7 @@ Item {
                             map.rotate("ccw");
                         }
                         onPressAndHold: {
-                            timer_rotate.isplus = false;
+                            timer_rotate.cw = false;
                             timer_rotate.start();
                         }
                         onReleased: {

@@ -66,12 +66,12 @@ void MapView::loadFile(QString name){
         exist_edited = true;
         file_width = file_edited.rows;
         log_str += ", EDITED(success) ";
-        map_orin = file_edited;
+        file_edited.copyTo(map_orin);
     }else{
         exist_edited = false;
         log_str += ", EDITED(failed) ";
         if(exist_raw){
-            map_orin = file_raw;
+            file_raw.copyTo(map_orin);
         }
     }
 
@@ -82,7 +82,6 @@ void MapView::loadFile(QString name){
         cv::rotate(file_travelline,file_travelline,cv::ROTATE_90_COUNTERCLOCKWISE);
         log_str += ", TRAVELLINE(success) ";
         exist_travelline = true;
-        map_orin = file_edited;
     }else{
         file_travelline = cv::Mat(file_width, file_width, CV_8U ,cv::Scalar::all(0));
         exist_travelline = false;
@@ -114,7 +113,6 @@ void MapView::loadFile(QString name){
 
         log_str += ", VELOCITY(success) ";
         exist_velmap = true;
-        map_orin = file_edited;
     }else{
         file_velocity = cv::Mat(file_width, file_width, CV_8UC3 ,cv::Scalar::all(0));
         exist_velmap = false;
@@ -127,6 +125,7 @@ void MapView::loadFile(QString name){
     draw_width = file_width;
     log_str += QString().sprintf(", FILEWIDTH(%d)",draw_width);
     initDrawing();
+    initRotate();
     plog->write("[MAPVIEW] load File "+name+" : "+log_str);
 }
 
@@ -317,12 +316,11 @@ void MapView::setMap(){
     if(mode == "mapping"){
         map = QPixmap::fromImage(mat_to_qimage_cpy(pmap->map_mapping));
         file_width = pmap->map_mapping.rows;
-        grid_width = pmap->mapping_gridwidth;
-    }else{
+        grid_width = pmap->mapping_gridwidth*pmap->mapping_width/file_width;
+    }else if(map_orin.rows > 0){
+        file_width = map_orin.rows;
+        grid_width = pmap->gridwidth;
         cv::Mat temp_orin, temp_drawing, temp_travel, temp_velmap;
-        //맵 회전
-        cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
-        cv::warpAffine(map_orin,map_orin,rot,map_orin.size(),cv::INTER_NEAREST);
 
         cv::cvtColor(map_orin,temp_orin,cv::COLOR_GRAY2BGRA);
         cv::cvtColor(file_velocity,temp_velmap,cv::COLOR_BGR2BGRA);
@@ -673,10 +671,9 @@ void MapView::setMap(){
 void MapView::saveRotateMap(){
     cv::Mat map_edited_ui;
     map_orin.copyTo(map_edited_ui);
-    cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(map_edited_ui.cols/2, map_edited_ui.rows/2),-rotate_angle,1.0);
+//    cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(map_edited_ui.cols/2, map_edited_ui.rows/2),-rotate_angle,1.0);
     rotate_angle = 0;
-    cv::warpAffine(map_edited_ui,map_edited_ui,rot,map_edited_ui.size(),cv::INTER_NEAREST);
-
+//    cv::warpAffine(map_edited_ui,map_edited_ui,rot,map_edited_ui.size(),cv::INTER_NEAREST);
 
     cv::rotate(map_edited_ui,map_edited_ui,cv::ROTATE_90_CLOCKWISE);
     cv::flip(map_edited_ui,map_edited_ui,0);
@@ -833,18 +830,40 @@ void MapView::clearInitPose(){
 void MapView::rotateMap(int angle){
     rotate_angle = angle;
     pmap->map_rotate_angle = angle;
+    //맵 회전
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
+    if(exist_edited)
+        file_edited.copyTo(map_orin);
+    else if(exist_raw)
+        file_raw.copyTo(map_orin);
+    cv::warpAffine(map_orin,map_orin,rot,map_orin.size(),cv::INTER_NEAREST);
+
     setMap();
 }
 
 void MapView::rotateMapCW(){
     rotate_angle++;
     pmap->map_rotate_angle = rotate_angle;
+    //맵 회전
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
+    if(exist_edited)
+        file_edited.copyTo(map_orin);
+    else if(exist_raw)
+        file_raw.copyTo(map_orin);
+    cv::warpAffine(map_orin,map_orin,rot,map_orin.size(),cv::INTER_NEAREST);
     setMap();
 }
 
 void MapView::rotateMapCCW(){
     rotate_angle--;
     pmap->map_rotate_angle = rotate_angle;
+    //맵 회전
+    cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
+    if(exist_edited)
+        file_edited.copyTo(map_orin);
+    else if(exist_raw)
+        file_raw.copyTo(map_orin);
+    cv::warpAffine(map_orin,map_orin,rot,map_orin.size(),cv::INTER_NEAREST);
     setMap();
 }
 
