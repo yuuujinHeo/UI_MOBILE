@@ -153,30 +153,7 @@ public:
         cur_line_width = width;
     }
 
-//    //---------------------------------------------------Object
-//    void initObject();
-//    QVector<OBJECT> objects;
-//    bool new_object_flag = false;
-//    OBJECT new_object;
-//    int select_object = -1;
-//    int select_object_point = -1;
-//    Q_INVOKABLE int getObjectNum(int x, int y);
-//    Q_INVOKABLE int getObjectPointNum(int x, int y);
-//    Q_INVOKABLE void addObject(int x, int y);
-//    Q_INVOKABLE void addObjectPoint(int x, int y);
-//    Q_INVOKABLE void setObject(int x, int y);
-//    Q_INVOKABLE bool getObjectFlag(){return new_object_flag;}
-//    Q_INVOKABLE void editObjectStart(int x, int y);
-//    Q_INVOKABLE void editObject(int x, int y);
-//    Q_INVOKABLE void saveObject(QString type);
-//    Q_INVOKABLE void clearObject();
-//    Q_INVOKABLE void undoObject();
-//    Q_INVOKABLE void selectObject(int num);
-
-
-//    Q_INVOKABLE void setScreen(float s, int centerx, int centery);
-
-//    //---------------------------------------------------Location
+    //    //---------------------------------------------------Location
     QVector<LOCATION> locations;
     LOCATION new_location;
     int select_location = -1;
@@ -185,78 +162,45 @@ public:
     bool edit_location_flag;
     LOCATION orin_location;
 
-//    Q_INVOKABLE bool getLocationFlag(){return new_location_flag;}
     Q_INVOKABLE void saveLocation(QString type, int groupnum, QString name);
     Q_INVOKABLE void clearLocation();
 //    Q_INVOKABLE void selectLocation(int num, QString type="");
     Q_INVOKABLE void addLocation(int x, int y,float th);
     Q_INVOKABLE void addLocationCur(int x, int y,float th);
     Q_INVOKABLE void setLocation(int x, int y, float th);
-//    Q_INVOKABLE void editLocation(int x, int y, float th);
-//    Q_INVOKABLE void editLocation();
-//    Q_INVOKABLE void redoLocation();
+    Q_INVOKABLE void editLocation(int x, int y, float th);
     Q_INVOKABLE int getLocationNum(int x, int y);
     Q_INVOKABLE void removeLocation(int num);
     Q_INVOKABLE void setTableNumberAuto();
-//    //---------------------------------------------------Travel Line
-//    Q_INVOKABLE void initTline(QString filename);
-//    Q_INVOKABLE void setMapTline();
-
-//    //---------------------------------------------------Velocity Map
-//    Q_INVOKABLE void initVelmap(QString filename, int mode);
-//    Q_INVOKABLE void setMapVelmap();
-
     Q_INVOKABLE int getLocationNum(QString type);
     Q_INVOKABLE int getLocGroupNum(int num);
-//    //---------------------------------------------------Save
     void initLocation();
     Q_INVOKABLE void saveMap();
     Q_INVOKABLE void saveTline();
     Q_INVOKABLE void saveVelmap();
-//    //---------------------------------------------------Map Scale, Move
-//    int map_width;
-//    int map_height;
-//    int mapping_size;
-//    float mapping_grid;
-//    int map_x;
-//    int map_y;
-//    float prev_scale;
-//    float scale = 1;
     Q_INVOKABLE void setMapSize(int width, int height);
     Q_INVOKABLE void zoomIn(int x, int y);
     Q_INVOKABLE void zoomOut(int x, int y);
-//    Q_INVOKABLE void scaledIn(int x, int y);
-//    Q_INVOKABLE void scaledOut(int x, int y);
     Q_INVOKABLE void move(int x, int y);
     Q_INVOKABLE int getFileWidth(){return file_width;}
     Q_INVOKABLE int getX(){return draw_x;}
     Q_INVOKABLE int getY(){return draw_y;}
     Q_INVOKABLE float getScale(){return scale;}
+
+    Q_INVOKABLE void setSize(int x, int y, float width);
+
+
     void setX(int newx);
     void setY(int newy);
-//    void setCenter(int centerx, int centery);
     void setZoomCenter(int x=0, int y=0);
 
     int getLocationGroupSize(int num);
-//    void setSetting(QString name, QString value){
-//        QString ini_path = QDir::homePath()+"/robot_config.ini";
-//        QSettings setting(ini_path, QSettings::IniFormat);
-//        setting.setValue(name,value);
-//        plog->write("[SETTING] SET "+name+" VALUE TO "+value);
-//    }
-//    void setAnnotation(QString filename, QString name, QString value){
-//        QString ini_path = QDir::homePath()+"/maps/"+filename+"/annotation.ini";
-//        QSettings setting(ini_path, QSettings::IniFormat);
-//        setting.setValue(name,value);
-//        plog->write("[SETTING] SET "+name+" VALUE TO "+value);
-//    }
     Q_INVOKABLE void saveAnnotation(QString filename);
 protected:
     virtual void paint(QPainter *painter) Q_DECL_OVERRIDE;
 
 private:
     PixmapContainer pixmap_map;
-    PixmapContainer pixmap_layer;
 
     //직접 불러오는거
     //map_raw.png
@@ -274,6 +218,7 @@ private:
     cv::Mat map_drawing_mask;
 
     QPixmap map;
+
 private slots:
     void onTimer();
 private:

@@ -13,6 +13,7 @@ Item {
     objectName: "map_full"
     width: 1000
     height: 1000
+    clip: true
 
     //--------------------------------------- main variables
     property string tool: "move"
@@ -57,28 +58,12 @@ Item {
 
     Component.onCompleted: {
         mapview.setName(objectName);
-//        mapview.setRawMap("");
-//        mapview.setMapSize(width, height);
         mapview.setMapSize(width, height);
     }
 
     function setEnable(en){
         enabled = en;
         mapview.setEnable(en);
-    }
-
-    function checkLocCollision(){
-        return mapview.checkLocationCollision()
-    }
-
-    function checkLocCol(num){
-        return mapview.checkLocationCollision(num)
-    }
-    function checkCollision(x,y){
-        return mapview.isCollision(x,y);
-    }
-    function checkRobotCollision(){
-        return mapview.checkRobotCollision();
     }
 
     function setViewer(mode){
@@ -149,14 +134,6 @@ Item {
 
     }
 
-
-    function checkObject(){
-        is_object_new = false;
-        if(mapview.getObjectFlag()){
-            is_object_new = true;
-        }
-    }
-
     function checkDrawing(){
         is_drawing_redo = false;
         is_drawing_undo = false;
@@ -165,12 +142,6 @@ Item {
         }
         if(mapview.getDrawingUndoFlag()){
             is_drawing_redo = true;
-        }
-    }
-    function checkLocation(){
-        is_location_new = false;
-        if(mapview.getLocationFlag()){
-            is_location_new = true;
         }
     }
 
@@ -433,7 +404,8 @@ Item {
 
     MapView{
         id: mapview
-        anchors.fill: parent
+        width: parent.width
+        height: parent.height
         Component.onCompleted: {
         }
         clip: true
@@ -575,7 +547,6 @@ Item {
                 firstX = mapview.getX() + point2.x*mapview.getScale()*mapview.getFileWidth()/width;
                 firstY = mapview.getY() + point2.y*mapview.getScale()*mapview.getFileWidth()/width;
             }
-
             if(tool == "move"){
                 if(double_touch){
                     firstX = mapview.getX() + (point1.x+point2.x)*mapview.getScale()*mapview.getFileWidth()/width/2;
@@ -583,7 +554,6 @@ Item {
                     var dx = Math.abs(point1.x-point2.x);
                     var dy = Math.abs(point1.y-point2.y);
                     firstDist = Math.sqrt(dx*dx + dy*dy);
-//                    print("PRESS : ",firstX,firstY,firstDist);
                 }
             }else if(tool == "draw"){
                 mapview.setShowBrush(true);
@@ -601,12 +571,6 @@ Item {
                 mapview.setShowBrush(true);
                 mapview.setLineColor(-1);
                 mapview.startDrawing(firstX, firstY);
-            }else if( tool === "add_object"){
-                mapview.addObject(firstX, firstY);
-            }else if( tool === "edit_object"){
-                mapview.editObjectStart(firstX,firstY)
-            }else if( tool === "add_point"){
-                mapview.addObjectPoint(firstX, firstY);
             }else if( tool === "add_location"){
                 mapview.addLocation(firstX, firstY,0);
             }else if( tool === "edit_location"){
@@ -658,15 +622,6 @@ Item {
                     mapview.stopDrawingLine(newX, newY);
                 }else if(tool == "erase"){
                     mapview.endDrawing(newX, newY);
-                }else if( tool === "add_object"){
-                    setcostmap();
-                    update();
-                }else if( tool === "edit_object"){
-                    supervisor.setObjPose();
-                    setcostmap();
-                    update();
-                }else if( tool === "add_point"){
-
                 }else if( tool === "edit_location"){
 //                    var angle = Math.atan2((newX-firstX),(newY-firstY));
 //                    mapview.editLocation(firstX, firstY,angle);
@@ -719,7 +674,6 @@ Item {
                             newX = point2.x*mapview.getScale()*mapview.getFileWidth()/width;
                             newY = point2.y*mapview.getScale()*mapview.getFileWidth()/width;
                         }
-//                        print("UPDATE : ",point1.x,point1.y,newX,newY,mapview.getScale());
                         mapview.setRobotFollowing(false);
                         mapview.move(firstX-newX, firstY-newY);
                     }
@@ -775,13 +729,6 @@ Item {
                     mapview.setDrawingLine(newX, newY);
                 }else if(tool == "erase"){
                     mapview.addLinePoint(newX, newY);
-                }else if( tool === "add_object"){
-                    mapview.setObject(newX, newY);
-                }else if( tool === "edit_object"){
-                    mapview.editObject(newX, newY);
-                }else if(tool === "dot_spline"){
-                }else if( tool === "add_point"){
-                    mapview.setObject(newX, newY);
                 }else if( tool === "edit_location_new"){
                     var angle = Math.atan2((newY-firstY),(newX-firstX));
                     mapview.addLocation(firstX, firstY,angle);
@@ -906,7 +853,6 @@ Item {
                 }else{
                     loadmap(map_name,"RAW");
                 }
-
                 setfullscreen();
 
                 //타이머 종료

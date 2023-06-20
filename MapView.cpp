@@ -369,7 +369,6 @@ void MapView::setMap(){
     }
     float robot_angle = setAxis(probot->curPose.angle);
 
-
     //위치
     if(show_location){
         for(int i=0; i<locations.size(); i++){
@@ -504,9 +503,6 @@ void MapView::setMap(){
             }
         }
     }
-
-
-
 
     //잘라내기 박스 표시
     if(mode == "annot_rotate"){
@@ -669,6 +665,7 @@ void MapView::setMap(){
             painter.drawRoundedRect(curPoint.x-cur_line_width/2,curPoint.y-cur_line_width/2,cur_line_width,cur_line_width,cur_line_width,cur_line_width);
         }
     }
+
     pixmap_map.pixmap = map.copy(draw_x,draw_y,draw_width,draw_width);
     update();
 }
@@ -786,6 +783,20 @@ void MapView::setTableNumberAuto(){
     }
 }
 
+void MapView::setSize(int x, int y, float s){
+//    canvas_width = 740;
+    int new_canvas_width = canvas_width*s;
+    float over = canvas_width*(s-1)/2;
+    scale = scale/s;
+    draw_width = round(file_width*scale);
+    setX(-x + over);
+    setY(-y + over);
+//    draw_x = -x + over;
+//    draw_y = -y + over;
+    qDebug() << "SETSIZE " << x << y << s << over << scale;
+    qDebug() <<draw_x << draw_y << draw_width;
+    moveMap();
+}
 void MapView::zoomIn(int x, int y){
     scale -= 0.05;
     if(scale < 0.1){
@@ -840,12 +851,10 @@ void MapView::rotateMapCCW(){
 void MapView::move(int x, int y){
     setX(x);
     setY(y);
-    setMap();
+    moveMap();
 }
 
 void MapView::setX(int newx){
-
-
     if(newx < 0)
         draw_x = 0;
     else if(newx > file_width - draw_width)
@@ -1188,7 +1197,6 @@ void MapView::endDrawing(int x, int y){
 
     lines.push_back(temp_line);
     line.clear();
-//    initTline(map_name);
     initDrawing();
     setMapDrawing();
     setMap();
@@ -1570,22 +1578,20 @@ int MapView::getLocGroupNum(int num){
     return count;
 }
 
-//void MapView::editLocation(int x, int y, float th){
-//    int num = select_location;
-//    if(pmap->locations.size() > num && num > -1){
-//        if(!edit_location_flag){
-//            edit_location_flag = true;
-//            orin_location = pmap->locations[num];
-//        }
-//        //qDebug() <<"1            " <<  orin_location.point.x  << setAxisBack(cv::Point2f(x,y)).x;
-//        pmap->locations[num].point = setAxisBack(cv::Point2f(x,y));
-//        pmap->locations[num].angle = setAxisBack(th);
-//        pmap->annot_edit_location = true;
-////        //qDebug() << pmap->locations[num].angle;
-//    }
-//    initLocation();
-//    setMapLocation();
-//}
+void MapView::editLocation(int x, int y, float th){
+    int num = select_location;
+    if(pmap->locations.size() > num && num > -1){
+        if(!edit_location_flag){
+            edit_location_flag = true;
+            orin_location = pmap->locations[num];
+        }
+        pmap->locations[num].point = setAxisBack(cv::Point2f(x,y));
+        pmap->locations[num].angle = setAxisBack(th);
+        pmap->annot_edit_location = true;
+    }
+    initLocation();
+    setMap();
+}
 
 void MapView::paint(QPainter *painter){
     painter->drawPixmap(0,0,width(),height(),pixmap_map.pixmap);
