@@ -56,7 +56,7 @@ Item {
     }
 
     Component.onCompleted: {
-//        mapview.setName(objectName);
+        mapview.setName(objectName);
 //        mapview.setRawMap("");
 //        mapview.setMapSize(width, height);
         mapview.setMapSize(width, height);
@@ -83,7 +83,7 @@ Item {
 
     function setViewer(mode){
         supervisor.writelog("[QML MAP] SET Viewer "+objectName+" to "+mode);
-//        mapview.setMode(mode);
+        mapview.setMode(mode);
         show_connection = true;
         show_button_following = true;
         show_button_lidar = true;
@@ -106,7 +106,7 @@ Item {
             show_button_following = false;
             show_button_lidar = false;
         }else if(mode === "annot_location"){
-            mapview.setCostMap();
+//            mapview.setCostMap();
         }else if(mode === "mapping"){
             show_button_following = true;
             show_button_lidar = false;
@@ -149,15 +149,6 @@ Item {
 
     }
 
-    function checkEdit(){
-        checkDrawing();
-        checkObject();
-        checkLocation();
-        is_edited = false;
-        if(is_object_new || is_drawing_undo || is_location_new){
-            is_edited = true;
-        }
-    }
 
     function checkObject(){
         is_object_new = false;
@@ -183,8 +174,6 @@ Item {
         }
     }
 
-
-
     function loadmap(name,type){
         if(typeof(name) === 'undefined'){
             name = supervisor.getMapname();
@@ -198,53 +187,28 @@ Item {
         if(typeof(type) !== 'undefined'){
             map_type = type;
             timer_loadmap.stop();
+            map_loaded = true;
             mapview.loadFile(name);
-            if(type === "MINIMAP"){
-
-            }else if(type === "RAW"){
-                map_loaded = true;
-                mapview.setRawMap(name);
-            }else if(type === "EDITED"){
-                map_loaded = true;
-//                mapview.setEditedMap(name);
-            }else if(type === "T_EDIT"){
-                map_loaded = true;
-                mapview.setTlineMode(true);
-                mapview.initTline(name);
-                mapview.setEditedMap(name);
-                mapview.setFullScreen();
-            }else if(type === "OBJECT"){
-                map_loaded = true;
-                mapview.setCostMap();
-                mapview.setObjectMap(name);
-            }else if(type === "local"){
-                map_loaded = true;
-                mapview.setLocalizationMap(name);
-            }else if(type === "velmap"){
-                map_loaded = true;
-                mapview.initVelmap(name,1);
-                mapview.setEditedMap(name);
-            }
         }else{
+            map_loaded = true;
+            mapview.loadFile(name);
             if(supervisor.isExistAnnotation(name)){
-                map_loaded = true;
-                mapview.setEditedMap(name);
                 map_type = "EDITED";
             }else{
-                map_loaded = true;
-                mapview.setRawMap(name);
                 map_type = "RAW";
             }
         }
         mapview.setMap();
     }
+
     function startDrawingT(){
         mapview.startDrawingTline();
     }
+
     function stopDrawingT(){
         mapview.stopDrawingTline();
-
     }
+
     function getTFlag(){
         return mapview.getDrawingTline();
     }
@@ -285,7 +249,7 @@ Item {
                     mapview.setObjectMap(name);
                 }else if(type === "local"){
                     map_loaded = true;
-                    mapview.setLocalizationMap(name);
+//                    mapview.setLocalizationMap(name);
                 }else if(type === "velmap"){
                     map_loaded = true;
                     mapview.initVelmap(name,1);
@@ -302,7 +266,6 @@ Item {
                     map_type = "RAW";
                 }
             }
-            mapview.updateMap();
         }
     }
 
@@ -310,31 +273,13 @@ Item {
         mapview.setMapping();
     }
 
-    function setScreen(s,x,y){
-        mapview.setScreen(s,x,y);
-    }
-
-    function setcostmap(){
-
-        mapview.setCostMap();
-    }
-
-    function loadobjecting(){
-        mapview.setObjecting();
-    }
-
     function setfullscreen(){
         mapview.setFullScreen();
-    }
-
-    function setCurrentObject(num){
-        mapview.selectObject(num);
     }
 
     function setCurrentLocation(num, type){
         mapview.selectLocation(num, type);
     }
-
 
     function setTool(name){
         tool = name;
@@ -348,9 +293,6 @@ Item {
     }
     function drawing_redo(){
         mapview.redoLine();
-    }
-    function object_undo(){
-        mapview.undoObject();
     }
 
     function init(){
@@ -374,7 +316,6 @@ Item {
         }else if(mode==="all"){
             mapview.endSpline(false);
             mapview.clearDrawing();
-            mapview.clearObject();
             mapview.clearLocation();
             mapview.clearInitPose();
         }else if(mode==="tline"){
@@ -398,10 +339,6 @@ Item {
             mapview.rotateMap(dir);
         }
     }
-    function saveObject(type){
-        mapview.saveObject(type);
-    }
-
     function save(mode, type, name){
         if(mode==="obj"){
             mapview.saveObject();
@@ -433,7 +370,7 @@ Item {
         }else if(mode==="velmap"){
             mapview.saveVelmap();
         }else if(mode==="rotate"){
-            mapview.cutMap();
+            mapview.saveRotateMap();
         }else if(mode==="location_all"){
             mapview.saveAnnotation(map_name);
         }
@@ -456,10 +393,6 @@ Item {
         mapview.editLocation();
     }
 
-    function redoLocation(){
-        mapview.redoLocation();
-    }
-
 //    function savelocation(mode, type, name){
 //        if(mode==="cur_pose"){
 //            print(last_robot_x,last_robot_y,last_robot_th);
@@ -475,20 +408,15 @@ Item {
         cur_color = color;
     }
 
-
     function setDrawingWidth(width){
         mapview.setLineWidth(width);
-        cur_width = width/mapview.getScale() + 2;
-//        print("setdrawingwidth ",width,mapview.getScale(),cur_width);
+        cur_width = width*map_full.width/mapview.getFileWidth()/mapview.getScale() + 2;
     }
 
     function setAutoInit(x,y,th){
 //        print(objectName+" ?:",x,y,th);
         mapview.setInitPose(x,y,th);
         supervisor.setInitPos(x,y,th);
-    }
-    function updateMap(){
-        mapview.updateMap();
     }
 
     Timer{
@@ -497,9 +425,9 @@ Item {
         repeat: true
         running: true
         onTriggered: {
-//            btn_show_location.active = mapview.getlocationView();
-//            btn_robot_following.active = mapview.getRobotFollowing();
-//            btn_show_lidar.active = mapview.getlidarView();
+            btn_show_location.active = mapview.getshowLocation();
+            btn_robot_following.active = mapview.getRobotFollowing();
+            btn_show_lidar.active = mapview.getShowLidar();
         }
     }
 
@@ -613,7 +541,6 @@ Item {
         }
     }
     MouseArea{
-//        enabled: parent.enabled
         anchors.fill: parent
         hoverEnabled: true
         onWheel: {
@@ -638,7 +565,7 @@ Item {
         touchPoints: [TouchPoint{id:point1},TouchPoint{id:point2}]
         onPressed:{
             double_touch = false;
-//            mapview.setRobotFollowing(false);
+            mapview.setRobotFollowing(false);
             if(point1.pressed && point2.pressed){
                 double_touch = true;
             }else if(point1.pressed){
@@ -659,19 +586,19 @@ Item {
 //                    print("PRESS : ",firstX,firstY,firstDist);
                 }
             }else if(tool == "draw"){
-                mapview.showBrush(true);
+                mapview.setShowBrush(true);
                 mapview.startDrawing(firstX, firstY);
             }else if(tool == "draw_rect"){
-                mapview.showBrush(false);
+                mapview.setShowBrush(false);
                 mapview.startDrawingRect(firstX,firstY);
             }else if(tool == "straight"){
-                mapview.showBrush(true);
+                mapview.setShowBrush(true);
                 mapview.startDrawingLine(firstX, firstY);
             }else if(tool == "dot_spline"){
 //                mapview.startSpline(firstX, firstY);
                 mapview.addSpline(firstX,firstY);
             }else if(tool == "erase"){
-                mapview.showBrush(true);
+                mapview.setShowBrush(true);
                 mapview.setLineColor(-1);
                 mapview.startDrawing(firstX, firstY);
             }else if( tool === "add_object"){
@@ -703,7 +630,7 @@ Item {
             }
         }
         onReleased: {
-            mapview.showBrush(false);
+            mapview.setShowBrush(false);
             var newX = mapview.getX() + point1.x*mapview.getScale()*mapview.getFileWidth()/width;
             var newY = mapview.getY() + point1.y*mapview.getScale()*mapview.getFileWidth()/width;
             if(!point1.pressed && !point2.pressed){
@@ -792,7 +719,7 @@ Item {
                             newX = point2.x*mapview.getScale()*mapview.getFileWidth()/width;
                             newY = point2.y*mapview.getScale()*mapview.getFileWidth()/width;
                         }
-                        print("UPDATE : ",point1.x,point1.y,newX,newY,mapview.getScale());
+//                        print("UPDATE : ",point1.x,point1.y,newX,newY,mapview.getScale());
                         mapview.setRobotFollowing(false);
                         mapview.move(firstX-newX, firstY-newY);
                     }
@@ -919,9 +846,9 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     if(parent.active){
-                        mapview.setlidarView(false);
+                        mapview.setShowLidar(false);
                     }else{
-                        mapview.setlidarView(true);
+                        mapview.setShowLidar(true);
                     }
                 }
             }
@@ -944,9 +871,9 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     if(parent.active){
-                        mapview.setLocationView(false);
+                        mapview.setShowLocation(false);
                     }else{
-                        mapview.setLocationView(true);
+                        mapview.setShowLocation(true);
                     }
                 }
             }

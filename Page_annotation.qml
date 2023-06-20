@@ -3135,7 +3135,6 @@ Item {
                 height: 180
                 type: "round_text"
                 text: "종 료"
-                visible: false
                 onClicked: {
                     supervisor.writelog("[ANNOTATION] All Done");
                     if(annotation_after_mapping)
@@ -3269,10 +3268,10 @@ Item {
                                 type: "round_text"
                                 width: 120
                                 height: 60
-                                text:"저장 후 종료"
+                                text:"종료"
                                 onClicked:{
                                     supervisor.writelog("[MAPPING] Travel line : Save and Exit");
-                                    annot_pages.sourceComponent = page_annot_additional_menu;
+                                    popup_save_travelline.open()
                                 }
                             }
                         }
@@ -3790,81 +3789,83 @@ Item {
                         }
 
                     }
-                    Popup{
-                        id: popup_save_travelline
-                        width: parent.width
-                        height: parent.height
-                        background:Rectangle{
-                            anchors.fill: parent
-                            color: "#282828"
-                            opacity: 0.7
-                        }
-                        property string save_mode: "tline"
-                        property bool edited_mode: false
-                        Rectangle{
-                            anchors.centerIn: parent
-                            width: 450
-                            height: 230
-                            color: "white"
-                            radius: 20
+                    }
 
-                            Column{
-                                anchors.centerIn: parent
-                                spacing: 20
-                                Column{
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    Text{
-                                        text: "이대로 <font color=\"#12d27c\">저장</font>하시겠습니까?"
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 30
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                    Text{
-                                        text: "기존의 파일은 삭제됩니다."
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 20
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                }
-                                Row{
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: 20
-                                    Item_buttons{
-                                        type: "round_text"
-                                        text: "취소"
-                                        width: 180
-                                        height: 60
-                                        onClicked:{
-                                            popup_save_travelline.close();
-                                        }
-                                    }
-                                    Item_buttons{
-                                        type: "round_text"
-                                        text: "확인"
-                                        width: 180
-                                        height: 60
-                                        onClicked:{
-                                            //save temp Image
-                                            if(popup_save_travelline.save_mode === "tline"){
-                                                supervisor.writelog("[QML] MAP PAGE : SAVE TRAVELLINE ");
-                                                map.save("tline");
-                                                map.loadmap(supervisor.getMapname(),"T_EDIT");
-                                            }else if(popup_save_travelline.save_mode === "velmap"){
-                                                supervisor.writelog("[QML] MAP PAGE : SAVE VELOCITY MAP ");
-                                                map.save("velmap");
-                                            }
-                                            popup_save_travelline.close();
-                                        }
-                                    }
+            }
+            Popup{
+                id: popup_save_travelline
+                width: parent.width
+                height: parent.height
+                background:Rectangle{
+                    anchors.fill: parent
+                    color: "#282828"
+                    opacity: 0.7
+                }
+                property string save_mode: "tline"
+                property bool edited_mode: false
+                Rectangle{
+                    anchors.centerIn: parent
+                    width: 450
+                    height: 230
+                    color: "white"
+                    radius: 20
+
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 20
+                        Column{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            Text{
+                                text: "이대로 <font color=\"#12d27c\">저장</font>하시겠습니까?"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 30
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "기존의 파일은 삭제됩니다."
+                                font.family: font_noto_r.name
+                                font.pixelSize: 20
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                        Row{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 20
+                            Item_buttons{
+                                type: "round_text"
+                                text: "취소"
+                                width: 180
+                                height: 60
+                                onClicked:{
+                                    popup_save_travelline.close();
                                 }
                             }
-
+                            Item_buttons{
+                                type: "round_text"
+                                text: "확인"
+                                width: 180
+                                height: 60
+                                onClicked:{
+                                    //save temp Image
+                                    if(popup_save_travelline.save_mode === "tline"){
+                                        supervisor.writelog("[QML] MAP PAGE : SAVE TRAVELLINE ");
+                                        map.save("tline");
+                                        map.loadmap(supervisor.getMapname(),"T_EDIT");
+                                    }else if(popup_save_travelline.save_mode === "velmap"){
+                                        supervisor.writelog("[QML] MAP PAGE : SAVE VELOCITY MAP ");
+                                        map.save("velmap");
+                                    }
+                                    popup_save_travelline.close();
+                                    annot_pages.sourceComponent = page_annot_additional_menu;
+                                }
+                            }
                         }
-
                     }
+
                 }
 
             }
+
             Popup_help{
                 id: popup_travelline_help
                 Component.onCompleted: {
@@ -3879,7 +3880,6 @@ Item {
                 interval: 500
                 triggeredOnStart: true
                 onTriggered: {
-                    map.checkEdit();
                     if(map.is_drawing_undo)
                         btn_undo.enabled = true;
                     else
@@ -3916,13 +3916,13 @@ Item {
             }
             Row{
                 Rectangle{
-                    width: 200
+                    width: 150
                     color: color_dark_navy
                     height: annot_pages.height
                 }
                 Column{
                     Rectangle{
-                        width: annot_pages.width - 200
+                        width: annot_pages.width - 150
                         height: 100
                         color: "transparent"
                         Text{
@@ -3956,15 +3956,14 @@ Item {
                                 height: 60
                                 onClicked:{
                                     supervisor.writelog("[MAPPING] Velocity Map : Save and Exit");
-    //                                    supervisor.saveMapping(map_name);
-                                    annot_pages.sourceComponent = page_annot_additional_menu;
+                                    popup_save_velmap.open();
                                 }
                             }
                         }
                     }
                     Row{
                         Rectangle{
-                            width: annot_pages.width - map.width - 200
+                            width: annot_pages.width - map.width - 150
                             height: map.height
                             color: color_light_gray
                             Column{
@@ -4348,8 +4347,7 @@ Item {
                                 width: 200
                                 height: 100
                                 onClicked:{
-                                    popup_save_travelline.save_mode = "velmap";
-                                    popup_save_travelline.open();
+                                    popup_save_velmap.open();
                                 }
                             }
                         }
@@ -4363,14 +4361,12 @@ Item {
                         }
                     }
 
-
                     Timer{
                         running: true
                         repeat: true
                         interval: 500
                         triggeredOnStart: true
                         onTriggered: {
-                            map.checkEdit();
                             if(map.is_drawing_undo)
                                 btn_undo.enabled = true;
                             else
@@ -4383,6 +4379,72 @@ Item {
 
                         }
                     }
+                }
+
+            }
+            Popup{
+                id: popup_save_velmap
+                width: parent.width
+                height: parent.height
+                background:Rectangle{
+                    anchors.fill: parent
+                    color: "#282828"
+                    opacity: 0.7
+                }
+                Rectangle{
+                    anchors.centerIn: parent
+                    width: 450
+                    height: 230
+                    color: "white"
+                    radius: 20
+
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 20
+                        Column{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            Text{
+                                text: "이대로 <font color=\"#12d27c\">저장</font>하시겠습니까?"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 30
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "기존의 파일은 삭제됩니다."
+                                font.family: font_noto_r.name
+                                font.pixelSize: 20
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                        Row{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 20
+                            Item_buttons{
+                                type: "round_text"
+                                text: "취소"
+                                width: 180
+                                height: 60
+                                onClicked:{
+                                    popup_save_velmap.close();
+                                }
+                            }
+                            Item_buttons{
+                                type: "round_text"
+                                text: "확인"
+                                width: 180
+                                height: 60
+                                onClicked:{
+                                    //save temp Image
+                                    supervisor.writelog("[QML] MAP PAGE : SAVE VELOCITY MAP ");
+                                    map.save("velmap");
+
+                                    popup_save_velmap.close();
+                                    annot_pages.sourceComponent = page_annot_additional_menu;
+                                }
+                            }
+                        }
+                    }
+
                 }
 
             }

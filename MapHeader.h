@@ -27,6 +27,7 @@
 #define hex_color_gray      "#d8d8d8"
 #define hex_color_blue      "#83B8F9"
 #define hex_color_pink      "#FFD9FF"
+#define hex_color_yellow    "#ffc850"
 
 typedef struct{
     cv::Point2f point;

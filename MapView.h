@@ -30,14 +30,16 @@ public:
     bool exist_velmap = false;
 
     //맵 파일 크기
-    int file_width;
+    int file_width = 0;
+    float grid_width = 0;
+    float scale = 1;
+    float prev_scale = 1;
+    int rotate_angle = 0;
 
     //맵 표시범위
     int draw_x = 0;
     int draw_y = 0;
     int draw_width = 0;
-    float scale = 1;
-    float prev_scale = 1;
 
     //캔버스(맵뷰어) 크기
     int canvas_width = 0;
@@ -46,140 +48,111 @@ public:
     //------------file load--------------//
     Q_INVOKABLE void loadFile(QString name);
 
+    //------------draw map--------------//
     Q_INVOKABLE void setMap();
+    Q_INVOKABLE void moveMap();
+    Q_INVOKABLE void setFullScreen();
+    Q_INVOKABLE void setMapDrawing();
 
-
-
-
-
-
-
-//    Q_INVOKABLE bool checkRobotCollision();
-//    Q_INVOKABLE bool checkLocationCollision();
-//    Q_INVOKABLE bool isCollision(int x, int y);
-//    Q_INVOKABLE bool checkLocationCollision(int num);
+    //------------map variables--------------//
+    Q_INVOKABLE void setName(QString name){object_name = name;}
+    Q_INVOKABLE void setTool(QString name){tool = name;}
+    Q_INVOKABLE QString getTool(){return tool;}
+    Q_INVOKABLE void setMode(QString name);
     Q_INVOKABLE void setEnable(bool en){enable = en;}
-//    Q_INVOKABLE void setName(QString name){object_name = name;}
-//    Q_INVOKABLE void setTool(QString name){tool = name;}
-//    Q_INVOKABLE QString getTool(){return tool;}
-//    Q_INVOKABLE void setMode(QString name);
-//    Q_INVOKABLE QString getMode(){return mode;}
-//    Q_INVOKABLE void setlidarView(bool onoff){show_lidar = onoff; updateMap();}
-//    Q_INVOKABLE void setobjectView(bool onoff){show_object = onoff;updateMap();}
-//    Q_INVOKABLE void setobjectBoxView(bool onoff){show_object_box = onoff;updateMap();}
-//    Q_INVOKABLE void setLocationView(bool onoff){show_location = onoff;updateMap();}
+    Q_INVOKABLE QString getMode(){return mode;}
+    Q_INVOKABLE void setShowBrush(bool onoff){show_brush = onoff;}
+    Q_INVOKABLE void setShowLidar(bool onoff){show_lidar = onoff;}
+    Q_INVOKABLE void setShowLocation(bool onoff){show_location = onoff;}
     Q_INVOKABLE void setRobotFollowing(bool onoff){
         robot_following = onoff;
         setZoomCenter();
-        updateMap();
     }
-//    Q_INVOKABLE bool getlocationView(){return show_location;}
-//    Q_INVOKABLE bool getRobotFollowing(){return robot_following;}
-//    Q_INVOKABLE bool getlidarView(){return show_lidar;}
-//    Q_INVOKABLE bool getobjectView(){return show_object;}
-//    Q_INVOKABLE bool getobjectBoxView(){return show_object_box;}
 
-//    bool show_robot = false;
-//    bool show_global_path = false;
-//    bool show_local_path = false;
-//    bool show_lidar = false;
-//    bool show_object_box = false;
-//    bool show_object = false;
-//    bool show_location = false;
-//    bool show_location_icon = false;
+    Q_INVOKABLE bool getshowLocation(){return show_location;}
+    Q_INVOKABLE bool getRobotFollowing(){return robot_following;}
+    Q_INVOKABLE bool getShowLidar(){return show_lidar;}
+
+    bool show_brush = false;
+    bool show_robot = false;
+    bool show_global_path = false;
+    bool show_local_path = false;
+    bool show_lidar = false;
+    bool show_location = false;
+    bool show_location_icon = false;
     bool robot_following = false;
+    bool show_travelline = false;
+    bool show_velocitymap = false;
 
-//    //--------------------------------------------------Map Generation
-//    Q_INVOKABLE void setMap(QObject *pixmapContainer);
-    Q_INVOKABLE void updateMap();
-//    Q_INVOKABLE void moveMap();
-//    Q_INVOKABLE void reloadMap();
-//    Q_INVOKABLE void setMapping();
-//    Q_INVOKABLE void setObjecting();
-//    Q_INVOKABLE void setRawMap(QString filename);
-//    Q_INVOKABLE void setEditedMap(QString filename);
-//    Q_INVOKABLE void setCostMap();
-//    Q_INVOKABLE void setCostMap(QString filename);
-//    Q_INVOKABLE void setObjectMap(QString filename);
-//    Q_INVOKABLE void setFullScreen();
-//    Q_INVOKABLE void setLocalizationMap(QString filename);
-//    void setMapCurrent();
-//    void setMapDrawing();
-//    void setMapDrawingVel();
-//    void setMapObject();
-//    void setMapMap();
-//    void setMapLocation();
+    //------------localization--------------//
+    POSE set_init_pose;
+    bool set_init_flag = false;
+    Q_INVOKABLE void setInitPose(int x, int y, float th);
+    Q_INVOKABLE void clearInitPose();
 
-//    void updateMeta();
+    //------------drawing--------------//
+    bool flag_drawing=false;
+    cv::Point2f prev_pose;
+    void drawTline();
+    Q_INVOKABLE void startDrawingTline();
+    Q_INVOKABLE void stopDrawingTline();
+    Q_INVOKABLE bool getDrawingTline(){
+        return flag_drawing;
+    }
 
-//    //---------------------------------------------------Mapping, Localization
-//    POSE set_init_pose;
-//    bool set_init_flag = false;
-//    Q_INVOKABLE void setInitPose(int x, int y, float th);
-//    Q_INVOKABLE void clearInitPose();
+    //------------cut / rotate--------------//
+    cv::Point2f cut_box[2];
+    cv::Point2f orin_box[3];
+    Q_INVOKABLE void setBoxPoint(int num, int x, int y);
+    Q_INVOKABLE int getPointBox(int x, int y);
+    Q_INVOKABLE void saveRotateMap();
+    Q_INVOKABLE void initRotate();
+    Q_INVOKABLE void rotateMap(int angle);
+    Q_INVOKABLE void rotateMapCW();
+    Q_INVOKABLE void rotateMapCCW();
 
-//    bool flag_drawing=false;
-//    Q_INVOKABLE void startDrawingTline();
-//    Q_INVOKABLE void stopDrawingTline();
-//    Q_INVOKABLE bool getDrawingTline(){
-//        return flag_drawing;
-//    }
 
-//    //---------------------------------------------------Rotation
-//    int rotate_angle = 0;
-//    int dangle = 0;
-//    Q_INVOKABLE void rotateMap(int angle);
-//    Q_INVOKABLE void rotateMapCW();
-//    Q_INVOKABLE void rotateMapCCW();
-//    cv::Point2f cut_box[2];
-//    cv::Point2f orin_box[3];
-//    Q_INVOKABLE void setBoxPoint(int num, int x, int y);
-//    Q_INVOKABLE int getPointBox(int x, int y);
-//    Q_INVOKABLE void cutMap();
-//    Q_INVOKABLE void initRotate();
 //    //---------------------------------------------------Drawing
+    QVector<cv::Point2f> line;
+    QVector<cv::Point2f> line_spline;
+    QVector<cv::Point2f> spline_dot;
+    QVector<cv::Point2f> dot_trash;
+    QVector<cv::Point2f> temp_rect;
+    QVector<LINE> lines;
+    QVector<LINE> lines_trash;
+    int cur_line_color=255;
+    int cur_line_width=3;
+    bool new_straight_flag = false;
+    cv::Point2f straight[2];
+    void initDrawing(){
+        map_drawing = cv::Mat(file_width, file_width, CV_8UC4, cv::Scalar::all(0));
+        map_drawing_mask = cv::Mat(file_width, file_width, CV_8UC4, cv::Scalar::all(0));
+    }
+    Q_INVOKABLE bool getDrawingFlag();
+    Q_INVOKABLE bool getDrawingUndoFlag();
+    Q_INVOKABLE void startDrawing(int x, int y);
+    Q_INVOKABLE void addLinePoint(int x, int y);
+    Q_INVOKABLE void endDrawing(int x, int y);
 
+    Q_INVOKABLE void startDrawingRect(int x, int y);
+    Q_INVOKABLE void setDrawingRect(int x, int y);
+    Q_INVOKABLE void endDrawingRect();
 
-//    QVector<cv::Point2f> line;
-//    QVector<cv::Point2f> line_spline;
-//    QVector<cv::Point2f> spline_dot;
-//    QVector<cv::Point2f> dot_trash;
-//    QVector<cv::Point2f> temp_rect;
-//    QVector<LINE> lines;
-//    QVector<LINE> lines_trash;
-//    int cur_line_color=255;
-//    int cur_line_width=3;
-//    bool show_brush = false;
-//    bool new_straight_flag = false;
-//    cv::Point2f straight[2];
-//    Q_INVOKABLE void showBrush(bool onoff){show_brush = onoff;}
-//    Q_INVOKABLE bool getDrawingFlag();
-//    Q_INVOKABLE bool getDrawingUndoFlag();
-//    Q_INVOKABLE void startDrawing(int x, int y);
-//    Q_INVOKABLE void addLinePoint(int x, int y);
-//    Q_INVOKABLE void endDrawing(int x, int y);
+    Q_INVOKABLE void clearDrawing();
+    Q_INVOKABLE void undoLine();
+    Q_INVOKABLE void redoLine();
+    Q_INVOKABLE void startSpline(int x, int y);
+    Q_INVOKABLE void addSpline(int x, int y);
+    Q_INVOKABLE void drawSpline();
+    Q_INVOKABLE void endSpline(bool save);
+    Q_INVOKABLE void startDrawingLine(int x, int y);
+    Q_INVOKABLE void setDrawingLine(int x, int y);
+    Q_INVOKABLE void stopDrawingLine(int x, int y);
+    Q_INVOKABLE void setLineColor(int color){cur_line_color = color;}
+    Q_INVOKABLE void setLineWidth(int width){
+        cur_line_width = width;
+    }
 
-//    Q_INVOKABLE void startDrawingRect(int x, int y);
-//    Q_INVOKABLE void setDrawingRect(int x, int y);
-//    Q_INVOKABLE void endDrawingRect();
-
-//    Q_INVOKABLE void clearDrawing();
-//    Q_INVOKABLE void undoLine();
-//    Q_INVOKABLE void redoLine();
-//    Q_INVOKABLE void startSpline(int x, int y);
-//    Q_INVOKABLE void addSpline(int x, int y);
-//    Q_INVOKABLE void drawSpline();
-//    Q_INVOKABLE void endSpline(bool save);
-//    Q_INVOKABLE void startDrawingLine(int x, int y);
-//    Q_INVOKABLE void setDrawingLine(int x, int y);
-//    Q_INVOKABLE void stopDrawingLine(int x, int y);
-//    Q_INVOKABLE void setLineColor(int color){cur_line_color = color;}
-//    Q_INVOKABLE void setLineWidth(int width){
-//        cur_line_width = width;
-//    }
-
-//    cv::Point2f prev_pose;
-//    void drawTline();
 //    //---------------------------------------------------Object
 //    void initObject();
 //    QVector<OBJECT> objects;
@@ -204,44 +177,42 @@ public:
 //    Q_INVOKABLE void setScreen(float s, int centerx, int centery);
 
 //    //---------------------------------------------------Location
-//    QVector<LOCATION> locations;
-//    LOCATION new_location;
-//    int select_location = -1;
+    QVector<LOCATION> locations;
+    LOCATION new_location;
+    int select_location = -1;
 //    QString select_location_type = "";
-//    bool new_location_flag;
-//    bool edit_location_flag;
-//    LOCATION orin_location;
+    bool new_location_flag;
+    bool edit_location_flag;
+    LOCATION orin_location;
 
 //    Q_INVOKABLE bool getLocationFlag(){return new_location_flag;}
-//    Q_INVOKABLE void saveLocation(QString type, int groupnum, QString name);
-//    Q_INVOKABLE void clearLocation();
+    Q_INVOKABLE void saveLocation(QString type, int groupnum, QString name);
+    Q_INVOKABLE void clearLocation();
 //    Q_INVOKABLE void selectLocation(int num, QString type="");
-//    Q_INVOKABLE void addLocation(int x, int y,float th);
-//    Q_INVOKABLE void addLocationCur(int x, int y,float th);
-//    Q_INVOKABLE void setLocation(int x, int y, float th);
+    Q_INVOKABLE void addLocation(int x, int y,float th);
+    Q_INVOKABLE void addLocationCur(int x, int y,float th);
+    Q_INVOKABLE void setLocation(int x, int y, float th);
 //    Q_INVOKABLE void editLocation(int x, int y, float th);
 //    Q_INVOKABLE void editLocation();
 //    Q_INVOKABLE void redoLocation();
-//    Q_INVOKABLE int getLocationNum(int x, int y);
-//    Q_INVOKABLE void removeLocation(int num);
-//    Q_INVOKABLE void setTableNumberAuto();
+    Q_INVOKABLE int getLocationNum(int x, int y);
+    Q_INVOKABLE void removeLocation(int num);
+    Q_INVOKABLE void setTableNumberAuto();
 //    //---------------------------------------------------Travel Line
-//    bool is_edited_tline = false;
 //    Q_INVOKABLE void initTline(QString filename);
-//    Q_INVOKABLE void setTlineMode(bool is_edit){is_edited_tline = is_edit;}
 //    Q_INVOKABLE void setMapTline();
 
 //    //---------------------------------------------------Velocity Map
 //    Q_INVOKABLE void initVelmap(QString filename, int mode);
 //    Q_INVOKABLE void setMapVelmap();
 
-//    Q_INVOKABLE int getLocationNum(QString type);
-//    Q_INVOKABLE int getLocGroupNum(int num);
+    Q_INVOKABLE int getLocationNum(QString type);
+    Q_INVOKABLE int getLocGroupNum(int num);
 //    //---------------------------------------------------Save
-//    void initLocation();
-//    Q_INVOKABLE void saveMap();
-//    Q_INVOKABLE void saveTline();
-//    Q_INVOKABLE void saveVelmap();
+    void initLocation();
+    Q_INVOKABLE void saveMap();
+    Q_INVOKABLE void saveTline();
+    Q_INVOKABLE void saveVelmap();
 //    //---------------------------------------------------Map Scale, Move
 //    int map_width;
 //    int map_height;
@@ -266,7 +237,7 @@ public:
 //    void setCenter(int centerx, int centery);
     void setZoomCenter(int x=0, int y=0);
 
-//    int getLocationGroupSize(int num);
+    int getLocationGroupSize(int num);
 //    void setSetting(QString name, QString value){
 //        QString ini_path = QDir::homePath()+"/robot_config.ini";
 //        QSettings setting(ini_path, QSettings::IniFormat);
@@ -279,7 +250,7 @@ public:
 //        setting.setValue(name,value);
 //        plog->write("[SETTING] SET "+name+" VALUE TO "+value);
 //    }
-//    Q_INVOKABLE void saveAnnotation(QString filename);
+    Q_INVOKABLE void saveAnnotation(QString filename);
 protected:
     virtual void paint(QPainter *painter) Q_DECL_OVERRIDE;
 
@@ -299,6 +270,8 @@ private:
 
     //현재 사용중인 map(raw | edited)
     cv::Mat map_orin;
+    cv::Mat map_drawing;
+    cv::Mat map_drawing_mask;
 
     QPixmap map;
 private slots:

@@ -501,10 +501,6 @@ Item {
 
 
 
-
-    function updatemap(){
-        map.reload();
-    }
     Popup{
         id: popup_save_edited
         width: parent.width
@@ -1581,7 +1577,6 @@ Item {
         print("map loadmap ",name,type);
         check_slam_init_timer.stop();
         map.loadmap(name,type);
-        updatemap();
     }
 
     Popup{
