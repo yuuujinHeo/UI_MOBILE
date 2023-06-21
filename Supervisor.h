@@ -48,7 +48,7 @@ public:
 public:
 
     ////*********************************************  FLAGS   ***************************************************////
-    int ui_cmd;
+//    int ui_cmd;
     bool flag_read_ini = false;
     bool isaccepted;
     bool flag_clear;
@@ -85,7 +85,6 @@ public:
     QList<int> wifi_cmds;
     int wifi_cmd = WIFI_CMD_NONE;
     QString wifi_temp_ssd = "";
-    Q_INVOKABLE void readWifi();
     Q_INVOKABLE int getWifiNum();
     Q_INVOKABLE int getWifiConnection(QString ssd);
     void setPrevWifiConnection(QString ssd, int state);
@@ -197,6 +196,9 @@ public:
     Q_INVOKABLE LOCATION getLocation(QString name);
 
 
+    Q_INVOKABLE void setUiState(int state){
+        ui_state = state;
+    }
 
 
     ////*********************************************  LOG 관련   ***************************************************////
@@ -214,17 +216,10 @@ public:
     Q_INVOKABLE QString getLogDate(int num);
     Q_INVOKABLE QString getLogAuth(int num);
     Q_INVOKABLE QString getLogMessage(int num);
-    Q_INVOKABLE void readLogList();
     Q_INVOKABLE void readLog(QDateTime date);
-    Q_INVOKABLE void readLog(int year, int month, int date);
-    Q_INVOKABLE bool isHasLog(QDateTime date);
-    Q_INVOKABLE bool isHasLog(int year, int month, int date);
     Q_INVOKABLE QString getLocaleDate(int year, int month, int date){
         return QString().sprintf("%d-%02d-%02d",year,month,date);
     }
-
-
-
 
     ////*********************************************  USB 관련   ***************************************************////
     Q_INVOKABLE void updateUSB();
@@ -399,6 +394,7 @@ public:
 
     ////*********************************************  SCHEDULER(SERVING) 관련   ***************************************************////
     Q_INVOKABLE void setTray(int tray_num, int table_num);
+    Q_INVOKABLE void startServing();
     Q_INVOKABLE void setPreset(int preset);
     Q_INVOKABLE void confirmPickup();
     Q_INVOKABLE QVector<int> getPickuptrays();
@@ -407,12 +403,9 @@ public:
 
     ////*********************************************  ROBOT MOVE 관련   ***************************************************////
 //    Q_INVOKABLE void moveTo(QString target_num);
-    Q_INVOKABLE void moveToServing(QString target, int preset);
-    Q_INVOKABLE void moveToLast();
     Q_INVOKABLE void movePause();
     Q_INVOKABLE void moveResume();
     Q_INVOKABLE void moveStop();
-    Q_INVOKABLE void moveManual();
     Q_INVOKABLE void moveToCharge();
     Q_INVOKABLE void moveToWait();
     Q_INVOKABLE QString getcurLoc();
@@ -428,7 +421,6 @@ public:
     Q_INVOKABLE int getMotorState();
     Q_INVOKABLE int getLocalizationState();
     Q_INVOKABLE int getStateMoving();
-    Q_INVOKABLE int getObsState();
     Q_INVOKABLE int getErrcode();
     Q_INVOKABLE QString getRobotName();
 
@@ -470,7 +462,6 @@ public:
     Q_INVOKABLE float getLocalPathy(int num);
 
     Q_INVOKABLE int getuistate();
-    Q_INVOKABLE void initdone();
 
     ////*********************************************  MAP IMAGE 관련   ***************************************************////
     Q_INVOKABLE QString getMapname();
@@ -485,8 +476,6 @@ public:
     ////*********************************************  OBJECTING 관련   ***************************************************////
 
     ////*********************************************  PATROL 관련   ***************************************************////
-    Q_INVOKABLE void runRotateTables();
-    Q_INVOKABLE void stopRotateTables();
 
     QStringList patrol_list;
     int patrol_num;
@@ -497,9 +486,6 @@ public:
     Q_INVOKABLE void clearFlagStop();
     Q_INVOKABLE void slam_fullautoInit();
     Q_INVOKABLE void moveToServingTest(QString name);
-    Q_INVOKABLE void startServingTest();
-    Q_INVOKABLE void stopServingTest();
-
     Q_INVOKABLE int getusberrorsize();
     Q_INVOKABLE QString getusberror(int num);
     Q_INVOKABLE int getzipstate();
@@ -509,15 +495,10 @@ public slots:
     void path_changed();
     void camera_update();
     void mapping_update();
-    void objecting_update();
     void usb_detect();
     void git_pull_failed();
     void git_pull_success();
     void new_call();
-    void zip_done();
-    void unzip_done();
-    void zip_failed();
-    void unzip_failed();
     void wifi_con_output();
     void wifi_con_error();
     void wifi_ch_output();

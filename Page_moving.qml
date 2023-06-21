@@ -340,21 +340,20 @@ Item {
             obs_in_path =supervisor.getObsinPath();
 
             if(show_face){
-                if(supervisor.getStateMoving() === 3){
-                    if(face_image.cur_source !== "image/face_cry.gif"){
-                        supervisor.writelog("[QML - MOVING] MOVING WAITED");
-                        face_image.play("image/face_cry.gif");
+                if(obs_in_path == 0){
+                    if(face_image.cur_source !== "image/temp.gif"){
+                        supervisor.writelog("[UI] SHOW MOVING FACE : NORMAL");
+                        face_image.play("image/temp.gif");
                     }
-
-                }else if(obs_in_path){
+                }else if(obs_in_path == 1){
                     if(face_image.cur_source !== "image/face_surprise.gif"){
-                        supervisor.writelog("[QML - MOVING] ROBOT DETECT SOMETHING");
+                        supervisor.writelog("[UI] SHOW MOVING FACE : SURPRISE");
                         face_image.play("image/face_surprise.gif");
                     }
-                }else{
-                    if(face_image.cur_source !== "image/temp.gif"){
-                        supervisor.writelog("[QML - MOVING] ROBOT START MOVING");
-                        face_image.play("image/temp.gif");
+                }else if(obs_in_path == 2){
+                    if(face_image.cur_source !== "image/face_cry.gif"){
+                        supervisor.writelog("[UI] SHOW MOVING FACE : CRY");
+                        face_image.play("image/face_cry.gif");
                     }
                 }
             }

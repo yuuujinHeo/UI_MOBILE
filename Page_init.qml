@@ -3792,7 +3792,6 @@ Item {
                     init_mode = 5;
                     update_timer.stop();
                     loadPage(pkitchen);
-                    supervisor.initdone();
                 }else{
                     if(loader_init.item.objectName != "init_motor"){
                         loader_init.sourceComponent = item_motor_init

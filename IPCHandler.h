@@ -64,8 +64,8 @@ public:
         int8_t     ui_loc_state = 0;
         int8_t     ui_auto_state = 0;
         int8_t     ui_obs_state = 0;
-        //경로 근처에 동적장애물 존재(1) 존재안함(0)
-        int8_t     ui_obs_near_path_state = 0;
+        //표정 보통표정(0) 놀란표정(1) 우는표정(@)
+        int8_t      ui_obs_near_path_state = 0;
         //현재 로봇에 적용된 preset 번호(0~5)
         int8_t     ui_cur_velocity_preset = 0;
         //모터 락 상태 풀림(0) 걸림(1)
@@ -101,7 +101,6 @@ public:
             power = p.power;
             total_power = p.total_power;
             ui_loc_state = p.ui_loc_state;
-            ui_auto_state = p.ui_auto_state;
             ui_obs_state = p.ui_obs_state;
             ui_obs_near_path_state = p.ui_obs_near_path_state;
             ui_cur_velocity_preset = p.ui_cur_velocity_preset;
