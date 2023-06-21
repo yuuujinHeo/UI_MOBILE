@@ -132,44 +132,50 @@ void MapView::loadFile(QString name){
 }
 
 void MapView::setTline(){
-    QString file_path = QDir::homePath() + "/maps/map_14/map_travel_line.png";
-    if(QFile::exists(file_path)){
-        cv::Mat test = cv::imread(file_path.toStdString(), cv::IMREAD_GRAYSCALE);
-        cv::flip(test,test,0);
-        cv::rotate(test,test,cv::ROTATE_90_COUNTERCLOCKWISE);
+    int radius = pmap->robot_radius*2/grid_width;
+    for(int i=0; i<file_travelline.rows;i++){
+        //1줄 당
+        for(int j=0; j<file_travelline.cols-1; j++){
+            //실마리 찾음
+            if(file_travelline.at<uchar>(i,j) == 255 && file_travelline.at<uchar>(i,j+1) == 0){
 
+                //실마리 부터 시작해서 로봇 크기만큼 가까운 실이 있는 지 찾아봄(찾으면 그 사이 매꿈)
+                for(int k=j+1; k<j+radius; k++){
+                    if(k>=file_travelline.cols)
+                        break;
 
-        cv::imshow("origin",test);
-
-        int radius = pmap->robot_radius/grid_width;
-        for(int i=0; i<test.rows;i++){
-            //1줄 당
-            for(int j=0; j<test.cols-1; j++){
-                //실마리 찾음
-                if(test.at<uchar>(i,j) == 255 && test.at<uchar>(i,j+1) == 0){
-
-                    //실마리 부터 시작해서 로봇 크기만큼 가까운 실이 있는 지 찾아봄(찾으면 그 사이 매꿈)
-                    for(int k=j+1; k<j+radius; k++){
-                        if(k>=test.cols)
-                            break;
-
-                        if(test.at<uchar>(i,k) == 255){
-                            for(int h=j+1; h<k+1; h++){
-                                test.at<uchar>(i,h) = 255;
-                            }
-                            break;
+                    if(file_travelline.at<uchar>(i,k) == 255){
+                        for(int h=j+1; h<k+1; h++){
+                            file_travelline.at<uchar>(i,h) = 255;
                         }
+                        break;
                     }
                 }
             }
         }
-
-        cv::imshow("result",test);
-
-
-
     }
 
+    for(int i=0; i<file_travelline.cols;i++){
+        //1줄 당
+        for(int j=0; j<file_travelline.rows-1; j++){
+            //실마리 찾음
+            if(file_travelline.at<uchar>(j,i) == 255 && file_travelline.at<uchar>(j+1,i) == 0){
+
+                //실마리 부터 시작해서 로봇 크기만큼 가까운 실이 있는 지 찾아봄(찾으면 그 사이 매꿈)
+                for(int k=j+1; k<j+radius; k++){
+                    if(k>=file_travelline.rows)
+                        break;
+
+                    if(file_travelline.at<uchar>(k,i) == 255){
+                        for(int h=j+1; h<k+1; h++){
+                            file_travelline.at<uchar>(h,i) = 255;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
 
 
@@ -1370,17 +1376,17 @@ void MapView::saveTline(){
     cv::cvtColor(map_drawing,temp_draw,cv::COLOR_BGRA2GRAY);
     cv::cvtColor(map_drawing_mask,temp_mask,cv::COLOR_BGRA2GRAY);
 
-    file_travelline.copyTo(temp_travel);
+    cv::multiply(cv::Scalar::all(1.0)-temp_mask,file_travelline,file_travelline);
+    cv::add(file_travelline,temp_draw,file_travelline);
 
-    cv::multiply(cv::Scalar::all(1.0)-temp_mask,temp_travel,temp_travel);
-    cv::add(temp_travel,temp_draw,temp_travel);
+    setTline();
 
-    cv::rotate(temp_travel,temp_travel,cv::ROTATE_90_CLOCKWISE);
-    cv::flip(temp_travel,temp_travel,0);
+    cv::rotate(file_travelline,file_travelline,cv::ROTATE_90_CLOCKWISE);
+    cv::flip(file_travelline,file_travelline,0);
 
     QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_travel_line.png";
     plog->write("[MAPVIEW] SAVE MAP "+path);
-    cv::imwrite(path.toStdString(),temp_travel);
+    cv::imwrite(path.toStdString(),file_travelline);
 }
 
 void MapView::redoLine(){
