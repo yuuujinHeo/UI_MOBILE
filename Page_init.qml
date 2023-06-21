@@ -2981,13 +2981,14 @@ Item {
 
     Popup{
         id: popup_loading
-        anchors.centerIn: parent
+        y: statusbar.height
         leftPadding: 0
         rightPadding: 0
         topPadding: 0
         bottomPadding: 0
         width: 1280
-        height: 800
+        height: 800 - statusbar.height
+        closePolicy: Popup.NoAutoClose
         background: Rectangle{
             anchors.fill: parent
             color: "transparent"
@@ -3035,12 +3036,14 @@ Item {
         anchors.centerIn: parent
         closePolicy: Popup.NoAutoClose
         width: 1280
-        height: 800
+        height: 800 - statusbar.height
+        y: statusbar.height
         background: Rectangle{
             anchors.fill: parent
             color: "transparent"
         }
         onOpened:{
+            print("popup_localization_done opend")
             mapview_localization.setEnable(true);
             mapview_localization.setViewer("local_view");
             mapview_localization.loadmap(supervisor.getMapname(),"local");
@@ -3193,7 +3196,9 @@ Item {
         id: popup_localization_start
         anchors.centerIn: parent
         width: 1280
-        height: 800
+        height: 800 - statusbar.height
+        y: statusbar.height
+        closePolicy: Popup.NoAutoClose
         property bool auto_mode: false
         background: Rectangle{
             anchors.fill: parent
