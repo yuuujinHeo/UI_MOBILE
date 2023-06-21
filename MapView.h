@@ -176,6 +176,7 @@ public:
     Q_INVOKABLE int getLocGroupNum(int num);
     void initLocation();
     Q_INVOKABLE void saveMap();
+    void setTline();
     Q_INVOKABLE void saveTline();
     Q_INVOKABLE void saveVelmap();
     Q_INVOKABLE void setMapSize(int width, int height);

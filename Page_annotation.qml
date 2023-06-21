@@ -1678,11 +1678,6 @@ Item {
                     }
                     checkLocationNumber();
 
-                    if(isError()){
-                        btn_confirm_location.enabled = false;
-                    }else{
-                        btn_confirm_location.enabled = true;
-                    }
                 }
 
                 function isError(){

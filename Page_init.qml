@@ -3773,8 +3773,6 @@ Item {
                 //annotation과 map 존재여부 확인
                 if(supervisor.isExistAnnotation(map_name) && supervisor.isLoadMap()){
                     //이미 설정확인된 맵이 존재한다면 다음으로 넘어감
-                    popup_ask_annotation_use.close();
-                    popup_map_list.close();
                     init_mode = 3;
                 }else{
                     //annotation, map 둘 중 하나라도 없으면 안내페이지 표시

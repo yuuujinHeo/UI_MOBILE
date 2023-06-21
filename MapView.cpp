@@ -41,6 +41,8 @@ MapView::MapView(QQuickItem *parent):
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()),this,SLOT(onTimer()));
     timer->start(200);
+
+    setTline();
 }
 
 void MapView::loadFile(QString name){
@@ -129,6 +131,48 @@ void MapView::loadFile(QString name){
     plog->write("[MAPVIEW] load File "+name+" : "+log_str);
 }
 
+void MapView::setTline(){
+    QString file_path = QDir::homePath() + "/maps/map_14/map_travel_line.png";
+    if(QFile::exists(file_path)){
+        cv::Mat test = cv::imread(file_path.toStdString(), cv::IMREAD_GRAYSCALE);
+        cv::flip(test,test,0);
+        cv::rotate(test,test,cv::ROTATE_90_COUNTERCLOCKWISE);
+
+
+        cv::imshow("origin",test);
+
+        int radius = pmap->robot_radius/grid_width;
+        for(int i=0; i<test.rows;i++){
+            //1줄 당
+            for(int j=0; j<test.cols-1; j++){
+                //실마리 찾음
+                if(test.at<uchar>(i,j) == 255 && test.at<uchar>(i,j+1) == 0){
+
+                    //실마리 부터 시작해서 로봇 크기만큼 가까운 실이 있는 지 찾아봄(찾으면 그 사이 매꿈)
+                    for(int k=j+1; k<j+radius; k++){
+                        if(k>=test.cols)
+                            break;
+
+                        if(test.at<uchar>(i,k) == 255){
+                            for(int h=j+1; h<k+1; h++){
+                                test.at<uchar>(i,h) = 255;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        cv::imshow("result",test);
+
+
+
+    }
+
+}
+
+
 void MapView::setMapSize(int width, int height){
     canvas_width = width;
     canvas_height = height;
@@ -139,6 +183,12 @@ void MapView::onTimer(){
         setZoomCenter();
     }
 
+    if(flag_drawing){
+        show_robot = true;
+        drawTline();
+    }else if(mode == "annot_tline"){
+        show_robot = false;
+    }
     setMap();
 }
 
