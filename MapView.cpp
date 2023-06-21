@@ -184,17 +184,19 @@ void MapView::setMapSize(int width, int height){
     canvas_height = height;
 }
 void MapView::onTimer(){
+    if(flag_drawing){
+        show_robot = true;
+        robot_following = true;
+        drawTline();
+    }else if(mode == "annot_tline"){
+        show_robot = false;
+        robot_following = false;
+    }
     //Robot Following
     if(robot_following){
         setZoomCenter();
     }
 
-    if(flag_drawing){
-        show_robot = true;
-        drawTline();
-    }else if(mode == "annot_tline"){
-        show_robot = false;
-    }
     setMap();
 }
 

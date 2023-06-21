@@ -310,6 +310,7 @@ Window {
 
     function backPage(){
         loader_page.source = pbefore;
+        print(pbefore);
     }
 
     function update_ini(){
@@ -333,7 +334,7 @@ Window {
             timer_update.start();
             loader_page.item.init();
         }
-        source: pmap//pinit
+        source: pinit
     }
 
     Timer{

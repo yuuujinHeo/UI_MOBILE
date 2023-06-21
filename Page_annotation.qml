@@ -15,7 +15,7 @@ Item {
     objectName: "page_annotation"
     width: 1280
     height: 800
-    property bool test: true
+    property bool test: false
     property var last_robot_x: supervisor.getOrigin()[0]
     property var last_robot_y: supervisor.getOrigin()[1]
     property var last_robot_th: 0
@@ -3852,11 +3852,13 @@ Item {
                             spacing: 20
                             Item_buttons{
                                 type: "round_text"
-                                text: "취소"
+                                text: "저장 안하고 종료"
                                 width: 180
                                 height: 60
                                 onClicked:{
+                                    map.clear("all");
                                     popup_save_travelline.close();
+                                    annot_pages.sourceComponent = page_annot_additional_menu;
                                 }
                             }
                             Item_buttons{
@@ -4440,10 +4442,12 @@ Item {
                             spacing: 20
                             Item_buttons{
                                 type: "round_text"
-                                text: "취소"
+                                text: "저장 안하고 종료"
                                 width: 180
                                 height: 60
                                 onClicked:{
+                                    map.clear("all");
+                                    annot_pages.sourceComponent = page_annot_additional_menu;
                                     popup_save_velmap.close();
                                 }
                             }
