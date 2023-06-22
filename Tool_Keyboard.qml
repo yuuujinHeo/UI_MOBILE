@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import "."
+import QtMultimedia 5.12
 
 Popup {
     id: tool_keyboard
@@ -112,6 +113,7 @@ Popup {
         width: parent.width
         height: parent.height - rect_keyboard.height
         onClicked: {
+            click.play();
             tool_keyboard.close();
             owner.focus = false;
         }
@@ -181,6 +183,7 @@ Popup {
                     property var firstHeight: keyboard_height
                     property var firstPos: 0
                     onClicked: {
+                        click.play();
                         if(on_bottom){
                             on_bottom = false;
                         }else{
@@ -218,6 +221,7 @@ Popup {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             if(is_ko){
                                                 emitter.setHangul(owner, modelData);
                                             }else{
@@ -244,11 +248,13 @@ Popup {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked:{
+                                        click.play();
                                         emitter.keyPressed(owner,Qt.Key_Backspace);
                                         if(!is_capslock)
                                             is_shift = false;
                                     }
                                     onPressAndHold: {
+                                        click.play();
                                         timer_backspace.start();
                                     }
                                     onReleased: {
@@ -288,6 +294,7 @@ Popup {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             if(is_ko){
                                                 emitter.setHangul(owner, modelData);
                                             }else{
@@ -313,6 +320,7 @@ Popup {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked:{
+                                        click.play();
                                         owner.focus = false;
                                         tool_keyboard.close();
                                         emitter.initHangul();
@@ -338,6 +346,7 @@ Popup {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked:{
+                                        click.play();
                                         if(is_shift){
                                             is_capslock = false;
                                             is_shift = false;
@@ -346,6 +355,7 @@ Popup {
                                         }
                                     }
                                     onPressAndHold: {
+                                        click.play();
                                         is_shift = true;
                                         is_capslock = true;
                                     }
@@ -368,6 +378,7 @@ Popup {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             if(is_ko && (modelData != "_" && modelData != "!" && modelData != "&" && modelData != "|")){
                                                 emitter.setHangul(owner,modelData);
                                             }else{
@@ -399,12 +410,14 @@ Popup {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked:{
+                                        click.play();
                                         emitter.keyPressed(owner,Qt.Key_Left);
                                         emitter.initHangul();
                                         if(!is_capslock)
                                             is_shift = false;
                                     }
                                     onPressAndHold: {
+                                        click.play();
                                         timer_left.start();
                                     }
                                     onReleased: {
@@ -432,6 +445,7 @@ Popup {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked:{
+                                        click.play();
                                         emitter.keyPressed(owner,Qt.Key_Space);
                                         emitter.initHangul();
                                         if(!is_capslock)
@@ -454,6 +468,7 @@ Popup {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked:{
+                                        click.play();
                                         if(is_ko)
                                             is_ko = false;
                                         else
@@ -476,12 +491,14 @@ Popup {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked:{
+                                        click.play();
                                         emitter.keyPressed(owner,Qt.Key_Right);
                                         emitter.initHangul();
                                         if(!is_capslock)
                                             is_shift = false;
                                     }
                                     onPressAndHold: {
+                                        click.play();
                                         timer_right.start();
                                     }
                                     onReleased: {
@@ -525,6 +542,7 @@ Popup {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             emitter.keyPressed(owner,modelData);
                                             emitter.initHangul();
                                             if(!is_capslock)
@@ -554,6 +572,7 @@ Popup {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             emitter.keyPressed(owner,modelData);
                                             emitter.initHangul();
                                             if(!is_capslock)
@@ -583,6 +602,7 @@ Popup {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             emitter.keyPressed(owner,modelData);
                                             emitter.initHangul();
                                             if(!is_capslock)
@@ -610,6 +630,7 @@ Popup {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked:{
+                                        click.play();
                                         emitter.keyPressed(owner,"0");
                                         emitter.initHangul();
                                         if(!is_capslock)
@@ -631,6 +652,7 @@ Popup {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked:{
+                                        click.play();
                                         emitter.keyPressed(owner,".");
                                         emitter.initHangul();
                                         if(!is_capslock)
@@ -657,8 +679,14 @@ Popup {
         enabled: false
         height: parent.height - rect_keyboard.height
         onClicked: {
+            click.play();
             tool_keyboard.close();
             owner.focus = false;
         }
+    }
+
+    SoundEffect{
+        id: click
+        source: "bgm/click.wav"
     }
 }

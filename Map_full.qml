@@ -258,6 +258,7 @@ Item {
     }
     function saveMap(){
         mapview.saveMap();
+        supervisor.slam_map_reload(map_name);
     }
     function drawing_undo(){
         mapview.undoLine();
@@ -321,6 +322,7 @@ Item {
         }else if(mode==="edited"){
             mapview.saveMap();
             supervisor.setMap(map_name);
+            supervisor.slam_map_reload(map_name);
         }else if(mode==="location_cur"){
             last_robot_x = supervisor.getlastRobotx();
             last_robot_y = supervisor.getlastRoboty();
@@ -343,10 +345,13 @@ Item {
             mapview.endSpline(true);
         }else if(mode==="velmap"){
             mapview.saveVelmap();
+            supervisor.slam_map_reload(map_name);
         }else if(mode==="rotate"){
             mapview.saveRotateMap();
+            supervisor.slam_map_reload(map_name);
         }else if(mode==="location_all"){
             mapview.saveAnnotation(map_name);
+            supervisor.slam_map_reload(map_name);
         }
     }
 

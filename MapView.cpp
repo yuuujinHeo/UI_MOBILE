@@ -1402,7 +1402,7 @@ void MapView::saveTline(){
     cv::multiply(cv::Scalar::all(1.0)-temp_mask,file_travelline,file_travelline);
     cv::add(file_travelline,temp_draw,file_travelline);
 
-    setTline();
+//    setTline();
 
     cv::rotate(file_travelline,file_travelline,cv::ROTATE_90_CLOCKWISE);
     cv::flip(file_travelline,file_travelline,0);

@@ -201,5 +201,7 @@
         <file>Item_buttonStart.qml</file>
         <file>Popup_help.qml</file>
         <file>Item_buttons.qml</file>
+        <file>bgm/click_error.wav</file>
+        <file>bgm/click_start.wav</file>
     </qresource>
 </RCC>

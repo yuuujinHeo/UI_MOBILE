@@ -98,6 +98,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onDoubleClicked:{
+                        click.play();
                         popup_password.open();
                     }
                 }
@@ -117,6 +118,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        click.play();
                        select_category = 1;
                     }
                 }
@@ -144,6 +146,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        click.play();
                        select_category = 2;
                     }
                 }
@@ -172,6 +175,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        click.play();
                        select_category = 3;
                     }
                 }
@@ -199,6 +203,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        click.play();
                        select_category = 4;
                     }
                 }
@@ -509,6 +514,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             popup_preset.open();
                                             popup_preset.select_preset = 1;
                                         }
@@ -529,6 +535,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             popup_preset.open();
                                             popup_preset.select_preset = 2;
 
@@ -550,6 +557,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             popup_preset.open();
                                             popup_preset.select_preset = 3;
                                         }
@@ -570,6 +578,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             popup_preset.open();
                                             popup_preset.select_preset = 4;
 
@@ -591,6 +600,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             popup_preset.open();
                                             popup_preset.select_preset = 5;
                                         }
@@ -612,6 +622,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             popup_preset.open();
                                         }
                                     }
@@ -723,6 +734,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
+                                            click.play();
                                             if(slider_volume_bgm.value == 0){
                                                 slider_volume_bgm.value  = Number(supervisor.getSetting("ROBOT_SW","volume_bgm"));
                                             }else{
@@ -754,6 +766,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
+                                            click.play();
                                             if(bgm_test.isplaying){
                                                 bgm_test.stop();
                                                 ttet.source = "icon/icon_test_play.png";
@@ -806,6 +819,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
+                                            click.play();
                                             if(slider_volume_voice.value == 0){
                                                 slider_volume_voice.value  = Number(supervisor.getSetting("ROBOT_SW","volume_voice"));
                                             }else{
@@ -834,6 +848,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
+                                            click.play();
                                             print("test play")
                                             voice_test.play();
                                         }
@@ -1115,6 +1130,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             //Debug
 //                                            supervisor.connectWifi("mobile_robot_test","rainbow2011");
                                             popup_wifi.open();
@@ -1192,6 +1208,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             wifi_passwd.ischanged = false;
                                             supervisor.setSetting("ROBOT_SW/wifi_passwd",wifi_passwd.text);
                                         }
@@ -1390,6 +1407,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             ip_1.ischanged = false;
                                             ip_2.ischanged = false;
                                             ip_3.ischanged = false;
@@ -1604,6 +1622,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             ip_1.ischanged = false;
                                             ip_2.ischanged = false;
                                             ip_3.ischanged = false;
@@ -1816,6 +1835,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             ip_1.ischanged = false;
                                             ip_2.ischanged = false;
                                             ip_3.ischanged = false;
@@ -2031,6 +2051,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click.play();
                                             dnsserv_1.ischanged = false;
                                             dnsserv_2.ischanged = false;
                                             dnsserv_3.ischanged = false;
@@ -2397,6 +2418,7 @@ Item {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: {
+                                        click.play();
                                         popup_reset.open();
                                     }
                                 }
@@ -2500,6 +2522,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
+                                            click.play();
                                             popup_maplist.open();
                                             init();
                                         }
@@ -2783,6 +2806,7 @@ Item {
                                         MouseArea{
                                             anchors.fill: parent
                                             onClicked: {
+                                                click.play();
                                                 popup_change_call.callid = index
                                                 popup_change_call.open();
                                             }
@@ -10388,5 +10412,9 @@ Item {
     }
     Popup_map_list{
         id: popup_maplist
+    }
+    SoundEffect{
+        id: click
+        source: "bgm/click.wav"
     }
 }
