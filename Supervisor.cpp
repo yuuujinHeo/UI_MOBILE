@@ -598,6 +598,26 @@ bool Supervisor::isConnectServer(){
     return false;
 }
 
+void Supervisor::deleteEditedMap(){
+    plog->write("[USER INPUT] Remove Edited Map Data");
+    QFile *file = new QFile(QDir::homePath()+"/maps/"+pmap->map_name+"/map_edited.png");
+    file->remove();
+
+    QString path = QDir::homePath() + "/maps/"+ pmap->map_name + "/map_meta.ini";
+    QSettings setting(path, QSettings::IniFormat);
+
+    setting.setValue("map_metadata/map_edited_angle","");
+    setting.setValue("map_metadata/map_edited_w","");
+    setting.setValue("map_metadata/map_edited_h","");
+    setting.setValue("map_metadata/map_edited_origin_u","");
+    setting.setValue("map_metadata/map_edited_origin_v","");
+    setting.setValue("map_metadata/map_edited_cut_u","");
+    setting.setValue("map_metadata/map_edited_cut_v","");
+
+    readSetting(pmap->map_name);
+    slam_map_reload(pmap->map_name);
+
+}
 void Supervisor::deleteAnnotation(){
     plog->write("[USER INPUT] Remove Annotation Data");
 

@@ -255,6 +255,7 @@ public:
     Q_INVOKABLE int getMapFileSize(QString name);
     Q_INVOKABLE QString getMapFile(int num);
 
+    Q_INVOKABLE void deleteEditedMap();
     Q_INVOKABLE void deleteAnnotation();
 
     Q_INVOKABLE void removeMap(QString filename);

@@ -141,6 +141,8 @@ Item {
                     onClicked: {
                         supervisor.writelog("[ANNOTATION] MENU : Clear and New Annotation");
                         annot_pages.sourceComponent = page_annot_start;
+                        supervisor.deleteEditedMap();
+                        supervisor.deleteAnnotation();
                         annotation_after_mapping = true;
                     }
                 }
