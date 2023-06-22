@@ -9,11 +9,17 @@ Item {
     width: 1280
     height: 800
 
+    property bool debug_mode: false
     property var view_mode: 0
     Component.onCompleted: {
         init();
     }
     property bool show_serving: true
+
+    function setDebug(onoff){
+        debug_mode = onoff;
+    }
+
     function init(){
         statusbar.visible = true;
 
@@ -169,12 +175,12 @@ Item {
         model_group.clear();
         for(var i=0; i<supervisor.getLocationGroupNum(); i++){
             model_group.append({"name":supervisor.getLocGroupname(i)});
+
         }
         table_num = supervisor.getLocationGroupSize(cur_group);
         update_table();
     }
     function update_table(){
-//        print(col_num*row_num*cur_page,col_num*row_num*(cur_page+1), table_num)
         model_group_table.clear();
         for(var i=col_num*row_num*cur_page; i<col_num*row_num*(cur_page+1); i++){
             if(i>=table_num)

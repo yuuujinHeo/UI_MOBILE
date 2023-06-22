@@ -676,7 +676,7 @@ Item {
                     height: 80
                     type: "round_text"
                     selected: map.tool==="slam_init"
-                    text: "로봇위치 표시"
+                    text: "수동 지정"
                     onClicked: {
                         map.setTool("slam_init");
                         supervisor.setInitCurPos();
@@ -713,6 +713,7 @@ Item {
                 width: 600
                 height: 600
             }
+
             Item_buttons{
                 id: btn_right
                 visible: local_find_state===2
@@ -891,7 +892,7 @@ Item {
                 color: color_dark_navy
             }
             Text{
-                text: "로봇의 충전 위를 저장했습니다."
+                text: "로봇의 충전 위치를 저장했습니다."
                 color: "white"
                 font.pixelSize: 80
                 font.family: font_noto_b.name
@@ -1082,7 +1083,7 @@ Item {
             height: annot_pages.height
             Component.onCompleted: {
                 supervisor.setMotorLock(true);
-                supervisor.clearFlagStop();
+                supervisor.checkMoveFail();
             }
             Rectangle{
                 anchors.fill: parent
@@ -1133,9 +1134,9 @@ Item {
                 Text{
                     anchors.centerIn: parent
                     visible: test_move_state === 1
-                    text: "로봇이 이동 중 입니다."
+                    text: "로봇이 "+cur_location+" 로 이동 중 입니다. "
                     color: "white"
-                    font.pixelSize:60
+                    font.pixelSize:50
                     font.family: font_noto_b.name
                 }
                 Text{
@@ -1216,7 +1217,7 @@ Item {
             height: annot_pages.height
             Component.onCompleted: {
                 supervisor.setMotorLock(true);
-                supervisor.clearFlagStop();
+                supervisor.checkMoveFail();
             }
 
             Timer{
@@ -2311,7 +2312,7 @@ Item {
             Component.onCompleted: {
                 supervisor.setMotorLock(true);
                 readSetting();
-                supervisor.clearFlagStop();
+                supervisor.checkMoveFail();
 
             }
             Rectangle{

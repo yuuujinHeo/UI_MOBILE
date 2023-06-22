@@ -106,6 +106,8 @@ public:
     Q_INVOKABLE void readWifiState(QString ssd);
     Q_INVOKABLE void setWifiSSD(QString ssd);
 
+    Q_INVOKABLE void checkMoveFail();
+    Q_INVOKABLE void passInit();
 
     QProcess *wifi_process;
     QProcess *wifi_check_process;

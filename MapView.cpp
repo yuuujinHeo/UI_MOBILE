@@ -90,7 +90,7 @@ void MapView::loadFile(QString name){
         file_travelline = cv::imread(file_path.toStdString(), cv::IMREAD_GRAYSCALE);
         cv::flip(file_travelline,file_travelline,0);
         cv::rotate(file_travelline,file_travelline,cv::ROTATE_90_COUNTERCLOCKWISE);
-        log_str += ", TRAVELLINE(success) ";
+        log_str += ", TRAVELLINE(success "+QString::number(file_travelline.rows)+" ) ";
         exist_travelline = true;
     }else{
         file_travelline = cv::Mat(file_width, file_width, CV_8U ,cv::Scalar::all(0));
@@ -121,7 +121,7 @@ void MapView::loadFile(QString name){
 //        cv::imshow("vel",file_velocity);
 
 
-        log_str += ", VELOCITY(success) ";
+        log_str += ", VELOCITY(success "+QString::number(file_velocity.rows)+" ) ";
         exist_velmap = true;
     }else{
         file_velocity = cv::Mat(file_width, file_width, CV_8UC3 ,cv::Scalar::all(0));
@@ -724,6 +724,7 @@ void MapView::saveRotateMap(){
     cv::Mat map_edited_ui;
     if(tool == "cut_map"){
         map_orin(cv::Rect(cut_box[0].x,cut_box[0].y,(cut_box[1].x-cut_box[0].x),(cut_box[1].y-cut_box[0].y))).copyTo(map_edited_ui);
+
         pmap->cut_map[0] = cut_box[0].x;
         pmap->cut_map[1] = cut_box[0].y;
     }else{
@@ -1348,9 +1349,13 @@ void MapView::saveMap(){
 void MapView::saveVelmap(){
     initDrawing();
     QString file_path = QDir::homePath() + "/maps/"+map_name + "/map_velocity.png";
-    file_velocity = cv::imread(file_path.toStdString(), cv::IMREAD_COLOR);
-    cv::flip(file_velocity,file_velocity,0);
-    cv::rotate(file_velocity,file_velocity,cv::ROTATE_90_COUNTERCLOCKWISE);
+    if(QFile::exists(file_path)){
+        file_velocity = cv::imread(file_path.toStdString(), cv::IMREAD_COLOR);
+        cv::flip(file_velocity,file_velocity,0);
+        cv::rotate(file_velocity,file_velocity,cv::ROTATE_90_COUNTERCLOCKWISE);
+    }else{
+        file_velocity = cv::Mat(file_width,file_width,CV_8UC3, cv::Scalar::all(0));
+    }
     for(int line=0; line<lines.size(); line++){
         if(lines[line].type == 0){
             for(int i=0; i<lines[line].points.size()-1; i++){

@@ -20,7 +20,7 @@ Popup {
 
     property var owner
 
-    property bool is_ko: false
+    property bool is_ko: true
     property bool is_shift: false
     property bool is_capslock: false
     property bool only_en: false
@@ -37,24 +37,33 @@ Popup {
     property color color_default: "#D0D0D0"
     property color color_highlight: "#12d27c"
 
+    Component.onCompleted: {
+        setHanEn();
+    }
+
     onIs_koChanged: {
+        setHanEn();
+    }
+
+    function setHanEn(){
         if(only_en)
             is_ko = false;
 
         is_shift = false;
         is_capslock = false;
         if(is_ko){
-            text_ko_en.text = "영어";
+            text_ko_en.text = "한글";
             keys_2.model = ["ㅂ","ㅈ","ㄷ","ㄱ","ㅅ","ㅛ","ㅕ","ㅑ","ㅐ","ㅔ"];
             keys_3.model = ["ㅁ","ㄴ","ㅇ","ㄹ","ㅎ","ㅗ","ㅓ","ㅏ","ㅣ"];
             keys_4.model = ["ㅋ","ㅌ","ㅊ","ㅍ","ㅠ","ㅜ","ㅡ","_","!"];
         }else{
-            text_ko_en.text = "한글";
+            text_ko_en.text = "영어";
             keys_2.model = ["q","w","e","r","t","y","u","i","o","p"];
             keys_3.model = ["a","s","d","f","g","h","j","k","l"];
             keys_4.model = ["z","x","c","v","b","n","m","_","!"];
         }
     }
+
     onIs_shiftChanged: {
         if(only_en)
             is_ko = false;
@@ -110,7 +119,6 @@ Popup {
     onOpened: {
         emitter.initHangul();
         rect_keyboard.height = 300;
-        is_ko = false;
     }
     onClosed: {
         rect_keyboard.height = 0;

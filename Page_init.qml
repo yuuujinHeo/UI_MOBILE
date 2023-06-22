@@ -193,7 +193,10 @@ Item {
                         }
                         onReleased: {
                             supervisor.writelog("[INIT] PASS IPC Connection")
+                            supervisor.passInit();
+                            debug_mode = true;
                             loadPage(pkitchen);
+                            loader_page.item.setDebug(true);
                             parent.color = "transparent";
                         }
                     }
@@ -428,8 +431,11 @@ Item {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: {
+                                        supervisor.passInit();
+                                        debug_mode = true;
                                         supervisor.writelog("[USER INPUT] INIT PAGE : PASS CONNECTION")
                                         loadPage(pkitchen);
+                                        loader_page.item.setDebug(true);
                                         update_timer.stop();
                                     }
                                 }
@@ -2490,8 +2496,11 @@ Item {
                             parent.color = color_gray;
                         }
                         onReleased: {
+                            supervisor.passInit();
+                            debug_mode = true;
                             supervisor.writelog("[INIT] PASS IPC Connection")
                             loadPage(pkitchen);
+                            loader_page.item.setDebug(true);
                             parent.color = "transparent";
                         }
                     }
@@ -2842,8 +2851,11 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            supervisor.passInit();
+                            debug_mode = true;
                             supervisor.writelog("[USER INPUT] INIT PAGE : PASS LOCALIZATION")
                             loadPage(pkitchen);
+                            loader_page.item.setDebug(true);
                         }
                     }
                 }
@@ -2995,7 +3007,7 @@ Item {
                         height: 80
                         type: "round_text"
                         selected: map.tool==="slam_init"
-                        text: "로봇위치 표시"
+                        text:  "수동 지정"
                         onClicked: {
                             map.setTool("slam_init");
                             supervisor.setInitCurPos();
@@ -3160,8 +3172,11 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        supervisor.passInit();
+                        debug_mode = true;
                         supervisor.writelog("[USER INPUT] INIT PAGE : PASS ROBOT INIT")
                         loadPage(pkitchen);
+                        loader_page.item.setDebug(true);
     //                    update_timer.stop();
                     }
                 }

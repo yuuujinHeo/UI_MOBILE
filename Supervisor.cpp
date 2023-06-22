@@ -372,6 +372,12 @@ void Supervisor::readSetting(QString map_name){
     pmap->edited_height = setting_meta.value("map_edited_h").toInt();
     pmap->edited_origin[0] = setting_meta.value("map_edited_origin_u").toInt();
     pmap->edited_origin[1] = setting_meta.value("map_edited_origin_v").toInt();
+    if(pmap->edited_width > 0){
+        pmap->width = pmap->edited_width;
+        pmap->height = pmap->edited_height;
+        pmap->origin[0] = pmap->edited_origin[0];
+        pmap->origin[1] = pmap->edited_origin[1];
+    }
     setting_meta.endGroup();
 
     //Annotation======================================================================
@@ -686,9 +692,15 @@ void Supervisor::deleteAnnotation(){
     plog->write("[USER INPUT] Remove Annotation Data");
 
     pmap->locations.clear();
+    QFile *file = new QFile(QDir::homePath()+"/maps/"+pmap->map_name+"/map_travel_line.png");
+    file->remove();
+    QFile *file2 = new QFile(QDir::homePath()+"/maps/"+pmap->map_name+"/map_velocity.png");
+    file2->remove();
 
+    file->deleteLater();
+    file2->deleteLater();
     saveAnnotation(pmap->map_name);
-//    readSetting();
+
 }
 bool Supervisor::isExistAnnotation(QString name){
     QString file_meta = getMetaPath(name);
@@ -2778,7 +2790,7 @@ void Supervisor::onTimer(){
         if(ui_state != UI_STATE_NONE){
             plog->write("[SUPERVISOR] IPC Disconnected. (ui_state = NONE)");
             ui_state = UI_STATE_NONE;
-            QMetaObject::invokeMethod(mMain, "stateinit");
+            QMetaObject::invokeMethod(mMain, "need_init");
         }
     }
 
@@ -3209,6 +3221,20 @@ void Supervisor::onTimer(){
     prev_local_state = probot->localization_state;
 }
 
+void Supervisor::checkMoveFail(){
+    if(getMotorState() == 0){
+        plog->write(QString::number(probot->status_emo)+QString::number(probot->status_lock)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
+        plog->write("[SUPERVISOR] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL ");
+        ui_state = UI_STATE_MOVEFAIL;
+    }else if(probot->localization_state == LOCAL_NOT_READY){
+        plog->write("[SUPERVISOR] LOCAL NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
+        ui_state = UI_STATE_MOVEFAIL;
+    }
+}
+void Supervisor::passInit(){
+    plog->write("[COMMAND] ROBOT INIT PASS");
+    ui_state = UI_STATE_RESTING;
+}
 QString Supervisor::getLogDate(int num){
     QString str = curLog[num].split("[")[0];
     if(str.length() > 20){

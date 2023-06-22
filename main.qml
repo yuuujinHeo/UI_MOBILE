@@ -18,6 +18,8 @@ Window {
     height: 800
     title: qsTr("Hello World")
 
+    property bool debug_mode: false
+
     flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
     visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
     onVisibilityChanged: {
@@ -135,12 +137,6 @@ Window {
         voice_battery.stop();
     }
 
-    function stateinit(){
-        if(loader_page.item.objectName != "page_annotation" && loader_page.item.objectName != "page_mapping"){
-            supervisor.writelog("[UI] Force Page Change : Robot disconnected");
-            loadPage(pinit);
-        }
-    }
     function lessbattery(){
         supervisor.writelog("[UI] Play Voice : less battery");
         voice_all_stop();
@@ -268,10 +264,13 @@ Window {
     }
 
     function need_init(){
-        if(loader_page.item.objectName != "page_annotation" && loader_page.item.objectName != "page_mapping"){
-            supervisor.writelog("[UI] Force Page Change : Robot disconnected");
-            loadPage(pinit);
+        if(!debug_mode){
+            if(loader_page.item.objectName != "page_annotation" && loader_page.item.objectName != "page_mapping"){
+                supervisor.writelog("[UI] Force Page Change : Robot disconnected");
+                loadPage(pinit);
+            }
         }
+
     }
 
     function show_loading(){
