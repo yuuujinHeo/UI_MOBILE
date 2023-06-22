@@ -866,17 +866,11 @@ void MapView::setTableNumberAuto(){
 }
 
 void MapView::setSize(int x, int y, float s){
-//    canvas_width = 740;
-    int new_canvas_width = canvas_width*s;
     float over = canvas_width*(s-1)/2;
     scale = scale/s;
     draw_width = round(file_width*scale);
     setX(-x + over);
     setY(-y + over);
-//    draw_x = -x + over;
-//    draw_y = -y + over;
-    qDebug() << "SETSIZE " << x << y << s << over << scale;
-    qDebug() <<draw_x << draw_y << draw_width;
     moveMap();
 }
 void MapView::zoomIn(int x, int y){
@@ -1104,7 +1098,6 @@ void MapView::drawSpline(){
 
 void MapView::setMapDrawing(){
     initDrawing();
-//    qDebug() << "setmapdrawing" << cur_line_color;
     for(int line=0; line<lines.size(); line++){
         if(lines[line].type == 0){
             if(mode == "annot_velmap"){
@@ -1173,10 +1166,8 @@ void MapView::addSpline(int x, int y){
     drawSpline();
 }
 void MapView::setDrawingLine(int x, int y){
-//    //qDebug() << "setDrawingLine" << x << y;
     straight[1].x = x;
     straight[1].y = y;
-//    initTline(map_name);
     initDrawing();
     setMapDrawing();
     setMap();
@@ -1201,7 +1192,6 @@ void MapView::stopDrawingLine(int x, int y){
     setMap();
 }
 void MapView::startDrawing(int x, int y){
-//    //qDebug() << "startDrawing";
     line.clear();
     spline_dot.clear();
     lines_trash.clear();
@@ -1220,7 +1210,6 @@ void MapView::drawTline(){
     prev_pose = pose;
 }
 void MapView::addLinePoint(int x, int y){
-//    //qDebug() << "addlinepoint";
     curPoint.x = x;
     curPoint.y = y;
     line.push_back(curPoint);
