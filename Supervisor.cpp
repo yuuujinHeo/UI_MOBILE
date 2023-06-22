@@ -464,6 +464,7 @@ void Supervisor::readSetting(QString map_name){
         QString group_name = setting_anot.value("name").toString();
         pmap->location_groups.append(group_name);
 
+
         for(int j=0; j<serv_num; j++){
             QString loc_str = setting_anot.value("loc"+QString::number(j)).toString();
             QStringList strlist = loc_str.split(",");
@@ -489,100 +490,9 @@ void Supervisor::readSetting(QString map_name){
     }
 
     std::sort(pmap->locations.begin(),pmap->locations.end(),sortLocation2);
-    if(setting.table_num > total_serv_num){
-        //DEBUG 230504 임시로 table개수 늘려보려고 주석처리함
-//        setting.table_num = total_serv_num;
-    }
-//    setting_anot.endGroup();
+
 
     qDebug() << pmap->locations.size() << map_name;
-
-    setting_anot.beginGroup("object");
-    int obj_num = setting_anot.value("num").toInt();
-    pmap->objects.clear();
-    cv::Point2f temp_point;
-    for(int i=0; i<obj_num; i++){
-        QString name = setting_anot.value("poly"+QString::number(i)).toString();
-        QStringList strlist = name.split(",");
-        OBJECT temp_obj;
-        temp_obj.type = "Wall";
-        QStringList templist = strlist[1].split(":");
-
-        if(templist.size() > 1){
-            temp_obj.is_rect = false;
-            for(int j=1; j<strlist.size(); j++){
-                temp_point.x = strlist[j].split(":")[0].toFloat();
-                temp_point.y = strlist[j].split(":")[1].toFloat();
-                temp_obj.points.push_back(temp_point);
-            }
-        }else{
-            if(strlist[1].toInt() == 1){
-                temp_obj.is_rect = true;
-                for(int j=2; j<strlist.size(); j++){
-                    temp_point.x = strlist[j].split(":")[0].toFloat();
-                    temp_point.y = strlist[j].split(":")[1].toFloat();
-                    temp_obj.points.push_back(temp_point);
-                }
-            }else{
-                temp_obj.is_rect = false;
-                for(int j=2; j<strlist.size(); j++){
-                    temp_point.x = strlist[j].split(":")[0].toFloat();
-                    temp_point.y = strlist[j].split(":")[1].toFloat();
-                    temp_obj.points.push_back(temp_point);
-                }
-            }
-        }
-        pmap->objects.push_back(temp_obj);
-    }
-    setting_anot.endGroup();
-
-
-    setting_anot.beginGroup("objects");
-    obj_num = setting_anot.value("num").toInt();
-
-    for(int i=0; i<obj_num; i++){
-        QString name = setting_anot.value("poly"+QString::number(i)).toString();
-        QStringList strlist = name.split(",");
-        OBJECT temp_obj;
-        if(strlist[0].left(5) == "Table"){
-            temp_obj.type = "Table";
-        }else if(strlist[0].left(5) == "Chair"){
-            temp_obj.type = "Chair";
-        }else if(strlist[0].left(4) == "Wall"){
-            temp_obj.type = "Wall";
-        }else{
-            temp_obj.type = "Unknown";
-        }
-        QStringList templist = strlist[1].split(":");
-
-        if(templist.size() > 1){
-            temp_obj.is_rect = false;
-            for(int j=1; j<strlist.size(); j++){
-                temp_point.x = strlist[j].split(":")[0].toFloat();
-                temp_point.y = strlist[j].split(":")[1].toFloat();
-                temp_obj.points.push_back(temp_point);
-            }
-        }else{
-            if(strlist[1].toInt() == 1){
-                temp_obj.is_rect = true;
-                for(int j=2; j<strlist.size(); j++){
-                    temp_point.x = strlist[j].split(":")[0].toFloat();
-                    temp_point.y = strlist[j].split(":")[1].toFloat();
-                    temp_obj.points.push_back(temp_point);
-                }
-            }else{
-                temp_obj.is_rect = false;
-                for(int j=2; j<strlist.size(); j++){
-                    temp_point.x = strlist[j].split(":")[0].toFloat();
-                    temp_point.y = strlist[j].split(":")[1].toFloat();
-                    temp_obj.points.push_back(temp_point);
-                }
-            }
-        }
-        pmap->objects.push_back(temp_obj);
-    }
-    setObjPose();
-    setting_anot.endGroup();
 
     //Set Variable
     probot->trays.clear();

@@ -30,7 +30,7 @@ Item {
         view_mode = parseInt(supervisor.getSetting("ROBOT_SW","table_view"));
         group_num = supervisor.getLocationGroupNum();
         robot_type = supervisor.getSetting("ROBOT_HW","type");
-        table_num = supervisor.getLocationGroupSize(cur_group);
+        table_num = supervisor.getLocationGroupSize(model_group.get(cur_group).num);
         tray_num = supervisor.getSetting("ROBOT_HW","tray_num");
 
         if(robot_type == "CALLING"){
@@ -174,10 +174,12 @@ Item {
     function update_group(){
         model_group.clear();
         for(var i=0; i<supervisor.getLocationGroupNum(); i++){
-            model_group.append({"name":supervisor.getLocGroupname(i)});
+            if(supervisor.getLocationGroupSize(i) > 0){
+                model_group.append({"num":i,"name":supervisor.getLocGroupname(i)});
+            }
 
         }
-        table_num = supervisor.getLocationGroupSize(cur_group);
+        table_num = supervisor.getLocationGroupSize(model_group.get(cur_group).num);
         update_table();
     }
     function update_table(){
@@ -185,8 +187,7 @@ Item {
         for(var i=col_num*row_num*cur_page; i<col_num*row_num*(cur_page+1); i++){
             if(i>=table_num)
                 break;
-//            print("table append : ",i);
-            model_group_table.append({"num":supervisor.getLocationNumber(cur_group,i),"name":supervisor.getServingName(cur_group, i)});
+            model_group_table.append({"num":supervisor.getLocationNumber(model_group.get(cur_group).num,i),"name":supervisor.getServingName(model_group.get(cur_group).num, i)});
         }
     }
 
@@ -389,7 +390,7 @@ Item {
                                     Text{
                                         anchors.centerIn: parent
                                         text: (col_num*row_num*cur_page)+index+1
-                                        color: supervisor.isExistLocation(cur_group,(col_num*row_num*cur_page)+index)?"#525252":color_red
+                                        color: supervisor.isExistLocation(model_group.get(cur_group).num,(col_num*row_num*cur_page)+index)?"#525252":color_red
                                         font.family: font_noto_r.name
                                         font.pixelSize: 25
                                     }
@@ -578,7 +579,7 @@ Item {
                     Text{
                         anchors.centerIn: parent
                         text: num
-                        color: supervisor.isExistLocation(cur_group,(col_num*row_num*cur_page)+index)?"#525252":color_red
+                        color: supervisor.isExistLocation(model_group.get(cur_group).num,(col_num*row_num*cur_page)+index)?"#525252":color_red
                         font.family: font_noto_r.name
                         font.pixelSize: 25
                     }
@@ -610,7 +611,7 @@ Item {
                     Text{
                         anchors.centerIn: parent
                         text: name
-                        color: supervisor.isExistLocation(cur_group,(col_num*row_num*cur_page)+index)?"#525252":color_red
+                        color: supervisor.isExistLocation(model_group.get(cur_group).num,(col_num*row_num*cur_page)+index)?"#525252":color_red
                         font.family: font_noto_r.name
                         Component.onCompleted: {
                             scale = 1;
@@ -1015,7 +1016,7 @@ Item {
                     }
                     supervisor.startServing();
                 }else{
-                    supervisor.goSerivng(cur_group,cur_table);
+                    supervisor.goSerivng(model_group.get(cur_group).num,cur_table);
                 }
                 cur_table = 0;
 
