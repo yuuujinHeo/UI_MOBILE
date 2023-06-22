@@ -15,6 +15,7 @@ Item {
     objectName: "page_movefail"
     width: 1280
     height: 800
+    property bool need_emo: false
     property bool joystick_connection: false
     property var joy_axis_left_ud: 0
     property var joy_axis_right_rl: 0
@@ -27,15 +28,15 @@ Item {
     property int notice_num: 0
     onNotice_numChanged: {
         if(notice_num === 0){
-            text.text = "목적지로 이동하는데 실패하였습니다.\비상스위치 버튼을 누르고 로봇을 수동으로 이동시켜주세요."
+            text.text = "목적지로 이동하는데 실패하였습니다.\로봇을 수동으로 이동시켜주세요."
         }else if(notice_num === 1){
-            text.text = "로봇의 초기화가 필요합니다.\n 위치초기화를 다시 수행해주세요."
+            text.text = "로봇의 초기화가 필요합니다.\n위치초기화를 다시 수행해주세요."
         }else if(notice_num === 2){
             text.text = "비상스위치가 눌렸습니다.\n 로봇을 수동으로 이동시켜주세요."
         }else if(notice_num === 3){
             text.text = "사용자에 의해 정지되었습니다."
         }else if(notice_num === 4){
-            text.text = "목적지로 이동하는데 실패하였습니다.\n 비상스위치 버튼을 누르고 로봇을 수동으로 이동시켜주세요."
+            text.text = "목적지로 이동하는데 실패하였습니다.\n로봇을 수동으로 이동시켜주세요."
         }
     }
 
@@ -54,9 +55,11 @@ Item {
     Component.onCompleted: {
         init();
         map.enabled = true;
+        supervisor.setMotorLock(false);
     }
     Component.onDestruction: {
         map.enabled = false;
+        supervisor.setMotorLock(true);
     }
 
     function init(){
