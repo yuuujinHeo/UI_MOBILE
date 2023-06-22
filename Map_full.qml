@@ -268,7 +268,6 @@ Item {
     }
 
     function init(){
-        mapview.reloadMap();
         clear("all");
         setTool("move");
     }

@@ -995,9 +995,6 @@ Item {
                 rect_emo.color = color_light_gray;
             }
 
-                state_obs.enabled = false;
-
-
             if(supervisor.getEmoStatus() === 0){
                 btn_reset.enabled = true;
             }else{

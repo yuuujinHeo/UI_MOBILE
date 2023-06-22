@@ -3068,6 +3068,10 @@ void Supervisor::onTimer(){
                     }
                     QMetaObject::invokeMethod(mMain, "movelocation");
                 }
+            }else if(probot->running_state == ROBOT_MOVING_NOT_READY){
+                plog->write("[SUPERVISOR] PATH NOT FOUND -> UI_STATE = UI_STATE_MOVEFAIL");
+                QMetaObject::invokeMethod(mMain, "movefail");
+                ui_state = UI_STATE_MOVEFAIL;
             }
         }
         break;
@@ -3097,9 +3101,12 @@ void Supervisor::onTimer(){
     }
     case UI_STATE_MOVEFAIL:{
         if(getMotorState() == 1 && probot->status_charge == 0 && probot->localization_state == 2){
-            plog->write("[SUPERVISOR] MOVEFAILED : Wake Up Auto");
-            QMetaObject::invokeMethod(mMain, "movefail_wake");
-            ui_state = UI_STATE_NONE;
+            if(probot->running_state == ROBOT_MOVING_NOT_READY){
+            }else{
+                plog->write("[SUPERVISOR] MOVEFAILED : Wake Up Auto");
+                QMetaObject::invokeMethod(mMain, "movefail_wake");
+                ui_state = UI_STATE_NONE;
+            }
         }else{
             if(prev_motor_state != getMotorState()){
                 QMetaObject::invokeMethod(mMain, "movefail");
