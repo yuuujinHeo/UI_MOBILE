@@ -151,6 +151,10 @@ void IPCHandler::onTimer(){
         //DEBUG
         probot->status_charge = temp1.status_charge;
         probot->localization_state = temp1.ui_loc_state;
+        if(probot->localization_state == 2){
+            pmap->cut_map[0] = 0;
+            pmap->cut_map[1] = 0;
+        }
         probot->running_state = temp1.ui_auto_state;
         probot->obs_state = temp1.ui_obs_state;
         probot->robot_preset = temp1.ui_cur_velocity_preset;
@@ -406,6 +410,8 @@ void IPCHandler::set_cmd(int cmd, QString log){
 void IPCHandler::set_status_ui(){
     IPCHandler::UI_STATUS val;
     val.ui_map_rotate_angle = pmap->map_rotate_angle;
+    val.ui_cut_map_x = pmap->cut_map[0];
+    val.ui_cut_map_y = pmap->cut_map[1];
     shm_ui_status.lock();
     flag_tx = true;
     val.tick = ++tick;

@@ -996,14 +996,8 @@ Item {
             select_location_type = "Serving";
             tfield_location.text = select_location_type + "_" + Number(supervisor.getLocationSize(select_location_type))
             if(curpose_mode){
-                if(supervisor.getObsState() || map.checkLocCollision()){
-                    btn_next_000.enabled = false;
-                    popup_location_warning.open();
-                    popup_location_warning.set_obs();
-                    supervisor.writelog("[QML] MAP PAGE : SAVE LOCATION -> BUT OBS CLOSE");
-                }else{
-                    btn_next_000.enabled = true;
-                }
+                btn_next_000.enabled = true;
+
             }else{
                 if(map.checkLocCollision()){
                     btn_next_000.enabled = false;

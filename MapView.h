@@ -190,6 +190,8 @@ public:
 
     Q_INVOKABLE void setSize(int x, int y, float width);
 
+    void updateMeta();
+    Q_INVOKABLE bool getCutBoxFlag();
 
     void setX(int newx);
     void setY(int newy);

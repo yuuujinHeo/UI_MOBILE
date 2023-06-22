@@ -278,6 +278,9 @@ Item {
     function setTableNumberAuto(){
         mapview.setTableNumberAuto();
     }
+    function getCutFlag(){
+        return mapview.getCutBoxFlag();
+    }
 
     function clear(mode){
         if(mode==="obj"){

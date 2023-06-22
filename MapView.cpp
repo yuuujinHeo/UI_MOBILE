@@ -45,6 +45,14 @@ MapView::MapView(QQuickItem *parent):
     setTline();
 }
 
+bool MapView::getCutBoxFlag(){
+    if(cut_box[0].x == 0 && cut_box[0].y == 0){
+        if(cut_box[1].x == file_width && cut_box[1].y == file_width){
+            return false;
+        }
+    }
+    return true;
+}
 void MapView::loadFile(QString name){
     QString file_path = QDir::homePath() + "/maps/"+name + "/map_raw.png";
     QString log_str;
@@ -405,11 +413,7 @@ void MapView::setMap(){
         if(show_travelline){
             cv::addWeighted(temp_orin,0.5,temp_travel,1,0,temp_orin);
         }
-
-
         map = QPixmap::fromImage(mat_to_qimage_cpy(temp_orin));
-        file_width = map_orin.rows;
-        grid_width = pmap->gridwidth;
     }
 
     QPainter painter(&map);
@@ -439,7 +443,7 @@ void MapView::setMap(){
             float x2 =  (locations[i].point.x + distance2   * qCos(locations[i].angle+th_dist));
             float y2 =  (locations[i].point.y + distance2   * qSin(locations[i].angle+th_dist));
 
-            float rad = pmap->robot_radius*2*res/pmap->gridwidth;
+            float rad = pmap->robot_radius*2*res/grid_width;
             QPainterPath path;
             if(select_location == i){
                 qDebug() << select_location << locations[i].type << locations[i].name;
@@ -472,7 +476,7 @@ void MapView::setMap(){
             }
         }
         if(new_location_flag){
-            float distance = (pmap->robot_radius/pmap->gridwidth)*2;
+            float distance = (pmap->robot_radius/grid_width)*2;
             float distance2 = distance*0.8;
             float th_dist = M_PI/8;
 
@@ -482,7 +486,7 @@ void MapView::setMap(){
             float y1 =  (new_location.point.y + distance2   * qSin(new_location.angle-th_dist));
             float x2 =  (new_location.point.x + distance2   * qCos(new_location.angle+th_dist));
             float y2 =  (new_location.point.y + distance2   * qSin(new_location.angle+th_dist));
-            float rad = pmap->robot_radius*2*res/pmap->gridwidth;
+            float rad = pmap->robot_radius*2*res/grid_width;
             QPainterPath path;
             path.addRoundedRect((new_location.point.x-rad/2),(new_location.point.y-rad/2),rad,rad,rad,rad);
             painter.setPen(QPen(Qt::white,3));
@@ -497,10 +501,10 @@ void MapView::setMap(){
 
     if(show_location_icon){
         for(int i=0; i<locations.size(); i++){
-            float distance = (pmap->robot_radius/pmap->gridwidth)*2;
+            float distance = (pmap->robot_radius/grid_width)*2;
             float distance2 = distance*0.8;
             float th_dist = M_PI/8;
-            float rad = pmap->robot_radius*2*res/pmap->gridwidth;
+            float rad = pmap->robot_radius*2*res/grid_width;
 
             float x =   (locations[i].point.x + distance    * qCos(locations[i].angle));
             float y =   (locations[i].point.y + distance    * qSin(locations[i].angle));
@@ -561,7 +565,7 @@ void MapView::setMap(){
     }
 
     //잘라내기 박스 표시
-    if(mode == "annot_rotate"){
+    if(tool == "cut_map"){
         QPainterPath path;
         painter.setPen(QPen(Qt::red,10));
         path.addRect(QRectF(QPointF(cut_box[0].x,cut_box[0].y),QPointF(cut_box[1].x,cut_box[1].y)));
@@ -590,7 +594,7 @@ void MapView::setMap(){
         }
 
         if(probot->curPath.size() > 0){
-            float distance = (pmap->robot_radius/pmap->gridwidth)*2;
+            float distance = (pmap->robot_radius/grid_width)*2;
             float distance2 = distance*0.8;
             float th_dist = M_PI/8;
 
@@ -702,7 +706,7 @@ void MapView::setMap(){
         }else{
             for(int i=0; i<360; i++){
                 painter.setPen(QPen(QColor("red"),3));
-                if(probot->lidar_data[i] > pmap->gridwidth){
+                if(probot->lidar_data[i] > grid_width){
                     float x = (robot_pose.x + (probot->lidar_data[i]/grid_width)*cos((-M_PI*i)/180 + robot_angle));
                     float y = (robot_pose.y + (probot->lidar_data[i]/grid_width)*sin((-M_PI*i)/180 + robot_angle));
                     painter.drawPoint(round(x),round(y));
@@ -728,19 +732,41 @@ void MapView::setMap(){
 
 void MapView::saveRotateMap(){
     cv::Mat map_edited_ui;
-    map_orin.copyTo(map_edited_ui);
-//    cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(map_edited_ui.cols/2, map_edited_ui.rows/2),-rotate_angle,1.0);
+    if(tool == "cut_map"){
+        map_orin(cv::Rect(cut_box[0].x,cut_box[0].y,(cut_box[1].x-cut_box[0].x),(cut_box[1].y-cut_box[0].y))).copyTo(map_edited_ui);
+        pmap->cut_map[0] = cut_box[0].x;
+        pmap->cut_map[1] = cut_box[0].y;
+    }else{
+        map_orin.copyTo(map_edited_ui);
+        pmap->cut_map[0] = 0;
+        pmap->cut_map[1] = 0;
+    }
     rotate_angle = 0;
-//    cv::warpAffine(map_edited_ui,map_edited_ui,rot,map_edited_ui.size(),cv::INTER_NEAREST);
 
     cv::rotate(map_edited_ui,map_edited_ui,cv::ROTATE_90_CLOCKWISE);
     cv::flip(map_edited_ui,map_edited_ui,0);
 
-    QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_edited.png";
+    QString path = QDir::homePath() + "/maps/" + map_name + "/map_edited.png";
     plog->write("[Annotation] Map Size Cut : "+QString().sprintf("%d,%d ~ %d,%d",cut_box[0].x,cut_box[0].y,cut_box[1].x,cut_box[1].y));
+
     cv::imwrite(path.toStdString(),map_edited_ui);
+    updateMeta();
+    loadFile(map_name);
 }
 
+void MapView::updateMeta(){
+    QString path = QDir::homePath() + "/maps/"+ map_name + "/map_meta.ini";
+    QSettings setting(path, QSettings::IniFormat);
+    pmap->width = cut_box[1].x - cut_box[0].x;
+    pmap->height = cut_box[1].y - cut_box[0].y;
+    pmap->origin[0] = round(pmap->width/2);
+    pmap->origin[1] = round(pmap->height/2);
+    setting.setValue("map_metadata/map_w",QString::number(pmap->width));
+    setting.setValue("map_metadata/map_h",QString::number(pmap->height));
+    setting.setValue("map_metadata/map_origin_u",QString::number(pmap->origin[0]));
+    setting.setValue("map_metadata/map_origin_v",QString::number(pmap->origin[1]));
+    plog->write("[ANNOTATION] UPDATE META : "+QString().sprintf("%d, %d, %d, %d",pmap->width,pmap->height, pmap->origin[0],pmap->origin[1]));
+}
 void MapView::setBoxPoint(int num, int x, int y){
     int min,max;
     if(x < 0) x = 0;
@@ -1044,7 +1070,7 @@ void MapView::drawSpline(){
             sy.set_points(d_list, y_list, type);
             sy.make_monotonic();
 
-            for(double d = 0; d<=sum_d; d+= pmap->gridwidth){
+            for(double d = 0; d<=sum_d; d+= grid_width){
                 line.push_back(cv::Point2f(sx(d),sy(d)));
             }
             for(int i=0; i<line.size()-1; i++){
@@ -1262,7 +1288,7 @@ void MapView::endDrawing(int x, int y){
             sy.set_points(d_list, y_list, type);
             sy.make_monotonic();
 
-            for(double d = 0; d<=sum_d; d+= pmap->gridwidth){
+            for(double d = 0; d<=sum_d; d+= grid_width){
                 temp_line.points.push_back(cv::Point2f(sx(d),sy(d)));
             }
         }else{

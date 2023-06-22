@@ -683,11 +683,8 @@ void Supervisor::deleteAnnotation(){
     plog->write("[USER INPUT] Remove Annotation Data");
 
     pmap->locations.clear();
-    pmap->objects.clear();
 
-    pmap->list_obj_dR.clear();
-    pmap->list_obj_uL.clear();
-
+    saveAnnotation(pmap->map_name);
 //    readSetting();
 }
 bool Supervisor::isExistAnnotation(QString name){
@@ -1948,8 +1945,9 @@ cv::Point2f setAxis(cv::Point2f _point){
 }
 cv::Point2f setAxisMapping(cv::Point2f _point){
     cv::Point2f temp;
-    temp.x = -_point.y/pmap->mapping_gridwidth + 1000/2;
-    temp.y = -_point.x/pmap->mapping_gridwidth + 1000/2;
+    float grid = pmap->mapping_gridwidth*pmap->mapping_width/1000;
+    temp.x = -_point.y/grid + 1000/2;
+    temp.y = -_point.x/grid + 1000/2;
     return temp;
 }
 cv::Point2f setAxisBack(cv::Point2f _point){
@@ -2175,35 +2173,6 @@ bool Supervisor::saveAnnotation(QString filename){
         settings.setValue("serving_"+QString::number(i)+"/num",getLocationGroupSize(i));
     }
 
-    //데이터 입력(오브젝트)
-    int table_num = 0;
-    int chair_num = 0;
-    int wall_num = 0;
-    for(int i=0; i<pmap->objects.size(); i++){
-        qDebug() << pmap->objects.size() << pmap->objects[i].type << pmap->objects[i].is_rect;
-        if(pmap->objects[i].type == "Table"){
-            str_name = pmap->objects[i].type + "_" + QString::number(table_num++);
-        }else if(pmap->objects[i].type == "Chair"){
-            str_name = pmap->objects[i].type + "_" + QString::number(chair_num++);
-        }else if(pmap->objects[i].type == "Wall"){
-            str_name = pmap->objects[i].type + "_" + QString::number(wall_num++);
-        }else{
-            str_name = pmap->objects[i].type;
-        }
-
-        if(pmap->objects[i].is_rect){
-            str_name += ",1";
-        }else{
-            str_name += ",0";
-        }
-
-        for(int j=0; j<pmap->objects[i].points.size(); j++){
-            str_name += QString().sprintf(",%f:%f",pmap->objects[i].points[j].x, pmap->objects[i].points[j].y);
-        }
-        settings.setValue("objects/poly"+QString::number(i),str_name);
-    }
-    settings.setValue("objects/num",pmap->objects.size());
-
     readSetting(filename);
     restartSLAM();
     pmap->annotation_edited = false;
@@ -2283,7 +2252,7 @@ void Supervisor::moveStop(){
     QMetaObject::invokeMethod(mMain, "movestopped");
 }
 void Supervisor::moveToCharge(){
-    if(ui_state == UI_STATE_RESTING){
+    if(ui_state == UI_STATE_RESTING || ui_state == UI_STATE_MOVEFAIL){
         plog->write("[COMMAND] Move to Charging");
         current_target = getLocation("Charging");
         ui_state = UI_STATE_MOVING;
@@ -2292,7 +2261,7 @@ void Supervisor::moveToCharge(){
     }
 }
 void Supervisor::moveToWait(){
-    if(ui_state == UI_STATE_RESTING){
+    if(ui_state == UI_STATE_RESTING|| ui_state == UI_STATE_MOVEFAIL){
         plog->write("[COMMAND] Move to Resting");
         current_target = getLocation("Resting");
         ui_state = UI_STATE_MOVING;
@@ -2564,8 +2533,12 @@ QVector<int> Supervisor::getOrigin(){
 }
 
 void Supervisor::moveToServingTest(QString name){
-    if(ui_state == UI_STATE_RESTING){
-        if(probot->trays[0].empty){
+    if(ui_state == UI_STATE_RESTING || ui_state == UI_STATE_MOVEFAIL || ui_state == UI_STATE_PICKUP){
+        if(name == "Charging" || name == "Resting"){
+            current_target = getLocation(name);
+            ui_state = UI_STATE_MOVING;
+            plog->write("[COMMAND] Serving Test : "+name);
+        }else if(probot->trays[0].empty){
             LOCATION temp_loc = getLocation(name);
             if(temp_loc.name == ""){
                 plog->write("[COMMAND] Serving Test (Not found) : "+name);
@@ -2907,6 +2880,7 @@ void Supervisor::onTimer(){
         //변수 초기화, SharedMemory 초기화
         if(ipc->getConnection()){
             ipc->moveStop();
+            current_target.name = "";
             check_init = true;
             ui_state = UI_STATE_INITAILIZING;
         }
@@ -2967,11 +2941,21 @@ void Supervisor::onTimer(){
             if(isaccepted){
                 count_pass = 0;
                 if(current_target.name == "Charging"){
-                    ui_state = UI_STATE_CHARGING;
-                    plog->write("[SCHEDULER] GO CHARGE MOVING DONE -> docharge");
-                    QMetaObject::invokeMethod(mMain, "docharge");
+                    if(probot->is_patrol){
+                        ui_state = UI_STATE_MOVING;
+                        count_pass = 0;
+                        plog->write("[SCHEDULER] PICKUP -> AUTO PASS");
+                    }else{
+                        ui_state = UI_STATE_CHARGING;
+                        plog->write("[SCHEDULER] GO CHARGE MOVING DONE -> docharge");
+                        QMetaObject::invokeMethod(mMain, "docharge");
+                    }
                 }else if(current_target.name == "Resting"){
-                    if(probot->is_calling){
+                    if(probot->is_patrol){
+                        ui_state = UI_STATE_MOVING;
+                        count_pass = 0;
+                        plog->write("[SCHEDULER] PICKUP -> AUTO PASS");
+                    }else if(probot->is_calling){
                         plog->write("[SCHEDULER] GO HOME MOVING DONE -> clearkitchen");
                         QMetaObject::invokeMethod(mMain, "clearkitchen");
                         ui_state = UI_STATE_RESTING;
@@ -3070,7 +3054,7 @@ void Supervisor::onTimer(){
                                 }
                             }
 
-                            if(cur_target.name != ""){
+                            if(cur_target.name == ""){
                                 //PATROLLING
                                 if(patrol_list.size() > 0){
                                     if(patrol_mode == PATROL_RANDOM){
@@ -3084,7 +3068,7 @@ void Supervisor::onTimer(){
                                         patrol_num = temp%(patrol_list.size());
 
                                         //패트롤 위치가 유효한 지 체크
-                                        LOCATION temp_loc = getloc(patrol_list[patrol_num]);
+                                        LOCATION temp_loc = getLocation(patrol_list[patrol_num]);
                                         if(temp_loc.name != ""){
                                             cur_target = temp_loc;
                                             probot->is_patrol = true;
@@ -3100,7 +3084,7 @@ void Supervisor::onTimer(){
                                         plog->write("[SUPERVISOR] MOVING (PATROL SEQUENCE) : CUR ("+QString::number(patrol_num)+")");
 
                                         //패트롤 위치가 유효한 지 체크
-                                        LOCATION temp_loc = getloc(patrol_list[patrol_num]);
+                                        LOCATION temp_loc = getLocation(patrol_list[patrol_num]);
                                         if(temp_loc.name != ""){
                                             cur_target = temp_loc;
                                             probot->is_patrol = true;
@@ -3192,6 +3176,10 @@ void Supervisor::onTimer(){
             QMetaObject::invokeMethod(mMain, "movefail");
         }else if(getMotorState() == 1 && probot->localization_state == LOCAL_READY && isaccepted){
             QMetaObject::invokeMethod(mMain, "movefail");
+        }else if(getMotorState() == 1 && probot->status_charge == 0 && probot->localization_state == 2){
+            plog->write("[SUPERVISOR] MOVEFAILED : Wake Up Auto");
+            QMetaObject::invokeMethod(mMain, "movefail_wake");
+            ui_state = UI_STATE_NONE;
         }
         patrol_mode = PATROL_NONE;
         current_target.name = "";

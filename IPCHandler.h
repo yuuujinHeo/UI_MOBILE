@@ -30,12 +30,16 @@ public:
     struct UI_STATUS{
         uint32_t tick = 0;
         float       ui_map_rotate_angle = 0;
+        uint32_t    ui_cut_map_x = 0;
+        uint32_t    ui_cut_map_y = 0;
         UI_STATUS(){
 
         }
         UI_STATUS(const UI_STATUS& p){
             tick = p.tick;
             ui_map_rotate_angle = p.ui_map_rotate_angle;
+            ui_cut_map_x = p.ui_cut_map_x;
+            ui_cut_map_y = p.ui_cut_map_y;
         }
     };
 

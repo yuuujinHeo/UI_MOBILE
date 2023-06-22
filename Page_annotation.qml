@@ -397,14 +397,31 @@ Item {
                 anchors.bottomMargin: 50
                 anchors.rightMargin: 50
                 onClicked: {
-                    map.save("rotate");
-                    supervisor.writelog("[ANNOTATION] Rotate, Cut : done and save.")
-                    if(annotation_after_mapping)
-                        annot_pages.sourceComponent = page_annot_localization;
-                    else
-                        annot_pages.sourceComponent = page_annot_menu;
+                    if(map.tool == "cut_map"){
+                        if(map.getCutFlag() && !annotation_after_mapping){
 
-                    supervisor.slam_map_reload(supervisor.getMapname());
+                            popup_save_rotate.open();
+                        }else{
+                            map.save("rotate");
+                            supervisor.writelog("[ANNOTATION] Rotate, Cut : done and save.")
+                            if(annotation_after_mapping)
+                                annot_pages.sourceComponent = page_annot_localization;
+                            else
+                                annot_pages.sourceComponent = page_annot_menu;
+
+                            supervisor.slam_map_reload(supervisor.getMapname());
+                        }
+                    }else{
+                        map.save("rotate");
+                        supervisor.writelog("[ANNOTATION] Rotate, Cut : done and save.")
+                        if(annotation_after_mapping)
+                            annot_pages.sourceComponent = page_annot_localization;
+                        else
+                            annot_pages.sourceComponent = page_annot_menu;
+
+                        supervisor.slam_map_reload(supervisor.getMapname());
+                    }
+
                 }
             }
 
@@ -445,6 +462,81 @@ Item {
                     }
                 }
             }
+
+            Popup{
+                id : popup_save_rotate
+                width: parent.width
+                height: parent.height
+                background:Rectangle{
+                    anchors.fill: parent
+                    color: "#282828"
+                    opacity: 0.7
+                }
+                Rectangle{
+                    anchors.centerIn: parent
+                    width: 500
+                    height: 250
+                    color: "white"
+                    radius: 20
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 20
+                        Column{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            Text{
+                                text: "맵을 <font color=\"#12d27c\">잘라내기</font>하시겠습니까?"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 30
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "맵을 자르면 기존의 설정은 모두 삭제되며 새로 설정하셔야 합니다."
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                color: color_red
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                        Row{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 20
+                            Item_buttons{
+                                type: "round_text"
+                                text: "잘라내지 않음"
+                                width: 180
+                                height: 100
+                                onClicked:{
+                                    map.setTool("move");
+                                    map.save("rotate");
+                                    if(annotation_after_mapping)
+                                        annot_pages.sourceComponent = page_annot_localization;
+                                    else
+                                        annot_pages.sourceComponent = page_annot_menu;
+
+                                    supervisor.slam_map_reload(supervisor.getMapname());
+                                    popup_save_rotate.close();
+                                }
+                            }
+                            Item_buttons{
+                                type: "round_text"
+                                text: "확인"
+                                width: 180
+                                height: 100
+                                onClicked:{
+                                    map.save("rotate");
+                                    annotation_after_mapping = true;
+                                    annot_pages.sourceComponent = page_annot_localization;
+                                    supervisor.deleteAnnotation();
+                                    supervisor.slam_map_reload(supervisor.getMapname());
+                                    popup_save_rotate.close();
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+            }
         }
     }
     Component{
@@ -475,7 +567,7 @@ Item {
                         if(supervisor.getLocalizationState() === 2){//success
                             btn_right2.enabled = true;
                             btn_do_autoinit.running = false;
-                        }else if(supervisor.getLocationzationState() === 1){
+                        }else if(supervisor.getLocalizationState() === 1){
                             btn_do_autoinit.running = true;
                         }else{
                             btn_do_autoinit.running = false;
@@ -724,7 +816,7 @@ Item {
                 anchors.topMargin: 80
                 spacing: 30
                 Text{
-                    text: "로봇을 충전위치로 이동시켜주세요"
+                    text: "로봇을 충전 위치로 이동시켜주세요"
                     color: "white"
                     font.pixelSize: 80
                     font.family: font_noto_b.name
@@ -732,7 +824,7 @@ Item {
                 }
                 Column{
                     Text{
-                        text: "* 충전위치란?"
+                        text: "* 충전 위치란?"
                         color: color_green
                         font.bold: true
                         font.pixelSize: 20
@@ -799,7 +891,7 @@ Item {
                 color: color_dark_navy
             }
             Text{
-                text: "로봇의 충전위치를 저장했습니다."
+                text: "로봇의 충전 위를 저장했습니다."
                 color: "white"
                 font.pixelSize: 80
                 font.family: font_noto_b.name
@@ -1016,7 +1108,7 @@ Item {
                     text: "충전 위치로"
                     onClicked: {
                         supervisor.writelog("[Annotation] Location Test : go Charging");
-                        supervisor.moveToCharge();
+                        supervisor.moveToServingTest("Charging");
                     }
                 }
                 Item_buttons{
@@ -1026,7 +1118,7 @@ Item {
                     text: "대기 위치로"
                     onClicked: {
                         supervisor.writelog("[Annotation] Location Test : go Resting");
-                        supervisor.moveToWait();
+                        supervisor.moveToServingTest("Resting");
                     }
                 }
             }
@@ -1159,7 +1251,8 @@ Item {
                 text: "대기 위치로"
                 onClicked: {
                     supervisor.writelog("[Annotation] Location Test : go Resting");
-                    supervisor.moveToWait();
+
+                    supervisor.moveToServingTest("Resting");
                 }
             }
 

@@ -302,38 +302,6 @@ Item {
                                 }
                             }
                         }
-                        Rectangle{
-                            id: state_obs
-                            width: 100
-                            height: 80
-                            radius: 10
-                            color: "white"
-                            enabled: supervisor.getObsState()
-                            border.color:color_red
-                            border.width: enabled?3:0
-                            Column{
-                                anchors.centerIn: parent
-                                spacing: 3
-                                Image{
-                                    source: "icon/icon_obs.png"
-                                    Component.onCompleted: {
-                                        if(sourceSize.width > 30)
-                                            sourceSize.width = 30
-
-                                        if(sourceSize.height > 30)
-                                            sourceSize.height = 30
-                                    }
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-                                Text{
-                                    font.family: font_noto_r.name
-                                    font.pixelSize: 12
-                                    text: "장애물 걸림"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    horizontalAlignment: Text.AlignHCenter
-                                }
-                            }
-                        }
                     }
                 }
                 Grid{
@@ -1027,13 +995,10 @@ Item {
                 rect_emo.color = color_light_gray;
             }
 
-            if(supervisor.getObsState()){
-                state_obs.enabled = true;
-            }else{
                 state_obs.enabled = false;
-            }
 
-            if(supervisor.getEmoStatus() === 0 && supervisor.getObsState() === 0){
+
+            if(supervisor.getEmoStatus() === 0){
                 btn_reset.enabled = true;
             }else{
                 btn_reset.enabled = false;

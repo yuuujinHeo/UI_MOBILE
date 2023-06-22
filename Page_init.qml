@@ -2306,13 +2306,13 @@ Item {
                 statusbar.visible = true;
             }
             function enable_rawmap(){
-                notice_map_raw.enabled = true;
+//                notice_map_raw.enabled = true;
             }
             function disable_rawmap(){
                 notice_map_raw.enabled = false;
             }
             function enable_availablemap(){
-                notice_map_edited.enabled = true;
+//                notice_map_edited.enabled = true;
             }
             function disable_availablemap(){
                 notice_map_edited.enabled = false;
@@ -2619,7 +2619,7 @@ Item {
         Item{
             objectName: "init_slam"
             anchors.fill: parent
-            property var local_find_state: 0
+            property var local_find_state: -1
             Component.onCompleted: {
                 statusbar.visible = true;
                 supervisor.setMotorLock(false);
@@ -2659,20 +2659,23 @@ Item {
 
             Timer{
                 id: timer_check_localization
-                running: true
+                running: false
                 repeat: true
                 interval: 500
                 onTriggered: {
                     map.loadmapsoft(supervisor.getMapname(),"EDITED");
-
                     local_find_state = supervisor.getLocalizationState();
+//                    print(local_find_state);
                     if(local_find_state===0){//not ready
+                    }else if(local_find_state === 1){
+                        if(!popup_loading.opened)
+                            popup_loading.open();
                     }else if(local_find_state === 2){//success
-                        popup_loading.hide();
+                        popup_loading.close();
                         map.setViewer("local_view");
                         timer_check_localization.stop();
                     }else if(local_find_state === 3){//failed
-                        popup_loading.hide();
+                        popup_loading.close();
                         map.setViewer("localization");
                         timer_check_localization2.start();
                         timer_check_localization.stop();
@@ -2680,7 +2683,7 @@ Item {
 
                     if(!supervisor.getIPCConnection()){
                         local_find_state = 10;
-                        popup_loading.hide();
+                        popup_loading.close();
                         timer_check_localization.stop();
                     }
 
@@ -2693,24 +2696,22 @@ Item {
                 repeat: true
                 interval: 500
                 onTriggered: {
-                    if(test){
+                    if(supervisor.getLocalizationState() === 2){//success
                         btn_right2.enabled = true;
+                        btn_do_autoinit.running = false;
+                    }else if(supervisor.getLocalizationState() === 1){
+                        btn_do_autoinit.running = true;
+                        btn_right2.enabled = false;
                     }else{
-                        if(supervisor.getLocalizationState() === 2){//success
-                            btn_right2.enabled = true;
-                            btn_do_autoinit.running = false;
-                        }else if(supervisor.getLocationzationState() === 1){
-                            btn_do_autoinit.running = true;
-                        }else{
-                            btn_do_autoinit.running = false;
-                            btn_right2.enabled = false;
-                        }
+                        btn_do_autoinit.running = false;
+                        btn_right2.enabled = false;
                     }
+
                 }
             }
 
             Rectangle{
-                visible: local_find_state === 0
+                visible: local_find_state === -1
                 anchors.fill: parent
                 color: color_light_gray
                 Image{
@@ -2761,11 +2762,10 @@ Item {
                             parent.color = color_green;
                         }
                         onClicked: {
+                            timer_check_localization.start();
                             supervisor.writelog("[USER INPUT] INIT PAGE : DO LOCALIZATION")
-
                             supervisor.slam_autoInit();
                             update_timer.stop();
-                            local_state = 1;
                         }
                     }
                 }
@@ -2869,8 +2869,10 @@ Item {
 
             Rectangle{
                 visible: local_find_state === 1
-                anchors.fill: parent
-                color: color_light_gray
+                width: parent.width
+                height: parent.height - statusbar.height
+                anchors.bottom: parent.bottom
+                color: color_navy
                 Text{
                     id: text_finding
                     text: "로봇의 위치를 찾고 있습니다."
@@ -2891,8 +2893,10 @@ Item {
 
             Rectangle{
                 visible: local_find_state === 2
-                anchors.fill: parent
-                color: color_light_gray
+                width: parent.width
+                height: parent.height - statusbar.height
+                anchors.bottom: parent.bottom
+                color: color_navy
                 Text{
                     text:"로봇의 위치를 찾았습니다. 로봇의 위치가 정확합니까?"
                     font.pixelSize: 40
@@ -2940,8 +2944,10 @@ Item {
             }
             Rectangle{
                 visible: local_find_state === 3
-                anchors.fill: parent
-                color: color_light_gray
+                width: parent.width
+                height: parent.height - statusbar.height
+                anchors.bottom: parent.bottom
+                color: color_navy
                 Text{
                     text:"로봇의 위치를 찾을 수 없습니다. 로봇의 위치를 맵 상에서 표시해주세요."
                     font.pixelSize: 40
@@ -2954,7 +2960,6 @@ Item {
                 }
                 Item_buttons{
                     id: btn_right2
-                    visible: local_find_state===3
                     width: 200
                     height: 80
                     type: "round_text"
@@ -2970,9 +2975,10 @@ Item {
                     }
                 }
                 Column{
-                    anchors.right: map.left
-                    anchors.rightMargin: 30
-                    anchors.verticalCenter: map.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 30
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 100
                     spacing: 50
                     Item_buttons{
                         width: 200
@@ -3011,12 +3017,13 @@ Item {
                         }
                     }
                 }
-
             }
             Rectangle{
                 visible: local_find_state === 10
-                anchors.fill: parent
-                color: color_light_gray
+                width: parent.width
+                height: parent.height - statusbar.height
+                anchors.bottom: parent.bottom
+                color: color_navy
                 Text{
                     id: text_failed_connection
                     text: "로봇과 연결이 되지 않았습니다."
@@ -3052,8 +3059,8 @@ Item {
                 onVisibleChanged: {
                     print("map visible changed",visible,x,y,width,height);
                 }
-                anchors.top: text_find.bottom
-                anchors.topMargin: 30
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 50
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 600
                 height: 600
@@ -3070,6 +3077,7 @@ Item {
             anchors.fill: parent
             Component.onCompleted: {
                 statusbar.visible = true;
+                supervisor.setMotorLock(true);
             }
             Rectangle{
                 anchors.fill: parent

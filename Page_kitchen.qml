@@ -33,6 +33,7 @@ Item {
             show_serving = true;
         }
 
+        supervisor.setUiState(0);
 
         use_tray = JSON.parse(supervisor.getSetting("ROBOT_SW","use_tray"));
         if(use_tray){
