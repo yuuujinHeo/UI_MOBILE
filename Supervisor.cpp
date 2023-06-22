@@ -368,7 +368,10 @@ void Supervisor::readSetting(QString map_name){
     pmap->gridwidth = setting_meta.value("map_grid_width").toFloat();
     pmap->origin[0] = setting_meta.value("map_origin_u").toInt();
     pmap->origin[1] = setting_meta.value("map_origin_v").toInt();
-//    qDebug() << "Read Setting " << pmap->gridwidth;
+    pmap->edited_width = setting_meta.value("map_edited_w").toInt();
+    pmap->edited_height = setting_meta.value("map_edited_h").toInt();
+    pmap->edited_origin[0] = setting_meta.value("map_edited_origin_u").toInt();
+    pmap->edited_origin[1] = setting_meta.value("map_edited_origin_v").toInt();
     setting_meta.endGroup();
 
     //Annotation======================================================================

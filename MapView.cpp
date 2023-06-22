@@ -751,17 +751,19 @@ void MapView::updateMeta(){
     pmap->height = cut_box[1].y - cut_box[0].y;
     pmap->origin[0] = round(pmap->width/2);
     pmap->origin[1] = round(pmap->height/2);
-    setting.setValue("map_metadata/map_w",QString::number(pmap->width));
-    setting.setValue("map_metadata/map_h",QString::number(pmap->height));
-    setting.setValue("map_metadata/map_origin_u",QString::number(pmap->origin[0]));
-    setting.setValue("map_metadata/map_origin_v",QString::number(pmap->origin[1]));
+//    setting.setValue("map_metadata/map_w",QString::number(pmap->width));
+//    setting.setValue("map_metadata/map_h",QString::number(pmap->height));
+//    setting.setValue("map_metadata/map_origin_u",QString::number(pmap->origin[0]));
+//    setting.setValue("map_metadata/map_origin_v",QString::number(pmap->origin[1]));
 
-    setting.setValue("map_metadata/map_edited_angle",QString::number(rotate_angle));
+    setting.setValue("map_metadata/map_edited_angle",QString::number(pmap->map_rotate_angle));
     setting.setValue("map_metadata/map_edited_w",QString::number(pmap->width));
     setting.setValue("map_metadata/map_edited_h",QString::number(pmap->height));
     setting.setValue("map_metadata/map_edited_origin_u",QString::number(pmap->origin[0]));
     setting.setValue("map_metadata/map_edited_origin_v",QString::number(pmap->origin[1]));
-    plog->write("[ANNOTATION] UPDATE META : "+QString().sprintf("%d, %d, %d, %d",pmap->width,pmap->height, pmap->origin[0],pmap->origin[1]));
+    setting.setValue("map_metadata/map_edited_cut_u",QString::number(pmap->cut_map[0]));
+    setting.setValue("map_metadata/map_edited_cut_v",QString::number(pmap->cut_map[1]));
+    plog->write("[ANNOTATION] UPDATE META : "+QString().sprintf("%d, %d, %d, %d, %d, %d, %d",pmap->map_rotate_angle, pmap->cut_map[0], pmap->cut_map[1], pmap->width,pmap->height, pmap->origin[0],pmap->origin[1]));
 }
 void MapView::setBoxPoint(int num, int x, int y){
     int min,max;
