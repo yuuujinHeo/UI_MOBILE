@@ -2805,18 +2805,21 @@ void Supervisor::onTimer(){
         //State : None
         //Robot 연결 안됨, 초기화 시작 전(프로그램 실행직후)
         //변수 초기화, SharedMemory 초기화
+        qDebug() << ipc->getConnection();
         if(ipc->getConnection()){
             ipc->moveStop();
             current_target.name = "";
             check_init = true;
             ui_state = UI_STATE_INITAILIZING;
         }
+        qDebug() << "ipc->getConnection();";
         break;
     }
     case UI_STATE_INITAILIZING:{
         //State : Initializing
         //프로그램 루프 재 시작
         //init 상태 체크
+        qDebug() << "initializing";
         if(getMotorState() == READY && probot->localization_state == LOCAL_READY){
             if(probot->status_charge == 1){
                 ui_state = UI_STATE_CHARGING;

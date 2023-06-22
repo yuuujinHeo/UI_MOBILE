@@ -11,16 +11,12 @@ Item {
     width: 1280
     height: 800
 
-    property bool debug_mode: false
     property var view_mode: 0
     Component.onCompleted: {
         init();
     }
     property bool show_serving: true
 
-    function setDebug(onoff){
-        debug_mode = onoff;
-    }
 
     function init(){
         statusbar.visible = true;
@@ -66,6 +62,7 @@ Item {
         }
 
         update_group();
+        print("kitchen done");
     }
     property int tray_num: 3
     property int table_num: 5
@@ -179,14 +176,17 @@ Item {
             if(supervisor.getLocationGroupSize(i) > 0){
                 model_group.append({"num":i,"name":supervisor.getLocGroupname(i)});
             }
-
         }
-        table_num = supervisor.getLocationGroupSize(model_group.get(cur_group).num);
+        if(model_group.count > 0)
+            table_num = supervisor.getLocationGroupSize(model_group.get(cur_group).num);
+        else
+            table_num = 0;
         update_table();
     }
     function update_table(){
         model_group_table.clear();
         for(var i=col_num*row_num*cur_page; i<col_num*row_num*(cur_page+1); i++){
+            print(i);
             if(i>=table_num)
                 break;
             model_group_table.append({"num":supervisor.getLocationNumber(model_group.get(cur_group).num,i),"name":supervisor.getServingName(model_group.get(cur_group).num, i)});

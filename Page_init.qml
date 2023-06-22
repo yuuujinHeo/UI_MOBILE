@@ -2887,7 +2887,6 @@ Item {
                             debug_mode = true;
                             supervisor.writelog("[USER INPUT] INIT PAGE : PASS LOCALIZATION")
                             loadPage(pkitchen);
-                            loader_page.item.setDebug(true);
                         }
                     }
                 }

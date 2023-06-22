@@ -211,7 +211,7 @@ public:
     IMG get_cam1();
 
     bool getConnection(){
-        if(read_count > 10){
+        if(read_count > 30){
             return false;
         }else{
             return true;
@@ -249,7 +249,7 @@ public:
     void set_velocity(float vel);
 
     QString tempstr = "";
-    int read_count = 20;
+    int read_count = 50;
     unsigned int prev_tick_status = 0;
     unsigned int prev_tick_path = 0;
     unsigned int prev_tick_map = 0;

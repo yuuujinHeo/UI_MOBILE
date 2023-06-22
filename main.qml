@@ -20,20 +20,20 @@ Window {
 
     property bool debug_mode: false
 
-    flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
-    visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
-    onVisibilityChanged: {
-        if(homePath.split("/")[2]==="odroid"){
-            if(mainwindow.visibility == Window.Minimized){
-                print("minimized");
-            }else if(mainwindow.visibility == Window.FullScreen){
-                print("fullscreen");
-            }else{
-                supervisor.writelog("[QML - MAIN] Window show fullscreen");
-                mainwindow.visibility = Window.FullScreen;
-            }
-        }
-    }
+//    flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
+//    visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
+//    onVisibilityChanged: {
+//        if(homePath.split("/")[2]==="odroid"){
+//            if(mainwindow.visibility == Window.Minimized){
+//                print("minimized");
+//            }else if(mainwindow.visibility == Window.FullScreen){
+//                print("fullscreen");
+//            }else{
+//                supervisor.writelog("[QML - MAIN] Window show fullscreen");
+//                mainwindow.visibility = Window.FullScreen;
+//            }
+//        }
+//    }
     property color color_dark_gray: "#999999";
     property color color_red: "#E7584D"
     property color color_green: "#12d27c"
