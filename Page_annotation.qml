@@ -2323,13 +2323,10 @@ Item {
             }
 
             function readSetting(){
-                print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!");
                 groups.clear();
-                print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!",supervisor.getLocationGroupNum());
                 for(var i=0; i<supervisor.getLocationGroupNum(); i++){
                     print(i,supervisor.getLocationGroupNum())
                     groups.append({"value":supervisor.getLocGroupname(i)});
-                        print("groups append : ", supervisor.getLocGroupname(i))
                 }
 
                 if(supervisor.getSetting("ROBOT_SW","use_callbell")==="true"){
@@ -2344,7 +2341,6 @@ Item {
                     use_group = false;
 
                 locations.clear();
-                print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!",supervisor.getLocationNum("Serving"));
                 for(var i=0; i<supervisor.getLocationNum("Serving"); i++){
                     locations.append({"name": supervisor.getLocationName(i,"Serving"),
                                    "group":supervisor.getLocationGroupNum(i),
@@ -2352,7 +2348,6 @@ Item {
                                     "number_table" : supervisor.getLocationGroupSize(supervisor.getLocationGroupNum(i)),
                                     "call_id" : supervisor.getLocationCallID("Serving",i),
                                    "error":false});
-                        print("locations append : ",i,supervisor.getLocationGroupNum(i),supervisor.getLocationGroupNum(i),supervisor.getLocationNumber(-1,i))
                 }
                 update();
             }
@@ -2786,12 +2781,12 @@ Item {
                         supervisor.setLocation(i,details.get(i+2).name,details.get(i+2).group,details.get(i+2).number);
                     }
                     map_hide.save("location_all");
+                    supervisor.drawingRunawayStop();
                     supervisor.writelog("[ANNOTATION] LOCAION SAVE : Check Done ");
                     if(annotation_after_mapping)
                         annot_pages.sourceComponent = page_annot_done;
                     else
                         annot_pages.sourceComponent = page_annot_menu;
-                    supervisor.drawingRunawayStop();
                 }
             }
             Row{

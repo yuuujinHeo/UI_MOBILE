@@ -397,9 +397,9 @@ void IPCHandler::set_cmd(IPCHandler::CMD val, QString log)
     flag_tx = true;
     val.tick = ++tick;
     memcpy((char*)shm_cmd.data(), &val, sizeof(IPCHandler::CMD));
-    if(log != ""){
-        plog->write("[IPC] Set CMD "+QString::number(val.cmd)+" : "+log);
-    }
+
+    plog->write("[IPC] Set CMD "+QString::number(val.cmd)+" : "+log);
+
     shm_cmd.unlock();
 }
 void IPCHandler::set_cmd(int cmd, QString log){

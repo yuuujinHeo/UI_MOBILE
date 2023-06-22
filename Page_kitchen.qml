@@ -1020,7 +1020,7 @@ Item {
             id: btn_go
             anchors.fill: parent
             onPressed:{
-                click_start.play();
+                //click_start.play();
             }
 
             onClicked: {
@@ -1313,7 +1313,7 @@ Item {
             id: btn_go2
             anchors.fill: parent
             onClicked: {
-                click_start.play();
+                //click_start.play();
                 count_resting = 0;
                 go_patrol = true;
                 popup_question.visible = true;

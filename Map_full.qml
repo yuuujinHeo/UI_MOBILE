@@ -350,7 +350,7 @@ Item {
             supervisor.slam_map_reload(supervisor.getMapname());
         }else if(mode==="location_all"){
             mapview.saveAnnotation(map_name);
-            supervisor.slam_map_reload(supervisor.getMapname());
+//            supervisor.slam_map_reload(supervisor.getMapname());
         }
     }
 

@@ -224,7 +224,7 @@ Item {
                         anchors.fill: parent
                         onClicked: {
                             supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : RESTART SLAM")
-                            supervisor.restartSLAM();
+//                            supervisor.restartSLAM();
                         }
                     }
                 }

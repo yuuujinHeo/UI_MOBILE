@@ -34,7 +34,7 @@ Item {
         is_admin = false;
         is_reset_slam = false;
 //        supervisor.getAllWifiList();
-        supervisor.getWifiIP();
+//        supervisor.getWifiIP();
         init();
     }
 
@@ -515,8 +515,8 @@ Item {
                                         anchors.fill: parent
                                         onClicked:{
                                             click.play();
-                                            popup_preset.open();
                                             popup_preset.select_preset = 1;
+                                            popup_preset.open();
                                         }
                                     }
                                 }
@@ -536,8 +536,8 @@ Item {
                                         anchors.fill: parent
                                         onClicked:{
                                             click.play();
-                                            popup_preset.open();
                                             popup_preset.select_preset = 2;
+                                            popup_preset.open();
 
                                         }
                                     }
@@ -558,8 +558,8 @@ Item {
                                         anchors.fill: parent
                                         onClicked:{
                                             click.play();
-                                            popup_preset.open();
                                             popup_preset.select_preset = 3;
+                                            popup_preset.open();
                                         }
                                     }
                                 }
@@ -579,8 +579,8 @@ Item {
                                         anchors.fill: parent
                                         onClicked:{
                                             click.play();
-                                            popup_preset.open();
                                             popup_preset.select_preset = 4;
+                                            popup_preset.open();
 
                                         }
                                     }
@@ -601,8 +601,8 @@ Item {
                                         anchors.fill: parent
                                         onClicked:{
                                             click.play();
-                                            popup_preset.open();
                                             popup_preset.select_preset = 5;
+                                            popup_preset.open();
                                         }
                                     }
                                 }
@@ -1851,7 +1851,7 @@ Item {
                                             dnsmain_3.ischanged = false;
                                             dnsmain_4.ischanged = false;
                                             var dns_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
-                                            supervisor.setWifi(ip_str,gateway_str,dns_str);
+//                                            supervisor.setWifi(ip_str,gateway_str,dns_str);
                                             supervisor.setSetting("ROBOT_SW/wifi_ip",ip_str);
                                             supervisor.setSetting("ROBOT_SW/wifi_gateway",gateway_str);
                                             supervisor.setSetting("ROBOT_SW/wifi_dnsmain",dns_str);
@@ -6765,7 +6765,8 @@ Item {
         }
 
         if(is_reset_slam)
-            supervisor.restartSLAM();
+            supervisor.slam_ini_reload();
+//            supervisor.restartSLAM();
 
         init();
 
@@ -7347,7 +7348,7 @@ Item {
                         anchors.fill: parent
                         onClicked:{
                             supervisor.writelog("[USER INPUT] SETTING PAGE -> RESTART SLAM");
-                            supervisor.restartSLAM();
+//                            supervisor.restartSLAM();
                         }
                     }
                 }
@@ -9855,7 +9856,7 @@ Item {
             interval: 1000
             triggeredOnStart: true
             onTriggered: {
-                supervisor.getAllWifiList();
+//                supervisor.getAllWifiList();
                 model_wifis.clear();
                 for(var i=0; i<supervisor.getWifiNum(); i++){
                     model_wifis.append({"ssd":supervisor.getWifiSSD(i),"inuse":supervisor.getWifiInuse(i),"rate":supervisor.getWifiRate(i),"level":supervisor.getWifiLevel(i),"security":supervisor.getWifiSecurity(i)});
@@ -10074,7 +10075,7 @@ Item {
                                 popup_wifi_passwd.open();
                             }else{
                                 print("check connect", model_wifis.get(col_wifis.select_wifi).ssd, "");
-                                supervisor.connectWifi(model_wifis.get(col_wifis.select_wifi).ssd, "")
+//                                supervisor.connectWifi(model_wifis.get(col_wifis.select_wifi).ssd, "")
                                 popup_loading.open();
                             }
                         }
@@ -10314,7 +10315,7 @@ Item {
                         anchors.fill: parent
                         onClicked:{
                             print("check connect", popup_wifi_passwd.ssd, passwd_wifi.text);
-                            supervisor.connectWifi(popup_wifi_passwd.ssd, passwd_wifi.text);
+//                            supervisor.connectWifi(popup_wifi_passwd.ssd, passwd_wifi.text);
                             popup_loading.open();
                         }
                     }
