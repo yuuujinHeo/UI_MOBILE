@@ -250,15 +250,6 @@ void MapView::setMode(QString name){
         show_location_icon = true;
         robot_following = false;
         setFullScreen();
-    }else if(mode == "annot_objecting" || mode == "annot_object"){
-        show_robot = true;
-        show_global_path = false;
-        show_local_path = false;
-        show_lidar = true;
-        show_location = true;
-        show_location_icon = true;
-        robot_following = false;
-        setFullScreen();
     }else if(mode == "annot_drawing" || mode == "annot_rotate"){
         show_robot = false;
         show_global_path = false;
@@ -306,7 +297,6 @@ void MapView::setMode(QString name){
         show_location_icon = false;
         robot_following = true;
         pmap->annotation_edited = false;
-        pmap->annot_edit_object = false;
         pmap->annot_edit_drawing = false;
         pmap->annot_edit_location = false;
         pmap->annot_edit_tline = false;
@@ -765,6 +755,12 @@ void MapView::updateMeta(){
     setting.setValue("map_metadata/map_h",QString::number(pmap->height));
     setting.setValue("map_metadata/map_origin_u",QString::number(pmap->origin[0]));
     setting.setValue("map_metadata/map_origin_v",QString::number(pmap->origin[1]));
+
+    setting.setValue("map_metadata/map_edited_angle",QString::number(rotate_angle));
+    setting.setValue("map_metadata/map_edited_w",QString::number(pmap->width));
+    setting.setValue("map_metadata/map_edited_h",QString::number(pmap->height));
+    setting.setValue("map_metadata/map_edited_origin_u",QString::number(pmap->origin[0]));
+    setting.setValue("map_metadata/map_edited_origin_v",QString::number(pmap->origin[1]));
     plog->write("[ANNOTATION] UPDATE META : "+QString().sprintf("%d, %d, %d, %d",pmap->width,pmap->height, pmap->origin[0],pmap->origin[1]));
 }
 void MapView::setBoxPoint(int num, int x, int y){
@@ -805,25 +801,28 @@ int MapView::getPointBox(int x, int y){
         }
     }
 
+    orin_box[0] = cut_box[0];
+    orin_box[1] = cut_box[1];
+    orin_box[2] = cv::Point2f(x,y);
     //detect line
-    for(int i=0; i<2; i++){
-        if(fabs(cut_box[i].x - x) < 30){
-            if(y>cut_box[0].y && y<cut_box[1].y){
-                orin_box[0] = cut_box[0];
-                orin_box[1] = cut_box[1];
-                orin_box[2] = cv::Point2f(x,y);
-                return 3;
-            }
-        }
-        if(fabs(cut_box[i].y - y) < 30){
-            if(x>cut_box[0].x && x<cut_box[1].x){
-                orin_box[0] = cut_box[0];
-                orin_box[1] = cut_box[1];
-                orin_box[2] = cv::Point2f(x,y);
-                return 3;
-            }
-        }
-    }
+//    for(int i=0; i<2; i++){
+//        if(fabs(cut_box[i].x - x) < 30){
+//            if(y>cut_box[0].y && y<cut_box[1].y){
+//                orin_box[0] = cut_box[0];
+//                orin_box[1] = cut_box[1];
+//                orin_box[2] = cv::Point2f(x,y);
+//                return 3;
+//            }
+//        }
+//        if(fabs(cut_box[i].y - y) < 30){
+//            if(x>cut_box[0].x && x<cut_box[1].x){
+//                orin_box[0] = cut_box[0];
+//                orin_box[1] = cut_box[1];
+//                orin_box[2] = cv::Point2f(x,y);
+//                return 3;
+//            }
+//        }
+//    }
     return -1;
 }
 

@@ -54,21 +54,19 @@ void MapView::onTimer(){
     if(flag_drawing){
         drawTline();
     }
+
     if(mode != "mapping"){
         if(probot->ipc_use){
             setMapCurrent();
         }
     }else{
-        mapping_size = 1000;// pmap->mapping_width;
+        mapping_size = 1000;
         mapping_grid = pmap->mapping_gridwidth*pmap->mapping_width/1000;
 
         if(probot->ipc_use){
             setMapCurrent();
         }
-//            qDebug() << "set " << mapping_grid << pmap->mapping_gridwidth;
-
     }
-
 }
 
 
@@ -226,7 +224,6 @@ void MapView::setScreen(float s, int centerx, int centery){
 }
 
 void MapView::initObject(){
-    //Read annotation.ini
     QString file_path = QDir::homePath() + "/maps/" + map_name + "/map_obs.png";;
     objects.clear();
     map_objecting.release();

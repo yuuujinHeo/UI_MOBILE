@@ -585,15 +585,15 @@ Item {
                 mapview.setInitPose(firstX,firstY,0);
             }else if(tool === "cut_map"){
                 select_point = mapview.getPointBox(firstX,firstY);
-                if(select_point === -1){
-                    if(double_touch){
-                        firstX = mapview.getX() + (point1.x+point2.x)*mapview.getScale()*mapview.getFileWidth()/width/2;
-                        firstY = mapview.getY() + (point1.y+point2.y)*mapview.getScale()*mapview.getFileWidth()/width/2;
-                        var dx = Math.abs(point1.x-point2.x);
-                        var dy = Math.abs(point1.y-point2.y);
-                        firstDist = Math.sqrt(dx*dx + dy*dy);
-                    }
-                }
+//                if(select_point === -1){
+//                    if(double_touch){
+//                        firstX = mapview.getX() + (point1.x+point2.x)*mapview.getScale()*mapview.getFileWidth()/width/2;
+//                        firstY = mapview.getY() + (point1.y+point2.y)*mapview.getScale()*mapview.getFileWidth()/width/2;
+//                        var dx = Math.abs(point1.x-point2.x);
+//                        var dy = Math.abs(point1.y-point2.y);
+//                        firstDist = Math.sqrt(dx*dx + dy*dy);
+//                    }
+//                }
             }
         }
         onReleased: {
@@ -685,49 +685,7 @@ Item {
                 }else if(tool == "draw_rect"){
                     mapview.setDrawingRect(newX, newY);
                 }else if(tool == "cut_map"){
-                    if(select_point > -1){
-                        mapview.setBoxPoint(select_point,newX,newY);
-                    }else{
-
-                        if(double_touch){
-                            if(point1.pressed && point2.pressed){
-                                newX = (point1.x + point2.x)*mapview.getScale()*mapview.getFileWidth()/width/2;
-                                newY = (point1.y + point2.y)*mapview.getScale()*mapview.getFileWidth()/width/2;
-
-                                var dx = Math.abs(point1.x - point2.x)
-                                var dy = Math.abs(point1.y - point2.y)
-                                var dist = Math.sqrt(dx*dx + dy*dy);
-                                var thres = 10;
-
-                                for(var i=0; i<(firstDist-dist)/thres; i++){
-    //                                mapview.scaledOut(1,1);
-                                    mapview.zoomOut(newX,newY);
-                                }
-                                for(var i=0; i<(dist-firstDist)/thres; i++){
-    //                                mapview.scaledIn(1,1);
-                                    mapview.zoomIn(newX,newY);
-                                }
-                                firstDist = dist;
-
-    //                            print("UPDATE : ",newX,newY,dist);
-                                mapview.setRobotFollowing(false);
-                                mapview.move(firstX-newX, firstY-newY);
-                            }else{
-                                double_touch = false;
-                            }
-                        }else{
-                            if(point1.pressed){
-                                newX = point1.x*mapview.getScale()*mapview.getFileWidth()/width;
-                                newY = point1.y*mapview.getScale()*mapview.getFileWidth()/width;
-                            }else if(point2.pressed){
-                                newX = point2.x*mapview.getScale()*mapview.getFileWidth()/width;
-                                newY = point2.y*mapview.getScale()*mapview.getFileWidth()/width;
-                            }
-    //                        print("UPDATE : ",newX,newY);
-                            mapview.setRobotFollowing(false);
-                            mapview.move(firstX-newX, firstY-newY);
-                        }
-                    }
+                    mapview.setBoxPoint(select_point,newX,newY);
                 }else if(tool == "straight"){
                     mapview.setDrawingLine(newX, newY);
                 }else if(tool == "erase"){
