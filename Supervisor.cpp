@@ -94,12 +94,12 @@ Supervisor::Supervisor(QObject *parent)
 
 Supervisor::~Supervisor(){
     plog->write("[BUILDER] SUPERVISOR desployed");
-    slam_process->kill();
-    slam_process->close();
+//    slam_process->kill();
+//    slam_process->close();
     ipc->clearSharedMemory(ipc->shm_cmd);
-    QString file = QDir::homePath() + "/auto_reset.sh";
-    slam_process->start(file);
-    slam_process->waitForReadyRead(3000);
+//    QString file = QDir::homePath() + "/auto_reset.sh";
+//    slam_process->start(file);
+//    slam_process->waitForReadyRead(3000);
     QThread::sleep(1);
     slam_process->kill();
     slam_process->close();

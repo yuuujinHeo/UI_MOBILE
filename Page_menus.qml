@@ -10,6 +10,10 @@ Item {
     width: 1280
     height: 800
 
+    Component.onCompleted: {
+        print("menu");
+    }
+
     function init(){
 
     }

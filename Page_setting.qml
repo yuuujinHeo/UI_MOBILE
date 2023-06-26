@@ -6765,7 +6765,7 @@ Item {
         }
 
         if(is_reset_slam)
-            supervisor.slam_ini_reload();
+//            supervisor.slam_ini_reload();
 //            supervisor.restartSLAM();
 
         init();
