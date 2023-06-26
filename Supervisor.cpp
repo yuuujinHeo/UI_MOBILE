@@ -84,12 +84,12 @@ Supervisor::Supervisor(QObject *parent)
         startSLAM();
     }
 
-//    wifi_process = new QProcess();
-//    connect(wifi_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_con_output()));
-//    connect(wifi_process,SIGNAL(readyReadStandardError()),this,SLOT(wifi_con_error()));
-//    wifi_check_process = new QProcess();
-//    connect(wifi_check_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_ch_output()));
-//    connect(wifi_check_process,SIGNAL(readyReadStandardError()),this,SLOT(wifi_ch_error()));
+    wifi_process = new QProcess();
+    connect(wifi_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_con_output()));
+    connect(wifi_process,SIGNAL(readyReadStandardError()),this,SLOT(wifi_con_error()));
+    wifi_check_process = new QProcess();
+    connect(wifi_check_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_ch_output()));
+    connect(wifi_check_process,SIGNAL(readyReadStandardError()),this,SLOT(wifi_ch_error()));
 }
 
 Supervisor::~Supervisor(){
@@ -741,7 +741,6 @@ bool Supervisor::loadMaptoUSB(){
 
 void Supervisor::removeMap(QString filename){
     plog->write("[USER INPUT] Remove Map : "+filename);
-//    QFile *file = new QFile(QDir::homePath()+"/maps/"+filename);
     QDir dir(QDir::homePath()+"/maps/" + filename);
 
     if(dir.removeRecursively()){
@@ -749,7 +748,6 @@ void Supervisor::removeMap(QString filename){
     }else{
         qDebug() << "false";
     }
-//    file->remove();
 }
 bool Supervisor::isloadMap(){
     return pmap->map_loaded;
@@ -940,7 +938,7 @@ void Supervisor::makeRobotINI(){
         setSetting("SENSOR/right_camera_tf","0.23,-0.155,0.27,-90,0,-90");
 
         readSetting();
-//        slam_ini_reload();
+        slam_ini_reload();
 //        restartSLAM();
     }
 }
@@ -1017,7 +1015,7 @@ void Supervisor::saveMapfromUsb(QString path){
     QStringList kk = path.split('/');
     kk.pop_front();
 
-    QString new_path = QCoreApplication::applicationDirPath();// + "/image/" + kk[kk.length()-1];
+    QString new_path = QCoreApplication::applicationDirPath();
     for(int i=0; i<kk.size(); i++){
         new_path += "/" + kk[i];
     }
@@ -1038,8 +1036,6 @@ void Supervisor::setMap(QString name){
     setSetting("FLOOR/map_load","true");
     readSetting(name);
     slam_map_reload(name);
-//    restartSLAM();
-//    lcm->restartSLAM();
 }
 
 void Supervisor::loadMap(QString name){
@@ -1048,8 +1044,6 @@ void Supervisor::loadMap(QString name){
     setSetting("FLOOR/map_load","false");
     readSetting(name);
     slam_map_reload(name);
-//    restartSLAM();
-//    readSetting()
 }
 
 void Supervisor::restartSLAM(){
@@ -1245,128 +1239,6 @@ void Supervisor::setObjectingflag(bool flag){
     ipc->flag_objecting = flag;
 }
 
-
-
-
-#ifdef USE_MINIMAP
-QObject *Supervisor::getMinimap(QString filename) const{
-    PixmapContainer *pc = new PixmapContainer();
-
-    QString file_path = QDir::homePath()+"/maps/"+filename+"/map_edited.png";
-    if(filename == "" || !QFile::exists(file_path)){
-        QPixmap blank(pmap->height, pmap->width);{
-            QPainter painter(&blank);
-            painter.fillRect(blank.rect(),"black");
-        }
-
-        pc->pixmap = blank;
-        Q_ASSERT(!pc->pixmap.isNull());
-        QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
-        return pc;
-    }
-    cv::Mat map = cv::imread(file_path.toStdString(),cv::IMREAD_GRAYSCALE);
-    cv::flip(map,map,0);
-    cv::rotate(map,map,cv::ROTATE_90_COUNTERCLOCKWISE);
-
-
-
-
-    plog->write("[MAP] Make Minimap Start : "+filename);
-    int dp = 3;
-    for(int i=0; i<minimap.rows; i=i+dp){
-        for(int j=0; j<minimap.cols; j=j+dp){
-            int pixel = 0;
-            bool outline = false;
-            for(int k=0; k<dp; k++){
-                for(int m=0; m<dp; m++){
-                    if(i+k>minimap.rows-1)
-                        continue;
-                    if(j+m>minimap.cols-1)
-                        continue;
-                    pixel+=minimap.at<cv::Vec3b>(i+k,j+m)[0];
-                    if(minimap.at<cv::Vec3b>(i+k,j+m)[0] == 0)
-                        outline = true;
-                }
-            }
-            float kk = pixel/(dp*dp);
-            if(kk < 10 || outline)
-                pixel = 0;
-            else if(kk > 200)
-                pixel = 255;
-            else
-                pixel = 127;
-
-            for(int k=0; k<dp; k++){
-                for(int m=0; m<dp; m++){
-                    if(i+k>minimap.rows-1)
-                        continue;
-                    if(j+m>minimap.cols-1)
-                        continue;
-                    minimap.data[((i+k)*minimap.cols + (j+m))*3] = pixel;
-                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 1] = pixel;
-                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 2] = pixel;
-                }
-            }
-        }
-    }
-    dp = 15;
-    for(int i=0; i<minimap.rows; i=i+dp){
-        for(int j=0; j<minimap.cols; j=j+dp){
-
-            int pixel = 0;
-            int outline = 0;
-            for(int k=0; k<dp; k++){
-                for(int m=0; m<dp; m++){
-                    if(i+k>minimap.rows-1)
-                        continue;
-                    if(j+m>minimap.cols-1)
-                        continue;
-                    pixel+=minimap.at<cv::Vec3b>(i+k,j+m)[0];
-                    if(minimap.at<cv::Vec3b>(i+k,j+m)[0] == 0)
-                        outline++;
-                }
-            }
-            float kk = pixel/(dp*dp);
-            if(outline > (dp*dp)/3)
-                pixel = 0;
-            else if(kk > 200)
-                pixel = 255;
-            else
-                pixel = 127;
-
-            for(int k=0; k<dp; k++){
-                for(int m=0; m<dp; m++){
-                    if(i+k>minimap.rows-1)
-                        continue;
-                    if(j+m>minimap.cols-1)
-                        continue;
-                    minimap.data[((i+k)*minimap.cols + (j+m))*3] = pixel;
-                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 1] = pixel;
-                    minimap.data[((i+k)*minimap.cols + (j+m))*3 + 2] = pixel;
-                }
-            }
-        }
-    }
-
-    cv::cvtColor(minimap, minimap,cv::COLOR_BGR2HSV);
-    cv::GaussianBlur(minimap, minimap,cv::Size(3,3),0);
-    cv::Scalar lower(0,0,37);
-    cv::Scalar upper(0,0,255);
-    cv::inRange(minimap,lower,upper,minimap);
-    cv::Canny(minimap,minimap,600,600);
-    cv::Mat kernel = getStructuringElement(cv::MORPH_RECT, cv::Size(5,5));
-    dilate(minimap, minimap, kernel);
-
-
-
-    pc->pixmap = QPixmap::fromImage(mat_to_qimage_cpy(minimap));
-    Q_ASSERT(!pc->pixmap.isNull());
-    QQmlEngine::setObjectOwnership(pc, QQmlEngine::JavaScriptOwnership);
-    return pc;
-}
-
-#endif
-
 QString Supervisor::getnewMapname(){
     int max_num = -1;
     for(int i=0; i<getAvailableMap(); i++){
@@ -1460,9 +1332,6 @@ QString Supervisor::getusberror(int num){
     }
 }
 
-void Supervisor::readusbfile(QString name){
-
-}
 void Supervisor::readusbrecentfile(){
     double temp = 0;
     int num = -1;
@@ -1479,8 +1348,6 @@ void Supervisor::readusbrecentfile(){
 
     QString path = getusbfile(num);
     zip->getZip(path);
-
-
 }
 
 void Supervisor::updateUSB(){
@@ -2119,7 +1986,6 @@ bool Supervisor::saveAnnotation(QString filename){
     }
 
     readSetting(filename);
-//    restartSLAM();
     pmap->annotation_edited = false;
     return true;
 }

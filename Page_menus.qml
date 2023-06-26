@@ -1,17 +1,30 @@
 import QtQuick 2.12
-import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
+import QtQuick.Controls 2.12
 import "."
 import io.qt.Supervisor 1.0
 
 Item {
-    id: page_menu
+    id: page_menus
     objectName: "page_menus"
     width: 1280
     height: 800
 
+    Component.onCompleted: {
+        print("menu completed");
+    }
+
     function init(){
 
+    }
+
+    Timer{
+        running: true
+        interval: 100
+        repeat: true
+        onTriggered: {
+            print("menu triggred");
+        }
     }
 
     Rectangle{
@@ -71,30 +84,7 @@ Item {
                 }
             }
         }
-
-//tangle{
-//            id: rect_annot
-//            width: 100
-//            height: 100
-//            anchors.top: rect_kitchen.bottom
-//            anchors.topMargin: 50
-//            anchors.left: rect_kitchen.left
-//            color: "gray"
-//            Text{
-//                anchors.centerIn: parent
-//                text: "ANNOT"
-//            }
-//            MouseArea{
-//                anchors.fill: parent
-//                onClicked: {
-//                    pannotation.init();
-//                    stackview.push(pannotation);
-//                }
-//            }
-//        }
     }
-
-
 
     property var size_menu: 100
     Rectangle{

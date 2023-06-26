@@ -77,7 +77,6 @@ Window {
         }
     }
 
-
     function movefail(){
         if(loader_page.item.objectName == "page_annotation"){
             if(supervisor.getEmoStatus()){
@@ -270,7 +269,6 @@ Window {
                 loadPage(pinit);
             }
         }
-
     }
 
     function show_loading(){
@@ -316,8 +314,10 @@ Window {
     }
 
     function loadPage(page){
+        print("loadpage start");
         pbefore = loader_page.source;
         loader_page.source = page;
+        print("loadpage done");
     }
 
     function backPage(){

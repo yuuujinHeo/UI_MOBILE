@@ -15,6 +15,11 @@ Item {
     Component.onCompleted: {
         init();
     }
+
+    Component.onDestruction: {
+        print("kitchen destruction");
+    }
+
     property bool show_serving: true
 
 
@@ -1353,7 +1358,9 @@ Item {
                             click.play();
                             count_resting = 0;
                             cur_table = 0;
+                            print("11");
                             loadPage(pmenu);
+                            print("22");
                         }
                     }
                 }

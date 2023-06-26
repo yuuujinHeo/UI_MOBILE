@@ -226,7 +226,6 @@ public:
     ////*********************************************  USB 관련   ***************************************************////
     Q_INVOKABLE void updateUSB();
     Q_INVOKABLE int getusbsize();
-    Q_INVOKABLE void readusbfile(QString name);
     Q_INVOKABLE void readusbrecentfile();
     Q_INVOKABLE int getusbfilesize();
     Q_INVOKABLE QString getusbfile(int num);
