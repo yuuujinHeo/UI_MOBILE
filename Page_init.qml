@@ -243,75 +243,75 @@ Item {
                 supervisor.makeRobotINI();
             }
             function updatewifiState(){
-//                wizard_ip.connection = supervisor.getWifiConnection(wizard_ip.select_ssd);
+                wizard_ip.connection = supervisor.getWifiConnection(wizard_ip.select_ssd);
             }
             function connect_fail(){
                 text_wifi76788.visible = true;
             }
 
             function ip_update(){
-//                var ip = supervisor.getcurIP().split(".");
-//                if(ip.length >3){
-//                    ip_1.text = ip[0];
-//                    ip_2.text = ip[1];
-//                    ip_3.text = ip[2];
-//                    ip_4.text = ip[3];
-//                }else{
-//                    ip_1.text = "";
-//                    ip_2.text = "";
-//                    ip_3.text = "";
-//                    ip_4.text = "";
-//                }
+                var ip = supervisor.getcurIP().split(".");
+                if(ip.length >3){
+                    ip_1.text = ip[0];
+                    ip_2.text = ip[1];
+                    ip_3.text = ip[2];
+                    ip_4.text = ip[3];
+                }else{
+                    ip_1.text = "";
+                    ip_2.text = "";
+                    ip_3.text = "";
+                    ip_4.text = "";
+                }
 
-//                ip = supervisor.getcurGateway().split(".");
-//                if(ip.length >3){
-//                    gateway_1.text = ip[0];
-//                    gateway_2.text = ip[1];
-//                    gateway_3.text = ip[2];
-//                    gateway_4.text = ip[3];
-//                }else{
-//                    gateway_1.text = "";
-//                    gateway_2.text = "";
-//                    gateway_3.text = "";
-//                    gateway_4.text = "";
-//                }
-//                ip = supervisor.getcurDNS().split(".");
-//                if(ip.length >3){
-//                    dnsmain_1.text = ip[0];
-//                    dnsmain_2.text = ip[1];
-//                    dnsmain_3.text = ip[2];
-//                    dnsmain_4.text = ip[3];
-//                }else{
-//                    dnsmain_1.text = "";
-//                    dnsmain_2.text = "";
-//                    dnsmain_3.text = "";
-//                    dnsmain_4.text = "";
-//                }
-//                ip_1.ischanged = false;
-//                ip_2.ischanged = false;
-//                ip_3.ischanged = false;
-//                ip_4.ischanged = false;
-//                gateway_1.ischanged = false;
-//                gateway_2.ischanged = false;
-//                gateway_3.ischanged = false;
-//                gateway_4.ischanged = false;
-//                dnsmain_1.ischanged = false;
-//                dnsmain_2.ischanged = false;
-//                dnsmain_3.ischanged = false;
-//                dnsmain_4.ischanged = false;
-//                ip_1.focus = false;
-//                ip_2.focus = false;
-//                ip_3.focus = false;
-//                ip_4.focus = false;
-//                gateway_1.focus = false;
-//                gateway_2.focus = false;
-//                gateway_3.focus = false;
-//                gateway_4.focus = false;
-//                dnsmain_1.focus = false;
-//                dnsmain_2.focus = false;
-//                dnsmain_3.focus = false;
-//                dnsmain_4.focus = false;
-//                print("ip_update");
+                ip = supervisor.getcurGateway().split(".");
+                if(ip.length >3){
+                    gateway_1.text = ip[0];
+                    gateway_2.text = ip[1];
+                    gateway_3.text = ip[2];
+                    gateway_4.text = ip[3];
+                }else{
+                    gateway_1.text = "";
+                    gateway_2.text = "";
+                    gateway_3.text = "";
+                    gateway_4.text = "";
+                }
+                ip = supervisor.getcurDNS().split(".");
+                if(ip.length >3){
+                    dnsmain_1.text = ip[0];
+                    dnsmain_2.text = ip[1];
+                    dnsmain_3.text = ip[2];
+                    dnsmain_4.text = ip[3];
+                }else{
+                    dnsmain_1.text = "";
+                    dnsmain_2.text = "";
+                    dnsmain_3.text = "";
+                    dnsmain_4.text = "";
+                }
+                ip_1.ischanged = false;
+                ip_2.ischanged = false;
+                ip_3.ischanged = false;
+                ip_4.ischanged = false;
+                gateway_1.ischanged = false;
+                gateway_2.ischanged = false;
+                gateway_3.ischanged = false;
+                gateway_4.ischanged = false;
+                dnsmain_1.ischanged = false;
+                dnsmain_2.ischanged = false;
+                dnsmain_3.ischanged = false;
+                dnsmain_4.ischanged = false;
+                ip_1.focus = false;
+                ip_2.focus = false;
+                ip_3.focus = false;
+                ip_4.focus = false;
+                gateway_1.focus = false;
+                gateway_2.focus = false;
+                gateway_3.focus = false;
+                gateway_4.focus = false;
+                dnsmain_1.focus = false;
+                dnsmain_2.focus = false;
+                dnsmain_3.focus = false;
+                dnsmain_4.focus = false;
+                print("ip_update");
             }
 
             SwipeView{
@@ -1068,11 +1068,11 @@ Item {
                         interval: 3000
                         triggeredOnStart: true
                         onTriggered: {
-//                            supervisor.getAllWifiList();
-//                            model_wifis.clear();
-//                            for(var i=0; i<supervisor.getWifiNum(); i++){
-//                                model_wifis.append({"ssd":supervisor.getWifiSSD(i),"inuse":supervisor.getWifiInuse(i),"rate":supervisor.getWifiRate(i),"level":supervisor.getWifiLevel(i),"security":supervisor.getWifiSecurity(i)});
-//                            }
+                            supervisor.getAllWifiList();
+                            model_wifis.clear();
+                            for(var i=0; i<supervisor.getWifiNum(); i++){
+                                model_wifis.append({"ssd":supervisor.getWifiSSD(i),"inuse":supervisor.getWifiInuse(i),"rate":supervisor.getWifiRate(i),"level":supervisor.getWifiLevel(i),"security":supervisor.getWifiSecurity(i)});
+                            }
                         }
                     }
                     Timer{
@@ -1082,7 +1082,7 @@ Item {
                         interval: 500
                         triggeredOnStart: true
                         onTriggered: {
-//                            wizard_ip.connection = supervisor.getWifiConnection(wizard_ip.select_ssd);
+                            wizard_ip.connection = supervisor.getWifiConnection(wizard_ip.select_ssd);
                         }
                     }
                     Column{
@@ -1537,12 +1537,12 @@ Item {
                                                     text_wifi76788.visible = true;
                                                 }else{
                                                     print("check connect", wizard_ip.select_ssd, passwd_wifi.text);
-//                                                    supervisor.connectWifi(wizard_ip.select_ssd, passwd_wifi.text);
+                                                    supervisor.connectWifi(wizard_ip.select_ssd, passwd_wifi.text);
                                                     popup_loading.open();
                                                 }
                                             }else{
                                                 print("check connect", wizard_ip.select_ssd, passwd_wifi.text);
-//                                                supervisor.connectWifi(wizard_ip.select_ssd, passwd_wifi.text);
+                                                supervisor.connectWifi(wizard_ip.select_ssd, passwd_wifi.text);
                                                 popup_loading.open();
                                             }
                                         }
@@ -2102,8 +2102,8 @@ Item {
                                             anchors.fill: parent
                                             onClicked: {
                                                 click_sound.play();
-//                                                if(supervisor.getcurIP() === "")
-//                                                    supervisor.getWifiIP();
+                                                if(supervisor.getcurIP() === "")
+                                                    supervisor.getWifiIP();
                                                 item_init_2.ip_update();
                                             }
                                         }
@@ -2140,7 +2140,7 @@ Item {
                                                 dnsmain_3.ischanged = false;
                                                 dnsmain_4.ischanged = false;
                                                 var dns_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
-//                                                supervisor.setWifi(ip_str,gateway_str,dns_str);
+                                                supervisor.setWifi(ip_str,gateway_str,dns_str);
                                                 supervisor.setSetting("ROBOT_SW/wifi_ip",ip_str);
                                                 supervisor.setSetting("ROBOT_SW/wifi_gateway",gateway_str);
                                                 supervisor.setSetting("ROBOT_SW/wifi_dnsmain",dns_str);
@@ -2251,7 +2251,7 @@ Item {
                             }
                             onClicked: {
                                 if(wizard_ip.setting_step == 0){
-//                                    supervisor.readWifiState(wizard_ip.select_ssd);
+                                    supervisor.readWifiState(wizard_ip.select_ssd);
                                     supervisor.writelog("[USER INPUT] INIT PAGE : IP SETTING NEXT 1");
                                     wizard_ip.setting_step++;
                                     popup_loading.open();

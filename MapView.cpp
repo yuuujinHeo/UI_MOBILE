@@ -276,8 +276,9 @@ void MapView::setMode(QString name){
         show_lidar = true;
         show_location = true;
         show_location_icon = true;
-        robot_following = false;
-        setFullScreen();
+        robot_following = true;
+        show_travelline = true;
+//        setFullScreen();
     }else if(mode == "annot_tline"){
         show_robot = false;
         show_global_path = false;
@@ -792,8 +793,28 @@ void MapView::setBoxPoint(int num, int x, int y){
         cut_box[1].x = orin_box[1].x - (orin_box[1].x - max);
         cut_box[1].y = orin_box[1].y - (orin_box[1].x - max);
     }else{
-        cut_box[0] = orin_box[0] + (cv::Point2f(x,y) - orin_box[2]);
-        cut_box[1] = orin_box[1] + (cv::Point2f(x,y) - orin_box[2]);
+        int width = cut_box[1].x - cut_box[0].x;
+        int height = cut_box[1].y - cut_box[0].y;
+
+        cv::Point2f temp_1 = orin_box[0] + (cv::Point2f(x,y) - orin_box[2]);
+        cv::Point2f temp_2 = orin_box[1] + (cv::Point2f(x,y) - orin_box[2]);
+
+        if(temp_1.x < 0){
+            temp_1.x = 0;
+            temp_2.x = width;
+        }else if(temp_2.x > file_width){
+            temp_1.x = file_width-width;
+            temp_2.x = file_width;
+        }
+        if(temp_1.y < 0){
+            temp_1.y = 0;
+            temp_2.y = height;
+        }else if(temp_2.y > file_width){
+            temp_1.y = file_width-height;
+            temp_2.y = file_width;
+        }
+        cut_box[0] = temp_1;
+        cut_box[1] = temp_2;
     }
     setMap();
 }

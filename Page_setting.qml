@@ -33,8 +33,8 @@ Item {
         statusbar.visible = true;
         is_admin = false;
         is_reset_slam = false;
-//        supervisor.getAllWifiList();
-//        supervisor.getWifiIP();
+        supervisor.getAllWifiList();
+        supervisor.getWifiIP();
         init();
     }
 
@@ -1132,7 +1132,7 @@ Item {
                                         onClicked:{
                                             click.play();
                                             //Debug
-//                                            supervisor.connectWifi("mobile_robot_test","rainbow2011");
+                                            supervisor.connectWifi("mobile_robot_test","rainbow2011");
                                             popup_wifi.open();
                                         }
                                     }
@@ -1851,7 +1851,7 @@ Item {
                                             dnsmain_3.ischanged = false;
                                             dnsmain_4.ischanged = false;
                                             var dns_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
-//                                            supervisor.setWifi(ip_str,gateway_str,dns_str);
+                                            supervisor.setWifi(ip_str,gateway_str,dns_str);
                                             supervisor.setSetting("ROBOT_SW/wifi_ip",ip_str);
                                             supervisor.setSetting("ROBOT_SW/wifi_gateway",gateway_str);
                                             supervisor.setSetting("ROBOT_SW/wifi_dnsmain",dns_str);
@@ -6765,7 +6765,7 @@ Item {
         }
 
         if(is_reset_slam)
-            supervisor.slam_ini_reload();
+//            supervisor.slam_ini_reload();
 //            supervisor.restartSLAM();
 
         init();
@@ -6944,7 +6944,7 @@ Item {
             ip_4.text = ip[3];
         }
 
-//        ip = supervisor.getSetting("ROBOT_SW","wifi_gateway").split(".");
+        ip = supervisor.getSetting("ROBOT_SW","wifi_gateway").split(".");
         ip = supervisor.getcurGateway().split(".");
         if(ip.length >3){
             gateway_1.text = ip[0];
@@ -6952,7 +6952,7 @@ Item {
             gateway_3.text = ip[2];
             gateway_4.text = ip[3];
         }
-//        ip = supervisor.getSetting("ROBOT_SW","wifi_dnsmain").split(".");
+        ip = supervisor.getSetting("ROBOT_SW","wifi_dnsmain").split(".");
         ip = supervisor.getcurDNS().split(".");
         if(ip.length >3){
             dnsmain_1.text = ip[0];
@@ -6960,13 +6960,13 @@ Item {
             dnsmain_3.text = ip[2];
             dnsmain_4.text = ip[3];
         }
-//        ip = supervisor.getSetting("ROBOT_SW","wifi_dnsserv").split(".");
-//        if(ip.length >3){
-//            dnsserv_1.text = ip[0];
-//            dnsserv_2.text = ip[1];
-//            dnsserv_3.text = ip[2];
-//            dnsserv_4.text = ip[3];
-//        }
+        ip = supervisor.getSetting("ROBOT_SW","wifi_dnsserv").split(".");
+        if(ip.length >3){
+            dnsserv_1.text = ip[0];
+            dnsserv_2.text = ip[1];
+            dnsserv_3.text = ip[2];
+            dnsserv_4.text = ip[3];
+        }
 
 
         //변수 초기화
@@ -7171,7 +7171,7 @@ Item {
             }
 
             wifi_connection.connection = supervisor.getWifiConnection("");
-//            print(supervisor.getWifiState());
+            print(supervisor.getWifiState());
 
             motor_left_id = parseInt(supervisor.getSetting("MOTOR","left_id"));
             motor_right_id = parseInt(supervisor.getSetting("MOTOR","right_id"));
@@ -9843,8 +9843,8 @@ Item {
         }
         onOpened:{
             timer_update_wifi.start();
-//            supervisor.getAllWifiList();
-//            supervisor.readWifi();
+            supervisor.getAllWifiList();
+            supervisor.readWifi();
         }
         onClosed:{
             timer_update_wifi.stop();
@@ -9856,7 +9856,7 @@ Item {
             interval: 1000
             triggeredOnStart: true
             onTriggered: {
-//                supervisor.getAllWifiList();
+                supervisor.getAllWifiList();
                 model_wifis.clear();
                 for(var i=0; i<supervisor.getWifiNum(); i++){
                     model_wifis.append({"ssd":supervisor.getWifiSSD(i),"inuse":supervisor.getWifiInuse(i),"rate":supervisor.getWifiRate(i),"level":supervisor.getWifiLevel(i),"security":supervisor.getWifiSecurity(i)});
@@ -10075,7 +10075,7 @@ Item {
                                 popup_wifi_passwd.open();
                             }else{
                                 print("check connect", model_wifis.get(col_wifis.select_wifi).ssd, "");
-//                                supervisor.connectWifi(model_wifis.get(col_wifis.select_wifi).ssd, "")
+                                supervisor.connectWifi(model_wifis.get(col_wifis.select_wifi).ssd, "")
                                 popup_loading.open();
                             }
                         }
@@ -10315,7 +10315,7 @@ Item {
                         anchors.fill: parent
                         onClicked:{
                             print("check connect", popup_wifi_passwd.ssd, passwd_wifi.text);
-//                            supervisor.connectWifi(popup_wifi_passwd.ssd, passwd_wifi.text);
+                            supervisor.connectWifi(popup_wifi_passwd.ssd, passwd_wifi.text);
                             popup_loading.open();
                         }
                     }

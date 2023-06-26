@@ -317,7 +317,6 @@ void Supervisor::readSetting(QString map_name){
     pmap->mapping_gridwidth = setting_robot.value("grid_size").toFloat();
     setting_robot.endGroup();
 
-
     setting_robot.beginGroup("CALLING");
     probot->max_moving_count = setting_robot.value("call_maximum").toInt();
     setting_robot.endGroup();
@@ -330,17 +329,6 @@ void Supervisor::readSetting(QString map_name){
     pmap->map_path = setting_robot.value("map_path").toString();
     setting.table_num = setting_robot.value("table_num").toInt();
     setting.table_col_num = setting_robot.value("table_col_num").toInt();
-    setting_robot.endGroup();
-
-    setting_robot.beginGroup("SERVER");
-    setting.useServerCMD = setting_robot.value("use_servercmd").toBool();
-    setting.useTravelline = setting_robot.value("use_travelline").toBool();
-    setting.travelline = setting_robot.value("travelline").toInt();
-    setting_robot.endGroup();
-
-    setting_robot.beginGroup("PATROL");
-    patrol.filename = setting_robot.value("curfile").toString();
-    patrol.mode = setting_robot.value("patrol_mode").toInt();
     setting_robot.endGroup();
 
     setting_robot.beginGroup("SENSOR");
@@ -407,26 +395,6 @@ void Supervisor::readSetting(QString map_name){
     }
     setting_anot.endGroup();
 
-
-    setting_anot.beginGroup("other_locations");
-    int patrol_num = setting_anot.value("num").toInt();
-    for(int i=0; i<patrol_num; i++){
-        QString loc_str = setting_anot.value("loc"+QString::number(i)).toString();
-        QStringList strlist = loc_str.split(",");
-        temp_loc.point = cv::Point2f(strlist[1].toFloat(),strlist[2].toFloat());
-        temp_loc.angle = strlist[3].toFloat();
-        temp_loc.type = "Other";
-        temp_loc.group = 0;
-        temp_loc.name = strlist[0];
-        if(strlist.size() > 4)
-            temp_loc.number = strlist[4].toInt();
-        if(strlist.size() > 5)
-            temp_loc.call_id = strlist[5];
-        else
-            temp_loc.call_id = "";
-        pmap->locations.push_back(temp_loc);
-    }
-    setting_anot.endGroup();
 
 
     setting_anot.beginGroup("resting_locations");
@@ -2591,79 +2559,79 @@ void Supervisor::onTimer(){
     }
 
     //************************** WiFi *********************************//
-//    if(wifi_temp_ssd != ""){
-//        if(wifi_count++ > 1000/MAIN_THREAD){
-//            QMetaObject::invokeMethod(mMain,"checkwifidone");
-//            wifi_check_process->close();
-//            wifi_temp_ssd = "";
-//        }
-//    }else{
-//        wifi_count = 0;
-//    }
-//    getAllWifiList();
-//    if(setting.cur_ip == "" && getWifiConnection("")){
-//        qDebug() << "auto get wifi ip";
-//        getWifiIP();
-//    }
+    if(wifi_temp_ssd != ""){
+        if(wifi_count++ > 1000/MAIN_THREAD){
+            QMetaObject::invokeMethod(mMain,"checkwifidone");
+            wifi_check_process->close();
+            wifi_temp_ssd = "";
+        }
+    }else{
+        wifi_count = 0;
+    }
+    getAllWifiList();
+    if(setting.cur_ip == "" && getWifiConnection("")){
+        qDebug() << "auto get wifi ip";
+        getWifiIP();
+    }
 
-//    if(wifi_cmd == WIFI_CMD_NONE && wifi_cmds.size() > 0){
-//        wifi_cmd = wifi_cmds[0];
-//        wifi_cmd_count = 0;
-//        wifi_cmds.pop_front();
-//        wifi_process->close();
-//        if(setting.wifi_ssd == ""){
-//            setting.wifi_ssd = getSetting("ROBOT_SW","wifi_ssd");
-//        }
-//        switch(wifi_cmd){
-//        case WIFI_CMD_CONNECT:{
-//            if(setting.wifi_passwd != ""){
-//                plog->write("[SETTING] WIFI CONNECT : SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
-//                wifi_process->start("nmcli --a device wifi connect "+setting.wifi_ssd+" password "+setting.wifi_passwd);
-//            }else{
-//                plog->write("[SETTING] WIFI CONNECT : SSD("+setting.wifi_ssd+")");
-//                wifi_process->start("nmcli --a device wifi connect "+setting.wifi_ssd);
-//            }
-//            break;
-//        }
-//        case WIFI_CMD_GET_IP:{
-//            wifi_process->start("nmcli con show "+setting.wifi_ssd);
-////            wifi_process->start("nmcli con show "+setting.wifi_ssd+" | grep -i ip[4]");
-//            break;
-//        }
-//        case WIFI_CMD_SET_IP:{
-//            plog->write("[SETTING] SET WIFI IP "+setting.wifi_ssd+" -> "+setting.wifi_ip+", "+setting.wifi_gateway+", "+setting.wifi_dns);
-//            QString exe_str = "nmcli con mod "+setting.wifi_ssd;
-//            exe_str += " ipv4.address "+setting.wifi_ip+"/24";
-//            exe_str += " ipv4.dns "+setting.wifi_dns;
-//            exe_str += " ipv4.gateway "+setting.wifi_gateway;
-//            exe_str += " ipv4.method manual";
+    if(wifi_cmd == WIFI_CMD_NONE && wifi_cmds.size() > 0){
+        wifi_cmd = wifi_cmds[0];
+        wifi_cmd_count = 0;
+        wifi_cmds.pop_front();
+        wifi_process->close();
+        if(setting.wifi_ssd == ""){
+            setting.wifi_ssd = getSetting("ROBOT_SW","wifi_ssd");
+        }
+        switch(wifi_cmd){
+        case WIFI_CMD_CONNECT:{
+            if(setting.wifi_passwd != ""){
+                plog->write("[SETTING] WIFI CONNECT : SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
+                wifi_process->start("nmcli --a device wifi connect "+setting.wifi_ssd+" password "+setting.wifi_passwd);
+            }else{
+                plog->write("[SETTING] WIFI CONNECT : SSD("+setting.wifi_ssd+")");
+                wifi_process->start("nmcli --a device wifi connect "+setting.wifi_ssd);
+            }
+            break;
+        }
+        case WIFI_CMD_GET_IP:{
+            wifi_process->start("nmcli con show "+setting.wifi_ssd);
+//            wifi_process->start("nmcli con show "+setting.wifi_ssd+" | grep -i ip[4]");
+            break;
+        }
+        case WIFI_CMD_SET_IP:{
+            plog->write("[SETTING] SET WIFI IP "+setting.wifi_ssd+" -> "+setting.wifi_ip+", "+setting.wifi_gateway+", "+setting.wifi_dns);
+            QString exe_str = "nmcli con mod "+setting.wifi_ssd;
+            exe_str += " ipv4.address "+setting.wifi_ip+"/24";
+            exe_str += " ipv4.dns "+setting.wifi_dns;
+            exe_str += " ipv4.gateway "+setting.wifi_gateway;
+            exe_str += " ipv4.method manual";
 
-//            setting.cur_ip = "";
-//            setWifiConnection(setting.wifi_ssd,0);
-//            wifi_process->execute(exe_str);
-//            wifi_process->waitForStarted();
-//            wifi_process->start("nmcli con up "+setting.wifi_ssd);
-//            wifi_process->waitForStarted();
-//            break;
-//        }
-//        case WIFI_CMD_GET_LIST:{
-////            qDebug() << "get list wifi";
-//            wifi_process->start("nmcli device wifi list");
-//            break;
-//        }
-//        default:{
-//            plog->write("[SUPERVISOR] WIFI CMD WRONG : "+QString::number(wifi_cmd));
-//            wifi_cmd = WIFI_CMD_NONE;
-//            break;
-//        }
-//        }
-//    }else if(wifi_cmd != WIFI_CMD_NONE){
-//        if(wifi_cmd_count++ > 5000/MAIN_THREAD){
-//            plog->write("[WIFI] COMMAND IGNORED. ",wifi_cmd);
-//            wifi_cmd_count = 0;
-//            wifi_cmd = WIFI_CMD_NONE;
-//        }
-//    }
+            setting.cur_ip = "";
+            setWifiConnection(setting.wifi_ssd,0);
+            wifi_process->execute(exe_str);
+            wifi_process->waitForStarted();
+            wifi_process->start("nmcli con up "+setting.wifi_ssd);
+            wifi_process->waitForStarted();
+            break;
+        }
+        case WIFI_CMD_GET_LIST:{
+//            qDebug() << "get list wifi";
+            wifi_process->start("nmcli device wifi list");
+            break;
+        }
+        default:{
+            plog->write("[SUPERVISOR] WIFI CMD WRONG : "+QString::number(wifi_cmd));
+            wifi_cmd = WIFI_CMD_NONE;
+            break;
+        }
+        }
+    }else if(wifi_cmd != WIFI_CMD_NONE){
+        if(wifi_cmd_count++ > 5000/MAIN_THREAD){
+            plog->write("[WIFI] COMMAND IGNORED. ",wifi_cmd);
+            wifi_cmd_count = 0;
+            wifi_cmd = WIFI_CMD_NONE;
+        }
+    }
 
 
     switch(ui_state){
@@ -3211,296 +3179,296 @@ void Supervisor::setPrevWifiConnection(QString ssd, int state){
     }
 }
 void Supervisor::wifi_ch_output(){
-//    QString output = QString(wifi_check_process->readAllStandardOutput());
-//    output.replace(" ","");
-//    QStringList outputs = output.split(":");
-//    int temp_state;
-//    if(outputs.size() > 1 && outputs[0] == "GENERAL.STATE"){
-//        if(outputs[1] == "activated\n"){
-//            temp_state = 2;
-//        }else if(outputs[1] == "activating\n"){
-//            temp_state = 1;
-//        }else{
-//            temp_state = 0;
-//        }
-//    }else{
-//        temp_state = 0;
-//    }
+    QString output = QString(wifi_check_process->readAllStandardOutput());
+    output.replace(" ","");
+    QStringList outputs = output.split(":");
+    int temp_state;
+    if(outputs.size() > 1 && outputs[0] == "GENERAL.STATE"){
+        if(outputs[1] == "activated\n"){
+            temp_state = 2;
+        }else if(outputs[1] == "activating\n"){
+            temp_state = 1;
+        }else{
+            temp_state = 0;
+        }
+    }else{
+        temp_state = 0;
+    }
 
-//    setWifiConnection(wifi_temp_ssd,temp_state);
+    setWifiConnection(wifi_temp_ssd,temp_state);
 
-//    if(temp_state != getPrevWifiConnection(wifi_temp_ssd) || setting.cur_ip == ""){
-//        getWifiIP();
-//    }
+    if(temp_state != getPrevWifiConnection(wifi_temp_ssd) || setting.cur_ip == ""){
+        getWifiIP();
+    }
 
-//    setPrevWifiConnection(wifi_temp_ssd, temp_state);
-//    QMetaObject::invokeMethod(mMain,"checkwifidone");
+    setPrevWifiConnection(wifi_temp_ssd, temp_state);
+    QMetaObject::invokeMethod(mMain,"checkwifidone");
 
-//    wifi_check_process->close();
-//    wifi_temp_ssd = "";
+    wifi_check_process->close();
+    wifi_temp_ssd = "";
 }
 void Supervisor::wifi_ch_error(){
-//    wifi_check_process->close();
-//    QMetaObject::invokeMethod(mMain,"checkwifidone");
-//    wifi_temp_ssd = "";
+    wifi_check_process->close();
+    QMetaObject::invokeMethod(mMain,"checkwifidone");
+    wifi_temp_ssd = "";
 }
 void Supervisor::wifi_con_output(){
-//    QString output = QString(wifi_process->readAllStandardOutput());
-//    switch(wifi_cmd){
-//    case WIFI_CMD_CONNECT:{
-//        qDebug() << "WIFI CON OUTPUT : " << output;
-//        QStringList outputs = output.split(" ");
-//        for(int i=0; i<outputs.size(); i++){
-//            if(outputs[i] == "successfully"){
-//                plog->write("[SETTING] WIFI CONNECT SUCCESS : SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
-////                setSetting("ROBOT_SW/wifi_ssd",setting.wifi_ssd);
-////                setSetting("ROBOT_SW/wifi_passwd",setting.wifi_passwd);
-//                readWifiState(setting.wifi_ssd);
-//                QMetaObject::invokeMethod(mMain,"wifisuccess");
-//            }
-//        }
-//        wifi_cmd = WIFI_CMD_NONE;
-//        setting.cur_ip = "";
-//        getWifiIP();
-//        wifi_process->close();
-//        break;
-//    }
-//    case WIFI_CMD_GET_LIST:{
-//        QVector<ST_WIFI> wifi_all;
-//        QStringList output_lines = output.split("\n");
-//        for(int i=0; i<output_lines.size(); i++){
-//            QStringList outputs = output_lines[i].split(" ");
+    QString output = QString(wifi_process->readAllStandardOutput());
+    switch(wifi_cmd){
+    case WIFI_CMD_CONNECT:{
+        qDebug() << "WIFI CON OUTPUT : " << output;
+        QStringList outputs = output.split(" ");
+        for(int i=0; i<outputs.size(); i++){
+            if(outputs[i] == "successfully"){
+                plog->write("[SETTING] WIFI CONNECT SUCCESS : SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
+//                setSetting("ROBOT_SW/wifi_ssd",setting.wifi_ssd);
+//                setSetting("ROBOT_SW/wifi_passwd",setting.wifi_passwd);
+                readWifiState(setting.wifi_ssd);
+                QMetaObject::invokeMethod(mMain,"wifisuccess");
+            }
+        }
+        wifi_cmd = WIFI_CMD_NONE;
+        setting.cur_ip = "";
+        getWifiIP();
+        wifi_process->close();
+        break;
+    }
+    case WIFI_CMD_GET_LIST:{
+        QVector<ST_WIFI> wifi_all;
+        QStringList output_lines = output.split("\n");
+        for(int i=0; i<output_lines.size(); i++){
+            QStringList outputs = output_lines[i].split(" ");
 
-//            QStringList output_final;
-//            for(int j=0; j<outputs.size(); j++){
-//                if(outputs[j] != ""){
-//                    output_final << outputs[j];
-//                }
-//            }
-////            qDebug() << output_final;
-//            //parsing
-//            ST_WIFI temp;
-//            if(output_final.size() > 8){
-//                if(output_final[0] == "IN-USE"){
-//                    continue;
-//                }if(output_final[0] == "*"){
-//                    if(getSetting("ROBOT_SW","wifi_ssd") == ""){
-//                        setSetting("ROBOT_SW/wifi_ssd",output_final[2]);
-//                        setting.wifi_ssd = output_final[2];
-//                    }
-//                    temp.inuse = true;
-//                    temp.state = 2;
-//                    temp.prev_state = 2;
-//                }else{
-//                    temp.state = 0;
-//                    temp.prev_state = 0;
-//                    temp.inuse = false;
-//                    output_final.push_front(" ");
-//                }
-//            }else{
-//                continue;
-//            }
-//            temp.ssid = output_final[2];
-//            temp.rate = output_final[5].toInt();
-//            if(output_final[8] == "▂▄▆█"){
-//                temp.level = 4;
-//            }else if(output_final[8] == "▂▄▆_"){
-//                temp.level = 3;
-//            }else if(output_final[8] == "▂▄__"){
-//                temp.level = 2;
-//            }else if(output_final[8] == "▂___"){
-//                temp.level = 1;
-//            }else{
-//                temp.level = 0;
-//            }
-//            if(output_final[9].left(3) == "WPA"){
-//                temp.security = true;
-//            }else{
-//                temp.security = false;
-//            }
-//            temp.discon_count = 0;
-////            qDebug() << temp.ssid << temp.inuse << temp.rate << temp.level << temp.security;
-//            wifi_all.push_back(temp);
-//        }
+            QStringList output_final;
+            for(int j=0; j<outputs.size(); j++){
+                if(outputs[j] != ""){
+                    output_final << outputs[j];
+                }
+            }
+//            qDebug() << output_final;
+            //parsing
+            ST_WIFI temp;
+            if(output_final.size() > 8){
+                if(output_final[0] == "IN-USE"){
+                    continue;
+                }if(output_final[0] == "*"){
+                    if(getSetting("ROBOT_SW","wifi_ssd") == ""){
+                        setSetting("ROBOT_SW/wifi_ssd",output_final[2]);
+                        setting.wifi_ssd = output_final[2];
+                    }
+                    temp.inuse = true;
+                    temp.state = 2;
+                    temp.prev_state = 2;
+                }else{
+                    temp.state = 0;
+                    temp.prev_state = 0;
+                    temp.inuse = false;
+                    output_final.push_front(" ");
+                }
+            }else{
+                continue;
+            }
+            temp.ssid = output_final[2];
+            temp.rate = output_final[5].toInt();
+            if(output_final[8] == "▂▄▆█"){
+                temp.level = 4;
+            }else if(output_final[8] == "▂▄▆_"){
+                temp.level = 3;
+            }else if(output_final[8] == "▂▄__"){
+                temp.level = 2;
+            }else if(output_final[8] == "▂___"){
+                temp.level = 1;
+            }else{
+                temp.level = 0;
+            }
+            if(output_final[9].left(3) == "WPA"){
+                temp.security = true;
+            }else{
+                temp.security = false;
+            }
+            temp.discon_count = 0;
+//            qDebug() << temp.ssid << temp.inuse << temp.rate << temp.level << temp.security;
+            wifi_all.push_back(temp);
+        }
 
-//        QVector<ST_WIFI> temp_wifi;
-//        for(int i=0; i<wifi_all.size(); i++){
-//            bool already_in = false;
-//            for(int k=0; k<temp_wifi.size(); k++){
-//                if(wifi_all[i].ssid == temp_wifi[k].ssid){
-//                    if(wifi_all[i].inuse){
-//                        temp_wifi[k].inuse = true;
-//                    }
-//                    already_in = true;
-//                }
-//                if(wifi_all[i].ssid == "--")
-//                    already_in = true;
-//            }
-//            if(!already_in){
-//                if(wifi_all[i].ssid == "--"){
+        QVector<ST_WIFI> temp_wifi;
+        for(int i=0; i<wifi_all.size(); i++){
+            bool already_in = false;
+            for(int k=0; k<temp_wifi.size(); k++){
+                if(wifi_all[i].ssid == temp_wifi[k].ssid){
+                    if(wifi_all[i].inuse){
+                        temp_wifi[k].inuse = true;
+                    }
+                    already_in = true;
+                }
+                if(wifi_all[i].ssid == "--")
+                    already_in = true;
+            }
+            if(!already_in){
+                if(wifi_all[i].ssid == "--"){
 
-//                }else{
-//                    temp_wifi.push_back(wifi_all[i]);
-//                }
-//            }
-//        }
+                }else{
+                    temp_wifi.push_back(wifi_all[i]);
+                }
+            }
+        }
 
-//        for(int k=0; k<wifi_list.size(); k++){
-//            wifi_list[k].discon_count++;
-//        }
+        for(int k=0; k<wifi_list.size(); k++){
+            wifi_list[k].discon_count++;
+        }
 
-//        bool is_pushed = false;
-//        for(int i=0; i<temp_wifi.size(); i++){
-//            bool already_in = false;
-//            for(int k=0; k<wifi_list.size(); k++){
-//                if(temp_wifi[i].ssid == wifi_list[k].ssid){
-//                    wifi_list[k].inuse = temp_wifi[i].inuse;
-//                    wifi_list[k].level = temp_wifi[i].level;
-//                    wifi_list[k].discon_count = 0;
-//                    already_in = true;
-//                }
-//            }
-//            if(!already_in){
-//                is_pushed = true;
-//                wifi_list.push_back(temp_wifi[i]);
-//            }
-//        }
+        bool is_pushed = false;
+        for(int i=0; i<temp_wifi.size(); i++){
+            bool already_in = false;
+            for(int k=0; k<wifi_list.size(); k++){
+                if(temp_wifi[i].ssid == wifi_list[k].ssid){
+                    wifi_list[k].inuse = temp_wifi[i].inuse;
+                    wifi_list[k].level = temp_wifi[i].level;
+                    wifi_list[k].discon_count = 0;
+                    already_in = true;
+                }
+            }
+            if(!already_in){
+                is_pushed = true;
+                wifi_list.push_back(temp_wifi[i]);
+            }
+        }
 
-//        if(is_pushed)
-//            plog->write("[SETTING] READ WIFI LIST CHANGED : "+QString::number(wifi_list.size()));
-//        wifi_cmd = WIFI_CMD_NONE;
+        if(is_pushed)
+            plog->write("[SETTING] READ WIFI LIST CHANGED : "+QString::number(wifi_list.size()));
+        wifi_cmd = WIFI_CMD_NONE;
 
 //        qDebug() << "?????????????????????";
-////        wifi_process->close();
-////        wifi_process->deleteLater();
+        wifi_process->close();
+//        wifi_process->deleteLater();
 //        qDebug() << "no";
-//        break;
-//    }
-//    case WIFI_CMD_GET_IP:{
-//        bool is_read = false;
-//        QStringList output_lines = output.split("\n");
-////        qDebug() << output_lines;
-//        for(int i=0; i<output_lines.size(); i++){
-//            output_lines[i].replace(" ","");
-//            QStringList line = output_lines[i].split(":");
-////            qDebug() << i << line;
-//            if(line.size() > 1){
-//                if(line[0] == "IP4.ADDRESS[1]"){
-//                    qDebug() << line;
-//                    setting.cur_ip = line[1].split("/")[0];
-//                }else if(line[0] == "IP4.GATEWAY"){
-//                    qDebug() << line;
-//                    setting.cur_gateway = line[1];
-//                }else if(line[0] == "IP4.DNS[1]"){
-//                    qDebug() << line;
-//                    setting.cur_dns = line[1];
-//                    is_read = true;
-//                }
-//            }
-//        }
-//        if(output_lines.size() > 0){
-//            if(is_read){
-//                plog->write("[SETTING] READ IP : "+setting.wifi_ssd+" IP("+setting.cur_ip+") GATEWAY("+setting.cur_gateway+") DNS("+setting.cur_dns+")");
-//                QMetaObject::invokeMethod(mMain,"wifireset");
-//                wifi_process->close();
-//                wifi_cmd = WIFI_CMD_NONE;
-//            }
-//        }
-//        break;
-//    }
-//    case WIFI_CMD_SET_IP:{
-//        QMetaObject::invokeMethod(mMain,"wifireset");
-//        setWifiConnection(setting.wifi_ssd,2);
-//        wifi_cmd = WIFI_CMD_NONE;
-//        wifi_process->close();
-//        break;
-//    }
-//    }
+        break;
+    }
+    case WIFI_CMD_GET_IP:{
+        bool is_read = false;
+        QStringList output_lines = output.split("\n");
+//        qDebug() << output_lines;
+        for(int i=0; i<output_lines.size(); i++){
+            output_lines[i].replace(" ","");
+            QStringList line = output_lines[i].split(":");
+//            qDebug() << i << line;
+            if(line.size() > 1){
+                if(line[0] == "IP4.ADDRESS[1]"){
+                    qDebug() << line;
+                    setting.cur_ip = line[1].split("/")[0];
+                }else if(line[0] == "IP4.GATEWAY"){
+                    qDebug() << line;
+                    setting.cur_gateway = line[1];
+                }else if(line[0] == "IP4.DNS[1]"){
+                    qDebug() << line;
+                    setting.cur_dns = line[1];
+                    is_read = true;
+                }
+            }
+        }
+        if(output_lines.size() > 0){
+            if(is_read){
+                plog->write("[SETTING] READ IP : "+setting.wifi_ssd+" IP("+setting.cur_ip+") GATEWAY("+setting.cur_gateway+") DNS("+setting.cur_dns+")");
+                QMetaObject::invokeMethod(mMain,"wifireset");
+                wifi_process->close();
+                wifi_cmd = WIFI_CMD_NONE;
+            }
+        }
+        break;
+    }
+    case WIFI_CMD_SET_IP:{
+        QMetaObject::invokeMethod(mMain,"wifireset");
+        setWifiConnection(setting.wifi_ssd,2);
+        wifi_cmd = WIFI_CMD_NONE;
+        wifi_process->close();
+        break;
+    }
+    }
 }
 void Supervisor::wifi_con_error(){
-//    QString output = QString(wifi_process->readAllStandardError());
-//    qDebug() << "WIFI CON ERROR : " << output;
+    QString output = QString(wifi_process->readAllStandardError());
+    qDebug() << "WIFI CON ERROR : " << output;
 
-//    switch(wifi_cmd){
-//    case WIFI_CMD_CONNECT:{
-//        QStringList outputs = output.split(" ");
-//        for(int i=0; i<outputs.size(); i++){
-//            if(outputs[i] == "invalid.\n"){
-//                plog->write("[SETTING] WIFI CONNECT FAILED (PROPERTY): SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
-//                QMetaObject::invokeMethod(mMain,"wififailed");
-//                wifi_cmd = WIFI_CMD_NONE;
-//                wifi_process->close();
-//            }else if(outputs[i] == "No"){
-//                plog->write("[SETTING] WIFI CONNECT FAILED (NO SSD) : SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
-//                QMetaObject::invokeMethod(mMain,"wififailed");
-//                wifi_cmd = WIFI_CMD_NONE;
-//                wifi_process->close();
-//            }
-//        }
-//        break;
-//    }
-//    case WIFI_CMD_GET_LIST:{
-//        plog->write("[SETTING] WIFI GET LIST FAILED");
-//        wifi_cmd = WIFI_CMD_NONE;
-//        wifi_process->close();
-//        break;
-//    }
-//    case WIFI_CMD_GET_IP:{
-//        plog->write("[SETTING] WIFI GET IP FAILED " + setting.wifi_ssd);
-//        wifi_cmd = WIFI_CMD_NONE;
-//        wifi_process->close();
-//        break;
-//    }
-//    }
+    switch(wifi_cmd){
+    case WIFI_CMD_CONNECT:{
+        QStringList outputs = output.split(" ");
+        for(int i=0; i<outputs.size(); i++){
+            if(outputs[i] == "invalid.\n"){
+                plog->write("[SETTING] WIFI CONNECT FAILED (PROPERTY): SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
+                QMetaObject::invokeMethod(mMain,"wififailed");
+                wifi_cmd = WIFI_CMD_NONE;
+                wifi_process->close();
+            }else if(outputs[i] == "No"){
+                plog->write("[SETTING] WIFI CONNECT FAILED (NO SSD) : SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
+                QMetaObject::invokeMethod(mMain,"wififailed");
+                wifi_cmd = WIFI_CMD_NONE;
+                wifi_process->close();
+            }
+        }
+        break;
+    }
+    case WIFI_CMD_GET_LIST:{
+        plog->write("[SETTING] WIFI GET LIST FAILED");
+        wifi_cmd = WIFI_CMD_NONE;
+        wifi_process->close();
+        break;
+    }
+    case WIFI_CMD_GET_IP:{
+        plog->write("[SETTING] WIFI GET IP FAILED " + setting.wifi_ssd);
+        wifi_cmd = WIFI_CMD_NONE;
+        wifi_process->close();
+        break;
+    }
+    }
 }
 void Supervisor::connectWifi(QString ssd, QString passwd){
-//    bool match = false;
-//    for(int i=0; i<wifi_cmds.size(); i++){
-//        if(wifi_cmds[i] == WIFI_CMD_CONNECT){
-//            plog->write("[SETTING] CONNECT WIFI CMD : OVERWRITE PREV("+setting.wifi_ssd+") NEW("+ssd+")");
-//            setting.wifi_ssd = ssd;
-//            setting.wifi_passwd = passwd;
-//            match = true;
-//        }
-//    }
-//    if(!match){
-//        setting.wifi_ssd = ssd;
-//        setting.wifi_passwd = passwd;
-//        wifi_cmds.append(WIFI_CMD_CONNECT);
-//    }
+    bool match = false;
+    for(int i=0; i<wifi_cmds.size(); i++){
+        if(wifi_cmds[i] == WIFI_CMD_CONNECT){
+            plog->write("[SETTING] CONNECT WIFI CMD : OVERWRITE PREV("+setting.wifi_ssd+") NEW("+ssd+")");
+            setting.wifi_ssd = ssd;
+            setting.wifi_passwd = passwd;
+            match = true;
+        }
+    }
+    if(!match){
+        setting.wifi_ssd = ssd;
+        setting.wifi_passwd = passwd;
+        wifi_cmds.append(WIFI_CMD_CONNECT);
+    }
 }
 void Supervisor::setWifi(QString ip, QString gateway, QString dns){
-//    bool match = false;
-//    for(int i=0; i<wifi_cmds.size(); i++){
-//        if(wifi_cmds[i] == WIFI_CMD_SET_IP){
-//            plog->write("[SETTING] SET WIFI IP CMD : OVERWRITE PREV("+setting.wifi_ip+") NEW("+ip+")");
-//            match = true;
-//        }
-//    }
-//    setting.wifi_ip = ip;
-//    setting.wifi_gateway = gateway;
-//    setting.wifi_dns = dns;
-//    if(!match)
-//        wifi_cmds.append(WIFI_CMD_SET_IP);
+    bool match = false;
+    for(int i=0; i<wifi_cmds.size(); i++){
+        if(wifi_cmds[i] == WIFI_CMD_SET_IP){
+            plog->write("[SETTING] SET WIFI IP CMD : OVERWRITE PREV("+setting.wifi_ip+") NEW("+ip+")");
+            match = true;
+        }
+    }
+    setting.wifi_ip = ip;
+    setting.wifi_gateway = gateway;
+    setting.wifi_dns = dns;
+    if(!match)
+        wifi_cmds.append(WIFI_CMD_SET_IP);
 }
 void Supervisor::readWifiState(QString ssd){
-//    if(wifi_temp_ssd == ""){
-//        wifi_temp_ssd = ssd;
-//        wifi_check_process->start("nmcli -f GENERAL.STATE con show "+wifi_temp_ssd);
-//    }
+    if(wifi_temp_ssd == ""){
+        wifi_temp_ssd = ssd;
+        wifi_check_process->start("nmcli -f GENERAL.STATE con show "+wifi_temp_ssd);
+    }
 }
 void Supervisor::setWifiSSD(QString ssd){
     setting.wifi_ssd = ssd;
 }
 void Supervisor::getWifiIP(){
     bool match = false;
-//    for(int i=0; i<wifi_cmds.size(); i++){
-//        if(wifi_cmds[i] == WIFI_CMD_GET_IP){
-//            match = true;
-//        }
-//    }
-//    if(!match)
-//        wifi_cmds.append(WIFI_CMD_GET_IP);
+    for(int i=0; i<wifi_cmds.size(); i++){
+        if(wifi_cmds[i] == WIFI_CMD_GET_IP){
+            match = true;
+        }
+    }
+    if(!match)
+        wifi_cmds.append(WIFI_CMD_GET_IP);
 }
 QString Supervisor::getcurIP(){
     return setting.cur_ip;
@@ -3513,9 +3481,9 @@ QString Supervisor::getcurDNS(){
 }
 void Supervisor::getAllWifiList(){
 //    qDebug() << "getAllWifiList" << wifi_cmds.size() << wifi_cmd;
-//    if(wifi_cmds.size() == 0 && wifi_cmd == WIFI_CMD_NONE){
-//        wifi_cmds.append(WIFI_CMD_GET_LIST);
-//    }
+    if(wifi_cmds.size() == 0 && wifi_cmd == WIFI_CMD_NONE){
+        wifi_cmds.append(WIFI_CMD_GET_LIST);
+    }
 }
 bool Supervisor::getWifiSecurity(int num){
     if(num > -1 && num < wifi_list.size()){

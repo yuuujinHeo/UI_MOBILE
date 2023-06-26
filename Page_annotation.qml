@@ -15,7 +15,7 @@ Item {
     objectName: "page_annotation"
     width: 1280
     height: 800
-    property bool test: false
+    property bool test: true
     property var last_robot_x: supervisor.getOrigin()[0]
     property var last_robot_y: supervisor.getOrigin()[1]
     property var last_robot_th: 0
@@ -547,16 +547,15 @@ Item {
             width: annot_pages.width
             height: annot_pages.height
             property var local_find_state: 0
-            Rectangle{
-                anchors.fill: parent
-                color: color_dark_navy
-            }
             Component.onCompleted: {
                 supervisor.setMotorLock(true);
                 loading.show();
                 text_finding.opacity = 1;
             }
-
+            Rectangle{
+                anchors.fill: parent
+                color: color_dark_navy
+            }
             Timer{
                 id: timer_check_localization2
                 running: false
@@ -701,7 +700,6 @@ Item {
                     }
                 }
             }
-
             Map_full{
                 id: map
                 objectName: "annot_local"
@@ -715,7 +713,6 @@ Item {
                 width: 600
                 height: 600
             }
-
             Item_buttons{
                 id: btn_right
                 visible: local_find_state===2
@@ -805,6 +802,7 @@ Item {
                 interval: 500
                 onTriggered:{
                     supervisor.drawingRunawayStart();
+                    map_hide.startDrawingT();
                 }
             }
 
@@ -950,6 +948,7 @@ Item {
                 interval: 500
                 onTriggered:{
                     supervisor.drawingRunawayStart();
+                    map_hide.startDrawingT();
                 }
             }
 
@@ -1227,6 +1226,7 @@ Item {
                 interval: 500
                 onTriggered:{
                     supervisor.drawingRunawayStart();
+                    map_hide.startDrawingT();
                 }
             }
             Rectangle{
@@ -1318,21 +1318,49 @@ Item {
         Item{
             width: annot_pages.width
             height: annot_pages.height
+            property bool show_map: false
             Component.onCompleted: {
                 supervisor.setMotorLock(false);
-            }
+                map_location_view.setViewer("annot_location");
+                map_location_view.show_connection = false;
+                map_location_view.show_button_lidar = false;
 
+                map_location_view.loadmap(supervisor.getMapname(),"EDITED");
+            }
             Timer{
                 running: true
                 interval: 500
                 onTriggered:{
                     supervisor.drawingRunawayStart();
+                    map_hide.startDrawingT();
                 }
             }
-
             Rectangle{
                 anchors.fill: parent
                 color: color_dark_navy
+            }
+            AnimatedImage{
+                id: image_robotmoving
+                visible: !show_map
+                source: "image/robot_manual.gif"
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: 60
+                width: 1280/1.5
+                height: 800/1.5
+                speed: 0.5
+                anchors.bottomMargin: -100
+            }
+            Map_full{
+                id: map_location_view
+                width: 600
+                objectName: "serving_map"
+                visible: show_map
+                enabled: show_map
+                height: 600
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: 60
             }
             Column{
                 id: col
@@ -1340,9 +1368,9 @@ Item {
                 anchors.top: parent.top
                 anchors.topMargin: 30
                 Text{
-                    text: "로봇을 각 테이블의 서빙위치로 이동시켜주신 후\n저장 버튼을 누르세요"
+                    text: "로봇을 각 테이블의 서빙위치로 이동시켜주신 후 저장 버튼을 누르세요"
                     color: "white"
-                    font.pixelSize: 60
+                    font.pixelSize: 40
                     horizontalAlignment: Text.AlignHCenter
                     font.family: font_noto_b.name
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -1372,17 +1400,6 @@ Item {
                     }
                 }
             }
-            AnimatedImage{
-                id: image_robotmoving
-                source: "image/robot_manual.gif"
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: 60
-                width: 1280/1.5
-                height: 800/1.5
-                speed: 0.5
-                anchors.bottomMargin: -100
-            }
             Column{
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
@@ -1393,9 +1410,13 @@ Item {
                     width: 200
                     height: 80
                     type: "round_text"
-                    text: "맵 표시"
+                    text: show_map?"맵 끄기":"맵 표시"
                     onClicked: {
-                        popup_serving_map.open();
+                        if(show_map){
+                            show_map = false;
+                        }else{
+                            show_map = true;
+                        }
                     }
                 }
                 Item_buttons{
@@ -1747,14 +1768,14 @@ Item {
                         popup_serving_list.use_group = false;
 
                     details.clear();
-                    details.append({"type":"Charging",
+                    details.append({"ltype":"Charging",
                                        "name":"Charging",
                                        "group":0,
                                        "number":0,
                                        "number_table":0,
                                        "error":false,
                                        "call_id":supervisor.getLocationCallID("Charging",0)});
-                    details.append({"type":"Resting",
+                    details.append({"ltype":"Resting",
                                        "name":"Resting",
                                        "group":0,
                                        "number":0,
@@ -1763,7 +1784,7 @@ Item {
                                        "call_id":supervisor.getLocationCallID("Resting",0)});
 
                     for(var i=0; i<locations.count; i++){
-                        details.append({"type":"Serving",
+                        details.append({"ltype":"Serving",
                                         "name":locations.get(i).name,
                                        "group":locations.get(i).group,
                                        "number":locations.get(i).number,
@@ -1778,7 +1799,7 @@ Item {
 
                 function isError(){
                     for(var i=0; i<details.count; i++){
-                        if(details.get(i).type === "Serving")
+                        if(details.get(i).ltype === "Serving")
                             if(details.get(i).error)
                                 return true;
                     }
@@ -1820,7 +1841,7 @@ Item {
 
                 function checkLocationNumber(){
                     for(var i=0; i<details.count; i++){
-                        if(details.get(i).type === "Serving"){
+                        if(details.get(i).ltype === "Serving"){
                             if(details.get(i).number < 1){
                                 details.get(i).error = true;
                             }else if(details.get(i).number > details.get(i).number_table){
@@ -1832,9 +1853,9 @@ Item {
                         }
                     }
                     for(var i=0; i<details.count; i++){
-                        if(details.get(i).type === "Serving"){
+                        if(details.get(i).ltype === "Serving"){
                             for(var j=i+1; j<details.count; j++){
-                                if(details.get(j).type === "Serving"){
+                                if(details.get(j).ltype === "Serving"){
                                     if(details.get(i).number === details.get(j).number && details.get(i).group===details.get(j).group){
                                         details.get(i).error = true;
                                         details.get(j).error = true;
@@ -1844,9 +1865,9 @@ Item {
                         }
                     }
                     for(var i=0; i<details.count; i++){
-                        if(details.get(i).type === "Serving"){
+                        if(details.get(i).ltype === "Serving"){
                             for(var j=i+1; j<details.count; j++){
-                                if(details.get(j).type === "Serving"){
+                                if(details.get(j).ltype === "Serving"){
                                     if(details.get(i).call_id === "")
                                         continue;
                                     if(details.get(i).call_id === details.get(j).call_id){
@@ -1877,12 +1898,27 @@ Item {
                                combo_number.model.append({"value":(i+1).toString()});
                             }
                         }
+                        Item_buttons{
+                            width : 40
+                            height: 40
+                            type: "circle_text"
+                            visible:ltype==="Serving"
+                            text:"X"
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: rowsss.left
+                            anchors.rightMargin: 15
+                            onClicked: {
+                                popup_remove_location.select_location = index-2;
+                                popup_remove_location.open();
+                            }
+                        }
                         Row{
+                            id: rowsss
                             anchors.horizontalCenter: parent.horizontalCenter
                             spacing: 2
                             ComboBox{
                                 id: combo_group
-                                visible: popup_serving_list.use_group && type === "Serving"
+                                visible: popup_serving_list.use_group && ltype === "Serving"
                                 width: 150
                                 height: 40
                                 model: groups
@@ -1897,7 +1933,7 @@ Item {
                             TextField{
                                 id: tx_name
                                 text: name
-                                width:type==="Serving"?300:popup_serving_list.use_group?300+150+154:300+152
+                                width:ltype==="Serving"?300:popup_serving_list.use_group?300+150+154:300+152
                                 height: 40
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
@@ -1920,7 +1956,7 @@ Item {
                                 }
                             }
                             Image{
-                                visible: error && type ==="Serving"
+                                visible: error && ltype ==="Serving"
                                 source: "icon/icon_error.png"
                                 width: 40
                                 height: 38
@@ -1930,7 +1966,7 @@ Item {
                                 id: combo_number
                                 width : error?150-42:150
                                 height: 40
-                                visible: type ==="Serving"
+                                visible: ltype ==="Serving"
                                 model: ListModel{}
                                 currentIndex: number==-1?0:number
                                 onCurrentIndexChanged: {
@@ -2145,66 +2181,6 @@ Item {
                 }
             }
             Popup{
-                id: popup_serving_map
-                property bool use_group: false
-                width: 600
-                height:700
-                anchors.centerIn: parent
-                background:Rectangle{
-                    anchors.fill: parent
-                    color: "transparent"
-                }
-                onOpened:{
-                    map_location_view.setViewer("annot_location");
-                    map_location_view.show_connection = false;
-                    map_location_view.show_button_lidar = false;
-                    map_location_view.loadmap(supervisor.getMapname(),"EDITED");
-                }
-
-                function update(){
-
-                }
-
-                Rectangle{
-                    anchors.centerIn: parent
-                    width: 600
-                    height: 700
-                    radius: 20
-                    color: color_navy
-
-                    Column{
-                        Rectangle{
-                            color: "transparent"
-                            width: 600
-                            height: 100
-                            Text{
-                                text: "서빙위치 맵 뷰어"
-                                anchors.centerIn: parent
-                                color: "white"
-                                font.pixelSize: 40
-                                horizontalAlignment: Text.AlignHCenter
-                                font.family: font_noto_r.name
-                            }
-                        }
-                        Rectangle{
-                            color: "transparent"
-                            objectName: "annot_serving_mapview"
-                            width: 600
-                            height: 600
-                            Map_full{
-                                id: map_location_view
-                                width: 600
-                                objectName: "serving_map"
-
-                                enabled: popup_serving_map.opened
-                                height: 600
-                                anchors.centerIn: parent
-                            }
-                        }
-                    }
-                }
-            }
-            Popup{
                 id: popup_add_location_group
                 anchors.centerIn: parent
                 width: 400
@@ -2360,14 +2336,14 @@ Item {
 
                 details.clear();
                 print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!");
-                details.append({"type":"Charging",
+                details.append({"ltype":"Charging",
                                    "name":"Charging",
                                    "group":0,
                                    "number":0,
                                    "number_table":0,
                                    "error":false,
                                    "call_id":supervisor.getLocationCallID("Charging",0)});
-                details.append({"type":"Resting",
+                details.append({"ltype":"Resting",
                                    "name":"Resting",
                                    "group":0,
                                    "number":0,
@@ -2375,7 +2351,7 @@ Item {
                                    "error":false,
                                    "call_id":supervisor.getLocationCallID("Resting",0)});
                 for(var i=0; i<locations.count; i++){
-                    details.append({"type":"Serving",
+                    details.append({"ltype":"Serving",
                                     "name":locations.get(i).name,
                                    "group":locations.get(i).group,
                                    "number":locations.get(i).number,
@@ -2398,7 +2374,7 @@ Item {
 
             function isError(){
                 for(var i=0; i<details.count; i++){
-                    if(details.get(i).type === "Serving")
+                    if(details.get(i).ltype === "Serving")
                         if(details.get(i).error)
                             return true;
                 }
@@ -2440,7 +2416,7 @@ Item {
 
             function checkLocationNumber(){
                 for(var i=0; i<details.count; i++){
-                    if(details.get(i).type === "Serving"){
+                    if(details.get(i).ltype === "Serving"){
                         if(details.get(i).number < 1){
                             details.get(i).error = true;
                         }else if(details.get(i).number > details.get(i).number_table){
@@ -2452,9 +2428,9 @@ Item {
                     }
                 }
                 for(var i=0; i<details.count; i++){
-                    if(details.get(i).type === "Serving"){
+                    if(details.get(i).ltype === "Serving"){
                         for(var j=i+1; j<details.count; j++){
-                            if(details.get(j).type === "Serving"){
+                            if(details.get(j).ltype === "Serving"){
                                 if(details.get(i).number === details.get(j).number && details.get(i).group===details.get(j).group){
                                     details.get(i).error = true;
                                     details.get(j).error = true;
@@ -2465,9 +2441,9 @@ Item {
                     }
                 }
                 for(var i=0; i<details.count; i++){
-                    if(details.get(i).type === "Serving"){
+                    if(details.get(i).ltype === "Serving"){
                         for(var j=i+1; j<details.count; j++){
-                            if(details.get(j).type === "Serving"){
+                            if(details.get(j).ltype === "Serving"){
                                 if(details.get(i).call_id === "")
                                     continue;
                                 if(details.get(i).call_id === details.get(j).call_id){
@@ -2505,7 +2481,7 @@ Item {
                         width : 40
                         height: 40
                         type: "circle_text"
-                        visible:type==="Serving"
+                        visible:ltype==="Serving"
                         text:"X"
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.right: rowsss.left
@@ -2522,8 +2498,8 @@ Item {
                         spacing: 5
                         ComboBox{
                             id: combo_group
-                            visible: use_group && type === "Serving"
-                            width: 160
+                            visible: use_group && ltype === "Serving"
+                            width: 150
                             height: 50
                             model: groups
                             currentIndex: group
@@ -2536,7 +2512,7 @@ Item {
                         TextField{
                             id: tx_name
                             text: name
-                            width:type==="Serving"?320:use_group?320+160+160:320+155
+                            width:ltype==="Serving"?320:use_group?320+160+160:320+155
                             height: 50
                             font.family: font_noto_r.name
                             font.pixelSize: 20
@@ -2559,7 +2535,7 @@ Item {
                             }
                         }
                         Image{
-                            visible: error && type ==="Serving"
+                            visible: error && ltype ==="Serving"
                             source: "icon/icon_error.png"
                             width: 40
                             height: 38
@@ -2569,7 +2545,7 @@ Item {
                             id: combo_number
                             width : error?150-45:150
                             height: 50
-                            visible: type ==="Serving"
+                            visible: ltype ==="Serving"
                             model: ListModel{}
                             currentIndex: number==-1?0:number
                             onCurrentIndexChanged: {
@@ -2782,6 +2758,7 @@ Item {
                     }
                     map_hide.save("location_all");
                     supervisor.drawingRunawayStop();
+                    map_hide.stopDrawingT();
                     supervisor.writelog("[ANNOTATION] LOCAION SAVE : Check Done ");
                     if(annotation_after_mapping)
                         annot_pages.sourceComponent = page_annot_done;
@@ -2862,7 +2839,8 @@ Item {
                 Rectangle{
                     width: parent.width
                     height: parent.height
-                    color: color_dark_navy
+                    radius: 20
+                    color: color_navy
                     Column{
                         anchors.centerIn: parent
                         spacing: 30
@@ -3064,6 +3042,7 @@ Item {
                 interval: 500
                 onTriggered:{
                     supervisor.drawingRunawayStop();
+                    map_hide.stopDrawingT();
                 }
             }
 
@@ -3255,7 +3234,6 @@ Item {
             }
         }
     }
-
     Component{
         id: page_annot_travelline
         Item{
@@ -4620,7 +4598,6 @@ Item {
             }
         }
     }
-
     AnimatedImage{
         id: loading
         width: parent.width

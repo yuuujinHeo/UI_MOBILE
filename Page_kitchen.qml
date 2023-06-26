@@ -1646,13 +1646,22 @@ Item {
     SoundEffect{
         id: click
         source: "bgm/click.wav"
+        Component.onDestruction: {
+            print("click dest");
+        }
     }
     SoundEffect{
         id: click_no
         source: "bgm/click_error.wav"
+        Component.onDestruction: {
+            print("click_no dest");
+        }
     }
     SoundEffect{
         id: click_start
         source: "bgm/click_start.wav"
+        Component.onDestruction: {
+            print("click_start dest");
+        }
     }
 }

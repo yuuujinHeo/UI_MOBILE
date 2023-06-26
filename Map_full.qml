@@ -20,7 +20,7 @@ Item {
     property string map_type: ""
     property string map_name: ""
     property bool map_loaded: false
-
+    property bool touch_on: true
     property bool show_connection: true
     property bool show_button_lidar: false
     property bool show_button_following: false
@@ -522,6 +522,7 @@ Item {
     MouseArea{
         anchors.fill: parent
         hoverEnabled: true
+        enabled: touch_on
         onWheel: {
             if(wheel.angleDelta.y > 0){
                 mapview.zoomIn(mouseX, mouseY);
@@ -532,7 +533,7 @@ Item {
     }
 
     MultiPointTouchArea{
-        enabled: parent.enabled
+        enabled: touch_on
         anchors.fill: parent
         minimumTouchPoints: 1
         maximumTouchPoints: 2

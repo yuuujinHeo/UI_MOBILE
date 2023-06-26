@@ -85,6 +85,7 @@ public:
     QList<int> wifi_cmds;
     int wifi_cmd = WIFI_CMD_NONE;
     QString wifi_temp_ssd = "";
+    Q_INVOKABLE int getWifiState(){return wifi_cmd;}
     Q_INVOKABLE int getWifiNum();
     Q_INVOKABLE int getWifiConnection(QString ssd);
     void setPrevWifiConnection(QString ssd, int state);
