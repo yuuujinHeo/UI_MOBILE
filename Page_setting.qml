@@ -5608,7 +5608,6 @@ Item {
                                 font.pixelSize: 15
                             }
                         }
-
                     }
                     Rectangle{
                         width: (parent.width - 351)/2
@@ -6272,62 +6271,6 @@ Item {
             supervisor.setSetting("ROBOT_HW/radius",radius.text);
         }
 
-        if(combo_autoinit.ischanged){
-            if(combo_autoinit.currentIndex == 0)
-                supervisor.setSetting("ROBOT_SW/use_autoinit","false");
-            else
-                supervisor.setSetting("ROBOT_SW/use_autoinit","true");
-        }
-
-        if(combo_avoid.ischanged){
-            if(combo_avoid.currentIndex == 0)
-                supervisor.setSetting("ROBOT_SW/use_avoid","false");
-            else
-                supervisor.setSetting("ROBOT_SW/use_avoid","true");
-        }
-
-        if(combo_multirobot.ischanged){
-            if(combo_multirobot.currentIndex == 0)
-                supervisor.setSetting("ROBOT_SW/use_multirobot","false");
-            else
-                supervisor.setSetting("ROBOT_SW/use_multirobot","true");
-        }
-
-        if(combo_use_uicmd.ischanged){
-            if(combo_use_uicmd.currentIndex == 0)
-                supervisor.setSetting("ROBOT_SW/use_uicmd","false");
-            else
-                supervisor.setSetting("ROBOT_SW/use_uicmd","true");
-        }
-
-        if(map_size.ischanged){
-            supervisor.setSetting("ROBOT_SW/map_size",map_size.text);
-        }
-
-        if(grid_size.ischanged){
-            supervisor.setSetting("ROBOT_SW/grid_size",grid_size.text);
-        }
-
-        if(combo_table_num.ischanged){
-            supervisor.setTableNum(combo_table_num.currentIndex);
-        }
-
-        if(combo_call_max.ischanged){
-            supervisor.setSetting("CALLING/call_maximum",combo_call_max.currentText);
-        }
-
-        if(combo_call_num.ischanged){
-            supervisor.setSetting("CALLING/call_num",combo_call_num.currentText);
-        }
-
-        if(combo_baudrate.ischanged){
-            supervisor.setSetting("SENSOR/baudrate",combo_baudrate.currentText);
-        }
-
-        if(mask.ischanged){
-            supervisor.setSetting("SENSOR/mask",mask.text);
-        }
-
         if(obs_height_min.ischanged){
             supervisor.setSetting("ROBOT_SW/obs_height_min",obs_height_min.text);
         }
@@ -6414,6 +6357,10 @@ Item {
             supervisor.setSetting("MOTOR/gear_ratio",gear_ratio.text);
         }
 
+        if(combo_camera_model.ischanged){
+            supervisor.setSetting("SENSOR/camera_model",Number(combo_camera_model.currentIndex));
+        }
+
         if(k_p.ischanged){
             supervisor.setSetting("MOTOR/k_p",k_p.text);
         }
@@ -6442,24 +6389,12 @@ Item {
             supervisor.setSetting("MOTOR/limit_w_acc",motor_limit_w_acc.text);
         }
 
-        if(k_v.ischanged){
-            supervisor.setSetting("ROBOT_SW/k_v"                    ,k_v.text);
-        }
-
-        if(k_w.ischanged){
-            supervisor.setSetting("ROBOT_SW/k_w"                    ,k_w.text);
-        }
-
         if(look_ahead_dist.ischanged){
             supervisor.setSetting("ROBOT_SW/look_ahead_dist"         ,look_ahead_dist.text);
         }
 
         if(min_look_ahead_dist.ischanged){
             supervisor.setSetting("ROBOT_SW/min_look_ahead_dist"    ,min_look_ahead_dist.text);
-        }
-
-        if(narrow_decel_ratio.ischanged){
-            supervisor.setSetting("ROBOT_SW/narrow_decel_ratio"     ,narrow_decel_ratio.text);
         }
 
         if(obs_deadzone.ischanged){
@@ -6484,22 +6419,18 @@ Item {
 
         if(icp_near.ischanged){
             supervisor.setSetting("ROBOT_SW/icp_near"               ,icp_near.text);
-
         }
 
         if(icp_odometry_weight.ischanged){
             supervisor.setSetting("ROBOT_SW/icp_odometry_weight"    ,icp_odometry_weight.text);
-
         }
 
         if(icp_ratio.ischanged){
-
             supervisor.setSetting("ROBOT_SW/icp_ratio"              ,icp_ratio.text);
         }
 
         if(icp_repeat_dist.ischanged){
             supervisor.setSetting("ROBOT_SW/icp_repeat_dist"        ,icp_repeat_dist.text);
-
         }
 
         if(icp_repeat_time.ischanged){
@@ -6523,12 +6454,8 @@ Item {
             supervisor.setSetting("ROBOT_SW/goal_near_dist"         ,goal_near_dist.text);
         }
 
-        if(goal_near_th.ischanged){
-            supervisor.setSetting("ROBOT_SW/goal_near_th"           ,goal_near_th.text);
-        }
-
         if(is_reset_slam)
-//            supervisor.slam_ini_reload();
+            supervisor.slam_ini_reload();
 //            supervisor.restartSLAM();
 
         init();
@@ -6555,10 +6482,6 @@ Item {
 
         wheel_base.text = supervisor.getSetting("ROBOT_HW","wheel_base");
         wheel_radius.text = supervisor.getSetting("ROBOT_HW","wheel_radius");
-
-        map_name.text = supervisor.getMapname();
-        grid_size.text = supervisor.getSetting("ROBOT_SW","grid_size");
-        map_size.text = supervisor.getSetting("ROBOT_SW","map_size");
 
         left_camera_tf.text = supervisor.getSetting("SENSOR","left_camera_tf");
         right_camera_tf.text = supervisor.getSetting("SENSOR","right_camera_tf");
@@ -6607,9 +6530,6 @@ Item {
         text_preset_name_4.text = supervisor.getSetting("PRESET4","name");
         text_preset_name_5.text = supervisor.getSetting("PRESET5","name");
 
-//        slider_vxy.value = parseFloat(supervisor.getSetting("ROBOT_SW","velocity"));
-        combo_table_num.currentIndex = supervisor.getTableNum();
-
         gear_ratio.text = supervisor.getSetting("MOTOR","gear_ratio");
         k_d.text = supervisor.getSetting("MOTOR","k_d");
         k_i.text = supervisor.getSetting("MOTOR","k_i");
@@ -6627,6 +6547,12 @@ Item {
             combo_wheel_dir.currentIndex = 1;
         }
 
+        if(supervisor.getSetting("SENSOR","camera_model") === "0"){
+            combo_camera_model.currentIndex = 0;
+        }else{
+            combo_camera_model.currentIndex = 1;
+        }
+
         combo_tableview.currentIndex = parseInt(supervisor.getSetting("ROBOT_SW","table_view"));
         if(supervisor.getSetting("ROBOT_SW","moving_face") === "true"){
             combo_movingpage.currentIndex = 1;
@@ -6638,15 +6564,6 @@ Item {
         }else{
             combo_use_tray.currentIndex = 0;
         }
-
-        combo_call_max.currentIndex = parseInt(supervisor.getSetting("CALLING","call_maximum"))-1;
-        combo_call_num.currentIndex = parseInt(supervisor.getSetting("CALLING","call_num"));
-
-        model_callbell.clear();
-        for(var i=0; i<combo_call_num.currentIndex; i++){
-            model_callbell.append({name:supervisor.getSetting("CALLING","call_"+Number(i))});
-        }
-
 
         obs_margin1.text = supervisor.getSetting("ROBOT_SW","obs_margin1");
         obs_detect_area.text = supervisor.getSetting("ROBOT_SW","obs_detect_area");
@@ -6728,11 +6645,6 @@ Item {
         wheel_radius.ischanged = false;
         radius.ischanged = false;
 
-        map_size.ischanged = false;
-        grid_size.ischanged = false;
-        combo_table_num.ischanged = false;
-        combo_call_max.ischanged = false;
-        combo_call_num.ischanged = false;
 
         max_range.ischanged = false;
         cam_exposure.ischanged = false;
@@ -6756,6 +6668,7 @@ Item {
         k_p.ischanged = false;
         k_i.ischanged = false;
         k_d.ischanged = false;
+        combo_camera_model.ischanged = false;
         motor_limit_v.ischanged = false;
         motor_limit_v_acc.ischanged = false;
         motor_limit_w.ischanged = false;
@@ -6794,6 +6707,7 @@ Item {
         if(ip_2.ischanged) is_changed = true;
         if(ip_3.ischanged) is_changed = true;
         if(ip_4.ischanged) is_changed = true;
+        if(combo_camera_model.ischanged) is_changed = true;
         if(gateway_1.ischanged) is_changed = true;
         if(gateway_2.ischanged) is_changed = true;
         if(gateway_3.ischanged) is_changed = true;
@@ -6809,11 +6723,6 @@ Item {
         if(wheel_base.ischanged) is_changed = true;
         if(wheel_radius.ischanged) is_changed = true;
         if(radius.ischanged) is_changed = true;
-        if(map_size.ischanged) is_changed = true;
-        if(grid_size.ischanged) is_changed = true;
-        if(combo_table_num.ischanged) is_changed = true;
-        if(combo_call_max.ischanged) is_changed = true;
-        if(combo_call_num.ischanged) is_changed = true;
         if(max_range.ischanged) is_changed = true;
         if(cam_exposure.ischanged) is_changed = true;
         if(offset_x.ischanged) is_changed = true;
