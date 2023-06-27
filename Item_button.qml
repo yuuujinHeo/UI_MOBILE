@@ -38,7 +38,7 @@ Item {
     }
     function released(){
         btn_color = "white";
-        click_sound.play();
+        //click_sound.play();
     }
 
     Rectangle{
@@ -112,10 +112,10 @@ Item {
         }
     }
 
-    SoundEffect{
-        id: click_sound
-        source: "bgm/click2.wav"
-    }
+//    SoundEffect{
+//        id: click_sound
+//        source: "bgm/click2.wav"
+//    }
     SequentialAnimation{
         id: ani_radial_shape
         loops: -1

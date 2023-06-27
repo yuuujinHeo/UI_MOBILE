@@ -866,7 +866,7 @@ void Supervisor::makeRobotINI(){
         setSetting("ROBOT_SW/use_tray","true");
         setSetting("ROBOT_SW/use_group","false");
         setSetting("ROBOT_SW/use_help","true");
-        setSetting("ROBOT_SW/obs_dec_margin","0.7");
+        setSetting("ROBOT_SW/obs_margin1","0.7");
         setSetting("ROBOT_SW/obs_height_min","0.5");
         setSetting("ROBOT_SW/obs_height_max","0.8");
 

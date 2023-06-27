@@ -209,7 +209,7 @@ Item {
                     anchors.fill: parent
                     z: 99
                     onClicked:{
-                        click.play();
+                        //click.play();
                         supervisor.setMotorLock(!motor_lock);
                         supervisor.writelog("[USER INPUT] MOVING PAUSED : MOTOR LOCK DISABLE");
                     }
@@ -235,7 +235,7 @@ Item {
                     z: 99
                     propagateComposedEvents: true
                     onPressed:{
-                        click.play();
+                        //click.play();
                         parent.color = color_dark_navy
                     }
                     onReleased:{
@@ -267,7 +267,7 @@ Item {
                     anchors.fill: parent
                     z: 99
                     onClicked:{
-                        click.play();
+                        //click.play();
                         supervisor.writelog("[USER INPUT] MOVING PAUSED : RESUME");
                         supervisor.moveResume();
                         timer_check_pause.start();
@@ -287,7 +287,7 @@ Item {
         anchors.right: parent.right
         z: 99
         onClicked: {
-            click.play();
+            //click.play();
             password++;
             supervisor.writelog("[USER INPUT] MOVING PASSWORD "+Number(password));
             if(password > 4){
@@ -394,7 +394,7 @@ Item {
         anchors.fill: parent
         visible: !robot_paused
         onClicked: {
-            click.play();
+            //click.play();
             if(robot_paused){
                 supervisor.writelog("[USER INPUT] MOVING RESUME 2")
                 supervisor.moveResume();
@@ -407,8 +407,8 @@ Item {
             }
         }
     }
-    SoundEffect{
-        id: click
-        source: "bgm/click.wav"
-    }
+//    SoundEffect{
+//        id: click
+//        source: "bgm/click.wav"
+//    }
 }

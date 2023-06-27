@@ -5,6 +5,7 @@ import "."
 import io.qt.Supervisor 1.0
 import io.qt.CameraView 1.0
 import QtMultimedia 5.12
+
 Item {
     id: page_setting
     objectName: "page_setting"
@@ -16,7 +17,7 @@ Item {
 
     property bool is_admin: false
 
-    property int select_category: 4
+    property string select_category: "status"
     property string platform_name: supervisor.getRobotName()
     property string debug_platform_name: ""
     property bool is_debug: false
@@ -24,6 +25,9 @@ Item {
     property int motor_right_id: 0
 
     property bool is_reset_slam: false
+
+    property bool use_tray: false
+    property bool is_realsense: false
 
     function update_camera(){
         if(popup_camera.opened)
@@ -86,19 +90,19 @@ Item {
             spacing: 5
             Rectangle{
                 width: 250
-                height: 40
+                height: 50
                 color: "#323744"
                 Text{
                     anchors.centerIn: parent
                     font.family: font_noto_r.name
                     color: "white"
                     text: "설정"
-                    font.pixelSize: 20
+                    font.pixelSize: 25
                 }
                 MouseArea{
                     anchors.fill: parent
                     onDoubleClicked:{
-                        click.play();
+                        //click.play();
                         popup_password.open();
                     }
                 }
@@ -106,26 +110,26 @@ Item {
             Rectangle{
                 id: rect_category_1
                 width: 240
-                height: 40
+                height: 50
                 color: "#647087"
                 Text{
                     anchors.centerIn: parent
                     font.family: font_noto_r.name
                     color: "white"
-                    text: "로봇"
-                    font.pixelSize: 20
+                    text: "현재상태"
+                    font.pixelSize: 25
                 }
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        click.play();
-                       select_category = 1;
+                        //click.play();
+                       select_category = "status";
                     }
                 }
                 Rectangle{
                     width: parent.width
                     height: 7
-                    visible: select_category==1?true:false
+                    visible: select_category==="status" ? true : false
                     color: "#12d27c"
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.bottom
@@ -134,26 +138,26 @@ Item {
             Rectangle{
                 id: rect_category_2
                 width: 240
-                height: 40
+                height: 50
                 color: "#647087"
                 Text{
                     anchors.centerIn: parent
                     font.family: font_noto_r.name
                     color: "white"
-                    text: "맵"
-                    font.pixelSize: 20
+                    text: "로봇"
+                    font.pixelSize: 25
                 }
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        click.play();
-                       select_category = 2;
+                        //click.play();
+                       select_category = "robot";
                     }
                 }
                 Rectangle{
                     width: parent.width
                     height: 7
-                    visible: select_category==2?true:false
+                    visible: select_category === "robot" ? true : false
                     color: "#12d27c"
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.bottom
@@ -162,7 +166,7 @@ Item {
             Rectangle{
                 id: rect_category_3
                 width: 264
-                height: 40
+                height: 50
                 visible: is_admin
                 color: "#647087"
                 Text{
@@ -170,19 +174,19 @@ Item {
                     font.family: font_noto_r.name
                     color: "white"
                     text: "주행"
-                    font.pixelSize: 20
+                    font.pixelSize: 25
                 }
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        click.play();
-                       select_category = 3;
+                        //click.play();
+                       select_category = "moving";
                     }
                 }
                 Rectangle{
                     width: parent.width
                     height: 7
-                    visible: select_category==3?true:false
+                    visible: select_category === "moving" ? true : false
                     color: "#12d27c"
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.bottom
@@ -191,26 +195,27 @@ Item {
             Rectangle{
                 id: rect_category_4
                 width: 240
-                height: 40
+                height: 50
                 color: "#647087"
+                visible: is_admin
                 Text{
                     anchors.centerIn: parent
                     font.family: font_noto_r.name
                     color: "white"
-                    text: "상태"
-                    font.pixelSize: 20
+                    text: "인식"
+                    font.pixelSize: 25
                 }
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        click.play();
-                       select_category = 4;
+                        //click.play();
+                       select_category = "slam";
                     }
                 }
                 Rectangle{
                     width: parent.width
                     height: 7
-                    visible: select_category==4?true:false
+                    visible: select_category === "slam" ? true : false
                     color: "#12d27c"
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.bottom
@@ -220,7 +225,7 @@ Item {
 
         Flickable{
             id: area_setting_robot
-            visible: select_category==1?true:false
+            visible: select_category === "robot" ? true : false
             width: 880
             anchors.left: parent.left
             anchors.leftMargin: 100
@@ -237,8 +242,7 @@ Item {
             Column{
                 id:column_setting
                 width: parent.width
-                spacing:25
-
+                spacing:10
                 Rectangle{
                     width: 1100
                     height: 40
@@ -255,7 +259,7 @@ Item {
                 Rectangle{
                     id: set_robot_1
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -266,8 +270,24 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"플랫폼 이름(*영문)"
+                                text:"플랫폼 이름 (*영문)"
                                 font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("플랫폼 이름");
+                                    popup_help_setting.addLine("플랫폼을 지칭하는 이름을 적어주세요.");
+                                    popup_help_setting.addLine("반드시 영문이어야 합니다. ");
+                                    popup_help_setting.addLine("한글이나 특수문자가 들어가면 로봇이 움직이지 않을 수 있습니다.");
+                                }
                             }
                         }
                         Rectangle{
@@ -281,6 +301,7 @@ Item {
                             TextField{
                                 id: platform_name
                                 anchors.fill: parent
+                                horizontalAlignment: TextField.AlignHCenter
                                 text:supervisor.getSetting("ROBOT_HW","model");
                                 property bool ischanged: false
                                 onTextChanged: {
@@ -305,7 +326,8 @@ Item {
                 Rectangle{
                     id: set_robot_1_serial
                     width: 840
-                    height: 40
+                    height: 50
+                    visible: false
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -316,8 +338,24 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"플랫폼 넘버(중복 주의)"
+                                text:"플랫폼 넘버 (중복 주의)"
                                 font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("플랫폼 넘버");
+                                    popup_help_setting.addLine("로봇을 여러대 구동하며 동일한 로봇 이름을 사용하는 경우 사용합니다.");
+                                    popup_help_setting.addLine("로봇을 여러대 구동할 경우 각각 지정해줘야 합니다.");
+                                    popup_help_setting.addLine("각 로봇의 이름을 다르게 지정한 경우 지정하지 않으셔도 됩니다.");
+                                }
                             }
                         }
                         Rectangle{
@@ -344,7 +382,8 @@ Item {
                 Rectangle{
                     id: set_robot_1_id
                     width: 840
-                    height: 40
+                    height: 50
+                    visible: false
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -383,7 +422,7 @@ Item {
                 Rectangle{
                     id: set_robot_2
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -396,6 +435,23 @@ Item {
                                 font.family: font_noto_r.name
                                 text:"플랫폼 타입"
                                 font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("플랫폼 타입");
+                                    popup_help_setting.addLine("지정하기 전, 지원되는 모델인지 확인하세요.");
+                                    popup_help_setting.addLine("서빙용 : 호출기능을 사용하지 않고 각 테이블을 서빙만 합니다.");
+                                    popup_help_setting.addLine("호출용 : 서빙기능을 사용하지 않고 로봇이 대기하다가 호출이 울리면 이동합니다.");
+                                    popup_help_setting.addLine("서빙+호출용 : 서빙기능과 호출기능을 동시에 사용합니다. 서빙을 우선적으로 진행합니다.");
+                                }
                             }
                         }
                         Rectangle{
@@ -419,9 +475,70 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_use_tray
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"트레이 별 서빙"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("트레이 별 서빙");
+                                    popup_help_setting.addLine("트레이 별로 각각의 서빙위치를 지정하려면 사용하세요.");
+                                    popup_help_setting.addLine("사용할 경우 서빙순서는 1번 트레이를 우선으로 이동합니다.");
+                                    popup_help_setting.addLine("대기화면이 변경되며 그룹을 사용하지 않고 각 테이블 번호로 이동합니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_use_tray
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                    if(currentIndex == 0){
+                                        use_tray = false;
+                                    }else{
+                                        use_tray = true;
+                                    }
+                                }
+                                model:["사용안함", "사용"]
+
+                            }
+                        }
+                    }
+                }
+                Rectangle{
                     id: set_tray_num
                     width: 840
-                    height: 40
+                    height: 50
+                    visible: use_tray
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -451,29 +568,15 @@ Item {
                                 onCurrentIndexChanged: {
                                     ischanged = true;
                                 }
-                                model:[1,2,3,4,5]
+                                model:[1,2,3]
                             }
                         }
                     }
-
-                }
-
-                Rectangle{
-                    width: 1100
-                    height: 40
-                    color: "black"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_b.name
-                        text:"로봇 설정"
-                        color: "white"
-                        font.pixelSize: 20
-                    }
                 }
                 Rectangle{
+                    id: set_movingpage
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -484,8 +587,24 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"속도 프리셋"
+                                text:"이동 중 화면"
                                 font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("이동 중 화면");
+                                    popup_help_setting.addLine("로봇이 이동 중에 화면에 표시될 것을 고르세요.");
+                                    popup_help_setting.addLine("목적지 표시 : 목적지가 화면에 표시됩니다.");
+                                    popup_help_setting.addLine("귀여운 얼굴 : 귀여운 표정이 화면 가득 표시됩니다.");
+                                }
                             }
                         }
                         Rectangle{
@@ -496,146 +615,22 @@ Item {
                         Rectangle{
                             width: parent.width - 351
                             height: parent.height
-                            Row{
-                                anchors.centerIn: parent
-                                spacing: 10
-                                Rectangle{
-                                    width:70
-                                    height: 40
-                                    radius: 5
-                                    border.width: 1
-                                    Text{
-                                        id: text_preset_name_1
-                                        anchors.centerIn: parent
-                                        text: "preset 1"
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 13
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click.play();
-                                            popup_preset.select_preset = 1;
-                                            popup_preset.open();
-                                        }
-                                    }
+                            ComboBox{
+                                id: combo_movingpage
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
                                 }
-                                Rectangle{
-                                    width:70
-                                    height: 40
-                                    radius: 5
-                                    border.width: 1
-                                    Text{
-                                        id: text_preset_name_2
-                                        anchors.centerIn: parent
-                                        text: "preset 2"
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 13
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click.play();
-                                            popup_preset.select_preset = 2;
-                                            popup_preset.open();
-
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    width:70
-                                    height: 40
-                                    radius: 5
-                                    border.width: 1
-                                    Text{
-                                        id: text_preset_name_3
-                                        anchors.centerIn: parent
-                                        text: "preset 3"
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 13
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click.play();
-                                            popup_preset.select_preset = 3;
-                                            popup_preset.open();
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    width:70
-                                    height: 40
-                                    radius: 5
-                                    border.width: 1
-                                    Text{
-                                        id: text_preset_name_4
-                                        anchors.centerIn: parent
-                                        text: "preset 4"
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 13
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click.play();
-                                            popup_preset.select_preset = 4;
-                                            popup_preset.open();
-
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    width:70
-                                    height: 40
-                                    radius: 5
-                                    border.width: 1
-                                    Text{
-                                        id: text_preset_name_5
-                                        anchors.centerIn: parent
-                                        text: "preset 5"
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 13
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click.play();
-                                            popup_preset.select_preset = 5;
-                                            popup_preset.open();
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    width:80
-                                    height: 40
-                                    radius: 5
-                                    color: "black"
-                                    visible: false//is_admin
-                                    Text{
-                                        anchors.centerIn: parent
-                                        text: "변경"
-                                        color: "white"
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 13
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click.play();
-                                            popup_preset.open();
-                                        }
-                                    }
-                                }
+                                model:["목적지 표시", "귀여운 얼굴"]
                             }
                         }
                     }
                 }
-
                 Rectangle{
-                    id: set_velocity
+                    id: set_preset
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -649,6 +644,22 @@ Item {
                                 text:"이동 속도"
                                 font.pixelSize: 20
                             }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("이동 속도 (프리셋)");
+                                    popup_help_setting.addLine("이동속도는 5단계로 분류됩니다");
+                                    popup_help_setting.addLine("각각의 이동속도와 이름을 변경하실 수도 있습니다.");
+                                    popup_help_setting.addLine("안전속도맵을 사용하시는 경우, 기본 프리셋 기준 아주느리게, 느리게로 지정됩니다.");
+                                }
+                            }
                         }
                         Rectangle{
                             width: 1
@@ -656,42 +667,117 @@ Item {
                             color: "#d0d0d0"
                         }
                         Rectangle{
-                            id: rr
                             width: parent.width - 351
                             height: parent.height
                             Row{
-                                spacing: 10
                                 anchors.centerIn: parent
+                                spacing: 10
                                 Rectangle{
-                                    width: rr.width*0.2
-                                    height: 40
+                                    width:70
+                                    height: 50
+                                    radius: 5
+                                    border.width: 1
                                     Text{
-                                        id: text_velocity
+                                        id: text_preset_name_1
                                         anchors.centerIn: parent
-                                        text: slider_vxy.value.toFixed(2)
-                                        font.pixelSize: 15
+                                        text: "preset 1"
                                         font.family: font_noto_r.name
+                                        font.pixelSize: 13
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            //click.play();
+                                            popup_preset.select_preset = 1;
+                                            popup_preset.open();
+                                        }
                                     }
                                 }
-                                Slider{
-                                    id: slider_vxy
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: rr.width*0.7
-                                    height: 40
-                                    from: 0
-                                    to: 1
-                                    property bool ischanged: false
-                                    onValueChanged: {
-                                        if(pressed){
-                                            ischanged = true;
-                                            is_reset_slam = true;
-                                        }else{
+                                Rectangle{
+                                    width:70
+                                    height: 50
+                                    radius: 5
+                                    border.width: 1
+                                    Text{
+                                        id: text_preset_name_2
+                                        anchors.centerIn: parent
+                                        text: "preset 2"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            //click.play();
+                                            popup_preset.select_preset = 2;
+                                            popup_preset.open();
 
                                         }
                                     }
+                                }
+                                Rectangle{
+                                    width:70
+                                    height: 50
+                                    radius: 5
+                                    border.width: 1
+                                    Text{
+                                        id: text_preset_name_3
+                                        anchors.centerIn: parent
+                                        text: "preset 3"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            //click.play();
+                                            popup_preset.select_preset = 3;
+                                            popup_preset.open();
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width:70
+                                    height: 50
+                                    radius: 5
+                                    border.width: 1
+                                    Text{
+                                        id: text_preset_name_4
+                                        anchors.centerIn: parent
+                                        text: "preset 4"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            //click.play();
+                                            popup_preset.select_preset = 4;
+                                            popup_preset.open();
 
-
-                                    value: supervisor.getVelocity()
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width:70
+                                    height: 50
+                                    radius: 5
+                                    border.width: 1
+                                    Text{
+                                        id: text_preset_name_5
+                                        anchors.centerIn: parent
+                                        text: "preset 5"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            //click.play();
+                                            popup_preset.select_preset = 5;
+                                            popup_preset.open();
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -700,7 +786,7 @@ Item {
                 Rectangle{
                     id: set_bgm_volume
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -734,7 +820,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
-                                            click.play();
+                                            //click.play();
                                             if(slider_volume_bgm.value == 0){
                                                 slider_volume_bgm.value  = Number(supervisor.getSetting("ROBOT_SW","volume_bgm"));
                                             }else{
@@ -749,7 +835,7 @@ Item {
                                     id: slider_volume_bgm
 //                                    anchors.centerIn: parent
                                     width: tt.width*0.7
-                                    height: 40
+                                    height: 50
                                     from: 0
                                     to: 100
                                     property bool ischanged: false
@@ -766,7 +852,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
-                                            click.play();
+                                            //click.play();
                                             if(bgm_test.isplaying){
                                                 bgm_test.stop();
                                                 ttet.source = "icon/icon_test_play.png";
@@ -784,7 +870,7 @@ Item {
                 Rectangle{
                     id: set_voice_volume
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -819,7 +905,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
-                                            click.play();
+                                            //click.play();
                                             if(slider_volume_voice.value == 0){
                                                 slider_volume_voice.value  = Number(supervisor.getSetting("ROBOT_SW","volume_voice"));
                                             }else{
@@ -832,7 +918,7 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     id: slider_volume_voice
                                     width: te.width*0.7
-                                    height: 40
+                                    height: 50
                                     from: 0
                                     to: 100
                                     property bool ischanged: false
@@ -848,7 +934,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
-                                            click.play();
+                                            //click.play();
                                             print("test play")
                                             voice_test.play();
                                         }
@@ -858,86 +944,12 @@ Item {
                         }
                     }
                 }
-                Rectangle{
-                    id: set_movingpage
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"이동 중 화면"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_movingpage
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onCurrentIndexChanged: {
-                                    ischanged = true;
-                                }
-                                model:["목적지 표시", "귀여운 얼굴"]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_use_tray
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"트레이별 지정"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_use_tray
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onCurrentIndexChanged: {
-                                    ischanged = true;
-                                }
-                                model:["사용안함", "사용"]
-                            }
-                        }
-                    }
-                }
+
                 Rectangle{
                     id: set_tableview
                     width: 840
-                    height: 40
+                    height: 50
+                    visible: false
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -972,48 +984,11 @@ Item {
                         }
                     }
                 }
-                Rectangle{
-                    id: set_use_help
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"도움말 표시"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_use_help
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onCurrentIndexChanged: {
-                                    ischanged = true;
-                                }
-                                model:["사용안함", "사용"]
-                            }
-                        }
-                    }
-                }
+
 
                 Rectangle{
                     width: 1100
-                    height: 40
+                    height: 50
                     visible: is_admin
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -1026,10 +1001,161 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_robot_radius
+                    width: 840
+                    visible: is_admin
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"로봇 반지름 반경 [m]"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: radius
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                focus:false
+                                color: ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_HW","radius");
+                                onFocusChanged: {
+                                    keyboard.owner = radius;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_wheelbase
+                    width: 840
+                    visible: is_admin
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"휠 베이스 반경 [m]"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: wheel_base
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                focus:false
+                                color: ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT","wheel_base");
+                                onFocusChanged: {
+                                    keyboard.owner = wheel_base;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_wheelradius
+                    width: 840
+                    height: 50
+                    visible: is_admin
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"휠 반지름 반경 [m]"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: wheel_radius
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                focus:false
+                                color: ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT","wheel_radius");
+                                onFocusChanged: {
+                                    keyboard.owner = wheel_radius;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
                     id: set_wifi_connection
                     width: 840
                     visible: is_admin && debug_use_ip
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -1085,7 +1211,7 @@ Item {
                     id: set_wifi_ssd
                     width: 840
                     visible: is_admin && debug_use_ip
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -1130,7 +1256,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            click.play();
+                                            //click.play();
                                             //Debug
                                             supervisor.connectWifi("mobile_robot_test","rainbow2011");
                                             popup_wifi.open();
@@ -1147,7 +1273,7 @@ Item {
                     width: 840
                     visible: false
 //                    visible: is_admin && debug_use_ip
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -1208,7 +1334,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            click.play();
+                                            //click.play();
                                             wifi_passwd.ischanged = false;
                                             supervisor.setSetting("ROBOT_SW/wifi_passwd",wifi_passwd.text);
                                         }
@@ -1221,7 +1347,7 @@ Item {
                 Rectangle{
                     id: set_ip
                     width: 840
-                    height: 40
+                    height: 50
                     visible: is_admin && debug_use_ip
                     Row{
                         anchors.fill: parent
@@ -1252,7 +1378,7 @@ Item {
                                 TextField{
                                     id: ip_1
                                     width: 70
-                                    height: 40
+                                    height: 50
                                     focus:false
                                     onFocusChanged: {
                                         keyboard.owner = ip_1;
@@ -1287,7 +1413,7 @@ Item {
                                 TextField{
                                     id: ip_2
                                     width: 70
-                                    height: 40
+                                    height: 50
                                     focus:false
                                     onFocusChanged: {
                                         keyboard.owner = ip_2;
@@ -1325,7 +1451,7 @@ Item {
                                 TextField{
                                     id: ip_3
                                     width: 70
-                                    height: 40
+                                    height: 50
                                     focus:false
                                     onFocusChanged: {
                                         keyboard.owner = ip_3;
@@ -1363,7 +1489,7 @@ Item {
                                 TextField{
                                     id: ip_4
                                     width: 70
-                                    height: 40
+                                    height: 50
                                     focus:false
                                     onFocusChanged: {
                                         keyboard.owner = ip_4;
@@ -1407,7 +1533,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            click.play();
+                                            //click.play();
                                             ip_1.ischanged = false;
                                             ip_2.ischanged = false;
                                             ip_3.ischanged = false;
@@ -1437,7 +1563,7 @@ Item {
                 Rectangle{
                     id: set_gateway
                     width: 840
-                    height: 40
+                    height: 50
                     visible: is_admin && debug_use_ip
                     Row{
                         anchors.fill: parent
@@ -1468,7 +1594,7 @@ Item {
                                 TextField{
                                     id: gateway_1
                                     width: 70
-                                    height: 40
+                                    height: 50
                                     focus:false
                                     onFocusChanged: {
                                         keyboard.owner = gateway_1;
@@ -1503,7 +1629,7 @@ Item {
                                 TextField{
                                     id: gateway_2
                                     width: 70
-                                    height: 40
+                                    height: 50
                                     focus:false
                                     onFocusChanged: {
                                         keyboard.owner = gateway_2;
@@ -1541,7 +1667,7 @@ Item {
                                 TextField{
                                     id: gateway_3
                                     width: 70
-                                    height: 40
+                                    height: 50
                                     focus:false
                                     onFocusChanged: {
                                         keyboard.owner = gateway_3;
@@ -1579,7 +1705,7 @@ Item {
                                 TextField{
                                     id: gateway_4
                                     width: 70
-                                    height: 40
+                                    height: 50
                                     focus:false
                                     onFocusChanged: {
                                         keyboard.owner = gateway_4;
@@ -1622,7 +1748,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            click.play();
+                                            //click.play();
                                             ip_1.ischanged = false;
                                             ip_2.ischanged = false;
                                             ip_3.ischanged = false;
@@ -1652,7 +1778,7 @@ Item {
                 Rectangle{
                     id: set_dnsmain
                     width: 840
-                    height: 40
+                    height: 50
                     visible: is_admin && debug_use_ip
                     Row{
                         anchors.fill: parent
@@ -1684,7 +1810,7 @@ Item {
                                     id: dnsmain_1
                                     width: 70
                                     focus:false
-                                    height: 40
+                                    height: 50
                                     onFocusChanged: {
                                         keyboard.owner = dnsmain_1;
                                         dnsmain_1.selectAll();
@@ -1718,7 +1844,7 @@ Item {
                                 TextField{
                                     id: dnsmain_2
                                     width: 70
-                                    height: 40
+                                    height: 50
                                     onFocusChanged: {
                                         keyboard.owner = dnsmain_2;
                                         dnsmain_2.selectAll();
@@ -1755,7 +1881,7 @@ Item {
                                 TextField{
                                     id: dnsmain_3
                                     width: 70
-                                    height: 40
+                                    height: 50
                                     onFocusChanged: {
                                         keyboard.owner = dnsmain_3;
                                         dnsmain_3.selectAll();
@@ -1793,7 +1919,7 @@ Item {
                                     id: dnsmain_4
                                     width: 70
                                     focus:false
-                                    height: 40
+                                    height: 50
                                     onFocusChanged: {
                                         keyboard.owner = dnsmain_4;
                                         dnsmain_4.selectAll();
@@ -1835,7 +1961,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            click.play();
+                                            //click.play();
                                             ip_1.ischanged = false;
                                             ip_2.ischanged = false;
                                             ip_3.ischanged = false;
@@ -1865,7 +1991,7 @@ Item {
                 Rectangle{
                     id: set_dnsserve
                     width: 840
-                    height: 40
+                    height: 50
                     visible: false
 //                    visible: is_admin && debug_use_ip
                     Row{
@@ -1898,7 +2024,7 @@ Item {
                                     id: dnsserv_1
                                     width: 70
                                     focus:false
-                                    height: 40
+                                    height: 50
                                     onFocusChanged: {
                                         keyboard.owner = dnsserv_1;
                                         dnsserv_1.selectAll();
@@ -1932,7 +2058,7 @@ Item {
                                 TextField{
                                     id: dnsserv_2
                                     width: 70
-                                    height: 40
+                                    height: 50
                                     focus:false
                                     onFocusChanged: {
                                         keyboard.owner = dnsserv_2;
@@ -1970,7 +2096,7 @@ Item {
                                 TextField{
                                     id: dnsserv_3
                                     width: 70
-                                    height: 40
+                                    height: 50
                                     focus:false
                                     onFocusChanged: {
                                         keyboard.owner = dnsserv_3;
@@ -2008,7 +2134,7 @@ Item {
                                 TextField{
                                     id: dnsserv_4
                                     width: 70
-                                    height: 40
+                                    height: 50
                                     focus:false
                                     onFocusChanged: {
                                         keyboard.owner = dnsserv_4;
@@ -2051,7 +2177,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            click.play();
+                                            //click.play();
                                             dnsserv_1.ischanged = false;
                                             dnsserv_2.ischanged = false;
                                             dnsserv_3.ischanged = false;
@@ -2066,321 +2192,10 @@ Item {
                     }
                 }
                 Rectangle{
-                    id: set_robot_radius
-                    width: 840
-                    visible: is_admin
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"로봇 반지름 반경 [m]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: radius
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    ischanged = true;
-                                    is_reset_slam = true;
-                                }
-                                focus:false
-                                color: ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_HW","radius");
-                                onFocusChanged: {
-                                    keyboard.owner = radius;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_wheelbase
-                    width: 840
-                    visible: is_admin
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"휠 베이스 반경 [m]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: wheel_base
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    ischanged = true;
-                                    is_reset_slam = true;
-                                }
-                                focus:false
-                                color: ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT","wheel_base");
-                                onFocusChanged: {
-                                    keyboard.owner = wheel_base;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_wheelradius
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"휠 반지름 반경 [m]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: wheel_radius
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    ischanged = true;
-                                    is_reset_slam = true;
-                                }
-                                focus:false
-                                color: ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT","wheel_radius");
-                                onFocusChanged: {
-                                    keyboard.owner = wheel_radius;
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_auto_init
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"실행 시 자동 초기화"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_autoinit
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onCurrentIndexChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                font.family: font_noto_r.name
-                                model:["사용안함","사용"]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_use_Avoid
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"대기 후 경로재탐색"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_avoid
-                                property bool ischanged: false
-                                onCurrentIndexChanged: {
-                                    ischanged = true;
-                                    is_reset_slam = true;
-                                }
-                                anchors.fill: parent
-                                model:["사용안함","사용"]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_use_multirobot
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"멀티 로봇"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_multirobot
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onCurrentIndexChanged: {
-                                    ischanged = true;
-                                    is_reset_slam = true;
-                                }
-                                model:["사용안함","사용"]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_ui_cmd
-                    width: 840
-                    height: 40
-                    visible: is_admin
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"UI 명령 활성"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_use_uicmd
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onCurrentIndexChanged: {
-                                    ischanged = true;
-                                    is_reset_slam = true;
-                                }
-                                model:["비활성화","활성화"]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
                     id: init_
                     width: 840
-                    height: 40
-                    visible: is_admin && debug_test_1
+                    height: 50
+                    visible: false//is_admin && debug_test_1
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -2406,7 +2221,7 @@ Item {
                             Rectangle{
                                 anchors.centerIn: parent
                                 width: 300
-                                height: 40
+                                height: 50
                                 color: "black"
                                 Text{
                                     anchors.centerIn: parent
@@ -2418,7 +2233,7 @@ Item {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: {
-                                        click.play();
+                                        //click.play();
                                         popup_reset.open();
                                     }
                                 }
@@ -2430,399 +2245,10 @@ Item {
 
         }
 
-        Flickable{
-            id: area_setting_map
-            visible: select_category==2?true:false
-            width: 880
-            anchors.left: parent.left
-            anchors.leftMargin: 100
-            anchors.top: parent.top
-            anchors.topMargin: 120
-            height: parent.height - 200
-            contentHeight: column_setting2.height
-            clip: true
-            ScrollBar.vertical: ScrollBar{
-                width: 20
-                anchors.right: parent.right
-                policy: ScrollBar.AlwaysOn
-            }
-            Column{
-                id:column_setting2
-                width: parent.width
-                spacing:25
-                Rectangle{
-                    width: 1100
-                    height: 40
-                    color: "black"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_b.name
-                        text:"매장 설정"
-                        color: "white"
-                        font.pixelSize: 20
-                    }
-                }
-                Rectangle{
-                    id: set_cur_map
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"현재 설정된 맵"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                spacing: 30
-                                anchors.centerIn: parent
-                                TextField{
-                                    id: map_name
-                                    height: parent.height
-                                    focus:false
-                                    width: 300
-                                    text:supervisor.getMapname();
-                                    onFocusChanged: {
-                                        keyboard.owner = map_name;
-                                        if(focus){
-                                            keyboard.open();
-                                        }else{
-                                            keyboard.close();
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    width: 100
-                                    height: 40
-                                    radius: 5
-                                    color: "black"
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    Text{
-                                        font.family: font_noto_r.name
-                                        color: "white"
-                                        anchors.centerIn: parent
-                                        text: "변경"
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            click.play();
-                                            popup_maplist.open();
-                                            init();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_map_size
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"맵 크기"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: map_size
-                                anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT_SW","map_size");
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    ischanged = true;
-                                    is_reset_slam = true;
-                                }
-                                focus:false
-                                color: ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = map_size;
-                                    if(focus){
-                                        keypad.open();
-                                        map_size.selectAll();
-                                    }else{
-                                        keypad.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Rectangle{
-                    id: set_grid_size
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"맵 단위 크기"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: grid_size
-                                anchors.fill: parent
-                                text:supervisor.getSetting("ROBOT_SW","grid_size");
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    ischanged = true;
-                                    is_reset_slam = true;
-                                }
-                                focus:false
-                                color: ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keyboard.owner = grid_size;
-                                    if(focus){
-                                        keyboard.open();
-                                        grid_size.selectAll();
-                                    }else{
-                                        keyboard.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_table_num
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"테이블 개수"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_table_num
-                                property bool ischanged: false
-                                onCurrentIndexChanged: {
-                                    ischanged = true;
-                                }
-                                anchors.fill: parent
-                                model:30
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_max_call
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"최대 호출 횟수"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_call_max
-                                property bool ischanged: false
-                                onCurrentIndexChanged: {
-                                    ischanged = true;
-                                }
-                                anchors.fill: parent
-                                model:[1,2,3,4,5]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_call_num
-                    width: 840
-                    height: 40
-                    visible: false
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"호출벨 개수"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_call_num
-                                anchors.fill: parent
-                                model:20
-                                property bool ischanged: false
-                                onCurrentIndexChanged: {
-                                    ischanged = true;
-                                    model_callbell.clear();
-                                    for(var i=0; i<combo_call_num.currentIndex; i++){
-                                        model_callbell.append({name:supervisor.getSetting("CALLING","call_"+Number(i))});
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                }
-                Repeater{
-                    visible: false
-                    model: ListModel{id:model_callbell}//combo_call_num.currentIndex
-                    Rectangle{
-                        width: 840
-                        height: 40
-                        Row{
-                            anchors.fill: parent
-                            Rectangle{
-                                width: 350
-                                height: parent.height
-                                Text{
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: 50
-                                    font.family: font_noto_r.name
-                                    text:"호출벨 "+Number(index)
-                                    font.pixelSize: 20
-                                }
-                            }
-                            Rectangle{
-                                width: 1
-                                height: parent.height
-                                color: "#d0d0d0"
-                            }
-                            Rectangle{
-                                width: parent.width - 351
-                                height: parent.height
-                                Row{
-                                    anchors.centerIn: parent
-                                    spacing: 20
-                                    TextField{
-                                        id: call_id
-                                        width: 300
-                                        height: parent.height
-                                        text: name
-                                    }
-                                    Rectangle{
-                                        width: 100
-                                        height: 40
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        color: "black"
-                                        radius: 5
-                                        Text{
-                                            anchors.centerIn: parent
-                                            text: "변경"
-                                            font.family: font_noto_r.name
-                                            font.pixelSize: 10
-                                            color: "white"
-                                        }
-                                        MouseArea{
-                                            anchors.fill: parent
-                                            onClicked: {
-                                                click.play();
-                                                popup_change_call.callid = index
-                                                popup_change_call.open();
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         Flickable{
             id: area_setting_slam
-            visible: select_category==3?true:false
+            visible: select_category==="slam"?true:false
             width: 880
             anchors.left: parent.left
             anchors.leftMargin: 100
@@ -2842,7 +2268,7 @@ Item {
                 spacing:25
                 Rectangle{
                     width: 1100
-                    height: 40
+                    height: 50
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
@@ -2854,9 +2280,10 @@ Item {
                     }
                 }
                 Rectangle{
-                    id: set_left_camera
+                    id: set_camera_model
                     width: 840
-                    height: 40
+                    height: 50
+                    visible: false
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -2867,7 +2294,105 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"left_camera"
+                                text:"카메라 모델"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_camera_model
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                    if(currentIndex == 0){
+                                        is_realsense = true;
+                                    }else{
+                                        is_realsense = false;
+                                    }
+                                }
+                                model:["리얼센스","제미니"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_cam_exposure
+                    width: 840
+                    height: 50
+                    visible: is_realsense
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"노출 시간 [ms]"
+                                font.pixelSize: 20
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: cam_exposure
+                                anchors.fill: parent
+                                text:supervisor.getSetting("SENSOR","cam_exposure");
+                                property bool ischanged: false
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = cam_exposure;
+                                    cam_exposure.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        cam_exposure.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    if(focus){
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_left_camera
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"좌측 카메라 시리얼"
                                 font.pixelSize: 20
                             }
                         }
@@ -2899,13 +2424,11 @@ Item {
                                     text: "viewer"
                                     font.pixelSize: 15
                                     font.family: font_noto_r.name
-
                                 }
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: {
                                         popup_camera.open();
-
                                     }
                                 }
                             }
@@ -2915,7 +2438,7 @@ Item {
                 Rectangle{
                     id: set_right_camera
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -2926,7 +2449,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"right_camera"
+                                text:"우측 카메라 시리얼"
                                 font.pixelSize: 20
                             }
                             MouseArea{
@@ -2977,598 +2500,10 @@ Item {
                         }
                     }
                 }
-
-                Rectangle{
-                    width: 1100
-                    height: 40
-                    color: "black"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_b.name
-                        text:"장애물 감지 설정"
-                        color: "white"
-                        font.pixelSize: 20
-                    }
-                }
-                Rectangle{
-                    id: set_decmargin
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"감지 거리"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: obs_dec_margin
-                                anchors.fill: parent
-                                objectName: "obs_dec_margin"
-                                text:supervisor.getSetting("ROBOT_SW","obs_dec_margin");
-                                property bool ischanged: false
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = obs_dec_margin;
-                                    obs_dec_margin.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_dec_margin.select(0,0);
-                                    }
-                                }
-                                onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Rectangle{
-                    id: set_obs_area
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"감지영역"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: obs_detect_area
-                                anchors.fill: parent
-                                objectName: "obs_detect_area"
-                                text:supervisor.getSetting("ROBOT_SW","obs_detect_area");
-                                property bool ischanged: false
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = obs_detect_area;
-                                    obs_detect_area.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_detect_area.select(0,0);
-                                    }
-                                }
-                                onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Rectangle{
-                    id: set_obs_sensitivity
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"감지 민감도"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: obs_detect_sensitivity
-                                anchors.fill: parent
-                                objectName: "obs_detect_sensitivity"
-                                text:supervisor.getSetting("ROBOT_SW","obs_detect_sensitivity");
-                                property bool ischanged: false
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = obs_detect_sensitivity;
-                                    obs_detect_sensitivity.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_detect_sensitivity.select(0,0);
-                                    }
-                                }
-                                onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_obs_height_min
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"obs_height_min"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: obs_height_min
-                                anchors.fill: parent
-                                objectName: "obs_height_min"
-                                text:supervisor.getSetting("ROBOT_SW","obs_height_min");
-                                property bool ischanged: false
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = obs_height_min;
-                                    obs_height_min.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_height_min.select(0,0);
-                                    }
-                                }
-                                onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_obsheight_max
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"obs_height_max"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: obs_height_max
-                                anchors.fill: parent
-                                objectName: "obs_height_max"
-                                text:supervisor.getSetting("ROBOT_SW","obs_height_max");
-                                property bool ischanged: false
-                                color:ischanged?color_red:"black"
-                                focus:false
-                                onFocusChanged: {
-                                    keypad.owner = obs_height_max;
-                                    obs_height_max.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_height_max.select(0,0);
-                                    }
-                                }
-                                onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_baudrate
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"baudrate"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_baudrate
-                                property bool ischanged: false
-                                onCurrentIndexChanged: {
-                                    ischanged = true;
-                                    is_reset_slam = true;
-                                }
-
-                                anchors.fill: parent
-                                model:[115200,256000]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_mask
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"mask"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: mask
-                                anchors.fill: parent
-                                objectName: "mask"
-                                text:supervisor.getSetting("SENSOR","mask");
-                                property bool ischanged: false
-                                color:ischanged?color_red:"black"
-                                focus:false
-                                onFocusChanged: {
-                                    keypad.owner = mask;
-                                    mask.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        mask.select(0,0);
-                                    }
-                                }
-                                onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_max_range
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"max_range"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: max_range
-                                anchors.fill: parent
-                                text:supervisor.getSetting("SENSOR","max_range");
-                                property bool ischanged: false
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = max_range;
-                                    max_range.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        max_range.select(0,0);
-                                    }
-                                }
-                                onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_cam_exposure
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"cam_exposure"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: cam_exposure
-                                anchors.fill: parent
-                                text:supervisor.getSetting("SENSOR","cam_exposure");
-                                property bool ischanged: false
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = cam_exposure;
-                                    cam_exposure.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        cam_exposure.select(0,0);
-                                    }
-                                }
-                                onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_offset_X
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"offset_x"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: offset_x
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                color:ischanged?color_red:"black"
-                                focus:false
-                                text:supervisor.getSetting("SENSOR","offset_x");
-                                onFocusChanged: {
-                                    keypad.owner = offset_x;
-                                    offset_x.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        offset_x.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_offset_y
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"offset_y"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: offset_y
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                color:ischanged?color_red:"black"
-                                focus:false
-                                text:supervisor.getSetting("SENSOR","offset_y");
-                                onFocusChanged: {
-                                    keypad.owner = offset_y;
-                                    offset_y.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        offset_y.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
                 Rectangle{
                     id: set_left_camera_tf
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -3579,7 +2514,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"left_camera_tf"
+                                text:"좌측 카메라 TF"
                                 font.pixelSize: 20
                             }
                         }
@@ -3624,7 +2559,7 @@ Item {
                 Rectangle{
                     id: set_right_camera_tf
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -3635,7 +2570,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"right_camera_tf"
+                                text:"우측 카메라 TF"
                                 font.pixelSize: 20
                             }
                         }
@@ -3678,22 +2613,9 @@ Item {
                     }
                 }
                 Rectangle{
-                    width: 1100
-                    height: 40
-                    color: "black"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_b.name
-                        text:"속도 설정"
-                        color: "white"
-                        font.pixelSize: 20
-                    }
-                }
-                Rectangle{
-                    id: set_limitpivot
+                    id: set_obs_height_min
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -3704,8 +2626,1736 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_pivot [deg/s]"
+                                text:"최소 인식 높이"
                                 font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("최소 인식 높이");
+                                    popup_help_setting.addLine("장애물 감지에 사용되는 카메라 3D 데이터값의 최소높이값입니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_height_min
+                                anchors.fill: parent
+                                objectName: "obs_height_min"
+                                text:supervisor.getSetting("ROBOT_SW","obs_height_min");
+                                property bool ischanged: false
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = obs_height_min;
+                                    obs_height_min.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        obs_height_min.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    if(focus){
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_obsheight_max
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"최대 인식 높이"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("최대 인식 높이");
+                                    popup_help_setting.addLine("장애물 감지에 사용되는 카메라 3D 데이터값의 최대높이값입니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_height_max
+                                anchors.fill: parent
+                                objectName: "obs_height_max"
+                                text:supervisor.getSetting("ROBOT_SW","obs_height_max");
+                                property bool ischanged: false
+                                color:ischanged?color_red:"black"
+                                focus:false
+                                onFocusChanged: {
+                                    keypad.owner = obs_height_max;
+                                    obs_height_max.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        obs_height_max.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    if(focus){
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    width: 1100
+                    height: 50
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"라이다 설정"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_max_range
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"데이터 최대 거리 [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("데이터 최대 거리");
+                                    popup_help_setting.addLine("연산에 사용되는 라이다 데이터의 최대값입니다.");
+                                    popup_help_setting.addLine("이 값을 초과하는 라이다 데이터는 무시합니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: max_range
+                                anchors.fill: parent
+                                text:supervisor.getSetting("SENSOR","max_range");
+                                property bool ischanged: false
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = max_range;
+                                    max_range.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        max_range.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    if(focus){
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    id: set_icp_near
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"데이터 최소 거리 [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("데이터 최소 거리");
+                                    popup_help_setting.addLine("연산에 사용되는 라이다 데이터의 최소값(로봇 중심기준)입니다.");
+                                    popup_help_setting.addLine("이 값보다 작은 라이다 데이터는 무시합니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: icp_near
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_near");
+                                onFocusChanged: {
+                                    keypad.owner = icp_near;
+                                    icp_near.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_near.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_offset_X
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"오프셋 X [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("오프셋 X");
+                                    popup_help_setting.addLine("로봇 중심기준으로 라이다센서의 X축 오프셋입니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: offset_x
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                color:ischanged?color_red:"black"
+                                focus:false
+                                text:supervisor.getSetting("SENSOR","offset_x");
+                                onFocusChanged: {
+                                    keypad.owner = offset_x;
+                                    offset_x.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        offset_x.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_offset_y
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"오프셋 Y [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("오프셋 Y");
+                                    popup_help_setting.addLine("로봇 중심기준으로 라이다센서의 Y축 오프셋입니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: offset_y
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                color:ischanged?color_red:"black"
+                                focus:false
+                                text:supervisor.getSetting("SENSOR","offset_y");
+                                onFocusChanged: {
+                                    keypad.owner = offset_y;
+                                    offset_y.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        offset_y.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    width: 1100
+                    height: 50
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"주행 중 감지"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_lookaheaddist
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"경로추종 최대거리 [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("경로추종 최대거리");
+                                    popup_help_setting.addLine("로봇과 로봇이 추종하는 경로 상 한 점 사이 최대 거리입니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: look_ahead_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","look_ahead_dist");
+                                onFocusChanged: {
+                                    keypad.owner = look_ahead_dist;
+                                    look_ahead_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        look_ahead_dist.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_minlookaheaddist
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"경로추종 최소거리 [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("경로추종 최대거리");
+                                    popup_help_setting.addLine("로봇과 로봇이 추종하는 경로 상 한 점 사이 최소 거리입니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: min_look_ahead_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","min_look_ahead_dist");
+                                onFocusChanged: {
+                                    keypad.owner = min_look_ahead_dist;
+                                    min_look_ahead_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        min_look_ahead_dist.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_decmargin
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"감지 거리 Level 1 [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("감지 거리 Level 1");
+                                    popup_help_setting.addLine("주행 중 장애물을 감지하는 범위의 level 1 값입니다.");
+                                    popup_help_setting.addLine("로봇 중심 기준으로 동적장애물로 판단되는 것이 이 범위 안에 들어오면");
+                                    popup_help_setting.addLine("감속하고 놀란 표정을 띄웁니다.(바닥의 LED 색은 보라색)");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_margin1
+                                anchors.fill: parent
+                                objectName: "obs_margin1"
+                                text:supervisor.getSetting("ROBOT_SW","obs_margin1");
+                                property bool ischanged: false
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = obs_margin1;
+                                    obs_margin1.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        obs_margin1.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    if(focus){
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_decmargin0
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"감지 거리 Level 0 [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("감지 거리 Level 0");
+                                    popup_help_setting.addLine("주행 중 장애물을 감지하는 범위의 level 0 값입니다.");
+                                    popup_help_setting.addLine("로봇 중심 기준으로 동적장애물로 판단되는 것이 이 범위 안에 들어오면");
+                                    popup_help_setting.addLine("로봇을 즉시 정지하며 우는 표정을 띄웁니다.(바닥의 LED 색은 붉은색)");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_margin0
+                                anchors.fill: parent
+                                objectName: "obs_margin0"
+                                text:supervisor.getSetting("ROBOT_SW","obs_margin0");
+                                property bool ischanged: false
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = obs_margin0;
+                                    obs_margin0.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        obs_margin0.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    if(focus){
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_obs_area
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"장애물 넓이 [pixel]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("장애물 넓이");
+                                    popup_help_setting.addLine("감지되는 동적 센서 데이타가 이 값만큼 뭉쳐있다면 장애물로 판단합니다.");
+                                    popup_help_setting.addLine("단위는 pixel로 현재 설정된 픽셀 당 크기 값을 참조하세요.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_detect_area
+                                anchors.fill: parent
+                                objectName: "obs_detect_area"
+                                text:supervisor.getSetting("ROBOT_SW","obs_detect_area");
+                                property bool ischanged: false
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = obs_detect_area;
+                                    obs_detect_area.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        obs_detect_area.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    if(focus){
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_obs_sensitivity
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"장애물 감지 민감도"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("장애물 감지 민감도");
+                                    popup_help_setting.addLine("동적장애물로 판단하는 픽셀의 민감도 입니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_detect_sensitivity
+                                anchors.fill: parent
+                                objectName: "obs_detect_sensitivity"
+                                text:supervisor.getSetting("ROBOT_SW","obs_detect_sensitivity");
+                                property bool ischanged: false
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                onFocusChanged: {
+                                    keypad.owner = obs_detect_sensitivity;
+                                    obs_detect_sensitivity.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        obs_detect_sensitivity.select(0,0);
+                                    }
+                                }
+                                onTextChanged: {
+                                    if(focus){
+                                        ischanged = true;
+                                        is_reset_slam = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_obs_deadzone
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"즉시정지 거리 [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("즉시정지 거리");
+                                    popup_help_setting.addLine("로봇 중심 기준으로 동적장애물로 판단되는 것이 이 범위 안에 들어오면");
+                                    popup_help_setting.addLine("로봇을 즉시 정지하며 우는 표정을 띄웁니다.(바닥의 LED 색은 붉은색)");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_deadzone
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","obs_deadzone");
+                                onFocusChanged: {
+                                    keypad.owner = obs_deadzone;
+                                    obs_deadzone.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        obs_deadzone.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_obs_wait_time
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"감지 후 대기시간 [sec]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("감지 후 대기시간");
+                                    popup_help_setting.addLine("장애물을 감지 후 로봇이 멈춘 뒤 다시 출발할 때 까지 걸리는 대기시간입니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_wait_time
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","obs_wait_time");
+                                onFocusChanged: {
+                                    keypad.owner = obs_wait_time;
+                                    obs_wait_time.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        obs_wait_time.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_path_out_dist
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"경로이탈 거리 [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("경로이탈 거리");
+                                    popup_help_setting.addLine("로봇이 경로에서 이 값 이상 떨어지면 경로를 이탈했다고 판단합니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: path_out_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","path_out_dist");
+                                onFocusChanged: {
+                                    keypad.owner = path_out_dist;
+                                    path_out_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        path_out_dist.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+                Rectangle{
+                    width: 1100
+                    height: 50
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"위치 추정"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_icp_dist
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"Inlier 판단거리 [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:
+                                {
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("Inlier 판단거리");
+                                    popup_help_setting.addLine("로봇이 위치추정할 때, 실제 라이다데이터와 맵상 대응점과의 위치차이가");
+                                    popup_help_setting.addLine("이 값보다 작다면 inlier(일치)한다고 판단합니다.");
+                                    popup_help_setting.addLine("이 값이 작을 수록 위치추정이 정밀하지만 위치추정에 실패할 가능성도 높아집니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: icp_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_dist");
+                                onFocusChanged: {
+                                    keypad.owner = icp_dist;
+                                    icp_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_dist.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_icp_error
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"평균오차 최소값 [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:
+                                {
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("평균오차 최소값(icp_error)");
+                                    popup_help_setting.addLine("Inlier 판단된 데이터들의 실제 라이다데이터와 맵상 대응점과의 위치차이의 평균이");
+                                    popup_help_setting.addLine("이 값보다 작다면 위치추정에 성공했다고 판단합니다.");
+                                    popup_help_setting.addLine("위치추정은 평균오차의 최소값과 Inlier 비율이 모두 기준에 부합해야 성공으로 간주합니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: icp_error
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_error");
+                                onFocusChanged: {
+                                    keypad.owner = icp_error;
+                                    icp_error.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_error.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_icp_ratio
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"Inlier 비율 [%]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:
+                                {
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("Inlier 비율 (icp_ratio)");
+                                    popup_help_setting.addLine("전체 라이다데이터 대비 lnlier 판단된 데이터 값의 비율입니다.");
+                                    popup_help_setting.addLine("실제 값이 이 기준보다 높아야 위치추정에 성공했다고 판단합니다.");
+                                    popup_help_setting.addLine("위치추정은 평균오차의 최소값과 Inlier 비율이 모두 기준에 부합해야 성공으로 간주합니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: icp_ratio
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_ratio");
+                                onFocusChanged: {
+                                    keypad.owner = icp_ratio;
+                                    icp_ratio.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_ratio.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    id: set_icp_odometry_weight
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text: "모터 위치추정 비율 [%]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("모터 위치추정 비율");
+                                    popup_help_setting.addLine("모터의 엔코더값으로 계산되는 위치추정 값을 얼마나 사용할지의 비율입니다.");
+                                    popup_help_setting.addLine("값이 0에 가까울 수록 라이다데이타로 추정하는 ICP를 신뢰하고");
+                                    popup_help_setting.addLine("값이 1에 가까울 수록 라이다데이타는 사용하지 않습니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: icp_odometry_weight
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_odometry_weight");
+                                onFocusChanged: {
+                                    keypad.owner = icp_odometry_weight;
+                                    icp_odometry_weight.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_odometry_weight.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_icp_repeat_dist
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"위치추정 최소 거리 [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("위치추정 최소 거리");
+                                    popup_help_setting.addLine("로봇이 주행하며 이 거리 이상 움직이면 위치추정을 시도합니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: icp_repeat_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_repeat_dist");
+                                onFocusChanged: {
+                                    keypad.owner = icp_repeat_dist;
+                                    icp_repeat_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_repeat_dist.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_icp_repeat_time
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"위치추정 최소 시간[sec]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("위치추정 최소 시간");
+                                    popup_help_setting.addLine("로봇은 이 시간 간격으로 자동으로 위치추정을 시도합니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: icp_repeat_time
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_repeat_time");
+                                onFocusChanged: {
+                                    keypad.owner = icp_repeat_time;
+                                    icp_repeat_time.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        icp_repeat_time.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+
+
+                Rectangle{
+                    width: 1100
+                    height: 50
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"도착점 판단"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_goal_dist
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"도착점 허용 오차 [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("도착점 허용 오차");
+                                    popup_help_setting.addLine("로봇의 현재 위치와 목적지의 위치차이가 이 값보다 작으면 목적지에 도착했다고 판단합니다.");
+                                    popup_help_setting.addLine("값이 작을 수록 목작지에 정확하게 도달하지만 조금만 틀어져도 목적지에 도착했다고 판단하지 않아서");
+                                    popup_help_setting.addLine("주행실패하거나 이상동작을 할 수 있습니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: goal_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_dist");
+                                onFocusChanged: {
+                                    keypad.owner = goal_dist;
+                                    goal_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        goal_dist.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_goal_th
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"도착점 허용 오차 [deg]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("도착점 허용 오차");
+                                    popup_help_setting.addLine("로봇의 현재 위치와 목적지의 위치차이가 이 값보다 작으면 목적지에 도착했다고 판단합니다.");
+                                    popup_help_setting.addLine("값이 작을 수록 목작지에 정확하게 도달하지만 조금만 틀어져도 목적지에 도착했다고 판단하지 않아서");
+                                    popup_help_setting.addLine("주행실패하거나 이상동작을 할 수 있습니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: goal_th
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_th");
+                                onFocusChanged: {
+                                    keypad.owner = goal_th;
+                                    goal_th.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        goal_th.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_goal_near_dist
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"경로탐색 최소거리 [m]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("경로탐색 최소거리");
+                                    popup_help_setting.addLine("출발점과 도착점이 이 값보다 작으면 경로를 탐색하지 않고");
+                                    popup_help_setting.addLine("point to point 방식으로 이동합니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: goal_near_dist
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_near_dist");
+                                onFocusChanged: {
+                                    keypad.owner = goal_near_dist;
+                                    goal_near_dist.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        goal_near_dist.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Flickable{
+            id: area_setting_moving
+            visible: select_category==="moving"?true:false
+            width: 880
+            anchors.left: parent.left
+            anchors.leftMargin: 100
+            anchors.top: parent.top
+            anchors.topMargin: 120
+            height: parent.height - 200
+            contentHeight: column_setting45.height
+            clip: true
+            ScrollBar.vertical: ScrollBar{
+                width: 20
+                anchors.right: parent.right
+                policy: ScrollBar.AlwaysOn
+            }
+            Column{
+                id:column_setting45
+                width: parent.width
+                spacing:25
+                Rectangle{
+                    width: 1100
+                    height: 50
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"속도 제한"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_limitpivot
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"제자리 회전속도 [deg/s]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("제자리 회전속도(limit_pivot)");
+                                    popup_help_setting.addLine("로봇이 출발점에서 출발하기 전, 도착점에 도착 후 제자리 회전을 할때의 속도입니다.");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 제자리회전 시, 이 속도를 초과하지 않습니다.");
+                                }
                             }
                         }
                         Rectangle{
@@ -3744,7 +4394,7 @@ Item {
                 Rectangle{
                     id: set_limitpivotacc
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -3755,8 +4405,23 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_pivot_acc [deg/s^2]"
+                                text:"제자리 회전 가속도 [deg/s^2]"
                                 font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("제자리 회전가속도(limit_pivot_acc)");
+                                    popup_help_setting.addLine("로봇이 출발점에서 출발하기 전, 도착점에 도착 후 제자리 회전을 할때의 가속도입니다.");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 제자리회전 시, 이 속도를 초과하지 않습니다.");
+                                }
                             }
                         }
                         Rectangle{
@@ -3795,7 +4460,7 @@ Item {
                 Rectangle{
                     id: set_limitv
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -3806,8 +4471,23 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_v [m/s]"
+                                text:"주행 속도 [m/s]"
                                 font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("주행 속도(limit_v)");
+                                    popup_help_setting.addLine("로봇이 주행할 때의 최대 속도입니다.");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 속도를 초과하지 않습니다.");
+                                }
                             }
                         }
                         Rectangle{
@@ -3846,7 +4526,7 @@ Item {
                 Rectangle{
                     id: set_limit_vacc
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -3857,8 +4537,23 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_v_acc [m/s^2]"
+                                text:"주행 가속도 [m/s^2]"
                                 font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("주행 가속도(limit_v)");
+                                    popup_help_setting.addLine("로봇이 주행할 때의 최대 가속도입니다.");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 가속도를 초과하지 않습니다.");
+                                }
                             }
                         }
                         Rectangle{
@@ -3897,7 +4592,7 @@ Item {
                 Rectangle{
                     id: set_limitw
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -3908,8 +4603,23 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_w [deg/s]"
+                                text:"주행 회전속도 [deg/s]"
                                 font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("주행 회전속도(limit_w)");
+                                    popup_help_setting.addLine("로봇이 주행할 때의 최대 회전속도입니다.");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 회전속도를 초과하지 않습니다.");
+                                }
                             }
                         }
                         Rectangle{
@@ -3948,7 +4658,7 @@ Item {
                 Rectangle{
                     id: set_limitwacc
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -3959,8 +4669,23 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_w_acc [deg/s^2]"
+                                text:"주행 회전 가속도 [deg/s^2]"
                                 font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("주행 회전 가속도(limit_w_acc)");
+                                    popup_help_setting.addLine("로봇이 주행할 때의 최대 회전 가속도입니다.");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 회전 가속도를 초과하지 않습니다.");
+                                }
                             }
                         }
                         Rectangle{
@@ -3999,7 +4724,7 @@ Item {
                 Rectangle{
                     id: setlimitmanualv
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -4010,8 +4735,23 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_manual_v [m/s]"
+                                text:"JOG 속도 [m/s]"
                                 font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("JOG 속도(limit_manual_v)");
+                                    popup_help_setting.addLine("로봇을 Joystick 혹은 JOG로 움직일 때의 최대 속도입니다.");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 속도를 초과하지 않습니다.");
+                                }
                             }
                         }
                         Rectangle{
@@ -4050,7 +4790,7 @@ Item {
                 Rectangle{
                     id: setlimitmanualw
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -4061,8 +4801,23 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_manual_w [deg/s]"
+                                text:"JOG 회전속도 [deg/s]"
                                 font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("JOG 회전속도(limit_manual_v)");
+                                    popup_help_setting.addLine("로봇을 Joystick 혹은 JOG로 움직일 때의 최대 회전속도입니다.");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 회전속도를 초과하지 않습니다.");
+                                }
                             }
                         }
                         Rectangle{
@@ -4098,11 +4853,10 @@ Item {
                         }
                     }
                 }
-
                 Rectangle{
                     id: set_st_v
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -4113,8 +4867,23 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"st_v [m/s]"
+                                text:"출발 속도 [m/s]"
                                 font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("출발 속도(st_v)");
+                                    popup_help_setting.addLine("로봇이 출발할 때, 처음으로 주어지는 속도값입니다.");
+                                    popup_help_setting.addLine("작을 수록 천천히 출발합니다.");
+                                }
                             }
                         }
                         Rectangle{
@@ -4151,10 +4920,76 @@ Item {
                     }
                 }
 
+                Rectangle{
+                    id: set_goal_v
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 50
+                                font.family: font_noto_r.name
+                                text:"도착 속도 [m/s]"
+                                font.pixelSize: 20
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("도착 속도(goal_v)");
+                                    popup_help_setting.addLine("로봇이 목적지에 인접했을 때, 감속되는 최종 속도값입니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: goal_v
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_v");
+                                onFocusChanged: {
+                                    keypad.owner = goal_v;
+                                    goal_v.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        goal_v.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
 
                 Rectangle{
                     width: 1100
-                    height: 40
+                    height: 50
                     color: "black"
                     visible: is_admin
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -4169,7 +5004,7 @@ Item {
                 Rectangle{
                     id: set_wheel_dir
                     width: 840
-                    height: 40
+                    height: 50
                     visible: is_admin
                     Row{
                         anchors.fill: parent
@@ -4209,7 +5044,7 @@ Item {
                 Rectangle{
                     id: set_left_id
                     width: 840
-                    height: 40
+                    height: 50
                     visible: is_admin
                     Row{
                         anchors.fill: parent
@@ -4221,7 +5056,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"left_id"
+                                text:"왼쪽 ID"
                                 font.pixelSize: 20
                             }
                         }
@@ -4249,7 +5084,7 @@ Item {
                 Rectangle{
                     id: set_right_id
                     width: 840
-                    height: 40
+                    height: 50
                     visible: is_admin
                     Row{
                         anchors.fill: parent
@@ -4261,7 +5096,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"right_id"
+                                text:"오른쪽 ID"
                                 font.pixelSize: 20
                             }
                         }
@@ -4289,7 +5124,7 @@ Item {
                 Rectangle{
                     id: set_gear_ratio
                     width: 840
-                    height: 40
+                    height: 50
                     visible: is_admin
                     Row{
                         anchors.fill: parent
@@ -4301,7 +5136,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"gear_ratio"
+                                text:"모터 기어비"
                                 font.pixelSize: 20
                             }
                         }
@@ -4341,7 +5176,7 @@ Item {
                 Rectangle{
                     id: set_kp
                     width: 840
-                    height: 40
+                    height: 50
                     visible: is_admin
                     Row{
                         anchors.fill: parent
@@ -4353,7 +5188,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"k_p"
+                                text:"P 게인"
                                 font.pixelSize: 20
                             }
                         }
@@ -4393,7 +5228,7 @@ Item {
                 Rectangle{
                     id: set_ki
                     width: 840
-                    height: 40
+                    height: 50
                     visible: is_admin
                     Row{
                         anchors.fill: parent
@@ -4405,7 +5240,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"k_i"
+                                text:"I 게인"
                                 font.pixelSize: 20
                             }
                         }
@@ -4445,7 +5280,7 @@ Item {
                 Rectangle{
                     id: set_kd
                     width: 840
-                    height: 40
+                    height: 50
                     visible: is_admin
                     Row{
                         anchors.fill: parent
@@ -4457,7 +5292,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"k_d"
+                                text:"D 게인"
                                 font.pixelSize: 20
                             }
                         }
@@ -4498,7 +5333,7 @@ Item {
                     id: set_limit_v
                     width: 840
                     visible: is_admin
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -4509,7 +5344,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_v [m/s]"
+                                text:"최대 선속도 [m/s]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4550,7 +5385,7 @@ Item {
                     id: set_limitv_acc
                     width: 840
                     visible: is_admin
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -4561,7 +5396,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_v_acc [m/s^2]"
+                                text:"최대 선 가속도 [m/s^2]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4601,7 +5436,7 @@ Item {
                 Rectangle{
                     id: set_limit_w
                     width: 840
-                    height: 40
+                    height: 50
                     visible: is_admin
                     Row{
                         anchors.fill: parent
@@ -4613,7 +5448,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_w [deg/s]"
+                                text:"최대 각속도 [deg/s]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4653,7 +5488,7 @@ Item {
                 Rectangle{
                     id: set_limit_wacc
                     width: 840
-                    height: 40
+                    height: 50
                     visible: is_admin
                     Row{
                         anchors.fill: parent
@@ -4665,7 +5500,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 50
                                 font.family: font_noto_r.name
-                                text:"limit_w_acc [deg/s^2]"
+                                text:"최대 각가속도 [deg/s^2]"
                                 font.pixelSize: 20
                             }
                         }
@@ -4702,1075 +5537,13 @@ Item {
                         }
                     }
                 }
-                Rectangle{
-                    width: 1100
-                    height: 40
-                    color: "black"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_b.name
-                        text:"SLAM 설정"
-                        color: "white"
-                        font.pixelSize: 20
-                    }
-                }
-                Rectangle{
-                    id: set_kv
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"k_v"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: k_v
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","k_v");
-                                onFocusChanged: {
-                                    keypad.owner = k_v;
-                                    k_v.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        k_v.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_kw
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"k_w"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: k_w
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","k_w");
-                                onFocusChanged: {
-                                    keypad.owner = k_w;
-                                    k_w.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        k_w.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_lookaheaddist
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"앞서보기 거리[m]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: look_ahead_dist
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","look_ahead_dist");
-                                onFocusChanged: {
-                                    keypad.owner = look_ahead_dist;
-                                    look_ahead_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        look_ahead_dist.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_minlookaheaddist
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"앞서보기 최소거리[m]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: min_look_ahead_dist
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","min_look_ahead_dist");
-                                onFocusChanged: {
-                                    keypad.owner = min_look_ahead_dist;
-                                    min_look_ahead_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        min_look_ahead_dist.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_narrow_decel_ratio
-                    width: 840
-                    height: 40
-                    visible: false
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"narrow_decel_ratio [ratio, %]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: narrow_decel_ratio
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","narrow_decel_ratio");
-                                onFocusChanged: {
-                                    keypad.owner = narrow_decel_ratio;
-                                    narrow_decel_ratio.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        narrow_decel_ratio.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_obs_deadzone
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"동적장애물 정지거리[m]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: obs_deadzone
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","obs_deadzone");
-                                onFocusChanged: {
-                                    keypad.owner = obs_deadzone;
-                                    obs_deadzone.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_deadzone.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_obs_wait_time
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"동적장애물 대기시간[sec]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: obs_wait_time
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","obs_wait_time");
-                                onFocusChanged: {
-                                    keypad.owner = obs_wait_time;
-                                    obs_wait_time.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_wait_time.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_path_out_dist
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"경로이탈 마진[m]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: path_out_dist
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","path_out_dist");
-                                onFocusChanged: {
-                                    keypad.owner = path_out_dist;
-                                    path_out_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        path_out_dist.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 1100
-                    height: 40
-                    color: "black"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_b.name
-                        text:"위치추정(ICP) 설정"
-                        color: "white"
-                        font.pixelSize: 20
-                    }
-                }
-                Rectangle{
-                    id: set_icp_dist
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"라이다 판단거리[m]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: icp_dist
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_dist");
-                                onFocusChanged: {
-                                    keypad.owner = icp_dist;
-                                    icp_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_dist.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_icp_error
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"라이다 에러 마진[m]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: icp_error
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_error");
-                                onFocusChanged: {
-                                    keypad.owner = icp_error;
-                                    icp_error.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_error.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_icp_near
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"로봇기준 라이다 무시 거리[m]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: icp_near
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_near");
-                                onFocusChanged: {
-                                    keypad.owner = icp_near;
-                                    icp_near.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_near.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_icp_odometry_weight
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"모터 위치추정 비율[ratio, %]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: icp_odometry_weight
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_odometry_weight");
-                                onFocusChanged: {
-                                    keypad.owner = icp_odometry_weight;
-                                    icp_odometry_weight.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_odometry_weight.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_icp_ratio
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"라이다 위치추정 비율[ratio, %]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: icp_ratio
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_ratio");
-                                onFocusChanged: {
-                                    keypad.owner = icp_ratio;
-                                    icp_ratio.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_ratio.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_icp_repeat_dist
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"위치초기화 주행간격[m]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: icp_repeat_dist
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_repeat_dist");
-                                onFocusChanged: {
-                                    keypad.owner = icp_repeat_dist;
-                                    icp_repeat_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_repeat_dist.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_icp_repeat_time
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"위치초기화 시간간격[sec]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: icp_repeat_time
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_repeat_time");
-                                onFocusChanged: {
-                                    keypad.owner = icp_repeat_time;
-                                    icp_repeat_time.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_repeat_time.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 1100
-                    height: 40
-                    color: "black"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_b.name
-                        text:"GOAL 설정"
-                        color: "white"
-                        font.pixelSize: 20
-                    }
-                }
-                Rectangle{
-                    id: set_goal_dist
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"도착지점 마진[m]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: goal_dist
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","goal_dist");
-                                onFocusChanged: {
-                                    keypad.owner = goal_dist;
-                                    goal_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        goal_dist.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_goal_th
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"회전각 마진[deg]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: goal_th
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","goal_th");
-                                onFocusChanged: {
-                                    keypad.owner = goal_th;
-                                    goal_th.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        goal_th.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Rectangle{
-                    id: set_goal_v
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"도착점 도달속도[m/s]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: goal_v
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","goal_v");
-                                onFocusChanged: {
-                                    keypad.owner = goal_v;
-                                    goal_v.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        goal_v.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Rectangle{
-                    id: set_goal_near_dist
-                    width: 840
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"경로생성 최소거리[m]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: goal_near_dist
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","goal_near_dist");
-                                onFocusChanged: {
-                                    keypad.owner = goal_near_dist;
-                                    goal_near_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        goal_near_dist.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_goal_near_th
-                    width: 840
-                    visible: false
-                    height: 40
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 50
-                                font.family: font_noto_r.name
-                                text:"goal_near_th [deg]"
-                                font.pixelSize: 20
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            TextField{
-                                id: goal_near_th
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onTextChanged: {
-                                    is_reset_slam = true;
-                                    ischanged = true;
-                                }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","goal_near_th");
-                                onFocusChanged: {
-                                    keypad.owner = goal_near_th;
-                                    goal_near_th.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        goal_near_th.select(0,0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
 
+
         Flickable{
             id: area_setting_motor
-            visible: select_category==4?true:false
+            visible: select_category==="status" ? true : false
             width: 880
             anchors.left: parent.left
             anchors.leftMargin: 100
@@ -5788,7 +5561,7 @@ Item {
             Rectangle{
                 id: rect_motor_1
                 width: 1100
-                height: 40
+                height: 50
                 color: "black"
                 anchors.horizontalCenter: parent.horizontalCenter
                 Text{
@@ -5865,7 +5638,7 @@ Item {
                 spacing:25
                 Rectangle{
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -5927,7 +5700,7 @@ Item {
                 }
                 Rectangle{
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -5973,7 +5746,7 @@ Item {
                 }
                 Rectangle{
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -6019,7 +5792,7 @@ Item {
                 }
                 Rectangle{
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -6065,7 +5838,7 @@ Item {
                 }
                 Rectangle{
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -6112,7 +5885,7 @@ Item {
 
                 Rectangle{
                     width: 1100
-                    height: 40
+                    height: 50
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
@@ -6126,7 +5899,7 @@ Item {
 
                 Rectangle{
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -6194,7 +5967,7 @@ Item {
                 }
                 Rectangle{
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -6251,7 +6024,7 @@ Item {
                 }
                 Rectangle{
                     width: 840
-                    height: 40
+                    height: 50
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -6440,10 +6213,6 @@ Item {
             supervisor.setSetting("ROBOT_HW/tray_num",combo_tray_num.currentText);
         }
 
-        if(slider_vxy.ischanged){
-            supervisor.setSetting("ROBOT_SW/velocity",slider_vxy.value.toFixed(2));
-        }
-
         if(slider_volume_bgm.ischanged){
             supervisor.setSetting("ROBOT_SW/volume_bgm",slider_volume_bgm.value.toFixed(0));
         }
@@ -6452,12 +6221,6 @@ Item {
             supervisor.setSetting("ROBOT_SW/volume_voice",slider_volume_voice.value.toFixed(0));
         }
 
-        if(combo_use_help.ischanged){
-            if(combo_use_help.currentIndex == 0)
-                supervisor.setSetting("ROBOT_SW/use_help","false");
-            else
-                supervisor.setSetting("ROBOT_SW/use_help","true");
-        }
         if(combo_tableview.ischanged){
             supervisor.setSetting("ROBOT_SW/table_view",combo_tableview.currentIndex);
         }
@@ -6573,8 +6336,8 @@ Item {
             supervisor.setSetting("ROBOT_SW/obs_height_max",obs_height_max.text);
         }
 
-        if(obs_dec_margin.ischanged){
-            supervisor.setSetting("ROBOT_SW/obs_dec_margin",obs_dec_margin.text);
+        if(obs_margin1.ischanged){
+            supervisor.setSetting("ROBOT_SW/obs_margin1",obs_margin1.text);
         }
         if(obs_detect_area.ischanged){
             supervisor.setSetting("ROBOT_SW/obs_detect_area",obs_detect_area.text);
@@ -6808,7 +6571,7 @@ Item {
         icp_ratio.text = supervisor.getSetting("ROBOT_SW","icp_ratio");
         icp_repeat_dist.text = supervisor.getSetting("ROBOT_SW","icp_repeat_dist");
         icp_repeat_time.text = supervisor.getSetting("ROBOT_SW","icp_repeat_time");
-        narrow_decel_ratio.text = supervisor.getSetting("ROBOT_SW","narrow_decel_ratio");
+//        narrow_decel_ratio.text = supervisor.getSetting("ROBOT_SW","narrow_decel_ratio");
         obs_deadzone.text = supervisor.getSetting("ROBOT_SW","obs_deadzone");
         obs_wait_time.text = supervisor.getSetting("ROBOT_SW","obs_wait_time");
         path_out_dist.text = supervisor.getSetting("ROBOT_SW","path_out_dist");
@@ -6818,15 +6581,12 @@ Item {
         goal_th.text = supervisor.getSetting("ROBOT_SW","goal_th");
         goal_v.text = supervisor.getSetting("ROBOT_SW","goal_v");
         goal_near_dist.text = supervisor.getSetting("ROBOT_SW","goal_near_dist");
-        goal_near_th.text = supervisor.getSetting("ROBOT_SW","goal_near_th");
+//        goal_near_th.text = supervisor.getSetting("ROBOT_SW","goal_near_th");
 
         motor_limit_v.text = supervisor.getSetting("MOTOR","limit_v");
         motor_limit_v_acc.text = supervisor.getSetting("MOTOR","limit_v_acc");
         motor_limit_w.text = supervisor.getSetting("MOTOR","limit_w");
         motor_limit_w_acc.text = supervisor.getSetting("MOTOR","limit_w_acc");
-//        slider_k_curve.text = supervisor.getSetting("ROBOT_SW","k_curve"));
-        k_v.text = supervisor.getSetting("ROBOT_SW","k_v");
-        k_w.text = supervisor.getSetting("ROBOT_SW","k_w");
         limit_pivot.text = supervisor.getSetting("ROBOT_SW","limit_pivot");
         limit_pivot_acc.text = supervisor.getSetting("ROBOT_SW","limit_pivot_acc");
         limit_manual_v.text = supervisor.getSetting("ROBOT_SW","limit_manual_v");
@@ -6847,18 +6607,7 @@ Item {
         text_preset_name_4.text = supervisor.getSetting("PRESET4","name");
         text_preset_name_5.text = supervisor.getSetting("PRESET5","name");
 
-        if(supervisor.getSetting("ROBOT_SW","use_uicmd") === "true"){
-            combo_use_uicmd.currentIndex = 1;
-        }else{
-            combo_use_uicmd.currentIndex = 0;
-        }
-        if(supervisor.getSetting("ROBOT_SW","use_multirobot") === "true"){
-            combo_multirobot.currentIndex = 1;
-        }else{
-            combo_multirobot.currentIndex = 0;
-        }
-
-        slider_vxy.value = parseFloat(supervisor.getSetting("ROBOT_SW","velocity"));
+//        slider_vxy.value = parseFloat(supervisor.getSetting("ROBOT_SW","velocity"));
         combo_table_num.currentIndex = supervisor.getTableNum();
 
         gear_ratio.text = supervisor.getSetting("MOTOR","gear_ratio");
@@ -6878,17 +6627,6 @@ Item {
             combo_wheel_dir.currentIndex = 1;
         }
 
-        if(supervisor.getSetting("ROBOT_SW","use_autoinit") === "true"){
-            combo_autoinit.currentIndex = 1;
-        }else{
-            combo_autoinit.currentIndex = 0;
-        }
-
-        if(supervisor.getSetting("ROBOT_SW","use_help") === "true"){
-            combo_use_help.currentIndex = 1;
-        }else{
-            combo_use_help.currentIndex = 0;
-        }
         combo_tableview.currentIndex = parseInt(supervisor.getSetting("ROBOT_SW","table_view"));
         if(supervisor.getSetting("ROBOT_SW","moving_face") === "true"){
             combo_movingpage.currentIndex = 1;
@@ -6901,19 +6639,6 @@ Item {
             combo_use_tray.currentIndex = 0;
         }
 
-
-        if(supervisor.getSetting("ROBOT_SW","use_avoid") === "true"){
-            combo_avoid.currentIndex = 1;
-        }else{
-            combo_avoid.currentIndex = 0;
-        }
-
-        if(supervisor.getSetting("SENSOR","baudrate") === "115200"){
-            combo_baudrate.currentIndex = 0;
-        }else if(supervisor.getSetting("SENSOR","baudrate") === "256000"){
-            combo_baudrate.currentIndex = 1;
-        }
-
         combo_call_max.currentIndex = parseInt(supervisor.getSetting("CALLING","call_maximum"))-1;
         combo_call_num.currentIndex = parseInt(supervisor.getSetting("CALLING","call_num"));
 
@@ -6923,12 +6648,10 @@ Item {
         }
 
 
-        obs_dec_margin.text = supervisor.getSetting("ROBOT_SW","obs_dec_margin");
+        obs_margin1.text = supervisor.getSetting("ROBOT_SW","obs_margin1");
         obs_detect_area.text = supervisor.getSetting("ROBOT_SW","obs_detect_area");
         obs_detect_sensitivity.text = supervisor.getSetting("ROBOT_SW","obs_detect_sensitivity");
         obs_height_min.text = supervisor.getSetting("ROBOT_SW","obs_height_min");
-        obs_height_max.text = supervisor.getSetting("ROBOT_SW","obs_height_max");
-        mask.text = supervisor.getSetting("SENSOR","mask");
         max_range.text = supervisor.getSetting("SENSOR","max_range");
         offset_x.text = supervisor.getSetting("SENSOR","offset_x");
         offset_y.text = supervisor.getSetting("SENSOR","offset_y");
@@ -6978,10 +6701,9 @@ Item {
         combo_platform_type.ischanged = false;
         combo_tray_num.ischanged = false;
 
-        slider_vxy.ischanged = false;
+//        slider_vxy.ischanged = false;
         slider_volume_bgm.ischanged = false;
         slider_volume_voice.ischanged = false;
-        combo_use_help.ischanged = false;
 
 
         wifi_passwd.ischanged = false;
@@ -7005,10 +6727,6 @@ Item {
         wheel_base.ischanged = false;
         wheel_radius.ischanged = false;
         radius.ischanged = false;
-        combo_autoinit.ischanged = false;
-        combo_avoid.ischanged = false;
-        combo_multirobot.ischanged = false;
-        combo_use_uicmd.ischanged = false;
 
         map_size.ischanged = false;
         grid_size.ischanged = false;
@@ -7016,8 +6734,6 @@ Item {
         combo_call_max.ischanged = false;
         combo_call_num.ischanged = false;
 
-        combo_baudrate.ischanged = false;
-        mask.ischanged = false;
         max_range.ischanged = false;
         cam_exposure.ischanged = false;
         offset_x.ischanged = false;
@@ -7044,11 +6760,8 @@ Item {
         motor_limit_v_acc.ischanged = false;
         motor_limit_w.ischanged = false;
         motor_limit_w_acc.ischanged = false;
-        k_v.ischanged = false;
-        k_w.ischanged = false;
         look_ahead_dist.ischanged = false;
         min_look_ahead_dist.ischanged = false;
-        narrow_decel_ratio.ischanged = false;
         obs_deadzone.ischanged = false;
         obs_wait_time.ischanged = false;
         path_out_dist.ischanged = false;
@@ -7063,7 +6776,6 @@ Item {
         goal_v.ischanged = false;
         goal_th.ischanged = false;
         goal_near_dist.ischanged = false;
-        goal_near_th.ischanged = false;
     }
 
     function check_update(){
@@ -7074,10 +6786,9 @@ Item {
         if(combo_platform_id.ischanged) is_changed = true;
         if(combo_platform_type.ischanged) is_changed = true;
         if(combo_tray_num.ischanged) is_changed = true;
-        if(slider_vxy.ischanged) is_changed = true;
+//        if(slider_vxy.ischanged) is_changed = true;
         if(slider_volume_bgm.ischanged) is_changed = true;
         if(slider_volume_voice.ischanged) is_changed = true;
-        if(combo_use_help.ischanged) is_changed = true;
         if(wifi_passwd.ischanged) is_changed = true;
         if(ip_1.ischanged) is_changed = true;
         if(ip_2.ischanged) is_changed = true;
@@ -7098,17 +6809,11 @@ Item {
         if(wheel_base.ischanged) is_changed = true;
         if(wheel_radius.ischanged) is_changed = true;
         if(radius.ischanged) is_changed = true;
-        if(combo_autoinit.ischanged) is_changed = true;
-        if(combo_avoid.ischanged) is_changed = true;
-        if(combo_multirobot.ischanged) is_changed = true;
-        if(combo_use_uicmd.ischanged) is_changed = true;
         if(map_size.ischanged) is_changed = true;
         if(grid_size.ischanged) is_changed = true;
         if(combo_table_num.ischanged) is_changed = true;
         if(combo_call_max.ischanged) is_changed = true;
         if(combo_call_num.ischanged) is_changed = true;
-        if(combo_baudrate.ischanged) is_changed = true;
-        if(mask.ischanged) is_changed = true;
         if(max_range.ischanged) is_changed = true;
         if(cam_exposure.ischanged) is_changed = true;
         if(offset_x.ischanged) is_changed = true;
@@ -7133,11 +6838,8 @@ Item {
         if(motor_limit_v_acc.ischanged) is_changed = true;
         if(motor_limit_w.ischanged) is_changed = true;
         if(motor_limit_w_acc.ischanged) is_changed = true;
-        if(k_v.ischanged) is_changed = true;
-        if(k_w.ischanged) is_changed = true;
         if(look_ahead_dist.ischanged) is_changed = true;
         if(min_look_ahead_dist.ischanged) is_changed = true;
-        if(narrow_decel_ratio.ischanged) is_changed = true;
         if(obs_deadzone.ischanged) is_changed = true;
         if(obs_wait_time.ischanged) is_changed = true;
         if(path_out_dist.ischanged) is_changed = true;
@@ -7152,7 +6854,6 @@ Item {
         if(goal_v.ischanged) is_changed = true;
         if(goal_th.ischanged) is_changed = true;
         if(goal_near_dist.ischanged) is_changed = true;
-        if(goal_near_th.ischanged) is_changed = true;
 
         return is_changed;
     }
@@ -7213,9 +6914,58 @@ Item {
     }
 
     Popup{
+        id: popup_help_setting
+        anchors.centerIn: parent
+        width: 800
+        height: 400
+        property string titlestr: ""
+        onOpened:{
+            model_lines.clear();
+        }
+        function setTitle(t){
+            titlestr = t;
+        }
+        function addLine(l){
+            model_lines.append({"line":l});
+        }
+
+        background: Rectangle{
+            anchors.fill:parent
+            color: color_gray
+            opacity: 0.9
+        }
+        Column{
+            anchors.centerIn: parent
+            spacing: 30
+            Text{
+                text: popup_help_setting.titlestr
+                font.family: font_noto_b.name
+                font.pixelSize: 40
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+            Column{
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 5
+                Repeater{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    model:ListModel{id:model_lines}
+                    Text{
+                        text: line
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    Popup{
         id: popup_manager
         width: 500
-        height: 400
+        height: 500
         anchors.centerIn: parent
         leftPadding: 0
         topPadding: 0
@@ -7580,7 +7330,7 @@ Item {
                 Rectangle{
                     id: notice_recent
                     width: 200
-                    height: 40
+                    height: 50
                     color: color_navy
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
@@ -7611,7 +7361,7 @@ Item {
                     width: 100
                     radius: 5
                     anchors.horizontalCenter: parent.horizontalCenter
-                    height: 40
+                    height: 50
                     border.width:1
                     color: "white"//color_light_gray
                     Text{
@@ -7633,7 +7383,7 @@ Item {
 
                 Rectangle{
                     width: 200
-                    height: 40
+                    height: 50
                     color: color_navy
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
@@ -8125,7 +7875,7 @@ Item {
     Popup{
         id: popup_update
         width: 600
-        height: 400
+        height: 500
         anchors.centerIn: parent
 
         onOpened: {
@@ -8881,14 +8631,14 @@ Item {
                             }
                             Rectangle{
                                 width: 1
-                                height: 40
+                                height: 50
                                 color: "#d0d0d0"
                             }
                             TextField{
                                 id: preset_limit_pivot
                                 width: 200
                                 focus:false
-                                height: 40
+                                height: 50
                                 text:"";
                                 onFocusChanged: {
                                     keypad.owner = preset_limit_pivot;
@@ -8908,13 +8658,13 @@ Item {
                             }
                             Rectangle{
                                 width: 1
-                                height: 40
+                                height: 50
                                 color: "#d0d0d0"
                             }
                             TextField{
                                 id: preset_limit_pivot_acc
                                 width: 200
-                                height: 40
+                                height: 50
                                 text:"";
                                 focus:false
                                 onFocusChanged: {
@@ -8935,13 +8685,13 @@ Item {
                             }
                             Rectangle{
                                 width: 1
-                                height: 40
+                                height: 50
                                 color: "#d0d0d0"
                             }
                             TextField{
                                 id: preset_limit_v
                                 width: 200
-                                height: 40
+                                height: 50
                                 focus:false
                                 text:"";
                                 onFocusChanged: {
@@ -8962,13 +8712,13 @@ Item {
                             }
                             Rectangle{
                                 width: 1
-                                height: 40
+                                height: 50
                                 color: "#d0d0d0"
                             }
                             TextField{
                                 id: preset_limit_vacc
                                 width: 200
-                                height: 40
+                                height: 50
                                 focus:false
                                 text:"";
                                 onFocusChanged: {
@@ -8989,13 +8739,13 @@ Item {
                             }
                             Rectangle{
                                 width: 1
-                                height: 40
+                                height: 50
                                 color: "#d0d0d0"
                             }
                             TextField{
                                 id: preset_limit_w
                                 width: 200
-                                height: 40
+                                height: 50
                                 focus:false
                                 text:"";
                                 onFocusChanged: {
@@ -9016,13 +8766,13 @@ Item {
                             }
                             Rectangle{
                                 width: 1
-                                height: 40
+                                height: 50
                                 color: "#d0d0d0"
                             }
                             TextField{
                                 id: preset_limit_wacc
                                 width: 200
-                                height: 40
+                                height: 50
                                 focus:false
                                 text:"";
                                 onFocusChanged: {
@@ -9508,7 +9258,7 @@ Item {
                 TextField{
                     id: tf_left_x
                     width: 80
-                    height: 40
+                    height: 50
                     font.family: font_noto_r.name
                     focus:false
                     font.pixelSize: 15
@@ -9533,7 +9283,7 @@ Item {
                 TextField{
                     id: tf_right_x
                     width: 80
-                    height: 40
+                    height: 50
                     font.family: font_noto_r.name
                     focus:false
                     font.pixelSize: 15
@@ -9552,7 +9302,7 @@ Item {
                 TextField{
                     id: tf_left_y
                     width: 80
-                    height: 40
+                    height: 50
                     font.family: font_noto_r.name
                     focus:false
                     font.pixelSize: 15
@@ -9577,7 +9327,7 @@ Item {
                 TextField{
                     id: tf_right_y
                     width: 80
-                    height: 40
+                    height: 50
                     font.family: font_noto_r.name
                     focus:false
                     font.pixelSize: 15
@@ -9596,7 +9346,7 @@ Item {
                 TextField{
                     id: tf_left_z
                     width: 80
-                    height: 40
+                    height: 50
                     font.family: font_noto_r.name
                     focus:false
                     font.pixelSize: 15
@@ -9621,7 +9371,7 @@ Item {
                 TextField{
                     id: tf_right_z
                     width: 80
-                    height: 40
+                    height: 50
                     font.family: font_noto_r.name
                     focus:false
                     font.pixelSize: 15
@@ -9640,7 +9390,7 @@ Item {
                 TextField{
                     id: tf_left_rx
                     width: 80
-                    height: 40
+                    height: 50
                     font.family: font_noto_r.name
                     focus:false
                     font.pixelSize: 15
@@ -9665,7 +9415,7 @@ Item {
                 TextField{
                     id: tf_right_rx
                     width: 80
-                    height: 40
+                    height: 50
                     font.family: font_noto_r.name
                     focus:false
                     font.pixelSize: 15
@@ -9685,7 +9435,7 @@ Item {
                     id: tf_left_ry
                     width: 80
                     horizontalAlignment: Text.AlignHCenter
-                    height: 40
+                    height: 50
                     focus:false
                     font.family: font_noto_r.name
                     font.pixelSize: 15
@@ -9709,7 +9459,7 @@ Item {
                 TextField{
                     id: tf_right_ry
                     width: 80
-                    height: 40
+                    height: 50
                     font.family: font_noto_r.name
                     focus:false
                     font.pixelSize: 15
@@ -9728,7 +9478,7 @@ Item {
                 TextField{
                     id: tf_left_rz
                     width: 80
-                    height: 40
+                    height: 50
                     font.family: font_noto_r.name
                     focus:false
                     font.pixelSize: 15
@@ -9753,7 +9503,7 @@ Item {
                 TextField{
                     id: tf_right_rz
                     width: 80
-                    height: 40
+                    height: 50
                     horizontalAlignment: Text.AlignHCenter
                     focus:false
                     font.family: font_noto_r.name
@@ -9908,7 +9658,7 @@ Item {
                         model : ListModel{id: model_wifis}
                         Rectangle{
                             width: 330
-                            height: 40
+                            height: 50
                             radius: 5
                             border.width:4
                             border.color: col_wifis.select_wifi===index?color_green:"white"
@@ -9933,7 +9683,7 @@ Item {
                                 anchors.right: parent.right
                                 source: "icon/icon_lock_2.png"
                                 width: 40
-                                height: 40
+                                height: 50
                                 ColorOverlay{
                                     anchors.fill: parent
                                     source: parent
@@ -10414,8 +10164,8 @@ Item {
     Popup_map_list{
         id: popup_maplist
     }
-    SoundEffect{
-        id: click
-        source: "bgm/click.wav"
-    }
+//    SoundEffect{
+//        id: click
+//        source: "bgm/click.wav"
+//    }
 }

@@ -176,7 +176,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    click_start.play();
+                    //click_start.play();
                     supervisor.writelog("[USER INPUT] PICKUP CONFIRM clicked");
                     voice_pickup.stop();
                     voice_thanks.play();
@@ -238,8 +238,8 @@ Item {
             supervisor.writelog("[QML] PICKUP PAGE -> Move to Next");
         }
     }
-    SoundEffect{
-        id: click_start
-        source: "bgm/click_start.wav"
-    }
+//    SoundEffect{
+//        id: click_start
+//        source: "bgm/click_start.wav"
+//    }
 }

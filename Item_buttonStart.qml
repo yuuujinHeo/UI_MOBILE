@@ -103,7 +103,7 @@ Item {
                 onReleased: {
                     btn.color = color;
                     item_ButtonStart.clicked()
-                    click_sound.play();
+                    //click_sound.play();
                 }
             }
         }
@@ -114,8 +114,8 @@ Item {
             source: btn
         }
     }
-    SoundEffect{
-        id: click_sound
-        source: "bgm/click.wav"
-    }
+//    SoundEffect{
+//        id: click_sound
+//        source: "bgm/click.wav"
+//    }
 }

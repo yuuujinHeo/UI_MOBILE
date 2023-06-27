@@ -278,7 +278,7 @@ Item {
                         property var firstX;
                         property var width_dis: 0
                         onPressed: {
-                            click.play();
+                            //click.play();
                             firstX = mouseX;
                             width_dis = 0;
                         }
@@ -406,7 +406,7 @@ Item {
                                 MouseArea{
                                     anchors.fill:parent
                                     onClicked: {
-                                        click.play();
+                                        //click.play();
                                         count_resting = 0;
                                         if(cur_table == (col_num*row_num*cur_page)+index+1){
                                             cur_table = 0;
@@ -460,7 +460,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onPressAndHold: {
-                    click.play();
+                    //click.play();
                     count_resting = 0;
                     supervisor.writelog("[USER INPUT] TABLE NUM CHANGED DONE : "+Number(col_num));
                     btn_lock.visible = false;
@@ -496,7 +496,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        click.play();
+                        //click.play();
                         count_resting = 0;
                         if(col_num > 1)
                             supervisor.setTableColNum(--col_num);
@@ -524,7 +524,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        click.play();
+                        //click.play();
                         count_resting = 0;
                         if(col_num < max_col)
                             supervisor.setTableColNum(++col_num);
@@ -546,7 +546,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        click.play();
+                        //click.play();
                         count_resting = 0;
                         supervisor.writelog("[USER INPUT] TABLE NUM CHANGED");
                         btn_lock.visible = true;
@@ -600,7 +600,7 @@ Item {
                 MouseArea{
                     anchors.fill:parent
                     onClicked: {
-                        click.play();
+                        //click.play();
                         count_resting = 0;
                         cur_table = num;
                     }
@@ -639,7 +639,7 @@ Item {
                 MouseArea{
                     anchors.fill:parent
                     onClicked: {
-                        click.play();
+                        //click.play();
                         count_resting = 0;
                         cur_table = num;
                     }
@@ -684,7 +684,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked:{
-                                    click.play();
+                                    //click.play();
                                     cur_group = index;
                                 }
                             }
@@ -794,7 +794,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onPressAndHold: {
-                            click.play();
+                            //click.play();
                             count_resting = 0;
                             supervisor.writelog("[USER INPUT] TABLE NUM CHANGED DONE : "+Number(col_num));
                             btn_lock_group.visible = false;
@@ -848,7 +848,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    click.play();
+                                    //click.play();
                                     count_resting = 0;
                                     supervisor.setSetting("FLOOR/group_row_num",row_num-1);
                                     row_num--;
@@ -876,7 +876,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    click.play();
+                                    //click.play();
                                     count_resting = 0;
                                     supervisor.setSetting("FLOOR/group_row_num",row_num+1);
                                     row_num++;
@@ -917,7 +917,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    click.play();
+                                    //click.play();
                                     count_resting = 0;
                                     supervisor.setSetting("FLOOR/group_col_num",col_num-1);
                                     col_num--;
@@ -945,7 +945,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    click.play();
+                                    //click.play();
                                     count_resting = 0;
                                     supervisor.setSetting("FLOOR/group_col_num",col_num+1);
                                     col_num++;
@@ -971,7 +971,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                click.play();
+                                //click.play();
                                 count_resting = 0;
                                 supervisor.writelog("[USER INPUT] TABLE NUM CHANGED");
                                 btn_lock_group.visible = true;
@@ -1025,7 +1025,7 @@ Item {
             id: btn_go
             anchors.fill: parent
             onPressed:{
-                //click_start.play();
+                ////click_start.play();
             }
 
             onClicked: {
@@ -1068,7 +1068,7 @@ Item {
             id: btn_go_safe
             anchors.fill: parent
             onClicked: {
-                click.play();
+                //click.play();
                 popup_preset_menu.open();
             }
         }
@@ -1179,7 +1179,7 @@ Item {
                     height: parent.height
                     anchors.left: parent.left
                     onClicked:{
-                        click.play();
+                        //click.play();
                         if(cur_preset > 1)
                             cur_preset--;
                     }
@@ -1189,7 +1189,7 @@ Item {
                     height: parent.height
                     anchors.right: parent.right
                     onClicked:{
-                        click.play();
+                        //click.play();
                         if(cur_preset < 5)
                             cur_preset++;
                     }
@@ -1318,7 +1318,7 @@ Item {
             id: btn_go2
             anchors.fill: parent
             onClicked: {
-                //click_start.play();
+                ////click_start.play();
                 count_resting = 0;
                 go_patrol = true;
                 popup_question.visible = true;
@@ -1355,7 +1355,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            click.play();
+                            //click.play();
                             count_resting = 0;
                             cur_table = 0;
                             print("11");
@@ -1399,7 +1399,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        click.play();
+                        //click.play();
                         count_resting = 0;
                         cur_table = 0;
                         go_charge = true;
@@ -1442,7 +1442,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        click.play();
+                        //click.play();
                         count_resting = 0;
                         cur_table = 0;
                         go_wait = true;
@@ -1527,13 +1527,13 @@ Item {
                 onClicked: {
                     count_resting = 0;
                     if(go_wait){
-                        click_start.play();
+                        //click_start.play();
                         supervisor.moveToWait();
                     }else if(go_charge){
-                        click_start.play();
+                        //click_start.play();
                         supervisor.moveToCharge();
                     }else if(go_patrol){
-                        click_start.play();
+                        //click_start.play();
 
                     }else{
                         click_error.play();
@@ -1577,7 +1577,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    click.play();
+                    //click.play();
                     count_resting = 0;
                     go_wait = false;
                     go_charge = false;
@@ -1623,7 +1623,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    click.play();
+                    //click.play();
                     count_resting = 0;
                     if(go_wait){
                         supervisor.moveToWait();
@@ -1643,25 +1643,25 @@ Item {
         }
     }
 
-    SoundEffect{
-        id: click
-        source: "bgm/click.wav"
-        Component.onDestruction: {
-            print("click dest");
-        }
-    }
-    SoundEffect{
-        id: click_no
-        source: "bgm/click_error.wav"
-        Component.onDestruction: {
-            print("click_no dest");
-        }
-    }
-    SoundEffect{
-        id: click_start
-        source: "bgm/click_start.wav"
-        Component.onDestruction: {
-            print("click_start dest");
-        }
-    }
+//    SoundEffect{
+//        id: click
+//        source: "bgm/click.wav"
+//        Component.onDestruction: {
+//            print("click dest");
+//        }
+//    }
+//    SoundEffect{
+//        id: click_no
+//        source: "bgm/click_error.wav"
+//        Component.onDestruction: {
+//            print("click_no dest");
+//        }
+//    }
+//    SoundEffect{
+//        id: click_start
+//        source: "bgm/click_start.wav"
+//        Component.onDestruction: {
+//            print("click_start dest");
+//        }
+//    }
 }

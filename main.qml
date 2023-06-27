@@ -16,7 +16,6 @@ Window {
     visible: true
     width: 1280
     height: 800
-    title: qsTr("Hello World")
 
     property bool debug_mode: false
 

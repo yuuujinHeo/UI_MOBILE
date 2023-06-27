@@ -227,20 +227,20 @@ Item{
         onReleased:{
             item_Buttons.pressed = false;
             if(containsMouse){
-                if(click_sound==1)
-                    click_sound1.play();
-                else if(click_sound==2)
-                    click_sound2.play();
+//                if(click_sound==1)
+//                    //click_sound1.play();
+//                else if(click_sound==2)
+//                    //click_sound2.play();
                 item_Buttons.clicked();
             }
         }
     }
-    SoundEffect{
-        id: click_sound2
-        source: "bgm/click2.wav"
-    }
-    SoundEffect{
-        id: click_sound1
-        source: "bgm/click.wav"
-    }
+//    SoundEffect{
+//        id: click_sound2
+//        source: "bgm/click2.wav"
+//    }
+//    SoundEffect{
+//        id: click_sound1
+//        source: "bgm/click.wav"
+//    }
 }
