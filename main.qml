@@ -375,12 +375,12 @@ Window {
         source: "font/NotoSansKR-Light.otf"
     }
 
-//    Audio{
-//        id: voice_movewait
-//        autoPlay: false
-//        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
-//        source: "bgm/voice_move_wait.mp3"
-//    }
+    Audio{
+        id: voice_movewait
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/voice_move_wait.mp3"
+    }
     Audio{
         id: voice_movecharge
         autoPlay: false
@@ -446,7 +446,6 @@ Window {
         onClosed:{
             loading_image.stop();
         }
-
         background:Rectangle{
             anchors.fill: parent
             color: color_dark_black

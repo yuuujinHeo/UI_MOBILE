@@ -42,6 +42,7 @@ Item {
     function movefail(errnum){
         test_move_state = 2;
         test_move_error = errnum;
+        print("annotation move fail : ",errnum);
     }
 
     Timer{
@@ -802,7 +803,6 @@ Item {
                 interval: 500
                 onTriggered:{
                     supervisor.drawingRunawayStart();
-                    map_hide.startDrawingT();
                 }
             }
 
@@ -948,7 +948,6 @@ Item {
                 interval: 500
                 onTriggered:{
                     supervisor.drawingRunawayStart();
-                    map_hide.startDrawingT();
                 }
             }
 
@@ -1226,7 +1225,6 @@ Item {
                 interval: 500
                 onTriggered:{
                     supervisor.drawingRunawayStart();
-                    map_hide.startDrawingT();
                 }
             }
             Rectangle{
@@ -1325,14 +1323,14 @@ Item {
                 map_location_view.show_connection = false;
                 map_location_view.show_button_lidar = false;
 
-                map_location_view.loadmap(supervisor.getMapname(),"EDITED");
+                map_location_view.loadmap(supervisor.getMapname(),"T_EDIT");
             }
             Timer{
                 running: true
                 interval: 500
                 onTriggered:{
                     supervisor.drawingRunawayStart();
-                    map_hide.startDrawingT();
+                    map_location_view.startDrawingT();
                 }
             }
             Rectangle{
