@@ -338,8 +338,8 @@ Item {
         }else if(mode==="location"){
             mapview.saveLocation(type,0,name);
         }else if(mode==="tline"){
-            mapview.endSpline(true);
             mapview.saveTline();
+            supervisor.slam_map_reload(supervisor.getMapname());
         }else if(mode==="spline"){
             mapview.endSpline(true);
         }else if(mode==="velmap"){

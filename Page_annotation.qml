@@ -40,8 +40,8 @@ Item {
         test_move_state = 0;
     }
     function movefail(errnum){
-        test_move_state = 2;
         test_move_error = errnum;
+        test_move_state = 2;
         print("annotation move fail : ",errnum);
     }
 
@@ -54,16 +54,19 @@ Item {
             }else if(test_move_error === 1){//"로봇의 초기화가 틀어졌습니다."
                 if(supervisor.getLocalizationState() === 2){
                     test_move_state = 0;
+                    print("movefail local error clear");
                 }
             }else if(test_move_error === 2){//"비상스위치가 눌렸습니다."
                 if(supervisor.getEmoStatus()===0){
                     test_move_state = 0;
+                    print("movefail emo error clear");
                 }
             }else if(test_move_error === 3){//"사용자에 의해 정지되었습니다."
                 test_move_state = 0;
             }else if(test_move_error === 4){//"모터가 초기화 되지 않았습니다."
                 if(supervisor.getMotorState() === 1){
                     test_move_state = 0;
+                    print("movefail motor error clear");
                 }
             }
         }
@@ -220,7 +223,6 @@ Item {
             }
         }
     }
-
     Component{
         id: page_annot_start
         Item{
@@ -3041,6 +3043,13 @@ Item {
                 onTriggered:{
                     supervisor.drawingRunawayStop();
                     map_hide.stopDrawingT();
+                }
+            }
+            Timer{
+                running: true
+                interval: 1000
+                onTriggered:{
+                    supervisor.slam_map_reload();
                 }
             }
 
