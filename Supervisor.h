@@ -73,6 +73,8 @@ public:
 
     int count_excuseme = 0;
     bool flag_excuseme = false;
+    int count_movewait = 0;
+    bool flag_movewait = false;
 
     int setting_call_num = -1;
     QVector<QString> call_queue;

@@ -2929,6 +2929,13 @@ void Supervisor::onTimer(){
                 plog->write("[SUPERVISOR] PATH NOT FOUND -> UI_STATE = UI_STATE_MOVEFAIL");
                 QMetaObject::invokeMethod(mMain, "movefail");
                 ui_state = UI_STATE_MOVEFAIL;
+            }else if(probot->running_state == ROBOT_MOVING_WAIT){
+                if(!flag_movewait){
+                    plog->write("[SCHEDULER] ROBOT ERROR : MOVE WAIT");
+                    QMetaObject::invokeMethod(mMain, "movewait");
+                    count_movewait = 0;
+                    flag_movewait = true;
+                }
             }
         }
         break;
@@ -2987,6 +2994,12 @@ void Supervisor::onTimer(){
         }
     }
 
+    if(flag_movewait){
+        if(count_movewait++ > 15000/MAIN_THREAD){
+            flag_movewait = false;
+            count_movewait = 0;
+        }
+    }
 
     timer_cnt++;
     prev_state = ui_state;

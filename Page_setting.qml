@@ -268,10 +268,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"플랫폼 이름 (*영문)"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -336,10 +342,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"플랫폼 넘버 (중복 주의)"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -392,10 +404,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"플랫폼 번호(중복 주의)"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -431,10 +449,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"플랫폼 타입"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -486,10 +510,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"트레이 별 서빙"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -547,10 +577,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"트레이 개수"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -585,10 +621,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"이동 중 화면"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -639,10 +681,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"이동 속도"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -795,10 +843,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"음악 볼륨"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -879,10 +933,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"음성 볼륨"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -958,10 +1018,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"테이블 표시"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -988,7 +1054,7 @@ Item {
 
                 Rectangle{
                     width: 1100
-                    height: 50
+                    height: 40
                     visible: is_admin
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -1013,10 +1079,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"로봇 반지름 반경 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -1063,10 +1135,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"휠 베이스 반경 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -1113,10 +1191,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"휠 반지름 반경 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -1164,10 +1248,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"WIFI 연결상태"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -1220,10 +1310,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"WIFI SSD"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -1282,10 +1378,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"WIFI Password"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -1357,10 +1459,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"IP"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -1573,10 +1681,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"Gateway"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -1788,10 +1902,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"DNS(Main)"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -2002,10 +2122,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"DNS(Serv)"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -2204,10 +2330,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"초기화"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -2265,10 +2397,10 @@ Item {
             Column{
                 id:column_setting3
                 width: parent.width
-                spacing:25
+                spacing:10
                 Rectangle{
                     width: 1100
-                    height: 50
+                    height: 40
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
@@ -2277,6 +2409,12 @@ Item {
                         text:"카메라 설정"
                         color: "white"
                         font.pixelSize: 20
+                        Component.onCompleted: {
+                            scale = 1;
+                            while(width*scale > parent.width*0.8){
+                                scale=scale-0.01;
+                            }
+                        }
                     }
                 }
                 Rectangle{
@@ -2292,10 +2430,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"카메라 모델"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -2337,10 +2481,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"노출 시간 [ms]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -2390,10 +2540,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"좌측 카메라 시리얼"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -2447,10 +2603,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"우측 카메라 시리얼"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             MouseArea{
                                 anchors.fill: parent
@@ -2512,10 +2674,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"좌측 카메라 TF"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -2568,10 +2736,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"우측 카메라 TF"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -2624,10 +2798,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"최소 인식 높이"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -2692,10 +2872,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"최대 인식 높이"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -2751,7 +2937,7 @@ Item {
 
                 Rectangle{
                     width: 1100
-                    height: 50
+                    height: 40
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
@@ -2760,6 +2946,12 @@ Item {
                         text:"라이다 설정"
                         color: "white"
                         font.pixelSize: 20
+                        Component.onCompleted: {
+                            scale = 1;
+                            while(width*scale > parent.width*0.8){
+                                scale=scale-0.01;
+                            }
+                        }
                     }
                 }
                 Rectangle{
@@ -2774,10 +2966,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"데이터 최대 거리 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -2843,10 +3041,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"데이터 최소 거리 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -2909,10 +3113,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"오프셋 X [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -2974,10 +3184,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"오프셋 Y [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3030,7 +3246,7 @@ Item {
 
                 Rectangle{
                     width: 1100
-                    height: 50
+                    height: 40
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
@@ -3039,6 +3255,12 @@ Item {
                         text:"주행 중 감지"
                         color: "white"
                         font.pixelSize: 20
+                        Component.onCompleted: {
+                            scale = 1;
+                            while(width*scale > parent.width*0.8){
+                                scale=scale-0.01;
+                            }
+                        }
                     }
                 }
                 Rectangle{
@@ -3053,10 +3275,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"경로추종 최대거리 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3118,10 +3346,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"경로추종 최소거리 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3183,10 +3417,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"감지 거리 Level 1 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3253,10 +3493,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"감지 거리 Level 0 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3323,10 +3569,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"장애물 넓이 [pixel]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3392,10 +3644,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"장애물 감지 민감도"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3460,10 +3718,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"즉시정지 거리 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3526,10 +3790,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"감지 후 대기시간 [sec]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3591,10 +3861,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"경로이탈 거리 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3645,21 +3921,9 @@ Item {
                     }
                 }
 
-
-
-
-
-
-
-
-
-
-
-
-
                 Rectangle{
                     width: 1100
-                    height: 50
+                    height: 40
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
@@ -3682,10 +3946,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"Inlier 판단거리 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3750,10 +4020,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"평균오차 최소값 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3818,10 +4094,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"Inlier 비율 [%]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3887,10 +4169,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text: "모터 위치추정 비율 [%]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -3954,10 +4242,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"위치추정 최소 거리 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4019,10 +4313,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"위치추정 최소 시간[sec]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4078,7 +4378,7 @@ Item {
 
                 Rectangle{
                     width: 1100
-                    height: 50
+                    height: 40
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
@@ -4101,10 +4401,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"도착점 허용 오차 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4168,10 +4474,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"도착점 허용 오차 [deg]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4235,10 +4547,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"경로탐색 최소거리 [m]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4311,10 +4629,10 @@ Item {
             Column{
                 id:column_setting45
                 width: parent.width
-                spacing:25
+                spacing:10
                 Rectangle{
                     width: 1100
-                    height: 50
+                    height: 40
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
@@ -4323,6 +4641,12 @@ Item {
                         text:"속도 제한"
                         color: "white"
                         font.pixelSize: 20
+                        Component.onCompleted: {
+                            scale = 1;
+                            while(width*scale > parent.width*0.8){
+                                scale=scale-0.01;
+                            }
+                        }
                     }
                 }
                 Rectangle{
@@ -4337,10 +4661,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"제자리 회전속도 [deg/s]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4403,10 +4733,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"제자리 회전 가속도 [deg/s^2]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4469,10 +4805,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"주행 속도 [m/s]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4535,10 +4877,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"주행 가속도 [m/s^2]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4601,10 +4949,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"주행 회전속도 [deg/s]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4667,10 +5021,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"주행 회전 가속도 [deg/s^2]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4733,10 +5093,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"JOG 속도 [m/s]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4799,10 +5165,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"JOG 회전속도 [deg/s]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4865,10 +5237,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"출발 속도 [m/s]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4932,10 +5310,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"도착 속도 [m/s]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Item_buttons{
                                 type: "circle_text"
@@ -4989,7 +5373,7 @@ Item {
 
                 Rectangle{
                     width: 1100
-                    height: 50
+                    height: 40
                     color: "black"
                     visible: is_admin
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -5014,10 +5398,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"모터 방향"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5054,10 +5444,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"왼쪽 ID"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5094,10 +5490,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"오른쪽 ID"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5134,10 +5536,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"모터 기어비"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5186,10 +5594,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"P 게인"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5238,10 +5652,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"I 게인"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5290,10 +5710,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"D 게인"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5342,10 +5768,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"최대 선속도 [m/s]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5394,10 +5826,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"최대 선 가속도 [m/s^2]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5446,10 +5884,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"최대 각속도 [deg/s]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5498,10 +5942,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"최대 각가속도 [deg/s^2]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5561,7 +6011,7 @@ Item {
             Rectangle{
                 id: rect_motor_1
                 width: 1100
-                height: 50
+                height: 40
                 color: "black"
                 anchors.horizontalCenter: parent.horizontalCenter
                 Text{
@@ -5634,10 +6084,10 @@ Item {
                 width: parent.width
                 anchors.top: rect_motor_2.bottom
                 anchors.topMargin: 2
-                spacing:25
+                spacing:10
                 Rectangle{
                     width: 840
-                    height: 50
+                    height: 40
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -5646,10 +6096,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"모터 연결상태"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5708,10 +6164,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"모터 상태"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5754,10 +6216,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"모터 온도"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5800,10 +6268,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"모터 내부 온도"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5846,10 +6320,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"모터 전류"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5884,7 +6364,7 @@ Item {
 
                 Rectangle{
                     width: 1100
-                    height: 50
+                    height: 40
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
@@ -5907,10 +6387,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"상태값"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -5975,10 +6461,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"배터리"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -6032,10 +6524,16 @@ Item {
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 50
+                                anchors.leftMargin: 30
                                 font.family: font_noto_r.name
                                 text:"Power"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                         }
                         Rectangle{
@@ -6840,33 +7338,49 @@ Item {
 
         background: Rectangle{
             anchors.fill:parent
-            color: color_gray
-            opacity: 0.9
+            color: "black"
+            opacity: 0.8
         }
         Column{
-            anchors.centerIn: parent
-            spacing: 30
-            Text{
-                text: popup_help_setting.titlestr
-                font.family: font_noto_b.name
-                font.pixelSize: 40
-                anchors.horizontalCenter: parent.horizontalCenter
+            anchors.fill: parent
+            Rectangle{
+                width: parent.width
+                color: "transparent"
+                height: 100
+                Text{
+                    text: popup_help_setting.titlestr
+                    font.family: font_noto_b.name
+                    font.pixelSize: 40
+                    color: "white"
+                    anchors.centerIn: parent
+                }
             }
-            Column{
+            Rectangle{
+                width: parent.width*0.6
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 5
-                Repeater{
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    model:ListModel{id:model_lines}
-                    Text{
-                        text: line
-                        font.family: font_noto_r.name
-                        font.pixelSize: 20
+                color: "white"
+                height: 2
+            }
+            Rectangle{
+                width: parent.width
+                color: "transparent"
+                height: parent.height - 102
+                Column{
+                    anchors.centerIn: parent
+                    spacing: 5
+                    Repeater{
                         anchors.horizontalCenter: parent.horizontalCenter
+                        model:ListModel{id:model_lines}
+                        Text{
+                            text: line
+                            color: "white"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 20
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
                     }
                 }
             }
-
         }
 
     }
@@ -7756,7 +8270,6 @@ Item {
                     text: "정말 덮어씌우시겠습니까?"
                     font.family: font_noto_b.name
                     font.pixelSize: 20
-
                 }
                 Rectangle{
                     width: 100
@@ -8051,6 +8564,12 @@ Item {
                                 text: "Left"
                                 font.family: font_noto_b.name
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                                 color: "white"
                             }
 
@@ -8059,6 +8578,12 @@ Item {
                                 text: "Right"
                                 font.family: font_noto_b.name
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                                 color: "white"
                             }
 
@@ -8345,6 +8870,12 @@ Item {
                                     font.pixelSize: 20
                                     font.bold: true
                                     text: "프리셋 1"
+                                    Component.onCompleted: {
+                                        scale = 1;
+                                        while(width*scale > parent.width*0.8){
+                                            scale=scale-0.01;
+                                        }
+                                    }
                                 }
                                 MouseArea{
                                     anchors.fill: parent
@@ -8366,6 +8897,12 @@ Item {
                                     anchors.centerIn: parent
                                     font.family: font_noto_r.name
                                     font.pixelSize: 20
+                                    Component.onCompleted: {
+                                        scale = 1;
+                                        while(width*scale > parent.width*0.8){
+                                            scale=scale-0.01;
+                                        }
+                                    }
                                     font.bold: true
                                     text: "프리셋 2"
                                 }
@@ -8389,6 +8926,12 @@ Item {
                                     anchors.centerIn: parent
                                     font.family: font_noto_r.name
                                     font.pixelSize: 20
+                                    Component.onCompleted: {
+                                        scale = 1;
+                                        while(width*scale > parent.width*0.8){
+                                            scale=scale-0.01;
+                                        }
+                                    }
                                     font.bold: true
                                     text: "프리셋 3"
                                 }
@@ -8412,6 +8955,12 @@ Item {
                                     anchors.centerIn: parent
                                     font.family: font_noto_r.name
                                     font.pixelSize: 20
+                                    Component.onCompleted: {
+                                        scale = 1;
+                                        while(width*scale > parent.width*0.8){
+                                            scale=scale-0.01;
+                                        }
+                                    }
                                     font.bold: true
                                     text: "프리셋 4"
                                 }
@@ -8435,6 +8984,12 @@ Item {
                                     anchors.centerIn: parent
                                     font.family: font_noto_r.name
                                     font.pixelSize: 20
+                                    Component.onCompleted: {
+                                        scale = 1;
+                                        while(width*scale > parent.width*0.8){
+                                            scale=scale-0.01;
+                                        }
+                                    }
                                     font.bold: true
                                     text: "프리셋 5"
                                 }
@@ -8535,8 +9090,14 @@ Item {
                             verticalItemAlignment: Grid.AlignVCenter
                             Text{
                                 font.family: font_noto_r.name
-                                text:"limit_pivot"
+                                text:"제자리 회전 속도 [deg/s]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Rectangle{
                                 width: 1
@@ -8562,8 +9123,14 @@ Item {
                             }
                             Text{
                                 font.family: font_noto_r.name
-                                text:"limit_pivot_acc"
+                                text:"제자리 회전 가속도 [deg/s^2]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Rectangle{
                                 width: 1
@@ -8589,8 +9156,14 @@ Item {
                             }
                             Text{
                                 font.family: font_noto_r.name
-                                text:"limit_v"
+                                text:"주행 속도 [m/s]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Rectangle{
                                 width: 1
@@ -8616,8 +9189,14 @@ Item {
                             }
                             Text{
                                 font.family: font_noto_r.name
-                                text:"limit_v_acc"
+                                text:"주행 가속도 [m/s^2]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Rectangle{
                                 width: 1
@@ -8643,8 +9222,14 @@ Item {
                             }
                             Text{
                                 font.family: font_noto_r.name
-                                text:"limit_w"
+                                text:"주행 회전속도 [deg/s]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Rectangle{
                                 width: 1
@@ -8670,8 +9255,14 @@ Item {
                             }
                             Text{
                                 font.family: font_noto_r.name
-                                text:"limit_w_acc"
+                                text:"주행 회전 가속도 [deg/s^2]"
                                 font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
                             }
                             Rectangle{
                                 width: 1

@@ -203,5 +203,6 @@
         <file>Item_buttons.qml</file>
         <file>bgm/click_error.wav</file>
         <file>bgm/click_start.wav</file>
+        <file>bgm/serving.mp3</file>
     </qresource>
 </RCC>

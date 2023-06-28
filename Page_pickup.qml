@@ -191,6 +191,25 @@ Item {
         }
     }
 
+    MouseArea{
+        id: area_debug
+        width: 150
+        height: 150
+        anchors.right: parent.right
+        anchors.bottom : parent.bottom
+        z: 99
+        property var password: 0
+        onClicked: {
+            //click_sound.play();
+            password++;
+            if(password > 4){
+                password = 0;
+                supervisor.writelog("[USER INPUT] ENTER THE MOVEFAIL PAGE "+Number(password));
+                loadPage(pmovefail);
+                loader_page.item.setNotice(3);
+            }
+        }
+    }
 
     Text{
         id: text_hello
@@ -203,24 +222,28 @@ Item {
         anchors.leftMargin: 100
         anchors.verticalCenter: image_robot.verticalCenter
     }
+
     Audio{
         id: voice_pickup
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_pickup.mp3"
     }
+
     Audio{
         id: voice_tray_1
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_tray_1.mp3"
     }
+
     Audio{
         id: voice_tray_2
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_tray_2.mp3"
     }
+
     Audio{
         id: voice_thanks
         autoPlay: false

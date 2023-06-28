@@ -30,7 +30,7 @@ Item {
         cur_group = 0;
         cur_page = 0;
 
-        view_mode = parseInt(supervisor.getSetting("ROBOT_SW","table_view"));
+        view_mode = 1;//parseInt(supervisor.getSetting("ROBOT_SW","table_view"));
         group_num = supervisor.getLocationGroupNum();
         robot_type = supervisor.getSetting("ROBOT_HW","type");
         table_num = 0;

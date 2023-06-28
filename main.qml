@@ -296,6 +296,11 @@ Window {
         voice_all_stop();
         voice_avoid.play();
     }
+    function movewait(){
+        voice_all_stop();
+        voice_wait.play();
+    }
+
 
     function wififailed(){
         if(loader_page.item.objectName == "page_setting" || loader_page.item.objectName == "page_init")
@@ -318,8 +323,6 @@ Window {
         loader_page.source = page;
         print("loadpage done");
     }
-
-//    function b
 
     function backPage(){
         print(pbefore);
@@ -347,7 +350,7 @@ Window {
             timer_update.start();
             loader_page.item.init();
         }
-        source: pkitchen//pinit
+        source: pmovefail//pinit
     }
 
     Timer{
@@ -403,6 +406,12 @@ Window {
     }
     Audio{
         id: voice_avoid
+        autoPlay: false
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/serving.mp3"
+    }
+    Audio{
+        id: voice_wait
         autoPlay: false
         volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
         source: "bgm/voice_avoid.mp3"

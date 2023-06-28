@@ -66,8 +66,7 @@ Item {
         supervisor.writelog("[QML] MOVEFAIL PAGE init")
         notice_num = 0;
         statusbar.visible = true;
-        notice.y = 0;
-        area_swipe.enabled = true;
+        popup_notice.open();
         map.loadmap(supervisor.getMapname(),"EDITED");
         map.init();
         map.setViewer("current");
@@ -76,877 +75,842 @@ Item {
 
     }
 
-    SequentialAnimation{
-        id: ani_swipe
-        running: true;
-        loops: Animation.Infinite
-        ParallelAnimation{
-            NumberAnimation{target: image_swipe; property: "opacity"; to:1; duration: 1000; easing.type: Easing.OutCubic}
-            NumberAnimation{target: image_swipe; property: "anchors.bottomMargin"; to:80; from: 40; duration: 1000; easing.type: Easing.OutCubic}
-        }
-        ParallelAnimation{
-            NumberAnimation{target: image_swipe; property: "opacity"; to:0.2; duration: 600; easing.type: Easing.OutCubic}
-            NumberAnimation{target: image_swipe; property: "anchors.bottomMargin"; to:40; duration: 600; easing.type: Easing.OutCubic}
+    Rectangle{
+        anchors.fill: parent
+        color:"#282828"
+    }
+    Rectangle{
+        id: rect_state
+        height: parent.height
+        width: parent.width - rect_menu1.width - map.width
+        anchors.top: parent.top
+        anchors.topMargin: statusbar.height
+        color: color_dark_navy
+        Column{
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: 50
+            spacing: 30
+            Rectangle{
+                id: btn_reset
+                width: 90
+                height: 80
+                radius: 5
+                enabled: false
+                color: enabled?"white":color_gray
+                Column{
+                    anchors.centerIn: parent
+                    spacing: 5
+                    Image{
+                        source: "icon/icon_run.png"
+                        sourceSize.width: 40
+                        sourceSize.height: 40
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        text: "다시 시작"
+                        color:btn_reset.enabled?"black":"white"
+                        font.family: font_noto_r.name
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                DropShadow{
+                    anchors.fill: parent
+                    radius: 5
+                    color: color_navy
+                    source: parent
+                    visible:btn_reset.enabled?true:false
+                    z: -1
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : RESTART")
+                        supervisor.moveStop();
+                    }
+                }
+            }
+            Rectangle{
+                width: 90
+                height: 80
+                radius: 5
+                border.width: select_localmode?3:0
+                border.color: color_green
+                Column{
+                    anchors.centerIn: parent
+                    spacing: 5
+                    Image{
+                        source: "image/image_localization.png"
+                        sourceSize.width: 40
+                        sourceSize.height: 40
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        font.pixelSize: 15
+                        text: "Localization"
+                        font.family: font_noto_r.name
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                DropShadow{
+                    anchors.fill: parent
+                    radius: 3
+                    color: color_navy
+                    source: parent
+                    z: -1
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        if(select_localmode){
+                            supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : LOCALIZATION STOP")
+                            select_localmode = false;
+                        }else{
+                            supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : LOCALIZATION START")
+                            select_localmode = true;
+                        }
+                    }
+                }
+            }
+            Rectangle{
+                width: 90
+                height: 80
+                radius: 5
+                Column{
+                    anchors.centerIn: parent
+                    spacing: 5
+                    Image{
+                        source: "icon/icon_power.png"
+                        sourceSize.width: 40
+                        sourceSize.height: 40
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    Text{
+                        text: "SLAM 재부팅"
+                        font.family: font_noto_r.name
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                DropShadow{
+                    anchors.fill: parent
+                    z: -1
+                    radius: 5
+                    color: color_navy
+                    source: parent
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : RESTART SLAM")
+                        supervisor.restartSLAM();
+                    }
+                }
+            }
         }
     }
-
-
-    Item{
-        id: manual
-        width: 1280
-        height: 800
-        anchors.top: notice.bottom
-
-        Rectangle{
-            anchors.fill: parent
-            color:"#282828"
-        }
-        Rectangle{
-            id: rect_state
-            height: parent.height
-            width: parent.width - rect_menu1.width - map.width
+    Rectangle{
+        id: rect_menu1
+        width: 400
+        height: parent.height - statusbar.height
+        anchors.left: rect_state.right
+        anchors.topMargin: statusbar.height
+        anchors.top: parent.top
+        color: "#f4f4f4"
+        visible: select_localmode?false:true
+        Column{
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
-            anchors.topMargin: statusbar.height
-            color: color_dark_navy
-            Column{
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: 50
-                spacing: 30
-                Rectangle{
-                    id: btn_reset
-                    width: 90
-                    height: 80
-                    radius: 5
-                    enabled: false
-                    color: enabled?"white":color_gray
-                    Column{
-                        anchors.centerIn: parent
-                        spacing: 5
-                        Image{
-                            source: "icon/icon_run.png"
-                            sourceSize.width: 40
-                            sourceSize.height: 40
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                        Text{
-                            text: "다시 시작"
-                            color:btn_reset.enabled?"black":"white"
-                            font.family: font_noto_r.name
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                    }
-                    DropShadow{
-                        anchors.fill: parent
-                        radius: 5
-                        color: color_navy
-                        source: parent
-                        visible:btn_reset.enabled?true:false
-                        z: -1
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : RESTART")
-                            supervisor.moveStop();
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 90
-                    height: 80
-                    radius: 5
-                    border.width: select_localmode?3:0
-                    border.color: color_green
-                    Column{
-                        anchors.centerIn: parent
-                        spacing: 5
-                        Image{
-                            source: "image/image_localization.png"
-                            sourceSize.width: 40
-                            sourceSize.height: 40
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                        Text{
-                            font.pixelSize: 15
-                            text: "Localization"
-                            font.family: font_noto_r.name
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                    }
-                    DropShadow{
-                        anchors.fill: parent
-                        radius: 3
-                        color: color_navy
-                        source: parent
-                        z: -1
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            if(select_localmode){
-                                supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : LOCALIZATION STOP")
-                                select_localmode = false;
-                            }else{
-                                supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : LOCALIZATION START")
-                                select_localmode = true;
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 90
-                    height: 80
-                    radius: 5
-                    Column{
-                        anchors.centerIn: parent
-                        spacing: 5
-                        Image{
-                            source: "icon/icon_power.png"
-                            sourceSize.width: 40
-                            sourceSize.height: 40
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                        Text{
-                            text: "SLAM 재부팅"
-                            font.family: font_noto_r.name
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                    }
-                    DropShadow{
-                        anchors.fill: parent
-                        z: -1
-                        radius: 5
-                        color: color_navy
-                        source: parent
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : RESTART SLAM")
-//                            supervisor.restartSLAM();
-                        }
-                    }
+            spacing: 30
+            Rectangle{
+                width: rect_menu1.width
+                height: 80
+                color: color_dark_navy
+                Text{
+                    id: text_obs
+                    anchors.centerIn : parent
+                    font.family: font_noto_b.name
+                    font.pixelSize: 30
+                    color: "white"
+                    text:"현재 상태"
                 }
             }
-        }
-        Rectangle{
-            id: rect_menu1
-            width: 400
-            height: parent.height - statusbar.height
-            anchors.left: rect_state.right
-            anchors.topMargin: statusbar.height
-            anchors.top: parent.top
-            color: "#f4f4f4"
-            visible: select_localmode?false:true
             Column{
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                spacing: 30
+                spacing: 10
                 Rectangle{
-                    width: rect_menu1.width
-                    height: 80
-                    color: color_dark_navy
-                    Text{
-                        id: text_obs
-                        anchors.centerIn : parent
-                        font.family: font_noto_b.name
-                        font.pixelSize: 30
-                        color: "white"
-                        text:""
-                    }
-                }
-                Rectangle{
-                    id: rect_annot_box
-                    width: rect_menu1.width*0.9
-                    height: 120
-                    radius: 5
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: "#e8e8e8"
+                    id: state_emo
+                    width: 300
+                    height: 70
+                    radius: 20
+                    color: "transparent"
+                    enabled: supervisor.getEmoStatus()
+                    visible: enabled
+                    border.color:color_red
+                    border.width: 2
                     Row{
+                        spacing: 20
                         anchors.centerIn: parent
-                        spacing: 30
-                        Rectangle{
-                            id: state_manual
-                            width: 100
-                            height: 80
-                            radius: 10
-                            color: "white"
-                            enabled: supervisor.getEmoStatus()
-                            border.color:color_green
-                            border.width: enabled?3:0
-                            Column{
-                                spacing: 3
-                                anchors.centerIn: parent
-                                Image{
-                                    source: "icon/image_emergency.png"
-                                    Component.onCompleted: {
-                                        if(sourceSize.width > 30)
-                                            sourceSize.width = 30
+                        Image{
+                            source: "icon/image_emergency.png"
+                            anchors.verticalCenter: parent.verticalCenter
+                            Component.onCompleted: {
+                                if(sourceSize.width > 40)
+                                    sourceSize.width = 40
 
-                                        if(sourceSize.height > 30)
-                                            sourceSize.height = 30
-                                    }
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    ColorOverlay{
-                                        id: emo_light
-                                        anchors.fill: parent
-                                        source: parent
-                                        color: color_green
-                                        visible: state_manual.enabled
-                                    }
-                                }
-                                Text{
-                                    font.family: font_noto_r.name
-                                    font.pixelSize: 12
-                                    text: "비상스위치 눌림"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    horizontalAlignment: Text.AlignHCenter
-                                }
+                                if(sourceSize.height > 40)
+                                    sourceSize.height = 40
                             }
+                            ColorOverlay{
+                                id: emo_light
+                                anchors.fill: parent
+                                source: parent
+                                color: color_red
+                            }
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: color_red
+                            text: "비상스위치 눌림"
+                            anchors.verticalCenter: parent.verticalCenter
+                            horizontalAlignment: Text.AlignHCenter
                         }
                     }
                 }
-                Grid{
-                    id: grid_status
-                    rows: 20
-                    columns: 3
-                    horizontalItemAlignment: Grid.AlignHCenter
-                    verticalItemAlignment: Grid.AlignVCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 5
-                    property var led_size: 15
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: "충전 중"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: ":"
-                        width: 30
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Rectangle{
-                        id: rect_charging
-                        width: parent.led_size
-                        height: width
-                        radius: width
-                        color: color_light_gray
-                        border.width:1
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: "비상스위치"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: ":"
-                        width: 30
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Rectangle{
-                        id: rect_emo
-                        width: parent.led_size
-                        height: width
-                        radius: width
-                        color: color_light_gray
-                        border.width:1
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: "모터 전원"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: ":"
-                        width: 30
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Rectangle{
-                        id: rect_power
-                        width: parent.led_size
-                        height: width
-                        radius: width
-                        color: color_light_gray
-                        border.width:1
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: "원격스위치"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: ":"
-                        width: 30
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Rectangle{
-                        id: rect_remote
-                        width: parent.led_size
-                        height: width
-                        radius: width
-                        color: color_light_gray
-                        border.width:1
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: "배터리"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: ":"
-                        width: 30
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Rectangle{
-                        color: "transparent"
-                        width: parent.led_size*2 + 30
-                        height: parent.led_size
-                        Row{
-                            spacing: 30
-                            Text{
-                                id: text_battery_in
-                                font.pixelSize: 12
-                                text: "0V"
-                                horizontalAlignment: Text.AlignHCenter
+
+                Rectangle{
+                    id: state_charging
+                    width: 300
+                    height: 70
+                    radius: 20
+                    color: "transparent"
+                    enabled: supervisor.getChargeStatus()
+                    visible: enabled
+                    border.color:color_red
+                    border.width: 2
+                    Row{
+                        spacing: 20
+                        anchors.centerIn: parent
+                        Image{
+                            source: "icon/icon_charge_2.png"
+                            anchors.verticalCenter: parent.verticalCenter
+                            Component.onCompleted: {
+                                if(sourceSize.width > 40)
+                                    sourceSize.width = 40
+
+                                if(sourceSize.height > 40)
+                                    sourceSize.height = 40
                             }
-                            Text{
-                                id: text_battery_out
-                                font.pixelSize: 12
-                                text: "0V"
-                                horizontalAlignment: Text.AlignHCenter
+                            ColorOverlay{
+                                anchors.fill: parent
+                                source: parent
+                                color: color_red
                             }
                         }
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: "전류"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: ":"
-                        width: 30
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        id: text_current
-                        font.pixelSize: 12
-                        text: "0A"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: "전력"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: ":"
-                        width: 30
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        id: text_power
-                        font.pixelSize: 12
-                        text: "0W"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: "전력(Total)"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: ":"
-                        width: 30
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        id: text_power_total
-                        font.pixelSize: 12
-                        text: "0W"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: "모터 연결상태"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        width: 30
-                        text: ":"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Rectangle{
-                        color: "transparent"
-                        width: parent.led_size*2 + 30
-                        height: parent.led_size
-                        Row{
-                            spacing: 30
-                            Rectangle{
-                                id: rect_motor_con1
-                                width: grid_status.led_size
-                                height: width
-                                radius: width
-                                color: color_light_gray
-                                border.width:1
-                            }
-                            Rectangle{
-                                id: rect_motor_con2
-                                width: grid_status.led_size
-                                height: width
-                                radius: width
-                                color: color_light_gray
-                                border.width:1
-                            }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: color_red
+                            text: "충전 중"
+                            anchors.verticalCenter: parent.verticalCenter
+                            horizontalAlignment: Text.AlignHCenter
                         }
                     }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: "모터 상태 0"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: ":"
-                        width: 30
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        id: text_motor_stat1
-                        color: "white"
-                        font.pixelSize: 10
-                        font.family: font_noto_r.name
-                    }
+                }
 
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: "모터 상태 1"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: ":"
-                        width: 30
-                        horizontalAlignment: Text.AlignHCenter
-                    }
+                Rectangle{
+                    id: state_localization
+                    width: 300
+                    height: 70
+                    radius: 20
+                    color: "transparent"
+                    enabled: supervisor.getChargeStatus()
+                    border.color:enabled?color_red:color_green
+                    border.width: 3
+                    Row{
+                        spacing: 20
+                        anchors.centerIn: parent
+                        Image{
+                            source: "icon/icon_lidar.png"
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 40
+                            height: 40
+                            Component.onCompleted: {
+                                if(sourceSize.width > 50)
+                                    sourceSize.width = 50
 
-                    Text{
-                        id: text_motor_stat2
-                        color: "white"
-                        font.pixelSize: 10
-                        font.family: font_noto_r.name
+                                if(sourceSize.height > 50)
+                                    sourceSize.height = 50
+                            }
+                            ColorOverlay{
+                                anchors.fill: parent
+                                source: parent
+                                color: state_localization.enabled?color_red:color_green
+                            }
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: state_localization.enabled?color_red:color_green
+                            text: state_localization.enabled?"위치를 알 수 없음":"위치추정중"
+                            anchors.verticalCenter: parent.verticalCenter
+                            horizontalAlignment: Text.AlignHCenter
+                        }
                     }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: "모터 온도"
-                        horizontalAlignment: Text.AlignHCenter
+                }
+
+                Rectangle{
+                    id: state_motor_1
+                    width: 300
+                    height: 70
+                    radius: 20
+                    color: "transparent"
+                    enabled: false
+                    border.color:enabled?color_red:color_green
+                    border.width: 3
+                    Row{
+                        spacing: 20
+                        anchors.centerIn: parent
+                        Image{
+                            source: state_motor_1.enabled?"icon/icon_error.png":"icon/icon_charge_2.png"
+                            anchors.verticalCenter: parent.verticalCenter
+                            Component.onCompleted: {
+                                if(sourceSize.width > 40)
+                                    sourceSize.width = 40
+
+                                if(sourceSize.height > 40)
+                                    sourceSize.height = 40
+                            }
+                            ColorOverlay{
+                                anchors.fill: parent
+                                source: parent
+                                color: color_green
+                                visible: !state_motor_1.enabled
+                            }
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: state_motor_1.enabled?color_red:color_green
+                            text: state_motor_1.enabled?"모터 1 에러":"모터 1 정상"
+                            anchors.verticalCenter: parent.verticalCenter
+                            horizontalAlignment: Text.AlignHCenter
+                        }
                     }
-                    Text{
-                        font.family: font_noto_r.name
-                        font.pixelSize: 12
-                        text: ":"
-                        width: 30
-                        horizontalAlignment: Text.AlignHCenter
+                }
+                Rectangle{
+                    id: state_motor_2
+                    width: 300
+                    height: 70
+                    radius: 20
+                    color: "transparent"
+                    enabled: false
+                    border.color:enabled?color_red:color_green
+                    border.width: 3
+                    Row{
+                        spacing: 20
+                        anchors.centerIn: parent
+                        Image{
+                            source: state_motor_2.enabled?"icon/icon_error.png":"icon/icon_charge_2.png"
+                            anchors.verticalCenter: parent.verticalCenter
+                            Component.onCompleted: {
+                                if(sourceSize.width > 40)
+                                    sourceSize.width = 40
+
+                                if(sourceSize.height > 40)
+                                    sourceSize.height = 40
+                            }
+                            ColorOverlay{
+                                anchors.fill: parent
+                                source: parent
+                                color: color_green
+                                visible: !state_motor_2.enabled
+                            }
+                        }
+                        Text{
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: state_motor_2.enabled?color_red:color_green
+                            text: state_motor_2.enabled?"모터 2 에러":"모터 2 정상"
+                            anchors.verticalCenter: parent.verticalCenter
+                            horizontalAlignment: Text.AlignHCenter
+                        }
                     }
+                }
+
+            }
+        }
+
+        Column{
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            Rectangle{
+                width: 400
+                height: 60
+                color: color_navy
+                Row{
                     Rectangle{
                         color: "transparent"
-                        width: parent.led_size*2 + 30
-                        height: parent.led_size
-                        Row{
+                        width: 100
+                        height: 60
+                        Text{
                             anchors.centerIn: parent
-                            spacing: 30
+                            text: "모터\n1"
+                            horizontalAlignment: Text.AlignHCenter
+                            color: "white"
+                            font.family: font_noto_r.name
+                        }
+                    }
+                    Column{
+                        Rectangle{
+                            color: "transparent"
+                            width: 300
+                            height: 30
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                text: "온도"
+                                horizontalAlignment: Text.AlignHCenter
+                                color: "white"
+                                font.family: font_noto_r.name
+                            }
                             Text{
                                 id: text_motor_temp1
-                                font.pixelSize: 13
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 100
                                 text: "0"
+                                color: "white"
+                                font.family: font_noto_r.name
+                            }
+                        }
+                        Rectangle{
+                            height: 1
+                            width: 300
+                            color: "white"
+                        }
+                        Rectangle{
+                            color: "transparent"
+                            width: 300
+                            height: 30
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                text: "상태"
+                                color: "white"
                                 font.family: font_noto_r.name
                             }
                             Text{
-                                id: text_motor_temp2
-                                font.pixelSize: 13
-                                text: "0"
+                                id: text_motor_stat1
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 100
+                                text: "이상 없음"
+                                color: "white"
                                 font.family: font_noto_r.name
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        Timer{
-            id: timer_check_localization
-            running: false
-            repeat: true
-            interval: 500
-            onTriggered:{
-                if(supervisor.is_slam_running()){
-                    supervisor.writelog("[QML] CHECK LOCALIZATION : STARTED")
-                    btn_auto_init.running = false;
-                    timer_check_localization.stop();
-                }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
-                    supervisor.writelog("[QML] CHECK LOCALIZATION : FAILED OR NOT READY "+Number(supervisor.getLocalizationState()));
-                    timer_check_localization.stop();
-                    btn_auto_init.running = false;
-                }
-            }
-        }
-
-        Rectangle{
-            id: rect_menu2
-            width: 400
-            height: parent.height - statusbar.height
-            anchors.left: rect_state.right
-            anchors.topMargin: statusbar.height
-            anchors.top: parent.top
-            visible: select_localmode?true:false
-            color: "#f4f4f4"
-            Column{
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                spacing: 30
-                Rectangle{
-                    width: rect_menu1.width
-                    height: 80
-                    color: color_dark_navy
-                    Text{
-                        anchors.centerIn : parent
-                        font.family: font_noto_b.name
-                        font.pixelSize: 30
-                        color: "white"
-                        text:"위치 초기화"
-                    }
-                }
-                Rectangle{
-                    width: rect_menu1.width*0.9
-                    height: 120
-                    radius: 5
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: "#e8e8e8"
-                    Row{
-                        anchors.centerIn: parent
-                        spacing: 30
-                        Item_button{
-                            id: btn_move
-                            width: 80
-                            shadow_color: color_gray
-                            highlight: map.tool=="move"
-                            icon: "icon/icon_move.png"
-                            name: "이동"
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    map.setTool("move");
-                                }
-                            }
-                        }
-                        Item_button{
-                            width: 80
-                            visible: false
-                            shadow_color: color_gray
-                            icon: "icon/icon_local_manual.png"
-                            name: "대기위치로\n초기화"
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    supervisor.slam_stop();
-                                    if(supervisor.getGridWidth() > 0){
-                                        var init_x = supervisor.getLocationX("Resting");
-                                        var init_y = supervisor.getLocationY("Resting");
-                                        var init_th  = supervisor.getLocationTH("Resting");
-                                        map.setAutoInit(init_x,init_y,init_th);
-                                    }
-                                    supervisor.writelog("[QML] MAP PAGE (LOCAL) -> LOCALIZATION MANUAL ")
-                                    supervisor.slam_setInit();
-                                }
-                            }
-                        }
-                        Item_button{
-                            width: 80
-                            shadow_color: color_gray
-                            highlight: map.tool=="slam_init"
-                            icon: "icon/icon_point.png"
-                            name: "수동 초기화"
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : LOCALIZATION MANUAL")
-                                    supervisor.slam_stop();
-                                    map.setTool("slam_init");
-                                    if(supervisor.getGridWidth() > 0){
-                                        var init_x = supervisor.getlastRobotx();
-                                        var init_y = supervisor.getlastRoboty();
-                                        var init_th  = supervisor.getlastRobotth();// - Math.PI/2;
-                                        map.setAutoInit(init_x,init_y,init_th);
-                                        supervisor.setInitPos(init_x,init_y,init_th);
-                                    }
-                                    supervisor.slam_setInit();
-                                }
-                            }
-                        }
-                        Item_button{
-                            id: btn_auto_init
-                            width: 78
-                            shadow_color: color_gray
-                            icon:"icon/icon_auto_init.png"
-                            name:"자동 초기화"
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    supervisor.writelog("[USER INPUT] MOVEFAIL PAGE : LOCALIZATION AUTO")
-                                    if(supervisor.getLocalizationState() !== 1){
-                                        btn_auto_init.running = true;
-                                        supervisor.slam_autoInit();
-                                        timer_check_localization.start();
-                                    }
-                                }
                             }
                         }
                     }
                 }
             }
             Rectangle{
-                width: parent.width*0.9
-                height: 200
-                radius: 10
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 50
-                anchors.horizontalCenter: parent.horizontalCenter
+                height: 1
+                width: 400
+                color: "white"
+            }
+            Rectangle{
+                width: 400
+                height: 60
+                color: color_navy
+                Row{
+                    Rectangle{
+                        color: "transparent"
+                        width: 100
+                        height: 60
+                        Text{
+                            anchors.centerIn: parent
+                            text: "모터\n2"
+                            horizontalAlignment: Text.AlignHCenter
+                            color: "white"
+                            font.family: font_noto_r.name
+                        }
+                    }
+                    Column{
+                        Rectangle{
+                            color: "transparent"
+                            width: 300
+                            height: 30
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                text: "온도"
+                                horizontalAlignment: Text.AlignHCenter
+                                color: "white"
+                                font.family: font_noto_r.name
+                            }
+                            Text{
+                                id: text_motor_temp2
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 100
+                                text: "0"
+                                color: "white"
+                                font.family: font_noto_r.name
+                            }
+                        }
+                        Rectangle{
+                            height: 1
+                            width: 300
+                            color: "white"
+                        }
+                        Rectangle{
+                            color: "transparent"
+                            width: 300
+                            height: 30
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                text: "상태"
+                                color: "white"
+                                font.family: font_noto_r.name
+                            }
+                            Text{
+                                id: text_motor_stat2
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 100
+                                text: "이상 없음"
+                                color: "white"
+                                font.family: font_noto_r.name
+                            }
+                        }
+                    }
+                }
+            }
+            Rectangle{
+                height: 1
+                width: 400
+                color: "white"
+            }
+
+            Rectangle{
+                width: 400
+                height: 100
+                color: color_navy
+                Row{
+                    Rectangle{
+                        id: bat_in
+                        width: 80
+                        height: 100
+                        color: color_navy
+                        Column{
+                            Rectangle{
+                                width: 60
+                                height: 50
+                                color: "transparent"
+                                Text{
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 12
+                                    text: "전압\n(IN)"
+                                    color: "white"
+                                    anchors.centerIn: parent
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+                            Rectangle{
+                                width: 60
+                                height: 50
+                                color: "transparent"
+                                Text{
+                                    id: text_battery_in
+                                    font.pixelSize: 12
+                                    text: "0V"
+                                    anchors.centerIn: parent
+                                    color: "white"
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: bat_out
+                        width: 80
+                        height: 100
+                        color: color_navy
+                        Column{
+                            Rectangle{
+                                width: 60
+                                height: 50
+                                color: "transparent"
+                                Text{
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 12
+                                    text: "배터리\n(OUT)"
+                                    color: "white"
+                                    anchors.centerIn: parent
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+                            Rectangle{
+                                width: 60
+                                height: 50
+                                color: "transparent"
+                                Text{
+                                    id: text_battery_out
+                                    font.pixelSize: 12
+                                    text: "0V"
+                                    color: "white"
+                                    anchors.centerIn: parent
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: current
+                        width: 80
+                        height: 100
+                        color: color_navy
+                        Column{
+                            Rectangle{
+                                width: 60
+                                height: 50
+                                color: "transparent"
+                                Text{
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 12
+                                    text: "전류"
+                                    color: "white"
+                                    anchors.centerIn: parent
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+                            Rectangle{
+                                width: 60
+                                height: 50
+                                color: "transparent"
+                                Text{
+                                    id: text_current
+                                    font.pixelSize: 12
+                                    text: "0A"
+                                    anchors.centerIn: parent
+                                    color: "white"
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: power
+                        width: 80
+                        height: 100
+                        color: color_navy
+                        Column{
+                            Rectangle{
+                                width: 60
+                                height: 50
+                                color: "transparent"
+                                Text{
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 12
+                                    text: "전력"
+                                    anchors.centerIn: parent
+                                    color: "white"
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+                            Rectangle{
+                                width: 60
+                                height: 50
+                                color: "transparent"
+                                Text{
+                                    id: text_power
+                                    font.pixelSize: 12
+                                    anchors.centerIn: parent
+                                    text: "0W"
+                                    color: "white"
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: power_total
+                        width: 80
+                        height: 100
+                        color: color_navy
+                        Column{
+                            Rectangle{
+                                width: 60
+                                height: 50
+                                color: "transparent"
+                                Text{
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 12
+                                    text: "전력\n(Total)"
+                                    anchors.centerIn: parent
+                                    color: "white"
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+                            Rectangle{
+                                width: 60
+                                height: 50
+                                color: "transparent"
+                                Text{
+                                    id: text_power_total
+                                    font.pixelSize: 12
+                                    text: "0W"
+                                    color: "white"
+                                    anchors.centerIn: parent
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+    Timer{
+        id: timer_check_localization
+        running: false
+        repeat: true
+        interval: 500
+        onTriggered:{
+            if(supervisor.is_slam_running()){
+                supervisor.writelog("[QML] CHECK LOCALIZATION : STARTED")
+                btn_auto_init.running = false;
+                timer_check_localization.stop();
+            }else if(supervisor.getLocalizationState() === 0 || supervisor.getLocalizationState() === 3){
+                supervisor.writelog("[QML] CHECK LOCALIZATION : FAILED OR NOT READY "+Number(supervisor.getLocalizationState()));
+                timer_check_localization.stop();
+                btn_auto_init.running = false;
+            }
+        }
+    }
+
+    Rectangle{
+        id: rect_menu2
+        width: 400
+        height: parent.height - statusbar.height
+        anchors.left: rect_state.right
+        anchors.topMargin: statusbar.height
+        anchors.top: parent.top
+        visible: select_localmode?true:false
+        color: "#f4f4f4"
+        Column{
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            spacing: 30
+            Rectangle{
+                width: rect_menu1.width
+                height: 80
+                color: color_dark_navy
+                Text{
+                    anchors.centerIn : parent
+                    font.family: font_noto_b.name
+                    font.pixelSize: 30
+                    color: "white"
+                    text:"위치 초기화"
+                }
+            }
+            Rectangle{
+                color: "transparent"
+                width: rect_menu1.width
+                height: rect_menu2.height - 80
                 Column{
                     anchors.centerIn: parent
-                    spacing: 10
-                    Text{
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: "* 안 내 사 항 *"
-                        font.pixelSize: 18
-                        font.bold: true
-                        font.family: font_noto_b.name
-                        color: color_red
+                    spacing: 50
+                    Item_buttons{
+                        width: 200
+                        height: 80
+                        type: "round_text"
+                        selected: map.tool==="move"
+                        text: "이 동"
+                        onClicked: {
+                            map.setTool("move");
+                        }
                     }
-                    Grid{
-                        rows: 6
-                        columns: 2
-                        Text{
-                            text: "1."
-                            font.pixelSize: 13
-                            font.family: font_noto_r.name
-                            color: color_red
+                    Item_buttons{
+                        width: 200
+                        height: 80
+                        type: "round_text"
+                        selected: map.tool==="slam_init"
+                        text: "수동 지정"
+                        onClicked: {
+                            map.setTool("slam_init");
+                            supervisor.setInitCurPos();
+                            supervisor.slam_setInit();
                         }
-                        Text{
-                            text: "비상스위치가 눌려있다면 풀어주세요."
-                            font.pixelSize: 13
-                            font.family: font_noto_r.name
-                            color: color_red
-                        }
-                        Text{
-                            text: "2."
-                            font.pixelSize: 13
-                            font.family: font_noto_r.name
-                            color: color_red
-                        }
-                        Text{
-                            text: "자동 초기화 버튼을 눌러 초기화를 시작합니다. (약 3-5초 소요)"
-                            font.pixelSize: 13
-                            font.family: font_noto_r.name
-                            color: color_red
-                        }
-                        Text{
-                            text: "3."
-                            font.pixelSize: 13
-                            font.family: font_noto_r.name
-                            color: color_red
-                        }
-                        Text{
-                            text: "라이다 데이터가 맵과 일치하는 지 확인해주세요."
-                            font.pixelSize: 13
-                            font.family: font_noto_r.name
-                            color: color_red
-                        }
-                        Text{
-                            text: "4."
-                            font.pixelSize: 13
-                            font.family: font_noto_r.name
-                            color: color_red
-                        }
-                        Text{
-                            text: "일치하지 않는다면 수동 초기화 버튼을 누르세요."
-                            font.pixelSize: 13
-                            font.family: font_noto_r.name
-                            color: color_red
-                        }
-                        Text{
-                            text: "5."
-                            font.pixelSize: 13
-                            font.family: font_noto_r.name
-                            color: color_red
-                        }
-                        Text{
-                            text: "맵 상에서 로봇의 현재 위치와 방향대로 표시해주세요."
-                            font.pixelSize: 13
-                            font.family: font_noto_r.name
-                            color: color_red
-                        }
-                        Text{
-                            text: "6."
-                            font.pixelSize: 13
-                            font.family: font_noto_r.name
-                            color: color_red
-                        }
-                        Text{
-                            text: "라이다가 맵과 일치하는 지 확인해주세요."
-                            font.pixelSize: 13
-                            font.family: font_noto_r.name
-                            color: color_red
+                    }
+                    Item_buttons{
+                        id: btn_do_autoinit
+                        width: 200
+                        height: 100
+                        running: false
+                        type: "start_progress"
+                        text: "자동위치찾기\n(1분소요)"
+                        shadowcolor: color_dark_black
+                        onClicked: {
+                            map.setTool("move");
+                            supervisor.slam_fullautoInit();
+                            timer_check_localization2.start();
                         }
                     }
                 }
-            }
-        }
 
-        Map_full{
-            id: map
-            objectName: "MOVEFAIL"
-            width: 740
-            height: width
-            show_button_following: true
-            show_button_lidar: true
-            show_connection: true
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.topMargin: statusbar.height
+            }
         }
     }
-    Item{
-        id: notice
+
+    Map_full{
+        id: map
+        objectName: "MOVEFAIL"
+        width: 740
+        height: width
+        show_button_following: true
+        show_button_lidar: true
+        show_connection: true
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.topMargin: statusbar.height
+    }
+
+    Popup{
+        id: popup_notice
         width: 1280
-        height: 800
-        Behavior on y{
-            NumberAnimation{
-                duration: 500;
-                easing.type: Easing.OutCubic
-            }
+        height: 400
+        anchors.centerIn: parent
+        background: Rectangle{
+            anchors.fill: parent
+            color:"transparent"
         }
         Rectangle{
-            anchors.fill: parent
-            color:"#282828"
-        }
-        Image{
-            id: icon_warn
-            source: "icon/image_emergency_push.png"
-//            width: 130
-//            height: 130
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: parent.top
-            anchors.topMargin: 200
-        }
-        Text{
-            id: text
-            text:"목적지로 이동하는데 실패하였습니다.\n비상스위치 버튼을 누르고 로봇을 수동으로 이동시켜주세요."
-            anchors.top: icon_warn.bottom
-            anchors.topMargin: 40
-            anchors.horizontalCenter: parent.horizontalCenter
-            horizontalAlignment: Text.AlignHCenter
-            font.family: font_noto_b.name
-            font.pixelSize: 40
-            color: "white"
-        }
-        Image{
-            id: image_swipe
-            source: "icon/joy_up.png"
-            width: 60
-            height: 40
-            visible: area_swipe.enabled
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 40
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-        Text{
-            text: "위로 올리시면 메뉴가 나옵니다."
-            font.family: font_noto_r.name
-            color: "#e8e8e8"
-            visible: image_swipe.visible
-            opacity: image_swipe.opacity
-            anchors.verticalCenter: image_swipe.verticalCenter
-            anchors.left: image_swipe.right
-            anchors.leftMargin: 10
-        }
-    }
-    MouseArea{
-        id: area_swipe
-        anchors.fill: parent
-        enabled: false
-        property var password:0;
-        property var firstX;
-        property var firstY;
-        onPressed: {
-            firstX = mouseX;
-            firstY = mouseY;
-        }
-        onReleased: {
-            if(firstY - mouseY > 100){
-                supervisor.writelog("[USER INPUT] SWIPE MOVEFAIL PAGE TO DOWN "+Number(firstY - mouseY).toFixed(0))
-                notice.y = -800;
-                area_swipe.enabled = false;
-                password = 0;
-//                timer_get_joy.start();
-            }else{
-                supervisor.writelog("[USER INPUT] SWIPE MOVEFAIL PAGE TO UP "+Number(firstY - mouseY).toFixed(0))
-                notice.y = 0;
+            width: 1280
+            height: 400
+            color:color_dark_navy
+            Text{
+                id: text
+                text:"목적지로 이동하는데 실패하였습니다.\n로봇을 수동으로 이동시켜주세요."
+                anchors.centerIn: parent
+                horizontalAlignment: Text.AlignHCenter
+                font.family: font_noto_b.name
+                font.pixelSize: 40
+                color: "white"
             }
-        }
-        onPositionChanged: {
-            if(firstY - mouseY > 0){
-                notice.y =  mouseY - firstY;
-            }
-        }
-        onClicked: {
-            if(mouseX > parent.width - 100 && mouseY > parent.height-100){
-                password++;
-                print(password);
-                if(password > 4){
-                    password = 0;
-                    loadPage(pkitchen);
+            MouseArea{
+                anchors.fill: parent
+                onClicked:{
+                    popup_notice.close();
                 }
             }
         }
-    }
-
-    Audio{
-        id: voice_obs_close
-        autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
-        source: "bgm/voice_obs_too_close.mp3"
     }
 
     Timer{
@@ -954,82 +918,39 @@ Item {
         interval: 100
         running: true
         repeat: true
-        property bool prev_emo_state: supervisor.getEmoStatus()
         onTriggered: {
             //0: no path /1: local fail /2: emergency /3: user stop /4: motor error
-            if(notice_num === 0){
-                if(supervisor.getEmoStatus()){
-                    if(prev_emo_state !== supervisor.getEmoStatus()){
-                        //Auto Swipe
-                        notice.y = -800;
-                        area_swipe.enabled = false;
-                        area_swipe.password = 0;
-                    }else if(notice.y === 0){
-                        area_swipe.enabled = true;
-                    }
-                }else{
-                    area_swipe.enabled = false;
-                }
-
-                prev_emo_state = supervisor.getEmoStatus();
-            }else if(notice_num === 1){
-                if(notice.y === 0)
-                    area_swipe.enabled = true;
-            }else if(notice_num === 2){
-                if(notice.y === 0)
-                    area_swipe.enabled = true;
-            }else if(notice_num === 3){
-                if(notice.y === 0)
-                    area_swipe.enabled = true;
-            }else if(notice_num === 4){
-                if(supervisor.getEmoStatus()){
-                    if(notice.y === 0)
-                        area_swipe.enabled = true;
-                }else{
-                    area_swipe.enabled = false;
-                }
-            }
-
             if(supervisor.getEmoStatus()){
-                rect_emo.color = color_green;
-                state_manual.enabled = true;
+                state_emo.enabled = true;
             }else{
-                state_manual.enabled = false;
-                rect_emo.color = color_light_gray;
-            }
-
-            if(supervisor.getEmoStatus() === 0){
-                btn_reset.enabled = true;
-            }else{
-                btn_reset.enabled = false;
-            }
-
-            if(supervisor.getRemoteStatus()){
-                rect_remote.color = color_green;
-            }else{
-                rect_remote.color = color_light_gray;
-            }
-            if(supervisor.getPowerStatus()){
-                rect_power.color = color_green;
-            }else{
-                rect_power.color = color_light_gray;
+                state_emo.enabled = false;
             }
             if(supervisor.getChargeStatus()){
-                rect_charging.color = color_green;
+                state_charging.enabled = true;
             }else{
-                rect_charging.color = color_light_gray;
+                state_charging.enabled = false;
             }
+
             if(supervisor.getMotorConnection(0)){
-                rect_motor_con1.color = color_green;
+                if(supervisor.getMotorStatus(0) === 0){
+                    state_motor_1.enabled            = false;
+                }else{
+                    state_motor_1.enabled = true;
+                }
             }else{
-                rect_motor_con1.color = color_red;
+                state_motor_1.enabled = true;
             }
 
             if(supervisor.getMotorConnection(1)){
-                rect_motor_con2.color = color_green;
+                if(supervisor.getMotorStatus(1) === 0){
+                    state_motor_2.enabled            = false;
+                }else{
+                    state_motor_2.enabled = true;
+                }
             }else{
-                rect_motor_con2.color = color_red;
+                state_motor_2.enabled = true;
             }
+
             if(supervisor.getMotorStatus(0)===0){
                 text_motor_stat1.color = color_light_gray;
                 text_motor_stat1.text = supervisor.getMotorStatusStr(0);
@@ -1054,12 +975,12 @@ Item {
             if(supervisor.getMotorTemperature(0) > supervisor.getMotorWarningTemperature()){
                 text_motor_temp1.color = color_red;
             }else{
-                text_motor_temp1.color = "black";
+                text_motor_temp1.color = "white";
             }
             if(supervisor.getMotorTemperature(1) > supervisor.getMotorWarningTemperature()){
                 text_motor_temp2.color = color_red;
             }else{
-                text_motor_temp2.color = "black";
+                text_motor_temp2.color = "white";
             }
 
             text_motor_temp1.text = supervisor.getMotorTemperature(0).toFixed(0).toString();
@@ -1071,8 +992,6 @@ Item {
 
             text_power.text = supervisor.getPower(0).toFixed(0).toString() + "W";
             text_power_total.text = supervisor.getPowerTotal(1).toFixed(0).toString() + "W";
-
         }
-
     }
 }
