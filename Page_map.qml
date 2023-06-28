@@ -220,7 +220,8 @@ Item {
             anchors.fill: parent
             onClicked: {
                 supervisor.writelog("[UI] MAP : move to backPage");
-                backPage();
+                loadPage(pmenu);
+//                backPage();
             }
         }
     }
