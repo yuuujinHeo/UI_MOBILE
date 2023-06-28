@@ -739,7 +739,7 @@ void MapView::saveRotateMap(){
     cv::flip(map_edited_ui,map_edited_ui,0);
 
     QString path = QDir::homePath() + "/maps/" + map_name + "/map_edited.png";
-    plog->write("[Annotation] Map Size Cut : "+QString().sprintf("%d,%d ~ %d,%d",cut_box[0].x,cut_box[0].y,cut_box[1].x,cut_box[1].y));
+    plog->write("[Annotation] Map Size Cut : "+QString().sprintf("%f,%f ~ %f,%f",cut_box[0].x,cut_box[0].y,cut_box[1].x,cut_box[1].y));
 
     cv::Mat temp_travelline = cv::Mat(map_edited_ui.rows,map_edited_ui.cols, CV_8U,cv::Scalar::all(0));
     QString path1 = QDir::homePath() + "/maps/" + map_name + "/map_travel_line.png";
