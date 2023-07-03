@@ -6,13 +6,12 @@
 #include <QThread>
 #include <QQuickWindow>
 #include "GlobalHeader.h"
-
-#include "JoystickHandler.h"
 #include "CallbellHandler.h"
 #include "HTTPHandler.h"
 #include "ZIPHandler.h"
 #include "IPCHandler.h"
 #include "MapView.h"
+#include "MapHandler.h"
 #include <libusb-1.0/libusb.h>
 
 #define MOTOR_RUN(x)            ((x)&0x01)
@@ -116,13 +115,124 @@ public:
     QProcess *wifi_check_process;
     ////*********************************************  CLASS   ***************************************************////
     ZIPHandler *zip;
-    JoystickHandler *joystick;
+//    JoystickHandler *joystick;
     HTTPHandler *git;
+    MapHandler *maph;
     CallbellHandler *call;
     IPCHandler *ipc;
     QProcess *slam_process;
 
     Q_INVOKABLE void writelog(QString msg);
+
+    ////*********************************************  MAP HANDLER   ***************************************************////
+
+    Q_INVOKABLE void loadFile(QString name, QString type){maph->loadFile(name,type);}
+
+    //------------draw map--------------//
+    Q_INVOKABLE void setMap();
+    Q_INVOKABLE void moveMap();
+    Q_INVOKABLE void setFullScreen();
+    Q_INVOKABLE void setMapDrawing();
+
+    //------------map variables--------------//
+    Q_INVOKABLE void setName(QString name){maph->setName(name);}
+    Q_INVOKABLE void setTool(QString name){maph->setTool(name);}
+    Q_INVOKABLE QString getTool(){return maph->getTool();}
+    Q_INVOKABLE void setMode(QString name){maph->setMode(name);}
+    Q_INVOKABLE void setEnable(bool en){maph->setEnable(en);}
+    Q_INVOKABLE QString getMode(){return maph->getMode();}
+    Q_INVOKABLE void setShowBrush(bool onoff){maph->setShowBrush(onoff);}
+    Q_INVOKABLE void setShowLidar(bool onoff){maph->setShowLidar(onoff);}
+    Q_INVOKABLE void setShowLocation(bool onoff){maph->setShowLocation(onoff);}
+    Q_INVOKABLE void setRobotFollowing(bool onoff){maph->setRobotFollowing(onoff);}
+
+    Q_INVOKABLE bool getshowLocation(){return maph->getshowLocation();}
+    Q_INVOKABLE bool getRobotFollowing(){return maph->getRobotFollowing();}
+    Q_INVOKABLE bool getShowLidar(){return maph->getShowLidar();}
+
+
+    Q_INVOKABLE void setInitPose(int x, int y, float th){maph->setInitPose(x,y,th);}
+    Q_INVOKABLE void clearInitPose(){maph->clearInitPose();}
+
+
+    Q_INVOKABLE void startDrawingTline(){maph->startDrawingTline();}
+    Q_INVOKABLE void stopDrawingTline(){maph->stopDrawingTline();}
+    Q_INVOKABLE bool getDrawingTline(){maph->getDrawingTline();}
+
+
+    Q_INVOKABLE void setBoxPoint(int num, int x, int y){maph->setBoxPoint(num,x,y);}
+    Q_INVOKABLE int getPointBox(int x, int y){maph->getPointBox(x,y);}
+    Q_INVOKABLE void saveRotateMap(){maph->getDrawingTline();}
+    Q_INVOKABLE void initRotate(){maph->initRotate();}
+    Q_INVOKABLE void rotateMap(int angle){maph->rotateMap(angle);}
+    Q_INVOKABLE void rotateMapCW(){maph->rotateMapCCW();}
+    Q_INVOKABLE void rotateMapCCW(){maph->rotateMapCCW();}
+
+
+    Q_INVOKABLE bool getDrawingFlag(){maph->getDrawingFlag();}
+
+    Q_INVOKABLE bool getDrawingUndoFlag(){maph->getDrawingUndoFlag();}
+
+    Q_INVOKABLE void startDrawing(int x, int y){maph->startDrawing(x,y);}
+    Q_INVOKABLE void addLinePoint(int x, int y){maph->addLinePoint(x,y);}
+    Q_INVOKABLE void endDrawing(int x, int y){maph->endDrawing(x,y);}
+
+
+    Q_INVOKABLE void startDrawingRect(int x, int y){maph->startDrawingRect(x,y);}
+    Q_INVOKABLE void setDrawingRect(int x, int y){maph->setDrawingRect(x,y);}
+    Q_INVOKABLE void endDrawingRect(){maph->endDrawingRect();}
+
+    Q_INVOKABLE void clearDrawing(){maph->clearDrawing();}
+    Q_INVOKABLE void undoLine(){maph->undoLine();}
+    Q_INVOKABLE void redoLine(){maph->redoLine();}
+    Q_INVOKABLE void startSpline(int x, int y){maph->startSpline(x,y);}
+    Q_INVOKABLE void addSpline(int x, int y){maph->addSpline(x,y);}
+    Q_INVOKABLE void drawSpline(){maph->drawSpline();}
+    Q_INVOKABLE void endSpline(bool save){maph->endSpline(save);}
+    Q_INVOKABLE void startDrawingLine(int x, int y){maph->startDrawingLine(x,y);}
+    Q_INVOKABLE void setDrawingLine(int x, int y){maph->stopDrawingLine(x,y);}
+    Q_INVOKABLE void stopDrawingLine(int x, int y){maph->stopDrawingLine(x,y);}
+    Q_INVOKABLE void setLineColor(int color){maph->setLineColor(color);}
+    Q_INVOKABLE void setLineWidth(int width){maph->setLineWidth(width);}
+
+    Q_INVOKABLE void saveLocation(QString type, int groupnum, QString name){maph->saveLocation(type,groupnum,name);}
+    Q_INVOKABLE void clearLocation(){pmap->clearLocation();}
+    Q_INVOKABLE void addLocation(int x, int y,float th);
+    Q_INVOKABLE void addLocationCur(int x, int y,float th);
+    Q_INVOKABLE void setLocation(int x, int y, float th);
+    Q_INVOKABLE void editLocation(int x, int y, float th);
+    Q_INVOKABLE int getLocationNum(int x, int y);;
+    Q_INVOKABLE void removeLocation(int num);
+    Q_INVOKABLE void setTableNumberAuto();
+    Q_INVOKABLE int getLocationNum(QString type);
+    Q_INVOKABLE int getLocGroupNum(int num);
+    Q_INVOKABLE void saveMap();
+    Q_INVOKABLE void saveTline();
+    Q_INVOKABLE void saveTlineTemp();
+    Q_INVOKABLE void saveVelmap();
+    Q_INVOKABLE void setMapSize(int width, int height);
+    Q_INVOKABLE void zoomIn(int x, int y);
+    Q_INVOKABLE void zoomOut(int x, int y);
+    Q_INVOKABLE void move(int x, int y);
+    Q_INVOKABLE int getFileWidth(){return file_width;}
+    Q_INVOKABLE int getX(){return draw_x;}
+    Q_INVOKABLE int getY(){return draw_y;}
+    Q_INVOKABLE float getScale(){return scale;}
+
+    Q_INVOKABLE void setSize(int x, int y, float width);
+
+    void updateMeta();
+    Q_INVOKABLE bool getCutBoxFlag();
+
+
+
+
+
+
+
+
+
+
 
     ////*********************************************  SH   ***************************************************////
     Q_INVOKABLE bool checkINI();
@@ -314,6 +424,18 @@ public:
                 num++;
         }
         return num;
+    }
+    Q_INVOKABLE int getCallQueueSize();
+    Q_INVOKABLE void cleanTray();
+    Q_INVOKABLE QString getCallName(int id){
+        if(id > -1 && id < call_queue.size()){
+            return getCallLocation(call_queue[id]).name;
+        }else{
+            return "";
+        }
+    }
+    Q_INVOKABLE void clearCallQueue(){
+        call_queue.clear();
     }
     Q_INVOKABLE QString getCall(int id){return pmap->locations[id].call_id;}
     Q_INVOKABLE LOCATION getCallLocation(QString id);

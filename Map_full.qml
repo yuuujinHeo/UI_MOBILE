@@ -159,10 +159,10 @@ Item {
             map_type = type;
             timer_loadmap.stop();
             map_loaded = true;
-            mapview.loadFile(name);
+            mapview.loadFile(name,type);
         }else{
             map_loaded = true;
-            mapview.loadFile(name);
+            mapview.loadFile(name,type);
             if(supervisor.isExistAnnotation(name)){
                 map_type = "EDITED";
             }else{
@@ -212,6 +212,12 @@ Item {
                     map_loaded = true;
                     mapview.setTlineMode(true);
                     mapview.initTline(name);
+                    mapview.setEditedMap(name);
+                    mapview.setFullScreen();
+                }else if(type === "T_EDIT_TEMP"){
+                    map_loaded = true;
+                    mapview.setTlineMode(true);
+//                    mapview.initTline(name);
                     mapview.setEditedMap(name);
                     mapview.setFullScreen();
                 }else if(type === "OBJECT"){
@@ -340,6 +346,8 @@ Item {
         }else if(mode==="tline"){
             mapview.saveTline();
             supervisor.slam_map_reload(supervisor.getMapname());
+        }else if(mode==="tline_temp"){
+            mapview.saveTlineTemp();
         }else if(mode==="spline"){
             mapview.endSpline(true);
         }else if(mode==="velmap"){

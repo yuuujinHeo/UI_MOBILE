@@ -143,6 +143,7 @@ Item {
                             rect_btn.color = color_gray;
                         }
                         onReleased:{
+                            click_sound.play();
                             rect_btn.color = "white";
                             if(modelData == "맵 새로만들기"){
                                 supervisor.writelog("[UI] MAP : move to Mapping");
@@ -219,6 +220,7 @@ Item {
         MouseArea{
             anchors.fill: parent
             onClicked: {
+                click_sound.play();
                 supervisor.writelog("[UI] MAP : move to backPage");
                 loadPage(pmenu);
 //                backPage();
@@ -308,6 +310,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click_sound.play();
                                             popup_patrol_list.mode = "random";
                                         }
                                     }
@@ -329,6 +332,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click_sound.play();
                                             popup_patrol_list.mode = "sequence";
                                         }
                                     }
@@ -367,6 +371,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click_sound.play();
                                             popup_patrol_list.select_pos_mode = 0;
                                         }
                                     }
@@ -385,6 +390,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click_sound.play();
                                             popup_patrol_list.select_pos_mode = 1;
                                         }
                                     }
@@ -403,6 +409,8 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            popup_patrol_list.select_pos_mode = 2;
+                                            click_sound.play();
                                             cols_patrol_bigmenu.visible = false;
                                             flickable_patrol.visible = true;
                                         }
@@ -437,6 +445,7 @@ Item {
                                             MouseArea{
                                                 anchors.fill: parent
                                                 onClicked:{
+                                                    click_sound.play();
                                                     if(select)
                                                         select = false;
                                                     else
@@ -466,26 +475,33 @@ Item {
                                 anchors.fill: parent
                                 onClicked: {
                                     if(popup_patrol_list.select_pos_mode === 0){
+                                        click_sound.play();
                                         supervisor.clearRotateList();
                                         for(var i=0; i<supervisor.getLocationNum("");i++){
                                             supervisor.setRotateList(supervisor.getLocationName(i,""));
                                         }
                                         supervisor.startPatrol(popup_patrol_list.mode,false);
                                     }else if(popup_patrol_list.select_pos_mode === 1){
+                                        click_sound.play();
                                         supervisor.clearRotateList();
                                         for(var i=0; i<supervisor.getLocationNum("Serving");i++){
                                             supervisor.setRotateList(supervisor.getLocationName(i,"Serving"));
                                         }
                                         supervisor.startPatrol(popup_patrol_list.mode,false);
                                     }else if(popup_patrol_list.select_pos_mode === 2){
+                                        click_sound.play();
                                         supervisor.clearRotateList();
                                         for(var i=0; i<model_patrols.count; i++){
-                                            if(model_patrols.get(i).select)
+                                            if(model_patrols.get(i).select){
                                                 supervisor.setRotateList(model_patrols.get(i).name);
+                                            }
                                         }
                                         supervisor.startPatrol(popup_patrol_list.mode,false);
 
+                                    }else{
+                                        click_sound2.play();
                                     }
+
                                     popup_patrol_list.close();
                                 }
                             }
@@ -587,6 +603,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                click_sound.play();
                                 popup_save_edited.close();
                             }
                         }
@@ -609,7 +626,9 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 if(textfield_name.text == ""){
+                                    click_sound_no.play();
                                 }else{
+                                    click_sound.play();
                                     show_loading();
                                     supervisor.writelog("[QML] MAP PAGE : SAVE EDITED MAP "+textfield_name.text);
                                     //save temp Image
@@ -691,6 +710,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                click_sound.play();
                                 popup_save_travelline.close();
                             }
                         }
@@ -721,6 +741,7 @@ Item {
                                     supervisor.writelog("[QML] MAP PAGE : SAVE VELOCITY MAP ");
                                     map.save("velmap");
                                 }
+                                click_sound.play();
                                 popup_save_travelline.close();
                             }
                         }
@@ -757,6 +778,7 @@ Item {
                 id:area_compo
                 anchors.fill:parent
                 onClicked: {
+                    click_sound.play();
                     map.select_location_show = supervisor.getLocNum(name);
                     list_location2.currentIndex = index;
                     map.update_canvas();
@@ -827,6 +849,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            click_sound.play();
                             select_object_type = "Table";
                             text_annot_obj_name.text= "Object Name : " + select_object_type + "_" + Number(supervisor.getObjectSize(select_object_type))
                         }
@@ -854,6 +877,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            click_sound.play();
                             select_object_type = "Chair";
                             text_annot_obj_name.text= "Object Name : " + select_object_type + "_" + Number(supervisor.getObjectSize(select_object_type))
                         }
@@ -881,6 +905,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            click_sound.play();
                             select_object_type = "Wall";
                             text_annot_obj_name.text= "Object Name : " + select_object_type + "_" + Number(supervisor.getObjectSize(select_object_type))
                         }
@@ -935,6 +960,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
+                        click_sound.play();
                         popup_add_object.close();
                     }
                 }
@@ -957,6 +983,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
+                        click_sound.play();
                         supervisor.writelog("[QML] MAP PAGE : SAVE OBJECT -> "+select_object_type + "_" + Number(supervisor.getObjectSize(select_object_type)));
 
                         map.saveObject(select_object_type);
@@ -1063,6 +1090,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    click_sound.play();
                                     select_location_type = "Serving";
                                     tfield_location.text = select_location_type + "_" + Number(supervisor.getLocationSize(select_location_type))
                                 }
@@ -1085,6 +1113,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    click_sound.play();
                                     if(supervisor.getLocationNum("Charging") > 0){
                                         popup_location_warning.open();
                                         popup_location_warning.set_overwrite();
@@ -1111,6 +1140,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    click_sound.play();
                                     if(supervisor.getLocationNum("Resting") > 0){
                                         popup_location_warning.open();
                                         popup_location_warning.set_overwrite();
@@ -1149,6 +1179,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked:{
+                                    click_sound.play();
                                     popup_add_location_group.open();
                                 }
                             }
@@ -1183,13 +1214,16 @@ Item {
                                         MouseArea{
                                             anchors.fill: parent
                                             onClicked: {
+                                                click_sound.play();
                                                 cur_group = index
                                             }
                                             onDoubleClicked: {
+                                                click_sound.play();
                                                 cur_group = index
                                                 popup_remove_group.open();
                                             }
                                             onPressAndHold: {
+                                                click_sound.play();
                                                 cur_group = index
                                                 popup_remove_group.open();
 
@@ -1268,6 +1302,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click_sound.play();
                                             popup_remove_group.close();
                                         }
                                     }
@@ -1289,6 +1324,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
+                                            click_sound.play();
                                             supervisor.removeLocationGroup(cur_group);
                                             popup_remove_group.close();
                                             cur_group = 0;
@@ -1343,6 +1379,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                click_sound.play();
                                 popup_add_location.close();
                             }
                         }
@@ -1367,7 +1404,9 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 if(tfield_location.text == ""){
+                                    click_sound_no.play();
                                 }else{
+                                    click_sound.play();
                                     if(popup_add_location.curpose_mode){
                                         map.savelocation("location_cur",select_location_type, cur_group, tfield_location.text);
                                     }else{
@@ -1472,6 +1511,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                click_sound.play();
                                 popup_add_location_group.close();
                             }
                         }
@@ -1494,7 +1534,9 @@ Item {
                             anchors.fill: parent
                             onClicked:{
                                 if(tfield_group.text == ""){
+                                    click_sound_no.play();
                                 }else{
+                                    click_sound.play();
                                     supervisor.addLocationGroup(tfield_group.text);
                                     supervisor.writelog("[QML] MAP PAGE : ADD LOCATION GROUP -> "+tfield_group.text);
                                     popup_add_location.update();
@@ -1560,6 +1602,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked:{
+                    click_sound.play();
                     popup_location_warning.close();
                 }
             }
@@ -1624,6 +1667,7 @@ Item {
         MouseArea{
             anchors.fill: parent
             onClicked:{
+                click_sound.play();
                 popup_help.close();
             }
         }

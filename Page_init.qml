@@ -23,7 +23,6 @@ Item {
     Component.onCompleted: {
         init_mode = 0;
         update_timer.start();
-        statusbar.visible = false;
         supervisor.clearSharedMemory();
     }
 
@@ -67,7 +66,6 @@ Item {
                     anchors.horizontalCenter:  parent.horizontalCenter
                     y: 220
                 }
-
                 Text{
                     id: text_copyright
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -149,7 +147,7 @@ Item {
                             parent.color = color_mid_navy;
                         }
                         onReleased: {
-                            //click_start.play();
+                            start_sound.play();
                             supervisor.writelog("[INIT] PROGRAM RESTART")
                             supervisor.programRestart();
                             parent.color = color_navy;
@@ -194,7 +192,7 @@ Item {
                             parent.color = color_gray;
                         }
                         onReleased: {
-                            //click_sound.play();
+                            click_sound.play();
                             supervisor.writelog("[INIT] PASS IPC Connection")
                             supervisor.passInit();
                             debug_mode = true;
@@ -210,14 +208,14 @@ Item {
 
             MouseArea{
                 id: area_debug
-                width: 150
-                height: 150
+                width: 100
+                height: 100
                 anchors.right: parent.right
                 anchors.bottom : parent.bottom
                 z: 99
                 property var password: 0
                 onClicked: {
-                    //click_sound.play();
+                    click_sound2.play();
                     password++;
                     if(password > 4){
                         password = 0;
@@ -380,7 +378,7 @@ Item {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: {
-                                        //click_sound.play();
+                                        click_sound.play();
                                         supervisor.writelog("[USER INPUT] INIT PAGE : LOAD MAP FROM USB")
                                         popup_usb_download.open();
                                     }
@@ -402,7 +400,7 @@ Item {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: {
-                                        //click_start.play();
+                                        start_sound.play();
                                         supervisor.writelog("[USER INPUT] INIT PAGE : NEXT")
                                         swipeview_wizard.currentIndex++;
                                     }
@@ -437,7 +435,7 @@ Item {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: {
-                                        //click_sound.play();
+                                        click_sound.play();
                                         supervisor.passInit();
                                         debug_mode = true;
                                         supervisor.writelog("[USER INPUT] INIT PAGE : PASS CONNECTION")
@@ -485,7 +483,7 @@ Item {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: {
-                                        //click_sound.play();
+                                        click_sound.play();
                                         supervisor.writelog("[USER INPUT] INIT PAGE : SET ROBOT TYPE TO Serving")
                                         supervisor.setSetting("ROBOT_HW/type","SERVING");
                                         swipeview_wizard.currentIndex++;
@@ -509,7 +507,7 @@ Item {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: {
-                                        //click_sound.play();
+                                        click_sound.play();
                                         supervisor.writelog("[USER INPUT] INIT PAGE : SET ROBOT TYPE TO CALLING")
                                         supervisor.setSetting("ROBOT_HW/type","CALLING");
                                         swipeview_wizard.currentIndex++;
@@ -533,7 +531,7 @@ Item {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: {
-                                        //click_sound.play();
+                                        click_sound.play();
                                         supervisor.writelog("[USER INPUT] INIT PAGE : SET ROBOT TYPE TO BOTH")
                                         supervisor.setSetting("ROBOT_HW/type","BOTH");
                                         swipeview_wizard.currentIndex++;
@@ -669,7 +667,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                //click_sound.play();
+                                click_sound.play();
                                 supervisor.writelog("[USER INPUT] INIT PAGE : PREV")
                                 swipeview_wizard.currentIndex--;
                             }
@@ -694,7 +692,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                //click_sound.play();
+                                click_sound.play();
                                 supervisor.setSetting("ROBOT_HW/model",textfield_name.text);
                                 supervisor.setSetting("ROBOT_HW/serial_num",combobox_serialnum.currentText);
                                 supervisor.writelog("[USER INPUT] INIT PAGE : NEXT")
@@ -875,7 +873,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
-                                            //click_sound.play();
+                                            click_sound.play();
                                             supervisor.writelog("[USER INPUT] SETTING PAGE : CAMERA Position Switch")
                                             wizard_camera.is_switched = true;
                                             var temp_id = wizard_camera.left_id;
@@ -968,7 +966,7 @@ Item {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked:{
-                                        //click_sound.play();
+                                        click_sound.play();
                                         supervisor.writelog("[USER INPUT] INIT PAGE : PASS SETTING CAMERA");
                                         swipeview_wizard.currentIndex++;
                                     }
@@ -998,7 +996,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                //click_sound.play();
+                                click_sound.play();
                                 supervisor.writelog("[USER INPUT] INIT PAGE : PREV")
                                 swipeview_wizard.currentIndex--;
                             }
@@ -1023,7 +1021,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                //click_sound.play();
+                                click_sound.play();
                                 if(!rect_no_camera.visible){
                                     supervisor.writelog("[USER INPUT] INIT PAGE : NEXT")
                                     supervisor.setCamera(text_camera_1.text,text_camera_2.text);
@@ -1243,7 +1241,7 @@ Item {
                                             MouseArea{
                                                 anchors.fill: parent
                                                 onClicked:{
-                                                    //click_sound.play();
+                                                    click_sound.play();
                                                     col_wifis.select_wifi = index;
                                                     wizard_ip.select_ssd = ssd;
                                                     wizard_ip.select_inuse = inuse;
@@ -1504,7 +1502,7 @@ Item {
                                         MouseArea{
                                             anchors.fill: parent
                                             onClicked:{
-                                                //click_sound.play();
+                                                click_sound.play();
                                                 if(wizard_ip.show_passwd){
                                                     wizard_ip.show_passwd = false;
                                                 }else{
@@ -1531,7 +1529,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
-                                            //click_sound.play();
+                                            click_sound.play();
                                             if(wizard_ip.select_security){
                                                 if(passwd_wifi.text == ""){
                                                     text_wifi76788.visible = true;
@@ -2101,7 +2099,7 @@ Item {
                                         MouseArea{
                                             anchors.fill: parent
                                             onClicked: {
-                                                //click_sound.play();
+                                                click_sound.play();
                                                 if(supervisor.getcurIP() === "")
                                                     supervisor.getWifiIP();
                                                 item_init_2.ip_update();
@@ -2124,7 +2122,7 @@ Item {
                                         MouseArea{
                                             anchors.fill: parent
                                             onClicked: {
-                                                //click_sound.play();
+                                                click_sound.play();
                                                 ip_1.ischanged = false;
                                                 ip_2.ischanged = false;
                                                 ip_3.ischanged = false;
@@ -2176,7 +2174,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                //click_sound.play();
+                                click_sound.play();
                                 if(wizard_ip.setting_step > 0){
                                     wizard_ip.setting_step--;
                                 }else{
@@ -2207,7 +2205,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                //click_sound.play();
+                                click_sound.play();
                                 supervisor.writelog("[USER INPUT] INIT PAGE : SKIP WIFI SETTING");
                                 swipeview_wizard.currentIndex++;
                             }
@@ -2243,7 +2241,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onPressed:{
-                                //click_sound.play();
+                                click_sound.play();
                                 parent.color = color_mid_green;
                             }
                             onReleased: {
@@ -2309,14 +2307,14 @@ Item {
             }
             MouseArea{
                 id: area_debug
-                width: 150
-                height: 150
+                width: 100
+                height: 100
                 anchors.right: parent.right
                 anchors.bottom : parent.bottom
                 z: 99
                 property var password: 0
                 onClicked: {
-                    //click_sound.play();
+                    click_sound2.play();
                     password++;
                     if(password > 4){
                         password = 0;
@@ -2426,7 +2424,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onPressed:{
-                            //click_start.play();
+                            start_sound.play();
                             parent.color = color_mid_navy;
                         }
                         onReleased: {
@@ -2475,7 +2473,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onPressed:{
-                            //click_sound.play();
+                            click_sound.play();
                             parent.color = color_gray;
                         }
                         onReleased: {
@@ -2520,7 +2518,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onPressed:{
-                            //click_sound.play();
+                            click_sound.play();
                             parent.color = color_gray;
                         }
                         onReleased: {
@@ -2538,14 +2536,14 @@ Item {
 
             MouseArea{
                 id: area_debug
-                width: 150
-                height: 150
+                width: 100
+                height: 100
                 anchors.right: parent.right
                 anchors.bottom : parent.bottom
                 z: 99
                 property var password: 0
                 onClicked: {
-                    //click_sound.play();
+                    click_sound2.play();
                     password++;
                     if(password > 4){
                         password = 0;
@@ -2660,7 +2658,7 @@ Item {
             property var local_find_state: -1
             Component.onCompleted: {
                 statusbar.visible = true;
-                supervisor.setMotorLock(false);
+//                supervisor.setMotorLock(false);
             }
             function show_auto(){
                 btn_slam_fullauto.visible = true;
@@ -2794,7 +2792,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onPressed:{
-                            //click_start.play();
+                            start_sound.play();
                             parent.color = color_mid_green;
                         }
                         onReleased: {
@@ -2845,7 +2843,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            //click_start.play();
+                            start_sound.play();
                             supervisor.writelog("[USER INPUT] INIT PAGE : NEW MAPPING")
                             loadPage(pmapping);
                         }
@@ -2882,7 +2880,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            //click_sound.play();
+                            click_sound.play();
                             supervisor.passInit();
                             debug_mode = true;
                             supervisor.writelog("[USER INPUT] INIT PAGE : PASS LOCALIZATION")
@@ -2893,14 +2891,14 @@ Item {
 
                 MouseArea{
                     id: area_debug
-                    width: 150
-                    height: 150
+                    width: 100
+                    height: 100
                     anchors.right: parent.right
                     anchors.bottom : parent.bottom
                     z: 99
                     property var password: 0
                     onClicked: {
-                        //click_sound.play();
+                        click_sound2.play();
                         password++;
                         if(password > 4){
                             password = 0;
@@ -2963,6 +2961,7 @@ Item {
                     anchors.bottomMargin: 50
                     anchors.rightMargin: 50
                     onClicked: {
+                        click_sound.play();
                         supervisor.writelog("[ANNOTATION] Localization : Success");
                         update_timer.start();
                     }
@@ -2979,6 +2978,7 @@ Item {
                     anchors.bottomMargin: 50
                     anchors.leftMargin: 50
                     onClicked: {
+                        click_sound.play();
                         supervisor.writelog("[ANNOTATION] Localization : Failed")
                         local_find_state = 3;
                         map.setViewer("localization");
@@ -3014,6 +3014,7 @@ Item {
                     anchors.rightMargin: 50
                     enabled: false
                     onClicked: {
+                        click_sound.play();
                         supervisor.writelog("[INIT] Localization : Success");
                         update_timer.start();
                     }
@@ -3031,6 +3032,7 @@ Item {
                         selected: map.tool==="move"
                         text: "이 동"
                         onClicked: {
+                            click_sound.play();
                             map.setTool("move");
                         }
                     }
@@ -3041,9 +3043,34 @@ Item {
                         selected: map.tool==="slam_init"
                         text:  "수동 지정"
                         onClicked: {
+                            click_sound.play();
                             map.setTool("slam_init");
                             supervisor.setInitCurPos();
                             supervisor.slam_setInit();
+                        }
+                    }
+                    Item_buttons{
+                        width: 200
+                        height: 80
+                        type: "round_text"
+                        text:  "다시 시도"
+                        onClicked: {
+                            click_sound.play();
+                            map.setTool("move");
+                            supervisor.slam_autoInit();
+                            timer_check_localization2.start();
+                        }
+                    }
+                    Item_buttons{
+                        width: 200
+                        height: 80
+                        type: "round_text"
+                        text:  "다시 시도"
+                        onClicked: {
+                            click_sound.play();
+                            map.setTool("move");
+                            supervisor.slam_autoInit();
+                            timer_check_localization2.start();
                         }
                     }
                     Item_buttons{
@@ -3055,6 +3082,7 @@ Item {
                         text: "자동위치찾기\n(1분소요)"
                         shadowcolor: color_dark_black
                         onClicked: {
+                            click_sound.play();
                             map.setTool("move");
                             supervisor.slam_fullautoInit();
                             timer_check_localization2.start();
@@ -3090,6 +3118,7 @@ Item {
                     anchors.bottomMargin: 50
                     anchors.rightMargin: 50
                     onClicked: {
+                        click_sound.play();
                         supervisor.writelog("[ANNOTATION] Localization : Connection Failed. Restart");
                         supervisor.programRestart();
                     }
@@ -3204,7 +3233,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        //click_sound.play();
+                        click_sound.play();
                         supervisor.passInit();
                         debug_mode = true;
                         supervisor.writelog("[USER INPUT] INIT PAGE : PASS ROBOT INIT")
@@ -3216,14 +3245,14 @@ Item {
             }
             MouseArea{
                 id: area_debug
-                width: 150
-                height: 150
+                width: 100
+                height: 100
                 anchors.right: parent.right
                 anchors.bottom : parent.bottom
                 z: 99
                 property var password: 0
                 onClicked: {
-                    //click_sound.play();
+                    click_sound2.play();
                     password++;
                     if(password > 4){
                         password = 0;
@@ -3283,14 +3312,14 @@ Item {
             source:  ""
             MouseArea{
                 id: area_debug
-                width: 150
-                height: 150
+                width: 100
+                height: 100
                 anchors.right: parent.right
                 anchors.bottom : parent.bottom
                 z: 99
                 property var password: 0
                 onClicked: {
-                    //click_sound.play();
+                    click_sound2.play();
                     password++;
                     if(password > 4){
                         password = 0;
@@ -3412,7 +3441,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked:{
-                            //click_sound.play();
+                            click_sound.play();
                             supervisor.writelog("[USER INPUT] GET RECENT USB FILE : "+supervisor.getusbrecentfile());
                             popup_usb_notice.mode = "extract_recent";
                             popup_usb_notice.open();
@@ -3450,7 +3479,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                //click_sound.play();
+                                click_sound.play();
 //                                popup_usb_download.index = 1;
 //                                popup_usb_download.set_name = name;
                             }
@@ -3476,7 +3505,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            //click_sound.play();
+                            click_sound.play();
                             popup_usb_download.is_ui = !popup_usb_download.is_ui;
                         }
                     }
@@ -3495,7 +3524,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            //click_sound.play();
+                            click_sound.play();
                             popup_usb_download.is_slam = !popup_usb_download.is_slam;
                         }
                     }
@@ -3514,7 +3543,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            //click_sound.play();
+                            click_sound.play();
                             popup_usb_download.is_config = !popup_usb_download.is_config;
                         }
                     }
@@ -3533,7 +3562,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            //click_sound.play();
+                            click_sound.play();
                             popup_usb_download.is_map = !popup_usb_download.is_map;
                         }
                     }
@@ -3552,7 +3581,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            //click_sound.play();
+                            click_sound.play();
                             popup_usb_download.is_log = !popup_usb_download.is_log;
                         }
                     }
@@ -3577,7 +3606,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        //click_sound.play();
+                        click_sound.play();
                         popup_usb_notice.setProperty("compress",popup_usb_download.set_name,popup_usb_download.is_ui,popup_usb_download.is_slam,popup_usb_download.is_config,popup_usb_download.is_map,popup_usb_download.is_log);
                         popup_usb_download.close();
                         popup_usb_notice.open();
@@ -3743,7 +3772,7 @@ Item {
                         anchors.fill: parent
                         onClicked:{
 
-                            //click_sound.play();
+                            click_sound.play();
                             if(popup_usb_notice.mode== "compress"){
 
                             }else{
@@ -3772,7 +3801,7 @@ Item {
     }
     Timer{
         id: timer_wait_lcm
-        interval: 5000
+        interval: 3000
         running: false
         repeat: false
         onTriggered: {
@@ -3789,19 +3818,22 @@ Item {
             if(init_mode == 0){
                 //=============================== Init Check 1 : IPC ==============================//
                 if(supervisor.getIPCConnection()){
+                    supervisor.writelog("[INIT] IPC Connection Check : Success");
                     init_mode = 1;
                     timer_wait_lcm.stop();
                 }else if(!timer_wait_lcm.running && loader_init.item.objectName != "item_ipc"){
                     timer_wait_lcm.start();
+                    supervisor.writelog("[INIT] IPC Connection Check : Failed");
                 }
             }else if(init_mode == 1){
                 //========================== Init Check 2 : Robot Config ==============================//
                 if(supervisor.checkINI() && loader_init.item.objectName != "item_robot_config"){
+                    supervisor.writelog("[INIT] Robot_config Check : Success");
                     init_mode = 2;
                 }else{
                     if(loader_init.item.objectName != "item_robot_config"){
                         loader_init.sourceComponent = item_robot_config
-                        supervisor.writelog("[INIT] robot_config.ini not set.");
+                        supervisor.writelog("[INIT] Robot_config Check : Failed");
                     }
                 }
 
@@ -3811,56 +3843,61 @@ Item {
                 //annotation과 map 존재여부 확인
                 if(supervisor.isExistAnnotation(map_name) && supervisor.isLoadMap()){
                     //이미 설정확인된 맵이 존재한다면 다음으로 넘어감
+                    supervisor.writelog("[INIT] Map Check : Success");
                     init_mode = 3;
                 }else{
                     //annotation, map 둘 중 하나라도 없으면 안내페이지 표시
                     if(loader_init.item.objectName != "item_map"){
-                        supervisor.writelog("[INIT] Map not found. (" + map_name+")");
+                        supervisor.writelog("[INIT] Map Check : Failed (" + map_name+")");
                         loader_init.sourceComponent = item_map
-                    }
-
-                    //USB연결 확인
-                    if(supervisor.getusbsize() > 0){
-                        loader_init.item.enable_usb();
                     }else{
-                        loader_init.item.disable_usb();
-                    }
+                        //USB연결 확인
+                        if(supervisor.getusbsize() > 0){
+                            loader_init.item.enable_usb();
+                        }else{
+                            loader_init.item.disable_usb();
+                        }
 
-                    //설정 된 맵은 있지만 annotation은 없는 경우
-                    if(supervisor.isLoadMap()){
-                        loader_init.item.enable_rawmap();
-                    }else{
-                        loader_init.item.disable_rawmap();
-                    }
+                        //설정 된 맵은 있지만 annotation은 없는 경우
+                        if(supervisor.isLoadMap()){
+                            loader_init.item.enable_rawmap();
+                        }else{
+                            loader_init.item.disable_rawmap();
+                        }
 
-                    //가능한 다른 맵이 있는 경우
-                    var available_map_num = supervisor.getAvailableMap();
-                    if(available_map_num > 0){
-                        loader_init.item.enable_availablemap();
-                    }else{
-                        loader_init.item.disable_availablemap();
+                        //가능한 다른 맵이 있는 경우
+                        var available_map_num = supervisor.getAvailableMap();
+                        if(available_map_num > 0){
+                            loader_init.item.enable_availablemap();
+                        }else{
+                            loader_init.item.disable_availablemap();
+                        }
                     }
                 }
             }else if(init_mode == 3){
                 //======================= Init Check 4 : 로봇 상태 확인(Charging. Localization) =========================//
                 if(supervisor.getChargeStatus() === 1){
                     dochargeininit();
+                    supervisor.writelog("[INIT] Charging Detected");
                 }else if(supervisor.getIPCConnection() && supervisor.getLocalizationState() === 2){
                     init_mode = 4;
+                    supervisor.writelog("[INIT] Localization Check : Success");
                 }else{
                     if(loader_init.item.objectName != "init_slam"){
+                        supervisor.writelog("[INIT] Localization Check : Failed");
                         loader_init.sourceComponent = item_slam_init
                     }
                 }
             }else if(init_mode == 4){
                 //=============================== Init Check 5 : 로봇 상태 확인(Motor) ==============================//
                 if(supervisor.getIPCConnection() && supervisor.getMotorState() === 1){
-                    supervisor.writelog("[QML] INIT ALL DONE -> ROBOT READY")
+                    supervisor.writelog("[INIT] Motor Check : Success");
                     init_mode = 5;
                     update_timer.stop();
                     loadPage(pkitchen);
                 }else{
                     if(loader_init.item.objectName != "init_motor"){
+                        supervisor.writelog("[INIT] Motor Check : Failed");
                         loader_init.sourceComponent = item_motor_init
                     }
                 }

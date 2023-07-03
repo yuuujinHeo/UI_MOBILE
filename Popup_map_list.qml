@@ -111,6 +111,7 @@ Popup{
                 id:area_compo
                 anchors.fill:parent
                 onClicked: {
+                    click_sound.play();
                     list_map.currentIndex = index;
                     if(select_map_list == index){
                         select_map_list = -1;
@@ -194,6 +195,7 @@ Popup{
                 id:area_compo
                 anchors.fill:parent
                 onClicked: {
+                    click_sound.play();
                     list_map_detail.currentIndex = index;
                 }
             }
@@ -279,6 +281,7 @@ Popup{
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    click_sound.play();
                                     if(select_map_list > -1){
                                         supervisor.writelog("[USER INPUT] Map used changed : " + list_map.model.get(select_map_list).name);
                                         supervisor.setMap(list_map.model.get(select_map_list).name);
@@ -309,6 +312,7 @@ Popup{
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    click_sound.play();
                                     if(select_map_list > -1){
                                         var name = list_map.model.get(select_map_list).name;
                                         popup_map_list.close();
@@ -344,6 +348,7 @@ Popup{
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    click_sound.play();
                                     supervisor.removeMap(list_map.model.get(select_map_list).name);
                                     popup_map_list.update_list();
                                 }
@@ -370,6 +375,7 @@ Popup{
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    click_sound.play();
                                     if(select_map_list > -1){
                                         var name = list_map.model.get(select_map_list).name;
                                         print("name : ",name);
@@ -410,6 +416,7 @@ Popup{
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    click_sound.play();
                                     popup_map_list.close();
                                 }
                             }
@@ -536,6 +543,7 @@ Popup{
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                click_sound.play();
                                 popup_annotation_delete.close();
                             }
                         }
@@ -558,6 +566,7 @@ Popup{
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                click_sound.play();
                                 supervisor.deleteAnnotation();
                                 supervisor.setMap(name);
                                 loadPage(pmap);

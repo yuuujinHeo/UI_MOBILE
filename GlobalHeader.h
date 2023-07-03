@@ -77,10 +77,6 @@ typedef struct{
     QVector<QVector<cv::Point2f>> tlines;
     QVector<OBJECT> objects;
 
-
-    QVector<cv::Point2f> list_obj_uL;
-    QVector<cv::Point2f> list_obj_dR;
-
     float margin;
     bool use_server;
     bool use_uicmd;
@@ -93,6 +89,21 @@ typedef struct{
     bool annot_edit_drawing;
     bool annot_edit_location;
     bool annot_edit_tline;
+
+
+
+
+
+    QPixmap map;
+
+
+
+
+
+
+
+
+
 }ST_MAP;
 extern ST_MAP *pmap;
 
@@ -283,7 +294,8 @@ enum UI_STATE{
 
     UI_STATE_MOVING,//5
     UI_STATE_PICKUP,
-    UI_STATE_MOVEFAIL
+    UI_STATE_MOVEFAIL,
+    UI_STATE_CLENING
 };
 
 enum LOCALIZATION_STATE{

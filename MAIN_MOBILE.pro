@@ -22,10 +22,8 @@ SOURCES += \
     CallbellHandler.cpp \
     CameraView.cpp \
     IPCHandler.cpp \
-    JoystickHandler.cpp \
-    Loading.cpp \
+    MapHandler.cpp \
     MapView.cpp \
-    SoundHandler.cpp \
     ZIPHandler.cpp \
     automata.cpp \
     cv_to_qt.cpp \
@@ -73,15 +71,13 @@ HEADERS += \
     CameraView.h \
     GlobalHeader.h \
     IPCHandler.h \
+    MapHandler.h \
     spline.h \
-    JoystickHandler.h \
     Keyemitter.h \
-    Loading.h \
     Logger.h \
     MapHeader.h \
     MapView.h \
     automata.h \
-    SoundHandler.h \
     ZIPHandler.h \
     cv_to_qt.h \
     Supervisor.h\

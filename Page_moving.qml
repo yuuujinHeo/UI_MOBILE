@@ -20,7 +20,6 @@ Item {
     property bool show_face: false
     Component.onCompleted: {
         init();
-        print(statusbar.height);
         statusbar.visible = false;
     }
     Component.onDestruction:  {
@@ -177,15 +176,15 @@ Item {
             color: "#e2574c"
             text: move_fail?"경로를 찾을 수 없습니다.":"일시정지 됨"
         }
-        Text{
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top:teee.bottom
-            anchors.topMargin: 10
-            font.family: font_noto_b.name
-            font.pixelSize: 40
-            color: "#e2574c"
-            text: "( 목적지 : "+pos+" )"
-        }
+//        Text{
+//            anchors.horizontalCenter: parent.horizontalCenter
+//            anchors.top:teee.bottom
+//            anchors.topMargin: 10
+//            font.family: font_noto_b.name
+//            font.pixelSize: 40
+//            color: "#e2574c"
+//            text: "( 목적지 : "+pos+" )"
+//        }
         Row{
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: 80
@@ -209,7 +208,7 @@ Item {
                     anchors.fill: parent
                     z: 99
                     onClicked:{
-                        //click.play();
+                        click_sound.play();
                         supervisor.setMotorLock(!motor_lock);
                         supervisor.writelog("[USER INPUT] MOVING PAUSED : MOTOR LOCK DISABLE");
                     }
@@ -235,7 +234,7 @@ Item {
                     z: 99
                     propagateComposedEvents: true
                     onPressed:{
-                        //click.play();
+                        click_sound.play();
                         parent.color = color_dark_navy
                     }
                     onReleased:{
@@ -267,7 +266,7 @@ Item {
                     anchors.fill: parent
                     z: 99
                     onClicked:{
-                        //click.play();
+                        click_sound.play();
                         supervisor.writelog("[USER INPUT] MOVING PAUSED : RESUME");
                         supervisor.moveResume();
                         timer_check_pause.start();
@@ -287,7 +286,7 @@ Item {
         anchors.right: parent.right
         z: 99
         onClicked: {
-            //click.play();
+            click_sound2.play();
             password++;
             supervisor.writelog("[USER INPUT] MOVING PASSWORD "+Number(password));
             if(password > 4){
@@ -299,6 +298,8 @@ Item {
         }
     }
 
+    property bool flag_voice: false
+    property var count_voice: 0
     Timer{
         id: timer_check_pause
         interval: 500
@@ -350,11 +351,13 @@ Item {
                         face_image.play("image/temp.gif");
                     }
                 }else if(obs_in_path == 1){
+                    flag_voice = true;
                     if(face_image.cur_source !== "image/face_surprise.gif"){
                         supervisor.writelog("[UI] SHOW MOVING FACE : SURPRISE");
                         face_image.play("image/face_surprise.gif");
                     }
                 }else if(obs_in_path == 2){
+                    flag_voice = true;
                     if(face_image.cur_source !== "image/face_cry.gif"){
                         supervisor.writelog("[UI] SHOW MOVING FACE : CRY");
                         face_image.play("image/face_cry.gif");
@@ -365,6 +368,12 @@ Item {
             text_debug_1.text = "Robot Auto State : " + supervisor.getStateMoving().toString();
             text_debug_2.text = "Robot OBS In Path State : " + supervisor.getObsinPath().toString();
         }
+    }
+
+    Audio{
+        id: voice_serving
+        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        source: "bgm/serving.mp3"
     }
 
     Column{
@@ -394,7 +403,7 @@ Item {
         anchors.fill: parent
         visible: !robot_paused
         onClicked: {
-            //click.play();
+            click_sound.play();
             if(robot_paused){
                 supervisor.writelog("[USER INPUT] MOVING RESUME 2")
                 supervisor.moveResume();

@@ -804,6 +804,25 @@ Item {
         anchors.top: parent.top
         visible: select_localmode?true:false
         color: "#f4f4f4"
+        Timer{
+            id: timer_check_localization2
+            running: false
+            repeat: true
+            interval: 500
+            onTriggered: {
+                if(test){
+                    btn_right2.enabled = true;
+                }else{
+                    if(supervisor.getLocalizationState() === 2){//success
+                        btn_do_autoinit.running = false;
+                    }else if(supervisor.getLocalizationState() === 1){
+                        btn_do_autoinit.running = true;
+                    }else{
+                        btn_do_autoinit.running = false;
+                    }
+                }
+            }
+        }
         Column{
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
@@ -834,6 +853,7 @@ Item {
                         selected: map.tool==="move"
                         text: "이 동"
                         onClicked: {
+                            click_sound.play();
                             map.setTool("move");
                         }
                     }
@@ -844,9 +864,22 @@ Item {
                         selected: map.tool==="slam_init"
                         text: "수동 지정"
                         onClicked: {
+                            click_sound.play();
                             map.setTool("slam_init");
                             supervisor.setInitCurPos();
                             supervisor.slam_setInit();
+                        }
+                    }
+                    Item_buttons{
+                        width: 200
+                        height: 80
+                        type: "round_text"
+                        text:  "다시 시도"
+                        onClicked: {
+                            click_sound.play();
+                            map.setTool("move");
+                            supervisor.slam_autoInit();
+                            timer_check_localization2.start();
                         }
                     }
                     Item_buttons{
@@ -858,6 +891,7 @@ Item {
                         text: "자동위치찾기\n(1분소요)"
                         shadowcolor: color_dark_black
                         onClicked: {
+                            click_sound.play();
                             map.setTool("move");
                             supervisor.slam_fullautoInit();
                             timer_check_localization2.start();
@@ -915,7 +949,7 @@ Item {
 
     Timer{
         id: timer_update
-        interval: 100
+        interval: 300
         running: true
         repeat: true
         onTriggered: {
@@ -932,8 +966,8 @@ Item {
             }
 
             if(supervisor.getMotorConnection(0)){
-                if(supervisor.getMotorStatus(0) === 0){
-                    state_motor_1.enabled            = false;
+                if(supervisor.getMotorStatus(0) === 1){
+                    state_motor_1.enabled = false;
                 }else{
                     state_motor_1.enabled = true;
                 }
@@ -942,13 +976,25 @@ Item {
             }
 
             if(supervisor.getMotorConnection(1)){
-                if(supervisor.getMotorStatus(1) === 0){
+                if(supervisor.getMotorStatus(1) === 1){
                     state_motor_2.enabled            = false;
                 }else{
                     state_motor_2.enabled = true;
                 }
             }else{
                 state_motor_2.enabled = true;
+            }
+
+            if(supervisor.getLocalizationState() === 2){
+                state_localization.enabled = false;
+            }else{
+                state_localization.enabled = true;
+            }
+
+            if(state_localization.enabled == false && state_motor_1.enabled == false && state_motor_2.enabled == false){
+                btn_reset.enabled = true;
+            }else{
+                btn_reset.enabled = false;
             }
 
             if(supervisor.getMotorStatus(0)===0){

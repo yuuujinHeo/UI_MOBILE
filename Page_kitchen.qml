@@ -16,9 +16,6 @@ Item {
         init();
     }
 
-    Component.onDestruction: {
-        print("kitchen destruction");
-    }
 
     property bool show_serving: true
 
@@ -67,7 +64,11 @@ Item {
         }
 
         update_group();
-        print("kitchen done");
+
+        if(supervisor.isCallingMode() || supervisor.getCallQueueSize() > 0){
+            popup_clean_calling.open();
+        }
+
     }
     property int tray_num: 3
     property int table_num: 5
@@ -191,7 +192,7 @@ Item {
     function update_table(){
         model_group_table.clear();
         for(var i=col_num*row_num*cur_page; i<col_num*row_num*(cur_page+1); i++){
-            print(i);
+//            print(i);
             if(i>=table_num)
                 break;
             model_group_table.append({"num":supervisor.getLocationNumber(model_group.get(cur_group).num,i),"name":supervisor.getServingName(model_group.get(cur_group).num, i)});
@@ -278,7 +279,7 @@ Item {
                         property var firstX;
                         property var width_dis: 0
                         onPressed: {
-                            //click.play();
+                            click_sound.play();
                             firstX = mouseX;
                             width_dis = 0;
                         }
@@ -406,7 +407,7 @@ Item {
                                 MouseArea{
                                     anchors.fill:parent
                                     onClicked: {
-                                        //click.play();
+                                        click_sound.play();
                                         count_resting = 0;
                                         if(cur_table == (col_num*row_num*cur_page)+index+1){
                                             cur_table = 0;
@@ -460,7 +461,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onPressAndHold: {
-                    //click.play();
+                    click_sound.play();
                     count_resting = 0;
                     supervisor.writelog("[USER INPUT] TABLE NUM CHANGED DONE : "+Number(col_num));
                     btn_lock.visible = false;
@@ -496,7 +497,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        //click.play();
+                        click_sound.play();
                         count_resting = 0;
                         if(col_num > 1)
                             supervisor.setTableColNum(--col_num);
@@ -524,7 +525,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        //click.play();
+                        click_sound.play();
                         count_resting = 0;
                         if(col_num < max_col)
                             supervisor.setTableColNum(++col_num);
@@ -546,7 +547,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        //click.play();
+                        click_sound.play();
                         count_resting = 0;
                         supervisor.writelog("[USER INPUT] TABLE NUM CHANGED");
                         btn_lock.visible = true;
@@ -600,7 +601,7 @@ Item {
                 MouseArea{
                     anchors.fill:parent
                     onClicked: {
-                        //click.play();
+                        click_sound.play();
                         count_resting = 0;
                         cur_table = num;
                     }
@@ -639,7 +640,7 @@ Item {
                 MouseArea{
                     anchors.fill:parent
                     onClicked: {
-                        //click.play();
+                        click_sound.play();
                         count_resting = 0;
                         cur_table = num;
                     }
@@ -684,7 +685,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked:{
-                                    //click.play();
+                                    click_sound.play();
                                     cur_group = index;
                                 }
                             }
@@ -744,7 +745,7 @@ Item {
                                 Repeater{
                                     id: column_table_group
                                     delegate: {
-                                        if(supervisor.getSetting("ROBOT_SW","table_view") === "1"){
+                                        if(view_mode === 1){
                                             tableNameCompo
                                         }else{
                                             tableNumCompo
@@ -794,7 +795,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onPressAndHold: {
-                            //click.play();
+                            click_sound.play();
                             count_resting = 0;
                             supervisor.writelog("[USER INPUT] TABLE NUM CHANGED DONE : "+Number(col_num));
                             btn_lock_group.visible = false;
@@ -848,7 +849,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    //click.play();
+                                    click_sound.play();
                                     count_resting = 0;
                                     supervisor.setSetting("FLOOR/group_row_num",row_num-1);
                                     row_num--;
@@ -876,7 +877,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    //click.play();
+                                    click_sound.play();
                                     count_resting = 0;
                                     supervisor.setSetting("FLOOR/group_row_num",row_num+1);
                                     row_num++;
@@ -917,7 +918,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    //click.play();
+                                    click_sound.play();
                                     count_resting = 0;
                                     supervisor.setSetting("FLOOR/group_col_num",col_num-1);
                                     col_num--;
@@ -945,7 +946,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                    //click.play();
+                                    click_sound.play();
                                     count_resting = 0;
                                     supervisor.setSetting("FLOOR/group_col_num",col_num+1);
                                     col_num++;
@@ -971,7 +972,7 @@ Item {
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                //click.play();
+                                click_sound.play();
                                 count_resting = 0;
                                 supervisor.writelog("[USER INPUT] TABLE NUM CHANGED");
                                 btn_lock_group.visible = true;
@@ -1025,7 +1026,7 @@ Item {
             id: btn_go
             anchors.fill: parent
             onPressed:{
-                ////click_start.play();
+                start_sound.play();
             }
 
             onClicked: {
@@ -1068,7 +1069,7 @@ Item {
             id: btn_go_safe
             anchors.fill: parent
             onClicked: {
-                //click.play();
+                click_sound.play();
                 popup_preset_menu.open();
             }
         }
@@ -1179,7 +1180,7 @@ Item {
                     height: parent.height
                     anchors.left: parent.left
                     onClicked:{
-                        //click.play();
+                        click_sound.play();
                         if(cur_preset > 1)
                             cur_preset--;
                     }
@@ -1189,7 +1190,7 @@ Item {
                     height: parent.height
                     anchors.right: parent.right
                     onClicked:{
-                        //click.play();
+                        click_sound.play();
                         if(cur_preset < 5)
                             cur_preset++;
                     }
@@ -1318,7 +1319,7 @@ Item {
             id: btn_go2
             anchors.fill: parent
             onClicked: {
-                ////click_start.play();
+                start_sound.play();
                 count_resting = 0;
                 go_patrol = true;
                 popup_question.visible = true;
@@ -1355,12 +1356,12 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            //click.play();
+                            click_sound.play();
                             count_resting = 0;
                             cur_table = 0;
-                            print("11");
+//                            print("11");
                             loadPage(pmenu);
-                            print("22");
+//                            print("22");
                         }
                     }
                 }
@@ -1399,7 +1400,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        //click.play();
+                        click_sound.play();
                         count_resting = 0;
                         cur_table = 0;
                         go_charge = true;
@@ -1442,7 +1443,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        //click.play();
+                        click_sound.play();
                         count_resting = 0;
                         cur_table = 0;
                         go_wait = true;
@@ -1527,13 +1528,13 @@ Item {
                 onClicked: {
                     count_resting = 0;
                     if(go_wait){
-                        //click_start.play();
+                        start_sound.play();
                         supervisor.moveToWait();
                     }else if(go_charge){
-                        //click_start.play();
+                        start_sound.play();
                         supervisor.moveToCharge();
                     }else if(go_patrol){
-                        //click_start.play();
+                        start_sound.play();
 
                     }else{
                         click_error.play();
@@ -1577,7 +1578,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    //click.play();
+                    click_sound.play();
                     count_resting = 0;
                     go_wait = false;
                     go_charge = false;
@@ -1623,7 +1624,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    //click.play();
+                    click_sound.play();
                     count_resting = 0;
                     if(go_wait){
                         supervisor.moveToWait();
@@ -1643,13 +1644,197 @@ Item {
         }
     }
 
-//    SoundEffect{
-//        id: click
-//        source: "bgm/click.wav"
-//        Component.onDestruction: {
-//            print("click dest");
-//        }
-//    }
+    Popup{
+        id: popup_clean_calling
+        anchors.centerIn: parent
+        width: 1280
+        height: 800
+        background: Rectangle{
+            anchors.fill: parent
+            color: color_dark_black
+            opacity: 0.8
+        }
+        onOpened: {
+            update();
+            timer_upd.start();
+        }
+        onClosed:{
+            timer_upd.stop();
+        }
+        Timer{
+            id: timer_upd
+            repeat: true
+            interval: 1000
+            onTriggered:{
+                popup_clean_calling.update();
+            }
+        }
+
+        function update(){
+            supervisor.writelog("call size : "+Number(supervisor.getCallQueueSize()));
+            calls.clear();
+            for(var i=0; i<supervisor.getCallQueueSize(); i++){
+                calls.append({"loc_name":supervisor.getCallName(i)});
+            }
+
+            if(calls.count > 0){
+                calling_list.visible = true;
+            }else{
+                calling_list.visible = false;
+            }
+        }
+
+        Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+            Text{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 100
+                color: "white"
+                horizontalAlignment: Text.AlignHCenter
+                font.family: font_noto_r.name
+                font.pixelSize: 50
+                text: "호출하신 곳에 다녀왔습니다.\n트레이를 비워주시고 확인버튼을 눌러주세요."
+            }
+            Column{
+                id: calling_list
+                anchors.centerIn: parent
+                spacing: 5
+                Text{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                    text: "호출 대기열"
+                }
+                Flickable{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: 600
+                    height: 100
+                    contentWidth: row_calling.width
+                    clip: true
+                    Row{
+                        id: row_calling
+                        anchors.centerIn: parent
+                        spacing: 10
+                        Repeater{
+                            id: rep_call
+                            model: ListModel{id: calls}
+                            Rectangle{
+                                color: "transparent"
+                                border.width: 2
+                                border.color: "white"
+                                width: 150
+                                radius: 20
+                                height: 60
+                                Text{
+                                    color:"white"
+                                    font.family: font_noto_r.name
+                                    text: loc_name
+                                    anchors.centerIn: parent
+                                    font.pixelSize: 20
+                                    Component.onCompleted: {
+                                        scale = 1;
+                                        while(width*scale > parent.width*0.8){
+                                            scale=scale-0.01;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            Row{
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 100
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 30
+
+                Rectangle{
+                    width: 250
+                    height: 90
+                    radius: 19
+                    color:"#d0d0d0"
+                    Image{
+                        id: imm2
+                        source: "icon/btn_yes.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: 20
+                    }
+                    Text{
+                        text:"대기열 지우기"
+                        font.family: font_noto_b.name
+                        font.pixelSize: 25
+                        color:"#282828"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: imm2.right
+                        anchors.leftMargin : (parent.width - imm2.x - imm2.width)/2 - width/2
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.clearCallQueue();
+                        }
+                    }
+                }
+
+
+
+                Rectangle{
+                    width: 250
+                    height: 90
+                    radius: 20
+                    color: "#d0d0d0"
+                    Rectangle{
+                        width: 240
+                        height: 80
+                        anchors.centerIn: parent
+                        radius: 19
+                        color: "white"
+                        Image{
+                            id: imm
+                            source: "icon/btn_yes.png"
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 20
+                        }
+                        Text{
+                            text:"확인"
+                            font.family: font_noto_b.name
+                            font.pixelSize: 30
+                            color:"#282828"
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: imm.right
+                            anchors.leftMargin : (parent.width - imm.x - imm.width)/2 - width/2
+                        }
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.cleanTray();
+                            popup_clean_calling.close();
+                        }
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    SoundEffect{
+        id: click
+        source: "bgm/click.wav"
+        Component.onDestruction: {
+            print("click dest");
+        }
+    }
 //    SoundEffect{
 //        id: click_no
 //        source: "bgm/click_error.wav"

@@ -136,6 +136,7 @@ Item {
                         parent.color = color_mid_navy;
                     }
                     onReleased: {
+                        click_sound.play();
                         supervisor.writelog("[MAPPING] START Mapping : next page")
                         mapping_pages.sourceComponent = page_mapping_set;
                         parent.color = "transparent";
@@ -173,6 +174,7 @@ Item {
                         parent.color = color_mid_navy;
                     }
                     onReleased: {
+                        click_sound.play();
                         backPage();
                         parent.color = "transparent";
                     }
@@ -284,7 +286,7 @@ Item {
                         id: slider_mapsize
                         width: 550
                         from: 1000
-                        to: 3000
+                        to: 2500
                         stepSize: 200
                         onValueChanged: {
                             available_size = select_grid*slider_mapsize.value/100;
@@ -333,6 +335,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    click_sound.play();
                                     select_grid = 3;
                                 }
                             }
@@ -354,6 +357,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    click_sound.play();
                                     select_grid = 5;
                                 }
                             }
@@ -375,6 +379,7 @@ Item {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
+                                    click_sound.play();
                                     popup_select_grid.open();
                                 }
                             }
@@ -496,6 +501,7 @@ Item {
                         parent.color = color_mid_navy;
                     }
                     onReleased: {
+                        click_sound.play();
                         map_name = textfield_name.text;
                         map_width = slider_mapsize.value;
                         grid_width = (select_grid/100);
@@ -538,6 +544,7 @@ Item {
                         parent.color = color_mid_navy;
                     }
                     onReleased: {
+                        click_sound.play();
                         supervisor.writelog("[MAPPING] START Mapping : prev page")
                         mapping_pages.sourceComponent = page_mapping_start;
                         parent.color = "transparent";
@@ -589,6 +596,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
+                        click_sound.play();
                         popup_mapping_help.open();
                     }
                 }
@@ -643,6 +651,7 @@ Item {
                         parent.color = color_mid_navy;
                     }
                     onReleased: {
+                        click_sound.play();
                         supervisor.writelog("[MAPPING] START Mapping : save mapping");
                         supervisor.saveMapping(map_name);
                         mapping_pages.sourceComponent = page_mapping_done;
@@ -681,6 +690,7 @@ Item {
                         parent.color = color_mid_navy;
                     }
                     onReleased: {
+                        click_sound.play();
                         supervisor.writelog("[MAPPING] START Mapping : Stop and canceled")
                         supervisor.stopMapping();
                         mapping_pages.sourceComponent = page_mapping_start;
@@ -779,6 +789,7 @@ Item {
                         parent.color = color_mid_navy;
                     }
                     onReleased: {
+                        click_sound.play();
                         supervisor.writelog("[MAPPING] START Annotation");
                         loadPage(pannotation);
                         loader_page.item.setMappingFlag();

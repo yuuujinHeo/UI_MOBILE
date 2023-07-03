@@ -25,6 +25,7 @@ Item {
     }
 
     Component.onCompleted: {
+        statusbar.visible = true;
         init();
     }
 
@@ -82,8 +83,8 @@ Item {
                     voice_stop_charge.stop();
                     voice_charging.play();
                     is_charging = true;
-                    text_mention.text = "충전 중입니다."
                 }
+                text_mention.text = "충전 중입니다."
             }else{
                 if(is_charging){
                     init();
@@ -154,6 +155,7 @@ Item {
     MouseArea{
         anchors.fill: parent
         onClicked: {
+            click_sound.play();
             timer_bat.stop();
             popup_question.visible = true;
         }
@@ -247,6 +249,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        click_sound.play();
                         timer_bat.start();
                         popup_question.visible = false;
                     }
@@ -284,6 +287,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        click_sound.play();
                         supervisor.moveToWait();
                         popup_question.visible = false;
                     }
@@ -296,6 +300,7 @@ Item {
             anchors.fill: parent
             enabled: false
             onClicked: {
+                click_sound.play();
                 timer_bat.start();
                 popup_question.visible = false;
 
@@ -309,10 +314,12 @@ Item {
             anchors.bottom : parent.bottom
             z: 99
             onClicked: {
+                click_sound2.play();
                 password++;
                 print(password);
                 if(password > 4){
                     password = 0;
+                    debug_mode = true;
                     loadPage(pkitchen);
                 }
             }

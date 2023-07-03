@@ -18,7 +18,6 @@ Item{
     property string source: ""
     property bool pressed: false
     property bool selected: false
-    property var click_sound: 1
     property bool running: false
     property bool use_shadow: false
     signal clicked
@@ -42,20 +41,18 @@ Item{
     onTypeChanged: {
         if(type == "start_progress"){
             cur_rect = start_progress
-            click_sound = 1;
             use_shadow = true;
             btncolor = "white"
             pushcolor = color_light_gray
             fontcolor = color_dark_navy;
         }else if(type == "circle_text"){
             cur_rect = circle_text
-            click_sound = 2;
         }else if(type == "round_text"){
             cur_rect = round_text
-            click_sound = 2;
         }else if(type == "circle_image"){
             cur_rect = circle_image
-            click_sound = 2;
+        }else if(type == "round_image"){
+            cur_rect = round_image
         }
     }
 
@@ -174,6 +171,48 @@ Item{
                 font.family: font_noto_b.name
                 color: fontcolor
                 font.pixelSize:fontsize
+            }
+        }
+
+        Rectangle{
+            id: round_image
+            visible : type === "round_image"
+            width : parent.width
+            height: parent.height
+            radius: 20
+            color: item_Buttons.enabled?selected?selectcolor:pressed?pushcolor:btncolor:color_gray
+            border.width: 2
+            border.color: bordercolor
+            Column{
+                anchors.centerIn: parent
+                Image{
+                    source: item_Buttons.source
+                    Component.onCompleted: {
+                        while(width > item_Buttons.width*0.8){
+                            width = width*0.95;
+                            height = height*0.95;
+                        }
+                        while(height > item_Buttons.height*0.8){
+                            width = width*0.95;
+                            height = height*0.95;
+                        }
+                    }
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                Text{
+                    horizontalAlignment: Text.AlignHCenter
+                    Component.onCompleted: {
+                        scale = 1;
+                        while(width*scale> parent.width*0.8){
+                            scale=scale-0.01;
+                        }
+                    }
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text : item_Buttons.text
+                    font.family: font_noto_b.name
+                    color: fontcolor
+                    font.pixelSize:fontsize
+                }
             }
         }
         Rectangle{

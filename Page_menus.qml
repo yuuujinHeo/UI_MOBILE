@@ -10,22 +10,11 @@ Item {
     width: 1280
     height: 800
 
-    Component.onCompleted: {
-        print("menu completed");
-    }
 
     function init(){
 
     }
 
-    Timer{
-        running: true
-        interval: 100
-        repeat: true
-        onTriggered: {
-            print("menu triggred");
-        }
-    }
 
     Rectangle{
         id: status_bar
@@ -64,6 +53,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
+                    click_sound.play();
                     loadPage(pmap);
                 }
             }
@@ -80,6 +70,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
+                    click_sound.play();
                     loadPage(psetting);
                 }
             }
@@ -114,6 +105,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            click_sound.play();
                             loadPage(pkitchen);
                         }
                     }
@@ -156,6 +148,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        click_sound.play();
                         supervisor.programHide();
                         mainwindow.showMinimized()
                     }
@@ -196,6 +189,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
+                        click_sound.play();
                         popup_program_exit.open();
 //                        supervisor.programExit();
                     }
@@ -264,6 +258,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            click_sound.play();
                             popup_program_exit.close();
                         }
                     }
@@ -299,6 +294,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            click_sound.play();
                             supervisor.programExit();
                             popup_program_exit.close();
                         }
@@ -335,6 +331,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            click_sound.play();
                             supervisor.programRestart();
                             popup_program_exit.close();
                         }

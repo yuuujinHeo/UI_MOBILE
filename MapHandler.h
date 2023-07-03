@@ -1,5 +1,5 @@
-#ifndef MAPVIEW_H
-#define MAPVIEW_H
+#ifndef MAPHANDLER_H
+#define MAPHANDLER_H
 
 #include <QTimer>
 #include <QObject>
@@ -8,11 +8,11 @@
 #include "spline.h"
 #include "GlobalHeader.h"
 
-class MapView : public QQuickPaintedItem
+class MapHandler : public QObject
 {
     Q_OBJECT
 public:
-    MapView(QQuickItem *parent = nullptr);
+    MapHandler();
 
     bool enable = false;
     QString tool = "move";
@@ -200,12 +200,8 @@ public:
 
     int getLocationGroupSize(int num);
     Q_INVOKABLE void saveAnnotation(QString filename);
-protected:
-    virtual void paint(QPainter *painter) Q_DECL_OVERRIDE;
 
 private:
-    PixmapContainer pixmap_map;
-
     //직접 불러오는거
     //map_raw.png
     cv::Mat file_raw;
@@ -222,19 +218,13 @@ private:
     cv::Mat map_drawing_mask;
 
     QPixmap map;
+    QPixmap final_map;
 
+    void update();
 private slots:
     void onTimer();
 private:
-    QQuickWindow *mMain;
     QTimer *timer;
-    QObject *mObject = nullptr;
-    //---------------------------------------------------Window
-    void setWindow(QQuickWindow* Window);
-    QQuickWindow *getWindow();
-    void setObject(QObject* object);
-    QObject* getObject();
 };
 
-
-#endif // MAPVIEW_H
+#endif // MAPHANDLER_H

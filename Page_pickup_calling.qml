@@ -129,6 +129,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
+                    click_sound.play();
                     console.log("UI : CONFIRM");
                     voice_pickup.stop();
                     voice_thanks.play();
@@ -167,6 +168,25 @@ Item {
         source: "bgm/voice_thanks.mp3"
     }
 
+    MouseArea{
+        id: area_debug
+        width: 150
+        height: 150
+        anchors.right: parent.right
+        anchors.bottom : parent.bottom
+        z: 99
+        property var password: 0
+        onClicked: {
+            click_sound2.play();
+            password++;
+            if(password > 4){
+                password = 0;
+                supervisor.writelog("[USER INPUT] ENTER THE MOVEFAIL PAGE "+Number(password));
+                loadPage(pmovefail);
+                loader_page.item.setNotice(3);
+            }
+        }
+    }
     Timer{
         id: timer_hello
         interval: 3000

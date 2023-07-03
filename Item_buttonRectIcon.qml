@@ -67,7 +67,7 @@ Item {
             onReleased: {
                 btn.color = color;
                 item_ButtonRect.clicked()
-                //click_sound.play();
+                click_sound.play();
             }
         }
     }

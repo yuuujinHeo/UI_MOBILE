@@ -10,16 +10,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <QQmlEngine>
-#include "MapView.h"
+#include "MapHandler.h"
 
-extern QObject *object;
-
-PixmapContainer::PixmapContainer(QObject *parent){
-
-}
-
-MapView::MapView(QQuickItem *parent):
-    QQuickPaintedItem(parent)
+MapHandler::MapHandler()
 {
     scale = 1;
     draw_x = 0;
@@ -45,7 +38,7 @@ MapView::MapView(QQuickItem *parent):
     setTline();
 }
 
-bool MapView::getCutBoxFlag(){
+bool MapHandler::getCutBoxFlag(){
     if(cut_box[0].x == 0 && cut_box[0].y == 0){
         if(cut_box[1].x == file_width && cut_box[1].y == file_width){
             return false;
@@ -53,7 +46,7 @@ bool MapView::getCutBoxFlag(){
     }
     return true;
 }
-void MapView::loadFile(QString name, QString type){
+void MapHandler::loadFile(QString name, QString type){
     QString file_path = QDir::homePath() + "/maps/"+name + "/map_raw.png";
     QString log_str;
     if(QFile::exists(file_path)){
@@ -143,10 +136,10 @@ void MapView::loadFile(QString name, QString type){
     log_str += QString().sprintf(", FILEWIDTH(%d)",draw_width);
     initDrawing();
     initRotate();
-    plog->write("[MAPVIEW] load File "+name+" : "+log_str);
+    plog->write("[MapHandler] load File "+name+" : "+log_str);
 }
 
-void MapView::setTline(){
+void MapHandler::setTline(){
     int radius = pmap->robot_radius*2/grid_width;
     for(int i=0; i<file_travelline.rows;i++){
         //1줄 당
@@ -194,11 +187,11 @@ void MapView::setTline(){
 }
 
 
-void MapView::setMapSize(int width, int height){
+void MapHandler::setMapSize(int width, int height){
     canvas_width = width;
     canvas_height = height;
 }
-void MapView::onTimer(){
+void MapHandler::onTimer(){
     if(flag_drawing){
         show_robot = true;
         robot_following = true;
@@ -216,9 +209,9 @@ void MapView::onTimer(){
 }
 
 
-void MapView::setMode(QString name){
+void MapHandler::setMode(QString name){
     mode = name;
-    plog->write("[MAPVIEW] "+object_name+" set Mode to "+name);
+    plog->write("[MapHandler] "+object_name+" set Mode to "+name);
     show_travelline = false;
     show_velocitymap = false;
     if(mode == "none"){
@@ -319,7 +312,7 @@ void MapView::setMode(QString name){
         robot_following = true;
         scale = 0.7;
         setZoomCenter(0,0);
-    }else if(mode == "mapviewer"){
+    }else if(mode == "MapHandlerer"){
         show_robot = false;
         show_global_path = false;
         show_local_path = false;
@@ -332,23 +325,23 @@ void MapView::setMode(QString name){
     setMap();
 }
 
-//void MapView::setScreen(float s, int centerx, int centery){
+//void MapHandler::setScreen(float s, int centerx, int centery){
 //    scale = s;
 //    setZoomCenter(centerx,centery);
 //    updateMap();
 //}
 
 
-void MapView::startDrawingTline(){
+void MapHandler::startDrawingTline(){
     flag_drawing = true;
     prev_pose.x = 0;
     prev_pose.y = 0;
 }
-void MapView::stopDrawingTline(){
+void MapHandler::stopDrawingTline(){
     flag_drawing = false;
 }
 
-void MapView::initLocation(){
+void MapHandler::initLocation(){
     //Read annotation.ini
     locations.clear();
     pmap->annot_edit_location = false;
@@ -365,18 +358,19 @@ void MapView::initLocation(){
         locations.push_back(temp);
     }
 }
-void MapView::setFullScreen(){
+void MapHandler::setFullScreen(){
     draw_x = 0;
     draw_y = 0;
     draw_width = file_width;
     scale = 1;
 }
 
-void MapView::moveMap(){
-    pixmap_map.pixmap = map.copy(draw_x,draw_y,draw_width,draw_width);
+void MapHandler::moveMap(){
+    final_map = map.copy(draw_x,draw_y,draw_width,draw_width);
+    update();
 }
 
-void MapView::setMap(){
+void MapHandler::setMap(){
     if(mode == "mapping"){
         map = QPixmap::fromImage(mat_to_qimage_cpy(pmap->map_mapping));
         file_width = pmap->map_mapping.rows;
@@ -728,11 +722,14 @@ void MapView::setMap(){
         }
     }
 
-    pixmap_map.pixmap = map.copy(draw_x,draw_y,draw_width,draw_width);
+    final_map = map.copy(draw_x,draw_y,draw_width,draw_width);
     update();
 }
 
-void MapView::saveRotateMap(){
+void MapHandler::update(){
+    pmap->map = final_map;
+}
+void MapHandler::saveRotateMap(){
     cv::Mat map_edited_ui;
     if(tool == "cut_map"){
         map_orin(cv::Rect(cut_box[0].x,cut_box[0].y,(cut_box[1].x-cut_box[0].x),(cut_box[1].y-cut_box[0].y))).copyTo(map_edited_ui);
@@ -761,7 +758,7 @@ void MapView::saveRotateMap(){
     loadFile(map_name,"");
 }
 
-void MapView::updateMeta(){
+void MapHandler::updateMeta(){
     QString path = QDir::homePath() + "/maps/"+ map_name + "/map_meta.ini";
     QSettings setting(path, QSettings::IniFormat);
     pmap->width = cut_box[1].x - cut_box[0].x;
@@ -782,7 +779,7 @@ void MapView::updateMeta(){
     setting.setValue("map_metadata/map_edited_cut_v",QString::number(pmap->cut_map[1]));
     plog->write("[ANNOTATION] UPDATE META : "+QString().sprintf("%d, %d, %d, %d, %d, %d, %d",pmap->map_rotate_angle, pmap->cut_map[0], pmap->cut_map[1], pmap->width,pmap->height, pmap->origin[0],pmap->origin[1]));
 }
-void MapView::setBoxPoint(int num, int x, int y){
+void MapHandler::setBoxPoint(int num, int x, int y){
     int min,max;
     if(x < 0) x = 0;
     if(y < 0) y = 0;
@@ -829,7 +826,7 @@ void MapView::setBoxPoint(int num, int x, int y){
     }
     setMap();
 }
-int MapView::getPointBox(int x, int y){
+int MapHandler::getPointBox(int x, int y){
     for(int i=0; i<2; i++){
         if(fabs(cut_box[i].x - x) < 50){
             if(fabs(cut_box[i].y - y) < 50){
@@ -865,7 +862,7 @@ int MapView::getPointBox(int x, int y){
     return -1;
 }
 
-void MapView::initRotate(){
+void MapHandler::initRotate(){
     rotate_angle = 0;
     pmap->map_rotate_angle = 0;
     cut_box[0].x = 0;
@@ -875,7 +872,7 @@ void MapView::initRotate(){
     setMap();
 }
 
-void MapView::removeLocation(int num){
+void MapHandler::removeLocation(int num){
     int count = 0;
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == "Serving"){
@@ -888,7 +885,7 @@ void MapView::removeLocation(int num){
     setMap();
 }
 
-void MapView::setTableNumberAuto(){
+void MapHandler::setTableNumberAuto(){
     QMap<int,int> group_num;
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == "Serving"){
@@ -902,7 +899,7 @@ void MapView::setTableNumberAuto(){
     }
 }
 
-void MapView::setSize(int x, int y, float s){
+void MapHandler::setSize(int x, int y, float s){
     float over = canvas_width*(s-1)/2;
     scale = scale/s;
     draw_width = round(file_width*scale);
@@ -910,7 +907,7 @@ void MapView::setSize(int x, int y, float s){
     setY(-y + over);
     moveMap();
 }
-void MapView::zoomIn(int x, int y){
+void MapHandler::zoomIn(int x, int y){
     scale -= 0.05;
     if(scale < 0.1){
         scale = 0.1;
@@ -921,7 +918,7 @@ void MapView::zoomIn(int x, int y){
     update();
 }
 
-void MapView::zoomOut(int x, int y){
+void MapHandler::zoomOut(int x, int y){
     scale += 0.05;
     if(scale > 1)
         scale =1;
@@ -931,7 +928,7 @@ void MapView::zoomOut(int x, int y){
     update();
 }
 
-void MapView::setInitPose(int x, int y, float th){
+void MapHandler::setInitPose(int x, int y, float th){
     set_init_flag = true;
     set_init_pose.point.x = x;
     set_init_pose.point.y = y;
@@ -939,11 +936,11 @@ void MapView::setInitPose(int x, int y, float th){
     setMap();
 }
 
-void MapView::clearInitPose(){
+void MapHandler::clearInitPose(){
     set_init_flag = false;
 }
 
-void MapView::rotateMap(int angle){
+void MapHandler::rotateMap(int angle){
     rotate_angle = angle;
     pmap->map_rotate_angle = angle;
     //맵 회전
@@ -957,7 +954,7 @@ void MapView::rotateMap(int angle){
     setMap();
 }
 
-void MapView::rotateMapCW(){
+void MapHandler::rotateMapCW(){
     rotate_angle++;
     pmap->map_rotate_angle = rotate_angle;
     //맵 회전
@@ -970,7 +967,7 @@ void MapView::rotateMapCW(){
     setMap();
 }
 
-void MapView::rotateMapCCW(){
+void MapHandler::rotateMapCCW(){
     rotate_angle--;
     pmap->map_rotate_angle = rotate_angle;
     //맵 회전
@@ -983,13 +980,13 @@ void MapView::rotateMapCCW(){
     setMap();
 }
 
-void MapView::move(int x, int y){
+void MapHandler::move(int x, int y){
     setX(x);
     setY(y);
     moveMap();
 }
 
-void MapView::setX(int newx){
+void MapHandler::setX(int newx){
     if(newx < 0)
         draw_x = 0;
     else if(newx > file_width - draw_width)
@@ -998,7 +995,7 @@ void MapView::setX(int newx){
         draw_x = round(newx);
 }
 
-void MapView::setY(int newy){
+void MapHandler::setY(int newy){
     if(newy < 0)
         draw_y = 0;
     else if(newy > file_width - draw_width)
@@ -1008,25 +1005,25 @@ void MapView::setY(int newy){
 
 }
 
-void MapView::setZoomCenter(int x, int y){
+void MapHandler::setZoomCenter(int x, int y){
     float newx = draw_x - file_width*(scale - prev_scale)*((float)x/canvas_width);
     float newy = draw_y - file_width*(scale - prev_scale)*((float)y/canvas_width);
 
     setX(newx);
     setY(newy);
 
-    pixmap_map.pixmap = map.copy(draw_x,draw_y,draw_width,draw_width);
+    final_map = map.copy(draw_x,draw_y,draw_width,draw_width);
     update();
 }
 
-bool MapView::getDrawingFlag(){
+bool MapHandler::getDrawingFlag(){
     if(lines.size() > 0 || line.size() > 0){
         return true;
     }else{
         return false;
     }
 }
-bool MapView::getDrawingUndoFlag(){
+bool MapHandler::getDrawingUndoFlag(){
     if(dot_trash.size() > 0 || lines_trash.size() > 0){
         return true;
     }else{
@@ -1034,7 +1031,7 @@ bool MapView::getDrawingUndoFlag(){
     }
 }
 
-void MapView::startDrawingLine(int x, int y){
+void MapHandler::startDrawingLine(int x, int y){
 //    //qDebug() << "startDrawingLine";
     new_straight_flag = true;
     spline_dot.clear();
@@ -1044,7 +1041,7 @@ void MapView::startDrawingLine(int x, int y){
     straight[1].y = y;
     setMap();
 }
-void MapView::startSpline(int x, int y){
+void MapHandler::startSpline(int x, int y){
     line.clear();
     spline_dot.clear();
     lines_trash.clear();
@@ -1053,7 +1050,7 @@ void MapView::startSpline(int x, int y){
     line.push_back(curPoint);
     spline_dot.push_back(curPoint);
 }
-void MapView::endSpline(bool save){
+void MapHandler::endSpline(bool save){
     if(save){
         LINE temp_line;
         temp_line.color = cur_line_color;
@@ -1066,7 +1063,7 @@ void MapView::endSpline(bool save){
     lines_trash.clear();
     setMap();
 }
-void MapView::drawSpline(){
+void MapHandler::drawSpline(){
     line.clear();
     if(spline_dot.size() > 2){
         std::vector<double> x_list;
@@ -1133,7 +1130,7 @@ void MapView::drawSpline(){
     setMap();
 }
 
-void MapView::setMapDrawing(){
+void MapHandler::setMapDrawing(){
     initDrawing();
     for(int line=0; line<lines.size(); line++){
         if(lines[line].type == 0){
@@ -1195,21 +1192,21 @@ void MapView::setMapDrawing(){
     }
 
 }
-void MapView::addSpline(int x, int y){
+void MapHandler::addSpline(int x, int y){
     curPoint.x = x;
     curPoint.y = y;
     spline_dot.push_back(curPoint);
     dot_trash.clear();
     drawSpline();
 }
-void MapView::setDrawingLine(int x, int y){
+void MapHandler::setDrawingLine(int x, int y){
     straight[1].x = x;
     straight[1].y = y;
     initDrawing();
     setMapDrawing();
     setMap();
 }
-void MapView::stopDrawingLine(int x, int y){
+void MapHandler::stopDrawingLine(int x, int y){
 //    //qDebug() << "stopDrawingLine";
     line.clear();
     lines_trash.clear();
@@ -1228,7 +1225,7 @@ void MapView::stopDrawingLine(int x, int y){
     setMapDrawing();
     setMap();
 }
-void MapView::startDrawing(int x, int y){
+void MapHandler::startDrawing(int x, int y){
     line.clear();
     spline_dot.clear();
     lines_trash.clear();
@@ -1237,7 +1234,7 @@ void MapView::startDrawing(int x, int y){
     line.push_back(curPoint);
 }
 
-void MapView::drawTline(){
+void MapHandler::drawTline(){
     cv::Point2f pose = setAxis(probot->curPose.point);
     if(prev_pose.x == 0 && prev_pose.y == 0){
         //pass
@@ -1246,7 +1243,7 @@ void MapView::drawTline(){
     }
     prev_pose = pose;
 }
-void MapView::addLinePoint(int x, int y){
+void MapHandler::addLinePoint(int x, int y){
     curPoint.x = x;
     curPoint.y = y;
     line.push_back(curPoint);
@@ -1270,7 +1267,7 @@ void MapView::addLinePoint(int x, int y){
     setMap();
 }
 
-void MapView::endDrawing(int x, int y){
+void MapHandler::endDrawing(int x, int y){
     //qDebug() << "endDrawing";
     curPoint.x = x;
     curPoint.y = y;
@@ -1332,7 +1329,7 @@ void MapView::endDrawing(int x, int y){
     setMap();
 }
 
-void MapView::clearDrawing(){
+void MapHandler::clearDrawing(){
     line.clear();
     lines.clear();
     spline_dot.clear();
@@ -1341,7 +1338,7 @@ void MapView::clearDrawing(){
     setMap();
 }
 
-void MapView::undoLine(){
+void MapHandler::undoLine(){
     line.clear();
     if(spline_dot.size() > 0){
         //qDebug() << "undoLine(Spline)";
@@ -1357,7 +1354,7 @@ void MapView::undoLine(){
     }
 }
 
-void MapView::saveMap(){
+void MapHandler::saveMap(){
     cv::Mat temp_orin;
     cv::Mat temp_draw;
     cv::Mat temp_mask;
@@ -1378,11 +1375,11 @@ void MapView::saveMap(){
     cv::flip(rotated,rotated,0);
 
     QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_edited.png";
-    plog->write("[MAPVIEW] SAVE MAP "+path);
+    plog->write("[MapHandler] SAVE MAP "+path);
     cv::imwrite(path.toStdString(),rotated);
 }
 
-void MapView::saveVelmap(){
+void MapHandler::saveVelmap(){
     initDrawing();
     QString file_path = QDir::homePath() + "/maps/"+map_name + "/map_velocity.png";
     if(QFile::exists(file_path)){
@@ -1419,7 +1416,7 @@ void MapView::saveVelmap(){
     cv::flip(temp_velocity,temp_velocity,0);
 
     QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_velocity.png";
-    plog->write("[MAPVIEW] SAVE MAP "+path);
+    plog->write("[MapHandler] SAVE MAP "+path);
     cv::imwrite(path.toStdString(),temp_velocity);
 
     lines.clear();
@@ -1427,7 +1424,7 @@ void MapView::saveVelmap(){
     loadFile(map_name,"");
     setMap();
 }
-void MapView::saveTline(){
+void MapHandler::saveTline(){
     cv::Mat temp_travel;
     cv::Mat temp_draw;
     cv::Mat temp_mask;
@@ -1444,11 +1441,11 @@ void MapView::saveTline(){
     cv::flip(file_travelline,file_travelline,0);
 
     QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_travel_line.png";
-    plog->write("[MAPVIEW] SAVE MAP "+path);
+    plog->write("[MapHandler] SAVE MAP "+path);
     cv::imwrite(path.toStdString(),file_travelline);
 }
 
-void MapView::saveTlineTemp(){
+void MapHandler::saveTlineTemp(){
     cv::Mat temp_travel;
     cv::Mat temp_draw;
     cv::Mat temp_mask;
@@ -1465,11 +1462,11 @@ void MapView::saveTlineTemp(){
     cv::flip(file_travelline,file_travelline,0);
 
     QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_travel_line_ui.png";
-    plog->write("[MAPVIEW] SAVE MAP "+path);
+    plog->write("[MapHandler] SAVE MAP "+path);
     cv::imwrite(path.toStdString(),file_travelline);
 }
 
-void MapView::redoLine(){
+void MapHandler::redoLine(){
     if(dot_trash.size() > 0){
         //qDebug() << "redoLine(Spline)";
         spline_dot.push_back(dot_trash[dot_trash.size()-1]);
@@ -1484,7 +1481,7 @@ void MapView::redoLine(){
     }
 }
 
-void MapView::startDrawingRect(int x, int y){
+void MapHandler::startDrawingRect(int x, int y){
     temp_rect.clear();
     temp_rect.push_back(cv::Point2f(x,y));
     temp_rect.push_back(cv::Point2f(x,y));
@@ -1492,7 +1489,7 @@ void MapView::startDrawingRect(int x, int y){
     temp_rect.push_back(cv::Point2f(x,y));
     setMapDrawing();
 }
-void MapView::setDrawingRect(int x, int y){
+void MapHandler::setDrawingRect(int x, int y){
     if(temp_rect.size() > 3){
         cv::Point2f orin = temp_rect[0];
         temp_rect[1] = cv::Point2f(orin.x,y);
@@ -1502,7 +1499,7 @@ void MapView::setDrawingRect(int x, int y){
     setMapDrawing();
     setMap();
 }
-void MapView::endDrawingRect(){
+void MapHandler::endDrawingRect(){
     LINE temp_line;
     temp_line.points = temp_rect;
     temp_line.width = cur_line_width;
@@ -1512,7 +1509,7 @@ void MapView::endDrawingRect(){
     temp_rect.clear();
 }
 
-void MapView::saveLocation(QString type, int groupnum, QString name){
+void MapHandler::saveLocation(QString type, int groupnum, QString name){
     LOCATION temp;
     temp.type = type;
     temp.name = name;
@@ -1567,7 +1564,7 @@ void MapView::saveLocation(QString type, int groupnum, QString name){
     initLocation();
 }
 
-void MapView::saveAnnotation(QString filename){
+void MapHandler::saveAnnotation(QString filename){
     if(filename == ""){
         qDebug() << "file name set";
         filename = pmap->map_name;
@@ -1576,7 +1573,7 @@ void MapView::saveAnnotation(QString filename){
     //기존 파일 백업
     QString backup = QDir::homePath()+"/maps/"+filename+"/annotation_backup.ini";
     QString origin = QDir::homePath()+"/maps/"+filename+"/annotation.ini";
-    plog->write("[MAPVIEW] SAVE Annotation "+origin);
+    plog->write("[MapHandler] SAVE Annotation "+origin);
     if(QFile::exists(origin) == true){
         if(QFile::copy(origin, backup)){
             plog->write("[DEBUG] Copy annotation.ini to annotation_backup.ini");
@@ -1631,7 +1628,7 @@ void MapView::saveAnnotation(QString filename){
     pmap->annotation_edited = false;
 }
 
-int MapView::getLocationGroupSize(int num){
+int MapHandler::getLocationGroupSize(int num){
     int size = 0;
     if(num > -1 && num < pmap->location_groups.size()){
         for(int i=0; i<pmap->locations.size(); i++){
@@ -1643,7 +1640,7 @@ int MapView::getLocationGroupSize(int num){
 //    qDebug() << "location group size " << num << size << pmap->locations.size();
     return size;
 }
-void MapView::clearLocation(){
+void MapHandler::clearLocation(){
     new_location_flag = false;
     new_location.name = "";
     edit_location_flag = false;
@@ -1654,14 +1651,14 @@ void MapView::clearLocation(){
     setMap();
 }
 
-void MapView::addLocation(int x, int y, float th){
+void MapHandler::addLocation(int x, int y, float th){
     new_location_flag = true;
     new_location.point = cv::Point2f(x,y);
     new_location.angle = th;
     initLocation();
     setMap();
 }
-void MapView::addLocationCur(int x, int y, float th){
+void MapHandler::addLocationCur(int x, int y, float th){
     new_location_flag = true;
     new_location.point = setAxis(cv::Point2f(x,y));
     new_location.angle = setAxis(th);
@@ -1669,7 +1666,7 @@ void MapView::addLocationCur(int x, int y, float th){
     initLocation();
     setMap();
 }
-void MapView::setLocation(int x, int y, float th){
+void MapHandler::setLocation(int x, int y, float th){
     int num = select_location;
     new_location_flag = false;
     if(pmap->locations.size() > num && num > -1){
@@ -1683,7 +1680,7 @@ void MapView::setLocation(int x, int y, float th){
     setMap();
 }
 
-int MapView::getLocationNum(int x, int y){
+int MapHandler::getLocationNum(int x, int y){
     int loc_id = -1;
     for(int i=0; i<pmap->locations.size(); i++){
         cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
@@ -1714,7 +1711,7 @@ int MapView::getLocationNum(int x, int y){
     return -1;
 }
 
-int MapView::getLocationNum(QString type){
+int MapHandler::getLocationNum(QString type){
     int count = 0;
     for(int i=0; i<locations.size(); i++){
         if(locations[i].type == type)
@@ -1722,7 +1719,7 @@ int MapView::getLocationNum(QString type){
     }
     return count;
 }
-int MapView::getLocGroupNum(int num){
+int MapHandler::getLocGroupNum(int num){
     int count = 0;
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == "Serving" && pmap->locations[i].group == num){
@@ -1732,7 +1729,7 @@ int MapView::getLocGroupNum(int num){
     return count;
 }
 
-void MapView::editLocation(int x, int y, float th){
+void MapHandler::editLocation(int x, int y, float th){
     int num = select_location;
     if(pmap->locations.size() > num && num > -1){
         if(!edit_location_flag){
@@ -1747,26 +1744,5 @@ void MapView::editLocation(int x, int y, float th){
     setMap();
 }
 
-void MapView::paint(QPainter *painter){
-    painter->drawPixmap(0,0,width(),height(),pixmap_map.pixmap);
-}
 
-void MapView::setWindow(QQuickWindow *Window){
-    mMain = Window;
-}
 
-QQuickWindow *MapView::getWindow()
-{
-    return mMain;
-}
-
-void MapView::setObject(QObject *object)
-{
-    mObject = object;
-}
-
-QObject *MapView::getObject()
-{
-    //rootobject를 리턴해준다.
-    return mObject;
-}

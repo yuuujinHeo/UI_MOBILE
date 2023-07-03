@@ -102,7 +102,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onDoubleClicked:{
-                        //click.play();
+                        click_sound.play();
                         popup_password.open();
                     }
                 }
@@ -122,7 +122,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        //click.play();
+                        click_sound.play();
                        select_category = "status";
                     }
                 }
@@ -150,7 +150,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        //click.play();
+                        click_sound.play();
                        select_category = "robot";
                     }
                 }
@@ -179,7 +179,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        //click.play();
+                        click_sound.play();
                        select_category = "moving";
                     }
                 }
@@ -208,7 +208,7 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        //click.play();
+                        click_sound.play();
                        select_category = "slam";
                     }
                 }
@@ -288,6 +288,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("플랫폼 이름");
                                     popup_help_setting.addLine("플랫폼을 지칭하는 이름을 적어주세요.");
@@ -362,6 +363,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("플랫폼 넘버");
                                     popup_help_setting.addLine("로봇을 여러대 구동하며 동일한 로봇 이름을 사용하는 경우 사용합니다.");
@@ -469,6 +471,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("플랫폼 타입");
                                     popup_help_setting.addLine("지정하기 전, 지원되는 모델인지 확인하세요.");
@@ -494,6 +497,67 @@ Item {
                                     ischanged = true;
                                 }
                                 model:["서빙용","호출용","서빙+호출용"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_robot_442
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"최대 호출 횟수"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("최대 호출 횟수");
+                                    popup_help_setting.addLine("지정하기 전, 지원되는 모델인지 확인하세요.");
+                                    popup_help_setting.addLine("로봇이 한 번 이동에 호출되는 최대 횟수입니다..");
+                                    popup_help_setting.addLine("대기 위치에서 출발한 뒤 해당 횟수만큼 테이블을 이동하면");
+                                    popup_help_setting.addLine("추가적인 호출명령이 있어도 우선 대기위치로 돌아옵니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_max_calling
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:[1,2,3,4,5,6,7,8,9]
                             }
                         }
                     }
@@ -530,6 +594,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("트레이 별 서빙");
                                     popup_help_setting.addLine("트레이 별로 각각의 서빙위치를 지정하려면 사용하세요.");
@@ -641,6 +706,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("이동 중 화면");
                                     popup_help_setting.addLine("로봇이 이동 중에 화면에 표시될 것을 고르세요.");
@@ -701,6 +767,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("이동 속도 (프리셋)");
                                     popup_help_setting.addLine("이동속도는 5단계로 분류됩니다");
@@ -735,7 +802,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            //click.play();
+                                            click_sound.play();
                                             popup_preset.select_preset = 1;
                                             popup_preset.open();
                                         }
@@ -756,7 +823,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            //click.play();
+                                            click_sound.play();
                                             popup_preset.select_preset = 2;
                                             popup_preset.open();
 
@@ -778,7 +845,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            //click.play();
+                                            click_sound.play();
                                             popup_preset.select_preset = 3;
                                             popup_preset.open();
                                         }
@@ -799,7 +866,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            //click.play();
+                                            click_sound.play();
                                             popup_preset.select_preset = 4;
                                             popup_preset.open();
 
@@ -821,7 +888,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            //click.play();
+                                            click_sound.play();
                                             popup_preset.select_preset = 5;
                                             popup_preset.open();
                                         }
@@ -874,7 +941,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
-                                            //click.play();
+                                            click_sound.play();
                                             if(slider_volume_bgm.value == 0){
                                                 slider_volume_bgm.value  = Number(supervisor.getSetting("ROBOT_SW","volume_bgm"));
                                             }else{
@@ -906,7 +973,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
-                                            //click.play();
+                                            click_sound.play();
                                             if(bgm_test.isplaying){
                                                 bgm_test.stop();
                                                 ttet.source = "icon/icon_test_play.png";
@@ -965,7 +1032,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
-                                            //click.play();
+                                            click_sound.play();
                                             if(slider_volume_voice.value == 0){
                                                 slider_volume_voice.value  = Number(supervisor.getSetting("ROBOT_SW","volume_voice"));
                                             }else{
@@ -994,9 +1061,89 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked: {
-                                            //click.play();
+                                            click_sound.play();
                                             print("test play")
                                             voice_test.play();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    id: set_voice_button
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"버튼클릭 볼륨"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+
+                        Rectangle{
+                            id: te3
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Image{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    source: "icon/icon_mute.png"
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            click_sound.play();
+                                            if(slider_volume_button.value == 0){
+                                                slider_volume_button.value  = Number(supervisor.getSetting("ROBOT_SW","volume_button"));
+                                            }else{
+                                                slider_volume_button.value  = 0;
+                                            }
+                                        }
+                                    }
+                                }
+                                Slider{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    id: slider_volume_button
+                                    width: te.width*0.7
+                                    height: 50
+                                    from: 0
+                                    to: 100
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                    }
+                                    value: supervisor.getSetting("ROBOT_SW","volume_button")
+                                }
+                                Image{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    source: "icon/icon_test_play.png"
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            start_sound.play();
                                         }
                                     }
                                 }
@@ -1352,7 +1499,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            //click.play();
+                                            click_sound.play();
                                             //Debug
                                             supervisor.connectWifi("mobile_robot_test","rainbow2011");
                                             popup_wifi.open();
@@ -1436,7 +1583,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            //click.play();
+                                            click_sound.play();
                                             wifi_passwd.ischanged = false;
                                             supervisor.setSetting("ROBOT_SW/wifi_passwd",wifi_passwd.text);
                                         }
@@ -1641,7 +1788,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            //click.play();
+                                            click_sound.play();
                                             ip_1.ischanged = false;
                                             ip_2.ischanged = false;
                                             ip_3.ischanged = false;
@@ -1862,7 +2009,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            //click.play();
+                                            click_sound.play();
                                             ip_1.ischanged = false;
                                             ip_2.ischanged = false;
                                             ip_3.ischanged = false;
@@ -2081,7 +2228,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            //click.play();
+                                            click_sound.play();
                                             ip_1.ischanged = false;
                                             ip_2.ischanged = false;
                                             ip_3.ischanged = false;
@@ -2303,7 +2450,7 @@ Item {
                                     MouseArea{
                                         anchors.fill: parent
                                         onClicked:{
-                                            //click.play();
+                                            click_sound.play();
                                             dnsserv_1.ischanged = false;
                                             dnsserv_2.ischanged = false;
                                             dnsserv_3.ischanged = false;
@@ -2365,7 +2512,7 @@ Item {
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: {
-                                        //click.play();
+                                        click_sound.play();
                                         popup_reset.open();
                                     }
                                 }
@@ -2818,6 +2965,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("최소 인식 높이");
                                     popup_help_setting.addLine("장애물 감지에 사용되는 카메라 3D 데이터값의 최소높이값입니다.");
@@ -2892,6 +3040,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("최대 인식 높이");
                                     popup_help_setting.addLine("장애물 감지에 사용되는 카메라 3D 데이터값의 최대높이값입니다.");
@@ -2986,6 +3135,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("데이터 최대 거리");
                                     popup_help_setting.addLine("연산에 사용되는 라이다 데이터의 최대값입니다.");
@@ -3061,6 +3211,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("데이터 최소 거리");
                                     popup_help_setting.addLine("연산에 사용되는 라이다 데이터의 최소값(로봇 중심기준)입니다.");
@@ -3133,6 +3284,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("오프셋 X");
                                     popup_help_setting.addLine("로봇 중심기준으로 라이다센서의 X축 오프셋입니다.");
@@ -3204,6 +3356,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("오프셋 Y");
                                     popup_help_setting.addLine("로봇 중심기준으로 라이다센서의 Y축 오프셋입니다.");
@@ -3295,6 +3448,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("경로추종 최대거리");
                                     popup_help_setting.addLine("로봇과 로봇이 추종하는 경로 상 한 점 사이 최대 거리입니다.");
@@ -3366,6 +3520,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("경로추종 최대거리");
                                     popup_help_setting.addLine("로봇과 로봇이 추종하는 경로 상 한 점 사이 최소 거리입니다.");
@@ -3437,6 +3592,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("감지 거리 Level 1");
                                     popup_help_setting.addLine("주행 중 장애물을 감지하는 범위의 level 1 값입니다.");
@@ -3513,6 +3669,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("감지 거리 Level 0");
                                     popup_help_setting.addLine("주행 중 장애물을 감지하는 범위의 level 0 값입니다.");
@@ -3589,6 +3746,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("장애물 넓이");
                                     popup_help_setting.addLine("감지되는 동적 센서 데이타가 이 값만큼 뭉쳐있다면 장애물로 판단합니다.");
@@ -3664,6 +3822,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("장애물 감지 민감도");
                                     popup_help_setting.addLine("동적장애물로 판단하는 픽셀의 민감도 입니다.");
@@ -3738,6 +3897,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("즉시정지 거리");
                                     popup_help_setting.addLine("로봇 중심 기준으로 동적장애물로 판단되는 것이 이 범위 안에 들어오면");
@@ -3810,6 +3970,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("감지 후 대기시간");
                                     popup_help_setting.addLine("장애물을 감지 후 로봇이 멈춘 뒤 다시 출발할 때 까지 걸리는 대기시간입니다.");
@@ -3881,6 +4042,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("경로이탈 거리");
                                     popup_help_setting.addLine("로봇이 경로에서 이 값 이상 떨어지면 경로를 이탈했다고 판단합니다.");
@@ -3967,6 +4129,7 @@ Item {
                                 text: "?"
                                 onClicked:
                                 {
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("Inlier 판단거리");
                                     popup_help_setting.addLine("로봇이 위치추정할 때, 실제 라이다데이터와 맵상 대응점과의 위치차이가");
@@ -4041,6 +4204,7 @@ Item {
                                 text: "?"
                                 onClicked:
                                 {
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("평균오차 최소값(icp_error)");
                                     popup_help_setting.addLine("Inlier 판단된 데이터들의 실제 라이다데이터와 맵상 대응점과의 위치차이의 평균이");
@@ -4115,6 +4279,7 @@ Item {
                                 text: "?"
                                 onClicked:
                                 {
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("Inlier 비율 (icp_ratio)");
                                     popup_help_setting.addLine("전체 라이다데이터 대비 lnlier 판단된 데이터 값의 비율입니다.");
@@ -4189,6 +4354,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("모터 위치추정 비율");
                                     popup_help_setting.addLine("모터의 엔코더값으로 계산되는 위치추정 값을 얼마나 사용할지의 비율입니다.");
@@ -4262,6 +4428,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("위치추정 최소 거리");
                                     popup_help_setting.addLine("로봇이 주행하며 이 거리 이상 움직이면 위치추정을 시도합니다.");
@@ -4333,6 +4500,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("위치추정 최소 시간");
                                     popup_help_setting.addLine("로봇은 이 시간 간격으로 자동으로 위치추정을 시도합니다.");
@@ -4421,6 +4589,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("도착점 허용 오차");
                                     popup_help_setting.addLine("로봇의 현재 위치와 목적지의 위치차이가 이 값보다 작으면 목적지에 도착했다고 판단합니다.");
@@ -4494,6 +4663,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("도착점 허용 오차");
                                     popup_help_setting.addLine("로봇의 현재 위치와 목적지의 위치차이가 이 값보다 작으면 목적지에 도착했다고 판단합니다.");
@@ -4567,6 +4737,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("경로탐색 최소거리");
                                     popup_help_setting.addLine("출발점과 도착점이 이 값보다 작으면 경로를 탐색하지 않고");
@@ -4681,6 +4852,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("제자리 회전속도(limit_pivot)");
                                     popup_help_setting.addLine("로봇이 출발점에서 출발하기 전, 도착점에 도착 후 제자리 회전을 할때의 속도입니다.");
@@ -4753,6 +4925,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("제자리 회전가속도(limit_pivot_acc)");
                                     popup_help_setting.addLine("로봇이 출발점에서 출발하기 전, 도착점에 도착 후 제자리 회전을 할때의 가속도입니다.");
@@ -4825,6 +4998,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("주행 속도(limit_v)");
                                     popup_help_setting.addLine("로봇이 주행할 때의 최대 속도입니다.");
@@ -4897,6 +5071,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("주행 가속도(limit_v)");
                                     popup_help_setting.addLine("로봇이 주행할 때의 최대 가속도입니다.");
@@ -4969,6 +5144,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("주행 회전속도(limit_w)");
                                     popup_help_setting.addLine("로봇이 주행할 때의 최대 회전속도입니다.");
@@ -5041,6 +5217,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("주행 회전 가속도(limit_w_acc)");
                                     popup_help_setting.addLine("로봇이 주행할 때의 최대 회전 가속도입니다.");
@@ -5113,6 +5290,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("JOG 속도(limit_manual_v)");
                                     popup_help_setting.addLine("로봇을 Joystick 혹은 JOG로 움직일 때의 최대 속도입니다.");
@@ -5185,6 +5363,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("JOG 회전속도(limit_manual_v)");
                                     popup_help_setting.addLine("로봇을 Joystick 혹은 JOG로 움직일 때의 최대 회전속도입니다.");
@@ -5257,6 +5436,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("출발 속도(st_v)");
                                     popup_help_setting.addLine("로봇이 출발할 때, 처음으로 주어지는 속도값입니다.");
@@ -5330,6 +5510,7 @@ Item {
                                 anchors.rightMargin: 20
                                 text: "?"
                                 onClicked:{
+                                    click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("도착 속도(goal_v)");
                                     popup_help_setting.addLine("로봇이 목적지에 인접했을 때, 감속되는 최종 속도값입니다.");
@@ -6592,6 +6773,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
+                    click_sound.play();
                     supervisor.writelog("[USER INPUT] SETTING PAGE -> BACKPAGE");
                     if(check_update()){
                         popup_changed.open();
@@ -6696,6 +6878,10 @@ Item {
             supervisor.setSetting("ROBOT_SW/robot_id",combo_platform_id.currentText);
         }
 
+        if(combo_max_calling.ischanged){
+            supervisor.setSetting("ROBOT_SW/call_maximum",combo_max_calling.currentText);
+        }
+
         if(combo_platform_type.ischanged){
             if(combo_platform_type.currentIndex == 0){
                 supervisor.setSetting("ROBOT_HW/type","SERVING");
@@ -6718,6 +6904,9 @@ Item {
             supervisor.setSetting("ROBOT_SW/volume_voice",slider_volume_voice.value.toFixed(0));
         }
 
+        if(slider_volume_button.ischanged){
+            supervisor.setSetting("ROBOT_SW/volume_button",slider_volume_button.value.toFixed(0));
+        }
         if(combo_tableview.ischanged){
             supervisor.setSetting("ROBOT_SW/table_view",combo_tableview.currentIndex);
         }
@@ -6978,6 +7167,7 @@ Item {
             combo_platform_type.currentIndex = 2;
         }
 
+        combo_max_calling.currentIndex = parseInt(supervisor.getSetting("ROBOT_SW","call_maximum")) - 1;
         wheel_base.text = supervisor.getSetting("ROBOT_HW","wheel_base");
         wheel_radius.text = supervisor.getSetting("ROBOT_HW","wheel_radius");
 
@@ -7020,7 +7210,7 @@ Item {
 
         slider_volume_bgm.value = Number(supervisor.getSetting("ROBOT_SW","volume_bgm"));
         slider_volume_voice.value = Number(supervisor.getSetting("ROBOT_SW","volume_voice"));
-
+        slider_volume_button.value = Number(supervisor.getSetting("ROBOT_SW","volume_button"));
 
         text_preset_name_1.text = supervisor.getSetting("PRESET1","name");
         text_preset_name_2.text = supervisor.getSetting("PRESET2","name");
@@ -7279,7 +7469,6 @@ Item {
             }
 
             wifi_connection.connection = supervisor.getWifiConnection("");
-            print(supervisor.getWifiState());
 
             motor_left_id = parseInt(supervisor.getSetting("MOTOR","left_id"));
             motor_right_id = parseInt(supervisor.getSetting("MOTOR","right_id"));

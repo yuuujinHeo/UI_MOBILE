@@ -177,6 +177,7 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     //click_start.play();
+                    click_sound.play();
                     supervisor.writelog("[USER INPUT] PICKUP CONFIRM clicked");
                     voice_pickup.stop();
                     voice_thanks.play();
@@ -200,7 +201,7 @@ Item {
         z: 99
         property var password: 0
         onClicked: {
-            //click_sound.play();
+            click_sound2.play();
             password++;
             if(password > 4){
                 password = 0;
