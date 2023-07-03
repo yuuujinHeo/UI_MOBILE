@@ -5,12 +5,12 @@ import QtQuick.Dialogs 1.2
 import QtGraphicalEffects 1.0
 import "."
 import io.qt.Supervisor 1.0
-import io.qt.MapView 1.0
+import io.qt.MapViewer 1.0
 
 
 Item {
-    id: map_full
-    objectName: "map_full"
+    id: map_full2
+    objectName: "map_full2"
     width: 1000
     height: 1000
     clip: true
@@ -45,30 +45,25 @@ Item {
     property bool is_drawing_undo: false
     property bool is_drawing_redo: false
 
-    onEnabledChanged: {
-        print("enabled changed : "+objectName + enabled);
-        mapview.setEnable(enabled);
-    }
-
     onWidthChanged: {
         if(width>0 && height>0){
-            mapview.setMapSize(width, height);
+            supervisor.setMapSize(width, height);
         }
     }
 
     Component.onCompleted: {
-        mapview.setName(objectName);
-        mapview.setMapSize(width, height);
+        supervisor.setName(objectName);
+        supervisor.setMapSize(width, height);
     }
 
     function setEnable(en){
         enabled = en;
-        mapview.setEnable(en);
+        supervisor.setEnable(en);
     }
 
     function setViewer(mode){
         supervisor.writelog("[QML MAP] SET Viewer "+objectName+" to "+mode);
-        mapview.setMode(mode);
+        supervisor.setMode(mode);
         show_connection = true;
         show_button_following = true;
         show_button_lidar = true;
@@ -91,7 +86,7 @@ Item {
             show_button_following = false;
             show_button_lidar = false;
         }else if(mode === "annot_location"){
-//            mapview.setCostMap();
+//            supervisor.setCostMap();
         }else if(mode === "mapping"){
             show_button_following = true;
             show_button_lidar = false;
@@ -137,10 +132,10 @@ Item {
     function checkDrawing(){
         is_drawing_redo = false;
         is_drawing_undo = false;
-        if(mapview.getDrawingFlag()){
+        if(supervisor.getDrawingFlag()){
             is_drawing_undo = true;
         }
-        if(mapview.getDrawingUndoFlag()){
+        if(supervisor.getDrawingUndoFlag()){
             is_drawing_redo = true;
         }
     }
@@ -160,30 +155,30 @@ Item {
             timer_loadmap.stop();
             map_loaded = true;
             supervisor.loadFile(name,type);
-//            mapview.loadFile(name,type);
+//            supervisor.loadFile(name,type);
         }else{
             map_loaded = true;
             supervisor.loadFile(name,type);
-//            mapview.loadFile(name,type);
+//            supervisor.loadFile(name,type);
             if(supervisor.isExistAnnotation(name)){
                 map_type = "EDITED";
             }else{
                 map_type = "RAW";
             }
         }
-        mapview.setMap();
+        supervisor.setMap();
     }
 
     function startDrawingT(){
-        mapview.startDrawingTline();
+        supervisor.startDrawingTline();
     }
 
     function stopDrawingT(){
-        mapview.stopDrawingTline();
+        supervisor.stopDrawingTline();
     }
 
     function getTFlag(){
-        return mapview.getDrawingTline();
+        return supervisor.getDrawingTline();
     }
 
     function loadmapsoft(name,type){
@@ -206,41 +201,41 @@ Item {
 
                 }else if(type === "RAW"){
                     map_loaded = true;
-                    mapview.setRawMap(name);
+                    supervisor.setRawMap(name);
                 }else if(type === "EDITED"){
                     map_loaded = true;
-                    mapview.setEditedMap(name);
+                    supervisor.setEditedMap(name);
                 }else if(type === "T_EDIT"){
                     map_loaded = true;
-                    mapview.setTlineMode(true);
-                    mapview.initTline(name);
-                    mapview.setEditedMap(name);
-                    mapview.setFullScreen();
+                    supervisor.setTlineMode(true);
+                    supervisor.initTline(name);
+                    supervisor.setEditedMap(name);
+                    supervisor.setFullScreen();
                 }else if(type === "T_EDIT_TEMP"){
                     map_loaded = true;
-                    mapview.setTlineMode(true);
-//                    mapview.initTline(name);
-                    mapview.setEditedMap(name);
-                    mapview.setFullScreen();
+                    supervisor.setTlineMode(true);
+//                    supervisor.initTline(name);
+                    supervisor.setEditedMap(name);
+                    supervisor.setFullScreen();
                 }else if(type === "OBJECT"){
                     map_loaded = true;
-                    mapview.setCostMap();
-                    mapview.setObjectMap(name);
+                    supervisor.setCostMap();
+                    supervisor.setObjectMap(name);
                 }else if(type === "local"){
                     map_loaded = true;
-//                    mapview.setLocalizationMap(name);
+//                    supervisor.setLocalizationMap(name);
                 }else if(type === "velmap"){
                     map_loaded = true;
-                    mapview.initVelmap(name,1);
-                    mapview.setEditedMap(name);
+                    supervisor.initVelmap(name,1);
+                    supervisor.setEditedMap(name);
                 }
             }else{
                 if(supervisor.isExistAnnotation(name)){
                     map_loaded = true;
-                    mapview.setEditedMap(name);
+                    supervisor.setEditedMap(name);
                     map_type = "EDITED";
                 }else{
-                    mapview.setRawMap(name);
+                    supervisor.setRawMap(name);
                     map_loaded = true;
                     map_type = "RAW";
                 }
@@ -249,30 +244,30 @@ Item {
     }
 
     function loadmapping(){
-        mapview.setMap();
+        supervisor.setMap();
     }
 
     function setfullscreen(){
-        mapview.setFullScreen();
+        supervisor.setFullScreen();
     }
 
     function setCurrentLocation(num, type){
-        mapview.selectLocation(num, type);
+        supervisor.selectLocation(num, type);
     }
 
     function setTool(name){
         tool = name;
-        mapview.setTool(name);
+        supervisor.setTool(name);
     }
     function saveMap(){
-        mapview.saveMap();
+        supervisor.saveMap();
         supervisor.slam_map_reload(supervisor.getMapname());
     }
     function drawing_undo(){
-        mapview.undoLine();
+        supervisor.undoLine();
     }
     function drawing_redo(){
-        mapview.redoLine();
+        supervisor.redoLine();
     }
 
     function init(){
@@ -281,53 +276,53 @@ Item {
     }
 
     function removelocation(num){
-        mapview.removeLocation(num);
+        supervisor.removeLocation(num);
     }
     function setTableNumberAuto(){
-        mapview.setTableNumberAuto();
+        supervisor.setTableNumberAuto();
     }
     function getCutFlag(){
-        return mapview.getCutBoxFlag();
+        return supervisor.getCutBoxFlag();
     }
 
     function clear(mode){
         if(mode==="obj"){
 
         }else if(mode === "location"){
-            mapview.clearLocation();
+            supervisor.clearLocation();
         }else if(mode==="all"){
-            mapview.endSpline(false);
-            mapview.clearDrawing();
-            mapview.clearLocation();
-            mapview.clearInitPose();
+            supervisor.endSpline(false);
+            supervisor.clearDrawing();
+            supervisor.clearLocation();
+            supervisor.clearInitPose();
         }else if(mode==="tline"){
-            mapview.clearDrawing();
+            supervisor.clearDrawing();
 
         }else if(mode==="spline"){
-            mapview.endSpline(false);
+            supervisor.endSpline(false);
         }else if(mode ==="rotate"){
-            mapview.initRotate();
+            supervisor.initRotate();
         }
     }
     function rotate(dir){
 //        print("rotate map : "+dir)
         if(dir === "cw"){
-            mapview.rotateMapCW();
+            supervisor.rotateMapCW();
         }else if(dir === "ccw"){
-            mapview.rotateMapCCW();
+            supervisor.rotateMapCCW();
         }else if(dir === "clear"){
-            mapview.rotateMap(0);
+            supervisor.rotateMap(0);
         }else{
-            mapview.rotateMap(dir);
+            supervisor.rotateMap(dir);
         }
     }
     function save(mode, type, name){
         if(mode==="obj"){
-            mapview.saveObject();
+            supervisor.saveObject();
         }else if(mode==="raw"){
 
         }else if(mode==="edited"){
-            mapview.saveMap();
+            supervisor.saveMap();
             supervisor.setMap(map_name);
             supervisor.slam_map_reload(supervisor.getMapname());
         }else if(mode==="location_cur"){
@@ -335,28 +330,28 @@ Item {
             last_robot_y = supervisor.getlastRoboty();
             last_robot_th = supervisor.getlastRobotth();
 //            /*print(*/last_robot_x,last_robot_y,last_robot_th);
-            mapview.addLocation(last_robot_x,last_robot_y,last_robot_th);
-            mapview.saveLocation(type,0,name);
+            supervisor.addLocation(last_robot_x,last_robot_y,last_robot_th);
+            supervisor.saveLocation(type,0,name);
         }else if(mode==="edit_location"){
             last_robot_x = supervisor.getlastRobotx();
             last_robot_y = supervisor.getlastRoboty();
             last_robot_th = supervisor.getlastRobotth();
 //            /*print(*/last_robot_x,last_robot_y,last_robot_th);
-            mapview.editLocation(last_robot_x,last_robot_y,last_robot_th);
+            supervisor.editLocation(last_robot_x,last_robot_y,last_robot_th);
         }else if(mode==="location"){
-            mapview.saveLocation(type,0,name);
+            supervisor.saveLocation(type,0,name);
         }else if(mode==="tline"){
-            mapview.saveTline();
+            supervisor.saveTline();
             supervisor.slam_map_reload(supervisor.getMapname());
         }else if(mode==="tline_temp"){
-            mapview.saveTlineTemp();
+            supervisor.saveTlineTemp();
         }else if(mode==="spline"){
-            mapview.endSpline(true);
+            supervisor.endSpline(true);
         }else if(mode==="velmap"){
-            mapview.saveVelmap();
+            supervisor.saveVelmap();
             supervisor.slam_map_reload(supervisor.getMapname());
         }else if(mode==="rotate"){
-            mapview.saveRotateMap();
+            supervisor.saveRotateMap();
             supervisor.slam_map_reload(supervisor.getMapname());
         }else if(mode==="location_all"){
             supervisor.saveAnnotation(map_name);
@@ -370,40 +365,40 @@ Item {
            last_robot_y = supervisor.getlastRoboty();
            last_robot_th = supervisor.getlastRobotth();
 //           /*print(*/last_robot_x,last_robot_y,last_robot_th);
-           mapview.addLocation(last_robot_x,last_robot_y,last_robot_th);
-           mapview.saveLocation(type,group, name);
+           supervisor.addLocation(last_robot_x,last_robot_y,last_robot_th);
+           supervisor.saveLocation(type,group, name);
        }else if(mode==="location"){
-           mapview.saveLocation(type,group, name);
+           supervisor.saveLocation(type,group, name);
        }
     }
 
     function editLocation(){
-        mapview.editLocation();
+        supervisor.editLocation();
     }
 
 //    function savelocation(mode, type, name){
 //        if(mode==="cur_pose"){
 //            print(last_robot_x,last_robot_y,last_robot_th);
-//            mapview.addLocation(last_robot_x,last_robot_y,last_robot_th);
-//            mapview.saveLocation(type,name);
+//            supervisor.addLocation(last_robot_x,last_robot_y,last_robot_th);
+//            supervisor.saveLocation(type,name);
 //        }else if(mode==="new_target"){
-//            mapview.saveLocation(type,name);
+//            supervisor.saveLocation(type,name);
 //        }
 //    }
 
     function setDrawingColor(color){
-        mapview.setLineColor(color);
+        supervisor.setLineColor(color);
         cur_color = color;
     }
 
     function setDrawingWidth(width){
-        mapview.setLineWidth(width);
-        cur_width = width*map_full.width/mapview.getFileWidth()/mapview.getScale() + 2;
+        supervisor.setLineWidth(width);
+        cur_width = width*map_full.width/supervisor.getFileWidth()/supervisor.getScale() + 2;
     }
 
     function setAutoInit(x,y,th){
 //        print(objectName+" ?:",x,y,th);
-        mapview.setInitPose(x,y,th);
+        supervisor.setInitPose(x,y,th);
         supervisor.setInitPos(x,y,th);
     }
 
@@ -413,13 +408,13 @@ Item {
         repeat: true
         running: true
         onTriggered: {
-            btn_show_location.active = mapview.getshowLocation();
-            btn_robot_following.active = mapview.getRobotFollowing();
-            btn_show_lidar.active = mapview.getShowLidar();
+            btn_show_location.active = supervisor.getshowLocation();
+            btn_robot_following.active = supervisor.getRobotFollowing();
+            btn_show_lidar.active = supervisor.getShowLidar();
         }
     }
 
-    MapView{
+    MapViewer{
         id: mapview
         width: parent.width
         height: parent.height
@@ -535,9 +530,9 @@ Item {
         enabled: touch_on
         onWheel: {
             if(wheel.angleDelta.y > 0){
-                mapview.zoomIn(mouseX, mouseY);
+                supervisor.zoomIn(mouseX, mouseY);
             }else{
-                mapview.zoomOut(mouseX, mouseY);
+                supervisor.zoomOut(mouseX, mouseY);
             }
         }
     }
@@ -555,55 +550,55 @@ Item {
         touchPoints: [TouchPoint{id:point1},TouchPoint{id:point2}]
         onPressed:{
             double_touch = false;
-            mapview.setRobotFollowing(false);
+            supervisor.setRobotFollowing(false);
             if(point1.pressed && point2.pressed){
                 double_touch = true;
             }else if(point1.pressed){
-                firstX = mapview.getX() + point1.x*mapview.getScale()*mapview.getFileWidth()/width;
-                firstY = mapview.getY() + point1.y*mapview.getScale()*mapview.getFileWidth()/width;
+                firstX = supervisor.getX() + point1.x*supervisor.getScale()*supervisor.getFileWidth()/width;
+                firstY = supervisor.getY() + point1.y*supervisor.getScale()*supervisor.getFileWidth()/width;
             }else if(point2.pressed){
-                firstX = mapview.getX() + point2.x*mapview.getScale()*mapview.getFileWidth()/width;
-                firstY = mapview.getY() + point2.y*mapview.getScale()*mapview.getFileWidth()/width;
+                firstX = supervisor.getX() + point2.x*supervisor.getScale()*supervisor.getFileWidth()/width;
+                firstY = supervisor.getY() + point2.y*supervisor.getScale()*supervisor.getFileWidth()/width;
             }
             if(tool == "move"){
                 if(double_touch){
-                    firstX = mapview.getX() + (point1.x+point2.x)*mapview.getScale()*mapview.getFileWidth()/width/2;
-                    firstY = mapview.getY() + (point1.y+point2.y)*mapview.getScale()*mapview.getFileWidth()/width/2;
+                    firstX = supervisor.getX() + (point1.x+point2.x)*supervisor.getScale()*supervisor.getFileWidth()/width/2;
+                    firstY = supervisor.getY() + (point1.y+point2.y)*supervisor.getScale()*supervisor.getFileWidth()/width/2;
                     var dx = Math.abs(point1.x-point2.x);
                     var dy = Math.abs(point1.y-point2.y);
                     firstDist = Math.sqrt(dx*dx + dy*dy);
                 }
             }else if(tool == "draw"){
-                mapview.setShowBrush(true);
-                mapview.startDrawing(firstX, firstY);
+                supervisor.setShowBrush(true);
+                supervisor.startDrawing(firstX, firstY);
             }else if(tool == "draw_rect"){
-                mapview.setShowBrush(false);
-                mapview.startDrawingRect(firstX,firstY);
+                supervisor.setShowBrush(false);
+                supervisor.startDrawingRect(firstX,firstY);
             }else if(tool == "straight"){
-                mapview.setShowBrush(true);
-                mapview.startDrawingLine(firstX, firstY);
+                supervisor.setShowBrush(true);
+                supervisor.startDrawingLine(firstX, firstY);
             }else if(tool == "dot_spline"){
-//                mapview.startSpline(firstX, firstY);
-                mapview.addSpline(firstX,firstY);
+//                supervisor.startSpline(firstX, firstY);
+                supervisor.addSpline(firstX,firstY);
             }else if(tool == "erase"){
-                mapview.setShowBrush(true);
-                mapview.setLineColor(-1);
-                mapview.startDrawing(firstX, firstY);
+                supervisor.setShowBrush(true);
+                supervisor.setLineColor(-1);
+                supervisor.startDrawing(firstX, firstY);
             }else if( tool === "add_location"){
-                mapview.addLocation(firstX, firstY,0);
+                supervisor.addLocation(firstX, firstY,0);
             }else if( tool === "edit_location"){
-                mapview.editLocation(firstX, firstY,0);
+                supervisor.editLocation(firstX, firstY,0);
             }else if(tool === "edit_location_new"){
-                mapview.addLocation(firstX, firstY,0);
+                supervisor.addLocation(firstX, firstY,0);
             }else if( tool === "slam_init"){
 //                print("Pressed : ",firstX,firstY,0);
-                mapview.setInitPose(firstX,firstY,0);
+                supervisor.setInitPose(firstX,firstY,0);
             }else if(tool === "cut_map"){
-                select_point = mapview.getPointBox(firstX,firstY);
+                select_point = supervisor.getPointBox(firstX,firstY);
 //                if(select_point === -1){
 //                    if(double_touch){
-//                        firstX = mapview.getX() + (point1.x+point2.x)*mapview.getScale()*mapview.getFileWidth()/width/2;
-//                        firstY = mapview.getY() + (point1.y+point2.y)*mapview.getScale()*mapview.getFileWidth()/width/2;
+//                        firstX = supervisor.getX() + (point1.x+point2.x)*supervisor.getScale()*supervisor.getFileWidth()/width/2;
+//                        firstY = supervisor.getY() + (point1.y+point2.y)*supervisor.getScale()*supervisor.getFileWidth()/width/2;
 //                        var dx = Math.abs(point1.x-point2.x);
 //                        var dy = Math.abs(point1.y-point2.y);
 //                        firstDist = Math.sqrt(dx*dx + dy*dy);
@@ -612,20 +607,20 @@ Item {
             }
         }
         onReleased: {
-            mapview.setShowBrush(false);
-            var newX = mapview.getX() + point1.x*mapview.getScale()*mapview.getFileWidth()/width;
-            var newY = mapview.getY() + point1.y*mapview.getScale()*mapview.getFileWidth()/width;
+            supervisor.setShowBrush(false);
+            var newX = supervisor.getX() + point1.x*supervisor.getScale()*supervisor.getFileWidth()/width;
+            var newY = supervisor.getY() + point1.y*supervisor.getScale()*supervisor.getFileWidth()/width;
             if(!point1.pressed && !point2.pressed){
                 if(tool == "move"){
-                    if(mapview.getMode() === "annot_object"){
-                        var objnum = mapview.getObjectNum(newX, newY);
+                    if(supervisor.getMode() === "annot_object"){
+                        var objnum = supervisor.getObjectNum(newX, newY);
                         if(objnum > -1){
                             if(loader_menu.item.obj_category !== 2){
                                 loader_menu.item.setcategory(2);
                             }
                             loader_menu.item.setobjcur(objnum);
                         }else{
-                            var locnum = mapview.getLocationNum(newX, newY);
+                            var locnum = supervisor.getLocationNum(newX, newY);
                             if(locnum > -1 && loader_menu.item.obj_category !== 1){
                                 loader_menu.item.setcategory(1);
                             }
@@ -633,16 +628,16 @@ Item {
                         }
                     }
                 }else if(tool == "draw"){
-                    mapview.endDrawing(newX, newY);
+                    supervisor.endDrawing(newX, newY);
                 }else if(tool == "draw_rect"){
-                    mapview.endDrawingRect();
+                    supervisor.endDrawingRect();
                 }else if(tool == "straight"){
-                    mapview.stopDrawingLine(newX, newY);
+                    supervisor.stopDrawingLine(newX, newY);
                 }else if(tool == "erase"){
-                    mapview.endDrawing(newX, newY);
+                    supervisor.endDrawing(newX, newY);
                 }else if( tool === "edit_location"){
 //                    var angle = Math.atan2((newX-firstX),(newY-firstY));
-//                    mapview.editLocation(firstX, firstY,angle);
+//                    supervisor.editLocation(firstX, firstY,angle);
                 }else if( tool === "add_location"){
 
                 }else if( tool === "slam_init"){
@@ -655,13 +650,13 @@ Item {
         }
         onTouchUpdated: {
             if(point1.pressed || point2.pressed){
-                var newX = mapview.getX() + point1.x*mapview.getScale()*mapview.getFileWidth()/width;
-                var newY = mapview.getY() + point1.y*mapview.getScale()*mapview.getFileWidth()/width;
+                var newX = supervisor.getX() + point1.x*supervisor.getScale()*supervisor.getFileWidth()/width;
+                var newY = supervisor.getY() + point1.y*supervisor.getScale()*supervisor.getFileWidth()/width;
                 if(tool == "move"){
                     if(double_touch){
                         if(point1.pressed && point2.pressed){
-                            newX = (point1.x + point2.x)*mapview.getScale()/2;
-                            newY = (point1.y + point2.y)*mapview.getScale()/2;
+                            newX = (point1.x + point2.x)*supervisor.getScale()/2;
+                            newY = (point1.y + point2.y)*supervisor.getScale()/2;
 
                             var dx = Math.abs(point1.x - point2.x)
                             var dy = Math.abs(point1.y - point2.y)
@@ -669,56 +664,56 @@ Item {
                             var thres = 10;
 
                             for(var i=0; i<(firstDist-dist)/thres; i++){
-//                                mapview.scaledOut(1,1);
-                                mapview.zoomOut(newX,newY);
+//                                supervisor.scaledOut(1,1);
+                                supervisor.zoomOut(newX,newY);
                             }
                             for(var i=0; i<(dist-firstDist)/thres; i++){
-//                                mapview.scaledIn(1,1);
-                                mapview.zoomIn(newX,newY);
+//                                supervisor.scaledIn(1,1);
+                                supervisor.zoomIn(newX,newY);
                             }
                             firstDist = dist;
 
 //                            print("UPDATE : ",newX,newY,dist);
-                            mapview.setRobotFollowing(false);
-                            mapview.move(firstX-newX, firstY-newY);
+                            supervisor.setRobotFollowing(false);
+                            supervisor.move(firstX-newX, firstY-newY);
                         }else{
                             double_touch = false;
                         }
                     }else{
                         if(point1.pressed){
-                            newX = point1.x*mapview.getScale()*mapview.getFileWidth()/width;
-                            newY = point1.y*mapview.getScale()*mapview.getFileWidth()/width;
+                            newX = point1.x*supervisor.getScale()*supervisor.getFileWidth()/width;
+                            newY = point1.y*supervisor.getScale()*supervisor.getFileWidth()/width;
                         }else if(point2.pressed){
-                            newX = point2.x*mapview.getScale()*mapview.getFileWidth()/width;
-                            newY = point2.y*mapview.getScale()*mapview.getFileWidth()/width;
+                            newX = point2.x*supervisor.getScale()*supervisor.getFileWidth()/width;
+                            newY = point2.y*supervisor.getScale()*supervisor.getFileWidth()/width;
                         }
-                        mapview.setRobotFollowing(false);
-                        mapview.move(firstX-newX, firstY-newY);
+                        supervisor.setRobotFollowing(false);
+                        supervisor.move(firstX-newX, firstY-newY);
                     }
                 }else if(tool == "draw"){
-                    mapview.addLinePoint(newX, newY);
+                    supervisor.addLinePoint(newX, newY);
                 }else if(tool == "draw_rect"){
-                    mapview.setDrawingRect(newX, newY);
+                    supervisor.setDrawingRect(newX, newY);
                 }else if(tool == "cut_map"){
-                    mapview.setBoxPoint(select_point,newX,newY);
+                    supervisor.setBoxPoint(select_point,newX,newY);
                 }else if(tool == "straight"){
-                    mapview.setDrawingLine(newX, newY);
+                    supervisor.setDrawingLine(newX, newY);
                 }else if(tool == "erase"){
-                    mapview.addLinePoint(newX, newY);
+                    supervisor.addLinePoint(newX, newY);
                 }else if( tool === "edit_location_new"){
                     var angle = Math.atan2((newY-firstY),(newX-firstX));
-                    mapview.addLocation(firstX, firstY,angle);
+                    supervisor.addLocation(firstX, firstY,angle);
                 }else if( tool === "add_location"){
                     angle = Math.atan2((newY-firstY),(newX-firstX));
-                    mapview.addLocation(firstX, firstY,angle);
+                    supervisor.addLocation(firstX, firstY,angle);
                 }else if( tool === "edit_location"){
                     angle = Math.atan2((newY-firstY),(newX-firstX));
 //                    print(angle, newX-firstX, newY-firstY);
-                    mapview.editLocation(firstX, firstY,angle);
+                    supervisor.editLocation(firstX, firstY,angle);
                 }else if( tool === "slam_init"){
                     angle = Math.atan2((newY-firstY),(newX-firstX));
 //                    print("Update : ",firstX,firstY,angle);
-                    mapview.setInitPose(firstX,firstY,angle);
+                    supervisor.setInitPose(firstX,firstY,angle);
                 }
             }
         }
@@ -748,7 +743,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    mapview.setRobotFollowing(true);
+                    supervisor.setRobotFollowing(true);
                 }
             }
         }
@@ -769,9 +764,9 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     if(parent.active){
-                        mapview.setShowLidar(false);
+                        supervisor.setShowLidar(false);
                     }else{
-                        mapview.setShowLidar(true);
+                        supervisor.setShowLidar(true);
                     }
                 }
             }
@@ -794,9 +789,9 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     if(parent.active){
-                        mapview.setShowLocation(false);
+                        supervisor.setShowLocation(false);
                     }else{
-                        mapview.setShowLocation(true);
+                        supervisor.setShowLocation(true);
                     }
                 }
             }
@@ -863,7 +858,7 @@ Item {
                         rect_notice.msg =  "위치 초기화 중";
                         rect_notice.color = color_navy;
                         rect_notice.show_icon = false;
-                    }else if(!is_slam_running && mapview.getMode() !== "mapping"){
+                    }else if(!is_slam_running && supervisor.getMode() !== "mapping"){
                         rect_notice.visible = true;
                         rect_notice.msg =  "주행 활성화 안됨";
                         rect_notice.color = color_red;

@@ -607,10 +607,9 @@ Item {
                 Component.onCompleted: {
                     clear();
                     addTip("매핑을 새로 시작하고 싶어요.","매핑을 새로 시작하려면 취소를 누르고 다시 시작해주세요.");
-                    addTip("안녕 로봇","안녕 인간");
                 }
             }
-            Map_full{
+            MAP_FULL2{
                 id: mapping_view
                 enabled: true
                 objectName: "mappingview"
@@ -803,13 +802,13 @@ Item {
     Audio{
         id: voice_start_mapping
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_start_mapping.mp3"
     }
     Audio{
         id: voice_stop_mapping
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_stop_mapping.mp3"
     }
 

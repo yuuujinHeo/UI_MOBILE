@@ -7,6 +7,7 @@ import QtGraphicalEffects 1.0
 import "."
 import io.qt.Supervisor 1.0
 import io.qt.Keyemitter 1.0
+import io.qt.MapViewer 1.0
 import QtMultimedia 5.12
 import io.qt.MapView 1.0
 
@@ -17,9 +18,9 @@ Window {
     height: 800
 
     property bool debug_mode: false
-    property var volumn_voice: 0
-    property var volumn_bgm: 0
-    property var volumn_button: 0
+    property var volume_voice: 0
+    property var volume_bgm: 0
+    property var volume_button: 0
 
     flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
     visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
@@ -112,12 +113,16 @@ Window {
         next_sound = "";
     }
 
+
     Timer{
         id: timer_voice
         interval: 100
         repeat: true
         running: true
         onTriggered: {
+            volume_button = parseInt(supervisor.getSetting("ROBOT_SW","volume_button"));
+            volume_bgm = parseInt(supervisor.getSetting("ROBOT_SW","volume_bgm"));
+            volume_voice = parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"));
             if(playingSound){
                 cur_sound = "";
             }else{
@@ -468,7 +473,7 @@ Window {
     Audio{
         id: voice_movecharge
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_move_charge.mp3"
         onPlaylistChanged: {
             if(playing) playingSound = true;
@@ -478,7 +483,7 @@ Window {
     Audio{
         id: voice_serving
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_start_serving.mp3"
         onPlaylistChanged: {
             if(playing) playingSound = true;
@@ -488,7 +493,7 @@ Window {
     Audio{
         id: voice_calling
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_start_calling.mp3"
         onPlaylistChanged: {
             if(playing) playingSound = true;
@@ -498,7 +503,7 @@ Window {
     Audio{
         id: voice_avoid
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/serving.mp3"
         onPlaylistChanged: {
             if(playing) playingSound = true;
@@ -508,7 +513,7 @@ Window {
     Audio{
         id: voice_wait
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_avoid.mp3"
         onPlaylistChanged: {
             if(playing) playingSound = true;
@@ -518,7 +523,7 @@ Window {
     Audio{
         id: voice_movefail
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_movefail.mp3"
         onPlaylistChanged: {
             if(playing) playingSound = true;
@@ -528,7 +533,7 @@ Window {
     Audio{
         id: voice_movewait
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_move_wait.mp3"
         onPlaylistChanged: {
             if(playing) playingSound = true;
@@ -538,7 +543,7 @@ Window {
     Audio{
         id: voice_localfail
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_local_fail.mp3"
         onPlaylistChanged: {
             if(playing) playingSound = true;
@@ -548,7 +553,7 @@ Window {
     Audio{
         id: voice_motor_error
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_motor_error.mp3"
         onPlaylistChanged: {
             if(playing) playingSound = true;
@@ -558,7 +563,7 @@ Window {
     Audio{
         id: voice_emergency
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_emergency.mp3"
         onPlaylistChanged: {
             if(playing) playingSound = true;
@@ -568,7 +573,7 @@ Window {
     Audio{
         id: voice_battery
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/battery.mp3"
         onPlaylistChanged: {
             if(playing) playingSound = true;
@@ -653,21 +658,21 @@ Window {
     SoundEffect{
         id: click_sound
         source: "bgm/click.wav"
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volumn_button"))/100
+        volume: volume_button/100
     }
     SoundEffect{
         id: click_sound_no
         source: "bgm/click_error.wav"
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volumn_button"))/100
+        volume: volume_button/100
     }
     SoundEffect{
         id: click_sound2
         source: "bgm/click2.wav"
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volumn_button"))/100
+        volume: volume_button/100
     }
     SoundEffect{
         id: start_sound
         source: "bgm/click_start.wav"
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volumn_button"))/100
+        volume: volume_button/100
     }
 }

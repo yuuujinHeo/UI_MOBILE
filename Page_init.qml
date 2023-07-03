@@ -3125,7 +3125,7 @@ Item {
                 }
             }
 
-            Map_full{
+            MAP_FULL2{
                 id: map
                 objectName: "annot_local"
                 visible: local_find_state>1 && local_find_state<10

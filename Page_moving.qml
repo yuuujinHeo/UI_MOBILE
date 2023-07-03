@@ -56,7 +56,7 @@ Item {
     Audio{
         id: playMusic
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_bgm"))/100
+        volume: volume_bgm/100
         source: "bgm/song.mp3"
         loops: 99
     }
@@ -372,7 +372,7 @@ Item {
 
     Audio{
         id: voice_serving
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/serving.mp3"
     }
 

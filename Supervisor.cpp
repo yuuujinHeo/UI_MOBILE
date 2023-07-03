@@ -40,6 +40,7 @@ Supervisor::Supervisor(QObject *parent)
     pmap = &map;
     mMain = nullptr;
 
+    maph = new MapHandler();
     usb_list.clear();
     usb_backup_list.clear();
     call_queue.clear();
@@ -2363,13 +2364,16 @@ void Supervisor::startPatrol(QString mode, bool pickup){
 
 //// *********************************** SLOTS *********************************** ////
 void Supervisor::path_changed(){
-    QMetaObject::invokeMethod(mMain, "updatepath");
+    maph->setMap();
+//    QMetaObject::invokeMethod(mMain, "updatepath");
 }
 void Supervisor::camera_update(){
-    QMetaObject::invokeMethod(mMain, "updatecamera");
+    maph->setMap();
+//    QMetaObject::invokeMethod(mMain, "updatecamera");
 }
 void Supervisor::mapping_update(){
-    QMetaObject::invokeMethod(mMain, "updatemapping");
+    maph->setMap();
+//    QMetaObject::invokeMethod(mMain, "updatemapping");
 }
 
 void Supervisor::checkShellFiles(){

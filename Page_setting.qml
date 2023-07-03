@@ -6898,14 +6898,17 @@ Item {
 
         if(slider_volume_bgm.ischanged){
             supervisor.setSetting("ROBOT_SW/volume_bgm",slider_volume_bgm.value.toFixed(0));
+            volume_bgm = slider_volume_bgm.value.toFixed(0);
         }
 
         if(slider_volume_voice.ischanged){
             supervisor.setSetting("ROBOT_SW/volume_voice",slider_volume_voice.value.toFixed(0));
+            volume_voice = slider_volume_voice.value.toFixed(0);
         }
 
         if(slider_volume_button.ischanged){
             supervisor.setSetting("ROBOT_SW/volume_button",slider_volume_button.value.toFixed(0));
+            volume_button = slider_volume_button.value.toFixed(0);
         }
         if(combo_tableview.ischanged){
             supervisor.setSetting("ROBOT_SW/table_view",combo_tableview.currentIndex);
@@ -7309,6 +7312,7 @@ Item {
 //        slider_vxy.ischanged = false;
         slider_volume_bgm.ischanged = false;
         slider_volume_voice.ischanged = false;
+        slider_volume_button.ischanged = false;
 
 
         wifi_passwd.ischanged = false;
@@ -7390,6 +7394,7 @@ Item {
 //        if(slider_vxy.ischanged) is_changed = true;
         if(slider_volume_bgm.ischanged) is_changed = true;
         if(slider_volume_voice.ischanged) is_changed = true;
+        if(slider_volume_button.ischanged) is_changed = true;
         if(wifi_passwd.ischanged) is_changed = true;
         if(ip_1.ischanged) is_changed = true;
         if(ip_2.ischanged) is_changed = true;

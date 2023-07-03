@@ -479,7 +479,7 @@ Popup{
             anchors.top: rect_list_left.top
             anchors.left: rect_list_left.right
 
-            Map_full{
+            MAP_FULL2{
                 id: map_list_view
                 objectName: "POPUP"
                 width: parent.height-100
@@ -582,7 +582,6 @@ Popup{
             }
         }
     }
-
 }
 
 

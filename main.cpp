@@ -6,6 +6,7 @@
 #include "MapView.h"
 #include "CameraView.h"
 #include "Supervisor.h"
+#include "MapViewer.h"
 #include "Keyemitter.h"
 #include "Logger.h"
 
@@ -18,6 +19,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<MapView>("io.qt.MapView",1,0, "MapView");
     qmlRegisterType<CameraView>("io.qt.CameraView",1,0, "CameraView");
     qmlRegisterType<KeyEmitter>("io.qt.Keyemitter",1,0, "Keyemitter");
+    qmlRegisterType<MapViewer>("io.qt.MapViewer",1,0, "MapViewer");
 
     QApplication app(argc, argv);
     app.setOrganizationName("Mobile");

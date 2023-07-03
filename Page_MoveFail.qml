@@ -903,7 +903,7 @@ Item {
         }
     }
 
-    Map_full{
+    MAP_FULL2{
         id: map
         objectName: "MOVEFAIL"
         width: 740

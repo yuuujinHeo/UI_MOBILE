@@ -189,7 +189,7 @@ Item {
             id: rect_mapview
             anchors.fill: parent
             color: "#282828"
-            Map_full{
+            MAP_FULL2{
                 id: map_current
                 objectName: "CURRENT"
 //                enabled: false

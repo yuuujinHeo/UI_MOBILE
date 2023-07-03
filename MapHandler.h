@@ -4,7 +4,6 @@
 #include <QTimer>
 #include <QObject>
 #include <QSettings>
-#include "MapHeader.h"
 #include "spline.h"
 #include "GlobalHeader.h"
 

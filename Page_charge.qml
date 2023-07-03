@@ -328,19 +328,19 @@ Item {
     Audio{
         id: voice_charging
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_charging.mp3"
     }
     Audio{
         id: voice_start_charge
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_start_charge.mp3"
     }
     Audio{
         id: voice_stop_charge
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_stop_charge.mp3"
     }
 }

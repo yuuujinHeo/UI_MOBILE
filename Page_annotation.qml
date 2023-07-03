@@ -388,7 +388,7 @@ Item {
 
             }
 
-            Map_full{
+            MAP_FULL2{
                 id: map
                 enabled: false
                 objectName: "annot_rotate"
@@ -736,7 +736,7 @@ Item {
                     }
                 }
             }
-            Map_full{
+            MAP_FULL2{
                 id: map
                 objectName: "annot_local"
                 visible: local_find_state>1 && local_find_state<10
@@ -1417,7 +1417,7 @@ Item {
                 speed: 0.5
                 anchors.bottomMargin: -100
             }
-            Map_full{
+            MAP_FULL2{
                 id: map_location_view
                 width: 600
                 objectName: "serving_map"
@@ -1593,7 +1593,7 @@ Item {
                             }
                         }
 
-                        Map_full{
+                        MAP_FULL2{
                             id: map_tline
                             width: 550
                             objectName: "serving_map"
@@ -1667,7 +1667,7 @@ Item {
                             Row{
                                 anchors.centerIn: parent
                                 spacing: 50
-                                Map_full{
+                                MAP_FULL2{
                                     id: map_location
                                     width: 500
                                     objectName: "annot_add_Serving"
@@ -4024,7 +4024,7 @@ Item {
                                 }
                             }
                         }
-                        Map_full{
+                        MAP_FULL2{
                             id: map
                             objectName: "annot_tline"
                             width: height
@@ -4592,7 +4592,7 @@ Item {
                         }
 
 
-                        Map_full{
+                        MAP_FULL2{
                             id: map
                             width: height
                             objectName: "annot_velmap"
@@ -4763,7 +4763,7 @@ Item {
         source: ""
     }
 
-    Map_full{
+    MAP_FULL2{
         id: map_hide
         visible:false
         objectName: "annot_hide"

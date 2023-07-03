@@ -129,10 +129,10 @@ public:
     Q_INVOKABLE void loadFile(QString name, QString type){maph->loadFile(name,type);}
 
     //------------draw map--------------//
-    Q_INVOKABLE void setMap();
-    Q_INVOKABLE void moveMap();
-    Q_INVOKABLE void setFullScreen();
-    Q_INVOKABLE void setMapDrawing();
+    Q_INVOKABLE void setMap(){maph->setMap();}
+    Q_INVOKABLE void moveMap(){maph->moveMap();}
+    Q_INVOKABLE void setFullScreen(){maph->setFullScreen();}
+    Q_INVOKABLE void setMapDrawing(){maph->setMapDrawing();}
 
     //------------map variables--------------//
     Q_INVOKABLE void setName(QString name){maph->setName(name);}
@@ -157,11 +157,11 @@ public:
 
     Q_INVOKABLE void startDrawingTline(){maph->startDrawingTline();}
     Q_INVOKABLE void stopDrawingTline(){maph->stopDrawingTline();}
-    Q_INVOKABLE bool getDrawingTline(){maph->getDrawingTline();}
+    Q_INVOKABLE bool getDrawingTline(){return maph->getDrawingTline();}
 
 
     Q_INVOKABLE void setBoxPoint(int num, int x, int y){maph->setBoxPoint(num,x,y);}
-    Q_INVOKABLE int getPointBox(int x, int y){maph->getPointBox(x,y);}
+    Q_INVOKABLE int getPointBox(int x, int y){return maph->getPointBox(x,y);}
     Q_INVOKABLE void saveRotateMap(){maph->getDrawingTline();}
     Q_INVOKABLE void initRotate(){maph->initRotate();}
     Q_INVOKABLE void rotateMap(int angle){maph->rotateMap(angle);}
@@ -169,9 +169,9 @@ public:
     Q_INVOKABLE void rotateMapCCW(){maph->rotateMapCCW();}
 
 
-    Q_INVOKABLE bool getDrawingFlag(){maph->getDrawingFlag();}
+    Q_INVOKABLE bool getDrawingFlag(){return maph->getDrawingFlag();}
 
-    Q_INVOKABLE bool getDrawingUndoFlag(){maph->getDrawingUndoFlag();}
+    Q_INVOKABLE bool getDrawingUndoFlag(){return maph->getDrawingUndoFlag();}
 
     Q_INVOKABLE void startDrawing(int x, int y){maph->startDrawing(x,y);}
     Q_INVOKABLE void addLinePoint(int x, int y){maph->addLinePoint(x,y);}
@@ -196,34 +196,33 @@ public:
     Q_INVOKABLE void setLineWidth(int width){maph->setLineWidth(width);}
 
     Q_INVOKABLE void saveLocation(QString type, int groupnum, QString name){maph->saveLocation(type,groupnum,name);}
-    Q_INVOKABLE void clearLocation(){pmap->clearLocation();}
-    Q_INVOKABLE void addLocation(int x, int y,float th);
-    Q_INVOKABLE void addLocationCur(int x, int y,float th);
-    Q_INVOKABLE void setLocation(int x, int y, float th);
-    Q_INVOKABLE void editLocation(int x, int y, float th);
-    Q_INVOKABLE int getLocationNum(int x, int y);;
-    Q_INVOKABLE void removeLocation(int num);
-    Q_INVOKABLE void setTableNumberAuto();
-    Q_INVOKABLE int getLocationNum(QString type);
-    Q_INVOKABLE int getLocGroupNum(int num);
-    Q_INVOKABLE void saveMap();
-    Q_INVOKABLE void saveTline();
-    Q_INVOKABLE void saveTlineTemp();
-    Q_INVOKABLE void saveVelmap();
-    Q_INVOKABLE void setMapSize(int width, int height);
-    Q_INVOKABLE void zoomIn(int x, int y);
-    Q_INVOKABLE void zoomOut(int x, int y);
-    Q_INVOKABLE void move(int x, int y);
-    Q_INVOKABLE int getFileWidth(){return file_width;}
-    Q_INVOKABLE int getX(){return draw_x;}
-    Q_INVOKABLE int getY(){return draw_y;}
-    Q_INVOKABLE float getScale(){return scale;}
+    Q_INVOKABLE void clearLocation(){maph->clearLocation();}
+    Q_INVOKABLE void addLocation(int x, int y,float th){maph->addLocation(x,y,th);}
+    Q_INVOKABLE void addLocationCur(int x, int y,float th){maph->addLocationCur(x,y,th);}
+    Q_INVOKABLE void setLocation(int x, int y, float th){maph->setLocation(x,y,th);}
+    Q_INVOKABLE void editLocation(int x, int y, float th){maph->editLocation(x,y,th);}
+    Q_INVOKABLE int getLocationNum(int x, int y){return maph->getLocationNum(x,y);}
+    Q_INVOKABLE void removeLocation(int num){maph->removeLocation(num);}
+    Q_INVOKABLE void setTableNumberAuto(){maph->setTableNumberAuto();}
+//    Q_INVOKABLE int getLocationNum(QString type){return maph->getLocationNum(type);}
+    Q_INVOKABLE int getLocGroupNum(int num){return maph->getLocGroupNum(num);}
+    Q_INVOKABLE void saveMap(){maph->saveMap();}
+    Q_INVOKABLE void saveTline(){maph->saveTline();}
+    Q_INVOKABLE void saveTlineTemp(){maph->saveTlineTemp();}
+    Q_INVOKABLE void saveVelmap(){maph->saveVelmap();}
+    Q_INVOKABLE void setMapSize(int width, int height){maph->setMapSize(width, height);}
+    Q_INVOKABLE void zoomIn(int x, int y){maph->zoomIn(x,y);}
+    Q_INVOKABLE void zoomOut(int x, int y){maph->zoomOut(x,y);}
+    Q_INVOKABLE void move(int x, int y){maph->move(x,y);}
+    Q_INVOKABLE int getFileWidth(){return maph->getFileWidth();}
+    Q_INVOKABLE int getX(){return maph->getX();}
+    Q_INVOKABLE int getY(){return maph->getY();}
+    Q_INVOKABLE float getScale(){return maph->getScale();}
 
-    Q_INVOKABLE void setSize(int x, int y, float width);
+    Q_INVOKABLE void setSize(int x, int y, float width){maph->setSize(x,y,width);}
+    Q_INVOKABLE bool getCutBoxFlag(){return maph->getCutBoxFlag();}
 
-    void updateMeta();
-    Q_INVOKABLE bool getCutBoxFlag();
-
+//    Q_INVOKABLE void saveAnnotation(QString filename){maph->saveAnnotation(filename);}
 
 
 

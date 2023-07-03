@@ -227,28 +227,28 @@ Item {
     Audio{
         id: voice_pickup
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_pickup.mp3"
     }
 
     Audio{
         id: voice_tray_1
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_tray_1.mp3"
     }
 
     Audio{
         id: voice_tray_2
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_tray_2.mp3"
     }
 
     Audio{
         id: voice_thanks
         autoPlay: false
-        volume: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"))/100
+        volume: volume_voice/100
         source: "bgm/voice_thanks.mp3"
     }
 
