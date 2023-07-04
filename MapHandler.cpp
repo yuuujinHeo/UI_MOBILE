@@ -722,7 +722,11 @@ void MapHandler::setMap(){
         }
     }
 
+
+
+
     final_map = map.copy(draw_x,draw_y,draw_width,draw_width);
+
     update();
 }
 

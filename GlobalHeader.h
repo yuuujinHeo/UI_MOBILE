@@ -90,19 +90,7 @@ typedef struct{
     bool annot_edit_location;
     bool annot_edit_tline;
 
-
-
-
-
     QPixmap map;
-
-
-
-
-
-
-
-
 
 }ST_MAP;
 extern ST_MAP *pmap;
@@ -114,8 +102,8 @@ typedef struct{
     int motor_temp = 0;
     float current = 0;
 }ST_MOTOR;
-
 typedef struct{
+
     bool empty=true;
     LOCATION location;
 }ST_TRAY;
