@@ -145,6 +145,8 @@ public:
     Q_INVOKABLE void setShowLidar(bool onoff){maph->setShowLidar(onoff);}
     Q_INVOKABLE void setShowLocation(bool onoff){maph->setShowLocation(onoff);}
     Q_INVOKABLE void setRobotFollowing(bool onoff){maph->setRobotFollowing(onoff);}
+    Q_INVOKABLE void setShowTravelline(bool onoff){maph->setShowTravelline(onoff);}
+    Q_INVOKABLE void setShowVelocitymap(bool onoff){maph->setShowVelocitymap(onoff);}
 
     Q_INVOKABLE bool getshowLocation(){return maph->getshowLocation();}
     Q_INVOKABLE bool getRobotFollowing(){return maph->getRobotFollowing();}

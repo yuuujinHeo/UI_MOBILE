@@ -15,7 +15,7 @@ Item {
     objectName: "page_annotation"
     width: 1280
     height: 800
-    property bool test: false
+    property bool test: true
     property var last_robot_x: supervisor.getOrigin()[0]
     property var last_robot_y: supervisor.getOrigin()[1]
     property var last_robot_th: 0
@@ -217,6 +217,21 @@ Item {
                 }
             }
 
+            Item_buttons{
+                width: 200
+                height: 80
+                type: "round_text"
+                text: "맵 불러오기"
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.bottomMargin: 150
+                anchors.rightMargin: 50
+                onClicked: {
+                    click_sound.play();
+                    supervisor.writelog("[ANNOTATION] Load Map");
+                    popup_map_list.open();
+                }
+            }
             Item_buttons{
                 width: 200
                 height: 80
@@ -4793,6 +4808,10 @@ Item {
         visible:false
         objectName: "annot_hide"
         enabled:false
+    }
+
+    Popup_map_list{
+        id: popup_map_list
     }
 
     Tool_Keyboard{

@@ -77,6 +77,11 @@ Item {
             show_button_following = false;
             show_button_lidar = false;
             show_button_location = false;
+        }else if(mode === "map_list"){
+            show_connection = false;
+            show_button_following = false;
+            show_button_lidar = false;
+            show_button_location = false;
         }else if(mode === "annot_tline"){
             show_connection = false;
             show_button_location = true;
@@ -129,6 +134,18 @@ Item {
 
     function reload(){
 
+    }
+
+    function showLocation(onoff){
+        supervisor.setShowLocation(onoff);
+    }
+
+    function showTravelline(onoff){
+        supervisor.setShowTravelline(onoff);
+    }
+
+    function showVelocityMap(onoff){
+        supervisor.setShowVelocitymap(onoff);
     }
 
     function checkDrawing(){
@@ -866,10 +883,14 @@ Item {
                     rect_notice.visible = false;
                 }
             }else{
-                rect_notice.visible = true;
-                rect_notice.msg =  "로봇 연결 안됨";
-                rect_notice.color = color_red;
-                rect_notice.show_icon = true;
+                if(show_connection){
+
+                    rect_notice.visible = true;
+                    rect_notice.msg =  "로봇 연결 안됨";
+                    rect_notice.color = color_red;
+                    rect_notice.show_icon = true;
+                }
+
             }
 
         }

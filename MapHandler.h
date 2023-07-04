@@ -68,9 +68,23 @@ public:
         setZoomCenter();
     }
 
+    Q_INVOKABLE void setShowTravelline(bool onoff){
+        show_travelline = onoff;
+        setMap();
+    }
+    Q_INVOKABLE void setShowVelocitymap(bool onoff){
+        show_velocitymap = onoff;
+        setMap();
+    }
+
+
     Q_INVOKABLE bool getshowLocation(){return show_location;}
     Q_INVOKABLE bool getRobotFollowing(){return robot_following;}
     Q_INVOKABLE bool getShowLidar(){return show_lidar;}
+
+
+    bool show_travelline = false;
+    bool show_velocitymap = false;
 
     bool show_brush = false;
     bool show_robot = false;
@@ -80,8 +94,6 @@ public:
     bool show_location = false;
     bool show_location_icon = false;
     bool robot_following = false;
-    bool show_travelline = false;
-    bool show_velocitymap = false;
 
     //------------localization--------------//
     POSE set_init_pose;

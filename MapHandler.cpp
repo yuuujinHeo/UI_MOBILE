@@ -248,6 +248,15 @@ void MapHandler::setMode(QString name){
         show_location_icon = false;
         robot_following = true;
         setFullScreen();
+    }else if(mode == "map_list"){
+        show_robot = false;
+        show_global_path = false;
+        show_local_path = false;
+        show_lidar = false;
+        show_location = false;
+        show_location_icon = false;
+        robot_following = false;
+        setFullScreen();
     }else if(mode == "current"){
         file_width = map_orin.rows;
         show_robot = true;
@@ -379,10 +388,11 @@ void MapHandler::initLocation(){
         temp.name = pmap->locations[i].name;
         temp.point = setAxis(pmap->locations[i].point);
         temp.angle = setAxis(pmap->locations[i].angle);
-//        qDebug() << "locations push " << temp.type << temp.number;
+//        qDebug() <<"locations push " << temp.type << temp.number;
         locations.push_back(temp);
     }
 }
+
 void MapHandler::setFullScreen(){
     draw_x = 0;
     draw_y = 0;
@@ -414,31 +424,29 @@ void MapHandler::setMap(){
         cv::cvtColor(file_velocity,temp_velmap,cv::COLOR_BGR2BGRA);
         cv::cvtColor(file_travelline,temp_travel,cv::COLOR_GRAY2BGRA);
 
-        //그리기
-        if(mode == "annot_tline"){
-            cv::multiply(cv::Scalar::all(1.0)-map_drawing_mask,temp_travel,temp_travel);
-            cv::add(temp_travel,map_drawing,temp_travel);
-        }else if(mode == "annot_velmap"){
-            cv::multiply(cv::Scalar::all(1.0)-map_drawing_mask,temp_velmap,temp_velmap);
-            cv::add(temp_velmap,map_drawing,temp_velmap);
-        }else{
-            cv::multiply(cv::Scalar::all(1.0)-map_drawing_mask,temp_orin,temp_orin);
-            cv::add(temp_orin,map_drawing,temp_orin);
-        }
-
         //속도맵
         if(show_velocitymap){
+            cv::multiply(cv::Scalar::all(1.0)-map_drawing_mask,temp_velmap,temp_velmap);
+            cv::add(temp_velmap,map_drawing,temp_velmap);
             cv::addWeighted(temp_orin,1,temp_velmap,0.5,0,temp_orin);
         }
 
         //이동경로맵
         if(show_travelline){
-            if(mode == "annot_location"){
+            cv::multiply(cv::Scalar::all(1.0)-map_drawing_mask,temp_travel,temp_travel);
+            cv::add(temp_travel,map_drawing,temp_travel);
+            if(mode == "annot_location" || mode == "map_list"){
                 cv::addWeighted(temp_orin,1,temp_travel,1,0,temp_orin);
             }else{
                 cv::addWeighted(temp_orin,0.5,temp_travel,1,0,temp_orin);
             }
         }
+
+        if(!show_velocitymap && !show_travelline){
+            cv::multiply(cv::Scalar::all(1.0)-map_drawing_mask,temp_orin,temp_orin);
+            cv::add(temp_orin,map_drawing,temp_orin);
+        }
+
         map = QPixmap::fromImage(mat_to_qimage_cpy(temp_orin));
     }
 
@@ -757,11 +765,6 @@ void MapHandler::setMap(){
 
 
     final_map = map.copy(draw_x,draw_y,draw_width,draw_width);
-<<<<<<< HEAD
-
-=======
-//    qDebug() << draw_x << draw_y << draw_width;
->>>>>>> refs/remotes/origin/master
     update();
 }
 
