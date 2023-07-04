@@ -481,6 +481,7 @@ Popup{
 
             MAP_FULL2{
                 id: map_list_view
+                enabled: false
                 objectName: "POPUP"
                 width: parent.height-100
                 height: parent.height-100

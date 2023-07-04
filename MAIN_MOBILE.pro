@@ -23,7 +23,6 @@ SOURCES += \
     CameraView.cpp \
     IPCHandler.cpp \
     MapHandler.cpp \
-    MapView.cpp \
     MapViewer.cpp \
     ZIPHandler.cpp \
     automata.cpp \
@@ -78,7 +77,6 @@ HEADERS += \
     Keyemitter.h \
     Logger.h \
     MapHeader.h \
-    MapView.h \
     automata.h \
     ZIPHandler.h \
     cv_to_qt.h \

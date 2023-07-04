@@ -68,16 +68,14 @@ public:
         int8_t     ui_loc_state = 0;
         int8_t     ui_auto_state = 0;
         int8_t     ui_obs_state = 0;
-        //표정 보통표정(0) 놀란표정(1) 우는표정(@)
-        int8_t      ui_obs_near_path_state = 0;
-        //현재 로봇에 적용된 preset 번호(0~5)
+        int8_t     ui_face_state = 0;
         int8_t     ui_cur_velocity_preset = 0;
-        //모터 락 상태 풀림(0) 걸림(1)
         int8_t     ui_motor_lock_state = 0;
+
         float      robot_pose[3] = {0,};
         float      robot_scan[360] = {0,};
 
-        int8_t      ui_drawing_state = 0;
+        int8_t     ui_draw_state = 0;
 
         STATUS()
         {
@@ -105,10 +103,12 @@ public:
             power = p.power;
             total_power = p.total_power;
             ui_loc_state = p.ui_loc_state;
+            ui_auto_state = p.ui_auto_state;
             ui_obs_state = p.ui_obs_state;
-            ui_obs_near_path_state = p.ui_obs_near_path_state;
+            ui_face_state = p.ui_face_state;
             ui_cur_velocity_preset = p.ui_cur_velocity_preset;
             ui_motor_lock_state = p.ui_motor_lock_state;
+            ui_draw_state = p.ui_draw_state;
             memcpy(robot_pose, p.robot_pose, sizeof(float)*3);
             memcpy(robot_scan, p.robot_scan, sizeof(float)*360);
         }
@@ -148,9 +148,10 @@ public:
             tick = p.tick;
             width = p.width;
             height = p.height;
-            memcpy(buf, p.buf, 1000000);
+            memcpy(buf, p.buf, 1000*1000);
         }
     };
+
     struct IMG
     {
         uint32_t tick = 0;
@@ -172,6 +173,26 @@ public:
         }
     };
 
+    struct IMG_COLOR
+    {
+        uint32_t tick = 0;
+        uint8_t serial[255] = {0,};
+        uint32_t width = 480;
+        uint32_t height = 270;
+        uint8_t buf[480*270*3] = {0,};
+
+        IMG_COLOR()
+        {
+        }
+        IMG_COLOR(const IMG_COLOR& p)
+        {
+            tick = p.tick;
+            width = p.width;
+            height = p.height;
+            memcpy(serial, p.serial, 255);
+            memcpy(buf, p.buf, 480*270*3);
+        }
+    };
 
 
 public:
@@ -201,6 +222,8 @@ public:
     QSharedMemory shm_cam0;
     QSharedMemory shm_cam1;
     QSharedMemory shm_ui_status;
+    QSharedMemory shm_cam_color0;
+    QSharedMemory shm_cam_color1;
 
     CMD get_cmd();
     STATUS get_status();
@@ -209,6 +232,8 @@ public:
     MAP get_obs();
     IMG get_cam0();
     IMG get_cam1();
+    IMG_COLOR get_cam_color0();
+    IMG_COLOR get_cam_color1();
 
     bool getConnection(){
         if(read_count > 30){
@@ -256,6 +281,8 @@ public:
     unsigned int prev_tick_obs = 0;
     unsigned int prev_tick_cam0 = 0;
     unsigned int prev_tick_cam1 = 0;
+    unsigned int prev_tick_cam_color0 = 0;
+    unsigned int prev_tick_cam_color1 = 0;
 
 signals:
     void pathchanged();

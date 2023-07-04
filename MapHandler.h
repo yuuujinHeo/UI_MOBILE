@@ -46,7 +46,7 @@ public:
 
     //------------file load--------------//
     Q_INVOKABLE void loadFile(QString name, QString type);
-
+    void setMapOrin(QString type);
     //------------draw map--------------//
     Q_INVOKABLE void setMap();
     Q_INVOKABLE void moveMap();

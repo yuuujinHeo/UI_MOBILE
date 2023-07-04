@@ -52,12 +52,14 @@ Item {
     }
 
     Component.onCompleted: {
+        mapview.setName(objectName);
         supervisor.setName(objectName);
         supervisor.setMapSize(width, height);
     }
 
     function setEnable(en){
         enabled = en;
+        mapview.setActive(en);
         supervisor.setEnable(en);
     }
 
@@ -182,65 +184,66 @@ Item {
     }
 
     function loadmapsoft(name,type){
-        if(map_loaded){
+//        if(map_loaded){
 
-        }else{
-            if(typeof(name) === 'undefined'){
-                name = supervisor.getMapname();
-            }
-            if(map_name !== name){
-                supervisor.readSetting(name);
-                map_name = name;
-            }
+//        }else{
+//            if(typeof(name) === 'undefined'){
+//                name = supervisor.getMapname();
+//            }
+//            if(map_name !== name){
+//                supervisor.readSetting(name);
+//                map_name = name;
+//            }
 
-            print("loadmap "+objectName + " : "+ name,type);
-            if(typeof(type) !== 'undefined'){
-                map_type = type;
-                timer_loadmap.stop();
-                if(type === "MINIMAP"){
+//            print("loadmap "+objectName + " : "+ name,type);
+//            if(typeof(type) !== 'undefined'){
+//                map_type = type;
+//                timer_loadmap.stop();
+//                if(type === "MINIMAP"){
 
-                }else if(type === "RAW"){
-                    map_loaded = true;
-                    supervisor.setRawMap(name);
-                }else if(type === "EDITED"){
-                    map_loaded = true;
-                    supervisor.setEditedMap(name);
-                }else if(type === "T_EDIT"){
-                    map_loaded = true;
-                    supervisor.setTlineMode(true);
-                    supervisor.initTline(name);
-                    supervisor.setEditedMap(name);
-                    supervisor.setFullScreen();
-                }else if(type === "T_EDIT_TEMP"){
-                    map_loaded = true;
-                    supervisor.setTlineMode(true);
+//                }else if(type === "RAW"){
+//                    map_loaded = true;
+//                    supervisor.setRawMap(name);
+//                }else if(type === "EDITED"){
+//                    map_loaded = true;
+//                    supervisor.setEditedMap(name);
+//                }else if(type === "T_EDIT"){
+//                    map_loaded = true;
+//                    supervisor.setTlineMode(true);
 //                    supervisor.initTline(name);
-                    supervisor.setEditedMap(name);
-                    supervisor.setFullScreen();
-                }else if(type === "OBJECT"){
-                    map_loaded = true;
-                    supervisor.setCostMap();
-                    supervisor.setObjectMap(name);
-                }else if(type === "local"){
-                    map_loaded = true;
-//                    supervisor.setLocalizationMap(name);
-                }else if(type === "velmap"){
-                    map_loaded = true;
-                    supervisor.initVelmap(name,1);
-                    supervisor.setEditedMap(name);
-                }
-            }else{
-                if(supervisor.isExistAnnotation(name)){
-                    map_loaded = true;
-                    supervisor.setEditedMap(name);
-                    map_type = "EDITED";
-                }else{
-                    supervisor.setRawMap(name);
-                    map_loaded = true;
-                    map_type = "RAW";
-                }
-            }
-        }
+//                    supervisor.setEditedMap(name);
+//                    supervisor.setFullScreen();
+//                }else if(type === "T_EDIT_TEMP"){
+//                    map_loaded = true;
+//                    supervisor.setTlineMode(true);
+////                    supervisor.initTline(name);
+//                    supervisor.setEditedMap(name);
+//                    supervisor.setFullScreen();
+//                }else if(type === "OBJECT"){
+//                    map_loaded = true;
+//                    supervisor.setCostMap();
+//                    supervisor.setObjectMap(name);
+//                }else if(type === "local"){
+//                    map_loaded = true;
+////                    supervisor.setLocalizationMap(name);
+//                }else if(type === "velmap"){
+//                    map_loaded = true;
+//                    supervisor.initVelmap(name,1);
+//                    supervisor.setEditedMap(name);
+//                }
+//            }else{
+//                if(supervisor.isExistAnnotation(name)){
+//                    map_loaded = true;
+//                    supervisor.setEditedMap(name);
+//                    map_type = "EDITED";
+//                }else{
+//                    supervisor.setRawMap(name);
+//                    map_loaded = true;
+//                    map_type = "RAW";
+//                }
+//            }
+//        }
+
     }
 
     function loadmapping(){
@@ -393,7 +396,7 @@ Item {
 
     function setDrawingWidth(width){
         supervisor.setLineWidth(width);
-        cur_width = width*map_full.width/supervisor.getFileWidth()/supervisor.getScale() + 2;
+        cur_width = width*map_full2.width/supervisor.getFileWidth()/supervisor.getScale() + 2;
     }
 
     function setAutoInit(x,y,th){
@@ -402,17 +405,6 @@ Item {
         supervisor.setInitPos(x,y,th);
     }
 
-    Timer{
-        id: timer
-        interval: 500
-        repeat: true
-        running: true
-        onTriggered: {
-            btn_show_location.active = supervisor.getshowLocation();
-            btn_robot_following.active = supervisor.getRobotFollowing();
-            btn_show_lidar.active = supervisor.getShowLidar();
-        }
-    }
 
     MapViewer{
         id: mapview
@@ -649,6 +641,7 @@ Item {
             }
         }
         onTouchUpdated: {
+//            print(point1.pressed,point2.pressed,tool);
             if(point1.pressed || point2.pressed){
                 var newX = supervisor.getX() + point1.x*supervisor.getScale()*supervisor.getFileWidth()/width;
                 var newY = supervisor.getY() + point1.y*supervisor.getScale()*supervisor.getFileWidth()/width;
@@ -811,7 +804,7 @@ Item {
     //최초 실행 후 맵 파일을 받아올 수 있을 때까지 1회 수행
     Timer{
         id: timer_loadmap
-        running: parent.enabled
+        running: false//parent.enabled
         repeat: true
         interval: 500
         onTriggered: {
@@ -840,6 +833,9 @@ Item {
         repeat: true
         interval: 500
         onTriggered: {
+            btn_show_location.active = supervisor.getshowLocation();
+            btn_robot_following.active = supervisor.getRobotFollowing();
+            btn_show_lidar.active = supervisor.getShowLidar();
             if(supervisor.getIPCConnection()){
                 is_slam_running = supervisor.is_slam_running();
                 if(show_connection){

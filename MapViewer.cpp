@@ -1,5 +1,8 @@
 #include "MapViewer.h"
 
+PixmapContainer::PixmapContainer(QObject *parent){
+
+}
 MapViewer::MapViewer(QQuickItem *parent):
     QQuickPaintedItem(parent)
 {
@@ -9,10 +12,17 @@ MapViewer::MapViewer(QQuickItem *parent):
 }
 
 void MapViewer::onTimer(){
-    update();
+    if(active){
+//        qDebug() << "MapViewer " << object_name;
+        update();
+    }
 }
 void MapViewer::paint(QPainter *painter){
     QPixmap temp = pmap->map;
+<<<<<<< HEAD
     temp.scaled(width(),height(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
     painter->drawPixmap(0,0,width(),height(),temp);
+=======
+    painter->drawPixmap(0,0,width(),height(),temp.scaled(width(),height(),Qt::IgnoreAspectRatio,Qt::FastTransformation));
+>>>>>>> refs/remotes/origin/master
 }

@@ -162,7 +162,7 @@ public:
 
     Q_INVOKABLE void setBoxPoint(int num, int x, int y){maph->setBoxPoint(num,x,y);}
     Q_INVOKABLE int getPointBox(int x, int y){return maph->getPointBox(x,y);}
-    Q_INVOKABLE void saveRotateMap(){maph->getDrawingTline();}
+    Q_INVOKABLE void saveRotateMap(){maph->saveRotateMap();}
     Q_INVOKABLE void initRotate(){maph->initRotate();}
     Q_INVOKABLE void rotateMap(int angle){maph->rotateMap(angle);}
     Q_INVOKABLE void rotateMapCW(){maph->rotateMapCCW();}
@@ -178,6 +178,7 @@ public:
     Q_INVOKABLE void endDrawing(int x, int y){maph->endDrawing(x,y);}
 
 
+    Q_INVOKABLE void setMapOrin(QString type){maph->setMapOrin(type);}
     Q_INVOKABLE void startDrawingRect(int x, int y){maph->startDrawingRect(x,y);}
     Q_INVOKABLE void setDrawingRect(int x, int y){maph->setDrawingRect(x,y);}
     Q_INVOKABLE void endDrawingRect(){maph->endDrawingRect();}
@@ -190,7 +191,7 @@ public:
     Q_INVOKABLE void drawSpline(){maph->drawSpline();}
     Q_INVOKABLE void endSpline(bool save){maph->endSpline(save);}
     Q_INVOKABLE void startDrawingLine(int x, int y){maph->startDrawingLine(x,y);}
-    Q_INVOKABLE void setDrawingLine(int x, int y){maph->stopDrawingLine(x,y);}
+    Q_INVOKABLE void setDrawingLine(int x, int y){maph->setDrawingLine(x,y);}
     Q_INVOKABLE void stopDrawingLine(int x, int y){maph->stopDrawingLine(x,y);}
     Q_INVOKABLE void setLineColor(int color){maph->setLineColor(color);}
     Q_INVOKABLE void setLineWidth(int width){maph->setLineWidth(width);}

@@ -10,6 +10,8 @@ IPCHandler::IPCHandler(QObject *parent)
     , shm_cam0("slamnav_cam0")
     , shm_cam1("slamnav_cam1")
     , shm_ui_status("slamnav_ui_status")
+    , shm_cam_color0("slamnav_cam_color0")
+    , shm_cam_color1("slamnav_cam_color1")
 {
     // msg tick clear, check for new data
     tick = 0;
@@ -23,7 +25,8 @@ IPCHandler::IPCHandler(QObject *parent)
     updateSharedMemory(shm_obs,"ObsMap",sizeof(IPCHandler::MAP));
     updateSharedMemory(shm_cam0,"Camera0",sizeof(IPCHandler::IMG));
     updateSharedMemory(shm_cam1,"Camera1",sizeof(IPCHandler::IMG));
-
+    updateSharedMemory(shm_cam_color0,"CameraColor0",sizeof(IPCHandler::IMG_COLOR));
+    updateSharedMemory(shm_cam_color1,"CameraColor1",sizeof(IPCHandler::IMG_COLOR));
     clearSharedMemory(shm_cmd);
 
     timer = new QTimer();
@@ -80,6 +83,9 @@ void IPCHandler::update(){
     updateSharedMemory(shm_obs,"ObsMap",sizeof(IPCHandler::MAP));
     updateSharedMemory(shm_cam0,"Camera0",sizeof(IPCHandler::IMG));
     updateSharedMemory(shm_cam1,"Camera1",sizeof(IPCHandler::IMG));
+    updateSharedMemory(shm_cam_color0,"CameraColor0",sizeof(IPCHandler::IMG_COLOR));
+    updateSharedMemory(shm_cam_color1,"CameraColor1",sizeof(IPCHandler::IMG_COLOR));
+
 }
 
 IPCHandler::~IPCHandler()
@@ -92,6 +98,8 @@ IPCHandler::~IPCHandler()
     detachSharedMemory(shm_obs,"ObsMap");
     detachSharedMemory(shm_cam0,"Camera0");
     detachSharedMemory(shm_cam1,"Camera1");
+    detachSharedMemory(shm_cam_color0,"CameraColor0");
+    detachSharedMemory(shm_cam_color1,"CameraColor1");
 }
 
 void IPCHandler::onTimer(){
@@ -158,7 +166,7 @@ void IPCHandler::onTimer(){
         probot->running_state = temp1.ui_auto_state;
         probot->obs_state = temp1.ui_obs_state;
         probot->robot_preset = temp1.ui_cur_velocity_preset;
-        probot->obs_in_path_state = temp1.ui_obs_near_path_state;
+        probot->obs_in_path_state = temp1.ui_face_state;
         probot->curPose.point.x = temp1.robot_pose[0];
         probot->curPose.point.y = temp1.robot_pose[1];
 //        qDebug() << "status" << probot->localization_state;
@@ -307,6 +315,80 @@ void IPCHandler::onTimer(){
         prev_tick_cam1 = cam1.tick;
     }
 
+    IPCHandler::IMG_COLOR camcolor0 = get_cam_color0();
+    if(camcolor0.tick != prev_tick_cam_color0)
+    {
+        flag_rx = true;
+        read_count = 0;
+//        ST_CAMERA temp_info;
+//        char temp_char[255];
+//        for (int a = 0; a < 255; a++) {
+//            temp_char[a] = (char)cam0.serial[a];
+//        }
+//        char* temp_pchar = &temp_char[0];
+//        temp_info.serial = QString::fromUtf8(temp_pchar);
+////        qDebug() << temp_info.serial;
+
+//        temp_info.width = cam0.width;
+//        temp_info.height = cam0.height;
+//        temp_info.imageSize = cam0.width*cam0.height;
+
+
+//        cv::Mat cam0_img(temp_info.height, temp_info.width, CV_8U, cv::Scalar(0));
+//        memcpy((uint8_t*)cam0_img.data, cam0.buf, sizeof(cam0.buf));
+//        temp_info.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(cam0_img));
+
+//        if(pmap->camera_info.count() > 0){
+//            pmap->camera_info[0] = temp_info;
+//        }else{
+//            pmap->camera_info.push_back(temp_info);
+//        }
+
+//        try{
+//            emit cameraupdate();
+//        }catch(std::bad_alloc){
+//            qDebug() << "bad alloc?";
+//        }
+        prev_tick_cam_color0 = camcolor0.tick;
+    }
+
+    IPCHandler::IMG_COLOR camcolor1 = get_cam_color1();
+    if(camcolor1.tick != prev_tick_cam_color1)
+    {
+        flag_rx = true;
+        read_count = 0;
+//        ST_CAMERA temp_info;
+//        char temp_char[255];
+//        for (int a = 0; a < 255; a++) {
+//            temp_char[a] = (char)cam0.serial[a];
+//        }
+//        char* temp_pchar = &temp_char[0];
+//        temp_info.serial = QString::fromUtf8(temp_pchar);
+////        qDebug() << temp_info.serial;
+
+//        temp_info.width = cam0.width;
+//        temp_info.height = cam0.height;
+//        temp_info.imageSize = cam0.width*cam0.height;
+
+
+//        cv::Mat cam0_img(temp_info.height, temp_info.width, CV_8U, cv::Scalar(0));
+//        memcpy((uint8_t*)cam0_img.data, cam0.buf, sizeof(cam0.buf));
+//        temp_info.pixmap = QPixmap::fromImage(mat_to_qimage_cpy(cam0_img));
+
+//        if(pmap->camera_info.count() > 0){
+//            pmap->camera_info[0] = temp_info;
+//        }else{
+//            pmap->camera_info.push_back(temp_info);
+//        }
+
+//        try{
+//            emit cameraupdate();
+//        }catch(std::bad_alloc){
+//            qDebug() << "bad alloc?";
+//        }
+        prev_tick_cam_color1 = camcolor1.tick;
+    }
+
     static int count=0;
     if(count++%5==0){
         flag_rx = false;
@@ -358,6 +440,26 @@ IPCHandler::MAP IPCHandler::get_map()
     return res;
 }
 
+IPCHandler::IMG_COLOR IPCHandler::get_cam_color0()
+{
+    IPCHandler::IMG_COLOR res;
+
+    shm_cam_color0.lock();
+    memcpy(&res, (char*)shm_cam_color0.constData(), sizeof(IPCHandler::IMG_COLOR));
+    shm_cam_color0.unlock();
+
+    return res;
+}
+IPCHandler::IMG_COLOR IPCHandler::get_cam_color1()
+{
+    IPCHandler::IMG_COLOR res;
+
+    shm_cam_color1.lock();
+    memcpy(&res, (char*)shm_cam_color1.constData(), sizeof(IPCHandler::IMG_COLOR));
+    shm_cam_color1.unlock();
+
+    return res;
+}
 IPCHandler::MAP IPCHandler::get_obs()
 {
     IPCHandler::MAP res;
