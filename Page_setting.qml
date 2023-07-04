@@ -7514,69 +7514,8 @@ Item {
         }
     }
 
-    Popup{
+    Popup_help{
         id: popup_help_setting
-        anchors.centerIn: parent
-        width: 800
-        height: 400
-        property string titlestr: ""
-        onOpened:{
-            model_lines.clear();
-        }
-        function setTitle(t){
-            titlestr = t;
-        }
-        function addLine(l){
-            model_lines.append({"line":l});
-        }
-
-        background: Rectangle{
-            anchors.fill:parent
-            color: "black"
-            opacity: 0.8
-        }
-        Column{
-            anchors.fill: parent
-            Rectangle{
-                width: parent.width
-                color: "transparent"
-                height: 100
-                Text{
-                    text: popup_help_setting.titlestr
-                    font.family: font_noto_b.name
-                    font.pixelSize: 40
-                    color: "white"
-                    anchors.centerIn: parent
-                }
-            }
-            Rectangle{
-                width: parent.width*0.6
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "white"
-                height: 2
-            }
-            Rectangle{
-                width: parent.width
-                color: "transparent"
-                height: parent.height - 102
-                Column{
-                    anchors.centerIn: parent
-                    spacing: 5
-                    Repeater{
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        model:ListModel{id:model_lines}
-                        Text{
-                            text: line
-                            color: "white"
-                            font.family: font_noto_r.name
-                            font.pixelSize: 20
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                    }
-                }
-            }
-        }
-
     }
 
     Popup{

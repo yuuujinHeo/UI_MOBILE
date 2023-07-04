@@ -43,7 +43,6 @@ Item {
     property bool select_localmode: false
     onSelect_localmodeChanged: {
         map.init();
-        map.loadmap(supervisor.getMapname(),"EDITED");
         if(select_localmode){
             map.setViewer("localization");
         }else{
@@ -67,12 +66,9 @@ Item {
         notice_num = 0;
         statusbar.visible = true;
         popup_notice.open();
-        map.loadmap(supervisor.getMapname(),"EDITED");
         map.init();
         map.setViewer("current");
         map.setfullscreen();
-
-
     }
 
     Rectangle{

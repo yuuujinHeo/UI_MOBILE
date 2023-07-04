@@ -597,18 +597,13 @@ Item {
                     anchors.fill: parent
                     onClicked:{
                         click_sound.play();
-                        popup_mapping_help.open();
+                        popup_help.setTitle("맵 생성");
+                        popup_help.addTip("?","?");
+                        popup_help.open();
                     }
                 }
             }
 
-            Popup_help{
-                id: popup_mapping_help
-                Component.onCompleted: {
-                    clear();
-                    addTip("매핑을 새로 시작하고 싶어요.","매핑을 새로 시작하려면 취소를 누르고 다시 시작해주세요.");
-                }
-            }
             MAP_FULL2{
                 id: mapping_view
                 enabled: true
@@ -810,6 +805,10 @@ Item {
         autoPlay: false
         volume: volume_voice/100
         source: "bgm/voice_stop_mapping.mp3"
+    }
+
+    Popup_help{
+        id: popup_help
     }
 
     Tool_Keyboard{

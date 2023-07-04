@@ -340,6 +340,8 @@ void Supervisor::readSetting(QString map_name){
         map_name = pmap->map_name;
     }
 
+    maph->loadFile(pmap->map_name,"");
+
     pmap->annot_edit_location = false;
     pmap->annot_edit_tline = false;
     pmap->annot_edit_object = false;

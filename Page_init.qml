@@ -2,7 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import "."
 import io.qt.Supervisor 1.0
-import io.qt.MapView 1.0
+import io.qt.MapViewer 1.0
 import QtGraphicalEffects 1.0
 import io.qt.Supervisor 1.0
 import io.qt.CameraView 1.0
@@ -440,7 +440,7 @@ Item {
                                         debug_mode = true;
                                         supervisor.writelog("[USER INPUT] INIT PAGE : PASS CONNECTION")
                                         loadPage(pkitchen);
-                                        loader_page.item.setDebug(true);
+//                                        loader_page.item.setDebug(true);
                                         update_timer.stop();
                                     }
                                 }
@@ -2526,7 +2526,7 @@ Item {
                             debug_mode = true;
                             supervisor.writelog("[INIT] PASS IPC Connection")
                             loadPage(pkitchen);
-                            loader_page.item.setDebug(true);
+//                            loader_page.item.setDebug(true);
                             parent.color = "transparent";
                         }
                     }
@@ -2660,6 +2660,10 @@ Item {
                 statusbar.visible = true;
 //                supervisor.setMotorLock(false);
             }
+            Component.onDestruction: {
+                map.setEnable(false);
+            }
+
             function show_auto(){
                 btn_slam_fullauto.visible = true;
             }
@@ -2699,9 +2703,11 @@ Item {
                 repeat: true
                 interval: 500
                 onTriggered: {
-                    map.loadmapsoft(supervisor.getMapname(),"EDITED");
                     local_find_state = supervisor.getLocalizationState();
-//                    print(local_find_state);
+
+                    if(local_find_state > 0 && !map.enabled)
+                        map.setEnable(true);
+
                     if(local_find_state===0){//not ready
                     }else if(local_find_state === 1){
                         if(!popup_loading.opened)
@@ -2722,8 +2728,6 @@ Item {
                         popup_loading.close();
                         timer_check_localization.stop();
                     }
-
-
                 }
             }
             Timer{
@@ -2742,7 +2746,6 @@ Item {
                         btn_do_autoinit.running = false;
                         btn_right2.enabled = false;
                     }
-
                 }
             }
 
@@ -3062,18 +3065,6 @@ Item {
                         }
                     }
                     Item_buttons{
-                        width: 200
-                        height: 80
-                        type: "round_text"
-                        text:  "다시 시도"
-                        onClicked: {
-                            click_sound.play();
-                            map.setTool("move");
-                            supervisor.slam_autoInit();
-                            timer_check_localization2.start();
-                        }
-                    }
-                    Item_buttons{
                         id: btn_do_autoinit
                         width: 200
                         height: 100
@@ -3127,6 +3118,7 @@ Item {
 
             MAP_FULL2{
                 id: map
+                enabled: false
                 objectName: "annot_local"
                 visible: local_find_state>1 && local_find_state<10
                 onVisibleChanged: {
@@ -3238,7 +3230,7 @@ Item {
                         debug_mode = true;
                         supervisor.writelog("[USER INPUT] INIT PAGE : PASS ROBOT INIT")
                         loadPage(pkitchen);
-                        loader_page.item.setDebug(true);
+//                        loader_page.item.setDebug(true);
     //                    update_timer.stop();
                     }
                 }

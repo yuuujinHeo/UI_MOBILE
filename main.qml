@@ -9,7 +9,6 @@ import io.qt.Supervisor 1.0
 import io.qt.Keyemitter 1.0
 import io.qt.MapViewer 1.0
 import QtMultimedia 5.12
-import io.qt.MapView 1.0
 
 Window {
     id: mainwindow
@@ -18,9 +17,9 @@ Window {
     height: 800
 
     property bool debug_mode: false
-    property var volume_voice: 0
-    property var volume_bgm: 0
-    property var volume_button: 0
+    property var volume_button : parseInt(supervisor.getSetting("ROBOT_SW","volume_button"));
+    property var volume_bgm : parseInt(supervisor.getSetting("ROBOT_SW","volume_bgm"));
+    property var volume_voice: parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"));
 
     flags: homePath.split("/")[2]==="odroid"?Qt.Window | Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint |Qt.WindowStaysOnTopHint |Qt.WindowOverridesSystemGestures |Qt.MaximizeUsingFullscreenGeometryHint:Qt.Window
     visibility: homePath.split("/")[2]==="odroid"?Window.FullScreen:Window.Windowed
@@ -116,13 +115,10 @@ Window {
 
     Timer{
         id: timer_voice
-        interval: 100
+        interval: 200
         repeat: true
         running: true
         onTriggered: {
-            volume_button = parseInt(supervisor.getSetting("ROBOT_SW","volume_button"));
-            volume_bgm = parseInt(supervisor.getSetting("ROBOT_SW","volume_bgm"));
-            volume_voice = parseInt(supervisor.getSetting("ROBOT_SW","volume_voice"));
             if(playingSound){
                 cur_sound = "";
             }else{

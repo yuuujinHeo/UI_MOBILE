@@ -139,6 +139,18 @@ void MapHandler::loadFile(QString name, QString type){
     plog->write("[MapHandler] load File "+name+" : "+log_str);
 }
 
+void MapHandler::setMapOrin(QString type){
+    if(type == "RAW"){
+        plog->write("[MapHandler] set Map : map_raw.png");
+        file_raw.copyTo(map_orin);
+    }else if(type == "EDITED"){
+        plog->write("[MapHandler] set Map : map_edited.png");
+        file_edited.copyTo(map_orin);
+    }
+    setMap();
+    update();
+}
+
 void MapHandler::setTline(){
     int radius = pmap->robot_radius*2/grid_width;
     for(int i=0; i<file_travelline.rows;i++){
@@ -192,20 +204,23 @@ void MapHandler::setMapSize(int width, int height){
     canvas_height = height;
 }
 void MapHandler::onTimer(){
-    if(flag_drawing){
-        show_robot = true;
-        robot_following = true;
-        drawTline();
-    }else if(mode == "annot_tline"){
-        show_robot = false;
-        robot_following = false;
-    }
-    //Robot Following
-    if(robot_following){
-        setZoomCenter();
-    }
+    if(enable){
+//        qDebug() << "MapHandler " << object_name;
+        if(flag_drawing){
+            show_robot = true;
+            robot_following = true;
+            drawTline();
+        }else if(mode == "annot_tline"){
+            show_robot = false;
+            robot_following = false;
+        }
+        //Robot Following
+        if(robot_following){
+            setZoomCenter();
+        }
 
-    setMap();
+        setMap();
+    }
 }
 
 
@@ -215,6 +230,7 @@ void MapHandler::setMode(QString name){
     show_travelline = false;
     show_velocitymap = false;
     if(mode == "none"){
+        file_width = map_orin.rows;
         show_robot = true;
         show_global_path = false;
         show_local_path = false;
@@ -233,6 +249,7 @@ void MapHandler::setMode(QString name){
         robot_following = true;
         setFullScreen();
     }else if(mode == "current"){
+        file_width = map_orin.rows;
         show_robot = true;
         show_global_path = true;
         show_local_path = true;
@@ -242,6 +259,7 @@ void MapHandler::setMode(QString name){
         robot_following = true;
         setFullScreen();
     }else if(mode == "annot_view"){
+        file_width = map_orin.rows;
         show_robot = false;
         show_global_path = false;
         show_local_path = false;
@@ -251,6 +269,7 @@ void MapHandler::setMode(QString name){
         robot_following = false;
         setFullScreen();
     }else if(mode == "annot_drawing" || mode == "annot_rotate"){
+        file_width = map_orin.rows;
         show_robot = false;
         show_global_path = false;
         show_local_path = false;
@@ -260,6 +279,7 @@ void MapHandler::setMode(QString name){
         robot_following = false;
         setFullScreen();
     }else if(mode == "annot_velmap"){
+        file_width = map_orin.rows;
         show_robot = false;
         show_global_path = false;
         show_local_path = false;
@@ -270,6 +290,7 @@ void MapHandler::setMode(QString name){
         show_velocitymap = true;
         setFullScreen();
     }else if(mode == "annot_location"){
+        file_width = map_orin.rows;
         show_robot = true;
         show_global_path = false;
         show_local_path = false;
@@ -280,6 +301,7 @@ void MapHandler::setMode(QString name){
         show_travelline = true;
 //        setFullScreen();
     }else if(mode == "annot_tline"){
+        file_width = map_orin.rows;
         show_robot = false;
         show_global_path = false;
         show_local_path = false;
@@ -290,6 +312,7 @@ void MapHandler::setMode(QString name){
         show_travelline = true;
         setFullScreen();
     }else if(mode == "localization"){
+        file_width = map_orin.rows;
         show_robot = true;
         show_global_path = false;
         show_local_path = false;
@@ -303,6 +326,7 @@ void MapHandler::setMode(QString name){
         pmap->annot_edit_tline = false;
         setFullScreen();
     }else if(mode == "local_view"){
+        file_width = map_orin.rows;
         show_robot = true;
         show_global_path = false;
         show_local_path = false;
@@ -312,7 +336,8 @@ void MapHandler::setMode(QString name){
         robot_following = true;
         scale = 0.7;
         setZoomCenter(0,0);
-    }else if(mode == "MapHandlerer"){
+    }else if(mode == "mapviewer"){
+        file_width = map_orin.rows;
         show_robot = false;
         show_global_path = false;
         show_local_path = false;
@@ -363,6 +388,7 @@ void MapHandler::setFullScreen(){
     draw_y = 0;
     draw_width = file_width;
     scale = 1;
+    qDebug() << "set Full Screen " << file_width << pmap->mapping_width << pmap->map_mapping.rows << map_orin.rows;
 }
 
 void MapHandler::moveMap(){
@@ -373,8 +399,12 @@ void MapHandler::moveMap(){
 void MapHandler::setMap(){
     if(mode == "mapping"){
         map = QPixmap::fromImage(mat_to_qimage_cpy(pmap->map_mapping));
-        file_width = pmap->map_mapping.rows;
         grid_width = pmap->mapping_gridwidth*pmap->mapping_width/file_width;
+        if(file_width != pmap->map_mapping.rows){
+            file_width = pmap->map_mapping.rows;
+            setFullScreen();
+        }
+//        qDebug() << pmap->map_mapping.rows << pmap->mapping_gridwidth << pmap->mapping_width << grid_width << draw_width;
     }else if(map_orin.rows > 0){
         file_width = map_orin.rows;
         grid_width = pmap->gridwidth;
@@ -415,6 +445,7 @@ void MapHandler::setMap(){
     QPainter painter(&map);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+
 
     //공용 변수
     cv::Point2f robot_pose;
@@ -723,6 +754,7 @@ void MapHandler::setMap(){
     }
 
     final_map = map.copy(draw_x,draw_y,draw_width,draw_width);
+//    qDebug() << draw_x << draw_y << draw_width;
     update();
 }
 
@@ -733,7 +765,6 @@ void MapHandler::saveRotateMap(){
     cv::Mat map_edited_ui;
     if(tool == "cut_map"){
         map_orin(cv::Rect(cut_box[0].x,cut_box[0].y,(cut_box[1].x-cut_box[0].x),(cut_box[1].y-cut_box[0].y))).copyTo(map_edited_ui);
-
         pmap->cut_map[0] = cut_box[0].x;
         pmap->cut_map[1] = cut_box[0].y;
     }else{
@@ -1032,7 +1063,7 @@ bool MapHandler::getDrawingUndoFlag(){
 }
 
 void MapHandler::startDrawingLine(int x, int y){
-//    //qDebug() << "startDrawingLine";
+    qDebug() << "startDrawingLine";
     new_straight_flag = true;
     spline_dot.clear();
     straight[0].x = x;
@@ -1065,6 +1096,7 @@ void MapHandler::endSpline(bool save){
 }
 void MapHandler::drawSpline(){
     line.clear();
+    setMapDrawing();
     if(spline_dot.size() > 2){
         std::vector<double> x_list;
         std::vector<double> y_list;
@@ -1111,7 +1143,6 @@ void MapHandler::drawSpline(){
 //            //qDebug() <<"spline faile";
             line = spline_dot;
         }
-//        setMapDrawing();
     }else{
         if(spline_dot.size() == 1){
 //            //qDebug() <<"spline dot";
@@ -1200,6 +1231,7 @@ void MapHandler::addSpline(int x, int y){
     drawSpline();
 }
 void MapHandler::setDrawingLine(int x, int y){
+//    qDebug() << "setDrawingLine " << x << y;
     straight[1].x = x;
     straight[1].y = y;
     initDrawing();
@@ -1443,6 +1475,14 @@ void MapHandler::saveTline(){
     QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_travel_line.png";
     plog->write("[MapHandler] SAVE MAP "+path);
     cv::imwrite(path.toStdString(),file_travelline);
+
+    lines.clear();
+    line.clear();
+    spline_dot.clear();
+    lines_trash.clear();
+    initDrawing();
+
+    loadFile(map_name,"");
 }
 
 void MapHandler::saveTlineTemp(){

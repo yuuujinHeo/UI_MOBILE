@@ -159,12 +159,12 @@ Item {
             map_type = type;
             timer_loadmap.stop();
             map_loaded = true;
-            supervisor.loadFile(name,type);
-//            mapview.loadFile(name,type);
+//            supervisor.loadFile(name,type);
+            mapview.loadFile(name,type);
         }else{
             map_loaded = true;
-            supervisor.loadFile(name,type);
-//            mapview.loadFile(name,type);
+//            supervisor.loadFile(name,type);
+            mapview.loadFile(name,type);
             if(supervisor.isExistAnnotation(name)){
                 map_type = "EDITED";
             }else{

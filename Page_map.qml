@@ -173,16 +173,13 @@ Item {
         anchors.left: rect_menus.right
         anchors.bottom: parent.bottom
 
-        onVisibleChanged: {
-            if(visible){
-                map_current.setEnable(true);
-            }else{
-                map_current.setEnable(false);
-            }
-        }
         Component.onCompleted: {
-            map_current.loadmap(supervisor.getMapname(),"EDITED")
+//            map_current.loadmap(supervisor.getMapname(),"EDITED")
+            map_current.setEnable(true);
             map_current.setViewer("current");
+        }
+        Component.onDestruction: {
+            map_current.setEnable(false);
         }
 
         Rectangle{
@@ -639,7 +636,6 @@ Item {
 //                                    supervisor.setMap(textfield_name.text);
 
                                     //맵 새로 불러오기.
-                                    map.loadmap(textfield_name.text,"EDITED");
                                     map.init();
                                     map.setViewer("annot_objecting");
                                     loader_menu.sourceComponent = menu_annot_objecting;
@@ -736,7 +732,6 @@ Item {
                                 if(popup_save_travelline.save_mode === "tline"){
                                     supervisor.writelog("[QML] MAP PAGE : SAVE TRAVELLINE ");
                                     map.save("tline");
-                                    map.loadmap(supervisor.getMapname(),"T_EDIT");
                                 }else if(popup_save_travelline.save_mode === "velmap"){
                                     supervisor.writelog("[QML] MAP PAGE : SAVE VELOCITY MAP ");
                                     map.save("velmap");

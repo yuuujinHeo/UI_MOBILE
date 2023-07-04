@@ -244,20 +244,26 @@ Item {
                 color: color_dark_navy
             }
             Component.onCompleted: {
+                map.setEnable(true);
                 supervisor.setMotorLock(true);
             }
+            Component.onDestruction: {
+                map.setEnable(false);
+            }
+
             Timer{
                 interval: 500
                 running: true
                 onTriggered:{
+                    if(annotation_after_mapping)
+                        supervisor.setMapOrin("RAW");
+                    else
+                        supervisor.setMapOrin("EDITED");
+
+                    map.setEnable(true);
                     map.setViewer("annot_rotate");
                     map.setTool("move");
                     map.clear("rotate")
-                    map.setEnable(true);
-                    if(annotation_after_mapping)
-                        map.loadmap(supervisor.getMapname(),"RAW");
-                    else
-                        map.loadmap(supervisor.getMapname(),"EDITED");
                 }
             }
 
@@ -571,7 +577,12 @@ Item {
                 supervisor.setMotorLock(true);
                 loading.show();
                 text_finding.opacity = 1;
+                map.setEnable(true);
             }
+            Component.onDestruction: {
+                map.setEnable(false);
+            }
+
             Rectangle{
                 anchors.fill: parent
                 color: color_dark_navy
@@ -604,7 +615,7 @@ Item {
                 repeat: true
                 interval: 500
                 onTriggered: {
-                    map.loadmapsoft(supervisor.getMapname(),"EDITED");
+//                    map.loadmapsoft(supervisor.getMapname(),"EDITED");
                     if(test){
                         local_find_state = 2;
                         loading.hide();
@@ -612,6 +623,7 @@ Item {
                         timer_check_localization.stop();
                     }else{
                         local_find_state = supervisor.getLocalizationState();
+                        print("local state = ",local_find_state);
                         if(local_find_state===0){//not ready
                             supervisor.slam_autoInit();
                         }else if(local_find_state === 2){//success
@@ -1388,11 +1400,15 @@ Item {
             property bool show_map: false
             Component.onCompleted: {
                 supervisor.setMotorLock(false);
+                map_location_view.setEnable(true);
                 map_location_view.setViewer("annot_location");
                 map_location_view.show_connection = false;
                 map_location_view.show_button_lidar = false;
-                map_location_view.loadmap(supervisor.getMapname(),"T_EDIT");
             }
+            Component.onDestruction: {
+                map_location_view.setEnable(false);
+            }
+
             Timer{
                 running: true
                 interval: 500
@@ -1542,9 +1558,11 @@ Item {
                     map_tline.setViewer("annot_location");
                     map_tline.show_connection = false;
                     map_tline.show_button_lidar = false;
-                    map_tline.loadmap(supervisor.getMapname(),"T_TEMP");
-
+                    map_tline.setEnable(true);
                     map_tline.startDrawingT();
+                }
+                onClosed: {
+                    map_tline.setEnable(false);
                 }
 
                 Rectangle{
@@ -1598,7 +1616,7 @@ Item {
                             width: 550
                             objectName: "serving_map"
                             visible: show_map
-                            enabled: show_map
+                            enabled: false
                             height: 550
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -1622,15 +1640,18 @@ Item {
                 onOpened:{
                     update();
                     map_location.setViewer("annot_location");
-                    map_location.loadmap(supervisor.getMapname(),"EDITED");
+                    map_location.setEnable(true);
 
                     textfield_loc_name.text = "";
                 }
+                onClosed:{
+                    map_location.setEnable(false);
+                }
+
                 Timer{
                     running: true
                     interval: 500
                     onTriggered:{
-                        map_location.loadmap(supervisor.getMapname(),"EDITED");
                         map_location.setfullscreen();
 //                        map_location.move(0,0);
                     }
@@ -3376,11 +3397,13 @@ Item {
             Component.onCompleted: {
                 loading.hide();
                 supervisor.setMotorLock(true);
+                map.setEnable(true);
                 if(supervisor.isExistTravelMap(supervisor.getMapname())){
                     supervisor.writelog("[ANNOTATION] Travel Line : load map")
                 }
             }
             Component.onDestruction: {
+                map.setEnable(false);
                 if(map.getTFlag()){
                     supervisor.setMotorLock(true);
                     map.stopDrawingT();
@@ -3392,7 +3415,6 @@ Item {
                 running: true
                 onTriggered:{
                     map.setViewer("annot_tline");
-                    map.loadmap(supervisor.getMapname(),"T_EDIT");
                 }
             }
 
@@ -4096,7 +4118,6 @@ Item {
                                     if(popup_save_travelline.save_mode === "tline"){
                                         supervisor.writelog("[QML] MAP PAGE : SAVE TRAVELLINE ");
                                         map.save("tline");
-                                        map.loadmap(supervisor.getMapname(),"T_EDIT");
                                         click_sound.play();
                                     }else if(popup_save_travelline.save_mode === "velmap"){
                                         supervisor.writelog("[QML] MAP PAGE : SAVE VELOCITY MAP ");
@@ -4138,14 +4159,18 @@ Item {
                 color: color_dark_navy
             }
             Component.onCompleted: {
+                map.setEnable(true);
                 supervisor.setMotorLock(true);
             }
+            Component.onDestruction: {
+                map.setEnable(false);
+            }
+
             Timer{
                 interval: 500
                 running: true
                 onTriggered:{
                     map.setViewer("annot_velmap");
-                    map.loadmap(supervisor.getMapname(),"mapvel");
                 }
             }
             Row{
