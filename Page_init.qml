@@ -2435,6 +2435,54 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: btn_slam_start
+                    width: 230
+                    height: 130
+                    radius: 40
+                    color: enabled?color_navy:color_mid_gray
+                    Column{
+                        spacing: 15
+                        anchors.centerIn: parent
+                        Image{
+                            width: 40
+                            height: 40
+                            source:"icon/icon_open.png"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            ColorOverlay{
+                                source: parent
+                                anchors.fill: parent
+                                color: "white"
+                            }
+                        }
+                        Text{
+                            text: "맵 불러오기"
+                            Component.onCompleted: {
+                                scale = 1;
+                                while(width*scale > 200){
+                                    scale=scale-0.01;
+                                }
+                            }
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: "white"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 30
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onPressed:{
+                            start_sound.play();
+                            parent.color = color_mid_navy;
+                        }
+                        onReleased: {
+                            supervisor.writelog("[INIT] LOAD MAP LOCAL")
+                            popup_map_list.open();
+                            parent.color = color_navy;
+                        }
+                    }
+                }
+                Rectangle{
                     id: btn_usb_load
                     width: 230
                     height: 130

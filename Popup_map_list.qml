@@ -44,6 +44,9 @@ Popup{
             supervisor.readSetting(model_maps.get(select_map_list).name);
             model_details.clear();
             show_velocitymap = false;
+            supervisor.setShowLocation(false);
+            supervisor.setShowTravelline(false);
+            supervisor.setShowVelocitymap(false);
             show_location = false;
             show_travelline = false;
 
@@ -194,8 +197,8 @@ Popup{
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: {
-                                        click_sound.play();
                                         if(select_map_list > -1){
+                                            click_sound.play();
                                             var name = list_map.model.get(select_map_list).name;
                                             popup_map_list.close();
                                             print(name);
@@ -205,6 +208,8 @@ Popup{
                                             loader_page.item.is_init_state = true;
                                             loader_page.item.map_mode = 2;
     //                                        loader_page.item.init();
+                                        }else{
+                                            click_sound_no.play();
                                         }
                                     }
                                 }
@@ -307,7 +312,6 @@ Popup{
                     }
                 }
             }
-
             Row{
                 anchors.horizontalCenter: parent.horizontalCenter
                 Column{
@@ -320,6 +324,7 @@ Popup{
                             anchors.centerIn: parent
                             Flickable{
                                 width: 200
+                                clip: true
                                 height: 500
                                 contentHeight: column_maps.height
                                 Column{
@@ -517,7 +522,6 @@ Popup{
                 }
             }
         }
-
     }
     Popup{
         id: popup_annotation_delete

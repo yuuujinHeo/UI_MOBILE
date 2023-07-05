@@ -615,6 +615,7 @@ void MapHandler::setMap(){
             painter.fillPath(circles,Qt::white);
         }
     }
+
     //로봇 경로 표시
     if(show_global_path){
         painter.setPen(QPen(QColor(hex_color_pink),2));
@@ -760,9 +761,6 @@ void MapHandler::setMap(){
             painter.drawRoundedRect(curPoint.x-cur_line_width/2,curPoint.y-cur_line_width/2,cur_line_width,cur_line_width,cur_line_width,cur_line_width);
         }
     }
-
-
-
 
     final_map = map.copy(draw_x,draw_y,draw_width,draw_width);
     update();
