@@ -6,7 +6,7 @@ import QtQuick.Controls 2.12
 Popup{
     id: popup_help
     anchors.centerIn: parent
-    width: 800
+    width: 1000
     height: 500
     property string titlestr: ""
     onOpened:{
@@ -30,7 +30,7 @@ Popup{
             color: "transparent"
             height: 100
             Text{
-                text: popup_help_setting.titlestr
+                text: popup_help.titlestr
                 font.family: font_noto_b.name
                 font.pixelSize: 40
                 color: "white"
@@ -56,6 +56,7 @@ Popup{
                     Text{
                         text: line
                         color: "white"
+                        horizontalAlignment: Text.AlignHCenter
                         font.family: font_noto_r.name
                         font.pixelSize: 20
                         anchors.horizontalCenter: parent.horizontalCenter

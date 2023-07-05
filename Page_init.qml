@@ -2435,7 +2435,6 @@ Item {
                     }
                 }
                 Rectangle{
-                    id: btn_slam_start
                     width: 230
                     height: 130
                     radius: 40

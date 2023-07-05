@@ -306,6 +306,23 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
+            Item_buttons{
+                type: "circle_text"
+                text: "?"
+                width: 60
+                height: 60
+                anchors.top: parent.top
+                anchors.topMargin: 50
+                anchors.right: parent.right
+                anchors.rightMargin: 50
+                onClicked:{
+                    click_sound.play();
+                    popup_annot_help.open();
+                    popup_annot_help.setTitle("맵 회전 / 잘라내기");
+                    popup_annot_help.addLine("매장에 대한 로봇의 방향을 직관적으로 알 수 있도록 맵을 회전시켜주세요.\n맵을 회전하지 않아도 로봇 주행에는 문제가 없습니다.\n이미 사용중인 맵을 회전시키면 기존에 설정한 위치들이 전부 삭제되므로 신중하게 결정해주세요.");
+                    popup_annot_help.addLine("맵 생성을 한 뒤 맵의 여백이 너무 많은 경우 잘라내기를 할 수 있습니다.\n로봇이 이동해야할 부분을 잘라내기 하지 않도록 주의해주세요.");
+                }
+            }
             Row{
                 spacing: 20
                 anchors.verticalCenter: parent.verticalCenter
@@ -776,6 +793,32 @@ Item {
                 width: 600
                 height: 600
             }
+
+            Item_buttons{
+                type: "circle_text"
+                text: "?"
+                width: 60
+                height: 60
+                anchors.top: parent.top
+                anchors.topMargin: 50
+                anchors.right: parent.right
+                anchors.rightMargin: 50
+                onClicked:{
+                    click_sound.play();
+                    popup_annot_help.open();
+                    popup_annot_help.setTitle("로봇 위치 초기화");
+                    if(local_find_state === 2){
+                        popup_annot_help.addLine("파란색으로 표시된 라이다맵과 실제 맵이 일치하는 지 확인해주세요.");
+                        popup_annot_help.addLine("로봇이 충전, 대기, 서빙 위치 근처에 있으면 보다 정확하고 빠르게 위치를 찾습니다.");
+                        popup_annot_help.addLine("로봇은 위치를 찾았다고 생각하지만 라이다맵이 실제 맵과 일치 하지 않으면\n로봇이 주행 중 이상한 곳으로 가거나 충돌이 날 수 있습니다.");
+                    }else{
+                        popup_annot_help.addLine("로봇을 충전, 대기, 서빙 위치 근처로 이동시킨 뒤 [다시시도]를 하시면 보다 정확하고 빠르게 위치를 찾습니다.");
+                        popup_annot_help.addLine("아니라면 [수동지정]을 통해 맵 상의 로봇의 위치와 방향을 표시해주세요. 그 위치에서 초기화를 시도합니다.");
+                        popup_annot_help.addLine("로봇이 이동할 수 있는 상황이 아니고 수동지정도 어려우면 [자동위치찾기]버튼을 누르세요.\n시간이 조금 소요됩니다.");
+                    }
+
+                }
+            }
             Item_buttons{
                 id: btn_right
                 visible: local_find_state===2
@@ -1187,6 +1230,23 @@ Item {
                 anchors.topMargin: 80
                 anchors.horizontalCenter: parent.horizontalCenter
             }
+            Item_buttons{
+                type: "circle_text"
+                text: "?"
+                width: 60
+                height: 60
+                anchors.top: parent.top
+                anchors.topMargin: 50
+                anchors.right: parent.right
+                anchors.rightMargin: 50
+                onClicked:{
+                    click_sound.play();
+                    popup_annot_help.open();
+                    popup_annot_help.setTitle("충전위치/대기위치");
+                    popup_annot_help.addLine("충전위치와 대기위치를 지정하고 그 경로주행을 확인합니다.\n도착위치를 변경하고 싶으면 각 위치를 [다시지정]해주세요");
+                    popup_annot_help.addLine("로봇이 주행하거나 끌고 이동하는 모든 경로는 기억됩니다.");
+                }
+            }
             Row{
                 anchors.centerIn: parent
                 spacing: 100
@@ -1336,6 +1396,24 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
+            Item_buttons{
+                type: "circle_text"
+                text: "?"
+                width: 60
+                height: 60
+                anchors.top: parent.top
+                anchors.topMargin: 50
+                anchors.right: parent.right
+                anchors.rightMargin: 50
+                onClicked:{
+                    click_sound.play();
+                    popup_annot_help.open();
+                    popup_annot_help.setTitle("대기위치로 이동");
+                    popup_annot_help.addLine("로봇이 주행하거나 끌고 이동하는 모든 경로는 기억됩니다.");
+                    popup_annot_help.addLine("이 단계가 필요한 이유는 서빙위치와 대기위치는 서로 경로로 연결되어야하기 때문입니다.");
+                    popup_annot_help.addLine("대기위치에서 서빙위치로 출발하는 경로를 기억하기 위해서 대기위치로 이동한 뒤 서빙위치를 설정합니다.");
+                }
+            }
             Item_buttons{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
@@ -3532,7 +3610,11 @@ Item {
                                 height: 60
                                 onClicked:{
                                     click_sound.play();
-                                    popup_travelline_help.open();
+                                    popup_annot_help.open();
+                                    popup_annot_help.setTitle("이동 경로");
+                                    popup_annot_help.addLine("이동경로는 로봇이 목적지로 이동할 때 사용하는 경로의 집합입니다.\n보다 많은 경로를 학습시킬 수록 최적의 경로를 찾을 수 있습니다.");
+                                    popup_annot_help.addLine("로봇을 끌고 학습시킬 때 최대한 직진성을 유지해주세요.\n경로가 구불구불해도 최대한 부드럽게 이동하려고 하겠지만 보기에 다소 어색할 수 있습니다.");
+                                    popup_annot_help.addLine("대기, 충전 위치와 각 서빙위치 사이를 여러번 왕복시켜주세요.");
                                 }
                             }
                             Item_buttons{
@@ -4153,14 +4235,6 @@ Item {
 
             }
 
-            Popup_help{
-                id: popup_travelline_help
-                Component.onCompleted: {
-                    clear();
-                    addTip("이동경로가 뭔가요?","로봇이 목적지로 이동할 때 사용하는 경로입니다.\n맵 위에 표시되는 경로영역의 전부가 로봇이 경로를 찾을 때 사용하는 후보지역입니다.\n로봇이나 목적지가 경로영역에서 일정영역을 벗어나면 경로를 찾지 못할 수도 있습니다.");
-                    addTip("경로 학습을 하는 이유","로봇은 이동경로를 기반으로 ");
-                }
-            }
         }
     }
     Component{
@@ -4221,7 +4295,11 @@ Item {
                                 height: 60
                                 onClicked:{
                                     click_sound.play();
-                                    popup_velmap_help.open();
+                                    popup_annot_help.open();
+                                    popup_annot_help.setTitle("안전속도 구간");
+                                    popup_annot_help.addLine("사람이 붐비거나 통로가 비좁아서 로봇이 천천히 움직여야 하는 구간을 표시해주세요");
+                                    popup_annot_help.addLine("로봇이 주행 중 해당 구간에 진입하면 자동으로 속도를 1,2단계로 낮춥니다.");
+                                    popup_annot_help.addLine("각 속도 구간의 상세 속도를 지정하고 싶으시다면 세팅 페이지의 프리셋 수정을 이용하세요.")
                                 }
                             }
                             Item_buttons{
@@ -4814,6 +4892,9 @@ Item {
         id: popup_map_list
     }
 
+    Popup_help{
+        id: popup_annot_help
+    }
     Tool_Keyboard{
         id: keyboard
     }
