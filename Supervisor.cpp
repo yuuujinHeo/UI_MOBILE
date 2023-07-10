@@ -977,6 +977,8 @@ void Supervisor::readusb(){
 
 }
 
+
+
 void Supervisor::saveMapfromUsb(QString path){
     std::string user = getenv("USER");
     std::string path1 = "/media/" + user + "/";
@@ -1092,44 +1094,35 @@ void Supervisor::startMapping(int mapsize, float grid){
     pmap->origin[1] = pmap->height/2;
     pmap->mapping_width=mapsize;
     pmap->mapping_gridwidth=grid;
-    if(probot->ipc_use){
-        ipc->startMapping(mapsize, grid);
-        ipc->is_mapping = true;
-    }
+    ipc->startMapping(mapsize, grid);
+    ipc->is_mapping = true;
 }
+void Supervisor::startDrawingObject(){
+    plog->write("[COMMAND] Start Drawing Object");
+    ipc->startObject();
+}
+
+void Supervisor::stopDrawingObject(){
+    plog->write("[COMMAND] Stop Drawing Object");
+    ipc->stopObject();
+}
+
+void Supervisor::saveDrawingObject(){
+    plog->write("[COMMAND] Save Drawing Object");
+    ipc->saveObject();
+}
+
 void Supervisor::stopMapping(){
     plog->write("[USER INPUT] STOP MAPPING");
-    if(probot->ipc_use){
-        ipc->flag_mapping = false;
-        ipc->is_mapping = false;
-        ipc->stopMapping();
-    }
+    ipc->flag_mapping = false;
+    ipc->is_mapping = false;
+    ipc->stopMapping();
 }
 void Supervisor::saveMapping(QString name){
     if(probot->ipc_use){
         ipc->flag_mapping = false;
         ipc->is_mapping = false;
         ipc->saveMapping(name);
-    }
-}
-void Supervisor::startObjecting(){
-    plog->write("[USER INPUT] START OBJECTING");
-    if(probot->ipc_use){
-        ipc->startObjecting();
-        ipc->is_objecting = true;
-    }
-}
-void Supervisor::stopObjecting(){
-    plog->write("[USER INPUT] STOP OBJECTING");
-    if(probot->ipc_use){
-        ipc->flag_objecting = false;
-        ipc->is_objecting = false;
-        ipc->stopObjecting();
-    }
-}
-void Supervisor::saveObjecting(){
-    if(probot->ipc_use){
-        ipc->saveObjecting();
     }
 }
 void Supervisor::setSLAMMode(int mode){
@@ -1200,9 +1193,7 @@ bool Supervisor::getMappingflag(){
 
 
 bool Supervisor::getObjectingflag(){
-    if(probot->ipc_use){
-        return ipc->flag_objecting;
-    }
+    return ipc->flag_objecting;
 }
 
 void Supervisor::setObjectingflag(bool flag){

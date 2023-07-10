@@ -243,12 +243,15 @@ public:
         }
     }
 
+    void startObject();
+    void stopObject();
+    void saveObject();
+
     void set_cmd(IPCHandler::CMD val, QString log="");
     void set_cmd(int cmd, QString log="");
     void set_status_ui();
 
     ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
-//    void moveTo(QString target_loc, int flag_back);
     void moveToLocation(LOCATION target_loc, int preset);
     void moveToResting(int preset);
     void moveToCharging(int preset);
@@ -268,9 +271,6 @@ public:
     void startMapping(int map_size, float grid_size);
     void stopMapping();
     void restartSLAM();
-    void saveObjecting();
-    void startObjecting();
-    void stopObjecting();
     void set_velocity(float vel);
 
     QString tempstr = "";

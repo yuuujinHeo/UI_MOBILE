@@ -148,6 +148,7 @@ public:
     Q_INVOKABLE void setShowTravelline(bool onoff){maph->setShowTravelline(onoff);}
     Q_INVOKABLE void setShowVelocitymap(bool onoff){maph->setShowVelocitymap(onoff);}
 
+    Q_INVOKABLE void setInitFlag(bool onoff){maph->setInitFlag(onoff);}
     Q_INVOKABLE bool getshowLocation(){return maph->getshowLocation();}
     Q_INVOKABLE bool getRobotFollowing(){return maph->getRobotFollowing();}
     Q_INVOKABLE bool getShowLidar(){return maph->getShowLidar();}
@@ -229,6 +230,10 @@ public:
 
 
 
+
+    Q_INVOKABLE void startDrawingObject();
+    Q_INVOKABLE void stopDrawingObject();
+    Q_INVOKABLE void saveDrawingObject();
 
 
 
@@ -393,10 +398,6 @@ public:
     Q_INVOKABLE void stopMapping();
     Q_INVOKABLE void setSLAMMode(int mode);
     Q_INVOKABLE void saveMapping(QString name);
-
-    Q_INVOKABLE void startObjecting();
-    Q_INVOKABLE void stopObjecting();
-    Q_INVOKABLE void saveObjecting();
 
     Q_INVOKABLE void setInitCurPos();
     Q_INVOKABLE void setInitPos(int x, int y, float th);

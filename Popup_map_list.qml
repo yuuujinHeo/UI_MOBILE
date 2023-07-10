@@ -128,195 +128,6 @@ Popup{
                     }
                 }
             }
-
-            Rectangle{
-                id: rect_list_top2
-                color: "transparent"
-                height: 100
-                visible: false
-                width: parent.width
-                Row{
-                    anchors.centerIn: parent
-                    spacing: 100
-                    Rectangle{
-                        id: rect_list_menus
-                        width: rect_list_top2.width
-                        height: 100
-                        radius: 5
-                        color: color_gray
-                        Row{
-                            anchors.centerIn: parent
-                            spacing: 50
-                            Rectangle{
-                                id: btn_use
-                                width: 78
-                                height: width
-                                radius: width
-                                anchors.verticalCenter: parent.verticalCenter
-                                enabled: false
-                                color:enabled?"white":"#f4f4f4"
-                                Column{
-                                    anchors.centerIn: parent
-                                    Image{
-                                        source: "icon/icon_move.png"
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                    Text{
-                                        text: "사용"
-                                        font.family: font_noto_r.name
-                                        color: btn_use.enabled?color_dark_black:color_gray
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        click_sound.play();
-                                        if(select_map_list > -1){
-                                            supervisor.writelog("[USER INPUT] Map used changed : " + model_maps.get(select_map_list).name);
-                                            supervisor.setMap(model_maps.get(select_map_list).name);
-                                            loader_page.item.init();
-                                            popup_map_list.close();
-                                        }
-                                    }
-                                }
-                            }
-                            Rectangle{
-                                id: btn_draw
-                                width: 78
-                                anchors.verticalCenter: parent.verticalCenter
-                                height: width
-                                radius: width
-                                Column{
-                                    anchors.centerIn: parent
-                                    Image{
-                                        source: "icon/icon_draw.png"
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                    Text{
-                                        text: "수정"
-                                        color: btn_use.enabled?color_dark_black:color_gray
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        if(select_map_list > -1){
-                                            click_sound.play();
-                                            var name = list_map.model.get(select_map_list).name;
-                                            popup_map_list.close();
-                                            print(name);
-                                            supervisor.readSetting(name);
-                                            loadPage(pmap);
-                                            loader_page.item.loadmap(name);
-                                            loader_page.item.is_init_state = true;
-                                            loader_page.item.map_mode = 2;
-    //                                        loader_page.item.init();
-                                        }else{
-                                            click_sound_no.play();
-                                        }
-                                    }
-                                }
-                            }
-                            Rectangle{
-                                id: btn_erase
-                                width: 78
-                                height: width
-                                anchors.verticalCenter: parent.verticalCenter
-                                radius: width
-                                Column{
-                                    anchors.centerIn: parent
-                                    Image{
-                                        source: "icon/icon_erase.png"
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                    Text{
-                                        text: "삭제"
-                                        color: btn_use.enabled?color_dark_black:color_gray
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        click_sound.play();
-                                        supervisor.removeMap(list_map.model.get(select_map_list).name);
-                                        popup_map_list.update_list();
-                                    }
-                                }
-                            }
-                            Rectangle{
-                                id: btn_draw_new
-                                width: 78
-                                height: width
-                                anchors.verticalCenter: parent.verticalCenter
-                                radius: width
-                                Column{
-                                    anchors.centerIn: parent
-                                    Image{
-                                        source: "icon/icon_draw.png"
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                    Text{
-                                        text: "새로 수정"
-                                        color: btn_use.enabled?color_dark_black:color_gray
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        click_sound.play();
-                                        if(select_map_list > -1){
-                                            var name = list_map.model.get(select_map_list).name;
-                                            print("name : ",name);
-                                            if(supervisor.isExistAnnotation(name)){
-                                                temp_name = list_map.model.get(select_map_list).name;
-                                                popup_annotation_delete.name = name;
-                                                popup_annotation_delete.open();
-                                            }else{
-                                                supervisor.loadMap(name);
-                                                loadPage(pmap);
-                                                loader_page.item.loadmap(name,"RAW");
-                                                loader_page.item.map_mode = 2;
-                                                loader_page.item.is_init_state = true;
-                                                popup_map_list.close();
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            Rectangle{
-                                id: btn_menu
-                                width: 100
-                                height: width
-                                color: color_gray
-                                radius: 30
-                                Behavior on width{
-                                    NumberAnimation{
-                                        duration: 500;
-                                    }
-                                }
-                                Image{
-                                    id: image_btn_menu
-                                    source:"icon/btn_reset2.png"
-                                    scale: 1-(120-parent.width)/120
-                                    anchors.centerIn: parent
-                                }
-                                MouseArea{
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        click_sound.play();
-                                        popup_map_list.close();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
             Row{
                 anchors.horizontalCenter: parent.horizontalCenter
                 Column{
@@ -478,7 +289,7 @@ Popup{
                         anchors.horizontalCenter: parent.horizontalCenter
                         spacing: 30
                         Item_buttons{
-                            width: 150
+                            width: 130
                             height: 60
                             type: "round_text"
                             text: "사 용"
@@ -493,7 +304,7 @@ Popup{
                             }
                         }
                         Item_buttons{
-                            width: 150
+                            width: 130
                             height: 60
                             type: "round_text"
                             text: "수 정"
@@ -503,11 +314,21 @@ Popup{
                                     var name = model_maps.get(select_map_list).name;
                                     popup_map_list.close();
                                     print(name);
-                                    supervisor.readSetting(name);
-                                    loadPage(pmap);
-                                    loader_page.item.loadmap(name);
-                                    loader_page.item.is_init_state = true;
-                                    loader_page.item.map_mode = 2;
+                                    loadPage(pannotation);
+                                    loader_page.item.setMappingFlag();
+                                }
+                            }
+                        }
+                        Item_buttons{
+                            width: 130
+                            height: 60
+                            type: "round_text"
+                            text: "삭 제"
+                            onClicked: {
+                                click_sound.play();
+                                if(select_map_list > -1){
+                                    supervisor.removeMap(list_map.model.get(select_map_list).name);
+                                    popup_map_list.update_list();
                                 }
                             }
                         }

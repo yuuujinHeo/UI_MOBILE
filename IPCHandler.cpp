@@ -695,17 +695,17 @@ void IPCHandler::stopMapping(){
     send_msg.cmd = ROBOT_CMD_MAPPING_STOP;
     set_cmd(send_msg, "STOP MAPPING");
 }
-void IPCHandler::saveObjecting(){
+void IPCHandler::saveObject(){
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_OBJECTING_SAVE;
     set_cmd(send_msg,"SAVE OBJECTING");
 }
-void IPCHandler::startObjecting(){
+void IPCHandler::startObject(){
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_OBJECTING_START;
     set_cmd(send_msg,"START OBJECTING ");
 }
-void IPCHandler::stopObjecting(){
+void IPCHandler::stopObject(){
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_OBJECTING_STOP;
     set_cmd(send_msg, "STOP OBJECTING");

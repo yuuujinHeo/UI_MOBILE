@@ -61,6 +61,7 @@ Item {
         enabled = en;
         mapview.setActive(en);
         supervisor.setEnable(en);
+//        print("set enable ",objectName,en);
     }
 
     function setViewer(mode){
@@ -600,6 +601,7 @@ Item {
             }else if(tool === "edit_location_new"){
                 supervisor.addLocation(firstX, firstY,0);
             }else if( tool === "slam_init"){
+                supervisor.setInitFlag(true);
 //                print("Pressed : ",firstX,firstY,0);
                 supervisor.setInitPose(firstX,firstY,0);
             }else if(tool === "cut_map"){
@@ -650,6 +652,7 @@ Item {
                 }else if( tool === "add_location"){
 
                 }else if( tool === "slam_init"){
+                    supervisor.setInitFlag(false);
                     var angle = Math.atan2((newY-firstY),(newX-firstX));
 //                    print("Released : ",firstX,firstY,angle);
                     supervisor.setInitPos(firstX, firstY, angle);

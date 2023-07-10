@@ -102,8 +102,12 @@ public:
     //------------localization--------------//
     POSE set_init_pose;
     bool set_init_flag = false;
+    bool set_init_pressed = false;
     Q_INVOKABLE void setInitPose(int x, int y, float th);
     Q_INVOKABLE void clearInitPose();
+    Q_INVOKABLE void setInitFlag(bool onoff){
+        set_init_pressed = onoff;
+    }
 
     //------------drawing--------------//
     bool flag_drawing=false;

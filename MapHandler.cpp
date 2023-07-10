@@ -147,6 +147,11 @@ void MapHandler::setMapOrin(QString type){
         plog->write("[MapHandler] set Map : map_edited.png");
         file_edited.copyTo(map_orin);
     }
+    file_width = map_orin.rows;
+    file_velocity = cv::Mat(file_width, file_width, CV_8UC3, cv::Scalar::all(0));
+    file_travelline = cv::Mat(file_width, file_width, CV_8U, cv::Scalar::all(0));
+    initDrawing();
+    setFullScreen();
     setMap();
     update();
 }
@@ -443,6 +448,7 @@ void MapHandler::setMap(){
         }
 
         if(!show_velocitymap && !show_travelline){
+            qDebug() << map_drawing_mask.channels() << temp_orin.channels() << map_drawing_mask.rows << temp_orin.rows;
             cv::multiply(cv::Scalar::all(1.0)-map_drawing_mask,temp_orin,temp_orin);
             cv::add(temp_orin,map_drawing,temp_orin);
         }
@@ -687,6 +693,28 @@ void MapHandler::setMap(){
             QPainterPath direction;
             direction.addPolygon(polygon);
             painter.fillPath(direction,QBrush(QColor("red")));
+            if(set_init_pressed){
+                cv::Point2f init_pose = set_init_pose.point;
+                float init_angle = set_init_pose.angle;
+                float distance = (pmap->robot_radius/grid_width)*2;
+                float distance2 = distance*0.8;
+                float th_dist = M_PI/8;
+
+                float x =   (init_pose.x + distance    * qCos(init_angle));
+                float y =   (init_pose.y + distance    * qSin(init_angle));
+                float x1 =  (init_pose.x + distance2   * qCos(init_angle-th_dist));
+                float y1 =  (init_pose.y + distance2   * qSin(init_angle-th_dist));
+                float x2 =  (init_pose.x + distance2   * qCos(init_angle+th_dist));
+                float y2 =  (init_pose.y + distance2   * qSin(init_angle+th_dist));
+                float rad = pmap->robot_radius*2*res/grid_width;
+                QPainterPath path;
+                path.addRoundedRect((init_pose.x-rad/2),(init_pose.y-rad/2),rad,rad,rad,rad);
+                painter.setPen(QPen(QColor("white"),2));
+                painter.fillPath(path,QBrush(QColor(hex_color_green)));
+                painter.drawPath(path);
+                painter.drawLine(QLine(x1,y1,x,y));
+                painter.drawLine(QLine(x2,y2,x,y));
+            }
         }else if(set_init_flag){
             cv::Point2f init_pose = set_init_pose.point;
             float init_angle = set_init_pose.angle;
@@ -998,10 +1026,14 @@ void MapHandler::rotateMapCW(){
     pmap->map_rotate_angle = rotate_angle;
     //맵 회전
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
-    if(exist_edited)
-        file_edited.copyTo(map_orin);
-    else if(exist_raw)
-        file_raw.copyTo(map_orin);
+    if(map_orin.rows > 0){
+
+    }else{
+        if(exist_edited)
+            file_edited.copyTo(map_orin);
+        else if(exist_raw)
+            file_raw.copyTo(map_orin);
+    }
     cv::warpAffine(map_orin,map_orin,rot,map_orin.size(),cv::INTER_NEAREST);
     setMap();
 }
@@ -1011,10 +1043,14 @@ void MapHandler::rotateMapCCW(){
     pmap->map_rotate_angle = rotate_angle;
     //맵 회전
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
-    if(exist_edited)
-        file_edited.copyTo(map_orin);
-    else if(exist_raw)
-        file_raw.copyTo(map_orin);
+    if(map_orin.rows > 0){
+
+    }else{
+        if(exist_edited)
+            file_edited.copyTo(map_orin);
+        else if(exist_raw)
+            file_raw.copyTo(map_orin);
+    }
     cv::warpAffine(map_orin,map_orin,rot,map_orin.size(),cv::INTER_NEAREST);
     setMap();
 }

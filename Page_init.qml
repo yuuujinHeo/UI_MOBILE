@@ -3044,7 +3044,7 @@ Item {
                 color: color_navy
                 Text{
                     text:"로봇의 위치를 찾을 수 없습니다. 로봇의 위치를 맵 상에서 표시해주세요."
-                    font.pixelSize: 40
+                    font.pixelSize: 30
                     horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.top
@@ -3121,6 +3121,7 @@ Item {
                         shadowcolor: color_dark_black
                         onClicked: {
                             click_sound.play();
+                            print("init autoinit");
                             map.setTool("move");
                             supervisor.slam_fullautoInit();
                             timer_check_localization2.start();
