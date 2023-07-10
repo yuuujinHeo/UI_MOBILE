@@ -711,7 +711,7 @@ Item {
                 id: text_find
                 visible: local_find_state===2||local_find_state===3
                 text:local_find_state===2?"로봇의 위치를 찾았습니다. 로봇의 위치가 정확합니까?":"로봇의 위치를 찾을 수 없습니다. 로봇의 위치를 맵 상에서 표시해주세요."
-                font.pixelSize: 40
+                font.pixelSize: 30
                 horizontalAlignment: Text.AlignHCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
