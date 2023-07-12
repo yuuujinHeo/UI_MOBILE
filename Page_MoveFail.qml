@@ -961,25 +961,31 @@ Item {
                 state_charging.enabled = false;
             }
 
-            if(supervisor.getMotorConnection(0)){
-                if(supervisor.getMotorStatus(0) === 1){
-                    state_motor_1.enabled = false;
+            if(supervisor.getLockStatus() === 1){
+                if(supervisor.getMotorConnection(0)){
+                    if(supervisor.getMotorStatus(0) === 1){
+                        state_motor_1.enabled = false;
+                    }else{
+                        state_motor_1.enabled = true;
+                    }
                 }else{
                     state_motor_1.enabled = true;
                 }
-            }else{
-                state_motor_1.enabled = true;
-            }
-
-            if(supervisor.getMotorConnection(1)){
-                if(supervisor.getMotorStatus(1) === 1){
-                    state_motor_2.enabled            = false;
+                if(supervisor.getMotorConnection(1)){
+                    if(supervisor.getMotorStatus(1) === 1){
+                        state_motor_2.enabled            = false;
+                    }else{
+                        state_motor_2.enabled = true;
+                    }
                 }else{
                     state_motor_2.enabled = true;
                 }
             }else{
-                state_motor_2.enabled = true;
+                state_motor_1.enabled = false;
+                state_motor_2.enabled = false;
             }
+
+
 
             if(supervisor.getLocalizationState() === 2){
                 state_localization.enabled = false;

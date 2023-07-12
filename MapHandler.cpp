@@ -147,6 +147,11 @@ void MapHandler::setMapOrin(QString type){
         plog->write("[MapHandler] set Map : map_edited.png");
         file_edited.copyTo(map_orin);
     }
+    file_width = map_orin.rows;
+    file_velocity = cv::Mat(file_width, file_width, CV_8UC3, cv::Scalar::all(0));
+    file_travelline = cv::Mat(file_width, file_width, CV_8U, cv::Scalar::all(0));
+    initDrawing();
+    setFullScreen();
     setMap();
     update();
 }
@@ -228,6 +233,7 @@ void MapHandler::setMode(QString name){
     mode = name;
     plog->write("[MapHandler] "+object_name+" set Mode to "+name);
     show_travelline = false;
+    show_object = false;
     show_velocitymap = false;
     if(mode == "none"){
         file_width = map_orin.rows;
@@ -355,6 +361,18 @@ void MapHandler::setMode(QString name){
         show_location_icon = false;
         robot_following = false;
         setFullScreen();
+    }else if(mode == "annot_object"){
+        file_width = map_orin.rows;
+        show_robot = true;
+        show_global_path = false;
+        show_local_path = false;
+        show_lidar = false;
+        show_object = true;
+        show_location = true;
+        show_location_icon = true;
+        robot_following = false;
+        initObject();
+        setFullScreen();
     }
     setMap();
 }
@@ -443,10 +461,14 @@ void MapHandler::setMap(){
         }
 
         if(!show_velocitymap && !show_travelline){
+//            qDebug() << map_drawing_mask.channels() << temp_orin.channels() << map_drawing_mask.rows << temp_orin.rows;
             cv::multiply(cv::Scalar::all(1.0)-map_drawing_mask,temp_orin,temp_orin);
             cv::add(temp_orin,map_drawing,temp_orin);
         }
 
+        if(draw_object_flag){
+            cv::add(temp_orin, pmap->map_objecting, temp_orin);
+        }
         map = QPixmap::fromImage(mat_to_qimage_cpy(temp_orin));
     }
 
@@ -464,6 +486,88 @@ void MapHandler::setMap(){
     }
     float robot_angle = setAxis(probot->curPose.angle);
 
+
+    if(show_object){
+        for(int obj=0; obj<objs.size(); obj++){
+            QPainterPath path;
+            if(objs[obj].is_rect){
+                if(select_obj == obj){
+                    painter.setPen(QPen(Qt::white,3));
+                    path.addRect(QRectF(QPointF(objs[obj].points[0].x*res,objs[obj].points[0].y*res),QPointF(objs[obj].points[2].x*res,objs[obj].points[2].y*res)));
+                    painter.fillPath(path,QBrush(QColor(10,24,50,100)));
+                    painter.drawPath(path);
+
+                    QPainterPath circles;
+                    for(int j=0; j<objs[obj].points.size(); j++){
+                        int rad = 2*res;
+                        int xx = objs[obj].points[j].x*res - rad;
+                        int yy = objs[obj].points[j].y*res - rad;
+                        circles.addRoundedRect(xx,yy,rad*2,rad*2,rad,rad);
+                        painter.fillPath(circles,Qt::white);
+                    }
+                }else{
+                    painter.setPen(QPen(Qt::white,1));
+                    path.addRect(QRectF(QPointF(objs[obj].points[0].x*res,objs[obj].points[0].y*res),QPointF(objs[obj].points[2].x*res,objs[obj].points[2].y*res)));
+                    painter.fillPath(path,QBrush(QColor(0,0,0,100)));
+                    painter.drawPath(path);
+                }
+            }else{
+                QPolygonF polygon;
+                for(int j=0; j<objs[obj].points.size(); j++){
+                    polygon << QPointF(objs[obj].points[j].x*res, objs[obj].points[j].y*res);
+                }
+
+                path.addPolygon(polygon);
+                if(select_obj == obj){
+                    painter.setPen(QPen(Qt::white,3));
+                    painter.fillPath(path,QBrush(QColor(10,24,50,100)));
+                    painter.drawPolygon(polygon);
+                    QPainterPath circles;
+                    for(int j=0; j<objs[obj].points.size(); j++){
+                        int rad = 2*res;
+                        int xx = objs[obj].points[j].x*res - rad;
+                        int yy = objs[obj].points[j].y*res - rad;
+                        circles.addRoundedRect(xx,yy,rad*2,rad*2,rad,rad);
+                        painter.fillPath(circles,Qt::white);
+                    }
+
+                }else{
+                    painter.setPen(QPen(Qt::white,1));
+                    painter.fillPath(path,QBrush(QColor(0,0,0,100)));
+                    painter.drawPolygon(polygon);
+                }
+            }
+        }
+        if(new_obj_flag){
+            QPainterPath path;
+            qDebug() << "new object drawing";
+            if(new_obj.is_rect){
+                path.addRect(QRectF(QPointF(new_obj.points[0].x*res,new_obj.points[0].y*res),QPointF(new_obj.points[2].x*res,new_obj.points[2].y*res)));
+                painter.setPen(QPen(Qt::white,2));
+                painter.fillPath(path,QBrush(QColor(10,24,50,100)));
+                painter.drawPath(path);
+
+//                    QPainterPath circles;
+//                    for(int j=0; j<new_object.points.size(); j++){
+//                        int rad = 2*res;
+//                        int xx = new_object.points[j].x*res - rad;
+//                        int yy = new_object.points[j].y*res - rad;
+//                        circles.addRoundedRect(xx,yy,rad*2,rad*2,rad,rad);
+//                        painter.fillPath(circles,Qt::white);
+//                    }
+            }else{
+
+                QPolygonF polygon;
+                for(int j=0; j<new_obj.points.size(); j++){
+                    polygon << QPointF(new_obj.points[j].x*res, new_obj.points[j].y*res);
+                }
+                painter.setPen(QPen(Qt::white,2));
+                path.addPolygon(polygon);
+                painter.fillPath(path,QBrush(QColor(10,24,50,100)));
+                painter.drawPolygon(polygon);
+            }
+        }
+    }
     //위치
     if(show_location){
         for(int i=0; i<locations.size(); i++){
@@ -687,6 +791,28 @@ void MapHandler::setMap(){
             QPainterPath direction;
             direction.addPolygon(polygon);
             painter.fillPath(direction,QBrush(QColor("red")));
+            if(set_init_pressed){
+                cv::Point2f init_pose = set_init_pose.point;
+                float init_angle = set_init_pose.angle;
+                float distance = (pmap->robot_radius/grid_width)*2;
+                float distance2 = distance*0.8;
+                float th_dist = M_PI/8;
+
+                float x =   (init_pose.x + distance    * qCos(init_angle));
+                float y =   (init_pose.y + distance    * qSin(init_angle));
+                float x1 =  (init_pose.x + distance2   * qCos(init_angle-th_dist));
+                float y1 =  (init_pose.y + distance2   * qSin(init_angle-th_dist));
+                float x2 =  (init_pose.x + distance2   * qCos(init_angle+th_dist));
+                float y2 =  (init_pose.y + distance2   * qSin(init_angle+th_dist));
+                float rad = pmap->robot_radius*2*res/grid_width;
+                QPainterPath path;
+                path.addRoundedRect((init_pose.x-rad/2),(init_pose.y-rad/2),rad,rad,rad,rad);
+                painter.setPen(QPen(QColor("white"),2));
+                painter.fillPath(path,QBrush(QColor(hex_color_green)));
+                painter.drawPath(path);
+                painter.drawLine(QLine(x1,y1,x,y));
+                painter.drawLine(QLine(x2,y2,x,y));
+            }
         }else if(set_init_flag){
             cv::Point2f init_pose = set_init_pose.point;
             float init_angle = set_init_pose.angle;
@@ -796,7 +922,177 @@ void MapHandler::saveRotateMap(){
     updateMeta();
     loadFile(map_name,"");
 }
+void MapHandler::addObject(int x, int y){
+    new_obj_flag = true;
+    new_obj.is_rect = true;
+    new_obj.points.clear();
+    new_obj.points.push_back(cv::Point2f(x,y));
+    new_obj.points.push_back(cv::Point2f(x,y));
+    new_obj.points.push_back(cv::Point2f(x,y));
+    new_obj.points.push_back(cv::Point2f(x,y));
+    update();
+}
+void MapHandler::addObjectPoint(int x, int y){
+    new_obj_flag = true;
+    new_obj.is_rect = false;
+    new_obj.points.push_back(cv::Point2f(x,y));
+    update();
+}
+void MapHandler::setObject(int x, int y){
+    if(new_obj.is_rect){
+        if(new_obj.points.size() > 3){
+            cv::Point2f orin = new_obj.points[0];
+            new_obj.points[1] = cv::Point2f(orin.x,y);
+            new_obj.points[2] = cv::Point2f(x,y);
+            new_obj.points[3] = cv::Point2f(x,orin.y);
+        }
+    }else{
+        new_obj.points[new_obj.points.size()-1] = cv::Point2f(x,y);
+    }
+    update();
+}
+void MapHandler::editObjectStart(int x, int y){
+    select_obj_point = getObjectPointNum(x,y);
+}
+void MapHandler::editObject(int x, int y){
+    int num = select_obj;
+    int point = select_obj_point;
+    if(num > -1 && num < pmap->objects.size()){
+        if(pmap->objects[num].is_rect){
+            if(point == 0){
+                cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
+                pmap->objects[num].points[0].x = pos.x;
+                pmap->objects[num].points[0].y = pos.y;
+                pmap->objects[num].points[1].y = pos.y;
+                pmap->objects[num].points[3].x = pos.x;
+            }else if(point == 1){
+                cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
+                pmap->objects[num].points[1].x = pos.x;
+                pmap->objects[num].points[1].y = pos.y;
+                pmap->objects[num].points[0].y = pos.y;
+                pmap->objects[num].points[2].x = pos.x;
+            }else if(point == 2){
+                cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
+                pmap->objects[num].points[2].x = pos.x;
+                pmap->objects[num].points[2].y = pos.y;
+                pmap->objects[num].points[3].y = pos.y;
+                pmap->objects[num].points[1].x = pos.x;
+            }else if(point == 3){
+                cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
+                pmap->objects[num].points[3].x = pos.x;
+                pmap->objects[num].points[3].y = pos.y;
+                pmap->objects[num].points[2].y = pos.y;
+                pmap->objects[num].points[0].x = pos.x;
+            }
+            plog->write("[ANNOTATION] editObject " + QString().sprintf("(%d, %d, %d, %d)",num,point,x,y));
+        }else{
+            if(point > -1 && point < pmap->objects[num].points.size()){
+                cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
+                pmap->objects[num].points[point].x = pos.x;
+                pmap->objects[num].points[point].y = pos.y;
+                plog->write("[ANNOTATION] editObject "+ QString().sprintf("(%d, %d, %d, %d)",num,point,x,y));
+            }else{
+                plog->write("[ANNOTATION - ERROR] editObject " + QString().sprintf("(%d, %d, %d, %d)",num,point,x,y) + " but pose size error");
+            }
+        }
 
+        pmap->annotation_edited = true;
+    }
+    initObject();
+    update();
+}
+void MapHandler::saveObject(){
+    OBJECT temp;
+    if(new_obj.is_rect){
+        plog->write("[ANNOTATION] ADD Object (Rect) : "+QString().sprintf("(%f,%f) ,(%f,%f)",new_obj.points[0].x, new_obj.points[0].y, new_obj.points[2].x,new_obj.points[2].y));
+    }else{
+        plog->write("[ANNOTATION] ADD Object : "+QString().sprintf("%d",new_obj.points.size()));
+    }
+
+    temp.is_rect = new_obj.is_rect;
+    for(int i=0; i<new_obj.points.size(); i++){
+        temp.points.push_back(setAxisBack(new_obj.points[i]));
+    }
+    pmap->annotation_edited = true;
+    pmap->objects.push_back(temp);
+    clearObjectAll();
+    update();
+}
+void MapHandler::clearObject(){
+    new_obj_flag = false;
+    new_obj.points.clear();
+    initObject();
+    update();
+}
+void MapHandler::clearObjectAll(){
+    new_obj_flag = false;
+    new_obj.points.clear();
+    select_obj = -1;
+    select_obj_point = -1;
+    initObject();
+    update();
+}
+void MapHandler::undoObject(){
+    new_obj.points.pop_back();
+    if(new_obj.points.size() <= 0){
+        new_obj_flag = false;
+    }
+    initObject();
+    update();
+}
+int MapHandler::getObjectNum(int x, int y){
+    cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
+    for(int i=0; i<pmap->list_obj_uL.size(); i++){
+        if(pos.x<pmap->list_obj_uL[i].x && pos.x>pmap->list_obj_dR[i].x){
+            if(pos.y<pmap->list_obj_uL[i].y && pos.y>pmap->list_obj_dR[i].y){
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+int MapHandler::getObjectPointNum(int x, int y){
+    cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
+    int num = select_obj;
+    qDebug() << "check obj" << num;// << pmap->objects[num].points.size();
+    if(num < pmap->objects.size() && num > -1){
+        if(num != -1){
+            for(int j=0; j<pmap->objects[num].points.size(); j++){
+                qDebug() << pmap->objects[num].points[j].x << pmap->objects[num].points[j].y;
+                if(fabs(pmap->objects[num].points[j].x - pos.x) < 0.2){
+                    if(fabs(pmap->objects[num].points[j].y - pos.y) < 0.2){
+                        qDebug() << "Match Point !!" << num << j;
+                        return j;
+                    }
+                }
+            }
+        }
+    }
+    qDebug() << "can't find obj num : " << x << y;
+    return -1;
+}
+void MapHandler::selectObject(int num){
+    select_obj = num;
+    update();
+}
+void MapHandler::removeObject(int num){
+    clearObjectAll();
+}
+bool MapHandler::getObjectFlag(){
+    return new_obj_flag;
+}
+void MapHandler::initObject(){
+    objs.clear();
+//    qDebug() << "initObject " << pmap->objects.size();
+    for(int i=0; i<pmap->objects.size(); i++){
+        OBJECT temp;
+        temp.is_rect = pmap->objects[i].is_rect;
+        for(int j=0; j<pmap->objects[i].points.size(); j++){
+            temp.points.push_back(setAxis(pmap->objects[i].points[j]));
+        }
+        objs.push_back(temp);
+    }
+}
 void MapHandler::updateMeta(){
     QString path = QDir::homePath() + "/maps/"+ map_name + "/map_meta.ini";
     QSettings setting(path, QSettings::IniFormat);
@@ -998,10 +1294,14 @@ void MapHandler::rotateMapCW(){
     pmap->map_rotate_angle = rotate_angle;
     //맵 회전
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
-    if(exist_edited)
-        file_edited.copyTo(map_orin);
-    else if(exist_raw)
-        file_raw.copyTo(map_orin);
+    if(map_orin.rows > 0){
+
+    }else{
+        if(exist_edited)
+            file_edited.copyTo(map_orin);
+        else if(exist_raw)
+            file_raw.copyTo(map_orin);
+    }
     cv::warpAffine(map_orin,map_orin,rot,map_orin.size(),cv::INTER_NEAREST);
     setMap();
 }
@@ -1011,10 +1311,14 @@ void MapHandler::rotateMapCCW(){
     pmap->map_rotate_angle = rotate_angle;
     //맵 회전
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
-    if(exist_edited)
-        file_edited.copyTo(map_orin);
-    else if(exist_raw)
-        file_raw.copyTo(map_orin);
+    if(map_orin.rows > 0){
+
+    }else{
+        if(exist_edited)
+            file_edited.copyTo(map_orin);
+        else if(exist_raw)
+            file_raw.copyTo(map_orin);
+    }
     cv::warpAffine(map_orin,map_orin,rot,map_orin.size(),cv::INTER_NEAREST);
     setMap();
 }
@@ -1672,7 +1976,6 @@ void MapHandler::saveAnnotation(QString filename){
         settings.setValue("serving_"+QString::number(i)+"/name",pmap->location_groups[i]);
         settings.setValue("serving_"+QString::number(i)+"/num",getLocationGroupSize(i));
     }
-
     pmap->annotation_edited = false;
 }
 

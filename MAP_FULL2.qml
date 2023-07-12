@@ -61,6 +61,7 @@ Item {
         enabled = en;
         mapview.setActive(en);
         supervisor.setEnable(en);
+//        print("set enable ",objectName,en);
     }
 
     function setViewer(mode){
@@ -200,68 +201,6 @@ Item {
         return supervisor.getDrawingTline();
     }
 
-    function loadmapsoft(name,type){
-//        if(map_loaded){
-
-//        }else{
-//            if(typeof(name) === 'undefined'){
-//                name = supervisor.getMapname();
-//            }
-//            if(map_name !== name){
-//                supervisor.readSetting(name);
-//                map_name = name;
-//            }
-
-//            print("loadmap "+objectName + " : "+ name,type);
-//            if(typeof(type) !== 'undefined'){
-//                map_type = type;
-//                timer_loadmap.stop();
-//                if(type === "MINIMAP"){
-
-//                }else if(type === "RAW"){
-//                    map_loaded = true;
-//                    supervisor.setRawMap(name);
-//                }else if(type === "EDITED"){
-//                    map_loaded = true;
-//                    supervisor.setEditedMap(name);
-//                }else if(type === "T_EDIT"){
-//                    map_loaded = true;
-//                    supervisor.setTlineMode(true);
-//                    supervisor.initTline(name);
-//                    supervisor.setEditedMap(name);
-//                    supervisor.setFullScreen();
-//                }else if(type === "T_EDIT_TEMP"){
-//                    map_loaded = true;
-//                    supervisor.setTlineMode(true);
-////                    supervisor.initTline(name);
-//                    supervisor.setEditedMap(name);
-//                    supervisor.setFullScreen();
-//                }else if(type === "OBJECT"){
-//                    map_loaded = true;
-//                    supervisor.setCostMap();
-//                    supervisor.setObjectMap(name);
-//                }else if(type === "local"){
-//                    map_loaded = true;
-////                    supervisor.setLocalizationMap(name);
-//                }else if(type === "velmap"){
-//                    map_loaded = true;
-//                    supervisor.initVelmap(name,1);
-//                    supervisor.setEditedMap(name);
-//                }
-//            }else{
-//                if(supervisor.isExistAnnotation(name)){
-//                    map_loaded = true;
-//                    supervisor.setEditedMap(name);
-//                    map_type = "EDITED";
-//                }else{
-//                    supervisor.setRawMap(name);
-//                    map_loaded = true;
-//                    map_type = "RAW";
-//                }
-//            }
-//        }
-
-    }
 
     function loadmapping(){
         supervisor.setMap();
@@ -314,6 +253,7 @@ Item {
             supervisor.endSpline(false);
             supervisor.clearDrawing();
             supervisor.clearLocation();
+            supervisor.clearObjectAll();
             supervisor.clearInitPose();
         }else if(mode==="tline"){
             supervisor.clearDrawing();
@@ -322,6 +262,8 @@ Item {
             supervisor.endSpline(false);
         }else if(mode ==="rotate"){
             supervisor.initRotate();
+        }else if(mode === "object"){
+            supervisor.clearObject();
         }
     }
     function rotate(dir){
@@ -589,6 +531,12 @@ Item {
             }else if(tool == "dot_spline"){
 //                supervisor.startSpline(firstX, firstY);
                 supervisor.addSpline(firstX,firstY);
+            }else if(tool == "add_object"){
+                supervisor.addObject(firstX,firstY);
+            }else if(tool == "edit_object"){
+                supervisor.editObjectStart(firstX,firstY);
+            }else if(tool == "add_point"){
+                supervisor.addObjectPoint(firstX,firstY);
             }else if(tool == "erase"){
                 supervisor.setShowBrush(true);
                 supervisor.setLineColor(-1);
@@ -600,6 +548,7 @@ Item {
             }else if(tool === "edit_location_new"){
                 supervisor.addLocation(firstX, firstY,0);
             }else if( tool === "slam_init"){
+                supervisor.setInitFlag(true);
 //                print("Pressed : ",firstX,firstY,0);
                 supervisor.setInitPose(firstX,firstY,0);
             }else if(tool === "cut_map"){
@@ -624,16 +573,9 @@ Item {
                     if(supervisor.getMode() === "annot_object"){
                         var objnum = supervisor.getObjectNum(newX, newY);
                         if(objnum > -1){
-                            if(loader_menu.item.obj_category !== 2){
-                                loader_menu.item.setcategory(2);
-                            }
-                            loader_menu.item.setobjcur(objnum);
+                            loader_page.item.setobjcur(objnum);
                         }else{
-                            var locnum = supervisor.getLocationNum(newX, newY);
-                            if(locnum > -1 && loader_menu.item.obj_category !== 1){
-                                loader_menu.item.setcategory(1);
-                            }
-                            loader_menu.item.setloccur(locnum);
+                            loader_page.item.setobjcur(-1);
                         }
                     }
                 }else if(tool == "draw"){
@@ -647,9 +589,16 @@ Item {
                 }else if( tool === "edit_location"){
 //                    var angle = Math.atan2((newX-firstX),(newY-firstY));
 //                    supervisor.editLocation(firstX, firstY,angle);
+                }else if(tool == "add_object"){
+//                    supervisor
+                }else if(tool == "edit_object"){
+                    supervisor.setObjPose();
+                }else if(tool == "add_point"){
+
                 }else if( tool === "add_location"){
 
                 }else if( tool === "slam_init"){
+                    supervisor.setInitFlag(false);
                     var angle = Math.atan2((newY-firstY),(newX-firstX));
 //                    print("Released : ",firstX,firstY,angle);
                     supervisor.setInitPos(firstX, firstY, angle);
@@ -710,6 +659,12 @@ Item {
                     supervisor.setDrawingLine(newX, newY);
                 }else if(tool == "erase"){
                     supervisor.addLinePoint(newX, newY);
+                }else if(tool == "add_object"){
+                    supervisor.setObject(newX,newY);
+                }else if(tool == "edit_object"){
+                    supervisor.editObject(newX,newY);
+                }else if(tool == "add_point"){
+                    supervisor.setObject(newX,newY);
                 }else if( tool === "edit_location_new"){
                     var angle = Math.atan2((newY-firstY),(newX-firstX));
                     supervisor.addLocation(firstX, firstY,angle);

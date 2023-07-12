@@ -464,6 +464,49 @@ void Supervisor::readSetting(QString map_name){
 
     qDebug() << pmap->locations.size() << map_name;
 
+
+
+
+    setting_anot.beginGroup("objects");
+    int obj_num = setting_anot.value("num").toInt();
+
+    pmap->objects.clear();
+    cv::Point2f temp_point;
+    for(int i=0; i<obj_num; i++){
+        QString name = setting_anot.value("poly"+QString::number(i)).toString();
+        QStringList strlist = name.split(",");
+        OBJECT temp_obj;
+        QStringList templist = strlist[1].split(":");
+
+        if(templist.size() > 1){
+            temp_obj.is_rect = false;
+            for(int j=1; j<strlist.size(); j++){
+                temp_point.x = strlist[j].split(":")[0].toFloat();
+                temp_point.y = strlist[j].split(":")[1].toFloat();
+                temp_obj.points.push_back(temp_point);
+            }
+        }else{
+            if(strlist[1].toInt() == 1){
+                temp_obj.is_rect = true;
+                for(int j=2; j<strlist.size(); j++){
+                    temp_point.x = strlist[j].split(":")[0].toFloat();
+                    temp_point.y = strlist[j].split(":")[1].toFloat();
+                    temp_obj.points.push_back(temp_point);
+                }
+            }else{
+                temp_obj.is_rect = false;
+                for(int j=2; j<strlist.size(); j++){
+                    temp_point.x = strlist[j].split(":")[0].toFloat();
+                    temp_point.y = strlist[j].split(":")[1].toFloat();
+                    temp_obj.points.push_back(temp_point);
+                }
+            }
+        }
+        pmap->objects.push_back(temp_obj);
+    }
+    setObjPose();
+    setting_anot.endGroup();
+
     //Set Variable
     probot->trays.clear();
     for(int i=0; i<setting.tray_num; i++){
@@ -476,11 +519,63 @@ void Supervisor::readSetting(QString map_name){
     QMetaObject::invokeMethod(mMain, "update_ini");
 }
 
+////*********************************************  OBJECTING 관련   ***************************************************////
+void Supervisor::addObject(int x, int y){
+    maph->addObject(x,y);
+}
+void Supervisor::addObjectPoint(int x, int y){
+    maph->addObjectPoint(x,y);
+}
+void Supervisor::setObject(int x, int y){
+    maph->setObject(x,y);
+}
+void Supervisor::editObjectStart(int x, int y){
+    maph->editObjectStart(x,y);
+}
+void Supervisor::editObject(int x, int y){
+    maph->editObject(x,y);
+}
+void Supervisor::saveObject(){
+    maph->saveObject();
+    setObjPose();
+}
+void Supervisor::clearObject(){
+    qDebug() << "clear";
+    maph->clearObject();
+}
+void Supervisor::clearObjectAll(){
+    qDebug() << "clear all";
+    maph->clearObjectAll();
+}
+int Supervisor::getObjectNum(int x, int y){
+    return maph->getObjectNum(x,y);
+}
+int Supervisor::getObjectPointNum(int x, int y){
+    return maph->getObjectPointNum(x,y);
+}
+void Supervisor::selectObject(int num){
+    maph->selectObject(num);
+}
+void Supervisor::startDrawObject(){
+
+}
+void Supervisor::stopDrawObject(){
+
+}
+void Supervisor::saveDrawObject(){
+
+}
+bool Supervisor::getObjectFlag(){
+    return maph->getObjectFlag();
+}
 int Supervisor::getTrayNum(){
     return setting.tray_num;
 }
 int Supervisor::getTableNum(){
     return setting.table_num;
+}
+void Supervisor::undoObject(){
+    maph->undoObject();
 }
 void Supervisor::setTableNum(int table_num){
     setSetting("FLOOR/table_num",QString::number(table_num));
@@ -977,6 +1072,8 @@ void Supervisor::readusb(){
 
 }
 
+
+
 void Supervisor::saveMapfromUsb(QString path){
     std::string user = getenv("USER");
     std::string path1 = "/media/" + user + "/";
@@ -1092,44 +1189,35 @@ void Supervisor::startMapping(int mapsize, float grid){
     pmap->origin[1] = pmap->height/2;
     pmap->mapping_width=mapsize;
     pmap->mapping_gridwidth=grid;
-    if(probot->ipc_use){
-        ipc->startMapping(mapsize, grid);
-        ipc->is_mapping = true;
-    }
+    ipc->startMapping(mapsize, grid);
+    ipc->is_mapping = true;
 }
+void Supervisor::startDrawingObject(){
+    plog->write("[COMMAND] Start Drawing Object");
+    ipc->startObject();
+}
+
+void Supervisor::stopDrawingObject(){
+    plog->write("[COMMAND] Stop Drawing Object");
+    ipc->stopObject();
+}
+
+void Supervisor::saveDrawingObject(){
+    plog->write("[COMMAND] Save Drawing Object");
+    ipc->saveObject();
+}
+
 void Supervisor::stopMapping(){
     plog->write("[USER INPUT] STOP MAPPING");
-    if(probot->ipc_use){
-        ipc->flag_mapping = false;
-        ipc->is_mapping = false;
-        ipc->stopMapping();
-    }
+    ipc->flag_mapping = false;
+    ipc->is_mapping = false;
+    ipc->stopMapping();
 }
 void Supervisor::saveMapping(QString name){
     if(probot->ipc_use){
         ipc->flag_mapping = false;
         ipc->is_mapping = false;
         ipc->saveMapping(name);
-    }
-}
-void Supervisor::startObjecting(){
-    plog->write("[USER INPUT] START OBJECTING");
-    if(probot->ipc_use){
-        ipc->startObjecting();
-        ipc->is_objecting = true;
-    }
-}
-void Supervisor::stopObjecting(){
-    plog->write("[USER INPUT] STOP OBJECTING");
-    if(probot->ipc_use){
-        ipc->flag_objecting = false;
-        ipc->is_objecting = false;
-        ipc->stopObjecting();
-    }
-}
-void Supervisor::saveObjecting(){
-    if(probot->ipc_use){
-        ipc->saveObjecting();
     }
 }
 void Supervisor::setSLAMMode(int mode){
@@ -1200,9 +1288,7 @@ bool Supervisor::getMappingflag(){
 
 
 bool Supervisor::getObjectingflag(){
-    if(probot->ipc_use){
-        return ipc->flag_objecting;
-    }
+    return ipc->flag_objecting;
 }
 
 void Supervisor::setObjectingflag(bool flag){
@@ -1414,8 +1500,8 @@ void Supervisor::makeUSBShell(){
 
 ////*********************************************  ANNOTATION 관련   ***************************************************////
 void Supervisor::setObjPose(){
-//    pmap->list_obj_dR.clear();
-//    pmap->list_obj_uL.clear();
+    pmap->list_obj_dR.clear();
+    pmap->list_obj_uL.clear();
     for(int i=0; i<pmap->objects.size(); i++){
         cv::Point2f temp_uL;
         cv::Point2f temp_dR;
@@ -1438,8 +1524,8 @@ void Supervisor::setObjPose(){
                 temp_dR.y = pmap->objects[i].points[j].y;
             }
         }
-//        pmap->list_obj_dR.push_back(temp_uL);
-//        pmap->list_obj_uL.push_back(temp_dR);
+        pmap->list_obj_dR.push_back(temp_uL);
+        pmap->list_obj_uL.push_back(temp_dR);
     }
 }
 
@@ -1890,6 +1976,7 @@ void Supervisor::removeObject(int num){
         pmap->objects.remove(num);
         setObjPose();
         pmap->annotation_edited = true;
+        maph->clearObject();
         QMetaObject::invokeMethod(mMain, "updateobject");
         plog->write("[ANNOTATION - ERROR] removeObject " + QString().sprintf("(%d)",num));
     }else{

@@ -97,13 +97,18 @@ public:
     bool show_lidar = false;
     bool show_location = false;
     bool show_location_icon = false;
+    bool show_object = false;
     bool robot_following = false;
 
     //------------localization--------------//
     POSE set_init_pose;
     bool set_init_flag = false;
+    bool set_init_pressed = false;
     Q_INVOKABLE void setInitPose(int x, int y, float th);
     Q_INVOKABLE void clearInitPose();
+    Q_INVOKABLE void setInitFlag(bool onoff){
+        set_init_pressed = onoff;
+    }
 
     //------------drawing--------------//
     bool flag_drawing=false;
@@ -216,6 +221,35 @@ public:
     int getLocationGroupSize(int num);
     Q_INVOKABLE void saveAnnotation(QString filename);
 
+
+
+    ///Object
+    ///
+    bool draw_object_flag = false;
+    QVector<OBJECT> objs;
+    bool new_obj_flag = false;
+    OBJECT new_obj;
+    int select_obj = -1;
+    int select_obj_point = -1;
+    void initObject();
+    void startDrawObject();
+    void stopDrawObject();
+    void saveDrawObject();
+    int getObjectNum(int x, int y);
+    int getObjectPointNum(int x, int y);
+    void addObject(int x, int y);
+    void addObjectPoint(int x, int y);
+    void setObject(int x, int y);
+    void editObjectStart(int x, int y);
+    void editObject(int x, int y);
+    void saveObject();
+    void clearObject();
+    void clearObjectAll();
+    void selectObject(int num);
+    void undoObject();
+    void removeObject(int num);
+    void redoObject();
+    bool getObjectFlag();
 private:
     //직접 불러오는거
     //map_raw.png
@@ -233,6 +267,7 @@ private:
     cv::Mat map_drawing_mask;
 
     QPixmap map;
+    QPixmap map_obs;
     QPixmap final_map;
 
     void update();

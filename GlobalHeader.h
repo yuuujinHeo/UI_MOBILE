@@ -77,6 +77,9 @@ typedef struct{
     QVector<QVector<cv::Point2f>> tlines;
     QVector<OBJECT> objects;
 
+    QVector<cv::Point2f> list_obj_uL;
+    QVector<cv::Point2f> list_obj_dR;
+
     float margin;
     bool use_server;
     bool use_uicmd;

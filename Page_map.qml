@@ -1608,7 +1608,7 @@ Item {
 
     function loadmap(name,type){
         print("map loadmap ",name,type);
-        check_slam_init_timer.stop();
+//        check_slam_init_timer.stop();
         map.loadmap(name,type);
     }
 

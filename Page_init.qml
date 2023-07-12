@@ -3121,6 +3121,7 @@ Item {
                         shadowcolor: color_dark_black
                         onClicked: {
                             click_sound.play();
+                            print("init autoinit");
                             map.setTool("move");
                             supervisor.slam_fullautoInit();
                             timer_check_localization2.start();

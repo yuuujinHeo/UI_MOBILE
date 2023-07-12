@@ -148,6 +148,7 @@ public:
     Q_INVOKABLE void setShowTravelline(bool onoff){maph->setShowTravelline(onoff);}
     Q_INVOKABLE void setShowVelocitymap(bool onoff){maph->setShowVelocitymap(onoff);}
 
+    Q_INVOKABLE void setInitFlag(bool onoff){maph->setInitFlag(onoff);}
     Q_INVOKABLE bool getshowLocation(){return maph->getshowLocation();}
     Q_INVOKABLE bool getRobotFollowing(){return maph->getRobotFollowing();}
     Q_INVOKABLE bool getShowLidar(){return maph->getShowLidar();}
@@ -229,6 +230,10 @@ public:
 
 
 
+
+    Q_INVOKABLE void startDrawingObject();
+    Q_INVOKABLE void stopDrawingObject();
+    Q_INVOKABLE void saveDrawingObject();
 
 
 
@@ -393,10 +398,6 @@ public:
     Q_INVOKABLE void stopMapping();
     Q_INVOKABLE void setSLAMMode(int mode);
     Q_INVOKABLE void saveMapping(QString name);
-
-    Q_INVOKABLE void startObjecting();
-    Q_INVOKABLE void stopObjecting();
-    Q_INVOKABLE void saveObjecting();
 
     Q_INVOKABLE void setInitCurPos();
     Q_INVOKABLE void setInitPos(int x, int y, float th);
@@ -603,7 +604,22 @@ public:
     Q_INVOKABLE float getMappingGridwidth(){return pmap->mapping_gridwidth;}
 
     ////*********************************************  OBJECTING 관련   ***************************************************////
-
+    Q_INVOKABLE void startDrawObject();
+    Q_INVOKABLE void stopDrawObject();
+    Q_INVOKABLE void saveDrawObject();
+    Q_INVOKABLE int getObjectNum(int x, int y);
+    Q_INVOKABLE int getObjectPointNum(int x, int y);
+    Q_INVOKABLE void addObject(int x, int y);
+    Q_INVOKABLE void addObjectPoint(int x, int y);
+    Q_INVOKABLE void setObject(int x, int y);
+    Q_INVOKABLE void editObjectStart(int x, int y);
+    Q_INVOKABLE void editObject(int x, int y);
+    Q_INVOKABLE void saveObject();
+    Q_INVOKABLE void clearObject();
+    Q_INVOKABLE void clearObjectAll();
+    Q_INVOKABLE void selectObject(int num);
+    Q_INVOKABLE bool getObjectFlag();
+    Q_INVOKABLE void undoObject();
     ////*********************************************  PATROL 관련   ***************************************************////
 
     QStringList patrol_list;
