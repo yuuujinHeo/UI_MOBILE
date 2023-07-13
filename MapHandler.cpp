@@ -35,7 +35,7 @@ MapHandler::MapHandler()
     connect(timer, SIGNAL(timeout()),this,SLOT(onTimer()));
     timer->start(200);
 
-    setTline();
+//    setTline();
 }
 
 bool MapHandler::getCutBoxFlag(){
@@ -118,8 +118,6 @@ void MapHandler::loadFile(QString name, QString type){
                 }
             }
         }
-//        cv::imshow("vel",file_velocity);
-
 
         log_str += ", VELOCITY(success "+QString::number(file_velocity.rows)+" ) ";
         exist_velmap = true;
@@ -156,6 +154,7 @@ void MapHandler::setMapOrin(QString type){
     update();
 }
 
+//****setTline : 경로 좁은 사이 매꾸기 -> 미사용
 void MapHandler::setTline(){
     int radius = pmap->robot_radius*2/grid_width;
     for(int i=0; i<file_travelline.rows;i++){
@@ -203,14 +202,13 @@ void MapHandler::setTline(){
     }
 }
 
-
 void MapHandler::setMapSize(int width, int height){
     canvas_width = width;
     canvas_height = height;
 }
+
 void MapHandler::onTimer(){
     if(enable){
-//        qDebug() << "MapHandler " << object_name;
         if(flag_drawing){
             show_robot = true;
             robot_following = true;
@@ -219,6 +217,7 @@ void MapHandler::onTimer(){
             show_robot = false;
             robot_following = false;
         }
+
         //Robot Following
         if(robot_following){
             setZoomCenter();
@@ -227,7 +226,6 @@ void MapHandler::onTimer(){
         setMap();
     }
 }
-
 
 void MapHandler::setMode(QString name){
     mode = name;
@@ -377,19 +375,14 @@ void MapHandler::setMode(QString name){
     setMap();
 }
 
-//void MapHandler::setScreen(float s, int centerx, int centery){
-//    scale = s;
-//    setZoomCenter(centerx,centery);
-//    updateMap();
-//}
-
-
 void MapHandler::startDrawingTline(){
+    plog->write("[MapHandler] Start Draw Travel line");
     flag_drawing = true;
     prev_pose.x = 0;
     prev_pose.y = 0;
 }
 void MapHandler::stopDrawingTline(){
+    plog->write("[MapHandler] Stop Draw Travel line");
     flag_drawing = false;
 }
 
@@ -406,7 +399,6 @@ void MapHandler::initLocation(){
         temp.name = pmap->locations[i].name;
         temp.point = setAxis(pmap->locations[i].point);
         temp.angle = setAxis(pmap->locations[i].angle);
-//        qDebug() <<"locations push " << temp.type << temp.number;
         locations.push_back(temp);
     }
 }
@@ -416,7 +408,7 @@ void MapHandler::setFullScreen(){
     draw_y = 0;
     draw_width = file_width;
     scale = 1;
-    qDebug() << "set Full Screen " << file_width << pmap->mapping_width << pmap->map_mapping.rows << map_orin.rows;
+//    qDebug() << "set Full Screen " << file_width << pmap->mapping_width << pmap->map_mapping.rows << map_orin.rows;
 }
 
 void MapHandler::moveMap(){
