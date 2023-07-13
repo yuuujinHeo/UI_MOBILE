@@ -816,7 +816,7 @@ Item {
                         rect_notice.msg =  "맵 생성 중";
                         rect_notice.color = color_navy;
                         rect_notice.show_icon = false;
-                    }else if(supervisor.getObjectingflag()){
+                    }else if(supervisor.getObjectflag()){
                         rect_notice.visible = true;
                         rect_notice.msg =  "오브젝트 생성 중";
                         rect_notice.color = color_navy;

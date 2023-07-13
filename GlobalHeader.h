@@ -33,6 +33,7 @@ float setAxis(float _angle);
 float setAxisBack(float _angle);
 cv::Point2f setAxis(cv::Point2f _point);
 cv::Point2f setAxisMapping(cv::Point2f _point);
+cv::Point2f setAxisObject(cv::Point2f _point);
 cv::Point2f setAxisBack(cv::Point2f _point);
 POSE setAxis(POSE _pose);
 POSE setAxisBack(POSE _pose);

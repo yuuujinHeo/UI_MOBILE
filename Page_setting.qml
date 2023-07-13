@@ -1134,6 +1134,7 @@ Item {
                                     property bool ischanged: false
                                     onValueChanged: {
                                         ischanged = true;
+                                        volume_button = value;
                                     }
                                     value: supervisor.getSetting("ROBOT_SW","volume_button")
                                 }

@@ -234,6 +234,7 @@ void MapHandler::setMode(QString name){
     plog->write("[MapHandler] "+object_name+" set Mode to "+name);
     show_travelline = false;
     show_object = false;
+    draw_object_flag = false;
     show_velocitymap = false;
     if(mode == "none"){
         file_width = map_orin.rows;
@@ -404,8 +405,13 @@ void MapHandler::initLocation(){
         temp.number = pmap->locations[i].number;
         temp.type = pmap->locations[i].type;
         temp.name = pmap->locations[i].name;
-        temp.point = setAxis(pmap->locations[i].point);
-        temp.angle = setAxis(pmap->locations[i].angle);
+        if(draw_object_flag){
+            temp.point = setAxisObject(pmap->locations[i].point);
+            temp.angle = setAxis(pmap->locations[i].angle);
+        }else{
+            temp.point = setAxis(pmap->locations[i].point);
+            temp.angle = setAxis(pmap->locations[i].angle);
+        }
 //        qDebug() <<"locations push " << temp.type << temp.number;
         locations.push_back(temp);
     }
@@ -433,6 +439,15 @@ void MapHandler::setMap(){
             setFullScreen();
         }
 //        qDebug() << pmap->map_mapping.rows << pmap->mapping_gridwidth << pmap->mapping_width << grid_width << draw_width;
+    }else if(draw_object_flag){
+//        qDebug() << "draw_object_flag" << pmap->map_objecting.rows;
+        map = QPixmap::fromImage(mat_to_qimage_cpy(pmap->map_objecting));
+        grid_width = pmap->mapping_gridwidth*pmap->width/file_width;
+        if(file_width != pmap->map_objecting.rows){
+            file_width = pmap->map_objecting.rows;
+            setFullScreen();
+        }
+
     }else if(map_orin.rows > 0){
         file_width = map_orin.rows;
         grid_width = pmap->gridwidth;
@@ -466,11 +481,9 @@ void MapHandler::setMap(){
             cv::add(temp_orin,map_drawing,temp_orin);
         }
 
-        if(draw_object_flag){
-            cv::add(temp_orin, pmap->map_objecting, temp_orin);
-        }
         map = QPixmap::fromImage(mat_to_qimage_cpy(temp_orin));
     }
+
 
     QPainter painter(&map);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -481,13 +494,16 @@ void MapHandler::setMap(){
     cv::Point2f robot_pose;
     if(mode == "mapping"){
         robot_pose = setAxisMapping(probot->curPose.point);
+    }else if(draw_object_flag){
+//        qDebug() << "??? " <<probot->curPose.point.x <<  map_orin.rows;
+        robot_pose = setAxisObject(probot->curPose.point);
     }else{
         robot_pose = setAxis(probot->curPose.point);
     }
     float robot_angle = setAxis(probot->curPose.angle);
 
 
-    if(show_object){
+    if(show_object && !draw_object_flag){
         for(int obj=0; obj<objs.size(); obj++){
             QPainterPath path;
             if(objs[obj].is_rect){
@@ -571,6 +587,7 @@ void MapHandler::setMap(){
     //위치
     if(show_location){
         for(int i=0; i<locations.size(); i++){
+
             float distance = (pmap->robot_radius/grid_width)*2;
             float distance2 = distance*0.8;
             float th_dist = M_PI/8;
@@ -585,7 +602,6 @@ void MapHandler::setMap(){
             float rad = pmap->robot_radius*2*res/grid_width;
             QPainterPath path;
             if(select_location == i){
-                qDebug() << select_location << locations[i].type << locations[i].name;
                 if(locations[i].type == "Serving"){
                     path.addRoundedRect((locations[i].point.x-rad/2),(locations[i].point.y-rad/2),rad,rad,rad,rad);
                     painter.setPen(QPen(Qt::white,3));
@@ -769,7 +785,7 @@ void MapHandler::setMap(){
 
     //로봇 현재 위치 표시(매핑 중이거나 위치 초기화 성공했을 때만)
     if(show_robot){
-        if(probot->localization_state == LOCAL_READY || mode == "mapping"){
+        if(probot->localization_state == LOCAL_READY || mode == "mapping" || draw_object_flag){
             float distance = (pmap->robot_radius/grid_width)*2;
             float distance2 = distance*0.8;
             float th_dist = M_PI/8;
@@ -1017,6 +1033,7 @@ void MapHandler::saveObject(){
     pmap->objects.push_back(temp);
     clearObjectAll();
     update();
+    qDebug() << "?";
 }
 void MapHandler::clearObject(){
     new_obj_flag = false;
@@ -1198,6 +1215,7 @@ int MapHandler::getPointBox(int x, int y){
 }
 
 void MapHandler::initRotate(){
+    qDebug() << "init rotate";
     rotate_angle = 0;
     pmap->map_rotate_angle = 0;
     cut_box[0].x = 0;
@@ -1278,6 +1296,7 @@ void MapHandler::clearInitPose(){
 void MapHandler::rotateMap(int angle){
     rotate_angle = angle;
     pmap->map_rotate_angle = angle;
+    qDebug() << "rotate map " << angle << file_width << map_orin.rows;
     //맵 회전
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
     if(exist_edited)
@@ -1292,33 +1311,29 @@ void MapHandler::rotateMap(int angle){
 void MapHandler::rotateMapCW(){
     rotate_angle++;
     pmap->map_rotate_angle = rotate_angle;
+//    qDebug() << "rotate cw " << rotate_angle << file_width << map_orin.rows;
     //맵 회전
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
-    if(map_orin.rows > 0){
 
-    }else{
-        if(exist_edited)
-            file_edited.copyTo(map_orin);
-        else if(exist_raw)
-            file_raw.copyTo(map_orin);
-    }
+    if(exist_edited)
+        file_edited.copyTo(map_orin);
+    else if(exist_raw)
+        file_raw.copyTo(map_orin);
     cv::warpAffine(map_orin,map_orin,rot,map_orin.size(),cv::INTER_NEAREST);
     setMap();
 }
 
 void MapHandler::rotateMapCCW(){
+//    qDebug() << "rotate ccw " << rotate_angle << file_width;
     rotate_angle--;
     pmap->map_rotate_angle = rotate_angle;
     //맵 회전
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
-    if(map_orin.rows > 0){
 
-    }else{
-        if(exist_edited)
-            file_edited.copyTo(map_orin);
-        else if(exist_raw)
-            file_raw.copyTo(map_orin);
-    }
+    if(exist_edited)
+        file_edited.copyTo(map_orin);
+    else if(exist_raw)
+        file_raw.copyTo(map_orin);
     cv::warpAffine(map_orin,map_orin,rot,map_orin.size(),cv::INTER_NEAREST);
     setMap();
 }
@@ -1976,6 +1991,28 @@ void MapHandler::saveAnnotation(QString filename){
         settings.setValue("serving_"+QString::number(i)+"/name",pmap->location_groups[i]);
         settings.setValue("serving_"+QString::number(i)+"/num",getLocationGroupSize(i));
     }
+
+
+    for(int i=0; i<pmap->objects.size(); i++){
+        QString str = "Object_"+QString::number(i);
+
+        if(pmap->objects[i].is_rect){
+            str += ",1";
+        }else{
+            str += ",0";
+        }
+
+        for(int j=0; j<pmap->objects[i].points.size(); j++){
+            str += QString().sprintf(",%f:%f",pmap->objects[i].points[j].x,pmap->objects[i].points[j].y);
+
+        }
+        settings.setValue("objects/poly"+QString::number(i),str);
+    }
+    settings.setValue("objects/num",pmap->objects.size());
+
+
+
+
     pmap->annotation_edited = false;
 }
 
