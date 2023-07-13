@@ -4873,6 +4873,198 @@ Item {
                     Text{
                         anchors.centerIn: parent
                         font.family: font_noto_b.name
+                        text:"자동 일시정지"
+                        color: "white"
+                        font.pixelSize: 20
+                        Component.onCompleted: {
+                            scale = 1;
+                            while(width*scale > parent.width*0.8){
+                                scale=scale-0.01;
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_use_current
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"모터전류 감지"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    click_sound.play();
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("모터전류 감지");
+                                    popup_help_setting.addLine("로봇이 주행 중, 충돌했다고 판단할만큼 모터의 전류가 높다면 자동으로 일시정지합니다.");
+                                    popup_help_setting.addLine("감도를 올리거나 내리고 싶다면 모터전류 제한값을 변경해 주세요.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_use_motorcurrent
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["사용안함","사용"]
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    id: set_motor_current_margin
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"모터전류 제한값"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: pause_motor_current
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","pause_motor_current");
+                                onFocusChanged: {
+                                    keypad.owner = pause_motor_current;
+                                    pause_motor_current.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        pause_motor_current.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"모터전류 제한시간 [ms]"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: pause_check_ms
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","pause_check_ms");
+                                onFocusChanged: {
+                                    keypad.owner = pause_check_ms;
+                                    pause_check_ms.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        pause_check_ms.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
                         text:"속도 제한"
                         color: "white"
                         font.pixelSize: 20
@@ -7124,6 +7316,21 @@ Item {
             supervisor.setSetting("SENSOR/camera_model",Number(combo_camera_model.currentIndex));
         }
 
+        if(combo_use_motorcurrent.ischanged){
+            if(combo_use_motorcurrent.currentIndex == 0){
+                supervisor.setSetitng("ROBOT_SW/use_pause_current","false");
+            }else{
+                supervisor.setSetitng("ROBOT_SW/use_pause_current","true");
+            }
+        }
+
+        if(pause_check_ms.ischanged){
+            supervisor.setSetting("MOTOR/pause_check_ms",pause_check_ms.text);
+        }
+        if(pause_motor_current.ischanged){
+            supervisor.setSetting("MOTOR/pause_motor_current",pause_motor_current.text);
+        }
+
         if(k_p.ischanged){
             supervisor.setSetting("MOTOR/k_p",k_p.text);
         }
@@ -7311,6 +7518,14 @@ Item {
             combo_wheel_dir.currentIndex = 1;
         }
 
+        pause_motor_current.text = supervisor.getSetting("MOTOR","pause_motor_current");
+        pause_check_ms.text = supervisor.getSetting("MOTOR","pause_check_ms");
+        if(supervisor.getSetting("ROBOT_SW","use_pause_current") === "false"){
+            combo_use_motorcurrent.currentIndex = 0;
+        }else{
+            combo_use_motorcurrent.currentIndex = 1;
+        }
+
         if(supervisor.getSetting("SENSOR","camera_model") === "0"){
             combo_camera_model.currentIndex = 0;
         }else{
@@ -7438,6 +7653,7 @@ Item {
         k_p.ischanged = false;
         k_i.ischanged = false;
         k_d.ischanged = false;
+        combo_use_motorcurrent.ischanged = false;
         combo_camera_model.ischanged = false;
         motor_limit_v.ischanged = false;
         motor_limit_v_acc.ischanged = false;
@@ -7458,6 +7674,8 @@ Item {
         goal_dist.ischanged = false;
         goal_v.ischanged = false;
         goal_th.ischanged = false;
+        pause_motor_current.ischanged = false;
+        pause_check_ms.ischanged = false;
         goal_near_dist.ischanged = false;
     }
 
@@ -7478,6 +7696,9 @@ Item {
         if(ip_2.ischanged) is_changed = true;
         if(ip_3.ischanged) is_changed = true;
         if(ip_4.ischanged) is_changed = true;
+        if(combo_use_motorcurrent.ischanged) is_changed = true;
+        if(pause_motor_current.ischanged) is_changed = true;
+        if(pause_check_ms.ischanged) is_changed = true;
         if(combo_camera_model.ischanged) is_changed = true;
         if(gateway_1.ischanged) is_changed = true;
         if(gateway_2.ischanged) is_changed = true;

@@ -2221,8 +2221,8 @@ bool Supervisor::issetLocation(int number){
 
 
 ////*********************************************  ROBOT STATUS 관련   ***************************************************////
-float Supervisor::getBattery(){
-    return probot->battery;
+int Supervisor::getBattery(){
+    return probot->battery_percent;
 }
 bool Supervisor::getMotorConnection(int id){
     return probot->motor[id].connection;
@@ -2672,6 +2672,7 @@ void Supervisor::onTimer(){
     static int count_moveto = 0;
     static int wifi_count = 0;
     static int timer_cnt = 0;
+    static int current_cnt = 0;
 
     // QML 오브젝트 매칭
     if(mMain == nullptr && object != nullptr){
@@ -2800,7 +2801,7 @@ void Supervisor::onTimer(){
     }
     case UI_STATE_RESTING:{
         static int count_battery = 0;
-        if(probot->battery < 20){
+        if(probot->battery_percent < 20){
             if(count_battery++ > 60000/MAIN_THREAD){
                 QMetaObject::invokeMethod(mMain, "lessbattery");
                 plog->write("[SUPERVISOR] PLAY LESS BATTERY");
@@ -2840,7 +2841,21 @@ void Supervisor::onTimer(){
             plog->write("[SUPERVISOR] LOCAL NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
             ui_state = UI_STATE_MOVEFAIL;
         }else{
-
+            if(getSetting("ROBOT_SW","use_pause_current")=="true"){
+                float current_threshold = getSetting("MOTOR","pause_current_margin").toFloat();
+                int check_count = getSetting("MOTOR","pause_current_ms").toInt()/MAIN_THREAD;
+                if(probot->motor[0].current > current_threshold || probot->motor[1].current > current_threshold){
+                    if(current_cnt++ > check_count){
+                        //MOTOR THRESHOLD IN. PAUSED!
+                        if(probot->running_state != ROBOT_MOVING_PAUSED){
+                            plog->write("[SUPERVISOR] AUTO PAUSED : Motor Current Over "+QString().sprintf("(0 : %f, 1 : %f, limit: %f)",probot->motor[0].current,probot->motor[1].current,current_threshold));
+                            ipc->movePause();
+                        }
+                    }
+                }else{
+                    current_cnt = 0;
+                }
+            }
             if(probot->obs_in_path_state != 0&&probot->running_state == ROBOT_MOVING_MOVING){
                 if(!flag_excuseme){
                     plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");

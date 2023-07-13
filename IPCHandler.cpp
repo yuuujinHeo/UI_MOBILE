@@ -129,7 +129,27 @@ void IPCHandler::onTimer(){
         read_count = 0;
         probot->battery_in = temp1.bat_in;
         probot->battery_out = temp1.bat_out;
-        probot->battery = (temp1.bat_in-44)*100/10;
+
+        probot->bat_list.push_back(probot->battery_in);
+
+        float sum_battery = 0;
+        for(int i=0; i<probot->bat_list.size(); i++){
+            sum_battery += probot->bat_list[i];
+        }
+
+        float av_battery = sum_battery/probot->bat_list.size();
+        if(probot->bat_list.size() > 3){
+            probot->bat_list.pop_front();
+        }
+
+        if(probot->battery < av_battery){
+            probot->battery = av_battery;
+        }else if(av_battery - probot->battery > 1.){
+            probot->battery = av_battery;
+        }
+
+        probot->battery_percent = (probot->battery-44)*100/10;
+
         if(probot->battery > 100) probot->battery = 100;
         if(probot->battery < 0) probot->battery = 0;
 

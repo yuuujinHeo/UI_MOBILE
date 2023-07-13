@@ -436,7 +436,7 @@ Window {
             timer_update.start();
             loader_page.item.init();
         }
-        source: plog//pinit
+        source: psetting//pinit
     }
 
     Timer{

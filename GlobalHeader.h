@@ -123,6 +123,8 @@ typedef struct{
     int status_charge = 0;
     int status_lock = 0;
 
+    QVector<float> bat_list;
+    int battery_percent = 0;
     float battery = 0.;
     float battery_in = 0;
     float battery_out = 0;

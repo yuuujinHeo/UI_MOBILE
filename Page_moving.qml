@@ -341,6 +341,12 @@ Item {
                 motor_lock = true;
             }
 
+            if(supervisor.getStateMoving() === 4){
+                robot_paused = true;
+            }else{
+                robot_paused = false;
+            }
+
             //DEBUG 230605
             obs_in_path =supervisor.getObsinPath();
 

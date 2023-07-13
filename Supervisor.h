@@ -548,7 +548,7 @@ public:
 
 
     ////*********************************************  ROBOT STATUS 관련   ***************************************************////
-    Q_INVOKABLE float getBattery();
+    Q_INVOKABLE int getBattery();
     Q_INVOKABLE int getMotorState();
     Q_INVOKABLE int getLocalizationState();
     Q_INVOKABLE int getStateMoving();
