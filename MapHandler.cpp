@@ -232,6 +232,7 @@ void MapHandler::setMode(QString name){
     plog->write("[MapHandler] "+object_name+" set Mode to "+name);
     show_travelline = false;
     show_object = false;
+    draw_object_flag = false;
     show_velocitymap = false;
     if(mode == "none"){
         file_width = map_orin.rows;
@@ -397,8 +398,14 @@ void MapHandler::initLocation(){
         temp.number = pmap->locations[i].number;
         temp.type = pmap->locations[i].type;
         temp.name = pmap->locations[i].name;
-        temp.point = setAxis(pmap->locations[i].point);
-        temp.angle = setAxis(pmap->locations[i].angle);
+        if(draw_object_flag){
+            temp.point = setAxisObject(pmap->locations[i].point);
+            temp.angle = setAxis(pmap->locations[i].angle);
+        }else{
+            temp.point = setAxis(pmap->locations[i].point);
+            temp.angle = setAxis(pmap->locations[i].angle);
+        }
+//        qDebug() <<"locations push " << temp.type << temp.number;
         locations.push_back(temp);
     }
 }
@@ -424,7 +431,13 @@ void MapHandler::setMap(){
             file_width = pmap->map_mapping.rows;
             setFullScreen();
         }
-//        qDebug() << pmap->map_mapping.rows << pmap->mapping_gridwidth << pmap->mapping_width << grid_width << draw_width;
+    }else if(draw_object_flag){
+        map = QPixmap::fromImage(mat_to_qimage_cpy(pmap->map_objecting));
+        grid_width = pmap->mapping_gridwidth*pmap->width/file_width;
+        if(file_width != pmap->map_objecting.rows){
+            file_width = pmap->map_objecting.rows;
+            setFullScreen();
+        }
     }else if(map_orin.rows > 0){
         file_width = map_orin.rows;
         grid_width = pmap->gridwidth;
@@ -458,11 +471,9 @@ void MapHandler::setMap(){
             cv::add(temp_orin,map_drawing,temp_orin);
         }
 
-        if(draw_object_flag){
-            cv::add(temp_orin, pmap->map_objecting, temp_orin);
-        }
         map = QPixmap::fromImage(mat_to_qimage_cpy(temp_orin));
     }
+
 
     QPainter painter(&map);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -473,13 +484,15 @@ void MapHandler::setMap(){
     cv::Point2f robot_pose;
     if(mode == "mapping"){
         robot_pose = setAxisMapping(probot->curPose.point);
+    }else if(draw_object_flag){
+        robot_pose = setAxisObject(probot->curPose.point);
     }else{
         robot_pose = setAxis(probot->curPose.point);
     }
     float robot_angle = setAxis(probot->curPose.angle);
 
 
-    if(show_object){
+    if(show_object && !draw_object_flag){
         for(int obj=0; obj<objs.size(); obj++){
             QPainterPath path;
             if(objs[obj].is_rect){
@@ -548,7 +561,6 @@ void MapHandler::setMap(){
 //                        painter.fillPath(circles,Qt::white);
 //                    }
             }else{
-
                 QPolygonF polygon;
                 for(int j=0; j<new_obj.points.size(); j++){
                     polygon << QPointF(new_obj.points[j].x*res, new_obj.points[j].y*res);
@@ -563,6 +575,7 @@ void MapHandler::setMap(){
     //위치
     if(show_location){
         for(int i=0; i<locations.size(); i++){
+
             float distance = (pmap->robot_radius/grid_width)*2;
             float distance2 = distance*0.8;
             float th_dist = M_PI/8;
@@ -577,7 +590,6 @@ void MapHandler::setMap(){
             float rad = pmap->robot_radius*2*res/grid_width;
             QPainterPath path;
             if(select_location == i){
-                qDebug() << select_location << locations[i].type << locations[i].name;
                 if(locations[i].type == "Serving"){
                     path.addRoundedRect((locations[i].point.x-rad/2),(locations[i].point.y-rad/2),rad,rad,rad,rad);
                     painter.setPen(QPen(Qt::white,3));
@@ -761,7 +773,7 @@ void MapHandler::setMap(){
 
     //로봇 현재 위치 표시(매핑 중이거나 위치 초기화 성공했을 때만)
     if(show_robot){
-        if(probot->localization_state == LOCAL_READY || mode == "mapping"){
+        if(probot->localization_state == LOCAL_READY || mode == "mapping" || draw_object_flag){
             float distance = (pmap->robot_radius/grid_width)*2;
             float distance2 = distance*0.8;
             float th_dist = M_PI/8;
@@ -837,9 +849,7 @@ void MapHandler::setMap(){
             int num;
             float limit = pmap->robot_radius;
             for(int i=0; i<360; i++){
-                if(probot->lidar_data[i] <limit){
-
-                }else{
+                if(probot->lidar_data[i] > limit){
                     x1 = (robot_pose.x + (probot->lidar_data[i]/grid_width)*cos((-M_PI*(i))/180 + robot_angle));
                     y1 = (robot_pose.y + (probot->lidar_data[i]/grid_width)*sin((-M_PI*(i))/180 + robot_angle));
                     num = i;
@@ -847,9 +857,7 @@ void MapHandler::setMap(){
                 }
             }
             for(int i=num+1; i<360; i++){
-                if(probot->lidar_data[i] <limit){
-
-                }else{
+                if(probot->lidar_data[i] > limit){
                     float x2 = (robot_pose.x + (probot->lidar_data[i]/grid_width)*cos((-M_PI*i)/180 + robot_angle));
                     float y2 = (robot_pose.y + (probot->lidar_data[i]/grid_width)*sin((-M_PI*i)/180 + robot_angle));
                     painter.drawLine(round(x1), round(y1), round(x2), round(y2));
@@ -859,7 +867,7 @@ void MapHandler::setMap(){
             }
         }else{
             for(int i=0; i<360; i++){
-                painter.setPen(QPen(QColor("red"),3));
+                painter.setPen(QPen(QColor("red"),2));
                 if(probot->lidar_data[i] > grid_width){
                     float x = (robot_pose.x + (probot->lidar_data[i]/grid_width)*cos((-M_PI*i)/180 + robot_angle));
                     float y = (robot_pose.y + (probot->lidar_data[i]/grid_width)*sin((-M_PI*i)/180 + robot_angle));
@@ -904,16 +912,19 @@ void MapHandler::saveRotateMap(){
     cv::flip(map_edited_ui,map_edited_ui,0);
 
     QString path = QDir::homePath() + "/maps/" + map_name + "/map_edited.png";
-    plog->write("[Annotation] Map Size Cut : "+QString().sprintf("%f,%f ~ %f,%f",cut_box[0].x,cut_box[0].y,cut_box[1].x,cut_box[1].y));
+    plog->write("[MapHandler] Save Map (Rotate) : "+tool+", "+QString().sprintf("%f,%f ~ %f,%f",cut_box[0].x,cut_box[0].y,cut_box[1].x,cut_box[1].y));
 
-    cv::Mat temp_travelline = cv::Mat(map_edited_ui.rows,map_edited_ui.cols, CV_8U,cv::Scalar::all(0));
-    QString path1 = QDir::homePath() + "/maps/" + map_name + "/map_travel_line.png";
-    cv::imwrite(path1.toStdString(),temp_travelline);
-
+    //travel line 파일 없을 경우 대비해서 더미 제작
+    if(!exist_travelline){
+        cv::Mat temp_travelline = cv::Mat(map_edited_ui.rows,map_edited_ui.cols, CV_8U,cv::Scalar::all(0));
+        QString path1 = QDir::homePath() + "/maps/" + map_name + "/map_travel_line.png";
+        cv::imwrite(path1.toStdString(),temp_travelline);
+    }
     cv::imwrite(path.toStdString(),map_edited_ui);
     updateMeta();
     loadFile(map_name,"");
 }
+
 void MapHandler::addObject(int x, int y){
     new_obj_flag = true;
     new_obj.is_rect = true;
@@ -922,13 +933,14 @@ void MapHandler::addObject(int x, int y){
     new_obj.points.push_back(cv::Point2f(x,y));
     new_obj.points.push_back(cv::Point2f(x,y));
     new_obj.points.push_back(cv::Point2f(x,y));
-    update();
+    setMap();
 }
+
 void MapHandler::addObjectPoint(int x, int y){
     new_obj_flag = true;
     new_obj.is_rect = false;
     new_obj.points.push_back(cv::Point2f(x,y));
-    update();
+    setMap();
 }
 void MapHandler::setObject(int x, int y){
     if(new_obj.is_rect){
@@ -941,7 +953,7 @@ void MapHandler::setObject(int x, int y){
     }else{
         new_obj.points[new_obj.points.size()-1] = cv::Point2f(x,y);
     }
-    update();
+    setMap();
 }
 void MapHandler::editObjectStart(int x, int y){
     select_obj_point = getObjectPointNum(x,y);
@@ -976,29 +988,29 @@ void MapHandler::editObject(int x, int y){
                 pmap->objects[num].points[2].y = pos.y;
                 pmap->objects[num].points[0].x = pos.x;
             }
-            plog->write("[ANNOTATION] editObject " + QString().sprintf("(%d, %d, %d, %d)",num,point,x,y));
+            plog->write("[MapHandler] edit Object : " + QString().sprintf("(%d, %d, %d, %d)",num,point,x,y));
         }else{
             if(point > -1 && point < pmap->objects[num].points.size()){
                 cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
                 pmap->objects[num].points[point].x = pos.x;
                 pmap->objects[num].points[point].y = pos.y;
-                plog->write("[ANNOTATION] editObject "+ QString().sprintf("(%d, %d, %d, %d)",num,point,x,y));
+                plog->write("[MapHandler] edit Object : "+ QString().sprintf("(%d, %d, %d, %d)",num,point,x,y));
             }else{
-                plog->write("[ANNOTATION - ERROR] editObject " + QString().sprintf("(%d, %d, %d, %d)",num,point,x,y) + " but pose size error");
+                plog->write("[MapHandler] edit Object : " + QString().sprintf("(%d, %d, %d, %d)",num,point,x,y) + " but pose size error");
             }
         }
 
         pmap->annotation_edited = true;
     }
     initObject();
-    update();
+    setMap();
 }
 void MapHandler::saveObject(){
     OBJECT temp;
     if(new_obj.is_rect){
-        plog->write("[ANNOTATION] ADD Object (Rect) : "+QString().sprintf("(%f,%f) ,(%f,%f)",new_obj.points[0].x, new_obj.points[0].y, new_obj.points[2].x,new_obj.points[2].y));
+        plog->write("[MapHandler] ADD Object (Rect) : "+QString().sprintf("(%f,%f) ,(%f,%f)",new_obj.points[0].x, new_obj.points[0].y, new_obj.points[2].x,new_obj.points[2].y));
     }else{
-        plog->write("[ANNOTATION] ADD Object : "+QString().sprintf("%d",new_obj.points.size()));
+        plog->write("[MapHandler] ADD Object : "+QString().sprintf("%d",new_obj.points.size()));
     }
 
     temp.is_rect = new_obj.is_rect;
@@ -1008,13 +1020,13 @@ void MapHandler::saveObject(){
     pmap->annotation_edited = true;
     pmap->objects.push_back(temp);
     clearObjectAll();
-    update();
+    setMap();
 }
 void MapHandler::clearObject(){
     new_obj_flag = false;
     new_obj.points.clear();
     initObject();
-    update();
+    setMap();
 }
 void MapHandler::clearObjectAll(){
     new_obj_flag = false;
@@ -1022,7 +1034,7 @@ void MapHandler::clearObjectAll(){
     select_obj = -1;
     select_obj_point = -1;
     initObject();
-    update();
+    setMap();
 }
 void MapHandler::undoObject(){
     new_obj.points.pop_back();
@@ -1030,7 +1042,7 @@ void MapHandler::undoObject(){
         new_obj_flag = false;
     }
     initObject();
-    update();
+    setMap();
 }
 int MapHandler::getObjectNum(int x, int y){
     cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
@@ -1046,7 +1058,7 @@ int MapHandler::getObjectNum(int x, int y){
 int MapHandler::getObjectPointNum(int x, int y){
     cv::Point2f pos = setAxisBack(cv::Point2f(x,y));
     int num = select_obj;
-    qDebug() << "check obj" << num;// << pmap->objects[num].points.size();
+//    qDebug() << "check obj" << num;// << pmap->objects[num].points.size();
     if(num < pmap->objects.size() && num > -1){
         if(num != -1){
             for(int j=0; j<pmap->objects[num].points.size(); j++){
@@ -1065,7 +1077,7 @@ int MapHandler::getObjectPointNum(int x, int y){
 }
 void MapHandler::selectObject(int num){
     select_obj = num;
-    update();
+    setMap();
 }
 void MapHandler::removeObject(int num){
     clearObjectAll();
@@ -1075,7 +1087,6 @@ bool MapHandler::getObjectFlag(){
 }
 void MapHandler::initObject(){
     objs.clear();
-//    qDebug() << "initObject " << pmap->objects.size();
     for(int i=0; i<pmap->objects.size(); i++){
         OBJECT temp;
         temp.is_rect = pmap->objects[i].is_rect;
@@ -1104,7 +1115,7 @@ void MapHandler::updateMeta(){
     setting.setValue("map_metadata/map_edited_origin_v",QString::number(pmap->origin[1]));
     setting.setValue("map_metadata/map_edited_cut_u",QString::number(pmap->cut_map[0]));
     setting.setValue("map_metadata/map_edited_cut_v",QString::number(pmap->cut_map[1]));
-    plog->write("[ANNOTATION] UPDATE META : "+QString().sprintf("%d, %d, %d, %d, %d, %d, %d",pmap->map_rotate_angle, pmap->cut_map[0], pmap->cut_map[1], pmap->width,pmap->height, pmap->origin[0],pmap->origin[1]));
+    plog->write("[MapHandler] UPDATE META : "+QString().sprintf("%d, %d, %d, %d, %d, %d, %d",pmap->map_rotate_angle, pmap->cut_map[0], pmap->cut_map[1], pmap->width,pmap->height, pmap->origin[0],pmap->origin[1]));
 }
 void MapHandler::setBoxPoint(int num, int x, int y){
     int min,max;
@@ -1167,25 +1178,6 @@ int MapHandler::getPointBox(int x, int y){
     orin_box[0] = cut_box[0];
     orin_box[1] = cut_box[1];
     orin_box[2] = cv::Point2f(x,y);
-    //detect line
-//    for(int i=0; i<2; i++){
-//        if(fabs(cut_box[i].x - x) < 30){
-//            if(y>cut_box[0].y && y<cut_box[1].y){
-//                orin_box[0] = cut_box[0];
-//                orin_box[1] = cut_box[1];
-//                orin_box[2] = cv::Point2f(x,y);
-//                return 3;
-//            }
-//        }
-//        if(fabs(cut_box[i].y - y) < 30){
-//            if(x>cut_box[0].x && x<cut_box[1].x){
-//                orin_box[0] = cut_box[0];
-//                orin_box[1] = cut_box[1];
-//                orin_box[2] = cv::Point2f(x,y);
-//                return 3;
-//            }
-//        }
-//    }
     return -1;
 }
 
@@ -1204,6 +1196,7 @@ void MapHandler::removeLocation(int num){
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == "Serving"){
             if(count == num){
+                plog->write("[MapHandler] Remove Location : "+pmap->locations[i].name+" ("+QString::number(i)+" )");
                 pmap->locations.removeAt(i);
             }
             count++;
@@ -1214,6 +1207,7 @@ void MapHandler::removeLocation(int num){
 
 void MapHandler::setTableNumberAuto(){
     QMap<int,int> group_num;
+    plog->write("[MapHandler] Set Table Number Auto : "+QString::number(pmap->locations.size()));
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == "Serving"){
             if(group_num[pmap->locations[i].group] == 0){
@@ -1244,7 +1238,6 @@ void MapHandler::zoomIn(int x, int y){
     prev_scale = scale;
     update();
 }
-
 void MapHandler::zoomOut(int x, int y){
     scale += 0.05;
     if(scale > 1)
@@ -1254,7 +1247,6 @@ void MapHandler::zoomOut(int x, int y){
     prev_scale = scale;
     update();
 }
-
 void MapHandler::setInitPose(int x, int y, float th){
     set_init_flag = true;
     set_init_pose.point.x = x;
@@ -1262,14 +1254,13 @@ void MapHandler::setInitPose(int x, int y, float th){
     set_init_pose.angle = th;
     setMap();
 }
-
 void MapHandler::clearInitPose(){
     set_init_flag = false;
 }
-
 void MapHandler::rotateMap(int angle){
     rotate_angle = angle;
     pmap->map_rotate_angle = angle;
+//    qDebug() << "rotate map " << angle << file_width << map_orin.rows;
     //맵 회전
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
     if(exist_edited)
@@ -1286,31 +1277,25 @@ void MapHandler::rotateMapCW(){
     pmap->map_rotate_angle = rotate_angle;
     //맵 회전
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
-    if(map_orin.rows > 0){
-
-    }else{
-        if(exist_edited)
-            file_edited.copyTo(map_orin);
-        else if(exist_raw)
-            file_raw.copyTo(map_orin);
-    }
+    if(exist_edited)
+        file_edited.copyTo(map_orin);
+    else if(exist_raw)
+        file_raw.copyTo(map_orin);
     cv::warpAffine(map_orin,map_orin,rot,map_orin.size(),cv::INTER_NEAREST);
     setMap();
 }
 
 void MapHandler::rotateMapCCW(){
+//    qDebug() << "rotate ccw " << rotate_angle << file_width;
     rotate_angle--;
     pmap->map_rotate_angle = rotate_angle;
     //맵 회전
     cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(file_width/2, file_width/2),-rotate_angle,1.0);
-    if(map_orin.rows > 0){
 
-    }else{
-        if(exist_edited)
-            file_edited.copyTo(map_orin);
-        else if(exist_raw)
-            file_raw.copyTo(map_orin);
-    }
+    if(exist_edited)
+        file_edited.copyTo(map_orin);
+    else if(exist_raw)
+        file_raw.copyTo(map_orin);
     cv::warpAffine(map_orin,map_orin,rot,map_orin.size(),cv::INTER_NEAREST);
     setMap();
 }
@@ -1367,7 +1352,6 @@ bool MapHandler::getDrawingUndoFlag(){
 }
 
 void MapHandler::startDrawingLine(int x, int y){
-    qDebug() << "startDrawingLine";
     new_straight_flag = true;
     spline_dot.clear();
     straight[0].x = x;
@@ -1876,20 +1860,20 @@ void MapHandler::saveLocation(QString type, int groupnum, QString name){
 
 
     if(type == "Serving"){
-        plog->write("[ANNOTATION] ADD Location : "+type+","+name+","+QString().sprintf("%f,%f,%f,%d",temp.point.x, temp.point.y, temp.angle,temp.number));
+        plog->write("[MapHandler] Add Location : "+type+","+name+","+QString().sprintf("%f,%f,%f,%d",temp.point.x, temp.point.y, temp.angle,temp.number));
         pmap->locations.push_back(temp);
         pmap->annot_edit_location = true;
     }else if(getLocationNum(type) > 0){
         for(int i=0; i<pmap->locations.size(); i++){
             if(pmap->locations[i].type == type){
-                plog->write("[ANNOTATION] ADD Location(Overwrite): "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
+                plog->write("[MapHandler] Add Location(Overwrite): "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
                 pmap->locations[i] = temp;
                 pmap->annot_edit_location = true;
                 break;
             }
         }
     }else{
-        plog->write("[ANNOTATION] ADD Location : "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
+        plog->write("[MapHandler] Add Location : "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
         if(type == "Charging"){
             pmap->locations.insert(0,temp);
             pmap->annot_edit_location = true;
@@ -1968,6 +1952,28 @@ void MapHandler::saveAnnotation(QString filename){
         settings.setValue("serving_"+QString::number(i)+"/name",pmap->location_groups[i]);
         settings.setValue("serving_"+QString::number(i)+"/num",getLocationGroupSize(i));
     }
+
+
+    for(int i=0; i<pmap->objects.size(); i++){
+        QString str = "Object_"+QString::number(i);
+
+        if(pmap->objects[i].is_rect){
+            str += ",1";
+        }else{
+            str += ",0";
+        }
+
+        for(int j=0; j<pmap->objects[i].points.size(); j++){
+            str += QString().sprintf(",%f:%f",pmap->objects[i].points[j].x,pmap->objects[i].points[j].y);
+
+        }
+        settings.setValue("objects/poly"+QString::number(i),str);
+    }
+    settings.setValue("objects/num",pmap->objects.size());
+
+
+
+
     pmap->annotation_edited = false;
 }
 
@@ -2013,7 +2019,7 @@ void MapHandler::setLocation(int x, int y, float th){
     int num = select_location;
     new_location_flag = false;
     if(pmap->locations.size() > num && num > -1){
-        plog->write("[ANNOTATION] EDIT LOCATION "+QString().sprintf("%d : %f,%f,%f -> %f,%f,%f",num,pmap->locations[num].point.x, pmap->locations[num].point.y, pmap->locations[num].angle,setAxisBack(cv::Point2f(x,y)).x,setAxisBack(cv::Point2f(x,y)).y,setAxisBack(th)));
+        plog->write("[MapHandler] Edit Location "+QString().sprintf("%d : %f,%f,%f -> %f,%f,%f",num,pmap->locations[num].point.x, pmap->locations[num].point.y, pmap->locations[num].angle,setAxisBack(cv::Point2f(x,y)).x,setAxisBack(cv::Point2f(x,y)).y,setAxisBack(th)));
         pmap->locations[num].point = setAxisBack(cv::Point2f(x,y));
         pmap->locations[num].angle = setAxisBack(th);
 //        //qDebug() << pmap->locations[num].angle;

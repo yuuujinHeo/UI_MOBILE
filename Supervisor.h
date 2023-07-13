@@ -168,7 +168,7 @@ public:
     Q_INVOKABLE void saveRotateMap(){maph->saveRotateMap();}
     Q_INVOKABLE void initRotate(){maph->initRotate();}
     Q_INVOKABLE void rotateMap(int angle){maph->rotateMap(angle);}
-    Q_INVOKABLE void rotateMapCW(){maph->rotateMapCCW();}
+    Q_INVOKABLE void rotateMapCW(){maph->rotateMapCW();}
     Q_INVOKABLE void rotateMapCCW(){maph->rotateMapCCW();}
 
 
@@ -511,6 +511,7 @@ public:
     //******************************************************************Travel line
     Q_INVOKABLE bool saveAnnotation(QString filename);
 
+    Q_INVOKABLE bool isOdroid();
 
 
     Q_INVOKABLE void drawingRunawayStart();
@@ -618,7 +619,7 @@ public:
     Q_INVOKABLE void clearObject();
     Q_INVOKABLE void clearObjectAll();
     Q_INVOKABLE void selectObject(int num);
-    Q_INVOKABLE bool getObjectFlag();
+    Q_INVOKABLE bool getObjectflag();
     Q_INVOKABLE void undoObject();
     ////*********************************************  PATROL 관련   ***************************************************////
 

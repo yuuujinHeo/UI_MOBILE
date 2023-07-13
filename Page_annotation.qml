@@ -15,7 +15,7 @@ Item {
     objectName: "page_annotation"
     width: 1280
     height: 800
-    property bool test: true
+    property bool test: false
     property var last_robot_x: supervisor.getOrigin()[0]
     property var last_robot_y: supervisor.getOrigin()[1]
     property var last_robot_th: 0
@@ -26,6 +26,7 @@ Item {
 
     property var select_preset: 0
     property var select_object: -1
+    property bool is_object: false
 
     function setMappingFlag(){
         annotation_after_mapping = true;
@@ -800,9 +801,6 @@ Item {
                 id: map
                 objectName: "annot_local"
                 visible: local_find_state>1 && local_find_state<10
-                onVisibleChanged: {
-                    print("map visible changed",visible,x,y,width,height);
-                }
                 anchors.top: text_find.bottom
                 anchors.topMargin: 30
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -3499,7 +3497,7 @@ Item {
                 anchors.bottomMargin: 50
                 anchors.rightMargin: 50
                 width: 220
-                height: 180
+                height: 90
                 type: "round_text"
                 text: "종 료"
                 onClicked: {
@@ -3537,6 +3535,7 @@ Item {
             Component.onCompleted: {
                 loading.hide();
                 select_preset = 0;
+                supervisor.readSetting(supervisor.getMapname());
 
                 supervisor.setMotorLock(false);
                 map.setEnable(true);
@@ -3568,10 +3567,12 @@ Item {
                     else
                         btn_undo.enabled = false;
 
-                    if(supervisor.getObjectFlag()){
+                    if(supervisor.getObjectflag()){
+                        is_object = true;
                         btn_undo.enabled = true;
                         btn_clear.enabled = true;
                     }else{
+                        is_object = false;
                         btn_undo.enabled = false;
                         btn_clear.enabled = false;
                     }
@@ -3583,7 +3584,7 @@ Item {
                 interval: 500
                 repeat: true
                 onTriggered:{
-                    if(supervisor.getObjectingflag()){
+                    if(supervisor.getObjectflag()){
                         btn_do_drawing.running = true;
                     }else{
                         if(btn_do_drawing.running){
@@ -3698,6 +3699,7 @@ Item {
                                 anchors.verticalCenterOffset: -50
                                 width: 220
                                 height: 180
+                                running: is_object
                                 id: btn_do_drawing
                                 text: "인식 시작"
                                 onClicked:{
@@ -3706,12 +3708,10 @@ Item {
                                         click_sound.play();
                                         supervisor.writelog("[ANNOTATION] Object : Drawing Stop");
                                         supervisor.stopDrawObject();
-                                        supervisor.setMotorLock(true);
                                     }else{
                                         click_sound.play();
                                         supervisor.writelog("[ANNOTATION] Object : Drawing Start");
                                         supervisor.startDrawObject();
-                                        supervisor.setMotorLock(false);
                                         timer_check_drawing.start();
                                     }
                                 }
@@ -4132,10 +4132,15 @@ Item {
                                 onClicked:{
                                     //save temp Image
                                     supervisor.writelog("[QML] MAP PAGE : SAVE Object ");
-                                    supervisor.saveDrawObject();
                                     click_sound.play();
-                                    update_object();
+                                    if(supervisor.getObjectflag()){
+                                        supervisor.saveDrawObject();
+                                    }else{
+                                        supervisor.saveAnnotation(supervisor.getMapname());
+                                        annot_pages.sourceComponent = page_annot_additional_menu;
+                                    }
                                     popup_save_object.close();
+                                    update_object();
                                 }
                             }
                         }

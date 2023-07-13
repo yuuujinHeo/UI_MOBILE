@@ -537,6 +537,7 @@ void Supervisor::editObject(int x, int y){
 }
 void Supervisor::saveObject(){
     maph->saveObject();
+
     setObjPose();
 }
 void Supervisor::clearObject(){
@@ -557,16 +558,20 @@ void Supervisor::selectObject(int num){
     maph->selectObject(num);
 }
 void Supervisor::startDrawObject(){
-
+    ipc->startObject();
+    maph->initObject();
+    maph->draw_object_flag = true;
 }
 void Supervisor::stopDrawObject(){
-
+    ipc->stopObject();
+    maph->draw_object_flag = true;
 }
 void Supervisor::saveDrawObject(){
-
+    ipc->saveObject();
+    maph->draw_object_flag = true;
 }
-bool Supervisor::getObjectFlag(){
-    return maph->getObjectFlag();
+bool Supervisor::getObjectflag(){
+    return (ipc->flag_objecting||maph->getObjectFlag());
 }
 int Supervisor::getTrayNum(){
     return setting.tray_num;
@@ -681,7 +686,6 @@ void Supervisor::deleteEditedMap(){
 
     readSetting(pmap->map_name);
     slam_map_reload(pmap->map_name);
-
 }
 void Supervisor::deleteAnnotation(){
     plog->write("[USER INPUT] Remove Annotation Data");
@@ -1818,6 +1822,14 @@ cv::Point2f setAxisMapping(cv::Point2f _point){
     temp.y = -_point.x/grid + 1000/2;
     return temp;
 }
+cv::Point2f setAxisObject(cv::Point2f _point){
+    cv::Point2f temp;
+    float grid = pmap->gridwidth*pmap->width/1000;
+    temp.x = -_point.y/grid + 1000/2;
+    temp.y = -_point.x/grid + 1000/2;
+    qDebug() << temp.x << temp.y << pmap->width;
+    return temp;
+}
 cv::Point2f setAxisBack(cv::Point2f _point){
     cv::Point2f temp;
     temp.x = -pmap->gridwidth*(_point.y-pmap->origin[1]);
@@ -1984,6 +1996,13 @@ void Supervisor::removeObject(int num){
     }
 }
 
+bool Supervisor::isOdroid(){
+    if(QDir::homePath().split("/")[2]=="odroid"){
+        return true;
+    }else{
+        return false;
+    }
+}
 bool Supervisor::saveAnnotation(QString filename){
     plog->write("[SUPERVISOR] SAVE Annotation "+filename);
     //기존 파일 백업
@@ -2041,6 +2060,23 @@ bool Supervisor::saveAnnotation(QString filename){
         settings.setValue("serving_"+QString::number(i)+"/name",pmap->location_groups[i]);
         settings.setValue("serving_"+QString::number(i)+"/num",getLocationGroupSize(i));
     }
+
+    for(int i=0; i<pmap->objects.size(); i++){
+        QString str = "Object_"+QString::number(i);
+
+        if(pmap->objects[i].is_rect){
+            str += ",1";
+        }else{
+            str += ",0";
+        }
+
+        for(int j=0; j<pmap->objects[i].points.size(); j++){
+            str += QString().sprintf(",%f:%f",pmap->objects[i].points[j].x,pmap->objects[i].points[j].y);
+
+        }
+        settings.setValue("objects/poly"+QString::number(i),str);
+    }
+    settings.setValue("objects/num",pmap->objects.size());
 
     readSetting(filename);
     pmap->annotation_edited = false;

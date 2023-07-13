@@ -69,6 +69,11 @@ Item {
             popup_clean_calling.open();
         }
 
+        if(supervisor.getSetting("ROBOT_SW","resting_lock")==="true"){
+            supervisor.setMotorLock(false);
+        }else{
+            supervisor.setMotorLock(true);
+        }
     }
     property int tray_num: 3
     property int table_num: 5
@@ -1031,6 +1036,7 @@ Item {
 
             onClicked: {
                 count_resting = 0;
+                supervisor.setMotorLock(true);
                 print("serving start button");
                 supervisor.setPreset(cur_preset);
                 if(supervisor.getSetting("ROBOT_SW","use_tray") === "true"){
@@ -1626,6 +1632,7 @@ Item {
                 onClicked: {
                     click_sound.play();
                     count_resting = 0;
+                    supervisor.setMotorLock(true);
                     if(go_wait){
                         supervisor.moveToWait();
                     }else if(go_charge){

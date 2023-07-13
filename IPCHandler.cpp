@@ -219,7 +219,7 @@ void IPCHandler::onTimer(){
     temp3 = get_obs();
     if(temp3.tick != prev_tick_obs){
         flag_rx = true;
-//        qDebug() << "obs " << temp3.tick;
+        qDebug() << "obs " << temp3.tick;
         read_count = 0;
 
         cv::Mat map1(temp3.height, temp3.width, CV_8U, cv::Scalar::all(0));
@@ -232,9 +232,6 @@ void IPCHandler::onTimer(){
 //        cv::cvtColor(colortemp,colortemp,cv::COLOR_BGR2GRAY);
 
 //        cv::blendLinear(map1,colortemp,a,a,map1);
-
-
-
         pmap->map_objecting = map1;
 
         flag_objecting = true;
@@ -696,16 +693,19 @@ void IPCHandler::stopMapping(){
     set_cmd(send_msg, "STOP MAPPING");
 }
 void IPCHandler::saveObject(){
+    is_objecting = false;
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_OBJECTING_SAVE;
     set_cmd(send_msg,"SAVE OBJECTING");
 }
 void IPCHandler::startObject(){
+    is_objecting = true;
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_OBJECTING_START;
     set_cmd(send_msg,"START OBJECTING ");
 }
 void IPCHandler::stopObject(){
+    is_objecting = false;
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_OBJECTING_STOP;
     set_cmd(send_msg, "STOP OBJECTING");

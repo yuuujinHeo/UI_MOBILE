@@ -21,55 +21,65 @@ Item {
     property string week: ""
     property var date_end: 30
     property var select_category: 1
-    Component.onCompleted: {
-        setdateToday();
-        update();
+
+    function init(){
+        setdateToday(supervisor.isOdroid());
     }
-    function setdateToday(){
+    function setdateToday(is_odroid){
         today = currentDate.toLocaleDateString();
         var list = today.split(" ");
-        week = list[0].split(",")[0];
-        date = list[1];
-        if(list[2] === "January"){
-            date = 1;
-        }else if(list[2] === "February"){
-            date = 2;
-        }else if(list[2] === "March"){
-            date = 3;
-        }else if(list[2] === "April"){
-            date = 4;
-        }else if(list[2] === "May"){
-            date = 5;
-        }else if(list[2] === "June"){
-            date = 6;
-        }else if(list[2] === "July"){
-            date = 7;
-        }else if(list[2] === "August"){
-            date = 8;
-        }else if(list[2] === "September"){
-            date = 9;
-        }else if(list[2] === "October"){
-            date = 10;
-        }else if(list[2] === "November"){
-            date = 11;
-        }else if(list[2] === "December"){
-            date = 12;
-        }
-
-        month = list[2];
-        year = list[3];
-
         var tempStr = "2023-04-11";
-
-        print(Date.fromLocaleString(Qt.locale(),tempStr,"yyyy-MM-dd").toLocaleDateString())
         model_date.clear();
-        for(var i=1; i<date_end+1; i++){
-            tempStr = year+"-0"+month+"-"+Number(i);
-//            print(tempStr,Date.fromLocaleString(Qt.locale(),tempStr,"yyyy-MM-dd").toLocaleDateString())
-            var tempWeek = Date.fromLocaleString(Qt.locale(),tempStr,"yyyy-MM-dd").toLocaleDateString().split(" ")[3];
-            model_date.append({"date":month+"월 "+Number(i)+"일 ("+tempWeek+")"});
+        if(is_odroid){
+            week = list[0].split(",")[0];
+            date = list[1];
+            if(list[2] === "January"){
+                date = 1;
+            }else if(list[2] === "February"){
+                date = 2;
+            }else if(list[2] === "March"){
+                date = 3;
+            }else if(list[2] === "April"){
+                date = 4;
+            }else if(list[2] === "May"){
+                date = 5;
+            }else if(list[2] === "June"){
+                date = 6;
+            }else if(list[2] === "July"){
+                date = 7;
+            }else if(list[2] === "August"){
+                date = 8;
+            }else if(list[2] === "September"){
+                date = 9;
+            }else if(list[2] === "October"){
+                date = 10;
+            }else if(list[2] === "November"){
+                date = 11;
+            }else if(list[2] === "December"){
+                date = 12;
+            }
+            month = list[2];
+            year = list[3];
+            for(var i=1; i<date_end+1; i++){
+                tempStr = year+"-0"+month+"-"+Number(i);
+                var tempWeek = Date.fromLocaleString(Qt.locale(),tempStr,"yyyy-MM-dd").toLocaleDateString().split(" ")[3];
+                model_date.append({"date":month+"월 "+Number(i)+"일 ("+tempWeek+")"});
+            }
+            date_list.currentIndex = parseInt(date);
+        }else{
+            year = list[0].split("년")[0];
+            month = list[1].split("월")[0];
+            date = list[2].split("일")[0];
+            week = list[3];
+            for(var i=1; i<date_end+1; i++){
+                tempStr = year+"-0"+month+"-"+Number(i);
+                print(i,tempStr);
+                tempWeek = Date.fromLocaleString(Qt.locale(),tempStr,"yyyy-MM-dd").toLocaleDateString().split(" ")[3];
+                model_date.append({"date":month+"월 "+Number(i)+"일 ("+tempWeek+")"});
+            }
+            date_list.currentIndex = parseInt(date);
         }
-        date_list.currentIndex = parseInt(date);
+        print("?")
     }
     function setdate(new_date){
         model_date.clear();
@@ -81,9 +91,6 @@ Item {
         }
         date_list.currentIndex = parseInt(date);
     }
-    function update(){
-    }
-
 
     Rectangle{
         width: parent.width
@@ -97,7 +104,6 @@ Item {
             Row{
                 id: rows_category
                 spacing: 5
-
                 Rectangle{
                     width: 250
                     height: 40

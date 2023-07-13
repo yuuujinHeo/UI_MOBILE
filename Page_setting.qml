@@ -15,7 +15,8 @@ Item {
     property bool debug_use_ip: true
     property bool debug_test_1: false
 
-    property bool is_admin: false
+    property bool is_admin: true
+
 
     property string select_category: "status"
     property string platform_name: supervisor.getRobotName()
@@ -558,6 +559,68 @@ Item {
                                     ischanged = true;
                                 }
                                 model:[1,2,3,4,5,6,7,8,9]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_resting_lock
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"대기장소 모터 락 해제"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    click_sound.play();
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("대기장소 모터 락 해제");
+                                    popup_help_setting.addLine("로봇이 대기장소에서 대기하고 있을 때 사람이 밀어서 움직일 수 있는지 설정합니다.");
+                                    popup_help_setting.addLine("매장 바닥 상황에 따라 로봇이 굴러서 저절로 이동할 수 있으니 기본적으론 사용 안함으로 이용해주세요.");
+                                    popup_help_setting.addLine("사용 시에도 서빙을 보내기 전 대기장소와 너무 떨어지지 않도록 유의해주세요.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_resting_lock
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["사용안함", "사용"]
+
                             }
                         }
                     }
@@ -1134,6 +1197,7 @@ Item {
                                     property bool ischanged: false
                                     onValueChanged: {
                                         ischanged = true;
+                                        volume_button = value;
                                     }
                                     value: supervisor.getSetting("ROBOT_SW","volume_button")
                                 }
@@ -6919,11 +6983,20 @@ Item {
             else
                 supervisor.setSetting("ROBOT_SW/moving_face","true");
         }
+
         if(combo_use_tray.ischanged){
             if(combo_use_tray.currentIndex == 0)
                 supervisor.setSetting("ROBOT_SW/use_tray","false");
             else
                 supervisor.setSetting("ROBOT_SW/use_tray","true");
+        }
+
+        if(combo_resting_lock.ischanged){
+            if(combo_resting_lock.currentIndex == 0){
+                supervisor.setSetting("ROBOT_SW/resting_lock","false");
+            }else{
+                supervisor.setSetting("ROBOT_SW/resting_lock","true");
+            }
         }
 
         if(wifi_passwd.ischanged){
@@ -7256,6 +7329,11 @@ Item {
             combo_use_tray.currentIndex = 0;
         }
 
+        if(supervisor.getSetting("ROBOT_SW","resting_lock") === "true"){
+            combo_resting_lock.currentIndex = 1;
+        }else{
+            combo_resting_lock.currentIndex = 0;
+        }
         obs_margin1.text = supervisor.getSetting("ROBOT_SW","obs_margin1");
         obs_detect_area.text = supervisor.getSetting("ROBOT_SW","obs_detect_area");
         obs_detect_sensitivity.text = supervisor.getSetting("ROBOT_SW","obs_detect_sensitivity");
@@ -7533,11 +7611,40 @@ Item {
         }
 
         Rectangle{
-            width: parent.width
-            height: parent.height
-            radius: 5
+            radius: 20
+            clip: true
+            anchors.centerIn: parent
+            width: parent.width*0.99
+            height: parent.height*0.99
+            border.width: 3
+            border.color: color_dark_navy
+            Rectangle{
+                radius: 20
+                id: rect_prd_top
+                width: parent.width
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                Rectangle{
+                    width: parent.width
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    height: 20
+                    color: color_dark_navy
+                }
+                height: 80
+                color: color_dark_navy
+                Text{
+                    anchors.centerIn: parent
+                    color: "white"
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                    text: "관리자 메뉴"
+                }
+            }
             Grid{
-                anchors.centerIn: parent
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: 40
                 rows: 3
                 columns: 2
                 spacing: 30
@@ -7551,7 +7658,7 @@ Item {
                     border.color: "#7e7e7e"
                     Text{
                         anchors.centerIn: parent
-                        text: "Program Update"
+                        text: "프로그램 업데이트"
                         font.family: font_noto_r.name
                         font.pixelSize: 20
                     }
@@ -7664,8 +7771,8 @@ Item {
     Popup{
         id: popup_usb_notice
         anchors.centerIn: parent
-        width: 400
-        height: 300
+        width: 500
+        height: 500
         leftPadding: 0
         topPadding: 0
         bottomPadding: 0
@@ -7708,6 +7815,7 @@ Item {
 
                     }
                 }
+                text_usb_state.color = "white"
 
                 if(supervisor.getzipstate() === 1){
                     if(popup_usb_notice.mode== "compress"){
@@ -7735,6 +7843,7 @@ Item {
                         model_usb_error.append({"error":supervisor.getusberror(i)});
                     }
                 }else if(supervisor.getzipstate() === 4){
+                    text_usb_state.color = color_red;
                     if(popup_usb_notice.mode== "compress"){
                         text_usb_state.text = "저장에 실패했습니다.";
                     }else{
@@ -7763,7 +7872,7 @@ Item {
         Rectangle{
             width: parent.width
             height: parent.height
-            radius: 10
+            radius: 20
             color: color_dark_navy
             Column{
                 anchors.centerIn: parent
@@ -7773,20 +7882,26 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.family: font_noto_r.name
                     color: "white"
-                    font.pixelSize: 20
+                    font.pixelSize: 30
                     horizontalAlignment: Text.AlignHCenter
                     text:"잠시만 기다려주세요."
                 }
                 Repeater{
                     model: ListModel{id:model_usb_error}
-                    Text{
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        font.family: font_noto_r.name
-                        font.pixelSize: 10
-                        color: color_red
-                        horizontalAlignment: Text.AlignHCenter
-                        text:error
+                    Rectangle{
+                        width: 400
+                        height: 30
+                        color: color_navy
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            font.pixelSize: 12
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            text:error
+                        }
                     }
+
                 }
 
                 Rectangle{
@@ -8111,7 +8226,7 @@ Item {
     Popup{
         id: popup_usb_select
         anchors.centerIn: parent
-        width: 400
+        width: 500
         height: 500
         leftPadding: 0
         topPadding: 0
@@ -8126,6 +8241,7 @@ Item {
         property bool is_config: false
         property string set_name: "Desktop"
         background: Rectangle{
+            anchors.fill: parent
             color: "transparent"
         }
         onOpened: {
@@ -8161,7 +8277,7 @@ Item {
             onTriggered: {
                 if(supervisor.getusbsize() > 0){
                     text_no_usb.visible =false;
-                }else{
+                }else if(popup_usb_select.index === 0){
                     text_no_usb.visible = true;
                 }
                 model_usb_list.clear();
@@ -8173,187 +8289,224 @@ Item {
         }
 
         Rectangle{
-            anchors.fill: parent
+            radius: 20
+            clip: true
+            anchors.centerIn: parent
+            width: parent.width*0.99
+            height: parent.height*0.99
+            border.width: 3
+            border.color: color_dark_navy
             Rectangle{
-                id: rect_1
+                radius: 20
+                id: rect_ttt
                 width: parent.width
-                height: 50
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                Rectangle{
+                    width: parent.width
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    height: 20
+                    color: color_dark_navy
+                }
+                height: 80
                 color: color_dark_navy
                 Text{
                     anchors.centerIn: parent
                     font.family: font_noto_r.name
-                    font.pixelSize: 15
+                    font.pixelSize: 25
                     color: "white"
                     text: {
                         if(popup_usb_select.index === 0)
-                            "저장할 USB 이름(혹은 Desktop)을 선택해주세요."
+                            "저장소를 선택해주세요."
                         else if(popup_usb_select.index === 1)
                             "저장할 목록을 선택해주세요."
                     }
                 }
             }
-            Text{
-                id: text_no_usb
-                anchors.top: rect_1.bottom
-                anchors.topMargin: 30
-                visible: false
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.family: font_noto_r.name
-                font.pixelSize: 15
-                horizontalAlignment: Text.AlignHCenter
-                color: color_red
-                text: "** USB를 인식할 수 없습니다. **\n(USB를 뺏다 꼽아주시면 인식될 수 있습니다.)"
-            }
+            Rectangle{
+                width: parent.width
+                color: "transparent"
+                height: parent.height - rect_ttt.height
+                anchors.top: rect_ttt.bottom
+                Text{
+                    id: text_no_usb
+                    visible: false
+                    anchors.top: parent.top
+                    anchors.topMargin: 20
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.family: font_noto_r.name
+                    font.pixelSize: 25
+                    horizontalAlignment: Text.AlignHCenter
+                    color: color_red
+                    text: "** USB를 인식할 수 없습니다. **\nUSB를 뺏다 꼽아주시면 인식될 수 있습니다."
+                }
+                Column{
+                    anchors.centerIn: parent
+                    spacing: 30
+                    Column{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: popup_usb_select.index === 0
+                        spacing: 10
 
-            Column{
-                anchors.centerIn: parent
-                visible: popup_usb_select.index === 0
-                spacing: 10
-                Repeater{
-                    model: ListModel{id:model_usb_list}
+                        Rectangle{
+                            width: 400
+                            height: 40
+                            color: "black"
+                            Text{
+                                color: "white"
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                text: "저장소 목록"
+                            }
+                        }
+                        Repeater{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            model: ListModel{id:model_usb_list}
+                            Rectangle{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                width: 300
+                                radius: 10
+                                height: 50
+                                color: color_light_gray
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                    text: name
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        text_no_usb.visible = false;
+                                        popup_usb_select.index = 1;
+                                        popup_usb_select.set_name = name;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Column{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        spacing: 10
+                        visible: popup_usb_select.index === 1
+                        Rectangle{
+                            width: 280
+                            radius: 10
+                            height: 50
+                            color: popup_usb_select.is_ui?color_green:color_light_gray
+                            Text{
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                text: "UI 실행파일"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    popup_usb_select.is_ui = !popup_usb_select.is_ui;
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 280
+                            radius: 10
+                            height: 50
+                            color: popup_usb_select.is_slam?color_green:color_light_gray
+                            Text{
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                text: "슬램 네비게이션 실행파일"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    popup_usb_select.is_slam = !popup_usb_select.is_slam;
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 280
+                            radius: 10
+                            height: 50
+                            color: popup_usb_select.is_config?color_green:color_light_gray
+                            Text{
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                text: "설정파일"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    popup_usb_select.is_config = !popup_usb_select.is_config;
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 280
+                            radius: 10
+                            height: 50
+                            color: popup_usb_select.is_map?color_green:color_light_gray
+                            Text{
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                text: "맵 폴더"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    popup_usb_select.is_map = !popup_usb_select.is_map;
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 280
+                            radius: 10
+                            height: 50
+                            color: popup_usb_select.is_log?color_green:color_light_gray
+                            Text{
+                                anchors.centerIn: parent
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                text: "로그"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    popup_usb_select.is_log = !popup_usb_select.is_log;
+                                }
+                            }
+                        }
+                    }
                     Rectangle{
-                        width: 280
+                        width: 250
                         radius: 10
                         height: 50
-                        color: color_light_gray
+                        color: "black"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: popup_usb_select.index === 1
                         Text{
                             anchors.centerIn: parent
                             font.family: font_noto_r.name
                             font.pixelSize: 15
-                            text: name
+                            color:"white"
+                            text: "확인"
                         }
                         MouseArea{
                             anchors.fill: parent
                             onClicked: {
-                                popup_usb_select.index = 1;
-                                popup_usb_select.set_name = name;
+                                popup_usb_notice.setProperty("compress",popup_usb_select.set_name,popup_usb_select.is_ui,popup_usb_select.is_slam,popup_usb_select.is_config,popup_usb_select.is_map,popup_usb_select.is_log);
+                                popup_usb_select.close();
+                                popup_usb_notice.open();
                             }
                         }
                     }
                 }
             }
-            Column{
-                anchors.centerIn: parent
-                spacing: 10
-                visible: popup_usb_select.index === 1
-                Rectangle{
-                    width: 280
-                    radius: 10
-                    height: 50
-                    color: popup_usb_select.is_ui?color_green:color_light_gray
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: "UI"
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            popup_usb_select.is_ui = !popup_usb_select.is_ui;
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 280
-                    radius: 10
-                    height: 50
-                    color: popup_usb_select.is_slam?color_green:color_light_gray
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: "SLAMNAV"
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            popup_usb_select.is_slam = !popup_usb_select.is_slam;
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 280
-                    radius: 10
-                    height: 50
-                    color: popup_usb_select.is_config?color_green:color_light_gray
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: "robot_config"
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            popup_usb_select.is_config = !popup_usb_select.is_config;
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 280
-                    radius: 10
-                    height: 50
-                    color: popup_usb_select.is_map?color_green:color_light_gray
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: "maps"
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            popup_usb_select.is_map = !popup_usb_select.is_map;
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 280
-                    radius: 10
-                    height: 50
-                    color: popup_usb_select.is_log?color_green:color_light_gray
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_r.name
-                        font.pixelSize: 15
-                        text: "Log"
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            popup_usb_select.is_log = !popup_usb_select.is_log;
-                        }
-                    }
-                }
-            }
-            Rectangle{
-                width: 250
-                radius: 10
-                height: 50
-                color: "black"
-                anchors.bottom: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottomMargin: 30
-                visible: popup_usb_select.index === 1
-                Text{
-                    anchors.centerIn: parent
-                    font.family: font_noto_r.name
-                    font.pixelSize: 15
-                    color:"white"
-                    text: "확인"
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: {
-                        popup_usb_notice.setProperty("compress",popup_usb_select.set_name,popup_usb_select.is_ui,popup_usb_select.is_slam,popup_usb_select.is_config,popup_usb_select.is_map,popup_usb_select.is_log);
-                        popup_usb_select.close();
-                        popup_usb_notice.open();
-                    }
-                }
-            }
-
-
         }
     }
 
@@ -8429,9 +8582,13 @@ Item {
 
     Popup{
         id: popup_update
-        width: 600
-        height: 500
+        width: 1280
+        height: 400
         anchors.centerIn: parent
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
 
         onOpened: {
             //버전 체크
@@ -8440,118 +8597,42 @@ Item {
                 //버전이 이미 최신임
                 rect_lastest.visible = true;
                 rect_need_update.visible = false;
-                text_version.text = supervisor.getLocalVersionDate()
+                text_version.text = "현재 버전 : " + supervisor.getLocalVersionDate()
             }else{
                 supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> CHECK NEW VERSION")
                 //새로운 버전 확인됨
                 rect_lastest.visible = false;
                 rect_need_update.visible = true;
-                text_version1.text = "현재 : " + supervisor.getLocalVersionDate()
-                text_version2.text = "최신 : " + supervisor.getServerVersionDate()
+                text_version1.text = "현재 버전 : " + supervisor.getLocalVersionDate()
+                text_version2.text = "최신 버전 : " + supervisor.getServerVersionDate()
             }
         }
-
         Rectangle{
             id: rect_lastest
-            anchors.fill: parent
-            radius: 5
-            Text{
-                id: text_1
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: 50
-                font.family: font_noto_r.name
-                font.pixelSize: 20
-                text:"프로그램이 이미 최신입니다."
-            }
-            Text{
-                id: text_version
+            width: parent.width
+            height: parent.height
+            color: color_navy
+            Column{
                 anchors.centerIn: parent
-                anchors.topMargin: 50
-                font.family: font_noto_r.name
-                font.pixelSize: 20
-                text:supervisor.getLocalVersionDate()
-            }
+                spacing: 40
 
-            Rectangle{
-                width: 180
-                height: 60
-                radius: 10
-                color: "#12d27c"
-                border.width: 1
-                border.color: "#12d27c"
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 30
                 Text{
-                    anchors.centerIn: parent
-                    text: "확인"
+                    id: text_1
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.family: font_noto_r.name
+                    font.pixelSize: 40
+                    color: "white"
+                    text:"프로그램이 이미 최신입니다."
+                }
+                Text{
+                    id: text_version
+                    anchors.horizontalCenter: parent.horizontalCenter
                     font.family: font_noto_r.name
                     font.pixelSize: 25
                     color: "white"
+                    text: "현재 버전 : "+supervisor.getSetting("ROBOT_SW","version_date");
                 }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: {
-                        popup_update.close();
-                    }
-                }
-            }
-        }
-        Rectangle{
-            id: rect_need_update
-            anchors.fill: parent
-            radius: 5
-            Text{
-                id: text_11
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: 50
-                font.family: font_noto_r.name
-                font.pixelSize: 20
-                text:"새로운 버전이 확인되었습니다. 업데이트하시겠습니까?"
-            }
-            Column{
-                anchors.centerIn: parent
-                Text{
-                    id: text_version1
-                    font.family: font_noto_r.name
-                    font.pixelSize: 20
-                    text:"현재 : "+supervisor.getLocalVersionDate()
-                }
-                Text{
-                    id: text_version2
-                    font.family: font_noto_r.name
-                    font.pixelSize: 20
-                    text:"최신 : "+supervisor.getServerVersionDate()
-                }
-            }
-            Row{
-                spacing: 20
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 20
 
-                Rectangle{
-                    width: 180
-                    height: 60
-                    radius: 10
-                    color:"transparent"
-                    border.width: 1
-                    border.color: "#7e7e7e"
-                    Text{
-                        anchors.centerIn: parent
-                        text: "취소"
-                        font.family: font_noto_r.name
-                        font.pixelSize: 25
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            popup_update.close();
-                        }
-                    }
-                }
                 Rectangle{
                     width: 180
                     height: 60
@@ -8559,6 +8640,7 @@ Item {
                     color: "#12d27c"
                     border.width: 1
                     border.color: "#12d27c"
+                    anchors.horizontalCenter: parent.horizontalCenter
                     Text{
                         anchors.centerIn: parent
                         text: "확인"
@@ -8569,12 +8651,96 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> UPDATE START")
-                            if(is_admin){
-                                supervisor.pullGit();
+                            popup_update.close();
+                        }
+                    }
+                }
+            }
+
+        }
+        Rectangle{
+            id: rect_need_update
+            anchors.fill: parent
+            width: parent.width
+            height: parent.height
+            color: color_navy
+            Column{
+                anchors.centerIn: parent
+                spacing: 30
+
+                Text{
+                    id: text_11
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.family: font_noto_r.name
+                    font.pixelSize: 40
+                    color: "white"
+                    text:"새로운 버전이 확인되었습니다. 업데이트하시겠습니까?"
+                }
+                Column{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        id: text_version1
+                        font.family: font_noto_r.name
+                        font.pixelSize: 25
+                        color: "white"
+                        text:"현재 버전 : "+supervisor.getSetting("ROBOT_SW","version_date")
+                    }
+                    Text{
+                        id: text_version2
+                        font.family: font_noto_r.name
+                        font.pixelSize: 25
+                        color: "white"
+                        text:"최신 버전 : "+supervisor.getServerVersionDate()
+                    }
+                }
+                Row{
+                    spacing: 50
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Rectangle{
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color:"transparent"
+                        border.width: 1
+                        border.color: "white"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "취소"
+                            color: "white"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
                                 popup_update.close();
-                            }else{
-                                popup_password.open();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 180
+                        height: 60
+                        radius: 10
+                        color: "#12d27c"
+                        border.width: 1
+                        border.color: "#12d27c"
+                        Text{
+                            anchors.centerIn: parent
+                            text: "확인"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            color: "white"
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> UPDATE START")
+                                if(is_admin){
+                                    supervisor.pullGit();
+                                    popup_update.close();
+                                }else{
+                                    popup_password.open();
+                                }
                             }
                         }
                     }
