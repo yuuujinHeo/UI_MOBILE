@@ -343,6 +343,7 @@ Item {
 
             if(supervisor.getStateMoving() === 4){
                 robot_paused = true;
+                popup_pause.visible = true;
             }else{
                 robot_paused = false;
             }
@@ -371,8 +372,11 @@ Item {
                 }
             }
 
-            text_debug_1.text = "Robot Auto State : " + supervisor.getStateMoving().toString();
-            text_debug_2.text = "Robot OBS In Path State : " + supervisor.getObsinPath().toString();
+            text_debug_1.text = supervisor.getSetting("MOTOR","pause_motor_current");
+            text_debug_2.text = supervisor.getMotorCurrent(0).toString() + ", " + supervisor.getMotorCurrent(1).toString();
+
+//            text_debug_1.text = "Robot Auto State : " + supervisor.getStateMoving().toString();
+//            text_debug_2.text = "Robot OBS In Path State : " + supervisor.getObsinPath().toString();
         }
     }
 
@@ -383,7 +387,7 @@ Item {
     }
 
     Column{
-        visible: robot_paused
+//        visible: robot_paused
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         spacing: 20
@@ -411,9 +415,9 @@ Item {
         onClicked: {
             click_sound.play();
             if(robot_paused){
-                supervisor.writelog("[USER INPUT] MOVING RESUME 2")
-                supervisor.moveResume();
-                timer_check_pause.start();
+//                supervisor.writelog("[USER INPUT] MOVING RESUME 2")
+//                supervisor.moveResume();
+//                timer_check_pause.start();
             }else{
                 supervisor.writelog("[USER INPUT] MOVING PAUSE 2")
                 supervisor.movePause();

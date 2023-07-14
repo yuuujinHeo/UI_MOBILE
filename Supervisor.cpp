@@ -2841,8 +2841,9 @@ void Supervisor::onTimer(){
             plog->write("[SUPERVISOR] LOCAL NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
             ui_state = UI_STATE_MOVEFAIL;
         }else{
+//            qDebug() << getSetting("ROBOT_SW","use_pause_current") << getSetting("MOTOR","pause_motor_current");
             if(getSetting("ROBOT_SW","use_pause_current")=="true"){
-                float current_threshold = getSetting("MOTOR","pause_current_margin").toFloat();
+                float current_threshold = getSetting("MOTOR","pause_motor_current").toFloat();
                 int check_count = getSetting("MOTOR","pause_current_ms").toInt()/MAIN_THREAD;
                 if(probot->motor[0].current > current_threshold || probot->motor[1].current > current_threshold){
                     if(current_cnt++ > check_count){
@@ -2856,6 +2857,7 @@ void Supervisor::onTimer(){
                     current_cnt = 0;
                 }
             }
+
             if(probot->obs_in_path_state != 0&&probot->running_state == ROBOT_MOVING_MOVING){
                 if(!flag_excuseme){
                     plog->write("[SCHEDULER] ROBOT ERROR : EXCUSE ME");
