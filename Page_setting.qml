@@ -6587,7 +6587,7 @@ Item {
                                         id: bar_power
                                         width: 100
                                         height: 25
-                                        to: 5
+                                        to: 1
                                         from: 0
                                         value: 0
                                         Text{
@@ -8310,8 +8310,8 @@ Item {
             bar_battery_in.value = supervisor.getBatteryIn().toFixed(2);
             bar_battery_out.value = supervisor.getBatteryOut().toFixed(2);
             bar_battery_cur.value = supervisor.getBatteryCurrent().toFixed(2);
-            bar_power.value = supervisor.getPower();
-            bar_powert.value = supervisor.getPowerTotal();
+            bar_power.value = supervisor.getPower().toFixed(3);
+            bar_powert.value = supervisor.getPowerTotal().toFixed(3);
 
             text_status_charging.text = "Charge : " + supervisor.getChargeStatus().toString();
             text_status_power.text = "Power : " + supervisor.getPowerStatus().toString();
@@ -8352,7 +8352,7 @@ Item {
             //로봇 상태 - 로봇 상태
             var state = supervisor.getLocalizationState();
             if(state === 0){
-                bar_localization.background_color = color_gray;
+                bar_localization.background_color = color_red;
                 text_local.text = "초기화 안됨";
             }else if(state === 1){
                 bar_localization.background_color = color_yellow;
