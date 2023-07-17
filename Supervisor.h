@@ -171,6 +171,9 @@ public:
     Q_INVOKABLE void rotateMapCW(){maph->rotateMapCW();}
     Q_INVOKABLE void rotateMapCCW(){maph->rotateMapCCW();}
 
+    Q_INVOKABLE void saveObjectPNG(){
+        maph->saveObjectPNG();
+    }
 
     Q_INVOKABLE bool getDrawingFlag(){return maph->getDrawingFlag();}
 

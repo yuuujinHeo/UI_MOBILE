@@ -129,6 +129,8 @@ void IPCHandler::onTimer(){
         read_count = 0;
         probot->battery_in = temp1.bat_in;
         probot->battery_out = temp1.bat_out;
+        probot->power = temp1.power;
+        probot->total_power = temp1.total_power;
 
         probot->bat_list.push_back(probot->battery_in);
 
@@ -150,8 +152,8 @@ void IPCHandler::onTimer(){
 
         probot->battery_percent = (probot->battery-44)*100/10;
 
-        if(probot->battery > 100) probot->battery = 100;
-        if(probot->battery < 0) probot->battery = 0;
+        if(probot->battery_percent > 100) probot->battery_percent = 100;
+        if(probot->battery_percent < 0) probot->battery_percent = 0;
 
         probot->battery_cur = temp1.bat_cur;
         probot->motor[0].connection = temp1.connection_m0;

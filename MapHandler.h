@@ -131,6 +131,7 @@ public:
     Q_INVOKABLE void rotateMapCW();
     Q_INVOKABLE void rotateMapCCW();
 
+    Q_INVOKABLE void saveObjectPNG();
 
 //    //---------------------------------------------------Drawing
     QVector<cv::Point2f> line;
@@ -260,6 +261,8 @@ private:
     cv::Mat file_travelline;
     //map_velocity
     cv::Mat file_velocity;
+    //map_object
+    cv::Mat file_object;
 
     //현재 사용중인 map(raw | edited)
     cv::Mat map_orin;
