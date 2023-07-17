@@ -1054,7 +1054,7 @@ Item {
     }
     Rectangle{
         id: rect_go_safe
-        width: 80
+        width: 150
         visible: show_serving?true:false
         height: 80
         radius: 80
@@ -1062,15 +1062,27 @@ Item {
         anchors.left: rect_go.right
         anchors.leftMargin : 20
         color: "#24a9f7"
-        Text{
-            id: text_go_Safe
+        Column{
             anchors.centerIn: parent
-            text: "+"
-            font.family: font_noto_r.name
-            font.pixelSize: 35
-            font.bold: true
-            color: "white"
+            spacing: 3
+            Text{
+                text: "현재 속도"
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.family: font_noto_r.name
+                font.pixelSize: 15
+                font.bold: true
+                color: "white"
+            }
+            Text{
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: supervisor.getSetting("PRESET"+cur_preset.toString(),"name");
+                font.family: font_noto_r.name
+                font.pixelSize: 20
+                font.bold: true
+                color: "white"
+            }
         }
+
         MouseArea{
             id: btn_go_safe
             anchors.fill: parent
@@ -1082,7 +1094,7 @@ Item {
         Popup{
             id: popup_preset_menu
 //            anchors.centerIn: parent
-            width: 200
+            width: 400
             height: 80
             leftPadding: 0
             rightPadding: 0
@@ -1106,7 +1118,7 @@ Item {
                         target: rect_preset
                         duration: 500
                         to: popup_preset_menu.width
-                        from: popup_preset_menu.height
+                        from: 150
                         property: "width"
                     }
                     NumberAnimation{
@@ -1128,77 +1140,126 @@ Item {
                     id: row_preset
                     opacity: 0
                     anchors.centerIn: parent
-                    spacing: 20
+                    spacing: 15
                     Rectangle{
-                        color: "transparent"
-                        width: 20
-                        height: 25
-                        anchors.verticalCenter: parent.verticalCenter
-                        Image{
-                            anchors.fill: parent
-                            enabled:cur_preset > 1
-                            source:"icon/keyboard_left.png"
-                            ColorOverlay{
-                                anchors.fill: parent
-                                color: parent.enabled?"white":color_dark_gray
-                                source: parent
-                            }
-                        }
-                    }
-                    Column{
-                        spacing: 1
+                        width: 60
+                        height: width
+                        radius: width
                         Text{
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            font.family: font_noto_b.name
-                            font.pixelSize: 15
-                            font.bold: true
-                            text: "현재 속도"
-                            color: "white"
-                        }
-                        Text{
-                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.centerIn: parent
                             font.family: font_noto_r.name
-                            font.pixelSize: 15
-                            text: supervisor.getSetting("PRESET"+cur_preset.toString(),"name");
-                        }
-                    }
-
-                    Rectangle{
-                        color: "transparent"
-                        width: 20
-                        height: 25
-                        anchors.verticalCenter: parent.verticalCenter
-                        Image{
-                            anchors.fill: parent
-                            enabled:cur_preset < 5
-                            source:"icon/keyboard_right.png"
-                            ColorOverlay{
-                                anchors.fill: parent
-                                color: parent.enabled?"white":color_dark_gray
-                                source: parent
+                            font.pixelSize: 20
+                            Component.onCompleted: {
+                                scale = 1;
+                                while(width*scale > parent.width*0.8){
+                                    scale=scale-0.01;
+                                }
                             }
-
+                            text: supervisor.getSetting("PRESET1","name");
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                cur_preset = 1;
+                                popup_preset_menu.close();
+                            }
                         }
                     }
-                }
-                MouseArea{
-                    width: parent.width/2
-                    height: parent.height
-                    anchors.left: parent.left
-                    onClicked:{
-                        click_sound.play();
-                        if(cur_preset > 1)
-                            cur_preset--;
+                    Rectangle{
+                        width: 60
+                        height: width
+                        radius: width
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            font.pixelSize: 20
+                            Component.onCompleted: {
+                                scale = 1;
+                                while(width*scale > parent.width*0.8){
+                                    scale=scale-0.01;
+                                }
+                            }
+                            text: supervisor.getSetting("PRESET2","name");
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                cur_preset = 2;
+                                popup_preset_menu.close();
+                            }
+                        }
                     }
-                }
-                MouseArea{
-                    width: parent.width/2
-                    height: parent.height
-                    anchors.right: parent.right
-                    onClicked:{
-                        click_sound.play();
-                        if(cur_preset < 5)
-                            cur_preset++;
+                    Rectangle{
+                        width: 60
+                        height: width
+                        radius: width
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            font.pixelSize: 20
+                            Component.onCompleted: {
+                                scale = 1;
+                                while(width*scale > parent.width*0.8){
+                                    scale=scale-0.01;
+                                }
+                            }
+                            text: supervisor.getSetting("PRESET3","name");
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                cur_preset = 3;
+                                popup_preset_menu.close();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 60
+                        height: width
+                        radius: width
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            font.pixelSize: 20
+                            Component.onCompleted: {
+                                scale = 1;
+                                while(width*scale > parent.width*0.8){
+                                    scale=scale-0.01;
+                                }
+                            }
+                            text: supervisor.getSetting("PRESET4","name");
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                cur_preset = 4;
+                                popup_preset_menu.close();
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: 60
+                        height: width
+                        radius: width
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            font.pixelSize: 20
+                            Component.onCompleted: {
+                                scale = 1;
+                                while(width*scale > parent.width*0.8){
+                                    scale=scale-0.01;
+                                }
+                            }
+                            text: supervisor.getSetting("PRESET5","name");
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked:{
+                                cur_preset = 5;
+                                popup_preset_menu.close();
+                            }
+                        }
                     }
                 }
             }

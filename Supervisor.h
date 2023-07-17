@@ -546,7 +546,7 @@ public:
 
     Q_INVOKABLE bool issetLocation(int number);
 
-
+    Q_INVOKABLE int getObsState(){return probot->obs_state;}
     ////*********************************************  ROBOT STATUS 관련   ***************************************************////
     Q_INVOKABLE int getBattery();
     Q_INVOKABLE int getMotorState();

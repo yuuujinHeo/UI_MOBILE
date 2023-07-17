@@ -2797,7 +2797,7 @@ Item {
             }
 
             Rectangle{
-                visible: local_find_state === -1
+                visible: local_find_state === -1 || local_find_state === 0
                 anchors.fill: parent
                 color: color_light_gray
                 Image{

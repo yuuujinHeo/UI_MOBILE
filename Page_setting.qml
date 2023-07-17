@@ -4,6 +4,7 @@ import QtGraphicalEffects 1.0
 import "."
 import io.qt.Supervisor 1.0
 import io.qt.CameraView 1.0
+import QtQuick.Controls.Styles 1.4
 import QtMultimedia 5.12
 
 Item {
@@ -6428,98 +6429,740 @@ Item {
         }
 
 
-        Flickable{
+        Rectangle{
             id: area_setting_motor
             visible: select_category==="status" ? true : false
-            width: 880
+            width: 950
+            color:"transparent"
             anchors.left: parent.left
-            anchors.leftMargin: 100
+            anchors.leftMargin: 50
             anchors.top: parent.top
-            anchors.topMargin: 120
-            height: parent.height - 200
-            contentHeight: column_setting4.height
-            clip: true
-            ScrollBar.vertical: ScrollBar{
-                width: 20
-                anchors.right: parent.right
-                policy: ScrollBar.AlwaysOn
+            anchors.topMargin: 80
+            height: parent.height - 130
+            Column{
+                Rectangle{
+                    width: area_setting_motor.width
+                    height: area_setting_motor.height/2
+                    color: "transparent"
+                    Rectangle{
+                        width: 200
+                        height: 40
+                        color: "black"
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_b.name
+                            text:"로봇 상태"
+                            color: "white"
+                            font.pixelSize: 20
+                        }
+                    }
+                    Row{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.verticalCenterOffset: 20
+                        spacing: 80
+                        Column{
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 10
+                            Text{
+                                text: "전원"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 30
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Column{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: 5
+                                Item_ProgressBar{
+                                    id: bar_battery
+                                    width: grid_power.width
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    height: 50
+                                    to:100
+                                    from:0
+                                    value: supervisor.getBattery();
+                                    Text{
+                                        id: text_battery
+                                        anchors.centerIn: parent
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 20
+                                        text: parent.value + " %"
+                                        color: "white"
+                                    }
+                                }
+                                Grid{
+                                    id: grid_power
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    rows: 5
+                                    columns: 3
+                                    horizontalItemAlignment: Grid.AlignHCenter
+                                    verticalItemAlignment: Grid.AlignVCenter
+                                    spacing: 5
+                                    Text{
+                                        text: "입력전원"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                    Text{
+                                        text: ":"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                    Item_ProgressBar{
+                                        id: bar_battery_in
+                                        width: 100
+                                        height: 25
+                                        to: 56
+                                        from: 0
+                                        value: 0
+                                        Text{
+                                            id: text_battery_in
+                                            anchors.centerIn: parent
+                                            text: parent.value + " V"
+                                            font.family: font_noto_r.name
+                                            font.pixelSize: 15
+                                        }
+                                    }
+                                    Text{
+                                        text: "출력전원"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                    Text{
+                                        text: ":"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                    Item_ProgressBar{
+                                        id: bar_battery_out
+                                        width: 100
+                                        height: 25
+                                        to: 56
+                                        from: 0
+                                        value: 0
+                                        Text{
+                                            id: text_battery_out
+                                            anchors.centerIn: parent
+                                            text: parent.value + " V"
+                                            font.family: font_noto_r.name
+                                            font.pixelSize: 15
+                                        }
+                                    }
+                                    Text{
+                                        text: "전   류"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                    Text{
+                                        text: ":"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                    Item_ProgressBar{
+                                        id: bar_battery_cur
+                                        width: 100
+                                        height: 25
+                                        to: 20
+                                        from: 0
+                                        value: 0
+                                        Text{
+                                            id: text_battery_cur
+                                            anchors.centerIn: parent
+                                            text: parent.value + " A"
+                                            font.family: font_noto_r.name
+                                            font.pixelSize: 15
+                                        }
+                                    }
+                                    Text{
+                                        text: "순간전력"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                    Text{
+                                        text: ":"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                    Item_ProgressBar{
+                                        id: bar_power
+                                        width: 100
+                                        height: 25
+                                        to: 5
+                                        from: 0
+                                        value: 0
+                                        Text{
+                                            id: text_power
+                                            anchors.centerIn: parent
+                                            text: parent.value + " W"
+                                            font.family: font_noto_r.name
+                                            font.pixelSize: 15
+                                        }
+                                    }
+                                    Text{
+                                        text: "누적전력"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                    Text{
+                                        text: ":"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                    Item_ProgressBar{
+                                        id: bar_powert
+                                        width: 100
+                                        height: 25
+                                        to: 1
+                                        from: 0
+                                        value: 0
+                                        Text{
+                                            id: text_powert
+                                            anchors.centerIn: parent
+                                            text: parent.value + " Wh"
+                                            font.family: font_noto_r.name
+                                            font.pixelSize: 15
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Column{
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 10
+                            Text{
+                                text: "로봇 상태"
+                                font.family: font_noto_r.name
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                font.pixelSize: 30
+                            }
+                            Grid{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                rows: 8
+                                columns: 3
+                                horizontalItemAlignment: Grid.AlignHCenter
+                                verticalItemAlignment: Grid.AlignVCenter
+                                spacing: 5
+                                Text{
+                                    text: "위치초기화"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_localization
+                                    width: 100
+                                    height: 25
+                                    color: color_gray
+                                    Text{
+                                        id: text_local
+                                        anchors.centerIn: parent
+                                        text: "초기화 안됨"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                Text{
+                                    text: "주행 상태"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_moving
+                                    width: 100
+                                    height: 25
+                                    color: color_gray
+                                    Text{
+                                        id: text_moving
+                                        anchors.centerIn: parent
+                                        text: "준비 안됨"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                Text{
+                                    text: "장애물감지"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_obs
+                                    width: 100
+                                    height: 25
+                                    color: color_gray
+                                    Text{
+                                        id: text_obs
+                                        anchors.centerIn: parent
+                                        text: "없음"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                Text{
+                                    text: "로봇 표정"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_face
+                                    width: 100
+                                    height: 25
+                                    color: color_gray
+                                    Text{
+                                        id: text_face
+                                        anchors.centerIn: parent
+                                        text: "보통"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                Text{
+                                    text: "모터 락"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_motorlock
+                                    width: 100
+                                    height: 25
+                                    color: color_gray
+                                    Text{
+                                        id: text_motorlock
+                                        anchors.centerIn: parent
+                                        text: "풀림"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                Text{
+                                    text: "그리기"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_drawing
+                                    width: 100
+                                    height: 25
+                                    color: color_gray
+                                    Text{
+                                        id: text_drawing
+                                        anchors.centerIn: parent
+                                        text: "멈춤"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                            }
+                        }
+                        Column{
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 10
+                            Text{
+                                text: "상태 값"
+                                font.family: font_noto_r.name
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                font.pixelSize: 30
+                            }
+                            Grid{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                rows: 8
+                                columns: 3
+                                horizontalItemAlignment: Grid.AlignHCenter
+                                verticalItemAlignment: Grid.AlignVCenter
+                                spacing: 5
+                                Text{
+                                    text: "충전 상태"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_charging
+                                    width: 100
+                                    height: 25
+                                    color: color_gray
+                                    Text{
+                                        id: text_charging
+                                        anchors.centerIn: parent
+                                        text: "연결 안됨"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                Text{
+                                    text: "전원 공급"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_powerstate
+                                    width: 100
+                                    height: 25
+                                    color: color_gray
+                                    Text{
+                                        id: text_powerstate
+                                        anchors.centerIn: parent
+                                        text: "공급 안됨"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                Text{
+                                    text: "비상스위치"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_emo
+                                    width: 100
+                                    height: 25
+                                    color: color_gray
+                                    Text{
+                                        id: text_emo
+                                        anchors.centerIn: parent
+                                        text: "안 눌림"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                Text{
+                                    text: "원격스위치"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_remote
+                                    width: 100
+                                    height: 25
+                                    color: color_gray
+                                    Text{
+                                        id: text_remote
+                                        anchors.centerIn: parent
+                                        text: "안 눌림"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+                Rectangle{
+                    width: area_setting_motor.width
+                    height: area_setting_motor.height/2
+                    color: "transparent"
+                    Rectangle{
+                        width: 200
+                        height: 40
+                        color: "black"
+                        Text{
+                            anchors.centerIn: parent
+                            font.family: font_noto_b.name
+                            text:"모터 상태"
+                            color: "white"
+                            font.pixelSize: 20
+                        }
+                    }
+                    Row{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.verticalCenterOffset: 20
+                        spacing: 80
+                        Column{
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 10
+                            Text{
+                                text: "모터 1"
+                                font.family: font_noto_r.name
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                font.pixelSize: 30
+                            }
+                            Grid{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                rows: 8
+                                columns: 3
+                                horizontalItemAlignment: Grid.AlignHCenter
+                                verticalItemAlignment: Grid.AlignVCenter
+                                spacing: 5
+                                Text{
+                                    text: "연결상태"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_con1
+                                    width: 100
+                                    height: 25
+                                    color: color_red
+                                    Text{
+                                        id: text_con1
+                                        anchors.centerIn: parent
+                                        text: "연결 안됨"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                Text{
+                                    text: "상태"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_status1
+                                    width: 100
+                                    height: 25
+                                    color: color_gray
+                                    Text{
+                                        id: text_status1
+                                        anchors.centerIn: parent
+                                        text: "준비 안됨"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                Text{
+                                    text: "온  도"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_temp1
+                                    width: 100
+                                    height: 25
+                                    from: 20
+                                    to: 70
+                                    warning: true
+                                    value_margin: 60
+                                    Text{
+                                        id: text_temp1
+                                        anchors.centerIn: parent
+                                        text: parent.value + " 도"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+
+                                    }
+                                }
+                                Text{
+                                    text: "전  류"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_cur1
+                                    width: 100
+                                    height: 25
+                                    warning: true
+                                    from: 0
+                                    to: 15
+                                    value_margin: 6
+                                    Text{
+                                        id: text_cur1
+                                        anchors.centerIn: parent
+                                        text: parent.value + " A"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                            }
+                        }
+
+                        Column{
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 10
+                            Text{
+                                text: "모터 2"
+                                font.family: font_noto_r.name
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                font.pixelSize: 30
+                            }
+                            Grid{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                rows: 8
+                                columns: 3
+                                horizontalItemAlignment: Grid.AlignHCenter
+                                verticalItemAlignment: Grid.AlignVCenter
+                                spacing: 5
+                                Text{
+                                    text: "연결상태"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_con2
+                                    width: 100
+                                    height: 25
+                                    color: color_red
+                                    Text{
+                                        id: text_con2
+                                        anchors.centerIn: parent
+                                        text: "연결 안됨"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                Text{
+                                    text: "상태"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_status2
+                                    width: 100
+                                    height: 25
+                                    color: color_gray
+                                    Text{
+                                        id: text_status2
+                                        anchors.centerIn: parent
+                                        text: "준비 안됨"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                Text{
+                                    text: "온  도"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_temp2
+                                    width: 100
+                                    height: 25
+                                    from: 20
+                                    to: 70
+                                    warning: true
+                                    value_margin: 60
+                                    Text{
+                                        id: text_temp2
+                                        anchors.centerIn: parent
+                                        text: parent.value + " 도"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                                Text{
+                                    text: "전  류"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Text{
+                                    text: ":"
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 15
+                                }
+                                Item_ProgressBar{
+                                    id: bar_cur2
+                                    width: 100
+                                    height: 25
+                                    warning: true
+                                    from: 0
+                                    to: 15
+                                    value_margin: 6
+                                    Text{
+                                        id: text_cur2
+                                        anchors.centerIn: parent
+                                        text: parent.value + " A"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 15
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
             }
 
-            Rectangle{
-                id: rect_motor_1
-                width: 1100
-                height: 40
-                color: "black"
-                anchors.horizontalCenter: parent.horizontalCenter
-                Text{
-                    anchors.centerIn: parent
-                    font.family: font_noto_b.name
-                    text:"모터 상태"
-                    color: "white"
-                    font.pixelSize: 20
-                }
-            }
-            Rectangle{
-                id: rect_motor_2
-                anchors.top: rect_motor_1.bottom
-                anchors.topMargin: 3
-                width: 840
-                color: "transparent"
-                height: 20
-                Row{
-                    anchors.fill: parent
-                    Rectangle{
-                        width: 350
-                        color: "transparent"
-                        height: parent.height
-                    }
-                    Rectangle{
-                        width: 1
-                        height: parent.height
-                        color: "transparent"
-                    }
-                    Rectangle{
-                        width: (parent.width - 351)/2
-                        height: parent.height
-                        color: "transparent"
-                        Rectangle{
-                            anchors.centerIn: parent
-                            height: parent.height
-                            width: parent.width*0.8
-                            color: color_navy
-                            Text{
-                                anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                                text:"모터 좌측"
-                                color: "white"
-                                font.pixelSize: 15
-                            }
-                        }
-                    }
-                    Rectangle{
-                        width: (parent.width - 351)/2
-                        height: parent.height
-                        color: "transparent"
-                        Rectangle{
-                            anchors.centerIn: parent
-                            height: parent.height
-                            width: parent.width*0.8
-                            color: color_navy
-                            Text{
-                                anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                                text:"모터 우측"
-                                color: "white"
-                                font.pixelSize: 15
-                            }
-                        }
-                    }
-                }
-            }
+
+
+
             Column{
                 id:column_setting4
                 width: parent.width
-                anchors.top: rect_motor_2.bottom
+                visible: false
+//                anchors.top: rect_motor_2.bottom
                 anchors.topMargin: 2
                 spacing:10
                 Rectangle{
@@ -6887,121 +7530,6 @@ Item {
                         }
                     }
                 }
-                Rectangle{
-                    width: 840
-                    height: 50
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 30
-                                font.family: font_noto_r.name
-                                text:"배터리"
-                                font.pixelSize: 20
-                                Component.onCompleted: {
-                                    scale = 1;
-                                    while(width*scale > parent.width*0.8){
-                                        scale=scale-0.01;
-                                    }
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: (parent.width - 351)/3
-                            height: parent.height
-                            Text{
-                                id: text_battery_in
-                                anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                                text:"In : "+supervisor.getBatteryIn().toString()
-                                font.pixelSize: 15
-                            }
-                        }
-                        Rectangle{
-                            width: (parent.width - 351)/3
-                            height: parent.height
-                            Text{
-                                id: text_battery_out
-                                anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                                text:"Out : "+supervisor.getBatteryOut().toString()
-                                font.pixelSize: 15
-                            }
-                        }
-                        Rectangle{
-                            width: (parent.width - 351)/3
-                            height: parent.height
-                            Text{
-                                id: text_battery_current
-                                anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                                text:"Current : "+supervisor.getBatteryCurrent().toString()
-                                font.pixelSize: 15
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    width: 840
-                    height: 50
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 30
-                                font.family: font_noto_r.name
-                                text:"Power"
-                                font.pixelSize: 20
-                                Component.onCompleted: {
-                                    scale = 1;
-                                    while(width*scale > parent.width*0.8){
-                                        scale=scale-0.01;
-                                    }
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: (parent.width - 351)/2
-                            height: parent.height
-                            Text{
-                                id: text_power
-                                anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                                text:"Power : "+supervisor.getPower().toString()
-                                font.pixelSize: 15
-                            }
-                        }
-                        Rectangle{
-                            width: (parent.width - 351)/2
-                            height: parent.height
-                            Text{
-                                id: text_power_total
-                                anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                                text:"Total : "+supervisor.getPowerTotal().toString()
-                                font.pixelSize: 15
-                            }
-                        }
-                    }
-                }
             }
         }
 
@@ -7237,6 +7765,7 @@ Item {
         if(obs_margin1.ischanged){
             supervisor.setSetting("ROBOT_SW/obs_margin1",obs_margin1.text);
         }
+
         if(obs_detect_area.ischanged){
             supervisor.setSetting("ROBOT_SW/obs_detect_area",obs_detect_area.text);
         }
@@ -7777,39 +8306,220 @@ Item {
             motor_left_id = parseInt(supervisor.getSetting("MOTOR","left_id"));
             motor_right_id = parseInt(supervisor.getSetting("MOTOR","right_id"));
 
-            if(supervisor.getMotorConnection(motor_left_id)){
-                rect_connection_0.color = color_green;
-                text_connection_0.text = "연결됨"
-            }else{
-                rect_connection_0.color = color_red;
-                text_connection_0.text = "연결안됨"
-            }
-            if(supervisor.getMotorConnection(motor_right_id)){
-                rect_connection_1.color = color_green;
-                text_connection_1.text = "연결됨"
-            }else{
-                rect_connection_1.color = color_red;
-                text_connection_1.text = "연결안됨"
-            }
-            text_status_0.text = supervisor.getMotorStatus(motor_left_id).toString();
-            text_status_1.text = supervisor.getMotorStatus(motor_right_id).toString();
-
-            text_temp_0.text = supervisor.getMotorTemperature(motor_left_id).toString();
-            text_temp_1.text = supervisor.getMotorTemperature(motor_right_id).toString();
-            text_cur_0.text = supervisor.getMotorCurrent(motor_left_id).toString();
-            text_cur_1.text = supervisor.getMotorCurrent(motor_right_id).toString();
+            //로봇 상태 - 전원
+            bar_battery.value = supervisor.getBattery();
+            bar_battery_in.value = supervisor.getBatteryIn();
+            bar_battery_out.value = supervisor.getBatteryOut();
+            bar_battery_cur.value = supervisor.getBatteryCurrent();
+            bar_power.value = supervisor.getPower();
+            bar_powert.value = supervisor.getPowerTotal();
 
             text_status_charging.text = "Charge : " + supervisor.getChargeStatus().toString();
             text_status_power.text = "Power : " + supervisor.getPowerStatus().toString();
             text_status_emo.text = "Emo : " + supervisor.getEmoStatus().toString();
             text_status_remote.text = "Remote : " + supervisor.getRemoteStatus().toString();
 
-            text_battery_in.text = "In : " + supervisor.getBatteryIn().toFixed(2).toString();
-            text_battery_out.text = "Out : " + supervisor.getBatteryOut().toFixed(2).toString();
-            text_battery_current.text = "Current : " + supervisor.getBatteryCurrent().toFixed(2).toString();
 
-            text_power.text = "Power : " + supervisor.getPower().toString();
-            text_power_total.text = "Total : " + supervisor.getPowerTotal().toString();
+            //로봇 상태 - 상태 값
+            if(supervisor.getChargeStatus() === 0){
+                bar_charging.color = color_gray;
+                text_charging.text = "연결 안됨";
+            }else{
+                bar_charging.color = color_blue;
+                text_charging.text = "연결 됨";
+            }
+            if(supervisor.getPowerStatus() === 0){
+                bar_powerstate.color = color_red;
+                text_powerstate.text = "공급 안됨";
+            }else{
+                bar_powerstate.color = color_blue;
+                text_powerstate.text = "공급 됨";
+            }
+            if(supervisor.getEmoStatus() === 0){
+                bar_emo.color = color_red;
+                text_emo.text = "눌림"
+            }else{
+                bar_emo.color = color_gray;
+                text_emo.text = "안 눌림"
+            }
+            if(supervisor.getRemoteStatus() === 0){
+                bar_remote.color = color_red;
+                text_remote.text = "눌림";
+            }else{
+                bar_remote.color = color_gray;
+                text_remote.text = "안 눌림";
+            }
+
+            //로봇 상태 - 로봇 상태
+            var state = supervisor.getLocalizationState();
+            if(state === 0){
+                bar_localization.color = color_gray;
+                text_local.text = "초기화 안됨";
+            }else if(state === 1){
+                bar_localization.color = color_yellow;
+                text_local.text = "초기화 중";
+            }else if(state === 2){
+                bar_localization.color = color_blue;
+                text_local.text = "초기화 완료";
+            }else if(state === 3){
+                bar_localization.color = color_red;
+                text_local.text = "초기화 실패";
+            }
+
+            state = supervisor.getStateMoving();
+            if(state === 0){
+                bar_moving.color = color_red;
+                text_moving.text = "준비 안됨";
+            }else if(state === 1){
+                bar_moving.color = color_blue;
+                text_moving.text = "준비";
+            }else if(state === 2){
+                bar_moving.color = color_green;
+                text_moving.text = "이동 중";
+            }else if(state === 3){
+                bar_moving.color = color_yellow;
+                text_moving.text = "대기 중";
+            }else if(state === 4){
+                bar_moving.color = color_yellow;
+                text_moving.text = "일시정지 중";
+            }
+            state = supervisor.getObsState();
+            if(state === 0){
+                bar_obs.color = color_gray;
+                text_obs.text = "없음"
+            }else if(state === 1){
+                bar_obs.color = color_red;
+                text_obs.text = "장애물 겹침"
+            }
+            state = supervisor.getObsinPath();
+            if(state === 0){
+                text_face.text = "보통"
+            }else if(state === 1){
+                text_face.text = "놀람"
+            }else if(state === 2){
+                text_face.text = "운다"
+            }
+            state = supervisor.getLockStatus();
+            if(state === 0){
+                text_motorlock.text = "풀림"
+                bar_motorlock.color  = color_red;
+            }else{
+                text_motorlock.text = "락 걸림"
+                bar_motorlock.color = color_blue;
+            }
+
+            //모터 상태 - 모터 1
+            state = supervisor.getMotorConnection(0);
+            if(state === 0){
+                bar_con1.color = color_gray;
+                text_con1.text = "연결 안됨"
+            }else{
+                bar_con1.color = color_blue;
+                text_con1.text = "연결 됨"
+            }
+
+            state = supervisor.getMotorStatus(0);
+            if(state === 0){
+                bar_status1.color = color_gray;
+                text_status1.text = "연결 안됨"
+            }else if(state === 1){
+                bar_status1.color = color_blue;
+                text_status1.text = "연결 됨"
+            }else{
+                var str_error = "";
+                if(state >= 128){
+                    str_error += "Unknown ";
+                    state -= 128;
+                }
+                if(state >= 64){
+                    str_error += "PS1,2 ";
+                    state -= 64;
+                }
+                if(state >= 32){
+                    str_error += "INPUT ";
+                    state -= 32;
+                }
+                if(state >= 16){
+                    str_error += "BIG ";
+                    state -= 16;
+                }
+                if(state >= 8){
+                    str_error += "CUR ";
+                    state -= 8;
+                }
+                if(state >= 4){
+                    str_error += "JAM ";
+                    state -= 4;
+                }
+                if(state >= 2){
+                    str_error += "MOD ";
+                    state -= 2;
+                }
+
+                bar_status1.color = color_red;
+                text_status1.text = str_error;
+            }
+
+            bar_temp1.value = supervisor.getMotorTemperature(0);
+            bar_cur1.value = supervisor.getMotorCurrent(0);
+
+
+
+
+            //모터 상태 - 모터 2
+            state = supervisor.getMotorConnection(1);
+            if(state === 0){
+                bar_con2.color = color_gray;
+                text_con2.text = "연결 안됨"
+            }else{
+                bar_con2.color = color_blue;
+                text_con2.text = "연결 됨"
+            }
+
+            state = supervisor.getMotorStatus(1);
+            if(state === 0){
+                bar_status2.color = color_gray;
+                text_status2.text = "연결 안됨"
+            }else if(state === 1){
+                bar_status2.color = color_blue;
+                text_status2.text = "연결 됨"
+            }else{
+                var str_error = "";
+                if(state >= 128){
+                    str_error += "Unknown ";
+                    state -= 128;
+                }
+                if(state >= 64){
+                    str_error += "PS1,2 ";
+                    state -= 64;
+                }
+                if(state >= 32){
+                    str_error += "INPUT ";
+                    state -= 32;
+                }
+                if(state >= 16){
+                    str_error += "BIG ";
+                    state -= 16;
+                }
+                if(state >= 8){
+                    str_error += "CUR ";
+                    state -= 8;
+                }
+                if(state >= 4){
+                    str_error += "JAM ";
+                    state -= 4;
+                }
+                if(state >= 2){
+                    str_error += "MOD ";
+                    state -= 2;
+                }
+
+                bar_status2.color = color_red;
+                text_status2.text = str_error;
+            }
+
+            bar_temp2.value = supervisor.getMotorTemperature(1);
+            bar_cur2.value = supervisor.getMotorCurrent(1);
         }
     }
 
