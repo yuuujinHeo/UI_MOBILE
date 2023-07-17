@@ -6812,7 +6812,6 @@ Item {
                                     id: bar_charging
                                     width: 100
                                     height: 25
-                                    color: color_gray
                                     Text{
                                         id: text_charging
                                         anchors.centerIn: parent
@@ -6956,7 +6955,7 @@ Item {
                                     }
                                 }
                                 Text{
-                                    text: "상태"
+                                    text: "상 태"
                                     font.family: font_noto_r.name
                                     font.pixelSize: 15
                                 }
@@ -7074,7 +7073,7 @@ Item {
                                     }
                                 }
                                 Text{
-                                    text: "상태"
+                                    text: "상 태"
                                     font.family: font_noto_r.name
                                     font.pixelSize: 15
                                 }
@@ -8308,9 +8307,9 @@ Item {
 
             //로봇 상태 - 전원
             bar_battery.value = supervisor.getBattery();
-            bar_battery_in.value = supervisor.getBatteryIn();
-            bar_battery_out.value = supervisor.getBatteryOut();
-            bar_battery_cur.value = supervisor.getBatteryCurrent();
+            bar_battery_in.value = supervisor.getBatteryIn().toFixed(2);
+            bar_battery_out.value = supervisor.getBatteryOut().toFixed(2);
+            bar_battery_cur.value = supervisor.getBatteryCurrent().toFixed(2);
             bar_power.value = supervisor.getPower();
             bar_powert.value = supervisor.getPowerTotal();
 
@@ -8322,73 +8321,73 @@ Item {
 
             //로봇 상태 - 상태 값
             if(supervisor.getChargeStatus() === 0){
-                bar_charging.color = color_gray;
+                bar_charging.background_color = color_gray;
                 text_charging.text = "연결 안됨";
             }else{
-                bar_charging.color = color_blue;
+                bar_charging.background_color = color_blue;
                 text_charging.text = "연결 됨";
             }
             if(supervisor.getPowerStatus() === 0){
-                bar_powerstate.color = color_red;
+                bar_powerstate.background_color = color_red;
                 text_powerstate.text = "공급 안됨";
             }else{
-                bar_powerstate.color = color_blue;
+                bar_powerstate.background_color = color_blue;
                 text_powerstate.text = "공급 됨";
             }
             if(supervisor.getEmoStatus() === 0){
-                bar_emo.color = color_red;
-                text_emo.text = "눌림"
-            }else{
-                bar_emo.color = color_gray;
+                bar_emo.background_color = color_gray;
                 text_emo.text = "안 눌림"
+            }else{
+                bar_emo.background_color = color_red;
+                text_emo.text = "눌림"
             }
             if(supervisor.getRemoteStatus() === 0){
-                bar_remote.color = color_red;
+                bar_remote.background_color = color_red;
                 text_remote.text = "눌림";
             }else{
-                bar_remote.color = color_gray;
+                bar_remote.background_color = color_gray;
                 text_remote.text = "안 눌림";
             }
 
             //로봇 상태 - 로봇 상태
             var state = supervisor.getLocalizationState();
             if(state === 0){
-                bar_localization.color = color_gray;
+                bar_localization.background_color = color_gray;
                 text_local.text = "초기화 안됨";
             }else if(state === 1){
-                bar_localization.color = color_yellow;
+                bar_localization.background_color = color_yellow;
                 text_local.text = "초기화 중";
             }else if(state === 2){
-                bar_localization.color = color_blue;
+                bar_localization.background_color = color_blue;
                 text_local.text = "초기화 완료";
             }else if(state === 3){
-                bar_localization.color = color_red;
+                bar_localization.background_color = color_red;
                 text_local.text = "초기화 실패";
             }
 
             state = supervisor.getStateMoving();
             if(state === 0){
-                bar_moving.color = color_red;
+                bar_moving.background_color = color_red;
                 text_moving.text = "준비 안됨";
             }else if(state === 1){
-                bar_moving.color = color_blue;
+                bar_moving.background_color = color_blue;
                 text_moving.text = "준비";
             }else if(state === 2){
-                bar_moving.color = color_green;
+                bar_moving.background_color = color_green;
                 text_moving.text = "이동 중";
             }else if(state === 3){
-                bar_moving.color = color_yellow;
+                bar_moving.background_color = color_yellow;
                 text_moving.text = "대기 중";
             }else if(state === 4){
-                bar_moving.color = color_yellow;
+                bar_moving.background_color = color_yellow;
                 text_moving.text = "일시정지 중";
             }
             state = supervisor.getObsState();
             if(state === 0){
-                bar_obs.color = color_gray;
+                bar_obs.background_color = color_gray;
                 text_obs.text = "없음"
             }else if(state === 1){
-                bar_obs.color = color_red;
+                bar_obs.background_color = color_red;
                 text_obs.text = "장애물 겹침"
             }
             state = supervisor.getObsinPath();
@@ -8402,29 +8401,29 @@ Item {
             state = supervisor.getLockStatus();
             if(state === 0){
                 text_motorlock.text = "풀림"
-                bar_motorlock.color  = color_red;
+                bar_motorlock.background_color  = color_red;
             }else{
                 text_motorlock.text = "락 걸림"
-                bar_motorlock.color = color_blue;
+                bar_motorlock.background_color = color_blue;
             }
 
             //모터 상태 - 모터 1
             state = supervisor.getMotorConnection(0);
             if(state === 0){
-                bar_con1.color = color_gray;
+                bar_con1.background_color = color_gray;
                 text_con1.text = "연결 안됨"
             }else{
-                bar_con1.color = color_blue;
+                bar_con1.background_color = color_blue;
                 text_con1.text = "연결 됨"
             }
 
             state = supervisor.getMotorStatus(0);
             if(state === 0){
-                bar_status1.color = color_gray;
-                text_status1.text = "연결 안됨"
+                bar_status1.background_color = color_gray;
+                text_status1.text = "준비 안됨"
             }else if(state === 1){
-                bar_status1.color = color_blue;
-                text_status1.text = "연결 됨"
+                bar_status1.background_color = color_blue;
+                text_status1.text = "준비"
             }else{
                 var str_error = "";
                 if(state >= 128){
@@ -8456,7 +8455,7 @@ Item {
                     state -= 2;
                 }
 
-                bar_status1.color = color_red;
+                bar_status1.background_color = color_red;
                 text_status1.text = str_error;
             }
 
@@ -8469,20 +8468,20 @@ Item {
             //모터 상태 - 모터 2
             state = supervisor.getMotorConnection(1);
             if(state === 0){
-                bar_con2.color = color_gray;
+                bar_con2.background_color = color_gray;
                 text_con2.text = "연결 안됨"
             }else{
-                bar_con2.color = color_blue;
+                bar_con2.background_color = color_blue;
                 text_con2.text = "연결 됨"
             }
 
             state = supervisor.getMotorStatus(1);
             if(state === 0){
-                bar_status2.color = color_gray;
-                text_status2.text = "연결 안됨"
+                bar_status2.background_color = color_gray;
+                text_status2.text = "준비 안됨"
             }else if(state === 1){
-                bar_status2.color = color_blue;
-                text_status2.text = "연결 됨"
+                bar_status2.background_color = color_blue;
+                text_status2.text = "준비"
             }else{
                 var str_error = "";
                 if(state >= 128){
@@ -8514,7 +8513,7 @@ Item {
                     state -= 2;
                 }
 
-                bar_status2.color = color_red;
+                bar_status2.background_color = color_red;
                 text_status2.text = str_error;
             }
 
