@@ -7313,7 +7313,7 @@ Item {
                                 width: 150
                                 height: 80
                                 onClicked:{
-
+                                    popup_sensorview.open();
                                 }
                             }
                         }
@@ -8686,6 +8686,23 @@ Item {
 
     Popup_help{
         id: popup_help_setting
+    }
+
+    Popup{
+        id: popup_sensorview
+        anchors.centerIn: parent
+        width: 850
+        height: 650
+        background:Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 10
+            color: color_dark_navy
+        }
     }
 
     Popup{
