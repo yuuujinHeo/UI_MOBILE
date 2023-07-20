@@ -18,7 +18,6 @@ Item {
 
     property bool is_admin: true
 
-
     property string select_category: "status"
     property string platform_name: supervisor.getRobotName()
     property string debug_platform_name: ""
@@ -795,6 +794,67 @@ Item {
                                     ischanged = true;
                                 }
                                 model:["목적지 표시", "귀여운 얼굴"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_comeback_preset
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"복귀 속도 지정"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    click_sound.play();
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("복귀 속도 지정");
+                                    popup_help_setting.addLine("로봇이 서빙 후 대기위치로 이동할 때 속도를 지정합니다.");
+                                    popup_help_setting.addLine("사용하지 않으면 서빙 때 지정한 속도 그대로 사용합니다.");
+                                    popup_help_setting.addLine("안전속도 구간에 진입하면 속도가 자동으로 저하됩니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_comeback_preset
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["사용 안함", "아주느리게","느리게","보통","빠르게","아주빠르게"]
                             }
                         }
                     }
@@ -7867,6 +7927,10 @@ Item {
                 supervisor.setSetting("ROBOT_SW/moving_face","true");
         }
 
+        if(combo_comeback_preset.ischanged){
+            supervisor.setSetting("ROBOT_SW/comeback_preset",combo_comeback_preset.currentIndex.toString());
+        }
+
         if(combo_use_tray.ischanged){
             if(combo_use_tray.currentIndex == 0)
                 supervisor.setSetting("ROBOT_SW/use_tray","false");
@@ -8230,6 +8294,9 @@ Item {
         }else{
             combo_movingpage.currentIndex = 0;
         }
+
+        combo_comeback_preset.currentIndex = parseInt(supervisor.getSetting("ROBOT_SW","comeback_preset"));
+
         if(supervisor.getSetting("ROBOT_SW","use_tray") === "true"){
             combo_use_tray.currentIndex = 1;
         }else{
@@ -8299,7 +8366,8 @@ Item {
         slider_volume_voice.ischanged = false;
         slider_volume_button.ischanged = false;
 
-
+        combo_movingpage.ischanged = false;
+        combo_comeback_preset.ischanged = false;
         wifi_passwd.ischanged = false;
         ip_1.ischanged = false;
         ip_2.ischanged = false;

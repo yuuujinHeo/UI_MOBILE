@@ -173,6 +173,7 @@ public:
 
     Q_INVOKABLE void saveObjectPNG(){
         maph->saveObjectPNG();
+        slam_map_reload(getMapname());
     }
 
     Q_INVOKABLE bool getDrawingFlag(){return maph->getDrawingFlag();}

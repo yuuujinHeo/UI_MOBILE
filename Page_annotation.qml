@@ -3630,8 +3630,11 @@ Item {
             }
             Component.onDestruction: {
                 map.setEnable(false);
-                supervisor.setMotorLock(true);
-                supervisor.stopDrawObject();
+                if(supervisor.getLockStatus())
+                    supervisor.setMotorLock(true);
+
+                if(supervisor.getObjectflag())
+                    supervisor.stopDrawObject();
             }
 
             function update_object(){
@@ -3824,8 +3827,6 @@ Item {
                                 onClicked:{
                                     click_sound.play();
                                     supervisor.writelog("[ANNOTATION] Object : Drawing Save");
-                                    supervisor.stopDrawObject();
-                                    supervisor.setMotorLock(true);
                                     popup_save_object.open();
                                 }
                             }
@@ -4546,13 +4547,6 @@ Item {
                                 font.pixelSize: 30
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
-                            Text{
-                                text: "기존 가상벽들이 초기화됩니다."
-                                visible: !mode_drawing
-                                font.family: font_noto_r.name
-                                font.pixelSize: 20
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
                         }
                         Row{
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -4578,8 +4572,10 @@ Item {
                                     //save temp Image
                                     supervisor.writelog("[QML] MAP PAGE : SAVE Object ");
                                     click_sound.play();
+                                    print(supervisor.getObjectflag())
                                     if(supervisor.getObjectflag()){
                                         supervisor.saveDrawObject();
+                                        supervisor.setMode("annot_object_png");
                                     }else if(mode_drawing){
                                         supervisor.saveObjectPNG();
                                         annot_pages.sourceComponent = page_annot_additional_menu;

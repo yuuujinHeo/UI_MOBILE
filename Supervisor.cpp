@@ -537,7 +537,6 @@ void Supervisor::editObject(int x, int y){
 }
 void Supervisor::saveObject(){
     maph->saveObject();
-
     setObjPose();
 }
 void Supervisor::clearObject(){
@@ -568,7 +567,11 @@ void Supervisor::stopDrawObject(){
 }
 void Supervisor::saveDrawObject(){
     ipc->saveObject();
-    maph->draw_object_flag = true;
+    maph->loadFile(getMapname(),"");
+//    maph->initFileWidth();
+//    maph->initDrawing();
+//    maph->initObject();
+    maph->draw_object_flag = false;
 }
 bool Supervisor::getObjectflag(){
     return (ipc->flag_objecting||maph->getObjectFlag());
@@ -642,12 +645,12 @@ void Supervisor::slam_map_reload(QString filename){
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_MAP_RELOAD;
     memcpy(send_msg.params,filename.toUtf8(),sizeof(char)*255);
-    ipc->set_cmd(send_msg);
+    ipc->set_cmd(send_msg,"MAP RELOAD");
 }
 void Supervisor::slam_ini_reload(){
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_SETTING_RELOAD;
-    ipc->set_cmd(send_msg);
+    ipc->set_cmd(send_msg,"INI RELOAD");
 }
 QString Supervisor::getCameraSerial(int num){
     try{
@@ -1827,14 +1830,14 @@ cv::Point2f setAxisObject(cv::Point2f _point){
     float grid = pmap->gridwidth*pmap->width/1000;
     temp.x = -_point.y/grid + 1000/2;
     temp.y = -_point.x/grid + 1000/2;
-    qDebug() << temp.x << temp.y << pmap->width;
+//    qDebug() << temp.x << temp.y << pmap->width;
     return temp;
 }
 cv::Point2f setAxisBack(cv::Point2f _point){
     cv::Point2f temp;
     temp.x = -pmap->gridwidth*(_point.y-pmap->origin[1]);
     temp.y = -pmap->gridwidth*(_point.x-pmap->origin[0]);
-    qDebug() << _point.y << temp.x << pmap->gridwidth << pmap->origin[1];
+//    qDebug() << _point.y << temp.x << pmap->gridwidth << pmap->origin[1];
     return temp;
 }
 POSE setAxis(POSE _pose){

@@ -145,6 +145,10 @@ public:
     int cur_line_width=3;
     bool new_straight_flag = false;
     cv::Point2f straight[2];
+    void initFileWidth(){
+        file_width = map_orin.rows;
+        initDrawing();
+    }
     void initDrawing(){
         map_drawing = cv::Mat(file_width, file_width, CV_8UC4, cv::Scalar::all(0));
         map_drawing_mask = cv::Mat(file_width, file_width, CV_8UC4, cv::Scalar::all(0));
