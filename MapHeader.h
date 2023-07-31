@@ -55,6 +55,7 @@ typedef struct{
     float angle;
     int number;
     QString call_id;
+    bool available;
 }LOCATION;
 
 

@@ -220,6 +220,7 @@ public:
     Q_INVOKABLE void editLocation(int x, int y, float th){maph->editLocation(x,y,th);}
     Q_INVOKABLE int getLocationNum(int x, int y){return maph->getLocationNum(x,y);}
     Q_INVOKABLE void removeLocation(int num){maph->removeLocation(num);}
+    Q_INVOKABLE bool getLocationAvailable(int num);
     Q_INVOKABLE void setTableNumberAuto(){maph->setTableNumberAuto();}
 //    Q_INVOKABLE int getLocationNum(QString type){return maph->getLocationNum(type);}
     Q_INVOKABLE int getLocGroupNum(int num){return maph->getLocGroupNum(num);}

@@ -200,7 +200,7 @@ Item {
 //            print(i);
             if(i>=table_num)
                 break;
-            model_group_table.append({"num":supervisor.getLocationNumber(model_group.get(cur_group).num,i),"name":supervisor.getServingName(model_group.get(cur_group).num, i)});
+            model_group_table.append({"num":supervisor.getLocationNumber(model_group.get(cur_group).num,i),"available":supervisor.getLocationAvailable(supervisor.getLocationNumber(model_group.get(cur_group).num,i)),"name":supervisor.getServingName(model_group.get(cur_group).num, i)});
         }
     }
 
@@ -394,6 +394,7 @@ Item {
                                 width:80
                                 height:80
                                 radius:80
+                                enabled:supervisor.getLocationAvailable((col_num*row_num*cur_page)+index);
                                 color: ((col_num*row_num*cur_page)+index+1 == cur_table)?"#12d27c":"#d0d0d0"
                                 Rectangle{
                                     width:68
@@ -621,6 +622,7 @@ Item {
                 width:130
                 height:80
                 radius:20
+                enabled:available
                 color: (num == cur_table)?"#12d27c":"#d0d0d0"
                 Rectangle{
                     width:120
@@ -631,7 +633,7 @@ Item {
                     Text{
                         anchors.centerIn: parent
                         text: name
-                        color: "#525252"
+                        color: available?"#525252":color_red
                         font.family: font_noto_r.name
                         Component.onCompleted: {
                             scale = 1;

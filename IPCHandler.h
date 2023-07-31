@@ -194,6 +194,20 @@ public:
         }
     };
 
+    struct LOC_STATUS
+    {
+        uint32_t tick = 0;
+        uint8_t serving[255] = {0,}; // array index means unique number of serving loc. occupied is 1
+
+        LOC_STATUS()
+        {
+        }
+        LOC_STATUS(const LOC_STATUS& p)
+        {
+            tick = p.tick;
+            memcpy(serving, p.serving, 255);
+        }
+    };
 
 public:
     explicit IPCHandler(QObject *parent = nullptr);
@@ -224,6 +238,7 @@ public:
     QSharedMemory shm_ui_status;
     QSharedMemory shm_cam_color0;
     QSharedMemory shm_cam_color1;
+    QSharedMemory shm_loc_status;
 
     CMD get_cmd();
     STATUS get_status();
@@ -234,6 +249,8 @@ public:
     IMG get_cam1();
     IMG_COLOR get_cam_color0();
     IMG_COLOR get_cam_color1();
+    LOC_STATUS get_loc_status();
+
 
     bool getConnection(){
         if(read_count > 30){
@@ -283,6 +300,7 @@ public:
     unsigned int prev_tick_cam1 = 0;
     unsigned int prev_tick_cam_color0 = 0;
     unsigned int prev_tick_cam_color1 = 0;
+    unsigned int prev_tick_loc_status = 0;
 
 signals:
     void pathchanged();

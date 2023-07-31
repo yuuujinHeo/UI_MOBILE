@@ -136,6 +136,11 @@ void Supervisor::sendMapServer(){
     ipc->sendCommand(ROBOT_CMD_SERVER_MAP_UPDATE);
 }
 
+bool Supervisor::getLocationAvailable(int num){
+    if(pmap->locations.size() <= num)
+        return false;
+    return pmap->locations[num].available;
+}
 void Supervisor::programRestart(){
     plog->write("[USER INPUT] PROGRAM RESTART");
     ipc->clearSharedMemory(ipc->shm_cmd);

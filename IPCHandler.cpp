@@ -12,6 +12,7 @@ IPCHandler::IPCHandler(QObject *parent)
     , shm_ui_status("slamnav_ui_status")
     , shm_cam_color0("slamnav_cam_color0")
     , shm_cam_color1("slamnav_cam_color1")
+    , shm_loc_status("slamnav_loc_status")
 {
     // msg tick clear, check for new data
     tick = 0;
@@ -27,6 +28,7 @@ IPCHandler::IPCHandler(QObject *parent)
     updateSharedMemory(shm_cam1,"Camera1",sizeof(IPCHandler::IMG));
     updateSharedMemory(shm_cam_color0,"CameraColor0",sizeof(IPCHandler::IMG_COLOR));
     updateSharedMemory(shm_cam_color1,"CameraColor1",sizeof(IPCHandler::IMG_COLOR));
+    updateSharedMemory(shm_loc_status,"LocationStatus",sizeof(IPCHandler::LOC_STATUS));
     clearSharedMemory(shm_cmd);
 
     timer = new QTimer();
@@ -85,6 +87,7 @@ void IPCHandler::update(){
     updateSharedMemory(shm_cam1,"Camera1",sizeof(IPCHandler::IMG));
     updateSharedMemory(shm_cam_color0,"CameraColor0",sizeof(IPCHandler::IMG_COLOR));
     updateSharedMemory(shm_cam_color1,"CameraColor1",sizeof(IPCHandler::IMG_COLOR));
+    updateSharedMemory(shm_loc_status,"LocationStatus",sizeof(IPCHandler::LOC_STATUS));
 
 }
 
@@ -100,6 +103,8 @@ IPCHandler::~IPCHandler()
     detachSharedMemory(shm_cam1,"Camera1");
     detachSharedMemory(shm_cam_color0,"CameraColor0");
     detachSharedMemory(shm_cam_color1,"CameraColor1");
+    detachSharedMemory(shm_loc_status,"LocationStatus");
+
 }
 
 void IPCHandler::onTimer(){
@@ -409,6 +414,23 @@ void IPCHandler::onTimer(){
         prev_tick_cam_color1 = camcolor1.tick;
     }
 
+    IPCHandler::LOC_STATUS loc_status = get_loc_status();
+    if(loc_status.tick != prev_tick_loc_status){
+        flag_rx = true;
+        read_count = 0;
+        for(int i=0; i<pmap->locations.size(); i++){
+            if(i > 254)
+                break;
+
+            if(loc_status.serving[i] == 0){
+                pmap->locations[i].available = false;
+            }else{
+                pmap->locations[i].available = true;
+            }
+        }
+    }
+
+    flag_rx = true;
     static int count=0;
     if(count++%5==0){
         flag_rx = false;
@@ -416,6 +438,17 @@ void IPCHandler::onTimer(){
     }
 
     read_count++;
+}
+
+IPCHandler::LOC_STATUS IPCHandler::get_loc_status()
+{
+    IPCHandler::LOC_STATUS res;
+
+    shm_loc_status.lock();
+    memcpy(&res, (char*)shm_loc_status.constData(), sizeof(IPCHandler::LOC_STATUS));
+    shm_loc_status.unlock();
+
+    return res;
 }
 
 IPCHandler::CMD IPCHandler::get_cmd()
