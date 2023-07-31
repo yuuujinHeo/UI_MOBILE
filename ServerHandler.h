@@ -2,64 +2,58 @@
 #define SERVERHANDLER_H
 
 #include <QObject>
-#include <QThread>
-#include <QSettings>
+#include <QtNetwork>
 #include <QTimer>
-#include <chrono>
-#include <thread>
-#include <math.h>
-#include <QWebSocket>
-#include <QDir>
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include "GlobalHeader.h"
+#include <QDebug>
+
 #include <QGuiApplication>
+// json -----------------------
+#include <QJsonDocument>
+#include <QJsonValue>
+#include <QJsonArray>
+#include <QJsonObject>
 
-#define MOVING_TIMER_MS     40
+// connection ------------------
+#include <QEventLoop>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QUrl>
+#include <QNetworkRequest>
 
-enum{
-    MS_STOP = 0,
-    MS_MOVE,
-    MS_PAUSE
-};
+#include <QTimer>
+
+#include "GlobalHeader.h"
+
+// websocket ------------------
+#include <websocket/QtHttpServer.h>
+#include <websocket/QtHttpRequest.h>
+#include <websocket/QtHttpReply.h>
+#include <QApplication>
+#include <websocket/QtHttpHeader.h>
 
 class ServerHandler : public QObject
 {
     Q_OBJECT
 public:
     ServerHandler();
-    ~ServerHandler();
+    QByteArray generalPost(QByteArray post_data, QString url);
+    QByteArray generalGet(QString url);
+    QByteArray generalPut(QString url, QByteArray put_data);
+    QByteArray generalDelete(QString url);
+    void ClearJson(QJsonObject &json);
 
-    ////*********************************************  FLAGS   ***************************************************////
-    //서버 연결상태
-    bool isconnect = false;
-    bool acceptCmd = true;
+    void postStatus();
 
-    ////*********************************************  SEND FUNCTIONS   ***************************************************////
-    void sendCalllist();
-    void sendMap(QString map_name);
-    void requestMap();
-
-    QString server_map_name = "test1";
-
-signals:
-    void server_pause();
-    void server_resume();
-    void server_new_target();
-    void server_new_call();
-    void server_set_ini();
-    void server_get_map();
-public slots:
-    void onConnected();
-    void onDisconnected();
-    void onTextMessageReceived(QString message);
-    void onBinaryMessageReceived(QByteArray message);
-
+    QJsonObject json_in;
+    QJsonObject json_out;
+    QProcess *process;
+private slots:
     void onTimer();
 private:
+    // 네트워크 커넥션 관리 -----------------
+    QNetworkAccessManager   *manager;
+    QEventLoop              connection_loop;
     QTimer  *timer;
-    QWebSocket  socket;
 };
 
 #endif // SERVERHANDLER_H

@@ -10,6 +10,7 @@
 #include "HTTPHandler.h"
 #include "ZIPHandler.h"
 #include "IPCHandler.h"
+#include "ServerHandler.h"
 #include "MapView.h"
 #include "MapHandler.h"
 #include <libusb-1.0/libusb.h>
@@ -55,6 +56,8 @@ public:
     bool patrol_use_pickup = false;
     int state_rotate_tables;
 
+    ServerHandler *server;
+
     ////*********************************************  STRUCT   ***************************************************////
     ST_MAP map;
     ST_ROBOT robot;
@@ -77,6 +80,9 @@ public:
 
     int setting_call_num = -1;
     QVector<QString> call_queue;
+
+    Q_INVOKABLE void loadMapServer();
+    Q_INVOKABLE void sendMapServer();
 
     ////*********************************************  IP SETTINGs   *********************************************////
     QVector<ST_WIFI> wifi_list;
@@ -123,6 +129,9 @@ public:
     QProcess *slam_process;
 
     Q_INVOKABLE void writelog(QString msg);
+
+    ////*********************************************  Server   ***************************************************////
+    Q_INVOKABLE void sendServer();
 
     ////*********************************************  MAP HANDLER   ***************************************************////
 
@@ -290,8 +299,6 @@ public:
     Q_INVOKABLE QString getSetting(QString group, QString name);
 
     Q_INVOKABLE int getTrayNum();
-    Q_INVOKABLE int getTableNum();
-    Q_INVOKABLE void setTableNum(int table_num);
     Q_INVOKABLE void setTableColNum(int col_num);
 
     Q_INVOKABLE QString getRobotType();

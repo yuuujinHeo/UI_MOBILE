@@ -28,6 +28,7 @@ Item {
     property bool is_reset_slam: false
 
     property bool use_tray: false
+    property bool use_multirobot: false
     property bool is_realsense: false
 
     function update_camera(){
@@ -103,8 +104,9 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onDoubleClicked:{
-                        click_sound.play();
-                        popup_password.open();
+                        supervisor.sendServer();
+//                        click_sound.play();
+//                        popup_password.open();
                     }
                 }
             }
@@ -1323,6 +1325,389 @@ Item {
                     }
                 }
 
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"멀티로봇"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_use_multirobot
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"멀티로봇 사용"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_multirobot
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                    if(currentIndex == 0){
+                                        use_multirobot = false;
+                                    }else{
+                                        use_multirobot = true;
+                                    }
+                                }
+                                model:["사용안함","사용"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_server_ip
+                    width: 840
+                    height: 50
+                    visible: use_multirobot
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"서버 IP"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                TextField{
+                                    id: server_ip_1
+                                    width: 70
+                                    height: 50
+                                    focus:false
+                                    onFocusChanged: {
+                                        keyboard.owner = server_ip_1;
+                                        server_ip_1.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            keyboard.close();
+                                            server_ip_1.select(0,0);
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(server_ip_1.text.split(".").length > 1){
+                                            server_ip_1.text = server_ip_1.text.split(".")[0];
+                                            server_ip_1.focus = false;
+                                            server_ip_2.focus = true;
+                                        }
+                                        if(server_ip_1.text.length == 3){
+                                            server_ip_1.focus = false;
+                                            server_ip_2.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+
+                                TextField{
+                                    id: server_ip_2
+                                    width: 70
+                                    height: 50
+                                    focus:false
+                                    onFocusChanged: {
+                                        keyboard.owner = server_ip_2;
+                                        server_ip_2.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            keyboard.close();
+                                            server_ip_2.select(0,0);
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(server_ip_2.text == "."){
+                                            server_ip_2.text = server_ip_2.text.split(".")[0]
+                                        }
+
+                                        if(server_ip_2.text.split(".").length > 1){
+                                            server_ip_2.text = server_ip_2.text.split(".")[0];
+                                            server_ip_2.focus = false;
+                                            server_ip_3.focus = true;
+                                        }
+                                        if(server_ip_2.text.length == 3){
+                                            server_ip_2.focus = false;
+                                            server_ip_3.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+                                TextField{
+                                    id: server_ip_3
+                                    width: 70
+                                    height: 50
+                                    focus:false
+                                    onFocusChanged: {
+                                        keyboard.owner = server_ip_3;
+                                        server_ip_3.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            server_ip_3.select(0,0);
+                                            keyboard.close();
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(server_ip_3.text == "."){
+                                            server_ip_3.text = server_ip_3.text.split(".")[0]
+                                        }
+
+                                        if(server_ip_3.text.split(".").length > 1){
+                                            server_ip_3.text = server_ip_3.text.split(".")[0];
+                                            server_ip_3.focus = false;
+                                            server_ip_4.focus = true;
+                                        }
+                                        if(server_ip_3.text.length == 3){
+                                            server_ip_3.focus = false;
+                                            server_ip_4.focus = true;
+                                        }
+                                    }
+                                }
+                                Text{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:"."
+                                }
+                                TextField{
+                                    id: server_ip_4
+                                    width: 70
+                                    height: 50
+                                    focus:false
+                                    onFocusChanged: {
+                                        keyboard.owner = server_ip_4;
+                                        server_ip_4.selectAll();
+                                        if(focus){
+                                            keyboard.open();
+                                        }else{
+                                            server_ip_4.select(0,0);
+                                            keyboard.close();
+                                        }
+                                    }
+                                    color: ischanged?color_red:"black"
+                                    property bool ischanged: false
+                                    onTextChanged: {
+                                        ischanged = true;
+                                        if(server_ip_4.text == "."){
+                                            server_ip_4.text = server_ip_4.text.split(".")[0]
+                                        }
+
+                                        if(server_ip_4.text.split(".").length > 1){
+                                            server_ip_4.text = server_ip_4.text.split(".")[0];
+                                            server_ip_4.focus = false;
+                                        }
+                                        if(server_ip_4.text.length == 3){
+                                            server_ip_4.focus = false;
+                                        }
+                                    }
+                                }
+
+                                Rectangle{
+                                    height: parent.height
+                                    width: parent.width*0.2
+                                    radius: 5
+                                    color: "black"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        color: "white"
+                                        font.family: font_noto_r.name
+                                        text: "변경"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            click_sound.play();
+                                            server_ip_1.ischanged = false;
+                                            server_ip_2.ischanged = false;
+                                            server_ip_3.ischanged = false;
+                                            server_ip_4.ischanged = false;
+                                            var ip_str = server_ip_1.text + "." + server_ip_2.text + "." + server_ip_3.text + "." + server_ip_4.text;
+                                            supervisor.setSetting("SERVER/fms_ip",ip_str);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_server_id
+                    width: 840
+                    height: 50
+                    visible: use_multirobot
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"FMS 아이디"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: fms_id
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                focus:false
+                                color: ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_HW","fms_id");
+                                onFocusChanged: {
+                                    keyboard.owner = fms_id;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_server_pw
+                    width: 840
+                    height: 50
+                    visible: use_multirobot
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"FMS 비밀번호"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: fms_pw
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    ischanged = true;
+                                    is_reset_slam = true;
+                                }
+                                focus:false
+                                color: ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_HW","fms_pw");
+                                onFocusChanged: {
+                                    keyboard.owner = fms_pw;
+                                    if(focus){
+                                        keyboard.open();
+                                    }else{
+                                        keyboard.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 Rectangle{
                     width: 1100
@@ -7889,6 +8274,14 @@ Item {
             supervisor.setSetting("ROBOT_SW/call_maximum",combo_max_calling.currentText);
         }
 
+        if(combo_multirobot.ischanged){
+            if(combo_multirobot.currentIndex == 0){
+                supervisor.setSetting("ROBOT_SW/use_multirobot","false");
+            }else{
+                supervisor.setSetting("ROBOT_SW/use_multirobot","true");
+            }
+        }
+
         if(combo_platform_type.ischanged){
             if(combo_platform_type.currentIndex == 0){
                 supervisor.setSetting("ROBOT_HW/type","SERVING");
@@ -7916,9 +8309,6 @@ Item {
         if(slider_volume_button.ischanged){
             supervisor.setSetting("ROBOT_SW/volume_button",slider_volume_button.value.toFixed(0));
             volume_button = slider_volume_button.value.toFixed(0);
-        }
-        if(combo_tableview.ischanged){
-            supervisor.setSetting("ROBOT_SW/table_view",combo_tableview.currentIndex);
         }
         if(combo_movingpage.ischanged){
             if(combo_movingpage.currentIndex == 0)
@@ -7948,6 +8338,13 @@ Item {
 
         if(wifi_passwd.ischanged){
             supervisor.setSetting("ROBOT_SW/wifi_passwd",wifi_passwd.text);
+        }
+
+        if(fms_id.ischanged){
+            supervisor.setSetting("SERVER/fms_id",fms_id.text);
+        }
+        if(fms_pw.ischanged){
+            supervisor.setSetting("SERVER/fms_pw",fms_pw.text);
         }
 
         if(ip_1.ischanged||ip_2.ischanged||ip_3.ischanged||ip_4.ischanged){
@@ -8198,6 +8595,15 @@ Item {
 
         combo_tray_num.currentIndex = supervisor.getSetting("ROBOT_HW","tray_num")-1;
 
+        if(supervisor.getSetting("ROBOT_SW","use_multirobot")==="true"){
+            combo_multirobot.currentIndex = 1;
+        }else{
+            combo_multirobot.currentIndex = 0;
+        }
+
+
+
+
         if(supervisor.getSetting("ROBOT_HW","type") === "SERVING"){
             combo_platform_type.currentIndex = 0;
         }else if(supervisor.getSetting("ROBOT_HW","type") === "CALLING"){
@@ -8206,6 +8612,9 @@ Item {
             combo_platform_type.currentIndex = 2;
         }
 
+
+        fms_id.text = supervisor.getSetting("SERVER","fms_id");
+        fms_pw.text = supervisor.getSetting("SERVER","fms_pw");
         combo_max_calling.currentIndex = parseInt(supervisor.getSetting("ROBOT_SW","call_maximum")) - 1;
         wheel_base.text = supervisor.getSetting("ROBOT_HW","wheel_base");
         wheel_radius.text = supervisor.getSetting("ROBOT_HW","wheel_radius");
@@ -8221,7 +8630,6 @@ Item {
         icp_ratio.text = supervisor.getSetting("ROBOT_SW","icp_ratio");
         icp_repeat_dist.text = supervisor.getSetting("ROBOT_SW","icp_repeat_dist");
         icp_repeat_time.text = supervisor.getSetting("ROBOT_SW","icp_repeat_time");
-//        narrow_decel_ratio.text = supervisor.getSetting("ROBOT_SW","narrow_decel_ratio");
         obs_deadzone.text = supervisor.getSetting("ROBOT_SW","obs_deadzone");
         obs_wait_time.text = supervisor.getSetting("ROBOT_SW","obs_wait_time");
         path_out_dist.text = supervisor.getSetting("ROBOT_SW","path_out_dist");
@@ -8231,7 +8639,6 @@ Item {
         goal_th.text = supervisor.getSetting("ROBOT_SW","goal_th");
         goal_v.text = supervisor.getSetting("ROBOT_SW","goal_v");
         goal_near_dist.text = supervisor.getSetting("ROBOT_SW","goal_near_dist");
-//        goal_near_th.text = supervisor.getSetting("ROBOT_SW","goal_near_th");
 
         motor_limit_v.text = supervisor.getSetting("MOTOR","limit_v");
         motor_limit_v_acc.text = supervisor.getSetting("MOTOR","limit_v_acc");
@@ -8288,7 +8695,6 @@ Item {
             combo_camera_model.currentIndex = 1;
         }
 
-        combo_tableview.currentIndex = parseInt(supervisor.getSetting("ROBOT_SW","table_view"));
         if(supervisor.getSetting("ROBOT_SW","moving_face") === "true"){
             combo_movingpage.currentIndex = 1;
         }else{
@@ -8327,6 +8733,13 @@ Item {
             ip_4.text = ip[3];
         }
 
+        ip = supervisor.getSetting("SERVER","fms_ip").split(".");
+        if(ip.length >3){
+            server_ip_1.text = ip[0];
+            server_ip_2.text = ip[1];
+            server_ip_3.text = ip[2];
+            server_ip_4.text = ip[3];
+        }
         ip = supervisor.getSetting("ROBOT_SW","wifi_gateway").split(".");
         ip = supervisor.getcurGateway().split(".");
         if(ip.length >3){
@@ -8385,6 +8798,14 @@ Item {
         dnsserv_2.ischanged = false;
         dnsserv_3.ischanged = false;
         dnsserv_4.ischanged = false;
+
+        combo_multirobot.ischanged = false;
+        server_ip_1.ischanged = false;
+        server_ip_2.ischanged = false;
+        server_ip_3.ischanged = false;
+        server_ip_4.ischanged = false;
+        fms_id.ischanged = false;
+        fms_pw.ischanged = false;
 
         wheel_base.ischanged = false;
         wheel_radius.ischanged = false;
@@ -8690,8 +9111,6 @@ Item {
             bar_temp1.value = supervisor.getMotorTemperature(0);
             bar_mtemp1.value = supervisor.getMotorInsideTemperature(0);
             bar_cur1.value = supervisor.getMotorCurrent(0);
-
-
 
 
             //모터 상태 - 모터 2

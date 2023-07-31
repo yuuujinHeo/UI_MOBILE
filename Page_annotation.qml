@@ -319,7 +319,14 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "맵 불러오기"
+                text: {
+                    if(supervisor.getSetting("ROBOT_SW","use_multirobot")=="true"){
+                        "맵 보내기/가져오기"
+                    }else{
+                        "맵 불러오기"
+                    }
+                }
+
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.bottomMargin: 150
@@ -327,7 +334,12 @@ Item {
                 onClicked: {
                     click_sound.play();
                     supervisor.writelog("[ANNOTATION] Load Map");
-                    popup_map_list.open();
+
+                    if(supervisor.getSetting("ROBOT_SW","use_multirobot")==="true"){
+                        popup_ask_mapload.open();
+                    }else{
+                        popup_map_list.open();
+                    }
                 }
             }
             Item_buttons{
@@ -394,6 +406,7 @@ Item {
                     }
                 }
             }
+
             Text{
                 text: "맵을 회전하고 맵의 영역만큼 지정해주세요."
                 color: "white"
@@ -6003,6 +6016,107 @@ Item {
         visible:false
         objectName: "annot_hide"
         enabled:false
+    }
+
+    Popup{
+        id : popup_ask_mapload
+        anchors.centerIn: parent
+        width: 500
+        height: 450
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+        Rectangle{
+            width : parent.width
+            height: parent.height
+            radius: 10
+            Column{
+                anchors.centerIn: parent
+                spacing: 20
+                Text{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.family: font_noto_r.name
+                    font.pixelSize: 40
+                    color: color_dark_navy
+                    text : "맵 보내기/가져오기"
+                }
+                Rectangle{
+                    width: 300
+                    height: 80
+                    radius: 15
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color : "transparent"
+                    border.width: 3
+                    border.color:color_dark_navy
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 25
+                        color: color_dark_navy
+                        text : "서버로 보내기"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            click_sound.play();
+                            supervisor.sendMapServer();
+                            popup_ask_mapload.close();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 300
+                    visible: false
+                    height: 80
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    radius: 15
+                    color : "transparent"
+                    border.width: 3
+                    border.color: color_dark_navy
+                    Text{
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        anchors.centerIn: parent
+                        color: color_dark_navy
+                        text : "서버로부터 가져오기"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            click_sound.play();
+                            supervisor.loadMapServer();
+                            popup_ask_mapload.close();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 300
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: 80
+                    radius: 15
+                    color : "transparent"
+                    border.width: 3
+                    border.color:color_dark_navy
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                        color: color_dark_navy
+                        text : "로컬로부터 불러오기"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            click_sound.play();
+                            popup_ask_mapload.close();
+                            popup_map_list.open();
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     Popup_map_list{

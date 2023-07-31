@@ -40,6 +40,7 @@ Supervisor::Supervisor(QObject *parent)
     pmap = &map;
     mMain = nullptr;
 
+    server = new ServerHandler();
     maph = new MapHandler();
     usb_list.clear();
     usb_backup_list.clear();
@@ -107,6 +108,9 @@ Supervisor::~Supervisor(){
     plog->write("[BUILDER] KILLED SLAMNAV");
 }
 
+void Supervisor::sendServer(){
+    server->postStatus();
+}
 ////*********************************************  WINDOW 관련   ***************************************************////
 void Supervisor::setWindow(QQuickWindow *Window){
     plog->write("[BUILDER] SUPERVISOR SET WINDOW ");
@@ -124,6 +128,12 @@ QObject *Supervisor::getObject()
 {
     //rootobject를 리턴해준다.
     return mObject;
+}
+void Supervisor::loadMapServer(){
+//    ipc->sendCommand(ROBOT_CMD_SERVER_MAP_LOAD);
+}
+void Supervisor::sendMapServer(){
+    ipc->sendCommand(ROBOT_CMD_SERVER_MAP_UPDATE);
 }
 
 void Supervisor::programRestart(){
@@ -323,7 +333,6 @@ void Supervisor::readSetting(QString map_name){
 
     setting_robot.beginGroup("FLOOR");
     pmap->margin = setting_robot.value("margin").toFloat();
-    pmap->use_server = setting_robot.value("map_server").toBool();
     pmap->map_loaded = setting_robot.value("map_load").toBool();
     pmap->map_name = setting_robot.value("map_name").toString();
     pmap->map_path = setting_robot.value("map_path").toString();
@@ -579,15 +588,8 @@ bool Supervisor::getObjectflag(){
 int Supervisor::getTrayNum(){
     return setting.tray_num;
 }
-int Supervisor::getTableNum(){
-    return setting.table_num;
-}
 void Supervisor::undoObject(){
     maph->undoObject();
-}
-void Supervisor::setTableNum(int table_num){
-    setSetting("FLOOR/table_num",QString::number(table_num));
-    readSetting();
 }
 void Supervisor::setTableColNum(int col_num){
     setSetting("FLOOR/table_col_num",QString::number(col_num));
@@ -865,6 +867,125 @@ void Supervisor::checkRobotINI(){
     if(getSetting("FLOOR","table_col_num").toInt()==0)
         setSetting("FLOOR/table_col_num","1");
 
+
+
+    if(getSetting("MOTOR","gear_ratio").toFloat()==0)
+        setSetting("MOTOR/gear_ratio","1.0");
+    if(getSetting("MOTOR","k_d").toFloat()==0)
+        setSetting("MOTOR/k_d","4400.0");
+    if(getSetting("MOTOR","k_i").toFloat()==0)
+        setSetting("MOTOR/k_i","0.0");
+    if(getSetting("MOTOR","k_p").toFloat()==0)
+        setSetting("MOTOR/k_p","100.0");
+    if(getSetting("MOTOR","left_id").toInt()==0&&getSetting("MOTOR","right_id").toInt()==0){
+        setSetting("MOTOR/left_id","1");
+        setSetting("MOTOR/right_id","0");
+    }
+    if(getSetting("MOTOR","limit_v").toFloat()==0)
+        setSetting("MOTOR/limit_v","1.5");
+    if(getSetting("MOTOR","limit_v_acc").toFloat()==0)
+        setSetting("MOTOR/limit_v_acc","1.0");
+
+    if(getSetting("MOTOR","limit_w").toFloat()==0)
+        setSetting("MOTOR/limit_w","360.0");
+    if(getSetting("MOTOR","limit_w_acc").toFloat()==0)
+        setSetting("MOTOR/limit_w_acc","360.0");
+    if(getSetting("MOTOR","pause_check_ms").toInt()==0)
+        setSetting("MOTOR/pause_check_ms","500");
+    if(getSetting("MOTOR","pause_motor_current").toInt()==0)
+        setSetting("MOTOR/pause_motor_current","3000");
+    if(getSetting("MOTOR","wheel_dir").toInt()==0)
+        setSetting("MOTOR/wheel_dir","-1");
+
+    if(getSetting("ROBOT_HW","radius").toFloat()==0)
+        setSetting("ROBOT_HW/radius","0.3");
+    if(getSetting("ROBOT_HW","tray_num").toInt()==0)
+        setSetting("ROBOT_HW/tray_num","2");
+    if(getSetting("ROBOT_HW","wheel_base").toFloat()==0)
+        setSetting("ROBOT_HW/wheel_base","0.3542");
+    if(getSetting("ROBOT_HW","wheel_radius").toFloat()==0)
+        setSetting("ROBOT_HW/wheel_radius","0.0635");
+
+
+    if(getSetting("ROBOT_SW","goal_dist").toFloat()==0)
+        setSetting("ROBOT_SW/goal_dist","0.1");
+    if(getSetting("ROBOT_SW","goal_th").toFloat()==0)
+        setSetting("ROBOT_SW/goal_th","3.0");
+    if(getSetting("ROBOT_SW","goal_v").toFloat()==0)
+        setSetting("ROBOT_SW/goal_v","0.05");
+    if(getSetting("ROBOT_SW","grid_size").toFloat()==0)
+        setSetting("ROBOT_SW/grid_size","0.03");
+    if(getSetting("ROBOT_SW","icp_dist").toFloat()==0)
+        setSetting("ROBOT_SW/icp_dist","0.5");
+
+    if(getSetting("ROBOT_SW","icp_error").toFloat()==0)
+        setSetting("ROBOT_SW/icp_error","0.1");
+    if(getSetting("ROBOT_SW","icp_near").toFloat()==0)
+        setSetting("ROBOT_SW/icp_near","1.0");
+    if(getSetting("ROBOT_SW","icp_odometry_weight").toFloat()==0)
+        setSetting("ROBOT_SW/icp_odometry_weight","0.5");
+
+    if(getSetting("ROBOT_SW","icp_ratio").toFloat()==0)
+        setSetting("ROBOT_SW/icp_ratio","0.5");
+    if(getSetting("ROBOT_SW","icp_repeat_dist").toFloat()==0)
+        setSetting("ROBOT_SW/icp_repeat_dist","0.15");
+    if(getSetting("ROBOT_SW","icp_repeat_time").toFloat()==0)
+        setSetting("ROBOT_SW/icp_repeat_time","1.0");
+    if(getSetting("ROBOT_SW","k_curve").toFloat()==0)
+        setSetting("ROBOT_SW/k_curve","0.005");
+
+    if(getSetting("ROBOT_SW","k_v").toFloat()==0)
+        setSetting("ROBOT_SW/k_v","1.0");
+    if(getSetting("ROBOT_SW","k_w").toFloat()==0)
+        setSetting("ROBOT_SW/k_w","1.5");
+    if(getSetting("ROBOT_SW","limit_manual_v").toFloat()==0)
+        setSetting("ROBOT_SW/limit_manual_v","0.3");
+    if(getSetting("ROBOT_SW","limit_manual_w").toFloat()==0)
+        setSetting("ROBOT_SW/limit_manual_w","30.0");
+    if(getSetting("ROBOT_SW","limit_pivot").toFloat()==0)
+        setSetting("ROBOT_SW/limit_pivot","30.0");
+    if(getSetting("ROBOT_SW","limit_v").toFloat()==0)
+        setSetting("ROBOT_SW/limit_v","0.5");
+    if(getSetting("ROBOT_SW","limit_v_acc").toFloat()==0)
+        setSetting("ROBOT_SW/limit_v_acc","0.2");
+    if(getSetting("ROBOT_SW","limit_w").toFloat()==0)
+        setSetting("ROBOT_SW/limit_w","90.0");
+    if(getSetting("ROBOT_SW","limit_w_acc").toFloat()==0)
+        setSetting("ROBOT_SW/limit_w_acc","90.0");
+    if(getSetting("ROBOT_SW","look_ahead_dist").toFloat()==0)
+        setSetting("ROBOT_SW/look_ahead_dist","0.5");
+    if(getSetting("ROBOT_SW","map_size").toInt()==0)
+        setSetting("ROBOT_SW/map_size","1000");
+
+    if(getSetting("ROBOT_SW","min_look_ahead_dist").toFloat()==0)
+        setSetting("ROBOT_SW/min_look_ahead_dist","0.1");
+    if(getSetting("ROBOT_SW","narrow_decel_ratio").toFloat()==0)
+        setSetting("ROBOT_SW/narrow_decel_ratio","0.5");
+    if(getSetting("ROBOT_SW","obs_deadzone").toFloat()==0)
+        setSetting("ROBOT_SW/obs_deadzone","0.4");
+    if(getSetting("ROBOT_SW","obs_wait_time").toFloat()==0)
+        setSetting("ROBOT_SW/obs_wait_time","5.0");
+    if(getSetting("ROBOT_SW","path_out_dist").toFloat()==0)
+        setSetting("ROBOT_SW/path_out_dist","1.0");
+    if(getSetting("ROBOT_SW","st_v").toFloat()==0)
+        setSetting("ROBOT_SW/st_v","0.3");
+    if(getSetting("ROBOT_SW","velocity").toFloat()==0)
+        setSetting("ROBOT_SW/velocity","1.0");
+    if(getSetting("ROBOT_SW","volume_bgm").toInt()==0)
+        setSetting("ROBOT_SW/volume_bgm","50");
+    if(getSetting("ROBOT_SW","volume_voice").toInt()==0)
+        setSetting("ROBOT_SW/volume_voice","50");
+
+
+    if(getSetting("SENSOR","baudrate").toFloat()==0)
+        setSetting("SENSOR/baudrate","256000");
+    if(getSetting("SENSOR","cam_exposure").toFloat()==0)
+        setSetting("SENSOR/cam_exposure","2000.0");
+    if(getSetting("SENSOR","max_range").toFloat()==0)
+        setSetting("SENSOR/max_range","40.0");
+    if(getSetting("SENSOR","mask").toFloat()==0)
+        setSetting("SENSOR/mask","10.0");
+
     if(getSetting("PRESET1","name")==""){
         setSetting("PRESET1/name","매우느리게");
         setSetting("PRESET1/limit_pivot","30");
@@ -876,39 +997,39 @@ void Supervisor::checkRobotINI(){
     }
     if(getSetting("PRESET2","name")==""){
         setSetting("PRESET2/name","느리게");
-        setSetting("PRESET2/limit_pivot","30");
-        setSetting("PRESET2/limit_pivot_acc","30");
-        setSetting("PRESET2/limit_v","0.25");
-        setSetting("PRESET2/limit_v_acc","0.25");
-        setSetting("PRESET2/limit_w","30");
-        setSetting("PRESET2/limit_w_acc","45");
+        setSetting("PRESET2/limit_pivot","50");
+        setSetting("PRESET2/limit_pivot_acc","50");
+        setSetting("PRESET2/limit_v","0.75");
+        setSetting("PRESET2/limit_v_acc","0.4");
+        setSetting("PRESET2/limit_w","50");
+        setSetting("PRESET2/limit_w_acc","50");
     }
     if(getSetting("PRESET3","name")==""){
         setSetting("PRESET3/name","보통");
-        setSetting("PRESET3/limit_pivot","30");
-        setSetting("PRESET3/limit_pivot_acc","30");
-        setSetting("PRESET3/limit_v","0.25");
-        setSetting("PRESET3/limit_v_acc","0.25");
-        setSetting("PRESET3/limit_w","30");
-        setSetting("PRESET3/limit_w_acc","45");
+        setSetting("PRESET3/limit_pivot","80");
+        setSetting("PRESET3/limit_pivot_acc","80");
+        setSetting("PRESET3/limit_v","1.0");
+        setSetting("PRESET3/limit_v_acc","0.6");
+        setSetting("PRESET3/limit_w","80");
+        setSetting("PRESET3/limit_w_acc","80");
     }
     if(getSetting("PRESET4","name")==""){
         setSetting("PRESET4/name","빠르게");
-        setSetting("PRESET4/limit_pivot","30");
-        setSetting("PRESET4/limit_pivot_acc","30");
-        setSetting("PRESET4/limit_v","0.25");
-        setSetting("PRESET4/limit_v_acc","0.25");
-        setSetting("PRESET4/limit_w","30");
-        setSetting("PRESET4/limit_w_acc","45");
+        setSetting("PRESET4/limit_pivot","95");
+        setSetting("PRESET4/limit_pivot_acc","95");
+        setSetting("PRESET4/limit_v","1.2");
+        setSetting("PRESET4/limit_v_acc","0.8");
+        setSetting("PRESET4/limit_w","95");
+        setSetting("PRESET4/limit_w_acc","95");
     }
     if(getSetting("PRESET5","name")==""){
         setSetting("PRESET5/name","매우빠르게");
-        setSetting("PRESET5/limit_pivot","30");
-        setSetting("PRESET5/limit_pivot_acc","30");
-        setSetting("PRESET5/limit_v","0.25");
-        setSetting("PRESET5/limit_v_acc","0.25");
-        setSetting("PRESET5/limit_w","30");
-        setSetting("PRESET5/limit_w_acc","45");
+        setSetting("PRESET5/limit_pivot","120");
+        setSetting("PRESET5/limit_pivot_acc","120");
+        setSetting("PRESET5/limit_v","1.5");
+        setSetting("PRESET5/limit_v_acc","1.0");
+        setSetting("PRESET5/limit_w","120");
+        setSetting("PRESET5/limit_w_acc","120");
     }
 }
 void Supervisor::makeRobotINI(){
@@ -975,7 +1096,6 @@ void Supervisor::makeRobotINI(){
         setSetting("ROBOT_SW/obs_height_max","0.8");
 
         setSetting("FLOOR/map_load","true");
-        setSetting("FLOOR/map_server","false");
         setSetting("FLOOR/table_col_num","1");
         setSetting("FLOOR/table_row_num","5");
         setSetting("FLOOR/group_col_num","4");

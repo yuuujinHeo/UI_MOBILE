@@ -599,6 +599,11 @@ void IPCHandler::moveToCharging(int preset){
     plog->write("[IPC] MOVE TO COMMAND : CHARGING (NOT FOUND)");
 }
 
+void IPCHandler::sendCommand(int cmd){
+    IPCHandler::CMD send_msg;
+    send_msg.cmd = cmd;
+    set_cmd(send_msg,"");
+}
 void IPCHandler::moveTo(float x, float y, float th, int preset){
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_MOVE_TARGET;

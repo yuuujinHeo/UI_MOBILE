@@ -24,6 +24,7 @@ SOURCES += \
     IPCHandler.cpp \
     MapHandler.cpp \
     MapViewer.cpp \
+    ServerHandler.cpp \
     ZIPHandler.cpp \
     automata.cpp \
     cv_to_qt.cpp \
@@ -73,6 +74,7 @@ HEADERS += \
     IPCHandler.h \
     MapHandler.h \
     MapViewer.h \
+    ServerHandler.h \
     spline.h \
     Keyemitter.h \
     Logger.h \
