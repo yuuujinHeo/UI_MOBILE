@@ -139,6 +139,49 @@ Item {
     }
 
     Item{
+        id: popup_waiting
+        width: parent.width
+        height: parent.height
+        anchors.centerIn: parent
+        onVisibleChanged: {
+            if(visible){
+                statusbar.visible = true;
+            }else{
+                statusbar.visible = false;
+            }
+        }
+        Rectangle{
+            anchors.fill: parent
+            visible: robot_paused
+            color: "#282828"
+            opacity: 0.8
+        }
+        Text{
+            id: teeeq34e
+            anchors.centerIn: parent
+            font.family: font_noto_b.name
+            font.pixelSize: 50
+            color: "#e2574c"
+            text: "다른 로봇의 이동을 기다리고 있습니다"
+        }
+        Text{
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top:teeeq34e.bottom
+            anchors.topMargin: 10
+            font.family: font_noto_b.name
+            font.pixelSize: 40
+            color: "#e2574c"
+            text: "( 목적지 : "+pos+" )"
+        }
+//        Row{
+//            anchors.horizontalCenter: parent.horizontalCenter
+//            spacing: 80
+//            anchors.bottom: parent.bottom
+//            anchors.bottomMargin: 100
+//        }
+    }
+
+    Item{
         id: popup_pause
         width: parent.width
         height: parent.height
@@ -176,15 +219,15 @@ Item {
             color: "#e2574c"
             text: move_fail?"경로를 찾을 수 없습니다.":"일시정지 됨"
         }
-//        Text{
-//            anchors.horizontalCenter: parent.horizontalCenter
-//            anchors.top:teee.bottom
-//            anchors.topMargin: 10
-//            font.family: font_noto_b.name
-//            font.pixelSize: 40
-//            color: "#e2574c"
-//            text: "( 목적지 : "+pos+" )"
-//        }
+        Text{
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top:teee.bottom
+            anchors.topMargin: 10
+            font.family: font_noto_b.name
+            font.pixelSize: 40
+            color: "#e2574c"
+            text: "( 목적지 : "+pos+" )"
+        }
         Row{
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: 80
@@ -344,8 +387,12 @@ Item {
             if(supervisor.getStateMoving() === 4){
                 robot_paused = true;
                 popup_pause.visible = true;
+                popup_waiting.visible = false;
+            }else if(supervisor.getStateMoving() === 5){
+                popup_waiting.visible = true;
             }else{
                 robot_paused = false;
+                popup_waiting.visible = false;
             }
 
             //DEBUG 230605

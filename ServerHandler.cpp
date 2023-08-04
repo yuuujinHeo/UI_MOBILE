@@ -22,11 +22,12 @@ void ServerHandler::onTimer(){
 
 void ServerHandler::postStatus(){
     ClearJson(json_out);
-    json_out["id"] = "serving.001.0.1";
-    json_out["battery"] = 53;
+    json_out["id"] = "serving.001.0."+probot->name;
+    json_out["battery"] = probot->battery;
+    json_out["git_version"] = probot->program_date;
 
-    qDebug() << json_out;
-    plog->write("[SERVER] post status : "+QString::number(probot->battery));
+//    qDebug() << json_out;
+//    plog->write("[SERVER] post status : "+QString::number(probot->battery));
     QByteArray temp_array = QJsonDocument(json_out).toJson();
 
     QByteArray response = generalPost(temp_array,"http://rbyujin.com:8080/setstatus");
@@ -34,7 +35,7 @@ void ServerHandler::postStatus(){
     ClearJson(json_in);
     json_in = QJsonDocument::fromJson(response).object();
 
-    qDebug() << json_in;
+//    qDebug() << json_in;
 }
 
 // 공통적으로 사용되는 POST 구문 : 출력으로 응답 정보를 보냄
@@ -42,7 +43,7 @@ QByteArray ServerHandler::generalPost(QByteArray post_data, QString url){
     QByteArray postDataSize = QByteArray::number(post_data.size());
     QUrl serviceURL(url);
     QNetworkRequest request(serviceURL);
-    qDebug() << serviceURL << url;
+//    qDebug() << serviceURL << url;
     request.setRawHeader("Content-Type", "application/json");
     request.setRawHeader("Content-Length", postDataSize);
     request.setRawHeader("Connection", "Keep-Alive");

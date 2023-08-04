@@ -1891,6 +1891,8 @@ void MapHandler::saveTline(){
     plog->write("[MapHandler] SAVE MAP "+path);
     cv::imwrite(path.toStdString(),file_travelline);
 
+    cv::flip(file_travelline,file_travelline,0);
+    cv::rotate(file_travelline,file_travelline,cv::ROTATE_90_COUNTERCLOCKWISE);
     lines.clear();
     line.clear();
     spline_dot.clear();
@@ -1919,6 +1921,8 @@ void MapHandler::saveTlineTemp(){
     QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_travel_line_ui.png";
     plog->write("[MapHandler] SAVE MAP "+path);
     cv::imwrite(path.toStdString(),file_travelline);
+    cv::flip(file_travelline,file_travelline,0);
+    cv::rotate(file_travelline,file_travelline,cv::ROTATE_90_COUNTERCLOCKWISE);
 }
 
 void MapHandler::redoLine(){
@@ -1985,31 +1989,38 @@ void MapHandler::saveLocation(QString type, int groupnum, QString name){
         pmap->location_groups.push_back("DEFAULT");
     }
 
-
+    bool overwrite = false;
+    int overwrite_num = -1;
+    for(int i=0; i<pmap->locations.size(); i++){
+        if(pmap->locations[i].name == name){
+            overwrite = true;
+            overwrite_num = i;
+        }
+    }
     if(type == "Serving"){
         plog->write("[MapHandler] Add Location : "+type+","+name+","+QString().sprintf("%f,%f,%f,%d",temp.point.x, temp.point.y, temp.angle,temp.number));
         pmap->locations.push_back(temp);
         pmap->annot_edit_location = true;
-    }else if(getLocationNum(type) > 0){
-        for(int i=0; i<pmap->locations.size(); i++){
-            if(pmap->locations[i].type == type){
-                plog->write("[MapHandler] Add Location(Overwrite): "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
-                pmap->locations[i] = temp;
-                pmap->annot_edit_location = true;
-                break;
-            }
-        }
-    }else{
-        plog->write("[MapHandler] Add Location : "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
-        if(type == "Charging"){
-            pmap->locations.insert(0,temp);
-            pmap->annot_edit_location = true;
-        }else if(type == "Resting"){
+    }else if(type == "Charging"){
+        if(overwrite){
+            plog->write("[MapHandler] Add Location(Overwrite): "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
+            pmap->locations[overwrite_num] = temp;
+        }else{
+            plog->write("[MapHandler] Add Location : "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
             pmap->locations.insert(getLocationNum("Charging"),temp);
-            pmap->annot_edit_location = true;
+        }
+        pmap->annot_edit_location = true;
+    }else if(type == "Resting"){
+        if(overwrite){
+            plog->write("[MapHandler] Add Location(Overwrite): "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
+            pmap->locations[overwrite_num] = temp;
+        }else{
+            plog->write("[MapHandler] Add Location : "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
+            pmap->locations.insert(getLocationNum("Charging")+getLocationNum("Resting"),temp);
         }
         pmap->annot_edit_location = true;
     }
+    pmap->annot_edit_location = true;
     std::sort(pmap->locations.begin(),pmap->locations.end(),sortLocation2);
     pmap->annot_edit_location = true;
 
@@ -2050,22 +2061,24 @@ void MapHandler::saveAnnotation(QString filename){
     QString str_name;
     QSettings settings(origin, QSettings::IniFormat);
     settings.clear();
+    int id_num = 0;
+
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == "Resting"){
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number)+","+pmap->locations[i].call_id;
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;
             settings.setValue("resting_locations/loc"+QString::number(resting_num),str_name);
             resting_num++;
         }else if(pmap->locations[i].type == "Other"){
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number)+","+pmap->locations[i].call_id;
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;
             settings.setValue("other_locations/loc"+QString::number(other_num),str_name);
             other_num++;
         }else if(pmap->locations[i].type == "Serving"){
             QString groupname = "serving_" + QString::number(pmap->locations[i].group);
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number)+","+pmap->locations[i].call_id;
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;
             settings.setValue(groupname+"/loc"+QString::number(group_num[pmap->locations[i].group]),str_name);
             group_num[pmap->locations[i].group]++;
         }else if(pmap->locations[i].type == "Charging"){
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number)+","+pmap->locations[i].call_id;
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;
             settings.setValue("charging_locations/loc"+QString::number(charging_num),str_name);
             charging_num++;
         }
@@ -2097,9 +2110,6 @@ void MapHandler::saveAnnotation(QString filename){
         settings.setValue("objects/poly"+QString::number(i),str);
     }
     settings.setValue("objects/num",pmap->objects.size());
-
-
-
 
     pmap->annotation_edited = false;
 }

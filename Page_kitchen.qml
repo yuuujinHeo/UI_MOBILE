@@ -66,6 +66,7 @@ Item {
         update_group();
 
         if(supervisor.isCallingMode() || supervisor.getCallQueueSize() > 0){
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",supervisor.isCallingMode(),supervisor.getCallQueueSize())
             popup_clean_calling.open();
         }
 
@@ -200,7 +201,8 @@ Item {
 //            print(i);
             if(i>=table_num)
                 break;
-            model_group_table.append({"num":supervisor.getLocationNumber(model_group.get(cur_group).num,i),"available":supervisor.getLocationAvailable(supervisor.getLocationNumber(model_group.get(cur_group).num,i)),"name":supervisor.getServingName(model_group.get(cur_group).num, i)});
+            model_group_table.append({"num":supervisor.getLocationNumber(model_group.get(cur_group).num,i),"available":supervisor.getLocationAvailable(supervisor.getLocationID(model_group.get(cur_group).num,i)),"name":supervisor.getServingName(model_group.get(cur_group).num, i)});
+            print("update table : ",i,supervisor.getLocationNumber(model_group.get(cur_group).num,i),supervisor.getLocationAvailable(supervisor.getLocationNumber(model_group.get(cur_group).num,i)))
         }
     }
 

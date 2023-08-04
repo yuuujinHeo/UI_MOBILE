@@ -131,6 +131,7 @@ typedef struct{
     float power = 0;
     float total_power = 0;
 
+    int multirobot_state = 0;
     int localization_state = 0;
     int running_state = 0;
     int obs_state = 0;
@@ -166,7 +167,7 @@ typedef struct{
     int cur_preset=3;
 //    QVector<QString> call_list;
 
-    int call_moving_count;
+    int call_moving_count=0;
     int max_moving_count;
     float joystick[2];
     float lidar_data[360];
@@ -277,8 +278,7 @@ enum UI_CMD{
     UI_CMD_RESUME,
     UI_CMD_MOVE_RESTING,
 
-    UI_CMD_MOVE_CHARGING,//5
-    UI_CMD_PICKUP_CONFIRM
+    UI_CMD_MOVE_CHARGING//5
 };
 
 enum UI_STATE{
@@ -311,7 +311,8 @@ enum ROBOT_MOVING_STATE{
     ROBOT_MOVING_READY,
     ROBOT_MOVING_MOVING,
     ROBOT_MOVING_WAIT,
-    ROBOT_MOVING_PAUSED
+    ROBOT_MOVING_PAUSED,
+    ROBOT_MOVING_WAIT_ROBOT//5
 };
 
 enum ROBOT_ERROR{

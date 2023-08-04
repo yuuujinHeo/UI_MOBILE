@@ -191,6 +191,7 @@ void IPCHandler::onTimer(){
             pmap->cut_map[0] = 0;
             pmap->cut_map[1] = 0;
         }
+        probot->multirobot_state = temp1.ui_multi_state;
         probot->running_state = temp1.ui_auto_state;
         probot->obs_state = temp1.ui_obs_state;
         probot->robot_preset = temp1.ui_cur_velocity_preset;
@@ -582,6 +583,7 @@ void IPCHandler::moveToServing(QString target_loc, int preset){
     for(int i=0; i<pmap->locations.size(); i++){
         if(target_loc == pmap->locations[i].name){
             match = true;
+            probot->curLocation = pmap->locations[i];
             pose[0] = pmap->locations[i].point.x;
             pose[1] = pmap->locations[i].point.y;
             pose[2] = pmap->locations[i].angle;
@@ -603,6 +605,7 @@ void IPCHandler::moveToServing(QString target_loc, int preset){
 void IPCHandler::moveToLocation(LOCATION target_loc, int preset){
     if(target_loc.name != "" && target_loc.number != 0){
         plog->write("[IPC] MOVE TO COMMAND : "+target_loc.name);
+        probot->curLocation = target_loc;
         moveTo(target_loc.point.x, target_loc.point.y, target_loc.angle, preset);
     }else{
         plog->write("[IPC] MOVE TO COMMAND (UNMATCHED): "+target_loc.name + QString().sprintf("(group : %d, number : %d)",target_loc.group,target_loc.number));

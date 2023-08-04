@@ -481,6 +481,7 @@ public:
     Q_INVOKABLE void setLocationNumber(QString name, int num);
     Q_INVOKABLE int getLocationSize(QString type);
     Q_INVOKABLE QString getLocationGroup(int num);
+    Q_INVOKABLE int getLocationID(int group, int num);
     Q_INVOKABLE int getLocationGroupNum();
     Q_INVOKABLE int getLocationGroupSize(int num);
     Q_INVOKABLE int getLocationGroupNum(int num);
@@ -526,6 +527,7 @@ public:
     Q_INVOKABLE bool isOdroid();
 
 
+    Q_INVOKABLE int getMultiState();
     Q_INVOKABLE void drawingRunawayStart();
     Q_INVOKABLE void drawingRunawayStop();
     Q_INVOKABLE int getRunawayState();

@@ -32,6 +32,8 @@ public:
         float       ui_map_rotate_angle = 0;
         uint32_t    ui_cut_map_x = 0;
         uint32_t    ui_cut_map_y = 0;
+
+        //uint8_t   ui_state = 0;
         UI_STATUS(){
 
         }
@@ -40,6 +42,7 @@ public:
             ui_map_rotate_angle = p.ui_map_rotate_angle;
             ui_cut_map_x = p.ui_cut_map_x;
             ui_cut_map_y = p.ui_cut_map_y;
+            //ui_state = p.ui_state;
         }
     };
 
@@ -76,7 +79,7 @@ public:
         float      robot_scan[360] = {0,};
 
         int8_t     ui_draw_state = 0;
-
+        int8_t      ui_multi_state = 0;//ready, moving, wait
         STATUS()
         {
         }
@@ -109,6 +112,7 @@ public:
             ui_cur_velocity_preset = p.ui_cur_velocity_preset;
             ui_motor_lock_state = p.ui_motor_lock_state;
             ui_draw_state = p.ui_draw_state;
+            ui_multi_state = p.ui_multi_state;
             memcpy(robot_pose, p.robot_pose, sizeof(float)*3);
             memcpy(robot_scan, p.robot_scan, sizeof(float)*360);
         }

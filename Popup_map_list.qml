@@ -327,7 +327,7 @@ Popup{
                             onClicked: {
                                 click_sound.play();
                                 if(select_map_list > -1){
-                                    supervisor.removeMap(list_map.model.get(select_map_list).name);
+                                    supervisor.removeMap(model_maps.get(select_map_list).name);
                                     popup_map_list.update_list();
                                 }
                             }

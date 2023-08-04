@@ -1119,20 +1119,125 @@ Item {
             height: annot_pages.height
             Component.onCompleted: {
                 supervisor.setMotorLock(false);
-                map_hide.savelocation("location_cur","Charging", 0, "Charging");
-//                loading.show();
+                if(annotation_after_mapping || supervisor.getLocationNum("Charging") === 0){
+                    last_robot_x = supervisor.getlastRobotx();
+                    last_robot_y = supervisor.getlastRoboty();
+                    last_robot_th = supervisor.getlastRobotth();
+                    supervisor.addLocation(last_robot_x,last_robot_y,last_robot_th);
+                    supervisor.saveLocation("Charging", 0, "Charging0");
+                    text_save_done.visible = true;
+                    column_another_save.visible = false;
+                    btn_right.enabled = true;
+                }else{
+                    column_another_save.visible = true;
+                    text_save_done.visible = false;
+                    model_chargings.clear();
+                    for(var i=0; i<supervisor.getLocationNum("Charging"); i++){
+                        model_chargings.append({"name":"충전위치"+Number(i)});
+                    }
+                }
             }
+            property int select_charging: 0
             Rectangle{
                 anchors.fill: parent
                 color: color_dark_navy
             }
             Text{
+                id: text_save_done
                 text: "로봇의 충전 위치를 저장했습니다."
                 color: "white"
+                visible: false
                 font.pixelSize: 80
                 font.family: font_noto_b.name
                 anchors.centerIn: parent
             }
+            Column{
+                id: column_another_save
+                visible: false
+                anchors.centerIn: parent
+                spacing: 50
+                Text{
+                    text: "이미 세팅된 충전위치가 있습니다."
+                    color: "white"
+                    font.pixelSize: 80
+                    font.family: font_noto_b.name
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                Flickable{
+                    width: rows_charging.width
+                    height: 100
+                    clip: true
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    contentWidth: rows_charging.width
+                    Row{
+                        id: rows_charging
+                        spacing: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        Repeater{
+                            model: ListModel{id: model_chargings}
+                            Item_buttons{
+                                width: 200
+                                height: 100
+                                type: "round_text"
+                                selected: select_charging===index
+                                text: name
+                                onClicked:{
+                                    select_charging = index;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 50
+                    Item_buttons{
+                        width: 200
+                        height: 80
+                        type: "round_text"
+                        text: "덮어쓰기"
+                        onClicked:{
+                            last_robot_x = supervisor.getlastRobotx();
+                            last_robot_y = supervisor.getlastRoboty();
+                            last_robot_th = supervisor.getlastRobotth();
+                            supervisor.addLocation(last_robot_x,last_robot_y,last_robot_th);
+                            supervisor.saveLocation("Charging", 0, "Charging"+Number(select_charging));
+                            text_save_done.visible = true;
+                            column_another_save.visible = false;
+                            btn_right.enabled = true;
+                        }
+                    }
+                    Item_buttons{
+                        width: 200
+                        height: 80
+                        type: "round_text"
+                        text: "새로추가"
+                        onClicked:{
+                            last_robot_x = supervisor.getlastRobotx();
+                            last_robot_y = supervisor.getlastRoboty();
+                            last_robot_th = supervisor.getlastRobotth();
+                            supervisor.addLocation(last_robot_x,last_robot_y,last_robot_th);
+                            supervisor.saveLocation("Charging", 0, "Charging"+Number(supervisor.getLocationNum("Charging")));
+                            text_save_done.visible = true;
+                            column_another_save.visible = false;
+                            btn_right.enabled = true;
+                        }
+                    }
+                    Item_buttons{
+                        width: 200
+                        height: 80
+                        type: "round_text"
+                        text: "취 소"
+                        onClicked:{
+                            btn_right.enabled = true;
+
+                        }
+                    }
+
+                }
+            }
+
             Item_buttons{
                 id: btn_left
                 width: 200
@@ -1156,6 +1261,7 @@ Item {
                 height: 80
                 type: "round_text"
                 text: "다음으로"
+                enabled: false
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.bottomMargin: 50
@@ -1267,20 +1373,124 @@ Item {
             height: annot_pages.height
             Component.onCompleted: {
                 supervisor.setMotorLock(false);
-                map_hide.savelocation("location_cur","Resting", 0, "Resting");
+                if(annotation_after_mapping || supervisor.getLocationNum("Resting") === 0){
+                    last_robot_x = supervisor.getlastRobotx();
+                    last_robot_y = supervisor.getlastRoboty();
+                    last_robot_th = supervisor.getlastRobotth();
+                    supervisor.addLocation(last_robot_x,last_robot_y,last_robot_th);
+                    supervisor.saveLocation("Resting", 0, "Resting0");
+                    text_save_done.visible = true;
+                    column_another_save.visible = false;
+                    btn_right.enabled = true;
+                }else{
+                    column_another_save.visible = true;
+                    text_save_done.visible = false;
+                    model_resting.clear();
+                    for(var i=0; i<supervisor.getLocationNum("Resting"); i++){
+                        model_resting.append({"name":"대기위치"+Number(i)});
+                    }
+                }
 //                loading.show();
             }
+            property int select_resting: 0
             Rectangle{
                 anchors.fill: parent
                 color: color_dark_navy
             }
             Text{
+                id: text_save_done
                 text: "로봇의 대기위치를 저장했습니다."
                 color: "white"
+                visible: false
                 font.pixelSize: 80
                 font.family: font_noto_b.name
                 anchors.centerIn: parent
             }
+            Column{
+                id: column_another_save
+                visible: false
+                anchors.centerIn: parent
+                spacing: 50
+                Text{
+                    text: "이미 세팅된 대기위치가 있습니다."
+                    color: "white"
+                    font.pixelSize: 80
+                    font.family: font_noto_b.name
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                Flickable{
+                    width: rows_resting.width
+                    height: 100
+                    clip: true
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    contentWidth: rows_resting.width
+                    Row{
+                        id: rows_resting
+                        spacing: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        Repeater{
+                            model: ListModel{id: model_resting}
+                            Item_buttons{
+                                width: 200
+                                height: 100
+                                type: "round_text"
+                                selected: select_resting===index
+                                text: name
+                                onClicked:{
+                                    select_resting = index;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 50
+                    Item_buttons{
+                        width: 200
+                        height: 80
+                        type: "round_text"
+                        text: "덮어쓰기"
+                        onClicked:{
+                            last_robot_x = supervisor.getlastRobotx();
+                            last_robot_y = supervisor.getlastRoboty();
+                            last_robot_th = supervisor.getlastRobotth();
+                            supervisor.addLocation(last_robot_x,last_robot_y,last_robot_th);
+                            supervisor.saveLocation("Resting", 0, "Resting"+Number(select_resting));
+                            text_save_done.visible = true;
+                            column_another_save.visible = false;
+                            btn_right.enabled = true;
+                        }
+                    }
+                    Item_buttons{
+                        width: 200
+                        height: 80
+                        type: "round_text"
+                        text: "새로추가"
+                        onClicked:{
+                            last_robot_x = supervisor.getlastRobotx();
+                            last_robot_y = supervisor.getlastRoboty();
+                            last_robot_th = supervisor.getlastRobotth();
+                            supervisor.addLocation(last_robot_x,last_robot_y,last_robot_th);
+                            supervisor.saveLocation("Resting", 0, "Resting"+Number(supervisor.getLocationNum("Resting")));
+                            text_save_done.visible = true;
+                            column_another_save.visible = false;
+                            btn_right.enabled = true;
+                        }
+                    }
+                    Item_buttons{
+                        width: 200
+                        height: 80
+                        type: "round_text"
+                        text: "취 소"
+                        onClicked:{
+                            btn_right.enabled = true;
+                        }
+                    }
+                }
+            }
+
             Item_buttons{
                 id: btn_left
                 width: 200
@@ -1304,6 +1514,7 @@ Item {
                 height: 80
                 type: "round_text"
                 text: "다음으로"
+                enabled: false
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.bottomMargin: 50

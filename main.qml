@@ -237,10 +237,10 @@ Window {
     function movelocation(){
         cur_location = supervisor.getcurLoc();
         voice_all_stop();
-        if(cur_location == "Charging"){
+        if(cur_location == "Charging0"){
             cur_location = "충전 장소";
             playVoice("moveCharing");
-        }else if(cur_location == "Resting"){
+        }else if(cur_location == "Resting0"){
             cur_location = "대기 장소";
             playVoice("moveResting");
         }else{
