@@ -274,10 +274,12 @@ public:
 
     ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
     void moveToLocation(LOCATION target_loc, int preset);
+    void moveToLocationTest(LOCATION target_loc, int preset);
     void moveToResting(int preset);
     void moveToCharging(int preset);
     void moveToServing(QString target_loc, int preset);
     void moveTo(float x, float y, float th, int preset);
+    void moveToTest(float x, float y, float th, int preset);
     void movePause();
     void moveResume();
     void moveJog();

@@ -23,6 +23,7 @@ extern QObject *object;
 ST_ROBOT *probot;
 ST_MAP *pmap;
 int ui_state = 0;
+bool is_test_moving = false;
 bool is_debug = false;
 #define MAIN_THREAD 200
 
@@ -2329,7 +2330,9 @@ void Supervisor::moveToCharge(){
         plog->write("[COMMAND] Move to Charging");
         current_target = getLocation("Charging0");
         ui_state = UI_STATE_MOVING;
+        is_test_moving = false;
     }else{
+        is_test_moving = false;
         plog->write("[COMMAND] Move to Charging (State busy "+QString::number(ui_state)+")");
     }
 }
@@ -2338,7 +2341,9 @@ void Supervisor::moveToWait(){
         plog->write("[COMMAND] Move to Resting");
         current_target = getLocation("Resting0");
         ui_state = UI_STATE_MOVING;
+        is_test_moving = false;
     }else{
+        is_test_moving = false;
         plog->write("[COMMAND] Move to Resting (State busy "+QString::number(ui_state)+")");
     }
 }
@@ -2613,21 +2618,26 @@ void Supervisor::moveToServingTest(QString name){
         if(name.left(8) == "Charging" || name.left(7) == "Resting"){
             current_target = getLocation(name);
             ui_state = UI_STATE_MOVING;
+            is_test_moving = true;
             plog->write("[COMMAND] Serving Test : "+name);
         }else if(probot->trays[0].empty){
             LOCATION temp_loc = getLocation(name);
             if(temp_loc.name == ""){
                 plog->write("[COMMAND] Serving Test (Not found) : "+name);
+                is_test_moving = false;
             }else{
                 probot->trays[0].empty = false;
                 probot->trays[0].location = temp_loc;
                 ui_state = UI_STATE_MOVING;
+                is_test_moving = true;
                 plog->write("[COMMAND] Serving Test : "+name+QString().sprintf(" (number %d)",temp_loc.number));
             }
         }else{
+            is_test_moving = false;
             plog->write("[COMMAND] Serving Test (Already Moving) : "+name+" (cur target is "+probot->trays[0].location.name+")");
         }
     }else{
+        is_test_moving = false;
         plog->write("[COMMAND] Serving Test (state busy) : "+name+" ("+QString::number(ui_state)+")");
     }
 }
@@ -3007,7 +3017,9 @@ void Supervisor::onTimer(){
             plog->write(QString::number(probot->status_emo)+QString::number(probot->status_lock)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
             plog->write("[SUPERVISOR] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL ");
             ui_state = UI_STATE_MOVEFAIL;
+            is_test_moving = false;
         }else if(probot->localization_state == LOCAL_NOT_READY){
+            is_test_moving = false;
             plog->write("[SUPERVISOR] LOCAL NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
             ui_state = UI_STATE_MOVEFAIL;
         }else{
@@ -3021,6 +3033,7 @@ void Supervisor::onTimer(){
                         if(probot->running_state != ROBOT_MOVING_PAUSED){
                             plog->write("[SUPERVISOR] AUTO PAUSED : Motor Current Over "+QString().sprintf("(0 : %f, 1 : %f, limit: %f)",probot->motor[0].current,probot->motor[1].current,current_threshold));
                             ipc->movePause();
+                            is_test_moving = false;
                         }
                     }
                 }else{
@@ -3235,8 +3248,14 @@ void Supervisor::onTimer(){
                         if(timer_cnt%5==0){
                             if(count_moveto == 0){
                                 //무브 명령 보냄
-                                plog->write("[SUPERVISOR] MOVING SET TO "+current_target.name+QString::number(probot->cur_preset));
-                                ipc->moveToLocation(current_target,probot->cur_preset);
+                                if(is_test_moving){
+                                    plog->write("[SUPERVISOR] MOVING(TEST) SET TO "+current_target.name+QString::number(probot->cur_preset));
+                                    ipc->moveToLocationTest(current_target,probot->cur_preset);
+                                    is_test_moving = false;
+                                }else{
+                                    plog->write("[SUPERVISOR] MOVING SET TO "+current_target.name+QString::number(probot->cur_preset));
+                                    ipc->moveToLocation(current_target,probot->cur_preset);
+                                }
                             }else if(count_moveto++ > 5){
                                 if(probot->ipc_use){
                                     ipc->moveStop();
@@ -3244,11 +3263,11 @@ void Supervisor::onTimer(){
                                 ui_state = UI_STATE_MOVEFAIL;
                                 plog->write("[SUPERVISOR] MOVING FAILED : ROBOT NOT MOVING (Max 5)");
                             }
-
                         }
                     }
                     timer_cnt++;
                 }
+                is_test_moving = false;
             }else if(probot->running_state == ROBOT_MOVING_MOVING){
                 // moving
                 if(!isaccepted){

@@ -612,6 +612,16 @@ void IPCHandler::moveToLocation(LOCATION target_loc, int preset){
     }
     probot->curLocation = target_loc;
 }
+void IPCHandler::moveToLocationTest(LOCATION target_loc, int preset){
+    if(target_loc.name != "" && target_loc.number != 0){
+        plog->write("[IPC] MOVE(TEST) TO COMMAND : "+target_loc.name);
+        probot->curLocation = target_loc;
+        moveToTest(target_loc.point.x, target_loc.point.y, target_loc.angle, preset);
+    }else{
+        plog->write("[IPC] MOVE(TEST) TO COMMAND (UNMATCHED): "+target_loc.name + QString().sprintf("(group : %d, number : %d)",target_loc.group,target_loc.number));
+    }
+    probot->curLocation = target_loc;
+}
 void IPCHandler::moveToResting(int preset){
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == "Resting"){
@@ -643,6 +653,34 @@ void IPCHandler::sendCommand(int cmd){
 void IPCHandler::moveTo(float x, float y, float th, int preset){
     IPCHandler::CMD send_msg;
     send_msg.cmd = ROBOT_CMD_MOVE_TARGET;
+    uint8_t *array;
+    array = reinterpret_cast<uint8_t*>(&x);
+    send_msg.params[0] = array[0];
+    send_msg.params[1] = array[1];
+    send_msg.params[2] = array[2];
+    send_msg.params[3] = array[3];
+    array = reinterpret_cast<uint8_t*>(&y);
+    send_msg.params[4] = array[0];
+    send_msg.params[5] = array[1];
+    send_msg.params[6] = array[2];
+    send_msg.params[7] = array[3];
+    array = reinterpret_cast<uint8_t*>(&th);
+    send_msg.params[8] = array[0];
+    send_msg.params[9] = array[1];
+    send_msg.params[10]= array[2];
+    send_msg.params[11]= array[3];
+
+    send_msg.params[12] = (uint8_t)preset;
+    qDebug() << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << send_msg.params[12];
+
+    probot->curTarget.point.x = x;
+    probot->curTarget.point.y = y;
+    probot->curTarget.angle = th;
+    set_cmd(send_msg,"Move Target to "+QString().sprintf("%f, %f, %f, %d",x,y,th,preset));
+}
+void IPCHandler::moveToTest(float x, float y, float th, int preset){
+    IPCHandler::CMD send_msg;
+    send_msg.cmd = ROBOT_CMD_MOVE_TARGET_EX;
     uint8_t *array;
     array = reinterpret_cast<uint8_t*>(&x);
     send_msg.params[0] = array[0];
