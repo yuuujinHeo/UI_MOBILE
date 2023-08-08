@@ -428,6 +428,7 @@ void IPCHandler::onTimer(){
             }else{
                 pmap->locations[i].available = true;
             }
+            qDebug() << i << loc_status.serving[i] << pmap->locations[i].available;
         }
     }
 

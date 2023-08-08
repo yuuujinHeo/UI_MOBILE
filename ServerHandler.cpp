@@ -22,9 +22,39 @@ void ServerHandler::onTimer(){
 
 void ServerHandler::postStatus(){
     ClearJson(json_out);
-    json_out["id"] = "serving.001.0."+probot->name;
+    json_out["id"] = "serving.001.0.test"+probot->name;
     json_out["battery"] = probot->battery;
     json_out["git_version"] = probot->program_date;
+
+    json_out["last_update_time"] = QDateTime::currentDateTime().toString("yyyyMMdd-hhmmss");
+    json_out["map_name"] = pmap->map_name;
+    json_out["robot_x"] = probot->curPose.point.x;
+    json_out["robot_y"] = probot->curPose.point.y;
+    json_out["robot_th"] = probot->curPose.angle;
+    json_out["velocity_preset"] = probot->cur_preset;
+
+    json_out["state_ui"] = ui_state;
+    json_out["state_charge"] = probot->status_charge;
+    json_out["state_emo"] = probot->status_emo;
+    json_out["state_power"] = probot->status_power;
+    json_out["state_moving"] = probot->running_state;
+    json_out["state_localization"] = probot->localization_state;
+    json_out["state_obs"] = probot->obs_state;
+    json_out["state_face"] = probot->obs_in_path_state;
+    json_out["state_motorlock"] = probot->status_lock;
+    json_out["state_multirobot"] = probot->multirobot_state;
+
+    json_out["motor_connection_1"] = probot->motor[0].connection;
+    json_out["motor_state_1"] = probot->motor[0].status;
+    json_out["motor_temp_board_1"] = probot->motor[0].temperature;
+    json_out["motor_temp_motor_1"] = probot->motor[0].motor_temp;
+    json_out["motor_current_1"] = probot->motor[0].current;
+
+    json_out["motor_connection_2"] = probot->motor[1].connection;
+    json_out["motor_state_2"] = probot->motor[1].status;
+    json_out["motor_temp_board_2"] = probot->motor[1].temperature;
+    json_out["motor_temp_motor_2"] = probot->motor[1].motor_temp;
+    json_out["motor_current_2"] = probot->motor[1].current;
 
 //    qDebug() << json_out;
 //    plog->write("[SERVER] post status : "+QString::number(probot->battery));

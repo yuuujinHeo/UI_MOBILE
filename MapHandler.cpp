@@ -2066,6 +2066,7 @@ void MapHandler::saveAnnotation(QString filename){
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == "Resting"){
             str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;
+
             settings.setValue("resting_locations/loc"+QString::number(resting_num),str_name);
             resting_num++;
         }else if(pmap->locations[i].type == "Other"){

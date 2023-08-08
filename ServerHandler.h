@@ -47,10 +47,11 @@ public:
     QJsonObject json_in;
     QJsonObject json_out;
     QProcess *process;
+
 private slots:
     void onTimer();
+
 private:
-    // 네트워크 커넥션 관리 -----------------
     QNetworkAccessManager   *manager;
     QEventLoop              connection_loop;
     QTimer  *timer;
