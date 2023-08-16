@@ -3919,14 +3919,12 @@ Item {
                 if(supervisor.getChargeStatus() === 1){
                     dochargeininit();
                     supervisor.writelog("[INIT] Charging Detected");
+                }else if(loader_init.item.objectName != "init_slam"){
+                    supervisor.writelog("[INIT] Localization Check : Failed");
+                    loader_init.sourceComponent = item_slam_init
                 }else if(supervisor.getIPCConnection() && supervisor.getLocalizationState() === 2){
                     init_mode = 4;
                     supervisor.writelog("[INIT] Localization Check : Success");
-                }else{
-                    if(loader_init.item.objectName != "init_slam"){
-                        supervisor.writelog("[INIT] Localization Check : Failed");
-                        loader_init.sourceComponent = item_slam_init
-                    }
                 }
             }else if(init_mode == 4){
                 //=============================== Init Check 5 : 로봇 상태 확인(Motor) ==============================//
