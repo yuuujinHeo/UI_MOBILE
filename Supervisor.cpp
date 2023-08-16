@@ -3282,7 +3282,6 @@ void Supervisor::onTimer(){
                             plog->write("[SUPERVISOR] SERVING : MOVE START");
                         }
                     }
-
                     QMetaObject::invokeMethod(mMain, "movelocation");
                 }
             }else if(probot->running_state == ROBOT_MOVING_NOT_READY){
@@ -3381,6 +3380,7 @@ void Supervisor::checkMoveFail(){
         ui_state = UI_STATE_MOVEFAIL;
     }
 }
+
 void Supervisor::passInit(){
     plog->write("[COMMAND] ROBOT INIT PASS");
     ui_state = UI_STATE_RESTING;

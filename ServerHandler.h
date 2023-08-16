@@ -31,6 +31,7 @@
 #include <QApplication>
 #include <websocket/QtHttpHeader.h>
 
+
 class ServerHandler : public QObject
 {
     Q_OBJECT
@@ -42,11 +43,15 @@ public:
     QByteArray generalDelete(QString url);
     void ClearJson(QJsonObject &json);
 
+    void checkUpdate();
     void postStatus();
 
     QJsonObject json_in;
     QJsonObject json_out;
     QProcess *process;
+
+    QString serverURL = "http://rbyujin.com:8080";
+    QString myID = "serving.001.01.test";
 
 private slots:
     void onTimer();
