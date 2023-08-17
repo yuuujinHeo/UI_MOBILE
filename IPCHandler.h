@@ -213,6 +213,20 @@ public:
         }
     };
 
+    struct CALL_LOC
+    {
+        uint32_t  tick = 0;
+        uint32_t loc_id = 0;
+
+        CALL_LOC()
+        {
+        }
+        CALL_LOC(const CALL_LOC& p)
+        {
+            tick = p.tick;
+            loc_id = p.loc_id;
+        }
+    };
 public:
     explicit IPCHandler(QObject *parent = nullptr);
     ~IPCHandler();
@@ -243,6 +257,7 @@ public:
     QSharedMemory shm_cam_color0;
     QSharedMemory shm_cam_color1;
     QSharedMemory shm_loc_status;
+    QSharedMemory shm_call_loc;
 
     CMD get_cmd();
     STATUS get_status();
@@ -254,7 +269,7 @@ public:
     IMG_COLOR get_cam_color0();
     IMG_COLOR get_cam_color1();
     LOC_STATUS get_loc_status();
-
+    CALL_LOC get_call_loc();
 
     bool getConnection(){
         if(read_count > 30){
@@ -307,6 +322,7 @@ public:
     unsigned int prev_tick_cam_color0 = 0;
     unsigned int prev_tick_cam_color1 = 0;
     unsigned int prev_tick_loc_status = 0;
+    unsigned int prev_tick_call_loc = 0;
 
 signals:
     void pathchanged();

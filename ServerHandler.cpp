@@ -78,7 +78,6 @@ void ServerHandler::checkUpdate(){
 
     QJsonObject temp = QJsonDocument::fromJson(response).object();
 
-    qDebug() << serverURL << myID << temp["id"].toString() << temp["update_auto"].toInt();
 }
 
 // 공통적으로 사용되는 POST 구문 : 출력으로 응답 정보를 보냄

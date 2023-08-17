@@ -173,6 +173,10 @@ typedef struct{
     float lidar_data[360];
     float radius;
 
+    bool is_waiting_call=false;
+    int server_call_size=0;
+    int server_call_location=-1;
+
     QString program_version;
     QString program_date;
     QString program_message;
@@ -277,7 +281,6 @@ enum UI_CMD{
     UI_CMD_PAUSE,
     UI_CMD_RESUME,
     UI_CMD_MOVE_RESTING,
-
     UI_CMD_MOVE_CHARGING//5
 };
 
@@ -291,7 +294,8 @@ enum UI_STATE{
     UI_STATE_MOVING,//5
     UI_STATE_PICKUP,
     UI_STATE_MOVEFAIL,
-    UI_STATE_CLENING
+    UI_STATE_CLENING,
+    UI_STATE_MOVING_START
 };
 
 enum LOCALIZATION_STATE{

@@ -133,6 +133,7 @@ public:
     ////*********************************************  Server   ***************************************************////
     Q_INVOKABLE void sendServer();
 
+    bool checkCallQueue();
     ////*********************************************  MAP HANDLER   ***************************************************////
 
     Q_INVOKABLE void loadFile(QString name, QString type){maph->loadFile(name,type);}
@@ -328,7 +329,7 @@ public:
     Q_INVOKABLE void goSerivng(int group, int table);
     Q_INVOKABLE LOCATION getLocationbyCall(QString call);
     Q_INVOKABLE LOCATION getLocation(QString name);
-
+    Q_INVOKABLE LOCATION getLocationbyID(int id);
 
     Q_INVOKABLE void setUiState(int state){
         ui_state = state;

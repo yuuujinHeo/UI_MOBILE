@@ -2256,6 +2256,7 @@ bool Supervisor::saveAnnotation(QString filename){
 void Supervisor::acceptCall(bool yes){
 
 }
+
 ////*********************************************  SCHEDULER(SERVING) 관련   ***************************************************////
 void Supervisor::setTray(int tray_num, int table_num){
     if(ui_state == UI_STATE_RESTING){
@@ -2267,6 +2268,7 @@ void Supervisor::setTray(int tray_num, int table_num){
         }
     }
 }
+
 void Supervisor::startServing(){
     if(ui_state == UI_STATE_RESTING){
         QString tray_str = "";
@@ -2879,7 +2881,9 @@ void Supervisor::onTimer(){
     }else{
         wifi_count = 0;
     }
+
     getAllWifiList();
+
     if(setting.cur_ip == "" && getWifiConnection("")){
         qDebug() << "auto get wifi ip";
         getWifiIP();
@@ -2889,6 +2893,7 @@ void Supervisor::onTimer(){
         wifi_cmd = wifi_cmds[0];
         wifi_cmd_count = 0;
         wifi_cmds.pop_front();
+
         wifi_process->close();
         if(setting.wifi_ssd == ""){
             setting.wifi_ssd = getSetting("ROBOT_SW","wifi_ssd");
@@ -3010,6 +3015,47 @@ void Supervisor::onTimer(){
         }
         break;
     }
+    case UI_STATE_MOVING_START:{
+        if(probot->multirobot_state == 1 && getSetting("ROBOT_SW","server_calling") == "true"){
+            if(probot->server_call_size > 0){
+                probot->is_waiting_call = false;
+                //콜 번호가 유효한 지 체크
+                LOCATION temp_loc = getLocationbyID(probot->server_call_location);
+                if(temp_loc.loc_id == probot->server_call_location){
+                    //호출 포인트 세팅
+                    current_target = temp_loc;
+                    plog->write("[SUPERVISOR] MOVING (SERVER CALLING) : "+temp_loc.name+" ( loc id : "+temp_loc.loc_id+" )");
+                    probot->is_calling = true;
+                    ui_state = UI_STATE_MOVING;
+                    probot->server_call_size = 0;
+                }else{
+                    probot->server_call_size = 0;
+                    plog->write("[SUPERVISOR] MOVING (SERVER CALLING) : Location ID Wrong ("+QString::number(probot->server_call_location)+")");
+                    //세팅 되지 않음 -> 고 홈
+                    plog->write("[SUPERVISOR] MOVING (No Target) : Back to Resting");
+                    probot->call_moving_count = 0;
+                    current_target = getLocation("Resting0");
+                    ui_state = UI_STATE_MOVING;
+                }
+
+            }else if(probot->server_call_size == -1){
+                probot->server_call_size = 0;
+                plog->write("[SUPERVISOR] MOVING (SERVER CALLING) : Location ID Wrong ("+QString::number(probot->server_call_location)+")");
+                //세팅 되지 않음 -> 고 홈
+                plog->write("[SUPERVISOR] MOVING (No Target) : Back to Resting");
+                probot->call_moving_count = 0;
+                current_target = getLocation("Resting0");
+                ui_state = UI_STATE_MOVING;
+            }
+        }else{
+            //세팅 되지 않음 -> 고 홈
+            plog->write("[SUPERVISOR] MOVING (No Target) : Back to Resting");
+            probot->call_moving_count = 0;
+            current_target = getLocation("Resting0");
+            ui_state = UI_STATE_MOVING;
+        }
+        break;
+    }
     case UI_STATE_MOVING:{
         static int timer_cnt = 0;
         //ERROR
@@ -3023,7 +3069,6 @@ void Supervisor::onTimer(){
             plog->write("[SUPERVISOR] LOCAL NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
             ui_state = UI_STATE_MOVEFAIL;
         }else{
-//            qDebug() << getSetting("ROBOT_SW","use_pause_current") << getSetting("MOTOR","pause_motor_current");
             if(getSetting("ROBOT_SW","use_pause_current")=="true"){
                 float current_threshold = getSetting("MOTOR","pause_motor_current").toFloat();
                 int check_count = getSetting("MOTOR","pause_current_ms").toInt()/MAIN_THREAD;
@@ -3141,12 +3186,10 @@ void Supervisor::onTimer(){
                     current_target.name = "";
                 }else{
                     if(current_target.name == ""){
-                        count_moveto = 0;
-                        //출발
                         LOCATION cur_target;
                         probot->is_patrol = false;
 
-                        //서빙 포인트 있는지 체크
+                        //1. 서빙 포인트 있는지 체크
                         int tray_num = -1;
                         for(int i=0; i<setting.tray_num; i++){
                             if(!probot->trays[i].empty){
@@ -3165,29 +3208,42 @@ void Supervisor::onTimer(){
                                 probot->is_calling = true;
                                 plog->write("[SUPERVISOR] MOVING (CALL MAX) : Call Move Count is Max "+QString::number(probot->call_moving_count)+","+QString::number(probot->max_moving_count));
                             }else{
-                                //들어온 콜 위치가 있는지 체크
-                                bool call_set = false;
-                                while(!call_set){
-                                    if(call_queue.size() > 0){
-                                        //콜 번호가 유효한 지 체크
-                                        LOCATION temp_loc = getLocationbyCall(call_queue[0]);
-                                        if(temp_loc.call_id == call_queue[0]){
-                                            //호출 포인트 세팅
-                                            call_set = true;
+
+                                //2. 들어온 콜 위치가 있는지 체크
+                                if(probot->multirobot_state == 1 && getSetting("ROBOT_SW","server_calling")=="true"){
+                                    if(probot->server_call_location>-1){
+                                        LOCATION temp_loc = getLocationbyID(probot->server_call_location);
+                                        if(temp_loc.loc_id == probot->server_call_location){
                                             cur_target = temp_loc;
-                                            plog->write("[SUPERVISOR] MOVING (CALLING) : "+temp_loc.name+" ( call id : "+temp_loc.call_id+" )");
+                                            plog->write("[SUPERVISOR] MOVING (CALLING) : "+temp_loc.name+" ( call id : "+temp_loc.loc_id+" )");
                                             probot->is_calling = true;
-                                        }else{
-                                            plog->write("[SUPERVISOR] MOVING (CALLING) : Call ID Wrong ("+call_queue[0]+")");
-                                            call_queue.pop_front();
                                         }
-                                    }else{
-                                        call_set = true;
                                     }
+                                }else{
+                                    bool call_set = false;
+                                    while(!call_set){
+                                        if(call_queue.size() > 0){
+                                            //콜 번호가 유효한 지 체크
+                                            LOCATION temp_loc = getLocationbyCall(call_queue[0]);
+                                            if(temp_loc.call_id == call_queue[0]){
+                                                //호출 포인트 세팅
+                                                call_set = true;
+                                                cur_target = temp_loc;
+                                                plog->write("[SUPERVISOR] MOVING (CALLING) : "+temp_loc.name+" ( call id : "+temp_loc.call_id+" )");
+                                                probot->is_calling = true;
+                                            }else{
+                                                plog->write("[SUPERVISOR] MOVING (CALLING) : Call ID Wrong ("+call_queue[0]+")");
+                                                call_queue.pop_front();
+                                            }
+                                        }else{
+                                            call_set = true;
+                                        }
+                                    }
+
                                 }
 
                                 if(cur_target.name == ""){
-                                    //PATROLLING
+                                    //3. PATROLLING
                                     if(patrol_list.size() > 0){
                                         if(patrol_mode == PATROL_RANDOM){
                                             //패트롤 위치 랜덤하게 지정
@@ -3236,14 +3292,13 @@ void Supervisor::onTimer(){
                             }
                         }
 
+                        count_moveto = 0;
                         if(cur_target.name == ""){
-                            //세팅 되지 않음 -> 고 홈
-                            plog->write("[SUPERVISOR] MOVING (No Target) : Back to Resting");
-                            cur_target = getLocation("Resting0");
-                            probot->call_moving_count = 0;
+                            ui_state = UI_STATE_MOVING_START;
+                            break;
+                        }else{
+                            current_target = cur_target;
                         }
-                        current_target = cur_target;
-
                     }else{
                         if(timer_cnt%5==0){
                             if(count_moveto == 0){
@@ -3400,6 +3455,9 @@ QString Supervisor::getLogAuth(int num){
     else
         return "";
 }
+bool Supervisor::checkCallQueue(){
+    return false;
+}
 QString Supervisor::getLogMessage(int num){
     QString str = curLog[num];
     if(str.split("[").size() > 1){
@@ -3468,6 +3526,14 @@ void Supervisor::goSerivng(int group, int table){
     }
 }
 
+LOCATION Supervisor::getLocationbyID(int id){
+    for(int i=0; i<pmap->locations.size(); i++){
+        if(pmap->locations[i].loc_id == id){
+            return pmap->locations[i];
+        }
+    }
+    return LOCATION();
+}
 LOCATION Supervisor::getLocationbyCall(QString call){
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].call_id == call){
@@ -3589,6 +3655,7 @@ void Supervisor::wifi_ch_error(){
     wifi_temp_ssd = "";
 }
 void Supervisor::wifi_con_output(){
+    qDebug() << "wifi con output";
     QString output = QString(wifi_process->readAllStandardOutput());
     switch(wifi_cmd){
     case WIFI_CMD_CONNECT:{
@@ -3762,6 +3829,7 @@ void Supervisor::wifi_con_output(){
     }
 }
 void Supervisor::wifi_con_error(){
+    qDebug() << "wifi con error";
     QString output = QString(wifi_process->readAllStandardError());
     qDebug() << "WIFI CON ERROR : " << output;
 
@@ -3798,6 +3866,7 @@ void Supervisor::wifi_con_error(){
     }
 }
 void Supervisor::connectWifi(QString ssd, QString passwd){
+    qDebug() << "conwifi";
     bool match = false;
     for(int i=0; i<wifi_cmds.size(); i++){
         if(wifi_cmds[i] == WIFI_CMD_CONNECT){
@@ -3814,6 +3883,8 @@ void Supervisor::connectWifi(QString ssd, QString passwd){
     }
 }
 void Supervisor::setWifi(QString ip, QString gateway, QString dns){
+
+    qDebug() << "wifi se=t ";
     bool match = false;
     for(int i=0; i<wifi_cmds.size(); i++){
         if(wifi_cmds[i] == WIFI_CMD_SET_IP){

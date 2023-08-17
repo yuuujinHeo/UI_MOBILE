@@ -13,6 +13,7 @@ IPCHandler::IPCHandler(QObject *parent)
     , shm_cam_color0("slamnav_cam_color0")
     , shm_cam_color1("slamnav_cam_color1")
     , shm_loc_status("slamnav_loc_status")
+    , shm_call_loc("slamnav_call_loc")
 {
     // msg tick clear, check for new data
     tick = 0;
@@ -29,6 +30,7 @@ IPCHandler::IPCHandler(QObject *parent)
     updateSharedMemory(shm_cam_color0,"CameraColor0",sizeof(IPCHandler::IMG_COLOR));
     updateSharedMemory(shm_cam_color1,"CameraColor1",sizeof(IPCHandler::IMG_COLOR));
     updateSharedMemory(shm_loc_status,"LocationStatus",sizeof(IPCHandler::LOC_STATUS));
+    updateSharedMemory(shm_call_loc,"CallLocation",sizeof(IPCHandler::CALL_LOC));
     clearSharedMemory(shm_cmd);
 
     timer = new QTimer();
@@ -88,6 +90,7 @@ void IPCHandler::update(){
     updateSharedMemory(shm_cam_color0,"CameraColor0",sizeof(IPCHandler::IMG_COLOR));
     updateSharedMemory(shm_cam_color1,"CameraColor1",sizeof(IPCHandler::IMG_COLOR));
     updateSharedMemory(shm_loc_status,"LocationStatus",sizeof(IPCHandler::LOC_STATUS));
+    updateSharedMemory(shm_call_loc,"CallLocation",sizeof(IPCHandler::CALL_LOC));
 
 }
 
@@ -104,6 +107,7 @@ IPCHandler::~IPCHandler()
     detachSharedMemory(shm_cam_color0,"CameraColor0");
     detachSharedMemory(shm_cam_color1,"CameraColor1");
     detachSharedMemory(shm_loc_status,"LocationStatus");
+    detachSharedMemory(shm_call_loc,"CallLocation");
 
 }
 
@@ -432,6 +436,13 @@ void IPCHandler::onTimer(){
         }
     }
 
+
+    IPCHandler::CALL_LOC call_loc = get_call_loc();
+    if(call_loc.tick != prev_tick_call_loc){
+        flag_rx = true;
+        read_count = 0;
+
+    }
     flag_rx = true;
     static int count=0;
     if(count++%5==0){
@@ -440,6 +451,16 @@ void IPCHandler::onTimer(){
     }
 
     read_count++;
+}
+
+IPCHandler::CALL_LOC IPCHandler::get_call_loc(){
+    IPCHandler::CALL_LOC res;
+
+    shm_call_loc.lock();
+    memcpy(&res, (char*)shm_call_loc.constData(), sizeof(IPCHandler::CALL_LOC));
+    shm_call_loc.unlock();
+
+    return res;
 }
 
 IPCHandler::LOC_STATUS IPCHandler::get_loc_status()
