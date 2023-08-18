@@ -453,6 +453,7 @@ void IPCHandler::onTimer(){
     read_count++;
 }
 void IPCHandler::handsup(){
+    plog->write("[IPC] Hand Up");
     IPCHandler::CALL_STATUS res;
     shm_call_status.lock();
     flag_tx = true;
@@ -462,6 +463,7 @@ void IPCHandler::handsup(){
     shm_call_status.unlock();
 }
 void IPCHandler::handsdown(){
+    plog->write("[IPC] Hand Down");
     IPCHandler::CALL_STATUS res;
     shm_call_status.lock();
     flag_tx = true;
