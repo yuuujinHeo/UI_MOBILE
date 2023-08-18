@@ -14,7 +14,7 @@ ServerHandler::ServerHandler()
     connect(timer, SIGNAL(timeout()),this,SLOT(onTimer()));
     timer->start(TIMER_MS);
 
-    checkUpdate();
+//    checkUpdate();
 }
 
 void ServerHandler::onTimer(){
@@ -70,14 +70,33 @@ void ServerHandler::postStatus(){
 //    qDebug() << json_in;
 }
 
+void ServerHandler::setSetting(QString name, QString value){
+    QString ini_path = QDir::homePath()+"/robot_config.ini";
+    QSettings setting(ini_path, QSettings::IniFormat);
+    setting.setValue(name,value);
+    plog->write("[SETTING] SET "+name+" VALUE TO "+value);
+}
 void ServerHandler::checkUpdate(){
     QByteArray response = generalGet(serverURL+"/update/"+myID);
-//    QByteArray response = generalGet(temp_url);
 
     qDebug() << "response : " << response;
 
     QJsonObject temp = QJsonDocument::fromJson(response).object();
-
+    if(temp.size() > 0){
+        if(temp["id"] == myID){
+            setSetting("ROBOT_SW/update_auto",temp["update_auto"].toString());
+            update_config = temp["update_config"].toBool();
+            update_program = temp["update_program"].toBool();
+            update_map = temp["update_maps"].toBool();
+            config_version = temp["config_version"].toString();
+            program_version = temp["program_version"].toString();
+            maps_version = temp["maps_version"].toString();
+        }else{
+            new_update  = false;
+        }
+    }else{
+        new_update  = false;
+    }
 }
 
 // 공통적으로 사용되는 POST 구문 : 출력으로 응답 정보를 보냄
