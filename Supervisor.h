@@ -323,6 +323,10 @@ public:
     Q_INVOKABLE QString getLocalVersionMessage();
     Q_INVOKABLE QString getServerVersionMessage();
 
+    Q_INVOKABLE void checkUpdate();
+    Q_INVOKABLE bool checkNewUpdateProgram();
+    Q_INVOKABLE void updateNow();
+    Q_INVOKABLE QString getProgramUpdateVersion();
 
     ////*********************************************  MOVING 관련   *************************************************////
     Q_INVOKABLE bool isCallingMode(){return probot->is_calling;}

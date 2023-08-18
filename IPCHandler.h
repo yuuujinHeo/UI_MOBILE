@@ -212,7 +212,20 @@ public:
             memcpy(serving, p.serving, 255);
         }
     };
+    struct CALL_STATUS
+    {
+        uint32_t  tick = 0;
+        uint8_t call_acceptable = 0;
 
+        CALL_STATUS()
+        {
+        }
+        CALL_STATUS(const CALL_STATUS& p)
+        {
+            tick = p.tick;
+            call_acceptable = p.call_acceptable;
+        }
+    };
     struct CALL_LOC
     {
         uint32_t  tick = 0;
@@ -258,6 +271,7 @@ public:
     QSharedMemory shm_cam_color1;
     QSharedMemory shm_loc_status;
     QSharedMemory shm_call_loc;
+    QSharedMemory shm_call_status;
 
     CMD get_cmd();
     STATUS get_status();
@@ -270,6 +284,7 @@ public:
     IMG_COLOR get_cam_color1();
     LOC_STATUS get_loc_status();
     CALL_LOC get_call_loc();
+
 
     bool getConnection(){
         if(read_count > 30){
@@ -287,6 +302,8 @@ public:
     void set_cmd(int cmd, QString log="");
     void set_status_ui();
 
+    void handsup();
+    void handsdown();
     ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
     void moveToLocation(LOCATION target_loc, int preset);
     void moveToLocationTest(LOCATION target_loc, int preset);

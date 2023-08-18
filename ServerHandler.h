@@ -42,13 +42,21 @@ public:
     QByteArray generalPut(QString url, QByteArray put_data);
     QByteArray generalDelete(QString url);
     void ClearJson(QJsonObject &json);
-
+    void setSetting(QString name, QString value);
     void checkUpdate();
     void postStatus();
 
     QJsonObject json_in;
     QJsonObject json_out;
     QProcess *process;
+
+    bool new_update = false;
+    bool update_config = false;
+    bool update_program = false;
+    bool update_map = false;
+    QString config_version;
+    QString program_version;
+    QString maps_version;
 
     QString serverURL = "http://rbyujin.com:8080";
     QString myID = "serving.001.01.test";

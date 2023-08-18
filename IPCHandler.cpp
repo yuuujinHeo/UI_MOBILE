@@ -452,7 +452,25 @@ void IPCHandler::onTimer(){
 
     read_count++;
 }
+void IPCHandler::handsup(){
+    IPCHandler::CALL_STATUS res;
+    shm_call_status.lock();
+    flag_tx = true;
+    res.call_acceptable = 1;
+    res.tick = ++tick;
+    memcpy((char*)shm_call_status.data(),&res,sizeof(IPCHandler::CALL_STATUS));;
+    shm_call_status.unlock();
+}
+void IPCHandler::handsdown(){
+    IPCHandler::CALL_STATUS res;
+    shm_call_status.lock();
+    flag_tx = true;
+    res.call_acceptable = 0;
+    res.tick = ++tick;
+    memcpy((char*)shm_call_status.data(),&res,sizeof(IPCHandler::CALL_STATUS));;
+    shm_call_status.unlock();
 
+}
 IPCHandler::CALL_LOC IPCHandler::get_call_loc(){
     IPCHandler::CALL_LOC res;
 
