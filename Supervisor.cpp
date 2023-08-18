@@ -2981,13 +2981,11 @@ void Supervisor::onTimer(){
         //State : None
         //Robot 연결 안됨, 초기화 시작 전(프로그램 실행직후)
         //변수 초기화, SharedMemory 초기화
-//        qDebug() << ipc->getConnection();
-        if(ipc->getConnection()){
-            ipc->moveStop();
-            current_target.name = "";
-            check_init = true;
-            ui_state = UI_STATE_INITAILIZING;
-        }
+        ipc->moveStop();
+        current_target.name = "";
+        check_init = true;
+        ui_state = UI_STATE_INITAILIZING;
+
 //        qDebug() << "ipc->getConnection();";
         break;
     }
@@ -3001,6 +2999,7 @@ void Supervisor::onTimer(){
                 ui_state = UI_STATE_CHARGING;
             }else{
                 ui_state = UI_STATE_RESTING;
+                ipc->handsup();
             }
         }else{
             if(check_init){
@@ -3017,19 +3016,43 @@ void Supervisor::onTimer(){
                 QMetaObject::invokeMethod(mMain, "lessbattery");
                 plog->write("[SUPERVISOR] PLAY LESS BATTERY");
                 count_battery = 0;
+//                ipc->handsdown();
             }
         }else{
             count_battery = 0;
         }
+
         isaccepted = false;
         if(probot->status_charge == 1){
+            ipc->handsdown();
             plog->write("[SUPERVISOR] STATE Detect : Charging");
             ui_state = UI_STATE_CHARGING;
             QMetaObject::invokeMethod(mMain, "docharge");
         }else if(call_queue.size() > 0){
+            ipc->handsdown();
             plog->write("[SUPERVISOR] STATE Detect : Calling");
             ui_state = UI_STATE_MOVING;
             probot->call_moving_count = 0;
+        }else if(getSetting("ROBOT_SW","server_calling") == "true"){
+            if(probot->server_call_size > 0){
+                probot->server_call_size = 0;
+                probot->is_waiting_call = false;
+                //콜 번호가 유효한 지 체크
+                LOCATION temp_loc = getLocationbyID(probot->server_call_location);
+                if(temp_loc.loc_id == probot->server_call_location){
+                    //호출 포인트 세팅
+                    current_target = temp_loc;
+                    plog->write("[SUPERVISOR] MOVING (SERVER CALLING) : "+temp_loc.name+" ( loc id : "+temp_loc.loc_id+" )");
+                    probot->is_calling = true;
+                    ipc->handsdown();
+                    ui_state = UI_STATE_MOVING;
+                }else{
+                    plog->write("[SUPERVISOR] MOVING (SERVER CALLING) : Location ID Wrong ("+QString::number(probot->server_call_location)+")");
+                }
+            }else if(probot->server_call_size == -1){
+                probot->server_call_size = 0;
+                plog->write("[SUPERVISOR] MOVING (SERVER CALLING) : Location ID Wrong ("+QString::number(probot->server_call_location)+")");
+            }
         }
         break;
     }
@@ -3042,7 +3065,7 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_STATE_HANDS_UP:{
-        if(probot->multirobot_state == 1 && getSetting("ROBOT_SW","server_calling") == "true"){
+        if(getSetting("ROBOT_SW","server_calling") == "true"){
             if(probot->server_call_size > 0){
                 probot->server_call_size = 0;
                 ipc->handsdown();
@@ -3163,6 +3186,7 @@ void Supervisor::onTimer(){
                         }else{
                             plog->write("[SCHEDULER] GO HOME MOVING DONE -> waitkitchen");
                             QMetaObject::invokeMethod(mMain, "waitkitchen");
+                            ipc->handsup();
                             ui_state = UI_STATE_RESTING;
                         }
                     }else{
@@ -3257,7 +3281,7 @@ void Supervisor::onTimer(){
                                 }
 
                                 if(cur_target.name == ""){
-                                    if(probot->multirobot_state == 1 && getSetting("ROBOT_SW","server_calling") == "true"){
+                                    if(getSetting("ROBOT_SW","server_calling") == "true"){
 
                                     }else{
                                         //3. PATROLLING
@@ -3457,6 +3481,7 @@ void Supervisor::checkMoveFail(){
 
 void Supervisor::passInit(){
     plog->write("[COMMAND] ROBOT INIT PASS");
+//    ipc->handsup()
     ui_state = UI_STATE_RESTING;
 }
 QString Supervisor::getLogDate(int num){
@@ -3977,6 +4002,7 @@ bool Supervisor::getWifiInuse(int num){
 void Supervisor::cleanTray(){
     plog->write("[COMMAND] Clean Tray Set");
     ui_state = UI_STATE_RESTING;
+    ipc->handsup();
     if(call_queue.size() == 0)
         probot->is_calling = false;
 }

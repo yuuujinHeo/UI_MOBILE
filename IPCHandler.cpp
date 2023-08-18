@@ -13,6 +13,7 @@ IPCHandler::IPCHandler(QObject *parent)
     , shm_cam_color0("slamnav_cam_color0")
     , shm_cam_color1("slamnav_cam_color1")
     , shm_loc_status("slamnav_loc_status")
+    , shm_call_status("slamnav_call_status")
     , shm_call_loc("slamnav_call_loc")
 {
     // msg tick clear, check for new data
@@ -31,7 +32,10 @@ IPCHandler::IPCHandler(QObject *parent)
     updateSharedMemory(shm_cam_color1,"CameraColor1",sizeof(IPCHandler::IMG_COLOR));
     updateSharedMemory(shm_loc_status,"LocationStatus",sizeof(IPCHandler::LOC_STATUS));
     updateSharedMemory(shm_call_loc,"CallLocation",sizeof(IPCHandler::CALL_LOC));
+    updateSharedMemory(shm_call_status,"CallStatus",sizeof(IPCHandler::CALL_STATUS));
     clearSharedMemory(shm_cmd);
+    clearSharedMemory(shm_call_status);
+    clearSharedMemory(shm_call_loc);
 
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
@@ -91,6 +95,7 @@ void IPCHandler::update(){
     updateSharedMemory(shm_cam_color1,"CameraColor1",sizeof(IPCHandler::IMG_COLOR));
     updateSharedMemory(shm_loc_status,"LocationStatus",sizeof(IPCHandler::LOC_STATUS));
     updateSharedMemory(shm_call_loc,"CallLocation",sizeof(IPCHandler::CALL_LOC));
+    updateSharedMemory(shm_call_status,"CallStatus",sizeof(IPCHandler::CALL_STATUS));
 
 }
 
@@ -108,6 +113,7 @@ IPCHandler::~IPCHandler()
     detachSharedMemory(shm_cam_color1,"CameraColor1");
     detachSharedMemory(shm_loc_status,"LocationStatus");
     detachSharedMemory(shm_call_loc,"CallLocation");
+    detachSharedMemory(shm_call_status,"CallStatus");
 
 }
 
@@ -423,6 +429,7 @@ void IPCHandler::onTimer(){
     if(loc_status.tick != prev_tick_loc_status){
         flag_rx = true;
         read_count = 0;
+        prev_tick_loc_status = loc_status.tick;
         for(int i=0; i<pmap->locations.size(); i++){
             if(i > 254)
                 break;
@@ -432,7 +439,7 @@ void IPCHandler::onTimer(){
             }else{
                 pmap->locations[i].available = true;
             }
-            qDebug() << i << loc_status.serving[i] << pmap->locations[i].available;
+//            qDebug() << i << loc_status.serving[i] << pmap->locations[i].available;
         }
     }
 
@@ -441,7 +448,11 @@ void IPCHandler::onTimer(){
     if(call_loc.tick != prev_tick_call_loc){
         flag_rx = true;
         read_count = 0;
-
+        probot->server_call_size = 1;
+        prev_tick_call_loc = call_loc.tick;
+        probot->server_call_location = call_loc.loc_id;
+//        plog->write("[IPC] GET CAll Location : "+QString::number(call_loc.loc_id)+", "+QString::number(ui_state));
+//        if(call_loc.loc_id )
     }
     flag_rx = true;
     static int count=0;
@@ -453,6 +464,7 @@ void IPCHandler::onTimer(){
     read_count++;
 }
 void IPCHandler::handsup(){
+    plog->write("[IPC] Hands up");
     IPCHandler::CALL_STATUS res;
     shm_call_status.lock();
     flag_tx = true;
@@ -462,6 +474,7 @@ void IPCHandler::handsup(){
     shm_call_status.unlock();
 }
 void IPCHandler::handsdown(){
+    plog->write("[IPC] Hands down");
     IPCHandler::CALL_STATUS res;
     shm_call_status.lock();
     flag_tx = true;
