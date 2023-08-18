@@ -93,6 +93,19 @@ Supervisor::Supervisor(QObject *parent)
     wifi_check_process = new QProcess();
     connect(wifi_check_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_ch_output()));
     connect(wifi_check_process,SIGNAL(readyReadStandardError()),this,SLOT(wifi_ch_error()));
+
+
+
+
+
+
+
+
+
+
+
+    //Test
+    setSetting("ROBOT_SW/server_calling","true");
 }
 
 Supervisor::~Supervisor(){
