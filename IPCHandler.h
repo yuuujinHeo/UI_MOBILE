@@ -229,7 +229,7 @@ public:
     struct CALL_LOC
     {
         uint32_t  tick = 0;
-        uint32_t loc_id = 0;
+        int32_t loc_id = 0;
 
         CALL_LOC()
         {

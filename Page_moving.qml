@@ -12,7 +12,6 @@ Item {
 
     property bool motor_lock: false
     property string pos_name: ""
-    property string pos: "1번 테이블"
     property bool robot_paused: false
     property bool move_fail: false
     property int password: 0
@@ -87,9 +86,9 @@ Item {
     Image{
         id: image_robot
         source: {
-            if(pos == "충전 장소"){
+            if(pos_name == "충전 장소"){
                 "image/robot_move_charge.png"
-            }else if(pos == "대기 장소"){
+            }else if(pos_name == "대기 장소"){
                 "image/robot_move_wait.png"
             }else{
                 "image/robot_moving.png"
@@ -104,7 +103,7 @@ Item {
 
     Text{
         id: target_pos
-        text: pos
+        text: pos_name
         visible: !show_face
         font.pixelSize: 40
         font.family: font_noto_b.name
@@ -152,7 +151,6 @@ Item {
         }
         Rectangle{
             anchors.fill: parent
-            visible: robot_paused
             color: "#282828"
             opacity: 0.8
         }
@@ -171,14 +169,47 @@ Item {
             font.family: font_noto_b.name
             font.pixelSize: 40
             color: "#e2574c"
-            text: "( 목적지 : "+pos+" )"
+            text: "( 목적지 : "+pos_name+" )"
         }
-//        Row{
-//            anchors.horizontalCenter: parent.horizontalCenter
-//            spacing: 80
-//            anchors.bottom: parent.bottom
-//            anchors.bottomMargin: 100
-//        }
+        Row{
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 80
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 100
+            Rectangle{
+                width: 180
+                height: 120
+                radius: 20
+                color: "transparent"
+                enabled: motor_lock
+                border.color: motor_lock?color_red:color_gray
+                border.width: 6
+                Text{
+                    anchors.centerIn: parent
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                    text: "경로 취소"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    z: 99
+                    propagateComposedEvents: true
+                    onPressed:{
+                        click_sound.play();
+                        parent.color = color_dark_navy
+                    }
+                    onReleased:{
+                        parent.color = "transparent"
+                    }
+
+                    onClicked:{
+                        supervisor.writelog("[USER INPUT] MOVING PAUSED : PATH CANCELED");
+                        supervisor.moveStop();
+                    }
+                }
+            }
+        }
     }
 
     Item{
@@ -226,7 +257,7 @@ Item {
             font.family: font_noto_b.name
             font.pixelSize: 40
             color: "#e2574c"
-            text: "( 목적지 : "+pos+" )"
+            text: "( 목적지 : "+pos_name+" )"
         }
         Row{
             anchors.horizontalCenter: parent.horizontalCenter
