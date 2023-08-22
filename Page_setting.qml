@@ -10189,21 +10189,33 @@ Item {
         onOpened: {
             //버전 체크
             supervisor.checkUpdate();
+            if(supervisor.isNewVersion()){
+                supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> CHECK NEW VERSION")
+                //새로운 버전 확인됨
+                rect_lastest.visible = false;
+                rect_need_update.visible = true;
+                text_version1.text = "현재 버전 : " + supervisor.getLocalVersionDate()
+                text_version2.text = "최신 버전 : " + supervisor.getProgramUpdateVersion()
+            }else{
+                rect_lastest.visible = true;
+                rect_need_update.visible = false;
+                text_version.text = "현재 버전 : " + supervisor.getLocalVersionDate()
+            }
             if(supervisor.getSetting("ROBOT_SW","update_auto")==="true"){
-                if(supervisor.isNewVersion()){
-                    supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> ALREADY NEW VERSION")
-                    //버전이 이미 최신임
-                    rect_lastest.visible = true;
-                    rect_need_update.visible = false;
-                    text_version.text = "현재 버전 : " + supervisor.getLocalVersionDate()
-                }else{
-                    supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> CHECK NEW VERSION")
-                    //새로운 버전 확인됨
-                    rect_lastest.visible = false;
-                    rect_need_update.visible = true;
-                    text_version1.text = "현재 버전 : " + supervisor.getLocalVersionDate()
-                    text_version2.text = "최신 버전 : " + supervisor.getServerVersionDate()
-                }
+//                if(supervisor.checkNewUpdateProgram()){
+//                    supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> ALREADY NEW VERSION")
+//                    //버전이 이미 최신임
+//                    rect_lastest.visible = true;
+//                    rect_need_update.visible = false;
+//                    text_version.text = "현재 버전 : " + supervisor.getLocalVersionDate()
+//                }else{
+//                    supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> CHECK NEW VERSION")
+//                    //새로운 버전 확인됨
+//                    rect_lastest.visible = false;
+//                    rect_need_update.visible = true;
+//                    text_version1.text = "현재 버전 : " + supervisor.getLocalVersionDate()
+//                    text_version2.text = "최신 버전 : " + supervisor.getServerVersionDate()
+//                }
             }else{
                 if(supervisor.checkNewUpdateProgram()){
                     supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> CHECK NEW VERSION")
@@ -10350,11 +10362,12 @@ Item {
                             onClicked: {
                                 supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> UPDATE START")
                                 if(is_admin){
-                                    if(supervisor.getSetting("ROBOT_SW","update_auto")==="true"){
-                                        supervisor.updateNow();
-                                    }else{
-                                        supervisor.pullGit();
-                                    }
+                                    supervisor.pullGit();
+//                                    if(supervisor.getSetting("ROBOT_SW","update_auto")==="true"){
+//                                        supervisor.updateNow();
+//                                    }else{
+//                                        supervisor.pullGit();
+//                                    }
 
                                     popup_update.close();
                                 }else{
