@@ -4024,7 +4024,7 @@ Item {
         id: timer_check_version
         interval: 1000
         running: false
-        repeat: false
+        repeat: true
         property var count: 0
 
         onTriggered: {
