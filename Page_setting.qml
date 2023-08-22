@@ -10190,7 +10190,6 @@ Item {
             //버전 체크
             supervisor.checkUpdate();
             if(supervisor.getSetting("ROBOT_SW","update_auto")==="true"){
-
                 if(supervisor.isNewVersion()){
                     supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> ALREADY NEW VERSION")
                     //버전이 이미 최신임
