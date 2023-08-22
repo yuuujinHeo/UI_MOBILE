@@ -79,18 +79,24 @@ void ServerHandler::setSetting(QString name, QString value){
 void ServerHandler::checkUpdate(){
     QByteArray response = generalGet(serverURL+"/update/"+myID);
 
-    qDebug() << "response : " << response;
-
     QJsonObject temp = QJsonDocument::fromJson(response).object();
     if(temp.size() > 0){
         if(temp["id"] == myID){
-            setSetting("ROBOT_SW/update_auto",temp["update_auto"].toString());
+            update_auto = temp["update_auto"].toBool();
+            if(update_auto)
+                setSetting("ROBOT_SW/update_auto","true");
+            else
+                setSetting("ROBOT_SW/update_auto","false");
+
             update_config = temp["update_config"].toBool();
             update_program = temp["update_program"].toBool();
             update_map = temp["update_maps"].toBool();
             config_version = temp["config_version"].toString();
             program_version = temp["program_version"].toString();
             maps_version = temp["maps_version"].toString();
+            plog->write("[SERVER] New Update Detect : "+QVariant(update_auto).toString()+","+QVariant(update_program).toString()+","+QVariant(update_config).toString()
+                        +","+QVariant(update_map).toString()+","+program_version+","+config_version+","+maps_version);
+            new_update = true;
         }else{
             new_update  = false;
         }

@@ -96,21 +96,13 @@ Supervisor::Supervisor(QObject *parent)
 
 
 
-
-
-
-
-
-
-
-
     //Test
     setSetting("ROBOT_SW/server_calling","true");
 }
 
 Supervisor::~Supervisor(){
     plog->write("[BUILDER] SUPERVISOR desployed");
-    slam_process->kill();
+//    slam_process->kill();
     slam_process->close();
     ipc->clearSharedMemory(ipc->shm_cmd);
     QString file = QDir::homePath() + "/auto_reset.sh";
@@ -264,10 +256,12 @@ void Supervisor::git_pull_failed(){
 }
 bool Supervisor::isNewVersion(){
     git->updateGitArray();
-    if(probot->gitList[0].date == probot->program_date){
-        return true;
-    }else{
-        return false;
+    if(probot->gitList.size() > 0){
+        if(probot->gitList[0].date == probot->program_date){
+            return true;
+        }else{
+            return false;
+        }
     }
 }
 QString Supervisor::getLocalVersion(){
@@ -2760,7 +2754,11 @@ void Supervisor::checkUpdate(){
     server->checkUpdate();
 }
 bool Supervisor::checkNewUpdateProgram(){
-    return server->update_config||server->update_program||server->update_map;
+    return true;
+//    return server->update_config||server->update_program||server->update_map;
+}
+QString Supervisor::getProgramVersion(){
+    return getSetting("ROBOT_SW","version");
 }
 QString Supervisor::getProgramUpdateVersion(){
     return server->program_version;
@@ -3053,7 +3051,6 @@ void Supervisor::onTimer(){
                 }
             }else if(probot->server_call_size == -1){
                 probot->server_call_size = 0;
-                plog->write("[SUPERVISOR] MOVING (SERVER CALLING) : Location ID Wrong ("+QString::number(probot->server_call_location)+")");
             }
         }
         break;
@@ -3092,7 +3089,6 @@ void Supervisor::onTimer(){
             }else if(probot->server_call_size == -1){
                 ipc->handsdown();
                 probot->server_call_size = 0;
-                plog->write("[SUPERVISOR] MOVING (SERVER CALLING) : Location ID Wrong ("+QString::number(probot->server_call_location)+")");
                 //세팅 되지 않음 -> 고 홈
                 plog->write("[SUPERVISOR] MOVING (No Target) : Back to Resting");
                 probot->call_moving_count = 0;

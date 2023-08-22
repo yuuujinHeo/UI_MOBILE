@@ -24,6 +24,7 @@ Item {
         init_mode = 0;
         update_timer.start();
         supervisor.clearSharedMemory();
+        supervisor.checkUpdate();
     }
 
     function init(){
@@ -77,6 +78,176 @@ Item {
                     font.pixelSize: 15
                 }
             }
+        }
+    }
+
+    //0. 새로운 업데이트
+    Component{
+        id: item_program_update
+        Item{
+            objectName: "item_program_update"
+            anchors.fill: parent
+            Component.onCompleted: {
+                statusbar.visible = true;
+            }
+            Rectangle{
+                anchors.fill: parent
+                color: "#f4f4f4"
+            }
+            Column{
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenterOffset: -80
+                Text{
+                    font.family: font_noto_r.name
+                    color: "#7e7e7e"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "새로운 업데이트가 있습니다"
+                    font.pixelSize: 60
+                }
+                Text{
+                    font.family: font_noto_r.name
+                    color: "#7e7e7e"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "업데이트를 진행하면 프로그램이 재시작됩니다"
+                    font.pixelSize: 40
+                }
+            }
+
+            Column{
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.rightMargin: 50
+                anchors.bottomMargin: 50
+                spacing: 5
+                Text{
+                    font.family: font_noto_r.name
+                    color: "#7e7e7e"
+                    text: "최신 버전 : "+supervisor.getProgramUpdateVersion()
+                    font.pixelSize: 20
+                }
+                Text{
+                    font.family: font_noto_r.name
+                    color: "#7e7e7e"
+                    text: "현재 버전 : "+supervisor.getProgramVersion()
+                    font.pixelSize: 20
+                }
+            }
+
+
+            Row{
+                spacing: 40
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 140
+                anchors.horizontalCenter: parent.horizontalCenter
+                Rectangle{
+                    id: btn_update
+                    width: 230
+                    height: 130
+                    radius: 40
+                    color: color_navy
+                    Row{
+                        spacing: 15
+                        anchors.centerIn: parent
+                        Row{
+                            id: image_robot_con
+                            anchors.verticalCenter: parent.verticalCenter
+                            Image{
+                                id: image_tx
+                                width: 15
+                                height: 28
+                                mipmap: true
+                                antialiasing: true
+                                sourceSize.width: 15
+                                sourceSize.height: 28
+                                source: "icon/data_gray.png"
+                            }
+                            Image{
+                                id: image_rx
+                                mipmap: true
+                                antialiasing: true
+                                width: 15
+                                height: 28
+                                sourceSize.width: 15
+                                sourceSize.height: 28
+                                anchors.top: image_tx.top
+                                anchors.topMargin: 1
+                                rotation: 180
+                                source: "icon/data_green.png"
+                            }
+                        }
+                        Text{
+                            text: "업데이트"
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: "white"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 30
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onPressed:{
+                            parent.color = color_mid_navy;
+                        }
+                        onReleased: {
+                            start_sound.play();
+                            supervisor.writelog("[INIT] PROGRAM UPDATE")
+                            supervisor.updateNow();
+                            parent.color = color_navy;
+                        }
+                    }
+                }
+                Rectangle{
+                    id: btn_lcm_pass
+                    width: 230
+                    height: 130
+                    radius: 40
+                    color: "transparent"
+                    border.width: 2
+                    border.color: color_navy
+                    Row{
+                        spacing: 15
+                        anchors.centerIn: parent
+                        Image{
+                            id: image_charge1
+                            width: 40
+                            height: 40
+                            source:"icon/icon_remove.png"
+                            anchors.verticalCenter: parent.verticalCenter
+                            ColorOverlay{
+                                source: parent
+                                anchors.fill: parent
+                                color: color_navy
+                            }
+                        }
+                        Text{
+                            id: text_slam_pass
+                            text: "넘어가기"
+                            color: color_navy
+                            font.family: font_noto_r.name
+                            font.pixelSize: 30
+                        }
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onPressed:{
+                            parent.color = color_gray;
+                        }
+                        onReleased: {
+                            click_sound.play();
+                            supervisor.writelog("[INIT] Program Update Pass")
+                            init_mode = 1;
+                            parent.color = "transparent";
+                        }
+                    }
+                }
+
+            }
+
+
         }
     }
 
@@ -3715,7 +3886,6 @@ Item {
 
                     }
                 }
-
                 if(supervisor.getzipstate() === 1){
                     if(popup_usb_notice.mode== "compress"){
                         text_usb_state.text = "파일을 압축하여 저장 중..";
@@ -3847,8 +4017,27 @@ Item {
         onTriggered: {
             supervisor.writelog("[INIT] IPC not Connected.");
             loader_init.sourceComponent = item_ipc;
+
         }
     }
+    Timer{
+        id: timer_check_version
+        interval: 1000
+        running: false
+        repeat: false
+        property var count: 0
+
+        onTriggered: {
+            if(count < 2){
+                count++;
+            }else{
+                init_mode = 1;
+                supervisor.writelog("[INIT] Program version check : None");
+            }
+        }
+
+    }
+
     Timer{
         id: update_timer
         interval: 500
@@ -3856,20 +4045,33 @@ Item {
         repeat: true
         onTriggered: {
             if(init_mode == 0){
+                //=============================== Init Check 0 : Program Update ==============================//
+                if(supervisor.checkNewUpdateProgram()){
+                    if(loader_init.item.objectName != "item_program_update"){
+                        supervisor.writelog("[INIT] Program version check : New Version ("+supervisor.getProgramUpdateVersion()+")");
+                        loader_init.sourceComponent = item_program_update;
+                    }
+                }else{
+                    if(!timer_check_version.running){
+                        timer_check_version.count = 0;
+                        timer_check_version.start();
+                    }
+                }
+            }else if(init_mode == 1){
                 //=============================== Init Check 1 : IPC ==============================//
                 if(supervisor.getIPCConnection()){
                     supervisor.writelog("[INIT] IPC Connection Check : Success");
-                    init_mode = 1;
+                    init_mode = 2;
                     timer_wait_lcm.stop();
                 }else if(!timer_wait_lcm.running && loader_init.item.objectName != "item_ipc"){
                     timer_wait_lcm.start();
                     supervisor.writelog("[INIT] IPC Connection Check : Failed");
                 }
-            }else if(init_mode == 1){
+            }else if(init_mode == 2){
                 //========================== Init Check 2 : Robot Config ==============================//
                 if(supervisor.checkINI() && loader_init.item.objectName != "item_robot_config"){
                     supervisor.writelog("[INIT] Robot_config Check : Success");
-                    init_mode = 2;
+                    init_mode = 3;
                 }else{
                     if(loader_init.item.objectName != "item_robot_config"){
                         loader_init.sourceComponent = item_robot_config
@@ -3877,14 +4079,14 @@ Item {
                     }
                 }
 
-            }else if(init_mode == 2){
+            }else if(init_mode == 3){
                 //=============================== Init Check 3 : 맵 확인 ==============================//
                 var map_name = supervisor.getMapname();
                 //annotation과 map 존재여부 확인
                 if(supervisor.isExistAnnotation(map_name) && supervisor.isLoadMap()){
                     //이미 설정확인된 맵이 존재한다면 다음으로 넘어감
                     supervisor.writelog("[INIT] Map Check : Success");
-                    init_mode = 3;
+                    init_mode = 4;
                 }else{
                     //annotation, map 둘 중 하나라도 없으면 안내페이지 표시
                     if(loader_init.item.objectName != "item_map"){
@@ -3914,7 +4116,7 @@ Item {
                         }
                     }
                 }
-            }else if(init_mode == 3){
+            }else if(init_mode == 4){
                 //======================= Init Check 4 : 로봇 상태 확인(Charging. Localization) =========================//
                 if(supervisor.getChargeStatus() === 1){
                     dochargeininit();
@@ -3923,14 +4125,14 @@ Item {
                     supervisor.writelog("[INIT] Localization Check : Failed");
                     loader_init.sourceComponent = item_slam_init
                 }else if(supervisor.getIPCConnection() && supervisor.getLocalizationState() === 2){
-                    init_mode = 4;
+                    init_mode = 5;
                     supervisor.writelog("[INIT] Localization Check : Success");
                 }
-            }else if(init_mode == 4){
+            }else if(init_mode == 5){
                 //=============================== Init Check 5 : 로봇 상태 확인(Motor) ==============================//
                 if(supervisor.getIPCConnection() && supervisor.getMotorState() === 1){
                     supervisor.writelog("[INIT] Motor Check : Success");
-                    init_mode = 5;
+                    init_mode = 6;
                     update_timer.stop();
                     loadPage(pkitchen);
                 }else{

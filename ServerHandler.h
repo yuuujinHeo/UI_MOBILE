@@ -54,6 +54,7 @@ public:
     bool update_config = false;
     bool update_program = false;
     bool update_map = false;
+    bool update_auto = false;
     QString config_version;
     QString program_version;
     QString maps_version;

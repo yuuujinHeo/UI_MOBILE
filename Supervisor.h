@@ -327,6 +327,8 @@ public:
     Q_INVOKABLE bool checkNewUpdateProgram();
     Q_INVOKABLE void updateNow();
     Q_INVOKABLE QString getProgramUpdateVersion();
+    Q_INVOKABLE QString getProgramVersion();
+//    Q_INVOKABLE QString
 
     ////*********************************************  MOVING 관련   *************************************************////
     Q_INVOKABLE bool isCallingMode(){return probot->is_calling;}
