@@ -83,11 +83,6 @@ void ServerHandler::checkUpdate(){
     if(temp.size() > 0){
         if(temp["id"] == myID){
             update_auto = temp["update_auto"].toBool();
-            if(update_auto)
-                setSetting("ROBOT_SW/update_auto","true");
-            else
-                setSetting("ROBOT_SW/update_auto","false");
-
             update_config = temp["update_config"].toBool();
             update_program = temp["update_program"].toBool();
             update_map = temp["update_maps"].toBool();
@@ -96,7 +91,37 @@ void ServerHandler::checkUpdate(){
             maps_version = temp["maps_version"].toString();
             plog->write("[SERVER] New Update Detect : "+QVariant(update_auto).toString()+","+QVariant(update_program).toString()+","+QVariant(update_config).toString()
                         +","+QVariant(update_map).toString()+","+program_version+","+config_version+","+maps_version);
-            new_update = true;
+
+            if(update_auto){
+                setSetting("ROBOT_SW/update_auto","true");
+            }else{
+                setSetting("ROBOT_SW/update_auto","false");
+            }
+            new_update = false;
+            if(update_config){
+                if(config_version != getSetting("ROBOT_SW","config_version")){
+                    plog->write("[SERVER] NEW UPDATE(CONFIG) : OLD("+getSetting("ROBOT_SW","config_version")+") NEW("+config_version+")");
+                    new_update = true;
+                }
+            }
+            if(update_program){
+                if(program_version != getSetting("ROBOT_SW","version")){
+                    plog->write("[SERVER] NEW UPDATE(CONFIG) : OLD("+getSetting("ROBOT_SW","version")+") NEW("+program_version+")");
+                    new_update = true;
+                    ST_GIT temp_git;
+                    temp_git.date = "";
+                    temp_git.message = "";
+                    temp_git.commit = program_version;
+                    probot->gitList.clear();
+                    probot->gitList.append(temp_git);
+                }
+            }
+            if(update_map){
+                if(maps_version != getSetting("ROBOT_SW","map_version")){
+                    plog->write("[SERVER] NEW UPDATE(CONFIG) : OLD("+getSetting("ROBOT_SW","maps_version")+") NEW("+maps_version+")");
+                    new_update = true;
+                }
+            }
         }else{
             new_update  = false;
         }
@@ -105,6 +130,12 @@ void ServerHandler::checkUpdate(){
     }
 }
 
+QString ServerHandler::getSetting(QString group, QString name){
+    QString ini_path = QDir::homePath()+"/robot_config.ini";
+    QSettings setting_robot(ini_path, QSettings::IniFormat);
+    setting_robot.beginGroup(group);
+    return setting_robot.value(name).toString();
+}
 // 공통적으로 사용되는 POST 구문 : 출력으로 응답 정보를 보냄
 QByteArray ServerHandler::generalPost(QByteArray post_data, QString url){
     QByteArray postDataSize = QByteArray::number(post_data.size());

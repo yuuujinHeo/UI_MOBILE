@@ -45,7 +45,7 @@ public:
     void setSetting(QString name, QString value);
     void checkUpdate();
     void postStatus();
-
+    QString getSetting(QString group, QString name);
     QJsonObject json_in;
     QJsonObject json_out;
     QProcess *process;
