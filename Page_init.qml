@@ -4028,12 +4028,15 @@ Item {
         property var count: 0
 
         onTriggered: {
-            if(count < 2){
-                count++;
-            }else{
-                init_mode = 1;
-                supervisor.writelog("[INIT] Program version check : None");
+            if(init_mode == 0){
+                if(count < 2){
+                    count++;
+                }else{
+                    init_mode = 1;
+                    supervisor.writelog("[INIT] Program version check : None");
+                }
             }
+
         }
 
     }
