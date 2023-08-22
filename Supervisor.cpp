@@ -244,6 +244,7 @@ void Supervisor::git_pull_success(){
     setSetting("ROBOT_SW/version_date",date);//probot->program_date);
     setSetting("ROBOT_SW/version",probot->program_version);
     readSetting();
+    QMetaObject::invokeMethod(mMain,"pull_success");
 }
 void Supervisor::git_pull_failed(){
     QString date = probot->program_date;
@@ -2754,8 +2755,7 @@ void Supervisor::checkUpdate(){
     server->checkUpdate();
 }
 bool Supervisor::checkNewUpdateProgram(){
-    return true;
-//    return server->update_config||server->update_program||server->update_map;
+    return server->new_update;
 }
 QString Supervisor::getProgramVersion(){
     return getSetting("ROBOT_SW","version");

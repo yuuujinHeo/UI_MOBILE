@@ -149,6 +149,8 @@ void HTTPHandler::processPullOutput(){
     probot->program_date = probot->gitList[0].date;
     probot->program_message = probot->gitList[0].message;
     emit pullSuccess();
+    QProcess::startDetached(QApplication::applicationFilePath());
+    QApplication::exit(12);
 }
 void HTTPHandler::processLogOutput(){
     QString output = QString(process->readAllStandardOutput());

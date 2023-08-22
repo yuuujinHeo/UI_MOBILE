@@ -13,6 +13,7 @@ extern Logger *plog;
 extern int ui_state;
 extern bool is_debug;
 
+
 typedef struct{
     QString serial;
     int imageSize = 0;
