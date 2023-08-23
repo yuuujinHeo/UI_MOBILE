@@ -2074,9 +2074,11 @@ void MapHandler::saveAnnotation(QString filename){
             settings.setValue("other_locations/loc"+QString::number(other_num),str_name);
             other_num++;
         }else if(pmap->locations[i].type == "Serving"){
+            qDebug() << "SHIT?????" << i << pmap->locations[i].call_id;
             QString groupname = "serving_" + QString::number(pmap->locations[i].group);
             str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;
             settings.setValue(groupname+"/loc"+QString::number(group_num[pmap->locations[i].group]),str_name);
+            qDebug() << str_name;
             group_num[pmap->locations[i].group]++;
         }else if(pmap->locations[i].type == "Charging"){
             str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;

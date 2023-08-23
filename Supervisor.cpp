@@ -97,7 +97,7 @@ Supervisor::Supervisor(QObject *parent)
 
 
     //Test
-    setSetting("ROBOT_SW/server_calling","true");
+//    setSetting("ROBOT_SW/server_calling","true");
 }
 
 Supervisor::~Supervisor(){
@@ -206,8 +206,23 @@ void Supervisor::new_call(){
             }
         }
         if(!already_in){
-            call_queue.push_back(call->getBellID());
-            plog->write("[SUPERVISOR] NEW CALL (queue size "+QString::number(call_queue.size())+" ) : " + call->getBellID());
+            bool match_call = false;
+            for(int i=0; i<pmap->locations.size(); i++){
+                if(pmap->locations[i].call_id == call->getBellID()){
+                    match_call = true;
+                    break;
+                }
+            }
+            if(match_call){
+
+                call_queue.push_back(call->getBellID());
+                plog->write("[SUPERVISOR] NEW CALL (queue size "+QString::number(call_queue.size())+" ) : " + call->getBellID());
+
+            }else{
+
+                plog->write("[SUPERVISOR] NEW CALL (Wrong ID ->Ignored) : " + call->getBellID());
+
+            }
         }
     }
 }
@@ -2192,7 +2207,11 @@ bool Supervisor::saveAnnotation(QString filename){
         plog->write("[DEBUG] Fail to copy annotation.ini to annotation_backup.ini (No file found)");
     }
 
-    qDebug() << getAnnotPath(filename);
+    if(filename == ""){
+        filename = getMapname();
+    }
+
+    qDebug() << getMapname() << getAnnotPath(filename);
     //데이터 입력(로케이션)
     int other_num = 0;
     int resting_num = 0;
@@ -2208,6 +2227,7 @@ bool Supervisor::saveAnnotation(QString filename){
     int id_num = 0;
 
     for(int i=0; i<pmap->locations.size(); i++){
+        qDebug() << "WHAT?????" << i << pmap->locations[i].call_id;
         if(pmap->locations[i].type == "Resting"){
             str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;
             settings.setValue("resting_locations/loc"+QString::number(resting_num),str_name);
@@ -2220,6 +2240,7 @@ bool Supervisor::saveAnnotation(QString filename){
             QString groupname = "serving_" + QString::number(pmap->locations[i].group);
             str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;
             settings.setValue(groupname+"/loc"+QString::number(group_num[pmap->locations[i].group]),str_name);
+            qDebug() << str_name;
             group_num[pmap->locations[i].group]++;
         }else if(pmap->locations[i].type == "Charging"){
             str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;
@@ -3263,6 +3284,7 @@ void Supervisor::onTimer(){
                                     if(call_queue.size() > 0){
                                         //콜 번호가 유효한 지 체크
                                         LOCATION temp_loc = getLocationbyCall(call_queue[0]);
+                                        qDebug() << call_queue[0] << temp_loc.call_id;
                                         if(temp_loc.call_id == call_queue[0]){
                                             //호출 포인트 세팅
                                             call_set = true;
