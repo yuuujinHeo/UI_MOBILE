@@ -1578,7 +1578,7 @@ Item {
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[Annotation] Location Test : go Charging");
-                        supervisor.moveToServingTest("Charging");
+                        supervisor.moveToServingTest("Charging0");
                     }
                 }
                 Item_buttons{
@@ -1589,7 +1589,7 @@ Item {
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[Annotation] Location Test : go Resting");
-                        supervisor.moveToServingTest("Resting");
+                        supervisor.moveToServingTest("Resting0");
                     }
                 }
             }
