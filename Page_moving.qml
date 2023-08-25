@@ -142,6 +142,7 @@ Item {
         width: parent.width
         height: parent.height
         anchors.centerIn: parent
+        visible: false
         onVisibleChanged: {
             if(visible){
                 statusbar.visible = true;
@@ -419,15 +420,17 @@ Item {
                 motor_lock = true;
             }
 
+            if(supervisor.getMultiState() === 2){
+                popup_waiting.visible = true;
+            }else{
+                popup_waiting.visible = false;
+            }
+
             if(supervisor.getStateMoving() === 4){
                 robot_paused = true;
                 popup_pause.visible = true;
-                popup_waiting.visible = false;
-            }else if(supervisor.getStateMoving() === 5){
-                popup_waiting.visible = true;
             }else{
                 robot_paused = false;
-                popup_waiting.visible = false;
             }
 
             //DEBUG 230605
