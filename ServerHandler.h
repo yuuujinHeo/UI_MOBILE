@@ -50,6 +50,8 @@ public:
     QJsonObject json_out;
     QProcess *process;
 
+    bool connection = true;
+
     bool new_update = false;
     bool update_config = false;
     bool update_program = false;
@@ -58,9 +60,14 @@ public:
     QString config_version;
     QString program_version;
     QString maps_version;
+    QString config_str;
+    QString program_str;
+    QString maps_str;
+    QString message;
+
 
     QString serverURL = "http://rbyujin.com:8080";
-    QString myID = "serving.001.01.test";
+    QString myID = "serving.001.01.test123";
 
 private slots:
     void onTimer();
@@ -69,6 +76,7 @@ private:
     QNetworkAccessManager   *manager;
     QEventLoop              connection_loop;
     QTimer  *timer;
+    QTimer  *connection_timer;
 };
 
 #endif // SERVERHANDLER_H

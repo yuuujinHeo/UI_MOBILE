@@ -24,7 +24,7 @@ Item {
         init_mode = 0;
         update_timer.start();
         supervisor.clearSharedMemory();
-        supervisor.checkUpdate();
+//        supervisor.checkUpdate();
     }
 
     function init(){
@@ -33,8 +33,6 @@ Item {
             loader_init.item.ip_update();
         }
     }
-
-
 
     //init page main window
     Loader{
@@ -56,7 +54,7 @@ Item {
                     target: image_logo1;
                     from: 0;
                     to: 1;
-                    duration: 2000
+                    duration: 3000
                     running: true
                 }
                 Image{
@@ -4026,7 +4024,6 @@ Item {
         running: false
         repeat: true
         property var count: 0
-
         onTriggered: {
             if(init_mode == 0){
                 if(count < 2){
@@ -4065,9 +4062,9 @@ Item {
                 if(supervisor.getIPCConnection()){
                     supervisor.writelog("[INIT] IPC Connection Check : Success");
                     init_mode = 2;
-                    timer_wait_lcm.stop();
-                }else if(!timer_wait_lcm.running && loader_init.item.objectName != "item_ipc"){
-                    timer_wait_lcm.start();
+//                    timer_wait_lcm.stop();
+                }else if(loader_init.item.objectName != "item_ipc"){
+                    loader_init.sourceComponent = item_ipc;
                     supervisor.writelog("[INIT] IPC Connection Check : Failed");
                 }
             }else if(init_mode == 2){
@@ -4081,7 +4078,6 @@ Item {
                         supervisor.writelog("[INIT] Robot_config Check : Failed");
                     }
                 }
-
             }else if(init_mode == 3){
                 //=============================== Init Check 3 : 맵 확인 ==============================//
                 var map_name = supervisor.getMapname();

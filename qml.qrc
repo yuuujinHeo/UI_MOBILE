@@ -200,5 +200,6 @@
         <file>bgm/serving.mp3</file>
         <file>MAP_FULL2.qml</file>
         <file>Item_ProgressBar.qml</file>
+        <file>Page_localization.qml</file>
     </qresource>
 </RCC>

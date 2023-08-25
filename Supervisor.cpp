@@ -3819,8 +3819,10 @@ void Supervisor::wifi_con_output(){
             }
         }
 
-        for(int k=0; k<wifi_list.size(); k++){
-            wifi_list[k].discon_count++;
+        for(int k=wifi_list.size()-1; k>-1; k--){
+            if(wifi_list[k].discon_count++ > 5){
+                wifi_list.removeAt(k);
+            }
         }
 
         bool is_pushed = false;
@@ -3840,24 +3842,20 @@ void Supervisor::wifi_con_output(){
             }
         }
 
+
         if(is_pushed)
             plog->write("[SETTING] READ WIFI LIST CHANGED : "+QString::number(wifi_list.size()));
-        wifi_cmd = WIFI_CMD_NONE;
 
-//        qDebug() << "?????????????????????";
+        wifi_cmd = WIFI_CMD_NONE;
         wifi_process->close();
-//        wifi_process->deleteLater();
-//        qDebug() << "no";
         break;
     }
     case WIFI_CMD_GET_IP:{
         bool is_read = false;
         QStringList output_lines = output.split("\n");
-//        qDebug() << output_lines;
         for(int i=0; i<output_lines.size(); i++){
             output_lines[i].replace(" ","");
             QStringList line = output_lines[i].split(":");
-//            qDebug() << i << line;
             if(line.size() > 1){
                 if(line[0] == "IP4.ADDRESS[1]"){
                     qDebug() << line;

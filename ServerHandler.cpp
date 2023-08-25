@@ -12,6 +12,8 @@ ServerHandler::ServerHandler()
     connect(manager, SIGNAL(finished(QNetworkReply*)), &connection_loop, SLOT(quit()));
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()),this,SLOT(onTimer()));
+    connection_timer = new QTimer();
+    connect(connection_timer, SIGNAL(timeout()),&connection_loop,SLOT(quit()));
     timer->start(TIMER_MS);
 
 //    checkUpdate();
@@ -19,7 +21,9 @@ ServerHandler::ServerHandler()
 
 void ServerHandler::onTimer(){
     //주기적으로 서버에게 상태를 보냄.
-    postStatus();
+    if(!connection_loop.isRunning()){
+        postStatus();
+    }
 }
 
 void ServerHandler::postStatus(){
@@ -58,16 +62,22 @@ void ServerHandler::postStatus(){
     json_out["motor_temp_motor_2"] = probot->motor[1].motor_temp;
     json_out["motor_current_2"] = probot->motor[1].current;
 
-//    qDebug() << json_out;
-//    plog->write("[SERVER] post status : "+QString::number(probot->battery));
     QByteArray temp_array = QJsonDocument(json_out).toJson();
 
     QByteArray response = generalPost(temp_array,serverURL+"/setstatus");
-
+    if(response == ""){
+        if(connection){
+            plog->write("[SERVER] Post Status : Failed");
+            connection = false;
+        }
+    }else{
+        if(!connection){
+            plog->write("[SERVER] Post Status : Re-connected");
+            connection = true;
+        }
+    }
     ClearJson(json_in);
     json_in = QJsonDocument::fromJson(response).object();
-
-//    qDebug() << json_in;
 }
 
 void ServerHandler::setSetting(QString name, QString value){
@@ -77,6 +87,7 @@ void ServerHandler::setSetting(QString name, QString value){
     plog->write("[SETTING] SET "+name+" VALUE TO "+value);
 }
 void ServerHandler::checkUpdate(){
+    plog->write("[SERVER] Check Update");
     QByteArray response = generalGet(serverURL+"/update/"+myID);
 
     QJsonObject temp = QJsonDocument::fromJson(response).object();
@@ -89,6 +100,10 @@ void ServerHandler::checkUpdate(){
             config_version = temp["config_version"].toString();
             program_version = temp["program_version"].toString();
             maps_version = temp["maps_version"].toString();
+            config_str = temp["config_version_str"].toString();
+            program_str = temp["program_version_str"].toString();
+            maps_str = temp["maps_version_str"].toString();
+            message = temp["message"].toString();
             plog->write("[SERVER] New Update Detect : "+QVariant(update_auto).toString()+","+QVariant(update_program).toString()+","+QVariant(update_config).toString()
                         +","+QVariant(update_map).toString()+","+program_version+","+config_version+","+maps_version);
 
@@ -109,7 +124,7 @@ void ServerHandler::checkUpdate(){
                     plog->write("[SERVER] NEW UPDATE(CONFIG) : OLD("+getSetting("ROBOT_SW","version")+") NEW("+program_version+")");
                     new_update = true;
                     ST_GIT temp_git;
-                    temp_git.date = "";
+                    temp_git.date = program_str;
                     temp_git.message = "";
                     temp_git.commit = program_version;
                     probot->gitList.clear();
@@ -141,7 +156,6 @@ QByteArray ServerHandler::generalPost(QByteArray post_data, QString url){
     QByteArray postDataSize = QByteArray::number(post_data.size());
     QUrl serviceURL(url);
     QNetworkRequest request(serviceURL);
-//    qDebug() << serviceURL << url;
     request.setRawHeader("Content-Type", "application/json");
     request.setRawHeader("Content-Length", postDataSize);
     request.setRawHeader("Connection", "Keep-Alive");
@@ -149,6 +163,7 @@ QByteArray ServerHandler::generalPost(QByteArray post_data, QString url){
     request.setRawHeader("AcceptLanguage", "ko-KR,en,*");
 
     QNetworkReply *reply = manager->post(request, post_data);
+    connection_timer->start(1000);
     connection_loop.exec();
 
     reply->waitForReadyRead(200);
@@ -162,6 +177,7 @@ QByteArray ServerHandler::generalGet(QString url){
     QNetworkRequest request(serviceURL);
 
     QNetworkReply *reply = manager->get(request);
+    connection_timer->start(1000);
     connection_loop.exec();
 
     reply->waitForReadyRead(200);
@@ -175,6 +191,7 @@ QByteArray ServerHandler::generalPut(QString url, QByteArray put_data){
     QNetworkRequest request(serviceURL);
 
     QNetworkReply *reply = manager->put(request, put_data);
+    connection_timer->start(1000);
     connection_loop.exec();
 
     reply->waitForReadyRead(200);
@@ -188,6 +205,7 @@ QByteArray ServerHandler::generalDelete(QString url){
     QNetworkRequest request(serviceURL);
 
     QNetworkReply *reply = manager->deleteResource(request);
+    connection_timer->start(1000);
     connection_loop.exec();
 
     reply->waitForReadyRead(200);

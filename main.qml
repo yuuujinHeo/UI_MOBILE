@@ -64,6 +64,7 @@ Window {
     property string psetting: "qrc:/Page_setting.qml"
     property string plog: "qrc:/Page_log.qml"
     property string pmapping: "qrc:/Page_mapping.qml"
+    property string plocalization: "qrc:/Page_localization.qml"
     property string pannotation: "qrc:/Page_annotation.qml"
 
     property string robot_type: supervisor.getRobotType()

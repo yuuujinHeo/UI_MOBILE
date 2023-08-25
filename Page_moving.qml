@@ -355,7 +355,7 @@ Item {
         id: btn_password_1
         width: 100
         height: 100
-        enabled: robot_paused
+//        enabled: robot_paused
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         z: 99
@@ -369,6 +369,10 @@ Item {
                 loadPage(pmovefail);
                 loader_page.item.setNotice(3);
             }
+        }
+        onPressAndHold: {
+            password = 0;
+            mainwindow.showMinimized();
         }
     }
 

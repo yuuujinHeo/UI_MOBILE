@@ -92,10 +92,10 @@ Item {
         anchors.bottom: parent.bottom
         color: color_dark_navy
         Column{
-            spacing: 60
+            spacing: 40
             anchors.centerIn: parent
             Repeater{
-                model: ["맵 새로만들기","현재맵 수정하기","지정 순회"]
+                model: ["맵 새로만들기","현재맵 수정하기","위치 초기화","지정 순회"]
                 Rectangle{
                     property int btn_size: 135
                     width: btn_size
@@ -124,6 +124,8 @@ Item {
                                         "image/image_annot.png"
                                     }else if(modelData == "지정 순회"){
                                         "image/image_patrol.png"
+                                    }else if(modelData == "위치 초기화"){
+                                        "image/image_localization.png"
                                     }
                                 }
                             }
@@ -156,6 +158,9 @@ Item {
                                 supervisor.writelog("[UI] MAP : Show Patrol Popup")
                                 popup_patrol_list.open();
                                 popup_patrol_list.mode = "sequence";
+                            }else if(modelData == "위치 초기화"){
+                                supervisor.writelog("[UI] MAP : move to Localization")
+                                loadPage(plocalization);
                             }
                         }
                     }

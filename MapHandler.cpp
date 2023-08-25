@@ -892,7 +892,7 @@ void MapHandler::setMap(){
         if(mode == "local_view"){
             painter.setPen(QPen(QColor(hex_color_blue),3));
             float x1, y1;
-            int num;
+            int num=0;
             float limit = pmap->robot_radius;
             for(int i=0; i<360; i++){
                 if(probot->lidar_data[i] > limit){
