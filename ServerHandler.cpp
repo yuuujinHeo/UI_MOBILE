@@ -3,8 +3,6 @@
 #include <QUrl>
 #include <QDataStream>
 
-#define TIMER_MS    3000
-
 using namespace std;
 ServerHandler::ServerHandler()
 {
@@ -105,6 +103,11 @@ void ServerHandler::postStatus(){
     }
     ClearJson(json_in);
     json_in = QJsonDocument::fromJson(response).object();
+    if(json_in["id"].toString() == myID){
+        TIMER_MS = json_in["activate_level"].toInt();
+        qDebug() << "timer ms = " << TIMER_MS;
+    }
+//    timer->start(TIMER_MS);
 }
 
 void ServerHandler::setSetting(QString name, QString value){
