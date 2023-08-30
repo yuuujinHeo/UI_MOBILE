@@ -27,6 +27,8 @@ void ServerHandler::onTimer(){
             sendConfig();
         }else if(!send_map){
             sendMaps();
+            TIMER_MS = 60000;
+            timer->start(TIMER_MS);
         }else{
             postStatus();
         }
@@ -104,10 +106,11 @@ void ServerHandler::postStatus(){
     ClearJson(json_in);
     json_in = QJsonDocument::fromJson(response).object();
     if(json_in["id"].toString() == myID){
-        TIMER_MS = json_in["activate_level"].toInt();
-        qDebug() << "timer ms = " << TIMER_MS;
+
+        TIMER_MS = json_in["activate_level"].toString().toInt();
+//        qDebug() << "timer ms = " << TIMER_MS << json_in["activate_level"].toString() << json_in["activate_level"].toString().toInt();
+        timer->start(TIMER_MS);
     }
-//    timer->start(TIMER_MS);
 }
 
 void ServerHandler::setSetting(QString name, QString value){
