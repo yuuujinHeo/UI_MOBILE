@@ -67,7 +67,7 @@ public:
 
 
     QString serverURL = "http://rbyujin.com:8080";
-    QString myID = "serving.001.01.test123";
+    QString myID = "serving.001.01.test34";
 
 private slots:
     void onTimer();
