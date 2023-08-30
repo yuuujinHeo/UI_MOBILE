@@ -74,6 +74,7 @@ public:
     QString message;
 
 
+    int TIMER_MS = 60000;
     QString serverURL = "http://rbyujin.com:8080";
     QString myID = "serving.001.01.test34";
 
