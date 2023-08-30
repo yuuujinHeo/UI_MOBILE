@@ -20,6 +20,9 @@ public:
     ZIPHandler();
     void unZipandRead(QString path);
     QStringList showentry(){return filelist;}
+
+    void makeMapZip(QString path, QString mapname);
+
     void makeZip(QString path, bool _ui, bool _slam, bool _config, bool _map, bool _log);
     void getZip(QString path);
     void testzip(QString dst, QStringList sources);
