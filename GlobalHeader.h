@@ -5,8 +5,8 @@
 #include <opencv2/opencv.hpp>
 #include <QDir>
 #include <QPixmap>
-#include "cv_to_qt.h"
 #include "MapHeader.h"
+#include "cv_to_qt.h"
 
 
 extern Logger *plog;

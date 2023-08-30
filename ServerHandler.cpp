@@ -1,5 +1,6 @@
 #include "ServerHandler.h"
 #include <iostream>
+#include <QUrl>
 #include <QDataStream>
 
 #define TIMER_MS    3000
@@ -17,12 +18,20 @@ ServerHandler::ServerHandler()
     timer->start(TIMER_MS);
 
 //    checkUpdate();
+//    sendConfig();
+//    sendMaps();
 }
 
 void ServerHandler::onTimer(){
     //주기적으로 서버에게 상태를 보냄.
     if(!connection_loop.isRunning()){
-        postStatus();
+        if(!send_config){
+            sendConfig();
+        }else if(!send_map){
+            sendMaps();
+        }else{
+            postStatus();
+        }
     }
 }
 
@@ -61,6 +70,24 @@ void ServerHandler::postStatus(){
     json_out["motor_temp_board_2"] = probot->motor[1].temperature;
     json_out["motor_temp_motor_2"] = probot->motor[1].motor_temp;
     json_out["motor_current_2"] = probot->motor[1].current;
+
+
+
+    POSE temp;
+    temp.point.x = 1.2353465762;
+    probot->curPath.clear();
+    probot->curPath.append(temp);
+    probot->curPath.append(temp);
+    probot->curPath.append(temp);
+    probot->curPath.append(temp);
+    probot->curPath.append(temp);
+
+    json_out["path_size"] = probot->curPath.size();
+    for(int i=0; i<probot->curPath.size(); i++){
+        json_out["path_x_"+QString::number(i)] = QString::number(probot->curPath[i].point.x);
+        json_out["path_y_"+QString::number(i)] = probot->curPath[i].point.y;
+        json_out["path_th_"+QString::number(i)] = probot->curPath[i].angle;
+    }
 
     QByteArray temp_array = QJsonDocument(json_out).toJson();
 
@@ -145,11 +172,80 @@ void ServerHandler::checkUpdate(){
     }
 }
 
+void ServerHandler::sendConfig(){
+    QString dir = QDir::homePath()+"/robot_config.ini";
+    QFile config(dir);
+    send_config = true;
+    if(config.open(QIODevice::ReadOnly)){
+        QByteArray response = sendfilePost(dir, serverURL+"/upload/config/"+myID);
+        qDebug() << response;
+    }else{
+        plog->write("[SERVER] Send Config : Failed (File not open)");
+    }
+}
+
+void ServerHandler::sendMaps(){
+    ZIPHandler zip;
+    send_map = true;
+    zip.makeMapZip(QDir::homePath(),getSetting("FLOOR","map_name"));
+    QString dir = QDir::homePath()+"/"+getSetting("FLOOR","map_name")+".zip";
+    QFile config(dir);
+    if(config.open(QIODevice::ReadOnly)){
+        QByteArray response = sendfilePost(dir, serverURL+"/upload/map/"+myID);
+        qDebug() << response;
+    }else{
+        plog->write("[SERVER] Send Map : Failed (File not open)");
+    }
+
+
+}
+
 QString ServerHandler::getSetting(QString group, QString name){
     QString ini_path = QDir::homePath()+"/robot_config.ini";
     QSettings setting_robot(ini_path, QSettings::IniFormat);
     setting_robot.beginGroup(group);
     return setting_robot.value(name).toString();
+}
+
+QByteArray ServerHandler::sendfilePost(QString file_dir, QString url){
+    QUrl serviceURL(url);
+    QNetworkRequest request(serviceURL);
+
+    QHttpMultiPart *files = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+
+    QStringList file_dirs = file_dir.split("/");
+    QString filename = file_dirs[file_dirs.size()-1];
+
+    QHttpPart filepart;
+    filepart.setHeader(QNetworkRequest::ContentDispositionHeader,QVariant("form-data; name=\"file\"; filename=\""+filename+"\""));
+    QFile *file = new QFile(file_dir);
+    file->open(QIODevice::ReadOnly);
+    filepart.setBody(file->readAll());
+    file->setParent(files);
+
+    files->append(filepart);
+
+    quint32 random[6];
+    QRandomGenerator::global()->fillRange(random);
+    QByteArray boundary = "--boundary_zyl_"+ QByteArray::fromRawData(reinterpret_cast<char *>(random),sizeof(random)).toBase64();
+
+    QByteArray contentType;
+    contentType += "multipart/";
+    contentType += "form-data";
+    contentType += "; boundary=";
+    contentType += boundary;
+    files->setBoundary(boundary);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, contentType);
+
+    QNetworkReply *reply = manager->post(request, files);
+    files->setParent(reply);
+    connection_timer->start(1000);
+    connection_loop.exec();
+
+    reply->waitForReadyRead(200);
+    QByteArray ret = reply->readAll();
+    reply->deleteLater();
+    return ret;
 }
 // 공통적으로 사용되는 POST 구문 : 출력으로 응답 정보를 보냄
 QByteArray ServerHandler::generalPost(QByteArray post_data, QString url){

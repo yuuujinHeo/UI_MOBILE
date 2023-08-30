@@ -23,6 +23,7 @@
 #include <QTimer>
 
 #include "GlobalHeader.h"
+#include "ZIPHandler.h"
 
 // websocket ------------------
 #include <websocket/QtHttpServer.h>
@@ -37,6 +38,7 @@ class ServerHandler : public QObject
     Q_OBJECT
 public:
     ServerHandler();
+    QByteArray sendfilePost(QString file_dir, QString url);
     QByteArray generalPost(QByteArray post_data, QString url);
     QByteArray generalGet(QString url);
     QByteArray generalPut(QString url, QByteArray put_data);
@@ -45,12 +47,18 @@ public:
     void setSetting(QString name, QString value);
     void checkUpdate();
     void postStatus();
+
+    void sendConfig();
+    void sendMaps();
+
     QString getSetting(QString group, QString name);
     QJsonObject json_in;
     QJsonObject json_out;
     QProcess *process;
 
     bool connection = true;
+    bool send_config = false;
+    bool send_map = false;
 
     bool new_update = false;
     bool update_config = false;
@@ -75,6 +83,7 @@ private slots:
 private:
     QNetworkAccessManager   *manager;
     QEventLoop              connection_loop;
+
     QTimer  *timer;
     QTimer  *connection_timer;
 };

@@ -12,6 +12,24 @@ void ZIPHandler::testzip(QString dst, QStringList sources){
         qDebug() << "FAIL";
     }
 }
+
+void ZIPHandler::makeMapZip(QString path, QString mapname){
+    plog->write("[ZIP] Make Map.zip : "+mapname);
+    process = 1;
+    errorlist.clear();
+
+    //최종 파일 이름
+    QString target = path + "/"+mapname+".zip";
+    QString source = QDir::homePath() + "/maps/"+mapname;
+    if(zipper.compressDir(target,source,true)){
+        plog->write("[ZIP] Compress : "+source);
+    }else{
+        errorlist.append("maps 압축 실패");
+        plog->write("[ZIP] Compress Error : "+source);
+    }
+    emit zip_done();
+
+}
 void ZIPHandler::makeZip(QString path, bool _ui, bool _slam, bool _config, bool _map, bool _log){
     if(_ui || _slam || _config || _map || _log){
         QString log_str = "[ZIP] make Zip :";

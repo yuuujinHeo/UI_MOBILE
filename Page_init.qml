@@ -4044,6 +4044,7 @@ Item {
         running: true
         repeat: true
         onTriggered: {
+
             if(init_mode == 0){
                 //=============================== Init Check 0 : Program Update ==============================//
                 if(supervisor.checkNewUpdateProgram()){
