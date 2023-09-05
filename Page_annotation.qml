@@ -1095,6 +1095,22 @@ Item {
             }
 
             Item_buttons{
+                id: btn_right2
+                width: 200
+                height: 80
+                visible: !annotation_after_mapping
+                type: "round_text"
+                text: "취 소"
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.bottomMargin: 150
+                anchors.rightMargin: 50
+                onClicked: {
+                    click_sound.play();
+                    annot_pages.sourceComponent = page_annot_menu;
+                }
+            }
+            Item_buttons{
                 id: btn_right
                 width: 200
                 height: 80
@@ -1348,6 +1364,22 @@ Item {
                 anchors.bottomMargin: -100
             }
 
+            Item_buttons{
+                id: btn_right2
+                width: 200
+                height: 80
+                visible: !annotation_after_mapping
+                type: "round_text"
+                text: "취 소"
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.bottomMargin: 150
+                anchors.rightMargin: 50
+                onClicked: {
+                    click_sound.play();
+                    annot_pages.sourceComponent = page_annot_menu;
+                }
+            }
             Item_buttons{
                 id: btn_right
                 width: 200

@@ -264,9 +264,6 @@ Item {
         onClicked: {
             click_sound.play();
             supervisor.writelog("[ANNOTATION] Localization : Success");
-            if(annotation_after_mapping)
-                annot_pages.sourceComponent = page_annot_location_charging;
-            else
                 annot_pages.sourceComponent = page_annot_menu;
         }
     }
@@ -285,9 +282,6 @@ Item {
         onClicked: {
             click_sound.play();
             supervisor.writelog("[ANNOTATION] Localization : Success");
-            if(annotation_after_mapping)
-                annot_pages.sourceComponent = page_annot_location_charging;
-            else
                 annot_pages.sourceComponent = page_annot_menu;
         }
     }
