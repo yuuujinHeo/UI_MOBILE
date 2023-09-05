@@ -10248,7 +10248,7 @@ Item {
         onOpened: {
             //버전 체크
 //            supervisor.checkUpdate();
-            if(supervisor.isNewVersion()){
+            if(!supervisor.isNewVersion()){
                 supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> CHECK NEW VERSION")
                 //새로운 버전 확인됨
                 rect_lastest.visible = false;
@@ -10260,6 +10260,9 @@ Item {
                 rect_need_update.visible = false;
                 text_version.text = "현재 버전 : " + supervisor.getLocalVersionDate()
             }
+
+
+
             if(supervisor.getSetting("ROBOT_SW","update_auto")==="true"){
 //                if(supervisor.checkNewUpdateProgram()){
 //                    supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> ALREADY NEW VERSION")
