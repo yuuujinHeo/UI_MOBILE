@@ -8633,8 +8633,8 @@ Item {
             supervisor.slam_ini_reload();
 //            supervisor.restartSLAM();
 
-        init();
-
+//        init();
+        backPage();
     }
 
     function init(){
