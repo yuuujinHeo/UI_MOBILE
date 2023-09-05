@@ -47,7 +47,9 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onPressAndHold: {
-                    popup_menu.open();
+                    supervisor.writelog("[USER INPUT] STATUS BAR : MINIMIZED")
+                    supervisor.programHide();
+                    mainwindow.showMinimized()
                 }
                 onDoubleClicked: {
                     popup_menu.open();
