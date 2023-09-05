@@ -2706,12 +2706,13 @@ Item {
                 }
                 width : 500
                 height: 200
+                property string calltype: ""
                 property var callid: 0
                 onOpened: {
-                    supervisor.setCallbell(callid);
+                    supervisor.setCallbell(calltype, callid);
                 }
                 onClosed: {
-                    supervisor.setCallbell(-1);
+                    supervisor.setCallbell("", -1);
                 }
 
                 Rectangle{
@@ -3125,6 +3126,8 @@ Item {
                             text:"설정"
                             onClicked: {
                                 click_sound.play();
+                                print(ltype);
+                                popup_add_callbell.calltype = ltype;
                                 popup_add_callbell.callid = index;
                                 popup_add_callbell.open();
                             }
@@ -3456,12 +3459,13 @@ Item {
                 }
                 width : 500
                 height: 200
+                property string calltype: ""
                 property var callid: 0
                 onOpened: {
-                    supervisor.setCallbell(callid);
+                    supervisor.setCallbell(calltype, callid);
                 }
                 onClosed: {
-                    supervisor.setCallbell(-1);
+                    supervisor.setCallbell("", -1);
                 }
 
                 Rectangle{

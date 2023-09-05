@@ -227,8 +227,29 @@ void Supervisor::new_call(){
     }
 }
 
-void Supervisor::setCallbell(int id){
-    setting_call_num = id;
+void Supervisor::setCallbell(QString type, int id){
+    int serving_start_num = -1;
+    int resting_start_num = -1;
+    for(int i=0; i<pmap->locations.size(); i++){
+        if(pmap->locations[i].type == type){
+            if(type == "Serving"){
+                serving_start_num = i;
+                break;
+            }else if(type == "Resting"){
+                resting_start_num = i;
+                break;
+            }
+        }
+    }
+    if(type == "Charging"){
+        setting_call_num = 0;
+    }else if(type == "Serving"){
+        setting_call_num = id - 2 + serving_start_num;
+    }else if(type == "Resting"){
+        setting_call_num = resting_start_num;
+    }
+
+    plog->write("[CALLBELL] Set Callbell "+type+QString::number(id)+" is "+QString::number(setting_call_num));
 }
 
 LOCATION Supervisor::getCallLocation(QString id){

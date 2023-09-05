@@ -461,7 +461,7 @@ public:
     }
     Q_INVOKABLE QString getCall(int id){return pmap->locations[id].call_id;}
     Q_INVOKABLE LOCATION getCallLocation(QString id);
-    Q_INVOKABLE void setCallbell(int id);
+    Q_INVOKABLE void setCallbell(QString type, int id);
     Q_INVOKABLE void acceptCall(bool yes);
     Q_INVOKABLE void removeCall(int id);
     Q_INVOKABLE void removeCallAll();

@@ -10115,12 +10115,13 @@ Item {
         topPadding: 0
         bottomPadding: 0
         rightPadding: 0
+        property string calltype: ""
         property var callid: 0
         onOpened: {
-            supervisor.setCallbell(callid);
+            supervisor.setCallbell(calltype, callid);
         }
         onClosed: {
-            supervisor.setCallbell(-1);
+            supervisor.setCallbell("", -1);
         }
 
         Rectangle{
