@@ -1339,6 +1339,50 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_use_server_call
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"서버 호출 사용"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_server_calling
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["사용안함","사용"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
                     id: set_use_multirobot
                     width: 840
                     height: 50
@@ -8282,6 +8326,14 @@ Item {
             }
         }
 
+        if(combo_server_calling.ischanged){
+            if(combo_server_calling.currentIndex == 0){
+                supervisor.setSetting("ROBOT_SW/server_calling","false");
+            }else{
+                supervisor.setSetting("ROBOT_SW/server_calling","true");
+            }
+        }
+
         if(combo_platform_type.ischanged){
             if(combo_platform_type.currentIndex == 0){
                 supervisor.setSetting("ROBOT_HW/type","SERVING");
@@ -8601,6 +8653,11 @@ Item {
             combo_multirobot.currentIndex = 0;
         }
 
+        if(supervisor.getSetting("ROBOT_SW","server_calling")==="true"){
+            combo_server_calling.currentIndex = 1;
+        }else{
+            combo_server_calling.currentIndex = 0;
+        }
 
 
 
@@ -8802,6 +8859,7 @@ Item {
         combo_multirobot.ischanged = false;
         server_ip_1.ischanged = false;
         server_ip_2.ischanged = false;
+        combo_server_calling.ischanged = false;
         server_ip_3.ischanged = false;
         server_ip_4.ischanged = false;
         fms_id.ischanged = false;

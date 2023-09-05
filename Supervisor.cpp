@@ -3869,8 +3869,8 @@ void Supervisor::wifi_con_output(){
         }
 
 
-        if(is_pushed)
-            plog->write("[SETTING] READ WIFI LIST CHANGED : "+QString::number(wifi_list.size()));
+//        if(is_pushed)
+//            plog->write("[SETTING] READ WIFI LIST CHANGED : "+QString::number(wifi_list.size()));
 
         wifi_cmd = WIFI_CMD_NONE;
         wifi_process->close();

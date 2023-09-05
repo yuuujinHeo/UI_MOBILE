@@ -198,8 +198,10 @@ void ServerHandler::getNewID(){
         ClearJson(json_in);
         json_in = QJsonDocument::fromJson(response).object();
         myID = json_in["id"].toString();
-        plog->write("[SERVER] Get New Name : "+myID);
-        setSetting("SERVER/my_id",myID);
+        if(myID != "" || getSetting("SERVER","my_id") != ""){
+            plog->write("[SERVER] Get New Name : "+myID);
+            setSetting("SERVER/my_id",myID);
+        }
     }
 }
 void ServerHandler::sendConfig(){
