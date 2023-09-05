@@ -239,7 +239,6 @@ void Supervisor::setCallbell(QString type, int id){
                 }else{
                     num++;
                 }
-                break;
             }else if(type == "Resting"){
                 resting_start_num = i;
                 break;
@@ -253,7 +252,6 @@ void Supervisor::setCallbell(QString type, int id){
     }else if(type == "Resting"){
         setting_call_num = resting_start_num;
     }
-
     plog->write("[CALLBELL] Set Callbell "+type+QString::number(id)+" is "+QString::number(setting_call_num));
 }
 
