@@ -237,6 +237,7 @@ void Supervisor::setCallbell(QString type, int id){
                 qDebug() << i << num << id-2;
                 if(num == id-2){
                     serving_num = i;
+                    break;
                 }else{
                     num++;
                 }
