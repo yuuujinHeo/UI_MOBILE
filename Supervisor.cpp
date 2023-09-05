@@ -190,6 +190,13 @@ QString Supervisor::getIniPath(){
     return QDir::homePath()+"/robot_config.ini";
 }
 
+void Supervisor::clear_call(){
+    if(setting_call_num > -1){
+        pmap->locations[setting_call_num].call_id = "";
+        setting_call_num = -1;
+        QMetaObject::invokeMethod(mMain, "call_setting");
+    }
+}
 ////*********************************************  CALLING 관련   ***************************************************////
 void Supervisor::new_call(){
     if(setting_call_num > -1){

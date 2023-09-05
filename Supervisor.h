@@ -656,6 +656,7 @@ public:
     Q_INVOKABLE int getusberrorsize();
     Q_INVOKABLE QString getusberror(int num);
     Q_INVOKABLE int getzipstate();
+    Q_INVOKABLE void clear_call();
     Q_INVOKABLE void usbsave(QString usb="", bool _ui=true, bool _slam=true, bool _config=true, bool _map=true, bool _log=true);
 public slots:
     void onTimer();

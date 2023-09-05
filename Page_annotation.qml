@@ -2759,6 +2759,15 @@ Item {
                         font.pixelSize: 25
                         color: "white"
                     }
+                    Item_buttons{
+                        width: 100
+                        height: 60
+                        type: "round_text"
+                        text: "사용안함"
+                        onClicked: {
+                            supervisor.clear_call();
+                        }
+                    }
                 }
             }
             Popup{
