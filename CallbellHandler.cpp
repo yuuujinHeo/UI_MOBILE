@@ -19,7 +19,12 @@ CallbellHandler::CallbellHandler()
     m_serialPort->setStopBits(QSerialPort::OneStop);
     m_serialPort->setFlowControl(QSerialPort::SoftwareControl);
 
-    m_serialPort->open(QIODevice::ReadWrite);
+    if(m_serialPort->open(QIODevice::ReadWrite)){
+        plog->write("[CALLBELL] Port Open Success");
+    }else{
+        m_serialPort->setPortName("ttyUSB1");
+        plog->write("[CALLBELL] Port Open Failed");
+    }
 
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
