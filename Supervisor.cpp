@@ -228,12 +228,17 @@ void Supervisor::new_call(){
 }
 
 void Supervisor::setCallbell(QString type, int id){
-    int serving_start_num = -1;
+    int serving_num = -1;
     int resting_start_num = -1;
+    int num = 0;
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == type){
             if(type == "Serving"){
-                serving_start_num = i;
+                if(num == id-2){
+                    serving_num = i;
+                }else{
+                    num++;
+                }
                 break;
             }else if(type == "Resting"){
                 resting_start_num = i;
@@ -244,7 +249,7 @@ void Supervisor::setCallbell(QString type, int id){
     if(type == "Charging"){
         setting_call_num = 0;
     }else if(type == "Serving"){
-        setting_call_num = id - 2 + serving_start_num;
+        setting_call_num = serving_num;
     }else if(type == "Resting"){
         setting_call_num = resting_start_num;
     }
