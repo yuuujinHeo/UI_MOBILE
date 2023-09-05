@@ -234,6 +234,7 @@ void Supervisor::setCallbell(QString type, int id){
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == type){
             if(type == "Serving"){
+                qDebug() << i << num << id-2;
                 if(num == id-2){
                     serving_num = i;
                 }else{
