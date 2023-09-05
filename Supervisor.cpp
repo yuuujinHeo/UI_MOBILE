@@ -195,6 +195,7 @@ void Supervisor::new_call(){
     if(setting_call_num > -1){
         plog->write("[SUPERVISOR] NEW CALL (Setting "+QString::number(setting_call_num)+") : " + call->getBellID());
         pmap->locations[setting_call_num].call_id = call->getBellID();
+        setting_call_num = -1;
         QMetaObject::invokeMethod(mMain, "call_setting");
     }else{
         bool already_in = false;
@@ -229,6 +230,7 @@ void Supervisor::new_call(){
 
 void Supervisor::setCallbell(QString type, int id){
     int serving_num = -1;
+    setting_call_num = -1;
     int resting_start_num = -1;
     int num = 0;
     for(int i=0; i<pmap->locations.size(); i++){
