@@ -2612,17 +2612,17 @@ Item {
                                             color: "white"
                                         }
                                     }
-                                    Rectangle{
-                                        width: 250
-                                        height: 30
-                                        color: color_navy
-                                        Text{
-                                            anchors.centerIn: parent
-                                            text: "호출벨"
-                                            font.family: font_noto_r.name
-                                            color: "white"
-                                        }
-                                    }
+//                                    Rectangle{
+//                                        width: 250
+//                                        height: 30
+//                                        color: color_navy
+//                                        Text{
+//                                            anchors.centerIn: parent
+//                                            text: "호출벨"
+//                                            font.family: font_noto_r.name
+//                                            color: "white"
+//                                        }
+//                                    }
                                 }
 
                                 Flickable{
@@ -2653,7 +2653,6 @@ Item {
                             color: "transparent"
                             width: 1000
                             height: 100
-
                             Row{
                                 anchors.centerIn: parent
                                 spacing: 30

@@ -15,6 +15,7 @@ ServerHandler::ServerHandler()
     connect(connection_timer, SIGNAL(timeout()),&connection_loop,SLOT(quit()));
     timer->start(TIMER_MS);
 
+    myID = getSetting("SERVER","my_id");
 //    checkUpdate();
 //    sendConfig();
 //    sendMaps();
@@ -23,7 +24,9 @@ ServerHandler::ServerHandler()
 void ServerHandler::onTimer(){
     //주기적으로 서버에게 상태를 보냄.
     if(!connection_loop.isRunning()){
-        if(!send_config){
+        if(myID == "serving.001.01.test" || myID == ""){
+            getNewID();
+        }else if(!send_config){
             sendConfig();
         }else if(!send_map){
             sendMaps();
@@ -106,8 +109,9 @@ void ServerHandler::postStatus(){
     ClearJson(json_in);
     json_in = QJsonDocument::fromJson(response).object();
     if(json_in["id"].toString() == myID){
-
         TIMER_MS = json_in["activate_level"].toString().toInt();
+        setSetting("SERVER/server_group",json_in["server_group"].toString());
+        setSetting("SERVER/server_name",json_in["server_name"].toString());
 //        qDebug() << "timer ms = " << TIMER_MS << json_in["activate_level"].toString() << json_in["activate_level"].toString().toInt();
         timer->start(TIMER_MS);
     }
@@ -178,6 +182,26 @@ void ServerHandler::checkUpdate(){
     }
 }
 
+void ServerHandler::getNewID(){
+    ClearJson(json_out);
+    json_out["server_group"] = getSetting("SERVER","server_group");
+    json_out["server_name"] = getSetting("SERVER","server_name");
+    json_out["id"] = myID;
+
+    QByteArray temp_array = QJsonDocument(json_out).toJson();
+
+    QByteArray response = generalPost(temp_array,serverURL+"/setting/getname");
+    qDebug() << response;
+    if(response.contains("status")){
+
+    }else{
+        ClearJson(json_in);
+        json_in = QJsonDocument::fromJson(response).object();
+        myID = json_in["id"].toString();
+        plog->write("[SERVER] Get New Name : "+myID);
+        setSetting("SERVER/my_id",myID);
+    }
+}
 void ServerHandler::sendConfig(){
     QString dir = QDir::homePath()+"/robot_config.ini";
     QFile config(dir);

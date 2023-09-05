@@ -48,6 +48,7 @@ public:
     void checkUpdate();
     void postStatus();
 
+    void getNewID();
     void sendConfig();
     void sendMaps();
 
@@ -76,7 +77,7 @@ public:
 
     int TIMER_MS = 1000;
     QString serverURL = "http://rbyujin.com:8080";
-    QString myID = "serving.001.01.test34";
+    QString myID = "";//"serving.001.01.test34";
 
 private slots:
     void onTimer();
