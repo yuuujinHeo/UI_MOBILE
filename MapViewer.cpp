@@ -13,7 +13,6 @@ MapViewer::MapViewer(QQuickItem *parent):
 
 void MapViewer::onTimer(){
     if(active){
-//        qDebug() << "MapViewer " << object_name;
         update();
     }
 }

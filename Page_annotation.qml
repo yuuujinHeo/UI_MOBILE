@@ -3811,6 +3811,7 @@ Item {
                     text: "이동경로\n설정"
                     onClicked: {
                         click_sound.play();
+                        supervisor.loadfile(supervisor.getMapname(),"");
                         supervisor.writelog("[ANNOTATION] Enter : Travelline Map");
                         annot_pages.sourceComponent = page_annot_travelline;
                     }
