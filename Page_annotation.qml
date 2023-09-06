@@ -4879,6 +4879,7 @@ Item {
                 supervisor.setMotorLock(true);
                 map.setEnable(true);
                 if(supervisor.isExistTravelMap(supervisor.getMapname())){
+//                    supervisor.loadfile
                     supervisor.writelog("[ANNOTATION] Travel Line : load map")
                 }
             }

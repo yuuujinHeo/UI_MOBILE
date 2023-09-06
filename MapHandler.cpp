@@ -82,7 +82,6 @@ void MapHandler::loadFile(QString name, QString type){
 
     if(type == "T_TEMP"){
         file_path = QDir::homePath() + "/maps/"+name + "/map_travel_line_ui.png";
-
     }else{
         file_path = QDir::homePath() + "/maps/"+name + "/map_travel_line.png";
     }

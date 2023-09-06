@@ -175,11 +175,9 @@ Item {
             timer_loadmap.stop();
             map_loaded = true;
             supervisor.loadFile(name,type);
-//            supervisor.loadFile(name,type);
         }else{
             map_loaded = true;
             supervisor.loadFile(name,type);
-//            supervisor.loadFile(name,type);
             if(supervisor.isExistAnnotation(name)){
                 map_type = "EDITED";
             }else{
@@ -200,7 +198,6 @@ Item {
     function getTFlag(){
         return supervisor.getDrawingTline();
     }
-
 
     function loadmapping(){
         supervisor.setMap();
