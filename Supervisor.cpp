@@ -3400,14 +3400,39 @@ void Supervisor::onTimer(){
                     }else{
                         if(timer_cnt%5==0){
                             if(count_moveto == 0){
-                                //무브 명령 보냄
-                                if(is_test_moving){
-                                    plog->write("[SUPERVISOR] MOVING(TEST) SET TO "+current_target.name+QString::number(probot->cur_preset));
-                                    ipc->moveToLocationTest(current_target,probot->cur_preset);
-                                    is_test_moving = false;
+                                if(current_target.name.left(7) == "Resting"){
+                                    int comeback_preset = getSetting("ROBOT_SW","comback_preset").toInt();
+                                    if(comeback_preset == 0){
+                                        //무브 명령 보냄
+                                        if(is_test_moving){
+                                            plog->write("[SUPERVISOR] MOVING(TEST) SET TO "+current_target.name+QString::number(probot->cur_preset));
+                                            ipc->moveToLocationTest(current_target,probot->cur_preset);
+                                            is_test_moving = false;
+                                        }else{
+                                            plog->write("[SUPERVISOR] MOVING SET TO "+current_target.name+QString::number(probot->cur_preset));
+                                            ipc->moveToLocation(current_target,probot->cur_preset);
+                                        }
+                                    }else{
+                                        //무브 명령 보냄
+                                        if(is_test_moving){
+                                            plog->write("[SUPERVISOR] MOVING(TEST) SET TO "+current_target.name+QString::number(probot->cur_preset));
+                                            ipc->moveToLocationTest(current_target,probot->cur_preset);
+                                            is_test_moving = false;
+                                        }else{
+                                            plog->write("[SUPERVISOR] MOVING SET TO "+current_target.name+QString::number(comeback_preset));
+                                            ipc->moveToLocation(current_target,comeback_preset);
+                                        }
+                                    }
                                 }else{
-                                    plog->write("[SUPERVISOR] MOVING SET TO "+current_target.name+QString::number(probot->cur_preset));
-                                    ipc->moveToLocation(current_target,probot->cur_preset);
+                                    //무브 명령 보냄
+                                    if(is_test_moving){
+                                        plog->write("[SUPERVISOR] MOVING(TEST) SET TO "+current_target.name+QString::number(probot->cur_preset));
+                                        ipc->moveToLocationTest(current_target,probot->cur_preset);
+                                        is_test_moving = false;
+                                    }else{
+                                        plog->write("[SUPERVISOR] MOVING SET TO "+current_target.name+QString::number(probot->cur_preset));
+                                        ipc->moveToLocation(current_target,probot->cur_preset);
+                                    }
                                 }
                             }else if(count_moveto++ > 5){
                                 if(probot->ipc_use){
