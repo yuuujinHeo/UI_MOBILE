@@ -4044,7 +4044,6 @@ Item {
         running: true
         repeat: true
         onTriggered: {
-
             if(init_mode == 0){
                 //=============================== Init Check 0 : Program Update ==============================//
                 if(supervisor.checkNewUpdateProgram()){
@@ -4130,7 +4129,10 @@ Item {
                 }
             }else if(init_mode == 5){
                 //=============================== Init Check 5 : 로봇 상태 확인(Motor) ==============================//
-                if(supervisor.getIPCConnection() && supervisor.getMotorState() === 1){
+                if(supervisor.getChargeStatus() === 1){
+                    dochargeininit();
+                    supervisor.writelog("[INIT] Charging Detected");
+                }else if(supervisor.getIPCConnection() && supervisor.getMotorState() === 1){
                     supervisor.writelog("[INIT] Motor Check : Success");
                     init_mode = 6;
                     update_timer.stop();
