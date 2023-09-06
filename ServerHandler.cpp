@@ -42,7 +42,7 @@ void ServerHandler::postStatus(){
     ClearJson(json_out);
     json_out["id"] = myID;
     json_out["battery"] = probot->battery;
-    json_out["git_version"] = probot->program_date;
+    json_out["git_version"] = getSetting("ROBOT_SW","version_date");
 
     json_out["last_update_time"] = QDateTime::currentDateTime().toString("yyyyMMdd-hhmmss");
     json_out["map_name"] = pmap->map_name;
