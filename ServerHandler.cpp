@@ -74,19 +74,10 @@ void ServerHandler::postStatus(){
     json_out["motor_temp_motor_2"] = probot->motor[1].motor_temp;
     json_out["motor_current_2"] = probot->motor[1].current;
 
-
-
-    POSE temp;
-    temp.point.x = 1.2353465762;
-    probot->curPath.clear();
-    probot->curPath.append(temp);
-    probot->curPath.append(temp);
-    probot->curPath.append(temp);
-    probot->curPath.append(temp);
-    probot->curPath.append(temp);
-
     json_out["path_size"] = probot->curPath.size();
+    qDebug() << probot->curPath.size();
     for(int i=0; i<probot->curPath.size(); i++){
+        qDebug() << i << probot->curPath[i].point.x;
         json_out["path_x_"+QString::number(i)] = QString::number(probot->curPath[i].point.x);
         json_out["path_y_"+QString::number(i)] = probot->curPath[i].point.y;
         json_out["path_th_"+QString::number(i)] = probot->curPath[i].angle;
