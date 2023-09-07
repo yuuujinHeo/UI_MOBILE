@@ -3177,7 +3177,7 @@ void Supervisor::onTimer(){
     case UI_STATE_MOVING:{
         static int timer_cnt = 0;
         //ERROR
-        if(probot->status_lock == 0){
+        if(probot->status_lock == 0 || probot->running_state == ROBOT_MOVING_PAUSED){
 
         }else if(getMotorState() == 0){
             plog->write(QString::number(probot->status_emo)+QString::number(probot->status_lock)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
