@@ -412,12 +412,19 @@ Item {
         onTriggered: {
             if(supervisor.getLockStatus()===0){
                 if(motor_lock)
-                    print("MOTOR LOCK FALSE");
+                    supervisor.writelog("[QML] Motor Lock : false");
                 motor_lock = false;
             }else{
-                if(!motor_lock)
-                    print("MOTOR LOCK TRUE");
+                if(!motor_lock){
+                    supervisor.writelog("[QML] Motor Lock : true");
+                }
                 motor_lock = true;
+                if(supervisor.getStateMoving() === 4){
+                    robot_paused = true;
+                    popup_pause.visible = true;
+                }else{
+                    robot_paused = false;
+                }
             }
 
             if(supervisor.getMultiState() === 2){
@@ -426,12 +433,6 @@ Item {
                 popup_waiting.visible = false;
             }
 
-            if(supervisor.getStateMoving() === 4){
-                robot_paused = true;
-                popup_pause.visible = true;
-            }else{
-                robot_paused = false;
-            }
 
             //DEBUG 230605
             obs_in_path =supervisor.getObsinPath();

@@ -350,6 +350,18 @@ void Supervisor::pullGit(){
 
 }
 
+void Supervisor::setSettingServer(QString name, QString value){
+    QString ini_path = QDir::homePath()+"/server_config.ini";
+    QSettings setting(ini_path, QSettings::IniFormat);
+    setting.setValue(name,value);
+    plog->write("[SETTING] SERVER SET "+name+" VALUE TO "+value);
+}
+QString Supervisor::getSettingServer(QString group, QString name){
+    QString ini_path = QDir::homePath()+"/server_config.ini";
+    QSettings setting_robot(ini_path, QSettings::IniFormat);
+    setting_robot.beginGroup(group);
+    return setting_robot.value(name).toString();
+}
 void Supervisor::setSetting(QString name, QString value){
     QString ini_path = getIniPath();
     QSettings setting(ini_path, QSettings::IniFormat);

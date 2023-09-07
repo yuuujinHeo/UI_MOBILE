@@ -42,7 +42,7 @@ void ServerHandler::postStatus(){
     ClearJson(json_out);
     json_out["id"] = myID;
     json_out["battery"] = probot->battery;
-    json_out["git_version"] = getSetting("ROBOT_SW","version_date");
+    json_out["git_version"] = getSetting("VERSION","version_date");
 
     json_out["last_update_time"] = QDateTime::currentDateTime().toString("yyyyMMdd-hhmmss");
     json_out["map_name"] = pmap->map_name;
@@ -75,9 +75,7 @@ void ServerHandler::postStatus(){
     json_out["motor_current_2"] = probot->motor[1].current;
 
     json_out["path_size"] = probot->curPath.size();
-    qDebug() << probot->curPath.size();
     for(int i=0; i<probot->curPath.size(); i++){
-        qDebug() << i << probot->curPath[i].point.x;
         json_out["path_x_"+QString::number(i)] = QString::number(probot->curPath[i].point.x);
         json_out["path_y_"+QString::number(i)] = probot->curPath[i].point.y;
         json_out["path_th_"+QString::number(i)] = probot->curPath[i].angle;
@@ -114,7 +112,7 @@ void ServerHandler::postStatus(){
 }
 
 void ServerHandler::setSetting(QString name, QString value){
-    QString ini_path = QDir::homePath()+"/robot_config.ini";
+    QString ini_path = QDir::homePath()+"/server_config.ini";
     QSettings setting(ini_path, QSettings::IniFormat);
     setting.setValue(name,value);
     plog->write("[SETTING] SET "+name+" VALUE TO "+value);
@@ -147,14 +145,14 @@ void ServerHandler::checkUpdate(){
             }
             new_update = false;
             if(update_config){
-                if(config_version != getSetting("ROBOT_SW","config_version")){
-                    plog->write("[SERVER] NEW UPDATE(CONFIG) : OLD("+getSetting("ROBOT_SW","config_version")+") NEW("+config_version+")");
+                if(config_version != getSetting("VERSION","config_version")){
+                    plog->write("[SERVER] NEW UPDATE(CONFIG) : OLD("+getSetting("VERSION","config_version")+") NEW("+config_version+")");
                     new_update = true;
                 }
             }
             if(update_program){
-                if(program_version != getSetting("ROBOT_SW","version")){
-                    plog->write("[SERVER] NEW UPDATE(CONFIG) : OLD("+getSetting("ROBOT_SW","version")+") NEW("+program_version+")");
+                if(program_version != getSetting("VERSION","version")){
+                    plog->write("[SERVER] NEW UPDATE(CONFIG) : OLD("+getSetting("VERSION","version")+") NEW("+program_version+")");
                     new_update = true;
                     ST_GIT temp_git;
                     temp_git.date = program_str;
@@ -165,8 +163,8 @@ void ServerHandler::checkUpdate(){
                 }
             }
             if(update_map){
-                if(maps_version != getSetting("ROBOT_SW","map_version")){
-                    plog->write("[SERVER] NEW UPDATE(CONFIG) : OLD("+getSetting("ROBOT_SW","maps_version")+") NEW("+maps_version+")");
+                if(maps_version != getSetting("VERSION","map_version")){
+                    plog->write("[SERVER] NEW UPDATE(CONFIG) : OLD("+getSetting("VERSION","maps_version")+") NEW("+maps_version+")");
                     new_update = true;
                 }
             }
@@ -215,8 +213,8 @@ void ServerHandler::sendConfig(){
 void ServerHandler::sendMaps(){
     ZIPHandler zip;
     send_map = true;
-    zip.makeMapZip(QDir::homePath(),getSetting("FLOOR","map_name"));
-    QString dir = QDir::homePath()+"/"+getSetting("FLOOR","map_name")+".zip";
+    zip.makeMapZip(QDir::homePath(),getSetting("VERSION","map_name"));
+    QString dir = QDir::homePath()+"/"+getSetting("VERSION","map_name")+".zip";
     QFile config(dir);
     if(config.open(QIODevice::ReadOnly)){
         QByteArray response = sendfilePost(dir, serverURL+"/upload/map/"+myID);
@@ -229,7 +227,7 @@ void ServerHandler::sendMaps(){
 }
 
 QString ServerHandler::getSetting(QString group, QString name){
-    QString ini_path = QDir::homePath()+"/robot_config.ini";
+    QString ini_path = QDir::homePath()+"/server_config.ini";
     QSettings setting_robot(ini_path, QSettings::IniFormat);
     setting_robot.beginGroup(group);
     return setting_robot.value(name).toString();

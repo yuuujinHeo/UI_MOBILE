@@ -299,7 +299,8 @@ public:
     Q_INVOKABLE void setSetting(QString name, QString value);
     Q_INVOKABLE void readSetting(QString map_name="");
     Q_INVOKABLE QString getSetting(QString group, QString name);
-
+    Q_INVOKABLE QString getSettingServer(QString group, QString name);
+    Q_INVOKABLE void setSettingServer(QString name, QString value);
     Q_INVOKABLE int getTrayNum();
     Q_INVOKABLE void setTableColNum(int col_num);
 
