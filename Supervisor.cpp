@@ -296,6 +296,7 @@ void Supervisor::git_pull_success(){
     readSetting();
     QMetaObject::invokeMethod(mMain,"pull_success");
 }
+
 void Supervisor::git_pull_failed(){
     QString date = probot->program_date;
     plog->write("[SUPERVISOR] GIT PULL FAILED : "+probot->program_date+", "+date);
@@ -305,6 +306,7 @@ void Supervisor::git_pull_failed(){
     readSetting();
     git->resetGit();
 }
+
 bool Supervisor::isNewVersion(){
     git->updateGitArray();
     if(probot->gitList.size() > 0){
@@ -3175,7 +3177,9 @@ void Supervisor::onTimer(){
     case UI_STATE_MOVING:{
         static int timer_cnt = 0;
         //ERROR
-        if(getMotorState() == 0){
+        if(probot->status_lock == 0){
+
+        }else if(getMotorState() == 0){
             plog->write(QString::number(probot->status_emo)+QString::number(probot->status_lock)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
             plog->write("[SUPERVISOR] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL ");
             ui_state = UI_STATE_MOVEFAIL;
