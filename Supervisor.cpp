@@ -3176,14 +3176,21 @@ void Supervisor::onTimer(){
     }
     case UI_STATE_MOVING:{
         static int timer_cnt = 0;
+        static bool paused = false;
         //ERROR
-        if(probot->status_lock == 0 || probot->running_state == ROBOT_MOVING_PAUSED){
+        if(probot->running_state == ROBOT_MOVING_PAUSED){
+            paused = true;
+        }else if(probot->running_state == ROBOT_MOVING_MOVING){
+            paused = false;
+        }
 
-        }else if(getMotorState() == 0){
-            plog->write(QString::number(probot->status_emo)+QString::number(probot->status_lock)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
-            plog->write("[SUPERVISOR] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL ");
-            ui_state = UI_STATE_MOVEFAIL;
-            is_test_moving = false;
+        if(getMotorState() == 0){
+            if(!paused){
+                plog->write(QString::number(probot->status_emo)+QString::number(probot->status_lock)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
+                plog->write("[SUPERVISOR] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL ");
+                ui_state = UI_STATE_MOVEFAIL;
+                is_test_moving = false;
+            }
         }else if(probot->localization_state == LOCAL_NOT_READY){
             is_test_moving = false;
             plog->write("[SUPERVISOR] LOCAL NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
