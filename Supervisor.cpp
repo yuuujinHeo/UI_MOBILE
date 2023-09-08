@@ -347,9 +347,9 @@ QString Supervisor::getServerVersionMessage(){
         return "";
     }
 }
+
 void Supervisor::pullGit(){
     git->pullGit();
-
 }
 
 void Supervisor::setSettingServer(QString name, QString value){
