@@ -100,11 +100,15 @@ void ServerHandler::postStatus(){
     if(json_in["id"].toString() == myID){
         TIMER_MS = json_in["activate_level"].toString().toInt();
 
-        if(getSetting("SERVER","server_group") != json_in["server_group"].toString()){
-            setSetting("SERVER/server_group",json_in["server_group"].toString());
+        if(json_in["server_group"].toString() != ""){
+            if(getSetting("SERVER","server_group") != json_in["server_group"].toString()){
+                setSetting("SERVER/server_group",json_in["server_group"].toString());
+            }
         }
-        if(getSetting("SERVER","server_name") != json_in["server_name"].toString()){
-            setSetting("SERVER/server_name",json_in["server_name"].toString());
+        if(json_in["server_name"].toString() != ""){
+            if(getSetting("SERVER","server_name") != json_in["server_name"].toString()){
+                setSetting("SERVER/server_name",json_in["server_name"].toString());
+            }
         }
 //        qDebug() << "timer ms = " << TIMER_MS << json_in["activate_level"].toString() << json_in["activate_level"].toString().toInt();
         timer->start(TIMER_MS);
