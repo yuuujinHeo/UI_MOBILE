@@ -201,5 +201,6 @@
         <file>MAP_FULL2.qml</file>
         <file>Item_ProgressBar.qml</file>
         <file>Page_localization.qml</file>
+        <file>icon/cursor.png</file>
     </qresource>
 </RCC>

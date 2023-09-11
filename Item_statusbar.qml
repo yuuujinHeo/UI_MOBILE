@@ -11,6 +11,7 @@ Item {
     width: parent.width
     height: 60
 
+    property bool show_cursor: false
     property date curDate: new Date()
     property string curTime: curDate.toLocaleTimeString()
 
@@ -416,7 +417,7 @@ Item {
 
     Popup{
         id: popup_menu
-        width: 240
+        width: 280
         height: 100
         bottomPadding: 0
         topPadding: 0
@@ -444,6 +445,43 @@ Item {
             Row{
                 anchors.centerIn: parent
                 spacing: 15
+                Rectangle{
+                    id: btn_cursor
+                    width: 78
+                    height: 78
+                    radius: width
+                    color: color_navy
+                    Column{
+                        anchors.centerIn: parent
+                        Image{
+                            id: image_cursor
+                            source:"icon/cursor.png"
+                            width: 30
+                            height: 30
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            ColorOverlay{
+                                source: parent
+                                anchors.fill: parent
+                                color: show_cursor?color_green:"white"
+                            }
+                        }
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            if(show_cursor){
+                                supervisor.writelog("[USER INPUT] STATUS BAR : CURSOR UNSHOW");
+                                supervisor.setCursorView(false);
+                                show_cursor = false;
+                            }else{
+                                supervisor.writelog("[USER INPUT] STATUS BAR : CURSOR SHOW");
+                                supervisor.setCursorView(true);
+                                show_cursor = true;
+
+                            }
+                        }
+                    }
+                }
                 Rectangle{
                     id: btn_minimize
                     width: 78

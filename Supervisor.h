@@ -314,6 +314,8 @@ public:
     Q_INVOKABLE QList<int> getCamera(int num);
     Q_INVOKABLE QString getCameraSerial(int num);
 
+    Q_INVOKABLE void setCursorView(bool visible);
+
     ////*********************************************  GIT 관련   ***************************************************////
     Q_INVOKABLE void pullGit();
     Q_INVOKABLE bool isNewVersion();

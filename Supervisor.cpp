@@ -757,6 +757,13 @@ QString Supervisor::getCameraSerial(int num){
     }
 }
 
+void Supervisor::setCursorView(bool visible){
+    if(visible){
+        QGuiApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    }else{
+        QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
+    }
+}
 
 ////*********************************************  INIT PAGE 관련   ***************************************************////
 bool Supervisor::isConnectServer(){
