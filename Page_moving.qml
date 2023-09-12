@@ -433,7 +433,6 @@ Item {
                 popup_waiting.visible = false;
             }
 
-
             //DEBUG 230605
             obs_in_path =supervisor.getObsinPath();
 

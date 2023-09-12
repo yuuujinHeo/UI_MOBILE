@@ -8,11 +8,12 @@ ServerHandler::ServerHandler()
 {
     // 네트워크 연결 관리
     manager = new QNetworkAccessManager(this);
-    connect(manager, SIGNAL(finished(QNetworkReply*)), &connection_loop, SLOT(quit()));
+//    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(response()));
+//    connect(manager, SIGNAL(finished(QNetworkReply*)), &connection_loop, SLOT(QEventLoop::quit()));
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()),this,SLOT(onTimer()));
-    connection_timer = new QTimer();
-    connect(connection_timer, SIGNAL(timeout()),&connection_loop,SLOT(quit()));
+//    connection_timer = new QTimer();
+//    connect(connection_timer, SIGNAL(timeout()),&connection_loop,SLOT(quit()));
     timer->start(TIMER_MS);
 
     myID = getSetting("SERVER","my_id");
@@ -23,7 +24,8 @@ ServerHandler::ServerHandler()
 
 void ServerHandler::onTimer(){
     //주기적으로 서버에게 상태를 보냄.
-    if(!connection_loop.isRunning()){
+//    getNewID();
+//    if(!connection_loop.isRunning()){
         if(myID == "serving.001.01.test" || myID == ""){
             getNewID();
         }else if(!send_config){
@@ -35,7 +37,7 @@ void ServerHandler::onTimer(){
         }else{
             postStatus();
         }
-    }
+//    }
 }
 
 void ServerHandler::postStatus(){
@@ -189,7 +191,7 @@ void ServerHandler::getNewID(){
     QByteArray temp_array = QJsonDocument(json_out).toJson();
 
     QByteArray response = generalPost(temp_array,serverURL+"/setting/getname");
-    qDebug() << response;
+    qDebug() << "getNewID : " << response;
     if(response.contains("status")){
 
     }else{
@@ -268,9 +270,15 @@ QByteArray ServerHandler::sendfilePost(QString file_dir, QString url){
     request.setHeader(QNetworkRequest::ContentTypeHeader, contentType);
 
     QNetworkReply *reply = manager->post(request, files);
-    files->setParent(reply);
-    connection_timer->start(1000);
+    QEventLoop connection_loop;
+    QTimer connection_timer;
+    connect(&connection_timer, SIGNAL(timeout()),&connection_loop,SLOT(quit()));
+    connect(manager, SIGNAL(finished(QNetworkReply*)), &connection_loop, SLOT(quit()));
+    connection_timer.start(1000);
     connection_loop.exec();
+    files->setParent(reply);
+//    connection_timer->start(1000);
+//    connection_loop.exec();
 
     reply->waitForReadyRead(200);
     QByteArray ret = reply->readAll();
@@ -289,13 +297,22 @@ QByteArray ServerHandler::generalPost(QByteArray post_data, QString url){
     request.setRawHeader("AcceptLanguage", "ko-KR,en,*");
 
     QNetworkReply *reply = manager->post(request, post_data);
-    connection_timer->start(1000);
+
+    QEventLoop connection_loop;
+    QTimer connection_timer;
+    connect(&connection_timer, SIGNAL(timeout()),&connection_loop,SLOT(quit()));
+    connect(manager, SIGNAL(finished(QNetworkReply*)), &connection_loop, SLOT(quit()));
+    connection_timer.start(1000);
     connection_loop.exec();
 
-    reply->waitForReadyRead(200);
+    reply->waitForReadyRead(2000);
     QByteArray ret = reply->readAll();
     reply->deleteLater();
     return ret;
+}
+
+void ServerHandler::response(){
+    qDebug() << "reseponse : " << QDateTime::currentDateTime();
 }
 
 QByteArray ServerHandler::generalGet(QString url){
@@ -303,8 +320,15 @@ QByteArray ServerHandler::generalGet(QString url){
     QNetworkRequest request(serviceURL);
 
     QNetworkReply *reply = manager->get(request);
-    connection_timer->start(1000);
+
+    QEventLoop connection_loop;
+    QTimer connection_timer;
+    connect(&connection_timer, SIGNAL(timeout()),&connection_loop,SLOT(quit()));
+    connect(manager, SIGNAL(finished(QNetworkReply*)), &connection_loop, SLOT(quit()));
+    connection_timer.start(1000);
     connection_loop.exec();
+//    connection_timer->start(1000);
+//    connection_loop.exec();
 
     reply->waitForReadyRead(200);
     QByteArray ret = reply->readAll();
@@ -317,8 +341,14 @@ QByteArray ServerHandler::generalPut(QString url, QByteArray put_data){
     QNetworkRequest request(serviceURL);
 
     QNetworkReply *reply = manager->put(request, put_data);
-    connection_timer->start(1000);
+    QEventLoop connection_loop;
+    QTimer connection_timer;
+    connect(&connection_timer, SIGNAL(timeout()),&connection_loop,SLOT(quit()));
+    connect(manager, SIGNAL(finished(QNetworkReply*)), &connection_loop, SLOT(quit()));
+    connection_timer.start(1000);
     connection_loop.exec();
+//    connection_timer->start(1000);
+//    connection_loop.exec();
 
     reply->waitForReadyRead(200);
     QByteArray ret = reply->readAll();
@@ -331,14 +361,19 @@ QByteArray ServerHandler::generalDelete(QString url){
     QNetworkRequest request(serviceURL);
 
     QNetworkReply *reply = manager->deleteResource(request);
-    connection_timer->start(1000);
+    QEventLoop connection_loop;
+    QTimer connection_timer;
+    connect(&connection_timer, SIGNAL(timeout()),&connection_loop,SLOT(quit()));
+    connect(manager, SIGNAL(finished(QNetworkReply*)), &connection_loop, SLOT(quit()));
+    connection_timer.start(1000);
     connection_loop.exec();
+//    connection_timer->start(1000);
+//    connection_loop.exec();
 
     reply->waitForReadyRead(200);
     QByteArray ret = reply->readAll();
     reply->deleteLater();
     return ret;
-
 }
 
 void ServerHandler::ClearJson(QJsonObject &json){

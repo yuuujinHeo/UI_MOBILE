@@ -250,7 +250,9 @@ void IPCHandler::onTimer(){
 
         pmap->map_mapping = map1;
 
-        flag_mapping = true;
+        if(is_mapping){
+            flag_mapping = true;
+        }
         prev_tick_map = temp3.tick;
         emit mappingin();
     }
