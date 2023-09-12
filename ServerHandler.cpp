@@ -25,18 +25,18 @@ ServerHandler::ServerHandler()
 void ServerHandler::onTimer(){
     //주기적으로 서버에게 상태를 보냄.
 //    getNewID();
-//    if(!connection_loop.isRunning()){
-        if(myID == "serving.001.01.test" || myID == ""){
-            getNewID();
-        }else if(!send_config){
-            sendConfig();
-        }else if(!send_map){
-            sendMaps();
-            TIMER_MS = 60000;
-            timer->start(TIMER_MS);
-        }else{
-            postStatus();
-        }
+////    if(!connection_loop.isRunning()){
+//        if(myID == "serving.001.01.test" || myID == ""){
+//            getNewID();
+//        }else{
+//            postStatus();
+//        }else if(!send_config){
+//            sendConfig();
+//        }else if(!send_map){
+//            sendMaps();
+//            TIMER_MS = 60000;
+//            timer->start(TIMER_MS);
+//        }
 //    }
 }
 

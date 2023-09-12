@@ -66,7 +66,7 @@ Item {
         update_group();
 
         if(supervisor.isCallingMode() || supervisor.getCallQueueSize() > 0){
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",supervisor.isCallingMode(),supervisor.getCallQueueSize())
+            print("!!!!!!",supervisor.isCallingMode(),supervisor.getCallQueueSize())
             popup_clean_calling.open();
         }
 
