@@ -472,6 +472,7 @@ Item {
     }
 
     Column{
+        visible: false
 //        visible: robot_paused
         anchors.left: parent.left
         anchors.bottom: parent.bottom

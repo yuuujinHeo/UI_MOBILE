@@ -1904,7 +1904,7 @@ Item {
         id: click
         source: "bgm/click.wav"
         Component.onDestruction: {
-            print("click dest");
+//            print("click dest");
         }
     }
 //    SoundEffect{
