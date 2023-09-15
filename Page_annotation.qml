@@ -1729,7 +1729,7 @@ Item {
                 running: true
                 interval: 500
                 onTriggered:{
-                    supervisor.drawingRunawayStart();
+                    supervisor.drawingRunawayStop();
                 }
             }
             Rectangle{
@@ -2885,6 +2885,14 @@ Item {
                 readSetting();
                 supervisor.checkMoveFail();
             }
+            Timer{
+                interval: 500
+                running: true
+                onTriggered:{
+                    supervisor.drawingRunawayStop();
+                }
+            }
+
             Rectangle{
                 anchors.fill: parent
                 color: color_dark_navy

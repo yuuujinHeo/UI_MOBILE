@@ -23,19 +23,20 @@ ServerHandler::ServerHandler()
 
 void ServerHandler::onTimer(){
     //주기적으로 서버에게 상태를 보냄.
-    if(!connection_loop.isRunning()){
-        if(myID == "serving.001.01.test" || myID == ""){
-            getNewID();
-        }else if(!send_config){
-            sendConfig();
-        }else if(!send_map){
-            sendMaps();
-            TIMER_MS = 60000;
-            timer->start(TIMER_MS);
-        }else{
-            postStatus();
-        }
-    }
+    postStatus();
+//    if(!connection_loop.isRunning()){
+//        if(myID == "serving.001.01.test" || myID == ""){
+//            getNewID();
+//        }else if(!send_config){
+//            sendConfig();
+//        }else if(!send_map){
+//            sendMaps();
+//            TIMER_MS = 60000;
+//            timer->start(TIMER_MS);
+//        }else{
+//            postStatus();
+//        }
+//    }
 }
 
 void ServerHandler::postStatus(){
@@ -288,13 +289,25 @@ QByteArray ServerHandler::generalPost(QByteArray post_data, QString url){
     request.setRawHeader("AcceptEncoding", "gzip, deflate");
     request.setRawHeader("AcceptLanguage", "ko-KR,en,*");
 
+//    if(!manager){
+//        manager = new QNetworkAccessManager;
+//        connect(QThread::currentThread, &QThread::finished, manager, &QObject::deleteLater);
+//        QNetworkReply *reply = manager->post(request, post_data);
+//        reply->waitForReadyRead(200);
+//        QByteArray ret = reply->readAll();
+//        reply->deleteLater();
+
+//        qDebug() << ret;
+//    }
+
+
     QNetworkReply *reply = manager->post(request, post_data);
     connection_timer->start(1000);
     connection_loop.exec();
-
     reply->waitForReadyRead(200);
     QByteArray ret = reply->readAll();
     reply->deleteLater();
+
     return ret;
 }
 

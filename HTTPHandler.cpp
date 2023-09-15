@@ -11,6 +11,9 @@ HTTPHandler::HTTPHandler()
     // 네트워크 연결 관리
     manager = new QNetworkAccessManager(this);
     connect(manager, SIGNAL(finished(QNetworkReply*)), &connection_loop, SLOT(quit()));
+    connection_timer = new QTimer();
+    connect(connection_timer, SIGNAL(timeout()),&connection_loop,SLOT(quit()));
+
 }
 
 // 공통적으로 사용되는 POST 구문 : 출력으로 응답 정보를 보냄
@@ -26,6 +29,7 @@ QByteArray HTTPHandler::generalPost(QByteArray post_data, QString url){
     request.setRawHeader("AcceptLanguage", "ko-KR,en,*");
 
     QNetworkReply *reply = manager->post(request, post_data);
+    connection_timer->start(1000);
     connection_loop.exec();
 
     reply->waitForReadyRead(200);
@@ -39,6 +43,7 @@ QByteArray HTTPHandler::generalGet(QString url){
     QNetworkRequest request(serviceURL);
 
     QNetworkReply *reply = manager->get(request);
+    connection_timer->start(1000);
     connection_loop.exec();
 
     reply->waitForReadyRead(200);

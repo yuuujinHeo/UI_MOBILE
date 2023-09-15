@@ -71,6 +71,7 @@ private:
     QNetworkAccessManager   *manager;
     QEventLoop              connection_loop;
 
+    QTimer  *connection_timer;
 };
 
 #endif // HTTPHANDLER_H

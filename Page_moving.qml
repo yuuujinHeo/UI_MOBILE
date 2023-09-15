@@ -315,7 +315,6 @@ Item {
                     onReleased:{
                         parent.color = "transparent"
                     }
-
                     onClicked:{
                         supervisor.writelog("[USER INPUT] MOVING PAUSED : PATH CANCELED");
                         supervisor.moveStop();
@@ -473,7 +472,7 @@ Item {
     }
 
     Column{
-//        visible: robot_paused
+        visible: false//robot_paused
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         spacing: 20

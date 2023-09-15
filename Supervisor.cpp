@@ -1436,6 +1436,8 @@ void Supervisor::stopMapping(){
     ipc->flag_mapping = false;
     ipc->is_mapping = false;
     ipc->stopMapping();
+    readSetting(getMapname());
+//    maph->loadFile(getMapname(),"");
 }
 void Supervisor::saveMapping(QString name){
     if(probot->ipc_use){
@@ -2983,12 +2985,12 @@ void Supervisor::onTimer(){
         wifi_count = 0;
     }
 
-    getAllWifiList();
+//    getAllWifiList();
 
-    if(setting.cur_ip == "" && getWifiConnection("")){
-        qDebug() << "auto get wifi ip";
-        getWifiIP();
-    }
+//    if(setting.cur_ip == "" && getWifiConnection("")){
+//        qDebug() << "auto get wifi ip";
+//        getWifiIP();
+//    }
 
     if(wifi_cmd == WIFI_CMD_NONE && wifi_cmds.size() > 0){
         wifi_cmd = wifi_cmds[0];
