@@ -316,6 +316,8 @@ public:
 
     Q_INVOKABLE void setCursorView(bool visible);
 
+    Q_INVOKABLE QString getVoice(QString name, QString mode="");
+
     ////*********************************************  GIT 관련   ***************************************************////
     Q_INVOKABLE void pullGit();
     Q_INVOKABLE bool isNewVersion();

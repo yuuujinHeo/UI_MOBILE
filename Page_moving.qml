@@ -468,7 +468,7 @@ Item {
     Audio{
         id: voice_serving
         volume: volume_voice/100
-        source: "bgm/serving.mp3"
+        source: supervisor.getVoice("serving");
     }
 
     Column{

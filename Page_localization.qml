@@ -282,7 +282,7 @@ Item {
         onClicked: {
             click_sound.play();
             supervisor.writelog("[ANNOTATION] Localization : Success");
-                annot_pages.sourceComponent = page_annot_menu;
+            loadPage(pmenu);//annot_pages.sourceComponent = page_annot_menu;
         }
     }
     Item_buttons{

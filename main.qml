@@ -471,7 +471,7 @@ Window {
         id: voice_movecharge
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_move_charge.mp3"
+        source: supervisor.getVoice("start_move_charge");
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
@@ -481,7 +481,7 @@ Window {
         id: voice_serving
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_start_serving.mp3"
+        source: supervisor.getVoice("start_serving");
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
@@ -491,7 +491,7 @@ Window {
         id: voice_calling
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_start_calling.mp3"
+        source: supervisor.getVoice("start_calling");
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
@@ -501,7 +501,7 @@ Window {
         id: voice_avoid
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/serving.mp3"
+        source: supervisor.getVoice("serving");
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
@@ -511,7 +511,7 @@ Window {
         id: voice_wait
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_avoid.mp3"
+        source: supervisor.getVoice("wait");
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
@@ -521,7 +521,7 @@ Window {
         id: voice_movefail
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_movefail.mp3"
+        source: supervisor.getVoice("error_no_path");
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
@@ -531,7 +531,7 @@ Window {
         id: voice_movewait
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_move_wait.mp3"
+        source: supervisor.getVoice("start_move_resting");
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
@@ -541,7 +541,7 @@ Window {
         id: voice_localfail
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_local_fail.mp3"
+        source: supervisor.getVoice("error_localization");
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
@@ -551,7 +551,7 @@ Window {
         id: voice_motor_error
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_motor_error.mp3"
+        source: supervisor.getVoice("error_call_manager");
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
@@ -561,7 +561,7 @@ Window {
         id: voice_emergency
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_emergency.mp3"
+        source: supervisor.getVoice("error_emo");
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
@@ -571,7 +571,7 @@ Window {
         id: voice_battery
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/battery.mp3"
+        source: supervisor.getVoice("low_battery");
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
