@@ -329,18 +329,18 @@ Item {
         id: voice_charging
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_charging.mp3"
+        source: supervisor.getVoice("charging");
     }
     Audio{
         id: voice_start_charge
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_start_charge.mp3"
+        source: supervisor.getVoice("start_charging");
     }
     Audio{
         id: voice_stop_charge
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_stop_charge.mp3"
+        source: supervisor.getVoice("stop_charging");
     }
 }

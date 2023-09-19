@@ -64,19 +64,16 @@ Item {
         repeat: true
         interval: 500
         onTriggered: {
-            if(test){
+            if(supervisor.getLocalizationState() === 2){//success
                 btn_right2.enabled = true;
+                btn_do_autoinit.running = false;
+            }else if(supervisor.getLocalizationState() === 1){
+                btn_do_autoinit.running = true;
             }else{
-                if(supervisor.getLocalizationState() === 2){//success
-                    btn_right2.enabled = true;
-                    btn_do_autoinit.running = false;
-                }else if(supervisor.getLocalizationState() === 1){
-                    btn_do_autoinit.running = true;
-                }else{
-                    btn_do_autoinit.running = false;
-                    btn_right2.enabled = false;
-                }
+                btn_do_autoinit.running = false;
+                btn_right2.enabled = false;
             }
+
         }
     }
 
@@ -264,7 +261,8 @@ Item {
         onClicked: {
             click_sound.play();
             supervisor.writelog("[ANNOTATION] Localization : Success");
-                annot_pages.sourceComponent = page_annot_menu;
+            loadPage(pmap);
+//                annot_pages.sourceComponent = page_annot_menu;
         }
     }
     Item_buttons{
@@ -282,7 +280,7 @@ Item {
         onClicked: {
             click_sound.play();
             supervisor.writelog("[ANNOTATION] Localization : Success");
-                annot_pages.sourceComponent = page_annot_menu;
+            loadPage(pmap);//annot_pages.sourceComponent = page_annot_menu;
         }
     }
     Item_buttons{

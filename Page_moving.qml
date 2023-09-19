@@ -432,7 +432,6 @@ Item {
                 popup_waiting.visible = false;
             }
 
-
             //DEBUG 230605
             obs_in_path =supervisor.getObsinPath();
 
@@ -468,11 +467,11 @@ Item {
     Audio{
         id: voice_serving
         volume: volume_voice/100
-        source: "bgm/serving.mp3"
+        source: supervisor.getVoice("serving");
     }
 
     Column{
-        visible: false//robot_paused
+        visible: false
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         spacing: 20

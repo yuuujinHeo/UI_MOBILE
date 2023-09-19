@@ -829,13 +829,13 @@ Item {
         id: voice_start_mapping
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_start_mapping.mp3"
+        source: supervisor.getVoice("start_mapping");
     }
     Audio{
         id: voice_stop_mapping
         autoPlay: false
         volume: volume_voice/100
-        source: "bgm/voice_stop_mapping.mp3"
+        source: supervisor.getVoice("stop_mapping");
     }
 
     Popup_help{

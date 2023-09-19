@@ -116,7 +116,7 @@ Supervisor::~Supervisor(){
 }
 
 void Supervisor::sendServer(){
-    server->postStatus();
+//    server->postStatus();
 }
 ////*********************************************  WINDOW 관련   ***************************************************////
 void Supervisor::setWindow(QQuickWindow *Window){
@@ -765,6 +765,18 @@ void Supervisor::setCursorView(bool visible){
     }
 }
 
+QString Supervisor::getVoice(QString name, QString mode){
+    if(mode == ""){
+        mode = getSetting("ROBOT_SW","voice_mode");
+        if(mode == ""){
+            setSetting("ROBOT_SW/voice_mode","child");
+            mode = getSetting("ROBOT_SW","voice_mode");
+        }
+    }
+    QString source = "voice/" + mode + "_" + name + ".mp3";
+    qDebug() << "getVoice : " << source;
+    return source;
+}
 ////*********************************************  INIT PAGE 관련   ***************************************************////
 bool Supervisor::isConnectServer(){
     return false;
@@ -2705,8 +2717,13 @@ QVector<int> Supervisor::getOrigin(){
 
 void Supervisor::moveToServingTest(QString name){
     if(ui_state == UI_STATE_RESTING || ui_state == UI_STATE_MOVEFAIL || ui_state == UI_STATE_PICKUP){
-        if(name.left(8) == "Charging" || name.left(7) == "Resting"){
-            current_target = getLocation(name);
+        if(name.left(8) == "Charging"){
+            current_target = getLocation("Charging0");
+            ui_state = UI_STATE_MOVING;
+            is_test_moving = true;
+            plog->write("[COMMAND] Serving Test : "+name);
+        }else if(name.left(7) == "Resting"){
+            current_target = getLocation("Resting0");
             ui_state = UI_STATE_MOVING;
             is_test_moving = true;
             plog->write("[COMMAND] Serving Test : "+name);
@@ -2831,7 +2848,7 @@ void Supervisor::makeKillShell(){
     process.waitForReadyRead(200);
 }
 void Supervisor::checkUpdate(){
-    server->checkUpdate();
+//    server->checkUpdate();
 }
 bool Supervisor::checkNewUpdateProgram(){
     return server->new_update;
@@ -3197,6 +3214,7 @@ void Supervisor::onTimer(){
             if(!paused){
                 plog->write(QString::number(probot->status_emo)+QString::number(probot->status_lock)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
                 plog->write("[SUPERVISOR] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL ");
+                QMetaObject::invokeMethod(mMain, "movefail");
                 ui_state = UI_STATE_MOVEFAIL;
                 is_test_moving = false;
             }
@@ -3204,6 +3222,7 @@ void Supervisor::onTimer(){
             is_test_moving = false;
             plog->write("[SUPERVISOR] LOCAL NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
             ui_state = UI_STATE_MOVEFAIL;
+            QMetaObject::invokeMethod(mMain, "movefail");
         }else{
             if(getSetting("ROBOT_SW","use_pause_current")=="true"){
                 float current_threshold = getSetting("MOTOR","pause_motor_current").toFloat();
@@ -3470,6 +3489,7 @@ void Supervisor::onTimer(){
                                 if(probot->ipc_use){
                                     ipc->moveStop();
                                 }
+                                QMetaObject::invokeMethod(mMain, "movefail");
                                 ui_state = UI_STATE_MOVEFAIL;
                                 plog->write("[SUPERVISOR] MOVING FAILED : ROBOT NOT MOVING (Max 5)");
                             }
@@ -3584,9 +3604,11 @@ void Supervisor::checkMoveFail(){
     if(getMotorState() == 0){
         plog->write(QString::number(probot->status_emo)+QString::number(probot->status_lock)+QString::number(probot->status_remote)+QString::number(probot->status_power)+QString::number(probot->motor[0].status)+QString::number(probot->motor[1].status)+QString::number(probot->battery_in)+QString::number(probot->battery_out));
         plog->write("[SUPERVISOR] MOTOR NOT READY -> UI_STATE = UI_STATE_MOVEFAIL ");
+        QMetaObject::invokeMethod(mMain, "movefail");
         ui_state = UI_STATE_MOVEFAIL;
     }else if(probot->localization_state == LOCAL_NOT_READY){
         plog->write("[SUPERVISOR] LOCAL NOT READY -> UI_STATE = UI_STATE_MOVEFAIL");
+        QMetaObject::invokeMethod(mMain, "movefail");
         ui_state = UI_STATE_MOVEFAIL;
     }
 }

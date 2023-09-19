@@ -67,7 +67,7 @@ Item {
         id: voice_test
         autoPlay: false
         volume: slider_volume_voice.value/100
-        source: "bgm/voice_start_serving.mp3"
+        source: supervisor.getVoice("start_serving");
     }
     Audio{
         id: bgm_test
@@ -1020,6 +1020,50 @@ Item {
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_voice_mode
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"음성"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_voice_mode
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["어린이", "여성"]
                             }
                         }
                     }
@@ -8372,6 +8416,14 @@ Item {
         if(combo_comeback_preset.ischanged){
             supervisor.setSetting("ROBOT_SW/comeback_preset",combo_comeback_preset.currentIndex.toString());
         }
+        if(combo_voice_mode.ischanged){
+            if(combo_voice_mode.currentIndex == 0){
+                supervisor.setSetting("ROBOT_SW/voice_mode","child");
+            }else if(combo_voice_mode.currentIndex == 1){
+                supervisor.setSetting("ROBOT_SW/voice_mode","woman");
+            }
+
+        }
 
         if(combo_use_tray.ischanged){
             if(combo_use_tray.currentIndex == 0)
@@ -8758,6 +8810,12 @@ Item {
             combo_movingpage.currentIndex = 0;
         }
 
+        if(supervisor.getSetting("ROBOT_SW","voice_mode") === "woman"){
+            combo_voice_mode.currentIndex = 1;
+        }else{
+            combo_voice_mode.currentIndex = 0;
+        }
+
         combo_comeback_preset.currentIndex = parseInt(supervisor.getSetting("ROBOT_SW","comeback_preset"));
 
         if(supervisor.getSetting("ROBOT_SW","use_tray") === "true"){
@@ -8828,6 +8886,7 @@ Item {
         platform_name.ischanged = false;
         combo_platform_serial.ischanged = false;
         combo_platform_id.ischanged = false;
+        combo_voice_mode.ischanged = false;
         combo_platform_type.ischanged = false;
         combo_tray_num.ischanged = false;
 

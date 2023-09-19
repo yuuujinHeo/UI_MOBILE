@@ -94,15 +94,16 @@ Item {
     }
 
     Component.onCompleted: {
-        if(annotation_after_mapping){
-            annot_pages.sourceComponent = page_annot_start;
-        }else{
-            if(supervisor.getLocalizationState() === 2){
-                annot_pages.sourceComponent = page_annot_menu;
-            }else{
-                annot_pages.sourceComponent = page_annot_localization;
-            }
-        }
+        annot_pages.sourceComponent = page_annot_main_travelline;
+//        if(annotation_after_mapping){
+//            annot_pages.sourceComponent = page_annot_start;
+//        }else{
+//            if(supervisor.getLocalizationState() === 2){
+//                annot_pages.sourceComponent = page_annot_menu;
+//            }else{
+//                annot_pages.sourceComponent = page_annot_localization;
+//            }
+//        }
     }
 
     Loader{
@@ -1708,7 +1709,7 @@ Item {
                     click_sound.play();
                     supervisor.writelog("[Annotation] Location Test : Done");
                     if(annotation_after_mapping)
-                        annot_pages.sourceComponent = page_annot_location_go_resting;
+                        annot_pages.sourceComponent = page_annot_main_travelline;
                     else
                         annot_pages.sourceComponent = page_annot_menu;
                 }
@@ -1777,7 +1778,7 @@ Item {
                     click_sound.play();
                     supervisor.writelog("[Annotation] Location Test : go Resting");
 
-                    supervisor.moveToServingTest("Resting");
+                    supervisor.moveToServingTest("Resting0");
                 }
             }
 
@@ -1837,6 +1838,149 @@ Item {
         }
     }
     Component{
+        id: page_annot_main_travelline
+        Item{
+            width: annot_pages.width
+            height: annot_pages.height
+            property bool show_map: false
+            Component.onCompleted: {
+                supervisor.setMotorLock(false);
+                map_travel_view.setEnable(true);
+                map_travel_view.setViewer("annot_location");
+                map_travel_view.show_connection = false;
+                map_travel_view.show_button_lidar = false;
+                if(!annotation_after_mapping){
+                    map_travel_view.startDrawingT();
+                }
+            }
+            Component.onDestruction: {
+                map_travel_view.setEnable(false);
+                if(!annotation_after_mapping){
+                    map_travel_view.stopDrawingT();
+                    map_travel_view.save("tline");
+                }
+            }
+
+            Timer{
+                running: true
+                interval: 500
+                onTriggered:{
+                    supervisor.drawingRunawayStart();
+                    map_travel_view.startDrawingT();
+                }
+            }
+            Rectangle{
+                anchors.fill: parent
+                color: color_dark_navy
+            }
+            AnimatedImage{
+                id: image_robotmoving
+                visible: !show_map
+                source: "image/robot_manual.gif"
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: 60
+                width: 1280/1.5
+                height: 800/1.5
+                speed: 0.5
+                anchors.bottomMargin: -100
+            }
+            MAP_FULL2{
+                id: map_travel_view
+                width: 500
+                objectName: "main_travelline_map"
+                enabled: true
+                height: 500
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: 85
+            }
+            Column{
+                id: col
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 30
+                Text{
+                    text: "로봇을 주 이동경로를 따라 끌고 이동해주세요."
+                    color: "white"
+                    font.pixelSize: 50
+                    horizontalAlignment: Text.AlignHCenter
+                    font.family: font_noto_b.name
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                Column{
+                    Text{
+                        text: "* 주 이동경로란?"
+                        color: color_green
+                        font.bold: true
+                        font.pixelSize:15
+                        horizontalAlignment: Text.AlignHCenter
+                        font.family: font_noto_r.name
+                    }
+                    Text{
+                        text: "로봇이 이동할 때 사용하는 경로입니다. 매장내부를 여러번 이동하면서 경로를 그려주세요."
+                        color: "white"
+                        font.pixelSize: 15
+                        horizontalAlignment: Text.AlignHCenter
+                        font.family: font_noto_r.name
+                    }
+                    Text{
+                        text: "테이블의 의자가 빠지는 것을 생각해서 통로의 중앙을 통하며 경로를 그려줘야합니다."
+                        color: "white"
+                        font.pixelSize: 15
+                        horizontalAlignment: Text.AlignHCenter
+                        font.family: font_noto_r.name
+                    }
+                    Text{
+                        text: "각 테이블의 서빙위치는 뒷 단계에서 진행하니 매장의 통로를 따라서만 진행하시면 됩니다."
+                        color: "white"
+                        font.pixelSize: 15
+                        horizontalAlignment: Text.AlignHCenter
+                        font.family: font_noto_r.name
+                    }
+                    Text{
+                        text: "로봇이 접근하지 말아야 하는 장소는 제외해주세요. 추가 설정에서 수정가능합니다."
+                        color: "white"
+                        font.pixelSize: 15
+                        horizontalAlignment: Text.AlignHCenter
+                        font.family: font_noto_r.name
+                    }
+                }
+            }
+            Item_buttons{
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.bottomMargin: 150
+                anchors.rightMargin: 50
+                width: 200
+                height: 80
+                type: "round_text"
+                text: "초기화"
+                visible: false
+                onClicked: {
+                    click_sound.play();
+//                    supervisor.stop
+                }
+            }
+            Item_buttons{
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.bottomMargin: 50
+                anchors.rightMargin: 50
+                width: 200
+                height: 80
+                type: "round_text"
+                text: "전부 완료했습니다"
+                onClicked: {
+                    click_sound.play();
+                    supervisor.writelog("[Annotation] Main Travelline : Done");
+                    annot_pages.sourceComponent = page_annot_location_serving;
+
+                }
+            }
+        }
+    }
+    Component{
         id: page_annot_location_serving
         Item{
             width: annot_pages.width
@@ -1852,6 +1996,7 @@ Item {
                     map_location_view.startDrawingT();
                 }
             }
+
             Component.onDestruction: {
                 map_location_view.setEnable(false);
                 if(!annotation_after_mapping){
@@ -1868,6 +2013,7 @@ Item {
                     map_location_view.startDrawingT();
                 }
             }
+
             Rectangle{
                 anchors.fill: parent
                 color: color_dark_navy
@@ -1994,6 +2140,7 @@ Item {
                 text: "전부 완료했습니다"
                 onClicked: {
                     click_sound.play();
+                    annot_pages.sourceComponent = page_annot_location_serving;
                     popup_drawing_notice.open();
                 }
             }

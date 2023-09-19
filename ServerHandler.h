@@ -81,13 +81,14 @@ public:
 
 private slots:
     void onTimer();
+    void response();
 
 private:
     QNetworkAccessManager   *manager;
-    QEventLoop              connection_loop;
+//    QEventLoop              connection_loop;
 
     QTimer  *timer;
-    QTimer  *connection_timer;
+//    QTimer  *connection_timer;
 };
 
 #endif // SERVERHANDLER_H
