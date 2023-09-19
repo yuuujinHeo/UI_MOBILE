@@ -15,8 +15,6 @@ Item {
     Component.onCompleted: {
         init();
     }
-
-
     property bool show_serving: true
 
 
@@ -111,9 +109,6 @@ Item {
         cur_table = 0;
         update_group();
     }
-    onCur_tableChanged: {
-        print("cur table : " ,cur_table);
-    }
 
     Rectangle{
         anchors.fill : parent
@@ -147,37 +142,85 @@ Item {
             if(is_con_robot){
                 if(is_motor_power){
                     if(is_emergency){
-                        btn_go.enabled = false;
+                        btn_go.active = false;
+                        btn_charge.active = false;
+                        btn_resting.active = false;
                         rect_go.color = color_red;
                         rect_go_safe.color = color_gray
                         text_go.text = "비상스위치가 눌려있음"
                         text_go.font.pixelSize = 25
+                        popup_notice.main_str = "비상스위치가 눌려있습니다."
+                        popup_notice.sub_str = "비상스위치를 풀어주세요"
+                        popup_notice.show_localization = false
+                        popup_notice.show_motorinit = false;
+                    }else if(supervisor.getMotorState() === 0){
+                        btn_go.active = false;
+                        btn_charge.active = false;
+                        btn_resting.active = false;
+                        rect_go.color = color_red;
+                        rect_go_safe.color = color_gray
+                        text_go.text = "모터 에러"
+                        text_go.font.pixelSize = 25
+                        if(supervisor.getMotorStatus(0) === 0 || supervisor.getMotorStatus(1) === 0){
+                            popup_notice.main_str = "모터 초기화가 되지 않았습니다."
+                            popup_notice.sub_str = "모터 초기화를 해주세요."
+                        }else{
+                            popup_notice.main_str = "모터에 에러가 발생했습니다."
+                            popup_notice.sub_str = "모터 초기화를 해주세요."
+                        }
+                        popup_notice.show_motorinit = true;
+                        popup_notice.show_localization = false
+
                     }else if(supervisor.getLocalizationState() === 2){
-                        btn_go.enabled = true;
+                        btn_go.active = true;
+                        btn_charge.active = true;
+                        btn_resting.active = true;
                         rect_go.color = color_blue;
                         rect_go_safe.color = color_blue
                         text_go.text = "서빙 시작"
                         text_go.font.pixelSize = 35
+                        popup_notice.main_str = ""
+                        popup_notice.sub_str = ""
+                        popup_notice.show_localization = false
+                        popup_notice.show_motorinit = false;
                     }else{
-                        btn_go.enabled = false;
+                        btn_go.active = false;
+                        btn_charge.active = false;
+                        btn_resting.active = false;
                         rect_go.color = color_red;
                         rect_go_safe.color = color_gray
                         text_go.text = "로봇 위치 에러"
                         text_go.font.pixelSize = 30
+                        popup_notice.main_str = "위치를 찾을 수 없습니다."
+                        popup_notice.sub_str = "위치 초기화를 다시 해주세요."
+                        popup_notice.show_localization = true;
+                        popup_notice.show_motorinit = false;
                     }
                 }else{
-                    btn_go.enabled = false;
+                    btn_go.active = false;
+                    btn_charge.active = false;
+                    btn_resting.active = false;
                     rect_go.color = color_gray;
                     rect_go_safe.color = color_gray
                     text_go.text = "로봇 전원 안켜짐"
                     text_go.font.pixelSize = 35
+                    popup_notice.main_str = "로봇 전원이 꺼져있습니다."
+                    popup_notice.sub_str = ""
+                    popup_notice.show_localization = false
+                    popup_notice.show_motorinit = false;
                 }
             }else{
-                btn_go.enabled = false;
+                btn_go.active = false;
+                btn_charge.active = false;
+                btn_resting.active = false;
                 rect_go_safe.color = color_gray
                 rect_go.color = color_gray;
                 text_go.text = "로봇 연결 안됨"
                 text_go.font.pixelSize = 35
+                popup_notice.main_str = "로봇이 연결되지 않았습니다."
+                popup_notice.sub_str = "프로그램을 재시작 해주세요."
+                popup_notice.show_localization = false
+                popup_notice.show_motorinit = false;
             }
         }
     }
@@ -574,7 +617,6 @@ Item {
         height: 580
         anchors.top: parent.top
         anchors.topMargin: statusbar.height;// (parent.height - statusbar.height - height - rect_go.height)/2
-//        anchors.topMargin: statusbar.height + (parent.height - statusbar.height - height - rect_go.height - rect_go.anchors.topMargin)/2
         anchors.left: parent.left
         color: color_dark_navy
         visible: show_serving && !use_tray
@@ -1033,26 +1075,34 @@ Item {
         }
         MouseArea{
             id: btn_go
+            property bool active: false
             anchors.fill: parent
             onPressed:{
-                start_sound.play();
-            }
-
-            onClicked: {
-                count_resting = 0;
-                supervisor.setMotorLock(true);
-                print("serving start button");
-                supervisor.setPreset(cur_preset);
-                if(supervisor.getSetting("ROBOT_SW","use_tray") === "true"){
-                    for(var i=0; i<tray_num; i++){
-                        supervisor.setTray(i,traymodel.get(i).set_table);
-                    }
-                    supervisor.startServing();
+                if(active){
+                    start_sound.play();
+                    count_resting = 0;
                 }else{
-                    supervisor.goSerivng(model_group.get(cur_group).num,cur_table);
+                    click_sound_no.play();
+                    count_resting = 0;
+                    cur_table = 0;
                 }
-                cur_table = 0;
-
+            }
+            onReleased:{
+                if(active){
+                    supervisor.setMotorLock(true);
+                    supervisor.setPreset(cur_preset);
+                    if(supervisor.getSetting("ROBOT_SW","use_tray") === "true"){
+                        for(var i=0; i<tray_num; i++){
+                            supervisor.setTray(i,traymodel.get(i).set_table);
+                        }
+                        supervisor.startServing();
+                    }else{
+                        supervisor.goSerivng(model_group.get(cur_group).num,cur_table);
+                    }
+                    cur_table = 0;
+                }else{
+                    popup_notice.open();
+                }
             }
         }
     }
@@ -1091,8 +1141,14 @@ Item {
             id: btn_go_safe
             anchors.fill: parent
             onClicked: {
-                click_sound.play();
-                popup_preset_menu.open();
+                if(btn_go.active){
+
+                    click_sound.play();
+                    popup_preset_menu.open();
+                }else{
+                    popup_notice.open();
+                    click_sound_no.play();
+                }
             }
         }
         Popup{
@@ -1270,6 +1326,7 @@ Item {
         }
     }
 
+
     Rectangle{
         id: rect_patrol_box
         visible: !show_serving?true:false
@@ -1365,8 +1422,6 @@ Item {
             font.pixelSize: 50
         }
     }
-
-
     Rectangle{
         id: rect_go_patrol
         width: 300
@@ -1422,17 +1477,20 @@ Item {
                 color: "transparent"
                 anchors.horizontalCenter: parent.horizontalCenter
                 Image{
+                    id: image_menu
                     source:"icon/btn_menu.png"
                     anchors.centerIn: parent
                     MouseArea{
                         anchors.fill: parent
-                        onClicked: {
+                        onPressed:{
+                            btn_menu.color = color_light_gray;
                             click_sound.play();
+                        }
+                        onReleased:{
+                            btn_menu.color = "white";
                             count_resting = 0;
                             cur_table = 0;
-//                            print("11");
                             loadPage(pmenu);
-//                            print("22");
                         }
                     }
                 }
@@ -1444,11 +1502,13 @@ Item {
             }
             Rectangle{
                 id: btn_charge
+                property bool active: false
                 width: size_menu
                 height: size_menu
                 anchors.horizontalCenter: parent.horizontalCenter
                 Rectangle{
                     width: size_menu
+                    color: parent.color
                     height: image_charge.height+text_charge.height
                     anchors.centerIn: parent
                     Image{
@@ -1462,7 +1522,7 @@ Item {
                         text:"충전위치로"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
-                        color: "#525252"
+                        color: btn_charge.active?"#525252":color_red
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: image_charge.bottom
                         anchors.topMargin: 10
@@ -1470,12 +1530,25 @@ Item {
                 }
                 MouseArea{
                     anchors.fill: parent
-                    onClicked: {
-                        click_sound.play();
+                    onPressed:{
+                        btn_charge.color = color_light_gray;
                         count_resting = 0;
                         cur_table = 0;
-                        go_charge = true;
-                        popup_question.visible = true;
+                        if(btn_charge.active){
+                            click_sound.play();
+                            go_charge = true;
+                        }else{
+                            click_sound_no.play();
+                        }
+                    }
+                    onReleased:{
+                        btn_charge.color = "white";
+                        if(btn_charge.active){
+                            popup_question.visible = true;
+                        }else{
+
+                            popup_notice.open();
+                        }
                     }
                 }
             }
@@ -1485,15 +1558,16 @@ Item {
                 color: "#f4f4f4"
             }
             Rectangle{
+                id: btn_resting
                 width: size_menu
-                height: size_menu
+                height: size_menu-10
+                property bool active: false
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: "transparent"
                 Rectangle{
                     width: size_menu
                     height: image_wait.height+text_wait.height
                     anchors.centerIn: parent
-                    color: "transparent"
+                    color: btn_resting.color
                     Image{
                         id: image_wait
                         scale: 1.3
@@ -1505,7 +1579,7 @@ Item {
                         text:"대기위치로"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
-                        color: "#525252"
+                        color: btn_resting.active?"#525252":color_red
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: image_wait.bottom
                         anchors.topMargin: 10
@@ -1513,12 +1587,151 @@ Item {
                 }
                 MouseArea{
                     anchors.fill: parent
-                    onClicked: {
-                        click_sound.play();
+                    onPressed:{
+                        btn_resting.color = color_light_gray;
                         count_resting = 0;
                         cur_table = 0;
-                        go_wait = true;
-                        popup_question.visible = true;
+                        if(btn_resting.active){
+                            click_sound.play();
+                        }else{
+                            click_sound_no.play();
+                        }
+                    }
+                    onReleased:{
+                        btn_resting.color = "white";
+                        if(btn_resting.active){
+                            go_wait = true;
+                            popup_question.visible = true;
+                        }else{
+
+                            popup_notice.open();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Popup{
+        id: popup_notice
+        anchors.centerIn: parent
+        width: 800
+        height: 300
+        property string main_str: ""
+        property string sub_str: ""
+        property bool show_localization: false
+        property bool show_motorinit: false
+        background:Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            opacity: 0.8
+            radius: 10
+            color: color_dark_black
+        }
+        Rectangle{
+            anchors.centerIn: parent
+            width: parent.width-20
+            height: parent.height-20
+//            opacity: 0.8
+            radius: 10
+            color: "transparent"
+            border.color: color_red
+            border.width: 5
+            Image{
+                id: image_warn
+                width: 120
+                height: 120
+                source: "image/icon_warning.png"
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: 50
+            }
+            Column{
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: image_warn.right
+                anchors.leftMargin: 50
+                Text{
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 40
+                    text: popup_notice.main_str
+                }
+                Text{
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                    text: popup_notice.sub_str
+                }
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked:{
+                    popup_notice.close();
+                }
+            }
+            Rectangle{
+                width:  120
+                height: 60
+                anchors.right: parent.right
+                anchors.rightMargin: 20
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 20
+                color: "transparent"
+                border.color: color_red
+                border.width: 3
+                radius: 10
+                visible: !popup_notice.show_localization
+                Text{
+                    anchors.centerIn: parent
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                    text: "위치초기화"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onPressed:{
+                        parent.color = color_dark_black
+                        click_sound.play()
+                    }
+                    onReleased:{
+                        parent.color = "transparent"
+                        loadPage(plocalization);
+                    }
+                }
+            }
+            Rectangle{
+                width:  120
+                height: 60
+                color: "transparent"
+                border.color: color_red
+                border.width: 3
+                anchors.right: parent.right
+                anchors.rightMargin: 20
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 20
+                radius: 10
+                visible: popup_notice.show_motorinit
+                Text{
+                    anchors.centerIn: parent
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                    text: "모터초기화"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onPressed:{
+                        parent.color = color_dark_black
+                        click_sound.play()
+                    }
+                    onReleased:{
+                        parent.color = "transparent"
+
                     }
                 }
             }
@@ -1899,26 +2112,4 @@ Item {
         }
 
     }
-
-    SoundEffect{
-        id: click
-        source: "bgm/click.wav"
-        Component.onDestruction: {
-//            print("click dest");
-        }
-    }
-//    SoundEffect{
-//        id: click_no
-//        source: "bgm/click_error.wav"
-//        Component.onDestruction: {
-//            print("click_no dest");
-//        }
-//    }
-//    SoundEffect{
-//        id: click_start
-//        source: "bgm/click_start.wav"
-//        Component.onDestruction: {
-//            print("click_start dest");
-//        }
-//    }
 }

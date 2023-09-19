@@ -136,6 +136,7 @@ typedef struct{
     int localization_state = 0;
     int running_state = 0;
     int obs_state = 0;
+    int ui_fail_state = 0;
     int obs_in_path_state = 0;
     int robot_preset = 0;
     int drawing_state = 0;
@@ -272,7 +273,8 @@ enum ROBOT_CMD{
     ROBOT_CMD_DRAW_LINE_SAVE,//25
     ROBOT_CMD_MAP_RELOAD,
     ROBOT_CMD_SETTING_RELOAD,
-    ROBOT_CMD_SERVER_MAP_UPDATE
+    ROBOT_CMD_SERVER_MAP_UPDATE,
+    ROBOT_CMD_CHECK_TRAVEL_LINE
 
 };
 

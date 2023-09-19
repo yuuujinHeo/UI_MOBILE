@@ -204,6 +204,7 @@ void IPCHandler::onTimer(){
         probot->multirobot_state = temp1.ui_multi_state;
         probot->running_state = temp1.ui_auto_state;
         probot->obs_state = temp1.ui_obs_state;
+        probot->ui_fail_state = temp1.ui_fail_state;
         probot->robot_preset = temp1.ui_cur_velocity_preset;
         probot->obs_in_path_state = temp1.ui_face_state;
         probot->curPose.point.x = temp1.robot_pose[0];

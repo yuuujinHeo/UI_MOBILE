@@ -104,9 +104,8 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onDoubleClicked:{
-                        supervisor.sendServer();
-//                        click_sound.play();
-//                        popup_password.open();
+                        click_sound.play();
+                        popup_password.open();
                     }
                 }
             }

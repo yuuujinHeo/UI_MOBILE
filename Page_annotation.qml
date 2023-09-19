@@ -69,6 +69,7 @@ Item {
     Timer{
         running: test_move_state === 2
         interval: 1000
+        repeat: true
         onTriggered:{
             if(test_move_error === 0){//경로 찾지 못 함
                 test_move_state = 0;
@@ -3500,7 +3501,7 @@ Item {
                     click_sound.play();
                     print("save location");
                     for(var i=0; i<details.count-2; i++){
-                        supervisor.setLocation(i,details.get(i+2).name,details.get(i+2).group,details.get(i+2).number);
+                        supervisor.setLocation(i,details.get(i+2).name,details.get(i+2).group,details.get(i+2).number,details.get(i+2).call_id);
                     }
                     map_hide.save("location_all");
                     supervisor.drawingRunawayStop();
@@ -5114,6 +5115,16 @@ Item {
                             onClicked: {
                                 select_mode = 2;
                                 map.setTool("move");
+                            }
+                        }
+                        Item_buttonRectIcon{
+                            selected: select_mode===3
+                            icon: "icon/icon-drawing-free drawing.png"
+                            name: "경로 검사"
+                            onClicked: {
+                                select_mode = 3;
+                                map.setTool("move");
+                                supervisor.checkTravelline();
                             }
                         }
                     }

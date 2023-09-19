@@ -48,23 +48,24 @@ public:
 public:
 
     ////*********************************************  FLAGS   ***************************************************////
-//    int ui_cmd;
-    bool flag_read_ini = false;
-    bool isaccepted;
-    bool flag_clear;
+
+    //넘어가기(debug)사용 시 true -> slam auto kill 안함
+    bool debug_mode = false;
+
+    //순회 모드, 순회 중 픽업해주세요 화면 띄울건지.
     int patrol_mode = PATROL_NONE;
-    bool patrol_use_pickup = false;
-    int state_rotate_tables;
+    bool use_patrol_pickup = false;
 
-    ServerHandler *server;
-
+    //
     ////*********************************************  STRUCT   ***************************************************////
     ST_MAP map;
     ST_ROBOT robot;
     ST_SETTING setting;
     ST_PATROLMODE patrol;
+    ServerHandler *server;
 
     ////*********************************************  VARIABLE   ***************************************************////
+
     QStringList usb_list;
     QStringList usb_file_full_list;
     QStringList usb_file_list;
@@ -73,13 +74,11 @@ public:
     QVector<QString> map_list;
     QVector<QString> map_detail_list;
 
-    int count_excuseme = 0;
-    bool flag_excuseme = false;
-    int count_movewait = 0;
-    bool flag_movewait = false;
 
     int setting_call_num = -1;
     QVector<QString> call_queue;
+    int patrol_num = -1;
+    LOCATION current_target;
 
     Q_INVOKABLE void loadMapServer();
     Q_INVOKABLE void sendMapServer();
@@ -121,17 +120,15 @@ public:
     QProcess *wifi_check_process;
     ////*********************************************  CLASS   ***************************************************////
     ZIPHandler *zip;
-//    JoystickHandler *joystick;
     HTTPHandler *git;
     MapHandler *maph;
     CallbellHandler *call;
     IPCHandler *ipc;
     QProcess *slam_process;
 
-    Q_INVOKABLE void writelog(QString msg);
 
     ////*********************************************  Server   ***************************************************////
-    Q_INVOKABLE void sendServer();
+
 
     bool checkCallQueue();
     ////*********************************************  MAP HANDLER   ***************************************************////
@@ -245,6 +242,7 @@ public:
 
 
 
+    Q_INVOKABLE void writelog(QString msg);
 
     Q_INVOKABLE void startDrawingObject();
     Q_INVOKABLE void stopDrawingObject();
@@ -284,7 +282,6 @@ public:
     QObject* getObject();
     Q_INVOKABLE void programRestart();
     Q_INVOKABLE void programExit();
-    Q_INVOKABLE void programHide();
 
 
     Q_INVOKABLE QString getRawMapPath(QString name);
@@ -311,13 +308,12 @@ public:
     Q_INVOKABLE QString getRightCamera();
     Q_INVOKABLE void setCamera(QString left, QString right);
     Q_INVOKABLE int getCameraNum();
-    Q_INVOKABLE QList<int> getCamera(int num);
     Q_INVOKABLE QString getCameraSerial(int num);
 
     Q_INVOKABLE void setCursorView(bool visible);
 
     Q_INVOKABLE QString getVoice(QString name, QString mode="");
-
+    Q_INVOKABLE void checkTravelline();
     ////*********************************************  GIT 관련   ***************************************************////
     Q_INVOKABLE void pullGit();
     Q_INVOKABLE bool isNewVersion();
@@ -377,16 +373,12 @@ public:
     Q_INVOKABLE QString getusbname(int num);
     Q_INVOKABLE void readusb();
 
-    Q_INVOKABLE bool isUSBFile();
-    Q_INVOKABLE QString getUSBFilename();
     Q_INVOKABLE void saveMapfromUsb(QString path);
-    Q_INVOKABLE bool loadMaptoUSB();
 
     ////*********************************************  INIT PAGE 관련   ***************************************************////
     Q_INVOKABLE bool isConnectServer();
 
     Q_INVOKABLE bool isLoadMap();
-    Q_INVOKABLE bool isLoadINI();
     Q_INVOKABLE bool isExistMap(QString name="");
     Q_INVOKABLE bool isExistRawMap(QString name);
     Q_INVOKABLE bool isExistTravelMap(QString name);
@@ -468,9 +460,6 @@ public:
     Q_INVOKABLE LOCATION getCallLocation(QString id);
     Q_INVOKABLE void setCallbell(QString type, int id);
     Q_INVOKABLE void acceptCall(bool yes);
-    Q_INVOKABLE void removeCall(int id);
-    Q_INVOKABLE void removeCallAll();
-
     LOCATION getloc(QString name){
         for(int i=0; i<pmap->locations.size(); i++){
             if(pmap->locations[i].name == name)
@@ -479,7 +468,6 @@ public:
         return LOCATION();
     }
 
-    LOCATION current_target;
 
     ////*********************************************  ANNOTATION 관련   ***************************************************////
 
@@ -648,9 +636,7 @@ public:
     Q_INVOKABLE bool getObjectflag();
     Q_INVOKABLE void undoObject();
     ////*********************************************  PATROL 관련   ***************************************************////
-
     QStringList patrol_list;
-    int patrol_num;
     Q_INVOKABLE void clearRotateList();
     Q_INVOKABLE void setRotateList(QString name);
     Q_INVOKABLE void startPatrol(QString mode, bool pickup);
