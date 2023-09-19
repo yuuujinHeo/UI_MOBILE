@@ -3182,6 +3182,7 @@ Item {
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[ANNOTATION] Localization : Success");
+                        supervisor.confirmLocalization();
                         update_timer.start();
                     }
                 }
@@ -3235,6 +3236,7 @@ Item {
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[INIT] Localization : Success");
+                        supervisor.confirmLocalization();
                         update_timer.start();
                     }
                 }

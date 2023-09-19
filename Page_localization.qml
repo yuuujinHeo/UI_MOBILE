@@ -261,6 +261,7 @@ Item {
         onClicked: {
             click_sound.play();
             supervisor.writelog("[ANNOTATION] Localization : Success");
+            supervisor.confirmLocalization();
             loadPage(pmap);
 //                annot_pages.sourceComponent = page_annot_menu;
         }
@@ -280,6 +281,7 @@ Item {
         onClicked: {
             click_sound.play();
             supervisor.writelog("[ANNOTATION] Localization : Success");
+            supervisor.confirmLocalization();
             loadPage(pmap);//annot_pages.sourceComponent = page_annot_menu;
         }
     }

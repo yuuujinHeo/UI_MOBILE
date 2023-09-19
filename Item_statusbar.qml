@@ -48,8 +48,7 @@ Item {
             MouseArea{
                 anchors.fill: parent
                 onPressAndHold: {
-                    supervisor.writelog("[USER INPUT] STATUS BAR : MINIMIZED")
-                    supervisor.programHide();
+                    supervisor.writelog("[USER INPUT] Screen Minimized.");
                     mainwindow.showMinimized()
                 }
                 onDoubleClicked: {
@@ -504,9 +503,8 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            supervisor.writelog("[USER INPUT] STATUS BAR : MINIMIZED")
-                            supervisor.programHide();
-                            mainwindow.showMinimized()
+                            supervisor.writelog("[USER INPUT] Screen Minimized.");
+                            mainwindow.showMinimized();
                         }
                     }
                 }

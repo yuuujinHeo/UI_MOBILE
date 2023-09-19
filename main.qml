@@ -37,6 +37,7 @@ Window {
     }
     property color color_dark_gray: "#999999";
     property color color_red: "#E7584D"
+    property color color_dark_red: "#D6473C"
     property color color_green: "#12d27c"
     property color color_mid_green: "#0FB168"
     property color color_yellow: "#F7DB0D"

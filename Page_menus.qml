@@ -149,8 +149,8 @@ Item {
                     anchors.fill: parent
                     onClicked: {
                         click_sound.play();
-                        supervisor.programHide();
-                        mainwindow.showMinimized()
+                        supervisor.writelog("[USER INPUT] Screen Minimized.");
+                        mainwindow.showMinimized();
                     }
                 }
             }
