@@ -21,7 +21,7 @@ Item {
     function init(){
         statusbar.visible = true;
 
-        cur_table = 0;
+        cur_table = -1;
         cur_group = 0;
         cur_page = 0;
 
@@ -96,7 +96,7 @@ Item {
     property int rect_size: 70
     property int traybox_margin: 150
 
-    property int cur_table: 0
+    property int cur_table: -1
     property int cur_group: 0
     property int cur_page: 0
 
@@ -107,7 +107,7 @@ Item {
 
     property var cur_preset: 3
     onCur_groupChanged: {
-        cur_table = 0;
+        cur_table = -1;
         update_group();
     }
 
@@ -245,9 +245,10 @@ Item {
 //            print(i);
             if(i>=table_num)
                 break;
-            model_group_table.append({"num":i,"available":supervisor.getLocationAvailable(supervisor.getLocationID(model_group.get(cur_group).num,i)),"name":supervisor.getServingName(model_group.get(cur_group).num, i)});
-            print("update table : ",i,supervisor.getLocationAvailable(supervisor.getLocationNumber(model_group.get(cur_group).num,i)))
-        }
+//            print("update table : ",i,supervisor.getLocationAvailable(supervisor.getLocationNumber(model_group.get(cur_group).num,i)))
+
+            model_group_table.append({"num":i,"available":true,"name":supervisor.getServingName(model_group.get(cur_group).num, i)});
+            }
     }
 
     Image{
@@ -338,7 +339,7 @@ Item {
                             if(width_dis > 50){
                                 model.set_table = 0;
                                 model.color =  "white"
-                                cur_table = 0;
+                                cur_table = -1;
                             }else{
                                 if(cur_table != 0){
                                     model.set_table = cur_table;
@@ -654,7 +655,10 @@ Item {
                     onClicked: {
                         click_sound.play();
                         count_resting = 0;
-                        cur_table = num;
+                        if(cur_table == num)
+                            cur_table = -1;
+                        else
+                            cur_table = num;
                     }
                 }
             }

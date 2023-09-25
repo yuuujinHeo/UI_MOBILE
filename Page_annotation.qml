@@ -111,7 +111,7 @@ Item {
             if(supervisor.getLocalizationState() === 2){
                 annot_pages.sourceComponent = page_annot_menu;
             }else{
-                annot_pages.sourceComponent = page_annot_location_serving_done//page_annot_localization;
+                annot_pages.sourceComponent = page_annot_localization;
             }
         }
     }
@@ -2712,7 +2712,7 @@ Item {
                 for(var i=0; i<supervisor.getLocationNum("Serving"); i++){
                     locations.append({"name": supervisor.getLocationName(i,"Serving"),
                                    "group":supervisor.getLocationGroupNum(i),
-                                    "call_id" : supervisor.getLocationCallID("Serving",i),
+                                    "call_id" : supervisor.getLocationCallID(2+i),
                                    "error":false});
                 }
                 update();
@@ -2727,12 +2727,12 @@ Item {
                                    "name":"충전위치",
                                    "group":0,
                                    "error":false,
-                                   "call_id":supervisor.getLocationCallID("Charging",0)});
+                                   "call_id":supervisor.getLocationCallID(0)});
                 details.append({"ltype":"Resting",
                                    "name":"대기위치",
                                    "group":0,
                                    "error":false,
-                                   "call_id":supervisor.getLocationCallID("Resting",0)});
+                                   "call_id":supervisor.getLocationCallID(1)});
                 for(var i=0; i<locations.count; i++){
                     details.append({"ltype":"Serving",
                                     "name":locations.get(i).name,
@@ -2790,20 +2790,14 @@ Item {
             function checkLocationNumber(){
 
                 for(var i=0; i<details.count; i++){
-                    if(details.get(i).ltype === "Serving"){
-                        for(var j=i+1; j<details.count; j++){
-                            if(details.get(j).ltype === "Serving"){
-                                if(details.get(i).call_id === "" || details.get(i).call_id === "-")
-                                    continue;
-                                else if(details.get(i).call_id === details.get(j).call_id){
-                                    details.get(i).error = true;
-                                    details.get(j).error = true;
-                                }
-                            }
-
+                    for(var j=i+1; j<details.count; j++){
+                        if(details.get(i).call_id === "" || details.get(i).call_id === "-")
+                            continue;
+                        else if(details.get(i).call_id === details.get(j).call_id){
+                            details.get(i).error = true;
+                            details.get(j).error = true;
                         }
                     }
-
                 }
             }
 
@@ -3216,7 +3210,7 @@ Item {
                 onClicked: {
                     click_sound.play();
                     print("save location");
-                    supervisor.saveAnnotation();
+                    supervisor.saveAnnotation(supervisor.getMapname());
                     supervisor.drawingRunawayStop();
                     map_hide.stopDrawingT();
                     supervisor.writelog("[ANNOTATION] LOCAION SAVE : Check Done ");
@@ -6426,7 +6420,7 @@ Item {
     Popup{
         id: popup_moving
         anchors.centerIn: parent
-        width: 1200
+        width: 1280
         height: 800
         property string location: ""
         background:Rectangle{

@@ -493,7 +493,7 @@ public:
     Q_INVOKABLE int getLocationGroupNum();
     Q_INVOKABLE int getLocationGroupSize(int num);
     Q_INVOKABLE int getLocationGroupNum(int num);
-    Q_INVOKABLE QString getLocationCallID(QString type, int num);
+    Q_INVOKABLE QString getLocationCallID(int num);
 
     Q_INVOKABLE void removeLocationGroup(int num);
     Q_INVOKABLE void addLocationGroup(QString name);

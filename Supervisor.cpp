@@ -396,6 +396,8 @@ void Supervisor::readSetting(QString map_name){
     probot->type = setting_robot.value("type").toString();
     setting_robot.endGroup();
 
+    plog->write("[SUPERVISOR] READ SETTING : robot_hw done");
+
     setting_robot.beginGroup("ROBOT_SW");
     probot->program_version = setting_robot.value("version").toString();
     probot->program_message = setting_robot.value("version_msg").toString();
@@ -409,9 +411,12 @@ void Supervisor::readSetting(QString map_name){
     pmap->mapping_gridwidth = setting_robot.value("grid_size").toFloat();
     setting_robot.endGroup();
 
+    plog->write("[SUPERVISOR] READ SETTING : robot_sw done");
     setting_robot.beginGroup("CALLING");
     probot->max_moving_count = setting_robot.value("call_maximum").toInt();
     setting_robot.endGroup();
+
+    plog->write("[SUPERVISOR] READ SETTING : calling done");
 
     setting_robot.beginGroup("FLOOR");
     pmap->margin = setting_robot.value("margin").toFloat();
@@ -422,11 +427,13 @@ void Supervisor::readSetting(QString map_name){
     setting.table_col_num = setting_robot.value("table_col_num").toInt();
     setting_robot.endGroup();
 
+    plog->write("[SUPERVISOR] READ SETTING : FLOOR done");
     setting_robot.beginGroup("SENSOR");
     pmap->left_camera = setting_robot.value("left_camera").toString();
     pmap->right_camera = setting_robot.value("right_camera").toInt();
     setting_robot.endGroup();
 
+    plog->write("[SUPERVISOR] READ SETTING : SENSOR done");
     if(map_name == ""){
         map_name = pmap->map_name;
     }
@@ -460,6 +467,7 @@ void Supervisor::readSetting(QString map_name){
         pmap->origin[1] = pmap->edited_origin[1];
     }
     setting_meta.endGroup();
+    plog->write("[SUPERVISOR] READ SETTING : meta done");
 
     //Annotation======================================================================
     ini_path = getAnnotPath(map_name);
@@ -468,38 +476,45 @@ void Supervisor::readSetting(QString map_name){
     pmap->locations.clear();
     LOCATION temp_loc;
 
+    qDebug() << "?";
     setting_anot.beginGroup("charging_locations");
     QString loc_str = setting_anot.value("loc0").toString();
     QStringList strlist = loc_str.split(",");
-    temp_loc.point = cv::Point2f(strlist[1].toFloat(),strlist[2].toFloat());
-    temp_loc.angle = strlist[3].toFloat();
-    temp_loc.group = 0;
-    temp_loc.type = "Charging";
-    temp_loc.name = strlist[0];
-    if(strlist.size() > 4)
-        temp_loc.call_id = strlist[4];
-    else
-        temp_loc.call_id = "";
+    if(strlist.size()>1){
+        temp_loc.point = cv::Point2f(strlist[1].toFloat(),strlist[2].toFloat());
+        temp_loc.angle = strlist[3].toFloat();
+        temp_loc.group = 0;
+        temp_loc.type = "Charging";
+        temp_loc.name = strlist[0];
+        if(strlist.size() > 4)
+            temp_loc.call_id = strlist[4];
+        else
+            temp_loc.call_id = "";
+    }
     pmap->locations.push_back(temp_loc);
     setting_anot.endGroup();
 
 
-
+    qDebug() << "??";
     setting_anot.beginGroup("resting_locations");
     loc_str = setting_anot.value("loc0").toString();
     strlist = loc_str.split(",");
-    temp_loc.point = cv::Point2f(strlist[1].toFloat(),strlist[2].toFloat());
-    temp_loc.angle = strlist[3].toFloat();
-    temp_loc.type = "Resting";
-    temp_loc.group = 0;
-    temp_loc.name = strlist[0];
-    if(strlist.size() > 4)
-        temp_loc.call_id = strlist[4];
-    else
-        temp_loc.call_id = "";
-    pmap->locations.push_back(temp_loc);
+    qDebug() << "??? "<<strlist.size();
+    if(strlist.size()>1){
+        temp_loc.point = cv::Point2f(strlist[1].toFloat(),strlist[2].toFloat());
+        temp_loc.angle = strlist[3].toFloat();
+        temp_loc.type = "Resting";
+        temp_loc.group = 0;
+        temp_loc.name = strlist[0];
+        if(strlist.size() > 4)
+            temp_loc.call_id = strlist[4];
+        else
+            temp_loc.call_id = "";
+        pmap->locations.push_back(temp_loc);
+    }
     setting_anot.endGroup();
 
+    qDebug() << "?";
     setting_anot.beginGroup("serving_locations");
     int total_serv_num = 0;
     int group_num = setting_anot.value("group").toInt();
@@ -514,6 +529,7 @@ void Supervisor::readSetting(QString map_name){
         QString group_name = setting_anot.value("name").toString();
         pmap->location_groups.append(group_name);
 
+        qDebug() << "?????????????????" << serv_num;
 
         for(int j=0; j<serv_num; j++){
             QString loc_str = setting_anot.value("loc"+QString::number(j)).toString();
@@ -533,6 +549,8 @@ void Supervisor::readSetting(QString map_name){
         setting_anot.endGroup();
     }
 
+    qDebug() << "?";
+    plog->write("[SUPERVISOR] READ SETTING : annot done");
 //    std::sort(pmap->locations.begin(),pmap->locations.end(),sortLocation2);
 
 
@@ -543,7 +561,6 @@ void Supervisor::readSetting(QString map_name){
 
     setting_anot.beginGroup("objects");
     int obj_num = setting_anot.value("num").toInt();
-
     pmap->objects.clear();
     cv::Point2f temp_point;
     for(int i=0; i<obj_num; i++){
@@ -581,6 +598,7 @@ void Supervisor::readSetting(QString map_name){
     setObjPose();
     setting_anot.endGroup();
 
+    plog->write("[SUPERVISOR] READ SETTING : object done");
     //Set Variable
     probot->trays.clear();
     for(int i=0; i<setting.tray_num; i++){
@@ -1871,21 +1889,23 @@ int Supervisor::getLocationGroupNum(int num){
         }
     }
     return 0;
-
-
 }
-QString Supervisor::getLocationCallID(QString type, int num){
+QString Supervisor::getLocationCallID(int num){
     int count = 0;
-    for(int i=0; i<pmap->locations.size(); i++){
-        if(pmap->locations[i].type == type){
-            if(count == num){
-                qDebug() << "callid " << type << num << i << pmap->locations[i].call_id;
-                return pmap->locations[i].call_id;
-            }
-            count++;
-        }
+    if(num>-1 && num < pmap->locations.size()){
+        return pmap->locations[num].call_id;
     }
     return "";
+//    for(int i=0; i<pmap->locations.size(); i++){
+//        if(pmap->locations[i].type == type){
+//            if(count == num){
+//                qDebug() << "callid " << type << num << i << pmap->locations[i].call_id;
+//                return pmap->locations[i].call_id;
+//            }
+//            count++;
+//        }
+//    }
+//    return "";
 }
 QString Supervisor::getLocationGroup(int num){
     int count = 0;
@@ -2377,16 +2397,16 @@ bool Supervisor::saveAnnotation(QString filename){
     //name,x,y,th,num,locnum,callid
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == "Charging"){
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle)+","+pmap->locations[i].call_id;
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle)+","+pmap->locations[i].call_id;
             settings.setValue("charging_locations/loc"+QString::number(charging_num),str_name);
             charging_num++;
         }else if(pmap->locations[i].type == "Resting"){
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle)+","+pmap->locations[i].call_id;
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle)+","+pmap->locations[i].call_id;
             settings.setValue("resting_locations/loc"+QString::number(resting_num),str_name);
             resting_num++;
         }else if(pmap->locations[i].type == "Serving"){
             QString groupname = "serving_" + QString::number(pmap->locations[i].group);
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle)+","+pmap->locations[i].call_id;
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle)+","+pmap->locations[i].call_id;
             settings.setValue(groupname+"/loc"+QString::number(group_num[pmap->locations[i].group]),str_name);
             group_num[pmap->locations[i].group]++;
         }
@@ -3197,6 +3217,7 @@ void Supervisor::onTimer(){
             current_target.name = "";
             check_init = true;
             ui_state = UI_STATE_INITAILIZING;
+            plog->write("[SUPERVISOR] NONE -> Connection check done -> Initailizing");
         }
         cmd_accept = false;
         break;
@@ -3216,7 +3237,7 @@ void Supervisor::onTimer(){
                 ipc->handsup();
             }
         }else if(probot->localization_confirm == LOCAL_READY){
-//            qDebug() << "?!!!!!!!!!!!!!!!!!!!!!";
+            qDebug() << "?!!!!!!!!!!!!!!!!!!!!!";
         }else{
             if(check_init){
                 QMetaObject::invokeMethod(mMain, "need_init");
@@ -3814,6 +3835,7 @@ void Supervisor::goSerivng(int group, int table){
                     if(count == table){
                         target = pmap->locations[i];
                         target_num = count;
+                        break;
                     }else{
                         count++;
                     }
