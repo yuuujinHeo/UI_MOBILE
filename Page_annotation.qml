@@ -2573,7 +2573,7 @@ Item {
                     radius: 10
                     Column{
                         anchors.centerIn: parent
-                        spacing: 20
+                        spacing:1
                         Text{
                             text: "저장된 서빙위치 목록"
                             font.family: font_noto_r.name
@@ -2608,11 +2608,13 @@ Item {
                             }
                         }
                         ListView{
+                            clip: true
                             model:details
+                            spacing: 2
                             delegate: servings_delegate
                             anchors.horizontalCenter: parent.horizontalCenter
                             width: 700
-                            height: 400
+                            height: 350
                         }
                     }
                 }
@@ -2620,35 +2622,43 @@ Item {
 
         }
     }
-    Item{
+    Component{
         id: servings_delegate
-        width: 800
-        height: 60
-        Rectangle{
-            anchors.fill: parent
-            Row{
-                Rectangle{
-                    width: 300
-                    height: 60
-                    Text{
-                        text: group
-                        anchors.centerIn: parent
-                        font.family: font_noto_r.name
-                        font.pixelSize: 30
+        Item{
+            width: 700
+            height: 50
+            Rectangle{
+                anchors.fill: parent
+                color: color_light_gray
+                Row{
+                    spacing:1
+                    Rectangle{
+                        width: 199
+                        height: 50
+                        color: color_yellow_rect
+                        visible:ltype==="Serving"
+                        Text{
+                            text: supervisor.getLocGroupname(group)
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            font.pixelSize: 20
+                        }
                     }
-                }
-                Rectangle{
-                    width: 700
-                    height: 60
-                    Text{
-                        text: name
-                        anchors.centerIn: parent
-                        font.family: font_noto_r.name
-                        font.pixelSize: 30
+                    Rectangle{
+                        width: ltype==="Serving"?500:700
+                        height: 50
+                        color: color_yellow_rect
+                        Text{
+                            text: name
+                            anchors.centerIn: parent
+                            font.family: font_noto_r.name
+                            font.pixelSize: 20
+                        }
                     }
                 }
             }
         }
+
 
     }
 
@@ -3062,7 +3072,8 @@ Item {
                                 onClicked: {
                                     click_sound.play();
                                     supervisor.writelog("[ANNOTATION] Location Edit : "+details.get(select_location).name);
-//                                    supervisor.moveToServingTest(details.get(select_location).name);
+                                    popup_edit_serving.open();
+
                                 }
                             }
 
@@ -3155,7 +3166,6 @@ Item {
                                 width: 150
                                 height: 30
                                 color: color_navy
-                                visible: use_callbell
                                 Text{
                                     anchors.centerIn: parent
                                     text: "호출벨"
@@ -3306,6 +3316,82 @@ Item {
                             }
                         }
                     }
+                }
+            }
+
+            Popup{
+                id: popup_edit_serving
+                width: 1280
+                height: 800-statusbar.height
+                background: Rectangle{
+                    anchors.fill: parent
+                    color: "transparent"
+                }
+                onOpened:{
+                    supervisor.setMotorLock(false);
+                }
+                onClosed:{
+                    supervisor.setMotorLock(true);
+                }
+                Rectangle{
+                    width: parent.width
+                    height: parent.height
+                    color: color_dark_navy
+                    Column{
+                        anchors.centerIn: parent
+                        Text{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.family:font_noto_r.name
+                            font.pixelSize: 60
+                            color: "white"
+                            text:"수정하실 서빙위치로 로봇을 이동시켜 주세요"
+                        }Text{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.family:font_noto_r.name
+                            font.pixelSize: 40
+                            color: "white"
+                            text:"("+details.get(select_location).name+")"
+                        }
+                        AnimatedImage{
+                            id: image_robotmoving
+                            source: "image/robot_manual.gif"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: 1280/1.5
+                            height: 800/1.5
+                            speed: 0.5
+                        }
+                    }
+                    Item_buttons{
+                        type:"round_text"
+                        width: 200
+                        height: 80
+                        text:"이동했습니다"
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 50
+                        anchors.right: parent.right
+                        anchors.rightMargin: 50
+                        onClicked:{
+                            supervisor.editLocation(select_location);
+    //                                supervisor.setLocation(select_location,details.get(select_location).name,details.get(select_location).group,0)
+                            map_location_list.init();
+                            map_location_list.setCurrentLocation(select_location);
+                            popup_edit_serving.close();
+                        }
+                    }
+                    Item_buttons{
+                        type:"round_text"
+                        width: 200
+                        height: 80
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 50
+                        anchors.left: parent.left
+                        anchors.leftMargin: 50
+                        text:"취소"
+                        onClicked:{
+                            popup_edit_serving.close();
+                        }
+                    }
+
                 }
             }
 

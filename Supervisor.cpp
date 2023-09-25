@@ -591,6 +591,12 @@ void Supervisor::readSetting(QString map_name){
     QMetaObject::invokeMethod(mMain, "update_ini");
 }
 
+void Supervisor::editLocation(int num){
+    plog->write("[ANNOTATION] Edit Location "+QString::number(num)+" : "+QString().sprintf("(%f,%f,%f) -> (%f,%f,%f)",
+                                                                                                 probot->lastPose.point.x,probot->lastPose.point.y,probot->lastPose.angle));
+    pmap->locations[num].point = probot->lastPose.point;
+    pmap->locations[num].angle = probot->lastPose.angle;
+}
 void Supervisor::saveLocation(QString type, int groupnum, QString name){
     LOCATION temp;
     temp.type = type;
@@ -1005,6 +1011,21 @@ void Supervisor::checkRobotINI(){
         setSetting("FLOOR/table_col_num","1");
 
 
+    if(getSetting("ROBOT_SW","obs_preview_time").toInt()==0){
+        setSetting("ROBOT_SW/obs_preview_time","3.0");
+    }
+    if(getSetting("ROBOT_SW","use_obs_preivew") == ""){
+        setSetting("ROBOT_SW/use_obs_preivew","true");
+    }
+    if(getSetting("ROBOT_SW","use_avoid") == ""){
+        setSetting("ROBOT_SW/use_avoid","false");
+    }
+    if(getSetting("ROBOT_SW","use_pivot_obs") == ""){
+        setSetting("ROBOT_SW/use_pivot_obs","false");
+    }
+    if(getSetting("ROBOT_SW","use_obs_near") == ""){
+        setSetting("ROBOT_SW/use_obs_near","false");
+    }
 
     if(getSetting("MOTOR","gear_ratio").toFloat()==0)
         setSetting("MOTOR/gear_ratio","1.0");

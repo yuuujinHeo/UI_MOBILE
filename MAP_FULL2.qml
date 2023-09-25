@@ -340,9 +340,7 @@ Item {
        }
     }
 
-    function editLocation(){
-        supervisor.editLocation();
-    }
+
 
 //    function savelocation(mode, type, name){
 //        if(mode==="cur_pose"){

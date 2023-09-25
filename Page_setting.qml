@@ -8832,6 +8832,41 @@ Item {
             supervisor.setSetting("ROBOT_SW/limit_manual_w"          ,limit_manual_w.text);
         }
 
+        if(obs_preview_time.ischanged){
+            supervisor.setSetting("ROBOT_SW/obs_preview_time",obs_preview_time.text);
+        }
+
+        if(combo_use_avoid.ischanged){
+            if(combo_use_avoid.currentIndex == 0){
+                supervisor.setSetting("ROBOT_SW/use_avoid",false);
+            }else{
+                supervisor.setSetting("ROBOT_SW/use_avoid",true);
+            }
+        }
+
+        if(combo_use_obs_near.ischanged){
+            if(combo_use_obs_near.currentIndex == 0){
+                supervisor.setSetting("ROBOT_SW/use_obs_near",false);
+            }else{
+                supervisor.setSetting("ROBOT_SW/use_obs_near",true);
+            }
+        }
+
+        if(combo_use_obs_preview.ischanged){
+            if(combo_use_obs_preview.currentIndex == 0){
+                supervisor.setSetting("ROBOT_SW/use_obs_preview",false);
+            }else{
+                supervisor.setSetting("ROBOT_SW/use_obs_preview",true);
+            }
+        }
+        if(combo_use_pivot_obs.ischanged){
+            if(combo_use_pivot_obs.currentIndex == 0){
+                supervisor.setSetting("ROBOT_SW/use_pivot_obs",false);
+            }else{
+                supervisor.setSetting("ROBOT_SW/use_pivot_obs",true);
+            }
+        }
+
         if(st_v.ischanged){
             supervisor.setSetting("ROBOT_SW/st_v"                   ,st_v.text);
         }
@@ -9046,6 +9081,28 @@ Item {
         limit_w_acc.text = supervisor.getSetting("ROBOT_SW","limit_w_acc");
         look_ahead_dist.text = supervisor.getSetting("ROBOT_SW","look_ahead_dist");
 
+        obs_preview_time.text = supervisor.getSetting("ROBOT_SW","obs_preview_time");
+        if(supervisor.getSetting("ROBOT_SW","use_obs_preview") === "true"){
+            combo_use_obs_preview.currentIndex = 1;
+        }else{
+            combo_use_obs_preview.currentIndex = 0;
+        }
+        if(supervisor.getSetting("ROBOT_SW","use_avoid") === "true"){
+            combo_use_avoid.currentIndex = 1;
+        }else{
+            combo_use_avoid.currentIndex = 0;
+        }
+        if(supervisor.getSetting("ROBOT_SW","use_pivot_obs") === "true"){
+            combo_use_pivot_obs.currentIndex = 1;
+        }else{
+            combo_use_pivot_obs.currentIndex = 0;
+        }
+        if(supervisor.getSetting("ROBOT_SW","use_obs_near") === "true"){
+            combo_use_obs_near.currentIndex = 1;
+        }else{
+            combo_use_obs_near.currentIndex = 0;
+        }
+
         slider_volume_bgm.value = Number(supervisor.getSetting("ROBOT_SW","volume_bgm"));
         slider_volume_voice.value = Number(supervisor.getSetting("ROBOT_SW","volume_voice"));
         slider_volume_button.value = Number(supervisor.getSetting("ROBOT_SW","volume_button"));
@@ -9246,6 +9303,13 @@ Item {
         limit_manual_v.ischanged = false;
         limit_manual_w.ischanged = false;
         st_v.ischanged = false;
+
+        obs_preview_time.ischanged = false;
+        combo_use_obs_near.ischanged = false;
+        combo_use_avoid.ischanged = false;
+        combo_use_obs_preview.ischanged = false;
+        combo_use_pivot_obs.ischanged = false;
+
 
         combo_wheel_dir.ischanged = false;
         combo_left_id.ischanged = false;
