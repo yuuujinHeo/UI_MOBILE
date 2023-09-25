@@ -15,15 +15,16 @@ Item {
     objectName: "page_annotation"
     width: 1280
     height: 800
-    property bool test: true
+    property bool test: false
+    property bool robot_paused: false
     property var last_robot_x: supervisor.getOrigin()[0]
     property var last_robot_y: supervisor.getOrigin()[1]
     property var last_robot_th: 0
     //0 none 1 moving 2 movefail
     property var test_move_state: 0
-    property var test_move_error: 0
     property bool annotation_after_mapping: false
 
+    property var select_location: -1
     property var select_preset: 0
     property var select_object: -1
     property bool is_object: false
@@ -32,6 +33,8 @@ Item {
         annotation_after_mapping = true;
         annot_pages.sourceComponent = page_annot_start;
         loading.hide();
+    }
+    onSelect_locationChanged: {
     }
 
     onSelect_objectChanged: {
@@ -52,46 +55,52 @@ Item {
     }
     function movestart(){
         test_move_state = 1;
+        var location_name = supervisor.getcurLoc();
+        if(location_name === "Charging0"){
+            location_name = "충전위치";
+        }else if(location_name === "Resting0"){
+            location_name = "대기위치";
+        }
+
+        popup_moving.location = location_name;
+        popup_moving.open();
     }
     function movedone(){
         test_move_state = 0;
+        popup_moving.close();
+        popup_notice.close();
     }
     function movefail(errnum){
-        test_move_error = errnum;
-        test_move_state = 2;
+        popup_notice.show_localization = false;
+        popup_notice.show_motorinit = false;
+        popup_moving.close();
+        if(errnum === 0){
+            popup_notice.main_str = "경로를 찾지 못했습니다.";
+            popup_notice.sub_str = "";
+        }else if(errnum === 1){
+            popup_notice.main_str = "로봇의 위치를 찾을 수 없습니다.";
+            popup_notice.sub_str = "로봇초기화를 다시 해주세요.";
+            popup_notice.show_localization = true;
+            popup_notice.show_motorinit = false;
+        }else if(errnum === 2){
+            popup_notice.main_str = "비상스위치가 눌려있습니다.";
+            popup_notice.sub_str = "비상스위치를 풀어주세요.";
+        }else if(errnum === 3){
+            popup_notice.main_str = "경로가 취소되었습니다.";
+            popup_notice.sub_str = "";
+        }else if(errnum === 4){
+            popup_notice.main_str = "모터가 초기화 되지 않았습니다.";
+            popup_notice.sub_str = "비상스위치를 눌렀다 풀어주세요.";
+        }else if(errnum === 5){
+            popup_notice.main_str = "모터와 연결되지 않았습니다.";
+            popup_notice.sub_str = "";
+        }
+        popup_notice.open();
         print("annotation move fail : ",errnum);
     }
 
     function set_call_done(){
         annot_pages.item.readSetting();
-    }
-
-    Timer{
-        running: test_move_state === 2
-        interval: 1000
-        repeat: true
-        onTriggered:{
-            if(test_move_error === 0){//경로 찾지 못 함
-                test_move_state = 0;
-            }else if(test_move_error === 1){//"로봇의 초기화가 틀어졌습니다."
-                if(supervisor.getLocalizationState() === 2){
-                    test_move_state = 0;
-                    print("movefail local error clear");
-                }
-            }else if(test_move_error === 2){//"비상스위치가 눌렸습니다."
-                if(supervisor.getEmoStatus()===0){
-                    test_move_state = 0;
-                    print("movefail emo error clear");
-                }
-            }else if(test_move_error === 3){//"사용자에 의해 정지되었습니다."
-                test_move_state = 0;
-            }else if(test_move_error === 4){//"모터가 초기화 되지 않았습니다."
-                if(supervisor.getMotorState() === 1){
-                    test_move_state = 0;
-                    print("movefail motor error clear");
-                }
-            }
-        }
     }
 
     Component.onCompleted: {
@@ -102,9 +111,13 @@ Item {
             if(supervisor.getLocalizationState() === 2){
                 annot_pages.sourceComponent = page_annot_menu;
             }else{
-                annot_pages.sourceComponent = page_annot_localization;
+                annot_pages.sourceComponent = page_annot_location_serving_done//page_annot_localization;
             }
         }
+    }
+
+    ListModel{
+        id: details
     }
 
     Loader{
@@ -723,6 +736,7 @@ Item {
                 loading.show();
                 text_finding.opacity = 1;
                 map.setEnable(true);
+                map.setTool("move");
             }
             Component.onDestruction: {
                 map.setEnable(false);
@@ -781,7 +795,6 @@ Item {
                             timer_check_localization2.start();
                             timer_check_localization.stop();
                         }
-
                         if(!supervisor.getIPCConnection()){
                             local_find_state = 10;
                             loading.hide();
@@ -927,6 +940,23 @@ Item {
                         popup_annot_help.addLine("로봇이 이동할 수 있는 상황이 아니고 수동지정도 어려우면 [자동위치찾기]버튼을 누르세요.\n시간이 조금 소요됩니다.");
                     }
 
+                }
+            }
+            Item_buttons{
+                id: btn_pass
+                visible: debug_mode && local_find_state > 1
+                width: 200
+                height: 80
+                type: "round_text"
+                text: "넘어가기"
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.bottomMargin: 150
+                anchors.rightMargin: 50
+                onClicked: {
+                    click_sound.play();
+                    supervisor.writelog("[ANNOTATION] Localization : Pass");
+                    annot_pages.sourceComponent = page_annot_menu;
                 }
             }
             Item_buttons{
@@ -1251,7 +1281,11 @@ Item {
                         text: "취 소"
                         onClicked:{
                             btn_right.enabled = true;
-
+                            supervisor.writelog("[Annotation] Location Save : Charging -> Done");
+                            if(annotation_after_mapping)
+                                annot_pages.sourceComponent = page_annot_location_resting;
+                            else
+                                annot_pages.sourceComponent = page_annot_location_test_1;
                         }
                     }
 
@@ -1570,8 +1604,16 @@ Item {
             height: annot_pages.height
             Component.onCompleted: {
                 supervisor.setMotorLock(true);
-                supervisor.checkMoveFail();
+//                supervisor.checkMoveFail();
             }
+            Timer{
+                running: true
+                interval: 500
+                onTriggered: {
+                    supervisor.drawingRunawayStop();
+                }
+            }
+
             Rectangle{
                 anchors.fill: parent
                 color: color_dark_navy
@@ -1605,7 +1647,6 @@ Item {
             Row{
                 anchors.centerIn: parent
                 spacing: 100
-                visible:test_move_state===0
                 Item_buttons{
                     width: 220
                     height: 120
@@ -1630,43 +1671,6 @@ Item {
                 }
             }
 
-            Rectangle{
-                id: notice_moving
-                width: parent.width
-                height: 250
-                anchors.centerIn: parent
-                color: "black"
-                visible: test_move_state!==0
-                Text{
-                    anchors.centerIn: parent
-                    visible: test_move_state === 1
-                    text: "로봇이 "+cur_location+" 로 이동 중 입니다. "
-                    color: "white"
-                    font.pixelSize:50
-                    font.family: font_noto_b.name
-                }
-                Text{
-                    id: text_error_msg
-                    anchors.centerIn: parent
-                    visible: test_move_state === 2
-                    color: color_red
-                    text: {
-                        if(test_move_error === 0){
-                            "경로를 찾을 수 없습니다."
-                        }else if(test_move_error === 1){
-                            "로봇의 초기화가 틀어졌습니다."
-                        }else if(test_move_error === 2){
-                            "비상스위치가 눌렸습니다."
-                        }else if(test_move_error === 3){
-                            "사용자에 의해 정지되었습니다."
-                        }else if(test_move_error === 4){
-                            "모터가 초기화 되지 않았습니다."
-                        }
-                    }
-                    font.pixelSize:60
-                    font.family: font_noto_b.name
-                }
-            }
 
             Item_buttons{
                 id: btn_left
@@ -1782,44 +1786,6 @@ Item {
                     supervisor.writelog("[Annotation] Location Test : go Resting");
 
                     supervisor.moveToServingTest("Resting0");
-                }
-            }
-
-            Rectangle{
-                id: notice_moving
-                width: parent.width
-                height: 250
-                anchors.centerIn: parent
-                color: "black"
-                visible: test_move_state!==0
-                Text{
-                    anchors.centerIn: parent
-                    visible: test_move_state === 1
-                    text: "로봇이 이동 중 입니다."
-                    color: "white"
-                    font.pixelSize:60
-                    font.family: font_noto_b.name
-                }
-                Text{
-                    id: text_error_msg
-                    anchors.centerIn: parent
-                    visible: test_move_state === 2
-                    color: color_red
-                    text: {
-                        if(test_move_error === 0){
-                            "경로를 찾을 수 없습니다."
-                        }else if(test_move_error === 1){
-                            "로봇의 초기화가 틀어졌습니다."
-                        }else if(test_move_error === 2){
-                            "비상스위치가 눌렸습니다."
-                        }else if(test_move_error === 3){
-                            "사용자에 의해 정지되었습니다."
-                        }else if(test_move_error === 4){
-                            "모터가 초기화 되지 않았습니다."
-                        }
-                    }
-                    font.pixelSize:60
-                    font.family: font_noto_b.name
                 }
             }
 
@@ -2143,8 +2109,9 @@ Item {
                 text: "전부 완료했습니다"
                 onClicked: {
                     click_sound.play();
-                    annot_pages.sourceComponent = page_annot_location_serving;
-                    popup_drawing_notice.open();
+//                    annot_pages.sourceComponent = page_annot_location_serving;
+                    annot_pages.sourceComponent = page_annot_location_serving_done;
+//                    popup_drawing_notice.open();
                 }
             }
             Popup{
@@ -2270,57 +2237,58 @@ Item {
                 }
                 Rectangle{
                     anchors.centerIn: parent
-                    width: 1000
+                    width: 1280
                     height: 700
-                    radius: 20
                     Column{
                         Rectangle{
+
                             color: "transparent"
-                            width: 1000
+                            width: 1280
                             height: 100
                             Text{
                                 text: "서빙위치를 추가합니다"
                                 anchors.centerIn: parent
-                                font.pixelSize: 40
+                                font.pixelSize: 50
                                 horizontalAlignment: Text.AlignHCenter
                                 font.family: font_noto_r.name
                             }
                         }
                         Rectangle{
-                            color: "transparent"
-                            width: 1000
+                            color: color_navy
+                            width: 1280
                             height: 500
                             Row{
                                 anchors.centerIn: parent
-                                spacing: 50
+                                spacing: 100
                                 MAP_FULL2{
                                     id: map_location
-                                    width: 500
+                                    width: 460
                                     objectName: "annot_add_Serving"
-                                    height: 500
+                                    height: 460
                                     enabled: popup_add_serving.opened
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                                 Column{
-                                    spacing: 50
+                                    spacing: 70
                                     anchors.verticalCenter: parent.verticalCenter
                                     Column{
                                         spacing : 20
                                         Text{
                                             text: "위치 이름"
-                                            font.pixelSize: 30
+                                            font.pixelSize: 40
+                                            color: "white"
                                             horizontalAlignment: Text.AlignHCenter
                                             font.family: font_noto_r.name
                                         }
                                         TextField{
                                             id: textfield_loc_name
                                             width: 400
-                                            height: 50
+                                            height: 80
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             placeholderText: "(loc_name)"
                                             font.family: font_noto_r.name
                                             horizontalAlignment: Text.AlignHCenter
-                                            font.pointSize: 20
+                                            font.pointSize: 30
                                             onFocusChanged: {
                                                 keyboard.owner = textfield_loc_name;
                                                 textfield_loc_name.selectAll();
@@ -2335,26 +2303,26 @@ Item {
                                     }
                                     Column{
                                         spacing: 20
-
                                         Text{
                                             text: "그룹 지정"
-                                            font.pixelSize: 30
+                                            font.pixelSize: 40
+                                            color: "white"
                                             horizontalAlignment: Text.AlignHCenter
                                             font.family: font_noto_r.name
                                         }
                                         Row{
                                             anchors.horizontalCenter: parent.horizontalCenter
-                                            spacing: 20
+                                            spacing: 30
                                             visible: !popup_add_serving.use_group
                                             Item_buttons{
                                                 width: 180
-                                                height: 60
+                                                height: 80
                                                 type: "round_text"
                                                 text: "지정 안함"
                                             }
                                             Item_buttons{
                                                 width: 180
-                                                height: 60
+                                                height: 80
                                                 type: "round_text"
                                                 text:  "그룹 사용"
                                                 onClicked: {
@@ -2375,8 +2343,8 @@ Item {
                                                 spacing: 20
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 Item_buttons{
-                                                    width: 60
-                                                    height: 60
+                                                    width: 70
+                                                    height: 70
                                                     type: "circle_text"
                                                     text:  "+"
                                                     btncolor: "black"
@@ -2388,7 +2356,7 @@ Item {
                                                 Repeater{
                                                     model:ListModel{id:model_loc_group}
                                                     Item_buttons{
-                                                        width: 80
+                                                        width: 100
                                                         height: 70
                                                         selected:popup_add_serving.cur_group === index
                                                         type: "round_text"
@@ -2407,14 +2375,14 @@ Item {
                         }
                         Rectangle{
                             color: "transparent"
-                            width: 1000
+                            width: 1280
                             height: 100
                             Row{
                                 anchors.centerIn: parent
                                 spacing: 50
                                 Item_buttons{
                                     width: 180
-                                    height: 60
+                                    height: 80
                                     type: "round_text"
                                     text: "취소"
                                     onClicked: {
@@ -2424,7 +2392,7 @@ Item {
                                 }
                                 Item_buttons{
                                     width: 180
-                                    height: 60
+                                    height: 80
                                     type: "round_text"
                                     text: "확인"
                                     onClicked: {
@@ -2438,439 +2406,6 @@ Item {
                                             supervisor.writelog("[ANNOTATION] LOCAION SAVE : Serving "+Number(supervisor.getlastRobotx())+", "+Number(supervisor.getlastRoboty())+", "+Number(supervisor.getlastRobotth()));
                                             popup_add_serving.close();
                                         }
-                                    }
-                                }
-                            }
-
-                        }
-                    }
-                }
-            }
-
-            Popup{
-                id: popup_serving_list
-                property bool use_group: false
-                width: 1280
-                height:800
-                y:-statusbar.height
-                background:Rectangle{
-                    anchors.fill: parent
-                    color: color_dark_black
-                    opacity: 0.8
-                }
-                onOpened:{
-                    readSetting();
-                }
-
-                function readSetting(){
-                    groups.clear();
-                    for(var i=0; i<supervisor.getLocationGroupNum(); i++){
-                        print(i,supervisor.getLocationGroupNum());
-                        groups.append({"value":supervisor.getLocGroupname(i)});
-                        print("groups append : ", supervisor.getLocGroupname(i))
-                    }
-
-                    if(supervisor.getLocationGroupNum() > 1)
-                        popup_add_serving.use_group = true;
-                    else
-                        popup_add_serving.use_group = false;
-
-                    locations.clear();
-                    for(var i=0; i<supervisor.getLocationNum("Serving"); i++){
-                        locations.append({"name": supervisor.getLocationName(i,"Serving"),
-                                       "group":supervisor.getLocationGroupNum(i),
-                                       "number": supervisor.getLocationNumber(-1,i),
-                                        "number_table" : supervisor.getLocationGroupSize(supervisor.getLocationGroupNum(i)),
-                                        "call_id" : supervisor.getLocationCallID("Serving",i),
-                                       "error":false});
-                        print("locations append : ",i,supervisor.getLocationGroupNum(i),supervisor.getLocationGroupNum(i),supervisor.getLocationNumber(-1,i))
-                    }
-                    update();
-                }
-
-                function update(){
-                    if(supervisor.getLocationGroupNum() > 1)
-                        popup_serving_list.use_group = true;
-                    else
-                        popup_serving_list.use_group = false;
-
-                    details.clear();
-                    details.append({"ltype":"Charging",
-                                       "name":"Charging",
-                                       "group":0,
-                                       "number":0,
-                                       "number_table":0,
-                                       "error":false,
-                                       "call_id":supervisor.getLocationCallID("Charging",0)});
-                    details.append({"ltype":"Resting",
-                                       "name":"Resting",
-                                       "group":0,
-                                       "number":0,
-                                       "number_table":0,
-                                       "error":false,
-                                       "call_id":supervisor.getLocationCallID("Resting",0)});
-
-                    for(var i=0; i<locations.count; i++){
-                        details.append({"ltype":"Serving",
-                                        "name":locations.get(i).name,
-                                       "group":locations.get(i).group,
-                                       "number":locations.get(i).number,
-                                       "number_table":getgroupsize(locations.get(i).group),
-                                        "call_id":locations.get(i).call_id,
-                                       "error":locations.get(i).error});
-//                        print("detail append : ",i, locations.get(i).group, locations.get(i).number, getgroupsize(locations.get(i).group))
-                    }
-                    checkLocationNumber();
-
-                }
-
-                function isError(){
-                    for(var i=0; i<details.count; i++){
-                        if(details.get(i).ltype === "Serving")
-                            if(details.get(i).error)
-                                return true;
-                    }
-                    return false;
-                }
-
-                function getgroupsize(group){
-                    var count = 0;
-                    for(var i=0; i<locations.count; i++){
-                        if(locations.get(i).group === group)
-                            count++
-                    }
-                    return count
-                }
-
-                function groupchange(number, group){
-//                    print(" group change ",number,group,locations.count);
-                    if(number > -1 && number < locations.count){
-                        locations.get(number-2).group = group;
-                        locations.get(number-2).number = 0;
-                    }
-                    update();
-                }
-
-                function tablechange(number, table){
-//                    print("table change ",number,table)
-                    if(number > -1 && number < locations.count){
-                        locations.get(number-2).number = table;
-                    }
-                    update();
-                }
-                function update_callbell(){
-                    details.get(0).call_id = supervisor.getLocationCallID("Charging",0);
-                    details.get(1).call_id = supervisor.getLocationCallID("Resting",0);
-                    for(var i=2; i<details.count; i++){
-                        details.get(i).call_id = supervisor.getLocationCallID("Serving",i-2);
-                    }
-                }
-
-                function checkLocationNumber(){
-                    for(var i=0; i<details.count; i++){
-                        if(details.get(i).ltype === "Serving"){
-                            if(details.get(i).number < 1){
-                                details.get(i).error = true;
-                            }else if(details.get(i).number > details.get(i).number_table){
-                                tablechange(i,0);
-                                details.get(i).error = true;
-                                details.get(i).number = 0;
-                            }else
-                                details.get(i).error = false;
-                        }
-                    }
-                    for(var i=0; i<details.count; i++){
-                        if(details.get(i).ltype === "Serving"){
-                            for(var j=i+1; j<details.count; j++){
-                                if(details.get(j).ltype === "Serving"){
-                                    if(details.get(i).number === details.get(j).number && details.get(i).group===details.get(j).group){
-                                        details.get(i).error = true;
-                                        details.get(j).error = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    for(var i=0; i<details.count; i++){
-                        if(details.get(i).ltype === "Serving"){
-                            for(var j=i+1; j<details.count; j++){
-                                if(details.get(j).ltype === "Serving"){
-                                    if(details.get(i).call_id === "")
-                                        continue;
-                                    if(details.get(i).call_id === details.get(j).call_id){
-                                        details.get(i).error = true;
-                                        details.get(j).error = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                ListModel{
-                    id: locations
-                }
-
-                ListModel{
-                    id: groups
-                }
-                Component{
-                    id: detaillocCompo
-                    Item{
-                        width: parent.width
-                        height: 40
-                        Component.onCompleted: {
-                            combo_number.model.append({"value":"지정 안됨"})
-                            for(var i=0; i<number_table; i++){
-                               combo_number.model.append({"value":(i+1).toString()});
-                            }
-                        }
-                        Item_buttons{
-                            width : 40
-                            height: 40
-                            type: "circle_text"
-                            visible:ltype==="Serving"
-                            text:"X"
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.right: rowsss.left
-                            anchors.rightMargin: 15
-                            onClicked: {
-                                click_sound.play();
-                                popup_remove_location.select_location = index-2;
-                                popup_remove_location.open();
-                            }
-                        }
-                        Row{
-                            id: rowsss
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            spacing: 2
-                            ComboBox{
-                                id: combo_group
-                                visible: popup_serving_list.use_group && ltype === "Serving"
-                                width: 150
-                                height: 40
-                                model: groups
-                                currentIndex: group
-                                onCurrentIndexChanged: {
-                                    if(focus){
-                                        print("group changed ",index,currentIndex);
-                                        popup_serving_list.groupchange(index,currentIndex);
-                                    }
-                                }
-                            }
-                            TextField{
-                                id: tx_name
-                                text: name
-                                width:ltype==="Serving"?300:popup_serving_list.use_group?300+150+154:300+152
-                                height: 40
-                                font.family: font_noto_r.name
-                                font.pixelSize: 20
-                                horizontalAlignment: Text.AlignHCenter
-                                onFocusChanged: {
-                                    keyboard.owner = tx_name;
-                                    tx_name.selectAll();
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
-                                        tx_name.select(0,0);
-                                    }
-                                }
-                                onTextChanged: {
-//                                    print("set name to "+text);
-                                    name = text;
-                                    if(index > 1)
-                                        locations.get(index-2).name = name;
-                                }
-                            }
-                            Image{
-                                visible: error && ltype ==="Serving"
-                                source: "icon/icon_error.png"
-                                width: 40
-                                height: 38
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                            ComboBox{
-                                id: combo_number
-                                width : error?150-42:150
-                                height: 40
-                                visible: ltype ==="Serving"
-                                model: ListModel{}
-                                currentIndex: number==-1?0:number
-                                onCurrentIndexChanged: {
-                                    if(focus){
-//                                        print("table focus change ",index,currentIndex)
-                                        popup_serving_list.tablechange(index,currentIndex);
-                                    }
-                                }
-                            }
-//                            Rectangle{
-//                                width : 150
-//                                height: 40
-//                                Text{
-//                                    anchors.centerIn: parent
-//                                    font.family: font_noto_r.name
-//                                    text: call_id==""?" - ":call_id
-//                                }
-//                            }
-
-//                            Item_buttons{
-//                                width : 100
-//                                height: 40
-//                                type: "round_text"
-//                                text:"설정"
-//                                onClicked:{
-//                                    popup_add_callbell.callid = index;
-//                                    popup_add_callbell.open();
-//                                }
-//                            }
-                        }
-
-                    }
-                }
-
-
-                Rectangle{
-                    anchors.centerIn: parent
-                    width: 1000
-                    height: 700
-                    radius: 20
-                    Column{
-                        Rectangle{
-                            color: "transparent"
-                            width: 1000
-                            height: 100
-                            Text{
-                                text: "서빙위치 상세 지정"
-                                anchors.centerIn: parent
-                                font.pixelSize: 40
-                                horizontalAlignment: Text.AlignHCenter
-                                font.family: font_noto_r.name
-                            }
-                        }
-                        Rectangle{
-                            color: "transparent"
-                            width: 1000
-                            height: 500
-
-                            Column{
-                                anchors.centerIn: parent
-                                spacing: 2
-
-                                Row{
-                                    spacing: 2
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    Rectangle{
-                                        width: 150
-                                        height: 30
-                                        color: color_navy
-                                        visible: popup_serving_list.use_group
-                                        Text{
-                                            anchors.centerIn: parent
-                                            text: "그룹"
-                                            font.family: font_noto_r.name
-                                            color: "white"
-                                        }
-                                    }
-                                    Rectangle{
-                                        width: 300
-                                        height: 30
-                                        color: color_navy
-                                        Text{
-                                            anchors.centerIn: parent
-                                            text: "이름"
-                                            font.family: font_noto_r.name
-                                            color: "white"
-                                        }
-                                    }
-                                    Rectangle{
-                                        width: 150
-                                        height: 30
-                                        color: color_navy
-                                        Text{
-                                            anchors.centerIn: parent
-                                            text: "테이블 번호(중복x)"
-                                            font.family: font_noto_r.name
-                                            color: "white"
-                                        }
-                                    }
-//                                    Rectangle{
-//                                        width: 250
-//                                        height: 30
-//                                        color: color_navy
-//                                        Text{
-//                                            anchors.centerIn: parent
-//                                            text: "호출벨"
-//                                            font.family: font_noto_r.name
-//                                            color: "white"
-//                                        }
-//                                    }
-                                }
-
-                                Flickable{
-                                    width: 1000
-                                    height: 400
-                                    clip: true
-                                    contentHeight: list_location_detail.height
-                                    ScrollBar.vertical: ScrollBar{
-                                        width: 25
-                                        anchors.right: parent.right
-                                        anchors.rightMargin: 10
-                                        policy: ScrollBar.AlwaysOn
-                                    }
-                                    ListView{
-                                        id: list_location_detail
-                                        width: parent.width
-                                        height: parent.height
-                                        spacing: 2
-                                        clip: true
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        delegate: detaillocCompo
-                                        model:ListModel{id:details}
-                                    }
-                                }
-                            }
-                        }
-                        Rectangle{
-                            color: "transparent"
-                            width: 1000
-                            height: 100
-                            Row{
-                                anchors.centerIn: parent
-                                spacing: 30
-                                Item_buttons{
-                                    width: 180
-                                    height: 60
-                                    type: "round_text"
-                                    text: "그룹 추가"
-                                    onClicked: {
-                                        click_sound.play();
-                                        popup_add_location_group.open();
-                                    }
-                                }
-                                Item_buttons{
-                                    width: 180
-                                    height: 60
-                                    type: "round_text"
-                                    text: "취소"
-                                    onClicked: {
-                                        click_sound.play();
-                                        popup_serving_list.close();
-                                    }
-                                }
-                                Item_buttons{
-                                    width: 180
-                                    height: 60
-                                    enabled: false
-                                    type: "round_text"
-                                    text: enabled?"확인":"오류가 있습니다"
-                                    onClicked: {
-                                        click_sound.play();
-                                        for(var i=0; i<details.count-2; i++){
-                                            supervisor.setLocation(i,details.get(i+2).name,details.get(i+2).group,details.get(i+2).number);
-                                        }
-//                                            loader_menu.item.update();
-                                        popup_serving_list.close();
                                     }
                                 }
                             }
@@ -2924,7 +2459,7 @@ Item {
                 id: popup_add_location_group
                 anchors.centerIn: parent
                 width: 400
-                height: 250
+                height: 300
                 bottomPadding: 0
                 topPadding: 0
                 leftPadding: 0
@@ -2940,12 +2475,12 @@ Item {
                 Rectangle{
                     id: rect_add_loc_group_1
                     width: parent.width
-                    height: 45
+                    height: 55
                     color: "#323744"
                     Text{
                         anchors.centerIn: parent
                         text: "그룹 추가"
-                        font.pixelSize: 20
+                        font.pixelSize: 40
                         font.family: font_noto_r.name
                         color: "white"
                     }
@@ -2963,7 +2498,7 @@ Item {
                             id: tfield_group
                             anchors.horizontalCenter: parent.horizontalCenter
                             width: popup_add_location_group.width*0.9
-                            height: 50
+                            height: 70
                             placeholderText: "(group_name)"
                             font.family: font_noto_r.name
                             horizontalAlignment: Text.AlignHCenter
@@ -3005,7 +2540,7 @@ Item {
                                         supervisor.addLocationGroup(tfield_group.text);
                                         supervisor.writelog("[QML] MAP PAGE : ADD LOCATION GROUP -> "+tfield_group.text);
                                         popup_add_serving.update();
-                                        popup_serving_list.readSetting();
+                                        readSetting();
                                         popup_add_serving.cur_group = supervisor.getLocationGroupNum()-1;
                                         popup_add_location_group.close();
                                     }
@@ -3021,8 +2556,102 @@ Item {
                     border.color: "#323744"
                 }
             }
+
+            Popup{
+                id: popup_serving_list
+                anchors.centerIn: parent
+                width: 800
+                height: 600
+                background: Rectangle{
+                    anchors.fill: parent
+                    color: "transparent"
+                }
+
+                Rectangle{
+                    width: parent.width
+                    height: parent.height
+                    radius: 10
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 20
+                        Text{
+                            text: "저장된 서빙위치 목록"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 50
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        Row{
+                            spacing: 1
+                            Rectangle{
+                                width: 199
+                                height: 40
+                                color: color_navy
+                                Text{
+                                    text: "그 룹"
+                                    color: "white"
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 20
+                                }
+                            }
+                            Rectangle{
+                                width: 500
+                                height: 40
+                                color: color_navy
+                                Text{
+                                    text: "이 름"
+                                    color: "white"
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 20
+                                }
+                            }
+                        }
+                        ListView{
+                            model:details
+                            delegate: servings_delegate
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: 700
+                            height: 400
+                        }
+                    }
+                }
+            }
+
         }
     }
+    Item{
+        id: servings_delegate
+        width: 800
+        height: 60
+        Rectangle{
+            anchors.fill: parent
+            Row{
+                Rectangle{
+                    width: 300
+                    height: 60
+                    Text{
+                        text: group
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 30
+                    }
+                }
+                Rectangle{
+                    width: 700
+                    height: 60
+                    Text{
+                        text: name
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 30
+                    }
+                }
+            }
+        }
+
+    }
+
     Component{
         id: page_annot_location_serving_done
         Item{
@@ -3033,8 +2662,15 @@ Item {
             Component.onCompleted: {
                 supervisor.setMotorLock(true);
                 readSetting();
-                supervisor.checkMoveFail();
+                map_location_list.init();
+                map_location_list.setViewer("serving_list");
+                map_location_list.setEnable(true);
+                map_location_list.setTool("none");
             }
+            Component.onDestruction: {
+                map_location_list.setEnable(false);
+            }
+
             Timer{
                 interval: 500
                 running: true
@@ -3048,10 +2684,10 @@ Item {
                 color: color_dark_navy
             }
 
+
             function readSetting(){
                 groups.clear();
                 for(var i=0; i<supervisor.getLocationGroupNum(); i++){
-                    print(i,supervisor.getLocationGroupNum())
                     groups.append({"value":supervisor.getLocGroupname(i)});
                 }
 
@@ -3061,17 +2697,11 @@ Item {
                     use_callbell = false;
                 }
 
-                if(supervisor.getLocationGroupNum() > 1)
-                    use_group = true;
-                else
-                    use_group = false;
-
                 locations.clear();
+                print(supervisor.getLocationNum("Serving"));
                 for(var i=0; i<supervisor.getLocationNum("Serving"); i++){
                     locations.append({"name": supervisor.getLocationName(i,"Serving"),
                                    "group":supervisor.getLocationGroupNum(i),
-                                   "number": supervisor.getLocationNumber(-1,i),
-                                    "number_table" : supervisor.getLocationGroupSize(supervisor.getLocationGroupNum(i)),
                                     "call_id" : supervisor.getLocationCallID("Serving",i),
                                    "error":false});
                 }
@@ -3080,33 +2710,23 @@ Item {
 
             function update(){
                 popup_add_callbell.close();
-                if(supervisor.getLocationGroupNum() > 1)
-                    use_group = true;
-                else
-                    use_group = false;
 
                 details.clear();
                 print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!");
                 details.append({"ltype":"Charging",
-                                   "name":"Charging",
+                                   "name":"충전위치",
                                    "group":0,
-                                   "number":0,
-                                   "number_table":0,
                                    "error":false,
                                    "call_id":supervisor.getLocationCallID("Charging",0)});
                 details.append({"ltype":"Resting",
-                                   "name":"Resting",
+                                   "name":"대기위치",
                                    "group":0,
-                                   "number":0,
-                                   "number_table":0,
                                    "error":false,
                                    "call_id":supervisor.getLocationCallID("Resting",0)});
                 for(var i=0; i<locations.count; i++){
                     details.append({"ltype":"Serving",
                                     "name":locations.get(i).name,
                                    "group":locations.get(i).group,
-                                   "number":locations.get(i).number,
-                                   "number_table":getgroupsize(locations.get(i).group),
                                     "call_id":locations.get(i).call_id,
                                    "error":locations.get(i).error});
 //                        print("detail append : ",i, locations.get(i).group, locations.get(i).number, getgroupsize(locations.get(i).group))
@@ -3131,15 +2751,6 @@ Item {
                 return false;
             }
 
-            function getgroupsize(group){
-                var count = 0;
-                for(var i=0; i<locations.count; i++){
-                    if(locations.get(i).group === group)
-                        count++
-                }
-                return count
-            }
-
             function groupchange(number, group){
                 print(" group change ",number,group,details.count);
                 if(number > 1 && number < details.count){
@@ -3156,47 +2767,25 @@ Item {
                 }
                 update();
             }
+
             function update_callbell(){
                 details.get(0).call_id = supervisor.getLocationCallID("Charging",0);
                 details.get(1).call_id = supervisor.getLocationCallID("Resting",0);
                 for(var i=2; i<details.count; i++){
                     details.get(i).call_id = supervisor.getLocationCallID("Serving",i-2);
+                    print(i,details.get(i).call_id);
                 }
             }
 
             function checkLocationNumber(){
-                for(var i=0; i<details.count; i++){
-                    if(details.get(i).ltype === "Serving"){
-                        if(details.get(i).number < 1){
-                            details.get(i).error = true;
-                        }else if(details.get(i).number > details.get(i).number_table){
-                            tablechange(i,0);
-                            details.get(i).error = true;
-                            details.get(i).number = 0;
-                        }else
-                            details.get(i).error = false;
-                    }
-                }
-                for(var i=0; i<details.count; i++){
-                    if(details.get(i).ltype === "Serving"){
-                        for(var j=i+1; j<details.count; j++){
-                            if(details.get(j).ltype === "Serving"){
-                                if(details.get(i).number === details.get(j).number && details.get(i).group===details.get(j).group){
-                                    details.get(i).error = true;
-                                    details.get(j).error = true;
-                                }
-                            }
 
-                        }
-                    }
-                }
                 for(var i=0; i<details.count; i++){
                     if(details.get(i).ltype === "Serving"){
                         for(var j=i+1; j<details.count; j++){
                             if(details.get(j).ltype === "Serving"){
-                                if(details.get(i).call_id === "")
+                                if(details.get(i).call_id === "" || details.get(i).call_id === "-")
                                     continue;
-                                if(details.get(i).call_id === details.get(j).call_id){
+                                else if(details.get(i).call_id === details.get(j).call_id){
                                     details.get(i).error = true;
                                     details.get(j).error = true;
                                 }
@@ -3220,26 +2809,56 @@ Item {
                 Item{
                     width: parent.width
                     height: 50
-                    Component.onCompleted: {
-                        combo_number.model.append({"value":"지정 안됨"})
-                        for(var i=0; i<number_table; i++){
-                           combo_number.model.append({"value":(i+1).toString()});
-                        }
-//                            print("COMPO UPDATE : ",index,combo_number.model.count);
-                    }
-                    Item_buttons{
-                        width : 40
-                        height: 40
-                        type: "circle_text"
-                        visible:ltype==="Serving"
-                        text:"X"
-                        anchors.verticalCenter: parent.verticalCenter
+                    Column{
                         anchors.right: rowsss.left
-                        anchors.rightMargin: 15
-                        onClicked: {
-                            click_sound.play();
-                            popup_remove_location.select_location = index-2;
-                            popup_remove_location.open();
+                        anchors.verticalCenter: rowsss.verticalCenter
+                        anchors.rightMargin: 5
+                        spacing: 5
+                        visible: select_location === index && ltype === "Serving"
+                        Rectangle{
+                            width: 30
+                            height: 30
+                            Image{
+                                anchors.centerIn: parent
+                                source:"icon/keyboard_up.png"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked:{
+                                    click_sound.play();
+                                    if(select_location>2){
+                                        combo_group.focus = false;
+                                        tx_name.focus = false;
+                                        keyboard.close();
+                                        supervisor.setLocationUp(select_location);
+                                        select_location--;
+                                        print("up select_location ",select_location);                                        readSetting();
+                                    }
+
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 30
+                            height: 30
+                            Image{
+                                anchors.centerIn: parent
+                                source:"icon/keyboard_down.png"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked:{
+                                    click_sound.play();
+                                    if(select_location<details.count-1){
+                                        combo_group.focus = false;
+                                        tx_name.focus = false;
+                                        keyboard.close();
+                                        supervisor.setLocationDown(select_location);
+                                        select_location++;
+                                        readSetting();
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -3247,15 +2866,55 @@ Item {
                         id: rowsss
                         anchors.horizontalCenter: parent.horizontalCenter
                         spacing: 5
+                        Rectangle{
+                            width: 50
+                            height: 50
+                            color:select_location === index?color_green:"white"
+                            Text{
+                                anchors.centerIn: parent
+                                text: index
+                                font.family: font_noto_r.name
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked:{
+                                    if(select_location == index){
+                                        select_location = -1;
+                                    }else{
+                                        select_location = index;
+                                    }
+                                    map_location_list.setCurrentLocation(select_location);
+                                }
+                            }
+                        }
+
                         ComboBox{
                             id: combo_group
-                            visible: use_group && ltype === "Serving"
-                            width: 150
+                            visible: ltype === "Serving"
+                            width: 160
                             height: 50
                             model: groups
+                            background: Rectangle{
+                                color:select_location === index?color_green:"white"
+                            }
+                            onFocusChanged: {
+                                if(focus){
+                                    select_location = index;
+                                    print("combo focus on select_location ",index);
+                                }
+                            }
+
+//                            style
                             currentIndex: group
                             onCurrentIndexChanged: {
                                 if(focus){
+                                    if(select_location == index){
+                                        select_location = -1;
+                                    }else{
+                                        select_location = index;
+                                        print("group focus select_location",index);
+                                    }
+                                    map_location_list.setCurrentLocation(select_location);
                                     groupchange(index,currentIndex);
                                 }
                             }
@@ -3263,7 +2922,10 @@ Item {
                         TextField{
                             id: tx_name
                             text: name
-                            width:ltype==="Serving"?320:use_group?320+160+160:320+155
+                            background: Rectangle{
+                                color:select_location === index?color_green:"white"
+                            }
+                            width:ltype==="Serving"?250:250+160+5
                             height: 50
                             font.family: font_noto_r.name
                             font.pixelSize: 20
@@ -3272,6 +2934,13 @@ Item {
                                 keyboard.owner = tx_name;
                                 tx_name.selectAll();
                                 if(focus){
+                                    if(select_location == index){
+                                        select_location = -1;
+                                    }else{
+                                        print("name focus select_location",index);
+                                        select_location = index;
+                                    }
+                                    map_location_list.setCurrentLocation(select_location);
                                     keyboard.open();
                                 }else{
                                     keyboard.close();
@@ -3279,7 +2948,6 @@ Item {
                                 }
                             }
                             onTextChanged: {
-//                                    print("set name to "+text);
                                 name = text;
                                 if(index > 1)
                                     locations.get(index-2).name = name;
@@ -3292,63 +2960,33 @@ Item {
                             height: 38
                             anchors.verticalCenter: parent.verticalCenter
                         }
-                        ComboBox{
-                            id: combo_number
-                            width : error?150-45:150
-                            height: 50
-                            visible: ltype ==="Serving"
-                            model: ListModel{}
-                            currentIndex: number==-1?0:number
-                            onCurrentIndexChanged: {
-                                if(focus){
-//                                        print("table focus change ",index,currentIndex)
-                                    tablechange(index,currentIndex);
-                                }
-                            }
-                        }
                         Rectangle{
-                            width : 150
+                            width : error && ltype ==="Serving"?105:150
                             height: 50
-                            visible: use_callbell
+                            color:select_location === index?color_green:"white"
                             Text{
                                 anchors.centerIn: parent
                                 font.family: font_noto_r.name
                                 text: call_id==""?" - ":call_id
                             }
-                        }
-                        Item_buttons{
-                            width : 100
-                            height: 50
-                            type: "round_text"
-                            fontsize: 20
-                            visible: use_callbell
-                            text:"설정"
-                            onClicked: {
-                                click_sound.play();
-                                print(ltype);
-                                popup_add_callbell.calltype = ltype;
-                                popup_add_callbell.callid = index;
-                                popup_add_callbell.open();
-                            }
-                        }
-                        Item_buttons{
-                            width : 100
-                            height: 50
-                            type: "round_text"
-                            text:"주행"
-                            fontsize: 20
-                            onClicked: {
-                                click_sound.play();
-                                supervisor.writelog("[ANNOTATION] TEST MOVING : "+name);
-                                supervisor.moveToServingTest(name);
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked:{
+                                    if(select_location == index){
+                                        select_location = -1;
+                                    }else{
+                                        select_location = index;
+                                    }
+                                    map_location_list.setCurrentLocation(select_location);
+                                }
                             }
                         }
                     }
-
                 }
             }
 
             Text{
+                id: teeeeee
                 text: annotation_after_mapping?"서빙 위치를 다시한번 확인해주세요.":"서빙위치를 수정합니다."
                 color: "white"
                 font.pixelSize: 60
@@ -3359,142 +2997,200 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
-            Rectangle{
-                color: "transparent"
-                width: 1200
-                height: 500
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: 110
-
-                Column{
-                    anchors.centerIn: parent
-                    spacing: 5
-
-                    Row{
-                        spacing: 5
+            Row{
+                anchors.top: teeeeee.bottom
+                anchors.topMargin: 20
+                Rectangle{
+                    width: 450
+                    height: 630
+                    color:"transparent"
+                    Column{
                         anchors.horizontalCenter: parent.horizontalCenter
-                        Rectangle{
-                            width: 160
-                            height: 30
-                            color: color_navy
-                            visible: use_group
-                            Text{
-                                anchors.centerIn: parent
-                                text: "그룹"
-                                font.family: font_noto_r.name
-                                color: "white"
+                        spacing: 20
+                        Grid{
+                            columns:2
+                            rows:2
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 10
+
+                            Item_buttons{
+                                width: 140
+                                height: 60
+                                enabled: select_location>-1
+                                type: "round_text"
+                                text: "호출벨 설정"
+                                fontsize: 20
+                                onClicked: {
+                                    click_sound.play();
+                                    popup_add_callbell.calltype = details.get(select_location).ltype;
+                                    popup_add_callbell.callid = select_location;
+                                    popup_add_callbell.open();
+                                }
                             }
-                        }
-                        Rectangle{
-                            width: 320
-                            height: 30
-                            color: color_navy
-                            Text{
-                                anchors.centerIn: parent
-                                text: "이름"
-                                font.family: font_noto_r.name
-                                color: "white"
+                            Item_buttons{
+                                width: 140
+                                height: 60
+                                enabled: select_location>-1
+                                type: "round_text"
+                                text: "테스트 주행"
+                                fontsize: 20
+                                onClicked: {
+                                    click_sound.play();
+                                    supervisor.writelog("[ANNOTATION] TEST MOVING : "+details.get(select_location).name);
+                                    supervisor.moveToServingTest(details.get(select_location).name);
+                                }
                             }
-                        }
-                        Rectangle{
-                            width: 150
-                            height: 30
-                            color: color_navy
-                            Text{
-                                anchors.centerIn: parent
-                                text: "테이블 번호"
-                                font.family: font_noto_r.name
-                                color: "white"
+                            Item_buttons{
+                                width: 140
+                                height: 60
+                                enabled: select_location>1
+                                type: "round_text"
+                                text: "삭제"
+                                fontsize: 20
+                                onClicked: {
+                                    click_sound.play();
+                                    popup_remove_location.open();
+                                }
                             }
-                        }
-                        Rectangle{
-                            width: 250
-                            height: 30
-                            color: color_navy
-                            visible: use_callbell
-                            Text{
-                                anchors.centerIn: parent
-                                text: "호출벨"
-                                font.family: font_noto_r.name
-                                color: "white"
+                            Item_buttons{
+                                width: 140
+                                height: 60
+                                enabled: select_location>-1
+                                type: "round_text"
+                                text: "위치 수정"
+                                fontsize: 20
+                                onClicked: {
+                                    click_sound.play();
+                                    supervisor.writelog("[ANNOTATION] Location Edit : "+details.get(select_location).name);
+//                                    supervisor.moveToServingTest(details.get(select_location).name);
+                                }
                             }
+
                         }
-                        Rectangle{
-                            width: 100
-                            height: 30
-                            color: color_navy
-                            Text{
-                                anchors.centerIn: parent
-                                text: "테스트주행"
-                                font.family: font_noto_r.name
-                                color: "white"
+                        MAP_FULL2{
+                            id: map_location_list
+                            width: 350
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            height: 350
+                        }
+                        Row{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 10
+                            Item_buttons{
+                                width: 140
+                                height: 60
+                                type: "round_text"
+                                text: "서빙위치 추가"
+                                onClicked: {
+                                    click_sound.play();
+                                    supervisor.writelog("[ANNOTATION] LOCAION SAVE : Back to Serving");
+                                    annot_pages.sourceComponent = page_annot_location_serving;
+                                }
+                            }
+                            Item_buttons{
+                                width: 140
+                                height: 60
+                                type: "round_text"
+                                text: "그룹 추가"
+                                fontsize: 20
+                                onClicked: {
+                                    click_sound.play();
+                                    popup_add_location_group.open();
+                                }
                             }
                         }
                     }
+                }
+                Rectangle{
+                    width: 1
+                    height: 600
+                }
 
-                    Flickable{
-                        width: 1200
-                        height: 400
-                        clip: true
-                        contentHeight: list_location_detail.height
-                        ScrollBar.vertical: ScrollBar{
-                            width: 25
-                            anchors.right: parent.right
-                            anchors.rightMargin: 10
-                            policy: ScrollBar.AlwaysOn
-                        }
-                        ListView{
-                            id: list_location_detail
-                            width: parent.width
-                            height: parent.height
+                Rectangle{
+                    id: rect_list_column
+                    color: "transparent"
+                    width: 1280-491
+                    height: 500
+                    Column{
+                        id: cooo
+                        spacing: 5
+                        Row{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            id: ddddd
                             spacing: 5
+                            Rectangle{
+                                width: 50
+                                height: 30
+                                color: color_navy
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "번호"
+                                    font.family: font_noto_r.name
+                                    color: "white"
+                                }
+                            }
+                            Rectangle{
+                                width: 160
+                                height: 30
+                                color: color_navy
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "그룹"
+                                    font.family: font_noto_r.name
+                                    color: "white"
+                                }
+                            }
+                            Rectangle{
+                                width: 250
+                                height: 30
+                                color: color_navy
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "이름"
+                                    font.family: font_noto_r.name
+                                    color: "white"
+                                }
+                            }
+                            Rectangle{
+                                width: 150
+                                height: 30
+                                color: color_navy
+                                visible: use_callbell
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "호출벨"
+                                    font.family: font_noto_r.name
+                                    color: "white"
+                                }
+                            }
+                        }
+
+                        Flickable{
+                            width: rect_list_column.width
+                            height: 450-35
                             clip: true
                             anchors.horizontalCenter: parent.horizontalCenter
-                            delegate: detaillocCompo
-                            model:ListModel{id:details}
+                            contentHeight: list_location_detail.height
+                            ScrollBar.vertical: ScrollBar{
+                                width: 25
+                                anchors.right: parent.right
+                                anchors.rightMargin: 10
+                                policy: ScrollBar.AlwaysOn
+                            }
+                            ListView{
+                                id: list_location_detail
+                                width: ddddd.width
+                                height: parent.height
+                                spacing: 5
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                delegate: detaillocCompo
+                                model:details
+                            }
                         }
                     }
                 }
             }
 
-            Rectangle{
-                id: notice_moving
-                width: parent.width
-                height: 250
-                anchors.centerIn: parent
-                color: "black"
-                visible: test_move_state!==0
-                Text{
-                    anchors.centerIn: parent
-                    visible: test_move_state === 1
-                    text: "로봇이 이동 중 입니다."
-                    color: "white"
-                    font.pixelSize:60
-                    font.family: font_noto_b.name
-                }
-                Text{
-                    id: text_error_msg
-                    anchors.centerIn: parent
-                    visible: test_move_state === 2
-                    color: color_red
-                    text: {
-                        if(test_move_error === 0){
-                            "경로를 찾을 수 없습니다."
-                        }else if(test_move_error === 1){
-                            "로봇의 초기화가 틀어졌습니다."
-                        }else if(test_move_error === 2){
-                            "비상스위치가 눌렸습니다."
-                        }else if(test_move_error === 3){
-                            "사용자에 의해 정지되었습니다."
-                        }else if(test_move_error === 4){
-                            "모터가 초기화 되지 않았습니다."
-                        }
-                    }
-                    font.pixelSize:60
-                    font.family: font_noto_b.name
-                }
-            }
 
             Item_buttons{
                 id: btn_right
@@ -3510,10 +3206,7 @@ Item {
                 onClicked: {
                     click_sound.play();
                     print("save location");
-                    for(var i=0; i<details.count-2; i++){
-                        supervisor.setLocation(i,details.get(i+2).name,details.get(i+2).group,details.get(i+2).number,details.get(i+2).call_id);
-                    }
-                    map_hide.save("location_all");
+                    supervisor.saveAnnotation();
                     supervisor.drawingRunawayStop();
                     map_hide.stopDrawingT();
                     supervisor.writelog("[ANNOTATION] LOCAION SAVE : Check Done ");
@@ -3533,45 +3226,8 @@ Item {
                     width: 180
                     height: 80
                     type: "round_text"
-                    text: "서빙위치 추가"
-                    onClicked: {
-                        click_sound.play();
-                        supervisor.writelog("[ANNOTATION] LOCAION SAVE : Back to Serving");
-                        annot_pages.sourceComponent = page_annot_location_serving;
-                    }
-                }
-                Item_buttons{
-                    width: 180
-                    height: 80
-                    type: "round_text"
-                    text: "그룹 추가"
-                    fontsize: 20
-                    onClicked: {
-                        click_sound.play();
-                        popup_add_location_group.open();
-                    }
-                }
-                Item_buttons{
-                    width: 180
-                    height: 80
-                    type: "round_text"
-                    text: "호출벨 사용"
-                    onClicked: {
-                        click_sound.play();
-                        if(use_callbell){
-                            supervisor.setSetting("ROBOT_SW/use_callbell","false");
-                            use_callbell = false;
-                        }else{
-                            supervisor.setSetting("ROBOT_SW/use_callbell","true");
-                            use_callbell = true;
-                        }
-                    }
-                }
-                Item_buttons{
-                    width: 180
-                    height: 80
-                    type: "round_text"
                     text: "번호 자동세팅"
+                    visible: false
                     onClicked: {
                         for(var i=0; i<details.count-2; i++){
                             supervisor.setLocation(i,details.get(i+2).name,details.get(i+2).group,details.get(i+2).number);
@@ -3585,58 +3241,62 @@ Item {
             Popup{
                 id: popup_remove_location
                 anchors.centerIn: parent
-                property var select_location: 0
                 property string name : ""
                 background: Rectangle{
                     anchors.fill: parent
                     color: "transparent"
                 }
                 onOpened:{
-                    name = supervisor.getLocationName(select_location, "Serving");
+                    name = supervisor.getLocationName(select_location);
                 }
-                width: 400
-                height: 250
+                width: 1280
+                height: 350
 
                 Rectangle{
                     width: parent.width
                     height: parent.height
-                    radius: 20
-                    color: color_navy
+                    color: color_dark_black
                     Column{
                         anchors.centerIn: parent
-                        spacing: 30
-                        Text{
+                        spacing: 40
+                        Column{
                             anchors.horizontalCenter: parent.horizontalCenter
-                            text: "삭제하시겠습니까?"
-                            font.pixelSize: 20
-                            font.family: font_noto_r.name
-                            color: "white"
+                            spacing: 10
+                            Text{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "삭제하시겠습니까?"
+                                font.pixelSize: 40
+                                font.family: font_noto_r.name
+                                color: "white"
+                            }
+                            Text{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "위치 : "+popup_remove_location.name
+                                font.pixelSize: 35
+                                font.family: font_noto_r.name
+                                color: "white"
+                            }
                         }
-                        Text{
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: "("+popup_remove_location.name+")"
-                            font.pixelSize: 20
-                            font.family: font_noto_r.name
-                            color: "white"
-                        }
+
                         Row{
                             anchors.horizontalCenter: parent.horizontalCenter
-                            spacing: 30
+                            spacing: 50
                             Item_buttons{
-                                width: 130
-                                height: 50
+                                width: 150
+                                height: 60
                                 type: "round_text"
                                 text: "예"
                                 onClicked: {
                                     click_sound.play();
-                                    map_hide.removelocation(popup_remove_location.select_location);
+                                    supervisor.removeLocation(select_location);
+                                    select_location = -1;
                                     annot_pages.item.readSetting();
                                     popup_remove_location.close();
                                 }
                             }
                             Item_buttons{
-                                width: 130
-                                height: 50
+                                width: 150
+                                height: 60
                                 type: "round_text"
                                 text: "아니오"
                                 onClicked: {
@@ -3666,6 +3326,7 @@ Item {
                 onClosed: {
                     supervisor.setCallbell("", -1);
                 }
+
 
                 Rectangle{
                     width: parent.width
@@ -6548,6 +6209,335 @@ Item {
         id: popup_map_list
     }
 
+    Popup{
+        id: popup_notice
+        anchors.centerIn: parent
+        width: 800
+        height: 300
+        property string main_str: ""
+        property string sub_str: ""
+        property bool show_localization: false
+        property bool show_motorinit: false
+        background:Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            opacity: 0.9
+            radius: 10
+            color: color_dark_black
+        }
+        Rectangle{
+            anchors.centerIn: parent
+            width: parent.width-20
+            height: parent.height-20
+//            opacity: 0.8
+            radius: 10
+            color: "transparent"
+            border.color: color_red
+            border.width: 5
+            Image{
+                id: image_warn
+                width: 120
+                height: 120
+                source: "image/icon_warning.png"
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: 50
+            }
+            Column{
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: image_warn.right
+                anchors.leftMargin: 50
+                Text{
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 40
+                    text: popup_notice.main_str
+                }
+                Text{
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                    text: popup_notice.sub_str
+                }
+            }
+            MouseArea{
+                anchors.fill: parent
+                onClicked:{
+                    popup_notice.close();
+                }
+            }
+            Rectangle{
+                width:  120
+                height: 60
+                anchors.right: parent.right
+                anchors.rightMargin: 20
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 20
+                color: "transparent"
+                border.color: color_red
+                border.width: 3
+                radius: 10
+                visible: popup_notice.show_localization
+                Text{
+                    anchors.centerIn: parent
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                    text: "위치초기화"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onPressed:{
+                        parent.color = color_dark_black
+                        click_sound.play()
+                    }
+                    onReleased:{
+                        parent.color = "transparent"
+
+                        loadPage(plocalization);
+                    }
+                }
+            }
+            Rectangle{
+                width:  120
+                height: 60
+                color: "transparent"
+                border.color: color_red
+                border.width: 3
+                anchors.right: parent.right
+                anchors.rightMargin: 20
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 20
+                radius: 10
+                visible: popup_notice.show_motorinit
+                Text{
+                    anchors.centerIn: parent
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                    text: "모터초기화"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onPressed:{
+                        parent.color = color_dark_black
+                        click_sound.play()
+                    }
+                    onReleased:{
+                        parent.color = "transparent"
+                        supervisor.setMotorLock(true);
+
+                    }
+                }
+            }
+        }
+    }
+
+    Popup{
+        id: popup_moving
+        anchors.centerIn: parent
+        width: 1200
+        height: 800
+        property string location: ""
+        background:Rectangle{
+            anchors.fill: parent
+            color: color_dark_black
+            opacity: 0.9
+        }
+        Rectangle{
+            anchors.centerIn: parent
+            width: parent.width-100
+            height: 400
+//            opacity: 0.8
+            radius: 10
+            color: "transparent"
+            border.color: color_blue
+            border.width: 5
+            Image{
+                id: image_moving
+                width: 200
+                height: 175
+                source: "image/robot_moving.png"
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: 100
+            }
+            Column{
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: image_moving.right
+                anchors.leftMargin: 50
+                spacing: 10
+                Text{
+                    visible: !robot_paused
+                    color: color_blue
+                    font.family: font_noto_r.name
+                    font.pixelSize: 45
+                    text: popup_moving.location===""?"로봇이 이동 중입니다.":"로봇이 "+popup_moving.location+"로"
+                }
+                Text{
+                    visible: !robot_paused && popup_moving.location !==""
+                    color: color_blue
+                    font.family: font_noto_r.name
+                    font.pixelSize: 45
+                    text: "이동 중입니다."
+                }
+                Text{
+                    visible: robot_paused
+                    color: color_blue
+                    font.family: font_noto_r.name
+                    font.pixelSize: 50
+                    text: "로봇이 일시정지 되었습니다."
+                }
+                Row{
+                    visible: robot_paused
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 60
+                    Item_buttons{
+                        type: "round_text"
+                        width: 140
+                        height: 80
+                        fontcolor: color_blue
+                        btncolor: color_dark_black
+                        bordercolor: color_blue
+                        text: "경로 재개"
+                        onClicked:{
+                            click_sound.play();
+                            supervisor.writelog("[ANNOTATION] Test Moving : Resume")
+                            supervisor.moveResume();
+                            timer_check_pause.start();
+                        }
+                    }
+                    Item_buttons{
+                        type: "round_text"
+                        width: 140
+                        height: 80
+                        fontcolor: color_blue
+                        btncolor: color_dark_black
+                        bordercolor: color_blue
+                        text: "경로 취소"
+                        onClicked:{
+                            click_sound.play();
+                            supervisor.writelog("[ANNOTATION] Test Moving : Path Cancled")
+                            supervisor.moveStop();
+                            timer_check_pause.start();
+                        }
+                    }
+                }
+            }
+            MouseArea{
+                anchors.fill: parent
+                visible: !robot_paused
+                onClicked:{
+                    click_sound.play();
+                    if(robot_paused){
+//                        supervisor.writelog("[USER INPUT] MOVING RESUME 2")
+//                        supervisor.moveResume();
+//                        timer_check_pause.start();
+                    }else{
+                        supervisor.writelog("[USER INPUT] MOVING PAUSE 2")
+                        supervisor.movePause();
+                        timer_check_pause.start();
+                    }
+                }
+            }
+            Rectangle{
+                width:  120
+                height: 60
+                anchors.right: parent.right
+                anchors.rightMargin: 20
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 20
+                color: "transparent"
+                border.color: color_red
+                border.width: 3
+                radius: 10
+                visible: popup_notice.show_localization
+                Text{
+                    anchors.centerIn: parent
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                    text: "위치초기화"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onPressed:{
+                        parent.color = color_dark_black
+                        click_sound.play()
+                    }
+                    onReleased:{
+                        parent.color = "transparent"
+                        loadPage(plocalization);
+                    }
+                }
+            }
+            Rectangle{
+                width:  120
+                height: 60
+                color: "transparent"
+                border.color: color_red
+                border.width: 3
+                anchors.right: parent.right
+                anchors.rightMargin: 20
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 20
+                radius: 10
+                visible: popup_notice.show_motorinit
+                Text{
+                    anchors.centerIn: parent
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 20
+                    text: "모터초기화"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onPressed:{
+                        parent.color = color_dark_black
+                        click_sound.play()
+                    }
+                    onReleased:{
+                        parent.color = "transparent"
+
+                    }
+                }
+            }
+        }
+    }
+    Timer{
+        id: timer_check_pause
+        interval: 500
+        running: false
+        repeat: true
+        onTriggered: {
+            if(supervisor.getStateMoving() === 4){
+                robot_paused = true;
+                supervisor.writelog("[QML] CHECK MOVING STATE : PAUSED")
+                timer_check_pause.stop();
+            }else if(supervisor.getStateMoving() === 0){
+                robot_paused = false;
+                test_move_state = 0;
+                supervisor.writelog("[QML] CHECK MOVING STATE : NOT READY")
+                movefail(4);
+                popup_moving.close();
+                timer_check_pause.stop();
+            }else if(supervisor.getStateMoving() === 1){
+                supervisor.writelog("[QML] CHECK MOVING STATE : READY")
+                robot_paused = false;
+                test_move_state = 0;
+                timer_check_pause.stop();
+                popup_moving.close();
+            }else{
+                robot_paused = false;
+                supervisor.writelog("[QML] CHECK MOVING STATE : "+Number(supervisor.getStateMoving()));
+                timer_check_pause.stop();
+            }
+        }
+    }
     Popup_help{
         id: popup_annot_help
     }

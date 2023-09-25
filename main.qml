@@ -77,35 +77,81 @@ Window {
     property bool playingSound: false
     property string cur_sound: ""
     property string next_sound: ""
+    property string prev_sound: ""
 
     function setVoice(str){
         next_sound = str;
     }
     function playVoice(str){
-        voice_all_stop();
+        print("playVoice ",str);
         if(str === "startServing"){
-            voice_serving.play();
+            if(voice_serving.isplaying){
+            }else{
+                voice_all_stop();
+                voice_serving.play();
+            }
         }else if(str === "startCalling"){
-            voice_calling.play();
+            if(voice_calling.isplaying){
+            }else{
+                voice_all_stop();
+                voice_calling.play();
+            }
         }else if(str === "moveResting"){
-            voice_movewait.play();
+            if(voice_movewait.isplaying){
+            }else{
+                voice_all_stop();
+                voice_movewait.play();
+            }
         }else if(str === "moveCharging"){
-            voice_movecharge.play();
+            if(voice_movecharge.isplaying){
+            }else{
+                voice_all_stop();
+                voice_movecharge.play();
+            }
         }else if(str === "noBattery"){
-            voice_battery.play();
+            if(voice_battery.isplaying){
+            }else{
+                voice_all_stop();
+                voice_battery.play();
+            }
         }else if(str === "moveWait"){
-            voice_wait.play();
+            if(voice_wait.isplaying){
+            }else{
+                voice_all_stop();
+                voice_wait.play();
+            }
         }else if(str === "excuseMe"){
-            voice_avoid.play();
+            if(voice_avoid.isplaying){
+            }else{
+                voice_all_stop();
+                voice_avoid.play();
+            }
         }else if(str === "errorEMO"){
-            voice_emergency.play();
+            if(voice_emergency.isplaying){
+            }else{
+                voice_all_stop();
+                voice_emergency.play();
+            }
         }else if(str === "errorLocal"){
-            voice_localfail.play();
+            if(voice_localfail.isplaying){
+            }else{
+                voice_all_stop();
+                voice_localfail.play();
+            }
         }else if(str === "errorMotor"){
-            voice_motor_error.play();
+            if(voice_motor_error.isplaying){
+            }else{
+                voice_all_stop();
+                voice_motor_error.play();
+            }
         }else if(str === "errorPath"){
-            voice_movefail.play();
+            if(voice_movefail.isplaying){
+            }else{
+                voice_all_stop();
+                voice_movefail.play();
+            }
         }
+        prev_sound = str;
     }
     function stopVoice(){
         voice_all_stop();
@@ -132,30 +178,31 @@ Window {
                         next_sound = "";
                     }
                 }else{
-                    voice_all_stop();
-                    if(cur_sound == "startServing"){
-                        voice_serving.play();
-                    }else if(cur_sound == "startCalling"){
-                        voice_calling.play();
-                    }else if(cur_sound == "moveResting"){
-                        voice_movewait.play();
-                    }else if(cur_sound == "moveCharging"){
-                        voice_movecharge.play();
-                    }else if(cur_sound == "noBattery"){
-                        voice_battery.play();
-                    }else if(cur_sound == "moveWait"){
-                        voice_wait.play();
-                    }else if(cur_sound == "excuseMe"){
-                        voice_avoid.play();
-                    }else if(cur_sound == "errorEMO"){
-                        voice_emergency.play();
-                    }else if(cur_sound == "errorLocal"){
-                        voice_localfail.play();
-                    }else if(cur_sound == "errorMotor"){
-                        voice_motor_error.play();
-                    }else if(cur_sound == "errorPath"){
-                        voice_movefail.play();
-                    }
+                    print("use this???");
+//                    voice_all_stop();
+//                    if(cur_sound == "startServing"){
+//                        voice_serving.play();
+//                    }else if(cur_sound == "startCalling"){
+//                        voice_calling.play();
+//                    }else if(cur_sound == "moveResting"){
+//                        voice_movewait.play();
+//                    }else if(cur_sound == "moveCharging"){
+//                        voice_movecharge.play();
+//                    }else if(cur_sound == "noBattery"){
+//                        voice_battery.play();
+//                    }else if(cur_sound == "moveWait"){
+//                        voice_wait.play();
+//                    }else if(cur_sound == "excuseMe"){
+//                        voice_avoid.play();
+//                    }else if(cur_sound == "errorEMO"){
+//                        voice_emergency.play();
+//                    }else if(cur_sound == "errorLocal"){
+//                        voice_localfail.play();
+//                    }else if(cur_sound == "errorMotor"){
+//                        voice_motor_error.play();
+//                    }else if(cur_sound == "errorPath"){
+//                        voice_movefail.play();
+//                    }
                     playingSound = true;
                 }
             }
@@ -170,7 +217,9 @@ Window {
 
     function movefail(){
         if(loader_page.item.objectName == "page_annotation"){
-            if(supervisor.getEmoStatus()){
+            if(supervisor.getIPCConnection() === false){
+                loader_page.item.movefail(5);
+            }if(supervisor.getEmoStatus()){
                 loader_page.item.movefail(2);
             }else if(supervisor.getMotorState() === 0){
                 loader_page.item.movefail(4);
@@ -238,7 +287,7 @@ Window {
 
     function movelocation(){
         cur_location = supervisor.getcurLoc();
-        voice_all_stop();
+//        voice_all_stop();
         if(cur_location == "Charging0"){
             cur_location = "충전 장소";
             playVoice("moveCharing");
@@ -354,7 +403,7 @@ Window {
         if(!debug_mode){
             if(loader_page.item.objectName != "page_annotation" && loader_page.item.objectName != "page_mapping"){
                 supervisor.writelog("[UI] Force Page Change : Robot disconnected");
-                loadPage(pinit);
+//                loadPage(pinit);
             }
         }
     }
@@ -438,7 +487,7 @@ Window {
             timer_update.start();
             loader_page.item.init();
         }
-        source:  pinit
+        source: pinit
     }
 
     Timer{
@@ -477,6 +526,13 @@ Window {
             if(playing) playingSound = true;
             else playingSound = false;
         }
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
     Audio{
         id: voice_serving
@@ -486,6 +542,13 @@ Window {
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
+        }
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
         }
     }
     Audio{
@@ -497,6 +560,13 @@ Window {
             if(playing) playingSound = true;
             else playingSound = false;
         }
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
     Audio{
         id: voice_avoid
@@ -506,6 +576,13 @@ Window {
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
+        }
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
         }
     }
     Audio{
@@ -517,6 +594,13 @@ Window {
             if(playing) playingSound = true;
             else playingSound = false;
         }
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
     Audio{
         id: voice_movefail
@@ -526,6 +610,13 @@ Window {
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
+        }
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
         }
     }
     Audio{
@@ -537,6 +628,13 @@ Window {
             if(playing) playingSound = true;
             else playingSound = false;
         }
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
     Audio{
         id: voice_localfail
@@ -546,6 +644,13 @@ Window {
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
+        }
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
         }
     }
     Audio{
@@ -557,6 +662,13 @@ Window {
             if(playing) playingSound = true;
             else playingSound = false;
         }
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
     Audio{
         id: voice_emergency
@@ -567,6 +679,13 @@ Window {
             if(playing) playingSound = true;
             else playingSound = false;
         }
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
     Audio{
         id: voice_battery
@@ -576,6 +695,13 @@ Window {
         onPlaylistChanged: {
             if(playing) playingSound = true;
             else playingSound = false;
+        }
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
         }
     }
 

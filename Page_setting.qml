@@ -68,6 +68,13 @@ Item {
         autoPlay: false
         volume: slider_volume_voice.value/100
         source: supervisor.getVoice("start_serving");
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
     Audio{
         id: bgm_test
@@ -319,6 +326,7 @@ Item {
                                 focus:false
                                 onFocusChanged: {
                                     keyboard.owner = platform_name;
+                                    keyboard.owner_text = "platform_name";
                                     if(focus){
                                         keyboard.open();
                                     }else{
@@ -1517,12 +1525,12 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = server_ip_1;
+                                        keypad.owner = server_ip_1;
                                         server_ip_1.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
-                                            keyboard.close();
+                                            keypad.close();
                                             server_ip_1.select(0,0);
                                         }
                                     }
@@ -1552,12 +1560,13 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = server_ip_2;
+                                        keypad.owner = server_ip_2;
+//                                        keyboard.owner_text = "server_ip_2";
                                         server_ip_2.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
-                                            keyboard.close();
+                                            keypad.close();
                                             server_ip_2.select(0,0);
                                         }
                                     }
@@ -1590,13 +1599,14 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = server_ip_3;
+                                        keypad.owner = server_ip_3;
+//                                        keyboard.owner_text = "server_ip_3";
                                         server_ip_3.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
                                             server_ip_3.select(0,0);
-                                            keyboard.close();
+                                            keypad.close();
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -1628,13 +1638,14 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = server_ip_4;
+                                        keypad.owner = server_ip_4;
+//                                        keyboard.owner_text = "server_ip_4";
                                         server_ip_4.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
                                             server_ip_4.select(0,0);
-                                            keyboard.close();
+                                            keypad.close();
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -1729,6 +1740,7 @@ Item {
                                 text:supervisor.getSetting("ROBOT_HW","fms_id");
                                 onFocusChanged: {
                                     keyboard.owner = fms_id;
+                                    keyboard.owner_text = "fms_id";
                                     if(focus){
                                         keyboard.open();
                                     }else{
@@ -1785,6 +1797,7 @@ Item {
                                 text:supervisor.getSetting("ROBOT_HW","fms_pw");
                                 onFocusChanged: {
                                     keyboard.owner = fms_pw;
+                                    keyboard.owner_text = "fms_pw";
                                     if(focus){
                                         keyboard.open();
                                     }else{
@@ -1855,11 +1868,12 @@ Item {
                                 color: ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT_HW","radius");
                                 onFocusChanged: {
-                                    keyboard.owner = radius;
+                                    keypad.owner = radius;
+//                                    keyboard.owner_text = "radius";
                                     if(focus){
-                                        keyboard.open();
+                                        keypad.open();
                                     }else{
-                                        keyboard.close();
+                                        keypad.close();
                                     }
                                 }
                             }
@@ -1911,11 +1925,12 @@ Item {
                                 color: ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT","wheel_base");
                                 onFocusChanged: {
-                                    keyboard.owner = wheel_base;
+                                    keypad.owner = wheel_base;
+//                                    keyboard.owner_text = "wheel_base";
                                     if(focus){
-                                        keyboard.open();
+                                        keypad.open();
                                     }else{
-                                        keyboard.close();
+                                        keypad.close();
                                     }
                                 }
                             }
@@ -1967,11 +1982,12 @@ Item {
                                 color: ischanged?color_red:"black"
                                 text:supervisor.getSetting("ROBOT","wheel_radius");
                                 onFocusChanged: {
-                                    keyboard.owner = wheel_radius;
+                                    keypad.owner = wheel_radius;
+//                                    keyboard.owner_text = "wheel_radius";
                                     if(focus){
-                                        keyboard.open();
+                                        keypad.open();
                                     }else{
-                                        keyboard.close();
+                                        keypad.close();
                                     }
                                 }
                             }
@@ -2157,6 +2173,7 @@ Item {
                                     focus:false
                                     onFocusChanged: {
                                         keyboard.owner = wifi_passwd;
+                                        keyboard.owner_text = "wifi_passwd";
                                         wifi_passwd.selectAll();
                                         if(focus){
                                             keyboard.open();
@@ -2233,12 +2250,13 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = ip_1;
+                                        keypad.owner = ip_1;
+//                                        keyboard.owner_text = "ip_1";
                                         ip_1.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
-                                            keyboard.close();
+                                            keypad.close();
                                             ip_1.select(0,0);
                                         }
                                     }
@@ -2268,12 +2286,13 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = ip_2;
+                                        keypad.owner = ip_2;
+//                                        keyboard.owner_text = "ip_2";
                                         ip_2.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
-                                            keyboard.close();
+                                            keypad.close();
                                             ip_2.select(0,0);
                                         }
                                     }
@@ -2306,13 +2325,14 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = ip_3;
+                                        keypad.owner = ip_3;
+//                                        keyboard.owner_text = "ip_3";
                                         ip_3.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
                                             ip_3.select(0,0);
-                                            keyboard.close();
+                                            keypad.close();
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -2344,13 +2364,14 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = ip_4;
+                                        keypad.owner = ip_4;
+//                                        keyboard.owner_text = "ip_4";
                                         ip_4.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
                                             ip_4.select(0,0);
-                                            keyboard.close();
+                                            keypad.close();
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -2455,12 +2476,13 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = gateway_1;
+                                        keypad.owner = gateway_1;
+//                                        keyboard.owner_text = "gateway_1";
                                         gateway_1.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
-                                            keyboard.close();
+                                            keypad.close();
                                             gateway_1.select(0,0);
                                         }
                                     }
@@ -2490,12 +2512,13 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = gateway_2;
+                                        keypad.owner = gateway_2;
+//                                        keyboard.owner_text = "gateway_2";
                                         gateway_2.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
-                                            keyboard.close();
+                                            keypad.close();
                                             gateway_2.select(0,0);
                                         }
                                     }
@@ -2528,13 +2551,14 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = gateway_3;
+                                        keypad.owner = gateway_3;
+//                                        keyboard.owner_text = "gateway_3";
                                         gateway_3.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
                                             gateway_3.select(0,0);
-                                            keyboard.close();
+                                            keypad.close();
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -2566,13 +2590,14 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = gateway_4;
+                                        keypad.owner = gateway_4;
+//                                        keyboard.owner_text = "gateway_4";
                                         gateway_4.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
                                             gateway_4.select(0,0);
-                                            keyboard.close();
+                                            keypad.close();
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -2676,12 +2701,13 @@ Item {
                                     focus:false
                                     height: 50
                                     onFocusChanged: {
-                                        keyboard.owner = dnsmain_1;
+                                        keypad.owner = dnsmain_1;
+//                                        keyboard.owner_text = "dnsmain_1";
                                         dnsmain_1.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
-                                            keyboard.close();
+                                            keypad.close();
                                             dnsmain_1.select(0,0);
                                         }
                                     }
@@ -2710,12 +2736,13 @@ Item {
                                     width: 70
                                     height: 50
                                     onFocusChanged: {
-                                        keyboard.owner = dnsmain_2;
+                                        keypad.owner = dnsmain_2;
+//                                        keyboard.owner_text = "dnsmain_2";
                                         dnsmain_2.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
-                                            keyboard.close();
+                                            keypad.close();
                                             dnsmain_2.select(0,0);
                                         }
                                     }
@@ -2747,13 +2774,14 @@ Item {
                                     width: 70
                                     height: 50
                                     onFocusChanged: {
-                                        keyboard.owner = dnsmain_3;
+                                        keypad.owner = dnsmain_3;
+//                                        keyboard.owner_text = "dnsmain_3";
                                         dnsmain_3.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
                                             dnsmain_3.select(0,0);
-                                            keyboard.close();
+                                            keypad.close();
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -2785,13 +2813,14 @@ Item {
                                     focus:false
                                     height: 50
                                     onFocusChanged: {
-                                        keyboard.owner = dnsmain_4;
+                                        keypad.owner = dnsmain_4;
+//                                        keyboard.owner_text = "dnsmain_4";
                                         dnsmain_4.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
                                             dnsmain_4.select(0,0);
-                                            keyboard.close();
+                                            keypad.close();
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -2896,12 +2925,13 @@ Item {
                                     focus:false
                                     height: 50
                                     onFocusChanged: {
-                                        keyboard.owner = dnsserv_1;
+                                        keypad.owner = dnsserv_1;
+//                                        keyboard.owner_text = "dnsserv_1";
                                         dnsserv_1.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
-                                            keyboard.close();
+                                            keypad.close();
                                             dnsserv_1.select(0,0);
                                         }
                                     }
@@ -2931,12 +2961,13 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = dnsserv_2;
+                                        keypad.owner = dnsserv_2;
+//                                        keyboard.owner_text = "dnsserv_2";
                                         dnsserv_2.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
-                                            keyboard.close();
+                                            keypad.close();
                                             dnsserv_2.select(0,0);
                                         }
                                     }
@@ -2969,13 +3000,14 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = dnsserv_3;
+                                        keypad.owner = dnsserv_3;
+//                                        keyboard.owner_text = "dnsserv_3";
                                         dnsserv_3.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
                                             dnsserv_3.select(0,0);
-                                            keyboard.close();
+                                            keypad.close();
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -3007,13 +3039,14 @@ Item {
                                     height: 50
                                     focus:false
                                     onFocusChanged: {
-                                        keyboard.owner = dnsserv_4;
+                                        keypad.owner = dnsserv_4;
+//                                        keyboard.owner_text = "dnsserv_4";
                                         dnsserv_4.selectAll();
                                         if(focus){
-                                            keyboard.open();
+                                            keypad.open();
                                         }else{
                                             dnsserv_4.select(0,0);
-                                            keyboard.close();
+                                            keypad.close();
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -4009,6 +4042,256 @@ Item {
                             scale = 1;
                             while(width*scale > parent.width*0.8){
                                 scale=scale-0.01;
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_use_obs_preview
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"장애물 예측 사용"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_use_obs_preview
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["사용안함","사용"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_obs_preview_time
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"장애물 예측 시간 [초]"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                visible: false
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    click_sound.play();
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("경로추종 최대거리");
+                                    popup_help_setting.addLine("로봇과 로봇이 추종하는 경로 상 한 점 사이 최대 거리입니다.");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            TextField{
+                                id: obs_preview_time
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onTextChanged: {
+                                    is_reset_slam = true;
+                                    ischanged = true;
+                                }
+                                focus:false
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","obs_preview_time");
+                                onFocusChanged: {
+                                    keypad.owner = obs_preview_time;
+                                    obs_preview_time.selectAll();
+                                    if(focus){
+                                        keypad.open();
+                                    }else{
+                                        keypad.close();
+                                        obs_preview_time.select(0,0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    id: set_use_avoid
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"장애물 회피"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_use_avoid
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["사용안함","사용"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_use_pivot_obs
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"제자리회전 장애물감지"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_use_pivot_obs
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["사용안함","사용"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_use_obs_near
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"근접 장애물 감속"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_use_obs_near
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["사용안함","사용"]
                             }
                         }
                     }
@@ -7823,6 +8106,7 @@ Item {
                         }
                         Rectangle{
                             color: "transparent"
+                            visible: false
                             width: area_setting_motor.width*0.4
                             height: area_setting_motor.height*0.45
                             Rectangle{
@@ -8846,6 +9130,10 @@ Item {
             ip_3.text = ip[2];
             ip_4.text = ip[3];
         }
+        ip_1.focus = false;
+        ip_2.focus = false;
+        ip_3.focus = false;
+        ip_4.focus = false;
 
         ip = supervisor.getSetting("SERVER","fms_ip").split(".");
         if(ip.length >3){
@@ -8854,6 +9142,10 @@ Item {
             server_ip_3.text = ip[2];
             server_ip_4.text = ip[3];
         }
+        server_ip_1.focus = false;
+        server_ip_2.focus = false;
+        server_ip_3.focus = false;
+        server_ip_4.focus = false;
         ip = supervisor.getSetting("ROBOT_SW","wifi_gateway").split(".");
         ip = supervisor.getcurGateway().split(".");
         if(ip.length >3){
@@ -8862,6 +9154,10 @@ Item {
             gateway_3.text = ip[2];
             gateway_4.text = ip[3];
         }
+        gateway_1.text.focus = false;
+        gateway_2.text.focus = false;
+        gateway_3.text.focus = false;
+        gateway_4.text.focus = false;
         ip = supervisor.getSetting("ROBOT_SW","wifi_dnsmain").split(".");
         ip = supervisor.getcurDNS().split(".");
         if(ip.length >3){
@@ -8870,6 +9166,10 @@ Item {
             dnsmain_3.text = ip[2];
             dnsmain_4.text = ip[3];
         }
+        dnsmain_1.text.focus = false;
+        dnsmain_2.text.focus = false;
+        dnsmain_3.text.focus = false;
+        dnsmain_4.text.focus = false;
         ip = supervisor.getSetting("ROBOT_SW","wifi_dnsserv").split(".");
         if(ip.length >3){
             dnsserv_1.text = ip[0];
@@ -8878,6 +9178,10 @@ Item {
             dnsserv_4.text = ip[3];
         }
 
+        dnsserv_1.text.focus = false;
+        dnsserv_2.text.focus = false;
+        dnsserv_3.text.focus = false;
+        dnsserv_4.text.focus = false;
 
         //변수 초기화
         is_reset_slam = false;
@@ -9474,6 +9778,27 @@ Item {
                         onClicked:{
                             supervisor.writelog("[USER INPUT] SETTING PAGE -> RESTART SLAM");
 //                            supervisor.restartSLAM();
+                        }
+                    }
+                }
+                Rectangle{
+                    id: btn_all_init
+                    width: 180
+                    height: 60
+                    radius: 10
+                    color:"transparent"
+                    border.width: 1
+                    border.color: "#7e7e7e"
+                    Text{
+                        anchors.centerIn: parent
+                        text: "공장 초기화"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 20
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            supervisor.writelog("[USER INPUT] RESET ALL -> REMOVE ALL");
                         }
                     }
                 }
@@ -11367,6 +11692,7 @@ Item {
                 text: supervisor.getSetting("PRESET"+Number(popup_preset.select_preset),"name");
                 onFocusChanged: {
                     keyboard.owner = preset_name;
+                    keyboard.owner_text = "preset_name";
                     preset_name.selectAll();
                     if(focus){
                         keyboard.open();
@@ -11821,6 +12147,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
                         keyboard.owner = tf_left_x;
+                        keyboard.owner_text = "tf_left_x";
                         tf_left_x.selectAll();
                         if(focus){
                             keyboard.open();
@@ -11846,6 +12173,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
                         keyboard.owner = tf_right_x;
+                        keyboard.owner_text = "tf_right_x";
                         tf_right_x.selectAll();
                         if(focus){
                             keyboard.open();
@@ -11865,6 +12193,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
                         keyboard.owner = tf_left_y;
+                        keyboard.owner_text = "tf_left_y";
                         tf_left_y.selectAll();
                         if(focus){
                             keyboard.open();
@@ -11890,6 +12219,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
                         keyboard.owner = tf_right_y;
+                        keyboard.owner_text = "tf_right_y";
                         tf_right_y.selectAll();
                         if(focus){
                             keyboard.open();
@@ -11909,6 +12239,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
                         keyboard.owner = tf_left_z;
+                        keyboard.owner_text = "tf_left_z";
                         tf_left_z.selectAll();
                         if(focus){
                             keyboard.open();
@@ -11934,6 +12265,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
                         keyboard.owner = tf_right_z;
+                        keyboard.owner_text = "tf_right_z";
                         tf_right_z.selectAll();
                         if(focus){
                             keyboard.open();
@@ -11953,6 +12285,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
                         keyboard.owner = tf_left_rx;
+                        keyboard.owner_text = "tf_left_rx";
                         tf_left_rx.selectAll();
                         if(focus){
                             keyboard.open();
@@ -11978,6 +12311,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
                         keyboard.owner = tf_right_rx;
+                        keyboard.owner_text = "tf_right_rx";
                         tf_right_rx.selectAll();
                         if(focus){
                             keyboard.open();
@@ -11997,6 +12331,7 @@ Item {
                     font.pixelSize: 15
                     onFocusChanged: {
                         keyboard.owner = tf_left_ry;
+                        keyboard.owner_text = "tf_left_ry";
                         tf_left_ry.selectAll();
                         if(focus){
                             keyboard.open();
@@ -12022,6 +12357,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
                         keyboard.owner = tf_right_ry;
+                        keyboard.owner_text = "tf_right_ry";
                         tf_right_ry.selectAll();
                         if(focus){
                             keyboard.open();
@@ -12041,6 +12377,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     onFocusChanged: {
                         keyboard.owner = tf_left_rz;
+                        keyboard.owner_text = "tf_left_rz";
                         tf_left_rz.selectAll();
                         if(focus){
                             keyboard.open();
@@ -12066,6 +12403,7 @@ Item {
                     font.pixelSize: 15
                     onFocusChanged: {
                         keyboard.owner = tf_right_rz;
+                        keyboard.owner_text = "tf_right_rz";
                         tf_right_rz.selectAll();
                         if(focus){
                             keyboard.open();
@@ -12074,6 +12412,7 @@ Item {
                             tf_right_rz.select(0,0);
                         }
                     }
+
                 }
             }
 
@@ -12540,6 +12879,7 @@ Item {
                             echoMode: popup_wifi_passwd.show_passwd?TextInput.Normal:TextInput.Password
                             onFocusChanged: {
                                 keyboard.owner = passwd_wifi;
+                                keyboard.owner_text = "passwd_wifi";
                                 passwd_wifi.selectAll();
                                 if(focus){
                                     keyboard.open();

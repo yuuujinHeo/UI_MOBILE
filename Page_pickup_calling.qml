@@ -31,141 +31,128 @@ Item {
         anchors.fill: parent
         color: "#282828"
     }
-    Image{
-        id: image_robot
-        source: {
-            if(type==0){
-                "image/robot_callme.png"
-            }else if(type == 1){
-                "image/robot_clear.png"
-            }
-        }
-        width: {
-            if(type==0){
-                221
-            }else if(type == 1){
-                257
-            }
-        }
-        height: {
-            if(type==0){
-                334
-            }else if(type == 1){
-                457
-            }
-        }
+    Row{
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
-        anchors.leftMargin: 200
-    }
-    Column{
-        id: column_pickup
-        anchors.left: image_robot.right
-        anchors.leftMargin: 100
-        anchors.verticalCenter: image_robot.verticalCenter
-
-        Text{
-            id: target_pos
-            text: {
-                if(type == 0){
-                    "고객님, 부르셨나요?"
-                }else if(type == 1){
-                    "<font color=\"#12d27c\">다 드신 그릇</font> 은"
-                }
-            }
-            font.pixelSize: 60
-            font.family: font_noto_b.name
-            color: "white"
-        }
-        Text{
-            id: target_pos2
-            visible:type==1?true:false
-            text: "저에게 전달해 주세요."
-            font.pixelSize: 60
-            font.family: font_noto_b.name
-            color: "white"
-        }
-        Rectangle{
-            color:"transparent"
-            width: parent.width
-            height: {
-                if(type == 0){
-                    10
-                }else if(type == 1){
-                    40
-                }
-            }
-        }
-        Text{
-            id: text_mention
-            text:  {
-                if(type == 0){
-                    "이용이 끝나시면 <font color=\"#12d27c\">확인버튼</font>을 눌러주세요."
-                }else if(type == 1){
-                    "완료 후 아래 <font color=\"#12d27c\">확인버튼</font>을 눌러주세요."
-                }
-            }
-            font.pixelSize: 40
-            font.family: font_noto_b.name
-            color: "white"
-        }
-        Rectangle{
-            color:"transparent"
-            width: parent.width
-            height: {
-                if(type == 0){
-                    60
-                }else if(type == 1){
-                    40
-                }
-            }
-        }
+        anchors.leftMargin: 70
+        spacing: 100
         Image{
-            id: btn_confirm
-            source:"icon/btn_confirm.png"
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: 250
-            height: 90
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
-                    click_sound.play();
-                    console.log("UI : CONFIRM");
-                    voice_pickup.stop();
-                    voice_thanks.play();
-                    text_mention.visible = false;
-                    target_pos.visible = false;
-                    target_pos2.visible = false;
-                    btn_confirm.visible = false;
-                    text_hello.visible = true;
-                    timer_hello.start();
+            id: image_robot
+            source: "image/robot_clear.png"
+            width: 257
+            height: 457
+            anchors.verticalCenter: parent.verticalCenter
+        }
+        Column{
+            id: column_pickup
+            visible: true
+            anchors.bottom: parent.bottom
+//            anchors.verticalCenter: image_robot.verticalCenter
+
+            Text{
+                id: target_pos
+                text: {
+                    if(type == 0){
+                        "고객님, 부르셨나요?"
+                    }else if(type == 1){
+                        "<font color=\"#12d27c\">다 드신 그릇</font> 은"
+                    }
+                }
+                font.pixelSize: 70
+                font.family: font_noto_b.name
+                color: "white"
+            }
+            Text{
+                id: target_pos2
+                visible:type==1?true:false
+                text: "저에게 전달해 주세요."
+                font.pixelSize: 60
+                font.family: font_noto_b.name
+                color: "white"
+            }
+            Rectangle{
+                color:"transparent"
+                width: parent.width
+                height: 10
+            }
+            Text{
+                id: text_mention
+                text:  {
+                    if(type == 0){
+                        "이용이 끝나시면 <font color=\"#12d27c\">확인버튼</font>을 눌러주세요."
+                    }else if(type == 1){
+                        "완료 후 아래 <font color=\"#12d27c\">확인버튼</font>을 눌러주세요."
+                    }
+                }
+                font.pixelSize: 45
+                font.family: font_noto_b.name
+                color: "white"
+            }
+            Rectangle{
+                color:"transparent"
+                width: parent.width
+                height: 80
+            }
+            Image{
+                id: btn_confirm
+                source:"icon/btn_confirm.png"
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 320
+                height: 120
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        click_sound.play();
+                        console.log("UI : CONFIRM");
+                        voice_pickup.stop();
+                        voice_thanks.play();
+                        column_pickup.visible = false;
+                        text_mention.visible = false;
+                        target_pos.visible = false;
+                        target_pos2.visible = false;
+                        btn_confirm.visible = false;
+                        text_hello.visible = true;
+                        timer_hello.start();
+                    }
                 }
             }
-        }
 
-    }
-    Text{
-        id: text_hello
-        text:"감사합니다."
-        visible: false
-        font.pixelSize: 50
-        font.family: font_noto_b.name
-        color: "white"
-        anchors.left: image_robot.right
-        anchors.leftMargin: 100
-        anchors.verticalCenter: image_robot.verticalCenter
+        }
+        Text{
+            id: text_hello
+            text:"감사합니다."
+            visible: false
+            font.pixelSize: 80
+            font.family: font_noto_b.name
+            color: "white"
+            anchors.verticalCenter: parent.verticalCenter
+        }
     }
     Audio{
         id: voice_pickup
         autoPlay: false
         volume: volume_voice/100
         source: supervisor.getVoice("pickup_calling");
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
     Audio{
         id: voice_thanks
         autoPlay: false
         volume: volume_voice/100
         source: supervisor.getVoice("thank");
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
 
     MouseArea{

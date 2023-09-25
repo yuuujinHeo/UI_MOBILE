@@ -657,22 +657,22 @@ void IPCHandler::moveToServing(QString target_loc, int preset){
 }
 
 void IPCHandler::moveToLocation(LOCATION target_loc, int preset){
-    if(target_loc.name != "" && target_loc.number != 0){
+    if(target_loc.name != "" ){
         plog->write("[IPC] MOVE TO COMMAND : "+target_loc.name);
         probot->curLocation = target_loc;
         moveTo(target_loc.point.x, target_loc.point.y, target_loc.angle, preset);
     }else{
-        plog->write("[IPC] MOVE TO COMMAND (UNMATCHED): "+target_loc.name + QString().sprintf("(group : %d, number : %d)",target_loc.group,target_loc.number));
+        plog->write("[IPC] MOVE TO COMMAND (UNMATCHED): "+target_loc.name + QString().sprintf("(group : %d)",target_loc.group));
     }
     probot->curLocation = target_loc;
 }
 void IPCHandler::moveToLocationTest(LOCATION target_loc, int preset){
-    if(target_loc.name != "" && target_loc.number != 0){
+    if(target_loc.name != "" ){
         plog->write("[IPC] MOVE(TEST) TO COMMAND : "+target_loc.name);
         probot->curLocation = target_loc;
         moveToTest(target_loc.point.x, target_loc.point.y, target_loc.angle, preset);
     }else{
-        plog->write("[IPC] MOVE(TEST) TO COMMAND (UNMATCHED): "+target_loc.name + QString().sprintf("(group : %d, number : %d)",target_loc.group,target_loc.number));
+        plog->write("[IPC] MOVE(TEST) TO COMMAND (UNMATCHED): "+target_loc.name + QString().sprintf("(group : %d)",target_loc.group));
     }
     probot->curLocation = target_loc;
 }

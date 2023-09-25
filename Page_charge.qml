@@ -330,17 +330,38 @@ Item {
         autoPlay: false
         volume: volume_voice/100
         source: supervisor.getVoice("charging");
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
     Audio{
         id: voice_start_charge
         autoPlay: false
         volume: volume_voice/100
         source: supervisor.getVoice("start_charging");
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
     Audio{
         id: voice_stop_charge
         autoPlay: false
         volume: volume_voice/100
         source: supervisor.getVoice("stop_charging");
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
 }

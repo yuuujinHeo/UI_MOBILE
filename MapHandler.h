@@ -187,7 +187,8 @@ public:
     bool edit_location_flag;
     LOCATION orin_location;
 
-    Q_INVOKABLE void saveLocation(QString type, int groupnum, QString name);
+    Q_INVOKABLE void setSelectLocation(int num);
+//    Q_INVOKABLE void saveLocation(QString type, int groupnum, QString name);
     Q_INVOKABLE void clearLocation();
 //    Q_INVOKABLE void selectLocation(int num, QString type="");
     Q_INVOKABLE void addLocation(int x, int y,float th);
@@ -224,7 +225,7 @@ public:
     void setZoomCenter(int x=0, int y=0);
 
     int getLocationGroupSize(int num);
-    Q_INVOKABLE void saveAnnotation(QString filename);
+//    Q_INVOKABLE void saveAnnotation(QString filename);
 
 
 

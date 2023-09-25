@@ -314,6 +314,18 @@ void MapHandler::setMode(QString name){
         show_location_icon = false;
         robot_following = false;
         setFullScreen();
+    }else if(mode == "serving_list"){
+        file_width = map_orin.rows;
+        show_robot = false;
+        show_global_path = false;
+        show_local_path = false;
+        show_lidar = false;
+        show_location = true;
+        show_location_icon = true;
+        robot_following = false;
+        show_velocitymap = false;
+
+        setFullScreen();
     }else if(mode == "annot_velmap"){
         file_width = map_orin.rows;
         show_robot = false;
@@ -429,7 +441,6 @@ void MapHandler::initLocation(){
         LOCATION temp;
         temp.group = pmap->locations[i].group;
         temp.call_id = pmap->locations[i].call_id;
-        temp.number = pmap->locations[i].number;
         temp.type = pmap->locations[i].type;
         temp.name = pmap->locations[i].name;
         if(draw_object_flag){
@@ -619,6 +630,8 @@ void MapHandler::setMap(){
     }
     //위치
     if(show_location){
+//        qDebug() << "location : " << locations.size() << pmap->locations.size();
+//        qDebug() << "setmap : " << select_location;
         for(int i=0; i<locations.size(); i++){
 
             float distance = (pmap->robot_radius/grid_width)*2;
@@ -639,7 +652,7 @@ void MapHandler::setMap(){
                     path.addRoundedRect((locations[i].point.x-rad/2),(locations[i].point.y-rad/2),rad,rad,rad,rad);
                     painter.setPen(QPen(Qt::white,3));
 
-                    painter.fillPath(path,QBrush(QColor(hex_color_blue)));
+                    painter.fillPath(path,QBrush(QColor(hex_color_green)));
 
                     painter.drawPath(path);
                     painter.drawLine(x1,y1,x,y);
@@ -706,7 +719,7 @@ void MapHandler::setMap(){
                 if(select_location == i){
                     path.addRoundedRect((locations[i].point.x-rad/2),(locations[i].point.y-rad/2),rad,rad,rad,rad);
 
-                    painter.setPen(QPen(Qt::yellow,3));
+                    painter.setPen(QPen(QColor(hex_color_green),3));
 
                     painter.drawPath(path);
                     painter.drawLine(x1,y1,x,y);
@@ -729,7 +742,7 @@ void MapHandler::setMap(){
                 if(select_location == i){
                     path.addRoundedRect((locations[i].point.x-rad/2),(locations[i].point.y-rad/2),rad,rad,rad,rad);
 
-                    painter.setPen(QPen(Qt::yellow,3));
+                    painter.setPen(QPen(QColor(hex_color_green),3));
 
                     painter.drawPath(path);
                     painter.drawLine(x1,y1,x,y);
@@ -1250,18 +1263,17 @@ void MapHandler::removeLocation(int num){
 }
 
 void MapHandler::setTableNumberAuto(){
-    QMap<int,int> group_num;
+    QMap<int,int> group_num;/*
     plog->write("[MapHandler] Set Table Number Auto : "+QString::number(pmap->locations.size()));
     for(int i=0; i<pmap->locations.size(); i++){
         if(pmap->locations[i].type == "Serving"){
             if(group_num[pmap->locations[i].group] == 0){
-                pmap->locations[i].number = 1;
                 group_num[pmap->locations[i].group] = 2;
             }else{
                 pmap->locations[i].number = group_num[pmap->locations[i].group]++;
             }
         }
-    }
+    }*/
 }
 
 void MapHandler::setSize(int x, int y, float s){
@@ -1967,154 +1979,6 @@ void MapHandler::endDrawingRect(){
     temp_rect.clear();
 }
 
-void MapHandler::saveLocation(QString type, int groupnum, QString name){
-    LOCATION temp;
-    temp.type = type;
-    temp.name = name;
-    temp.group = groupnum;
-    temp.call_id = "";
-    temp.point = setAxisBack(new_location.point);
-    temp.angle = setAxisBack(new_location.angle);
-
-    if(type == "Charging"){
-        temp.number = -10;
-    }else if(type == "Resting"){
-        temp.number = -5;
-    }else{
-        temp.number = getLocGroupNum(groupnum)+1;
-    }
-
-    if(pmap->location_groups.size() == 0){
-        pmap->location_groups.push_back("DEFAULT");
-    }
-
-    bool overwrite = false;
-    int overwrite_num = -1;
-    for(int i=0; i<pmap->locations.size(); i++){
-        if(pmap->locations[i].name == name){
-            overwrite = true;
-            overwrite_num = i;
-        }
-    }
-    if(type == "Serving"){
-        plog->write("[MapHandler] Add Location : "+type+","+name+","+QString().sprintf("%f,%f,%f,%d",temp.point.x, temp.point.y, temp.angle,temp.number));
-        pmap->locations.push_back(temp);
-        pmap->annot_edit_location = true;
-    }else if(type == "Charging"){
-        if(overwrite){
-            plog->write("[MapHandler] Add Location(Overwrite): "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
-            pmap->locations[overwrite_num] = temp;
-        }else{
-            plog->write("[MapHandler] Add Location : "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
-            pmap->locations.insert(getLocationNum("Charging"),temp);
-        }
-        pmap->annot_edit_location = true;
-    }else if(type == "Resting"){
-        if(overwrite){
-            plog->write("[MapHandler] Add Location(Overwrite): "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
-            pmap->locations[overwrite_num] = temp;
-        }else{
-            plog->write("[MapHandler] Add Location : "+type+","+name+","+QString().sprintf("%f,%f,%f",temp.point.x, temp.point.y, temp.angle));
-            pmap->locations.insert(getLocationNum("Charging")+getLocationNum("Resting"),temp);
-        }
-        pmap->annot_edit_location = true;
-    }
-    pmap->annot_edit_location = true;
-    std::sort(pmap->locations.begin(),pmap->locations.end(),sortLocation2);
-    pmap->annot_edit_location = true;
-
-
-    //ini setting
-    saveAnnotation(map_name);
-    initLocation();
-}
-
-void MapHandler::saveAnnotation(QString filename){
-    if(filename == ""){
-        qDebug() << "file name set";
-        filename = pmap->map_name;
-        qDebug() << filename;
-    }
-    //기존 파일 백업
-    QString backup = QDir::homePath()+"/maps/"+filename+"/annotation_backup.ini";
-    QString origin = QDir::homePath()+"/maps/"+filename+"/annotation.ini";
-    plog->write("[MapHandler] SAVE Annotation "+origin);
-    if(QFile::exists(origin) == true){
-        if(QFile::copy(origin, backup)){
-            plog->write("[DEBUG] Copy annotation.ini to annotation_backup.ini");
-        }else{
-            plog->write("[DEBUG] Fail to copy annotation.ini to annotation_backup.ini");
-        }
-    }else{
-        plog->write("[DEBUG] Fail to copy annotation.ini to annotation_backup.ini (No file found)");
-    }
-    //데이터 입력(로케이션)
-    int other_num = 0;
-    int resting_num = 0;
-    int charging_num = 0;
-    int serving_num = 0;
-    int group_num[pmap->location_groups.size()];
-    for(int i=0; i<pmap->location_groups.size(); i++)
-        group_num[i] = 0;
-
-    QString str_name;
-    QSettings settings(origin, QSettings::IniFormat);
-    settings.clear();
-    int id_num = 0;
-
-    for(int i=0; i<pmap->locations.size(); i++){
-        if(pmap->locations[i].type == "Resting"){
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;
-
-            settings.setValue("resting_locations/loc"+QString::number(resting_num),str_name);
-            resting_num++;
-        }else if(pmap->locations[i].type == "Other"){
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;
-            settings.setValue("other_locations/loc"+QString::number(other_num),str_name);
-            other_num++;
-        }else if(pmap->locations[i].type == "Serving"){
-            qDebug() << "SHIT?????" << i << pmap->locations[i].call_id;
-            QString groupname = "serving_" + QString::number(pmap->locations[i].group);
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;
-            settings.setValue(groupname+"/loc"+QString::number(group_num[pmap->locations[i].group]),str_name);
-            qDebug() << str_name;
-            group_num[pmap->locations[i].group]++;
-        }else if(pmap->locations[i].type == "Charging"){
-            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f,%d,%d",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle,pmap->locations[i].number,id_num++)+","+pmap->locations[i].call_id;
-            settings.setValue("charging_locations/loc"+QString::number(charging_num),str_name);
-            charging_num++;
-        }
-    }
-    settings.setValue("resting_locations/num",resting_num);
-    settings.setValue("serving_locations/group",pmap->location_groups.size());
-    settings.setValue("other_locations/num",other_num);
-    settings.setValue("charging_locations/num",charging_num);
-
-    for(int i=0; i<pmap->location_groups.size(); i++){
-        settings.setValue("serving_"+QString::number(i)+"/name",pmap->location_groups[i]);
-        settings.setValue("serving_"+QString::number(i)+"/num",getLocationGroupSize(i));
-    }
-
-
-    for(int i=0; i<pmap->objects.size(); i++){
-        QString str = "Object_"+QString::number(i);
-
-        if(pmap->objects[i].is_rect){
-            str += ",1";
-        }else{
-            str += ",0";
-        }
-
-        for(int j=0; j<pmap->objects[i].points.size(); j++){
-            str += QString().sprintf(",%f:%f",pmap->objects[i].points[j].x,pmap->objects[i].points[j].y);
-
-        }
-        settings.setValue("objects/poly"+QString::number(i),str);
-    }
-    settings.setValue("objects/num",pmap->objects.size());
-
-    pmap->annotation_edited = false;
-}
 
 int MapHandler::getLocationGroupSize(int num){
     int size = 0;
@@ -2154,6 +2018,9 @@ void MapHandler::addLocationCur(int x, int y, float th){
     //qDebug() << "add:ocationCur" << x << y << th << new_location.point.x << new_location.point.y << new_location.angle;
     initLocation();
     setMap();
+}
+void MapHandler::setSelectLocation(int num){
+    select_location = num;
 }
 void MapHandler::setLocation(int x, int y, float th){
     int num = select_location;

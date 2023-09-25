@@ -17,10 +17,12 @@ Item {
     property int password: 0
     property int obs_in_path : 0
     property bool show_face: false
+
     Component.onCompleted: {
         init();
         statusbar.visible = false;
     }
+
     Component.onDestruction:  {
         playMusic.stop();
     }
@@ -58,6 +60,13 @@ Item {
         volume: volume_bgm/100
         source: "bgm/song.mp3"
         loops: 99
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
 
     Rectangle{
@@ -277,15 +286,18 @@ Item {
                     color: color_red
                     font.family: font_noto_r.name
                     font.pixelSize: 30
-                    text: motor_lock?"수동 이동":"원래대로"
+//                    text: motor_lock?"수동 이동":"원래대로"
+                    text: "수동 이동"
                 }
                 MouseArea{
                     anchors.fill: parent
                     z: 99
                     onClicked:{
                         click_sound.play();
-                        supervisor.setMotorLock(!motor_lock);
-                        supervisor.writelog("[USER INPUT] MOVING PAUSED : MOTOR LOCK DISABLE");
+                        popup_motor_lock.open();
+
+//                        if(!motor_lock){
+//                        }
                     }
                 }
             }
@@ -348,6 +360,182 @@ Item {
                 }
             }
         }
+    }
+    Popup{
+        id: popup_motor_lock
+        anchors.centerIn: parent
+        width: parent.width
+        height: parent.height
+        background:Rectangle{
+            anchors.fill: parent
+            color: color_dark_black
+            opacity: 0.8
+        }
+        Rectangle{
+            width: parent.width
+            height: 300
+            anchors.centerIn: parent
+            color: color_dark_black
+            Image{
+                id: image_warn
+                source: "image/icon_warning.png"
+                width: 120
+                height: 120
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: 50
+            }
+            Column{
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: image_warn.right
+                anchors.leftMargin: 50
+                spacing: 5
+                Text{
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 35
+                    text: "로봇을 수동으로 이동하시겠습니까?"
+                }
+                Text{
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 30
+                    text: "기존의 경로는 취소되며 대기화면으로 넘어갑니다."
+                }
+            }
+            Row{
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 30
+                anchors.right: parent.right
+                anchors.rightMargin: 30
+                spacing: 50
+                Rectangle{
+                    width: 140
+                    height: 70
+                    radius: 10
+                    color: "transparent"
+                    border.color: color_red
+                    border.width: 3
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 25
+                        color: color_red
+                        text: "수동이동"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onPressed:{
+                            click_sound.play();
+                            parent.color = color_dark_black;
+                        }
+                        onReleased:{
+                            parent.color = "transparent";
+                            supervisor.setMotorLock(!motor_lock);
+                            supervisor.writelog("[USER INPUT] MOVING PAUSED : MOTOR LOCK DISABLE");
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 140
+                    height: 70
+                    radius: 10
+                    color: "transparent"
+                    border.color: color_red
+                    border.width: 3
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 25
+                        color: color_red
+                        text: "취 소"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onPressed:{
+                            click_sound.play();
+                            parent.color = color_dark_black;
+                        }
+                        onReleased:{
+                            parent.color = "transparent";
+                            popup_motor_lock.close();
+//                            supervisor.writelog("[USER INPUT] MOVING PAUSED : MOTOR LOCK DISABLE");
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    Popup{
+        id: popup_motor_lock_off
+        anchors.centerIn: parent
+        width: parent.width
+        height: parent.height
+        background:Rectangle{
+            anchors.fill: parent
+            color: color_dark_black
+            opacity: 0.8
+        }
+        Rectangle{
+            width: parent.width
+            height: 300
+            anchors.centerIn: parent
+            color: color_dark_black
+            Image{
+                id: image_warn2
+                source: "image/icon_warning.png"
+                width: 120
+                height: 120
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: 50
+            }
+            Column{
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.horizontalCenterOffset: 50
+                spacing: 50
+                Text{
+                    color: color_red
+                    font.family: font_noto_r.name
+                    font.pixelSize: 35
+                    text: "로봇이 수동이동 중입니다."
+                }
+                Rectangle{
+                    width: 140
+                    height: 70
+                    radius: 10
+                    color: "transparent"
+                    border.color: color_red
+                    border.width: 3
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 25
+                        color: color_red
+                        text: "원래대로"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onPressed:{
+                            click_sound.play();
+                            parent.color = color_dark_black;
+                        }
+                        onReleased:{
+                            parent.color = "transparent";
+                            supervisor.setMotorLock(!motor_lock);
+                            supervisor.moveStopFlag();
+                            supervisor.writelog("[USER INPUT] MOVING PAUSED : MOTOR LOCK EANBLE");
+                        }
+                    }
+                }
+            }
+
+        }
+
     }
 
 
@@ -413,11 +601,14 @@ Item {
                 if(motor_lock)
                     supervisor.writelog("[QML] Motor Lock : false");
                 motor_lock = false;
+                popup_motor_lock.close();
+                popup_motor_lock_off.open();
             }else{
                 if(!motor_lock){
                     supervisor.writelog("[QML] Motor Lock : true");
                 }
                 motor_lock = true;
+                popup_motor_lock_off.close();
                 if(supervisor.getStateMoving() === 4){
                     robot_paused = true;
                     popup_pause.visible = true;
@@ -468,6 +659,13 @@ Item {
         id: voice_serving
         volume: volume_voice/100
         source: supervisor.getVoice("serving");
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
 
     Column{

@@ -15,6 +15,7 @@ Item {
     width: 1280
     height: 800
     property var local_find_state: 0
+//    property bool debug_mode: false
     Component.onCompleted: {
         supervisor.setMotorLock(true);
         show_loading();
@@ -248,6 +249,23 @@ Item {
         }
     }
     Item_buttons{
+        id: btn_pass
+        visible: debug_mode
+        width: 200
+        height: 80
+        type: "round_text"
+        text: "넘어 가기"
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.bottomMargin: 150
+        anchors.rightMargin: 50
+        enabled: false
+        onClicked: {
+            click_sound.play();
+            loadPage(pmap);
+        }
+    }
+    Item_buttons{
         id: btn_right
         visible: local_find_state===2
         width: 200
@@ -262,7 +280,8 @@ Item {
             click_sound.play();
             supervisor.writelog("[ANNOTATION] Localization : Success");
             supervisor.confirmLocalization();
-            loadPage(pmap);
+//            loadPage(pmap);
+            backPage();
 //                annot_pages.sourceComponent = page_annot_menu;
         }
     }
@@ -282,7 +301,8 @@ Item {
             click_sound.play();
             supervisor.writelog("[ANNOTATION] Localization : Success");
             supervisor.confirmLocalization();
-            loadPage(pmap);//annot_pages.sourceComponent = page_annot_menu;
+            backPage();
+//            loadPage(pmap);//annot_pages.sourceComponent = page_annot_menu;
         }
     }
     Item_buttons{
@@ -319,6 +339,21 @@ Item {
             local_find_state = 3;
             map.setViewer("localization");
             timer_check_localization2.start();
+        }
+    }
+    MouseArea{
+        width: 50
+        height: 50
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        property var count: 0
+        onClicked:{
+            print(count);
+            if(count++ > 4){
+                count = 0;
+                print("???????????");
+                debug_mode = true;
+            }
         }
     }
 }

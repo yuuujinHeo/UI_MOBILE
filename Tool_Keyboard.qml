@@ -20,6 +20,7 @@ Popup {
     }
 
     property var owner
+    property string owner_text: ""
 
     property bool is_ko: true
     property bool is_shift: false
@@ -41,6 +42,7 @@ Popup {
     Component.onCompleted: {
         setHanEn();
     }
+
 
     onIs_koChanged: {
         setHanEn();
@@ -119,6 +121,7 @@ Popup {
         }
     }
     onOpened: {
+        print("keyboard opened : ",owner_text);
         emitter.initHangul();
         rect_keyboard.height = 300;
     }

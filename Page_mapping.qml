@@ -744,9 +744,7 @@ Item {
                 interval: 1000
                 onTriggered: {
                     if(supervisor.getIPCConnection()){
-                        supervisor.writelog("[MAPPING] START Mapping : Slam restart detected!")
                         loading.hide();
-//                        supervisor.setMotorLock(true);
                         supervisor.setMap(map_name);
                         detect_done = true;
                         stop();
@@ -830,12 +828,26 @@ Item {
         autoPlay: false
         volume: volume_voice/100
         source: supervisor.getVoice("start_mapping");
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
     Audio{
         id: voice_stop_mapping
         autoPlay: false
         volume: volume_voice/100
         source: supervisor.getVoice("stop_mapping");
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
 
     Popup_help{

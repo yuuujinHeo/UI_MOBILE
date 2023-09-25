@@ -2874,7 +2874,6 @@ Item {
             property var local_find_state: -1
             Component.onCompleted: {
                 statusbar.visible = true;
-//                supervisor.setMotorLock(false);
             }
             Component.onDestruction: {
                 map.setEnable(false);
@@ -2883,6 +2882,7 @@ Item {
             function show_auto(){
                 btn_slam_fullauto.visible = true;
             }
+
             SequentialAnimation{
                 id: ani_logo_up
                 running: true
@@ -4081,6 +4081,9 @@ Item {
                     }
                 }
             }else if(init_mode == 3){
+                if(supervisor.getLockStatus()===1){
+                    supervisor.setMotorLock(false);
+                }
                 //=============================== Init Check 3 : 맵 확인 ==============================//
                 var map_name = supervisor.getMapname();
                 //annotation과 map 존재여부 확인
@@ -4118,6 +4121,9 @@ Item {
                     }
                 }
             }else if(init_mode == 4){
+                if(supervisor.getLockStatus()===1){
+                    supervisor.setMotorLock(false);
+                }
                 //======================= Init Check 4 : 로봇 상태 확인(Charging. Localization) =========================//
                 if(supervisor.getChargeStatus() === 1){
                     dochargeininit();
@@ -4125,12 +4131,18 @@ Item {
                 }else if(loader_init.item.objectName != "init_slam"){
                     supervisor.writelog("[INIT] Localization Check : Failed");
                     loader_init.sourceComponent = item_slam_init
-                }else if(supervisor.getIPCConnection() && supervisor.getLocalizationState() === 2){
+                }else if(supervisor.getIPCConnection() && supervisor.getLocalizationConfirm() === 2){
                     init_mode = 5;
                     supervisor.writelog("[INIT] Localization Check : Success");
+                }else{
+//                    print("check localization",supervisor.getLocalizationConfirm());
                 }
             }else if(init_mode == 5){
                 //=============================== Init Check 5 : 로봇 상태 확인(Motor) ==============================//
+                if(supervisor.getLockStatus()===0){
+                    supervisor.setMotorLock(true);
+                }
+
                 if(supervisor.getChargeStatus() === 1){
                     dochargeininit();
                     supervisor.writelog("[INIT] Charging Detected");

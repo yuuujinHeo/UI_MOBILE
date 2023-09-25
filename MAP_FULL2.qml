@@ -78,6 +78,11 @@ Item {
             show_button_following = false;
             show_button_lidar = false;
             show_button_location = false;
+        }else if(mode === "serving_list"){
+            show_connection = false;
+            show_button_following = false;
+            show_button_lidar = false;
+            show_button_location = false;
         }else if(mode === "map_list"){
             show_connection = false;
             show_button_following = false;
@@ -207,8 +212,8 @@ Item {
         supervisor.setFullScreen();
     }
 
-    function setCurrentLocation(num, type){
-        supervisor.selectLocation(num, type);
+    function setCurrentLocation(num){
+        supervisor.selectLocation(num);
     }
 
     function setTool(name){
@@ -239,6 +244,10 @@ Item {
     }
     function getCutFlag(){
         return supervisor.getCutBoxFlag();
+    }
+
+    function selectLocation(num){
+        map.selectLocation(num);
     }
 
     function clear(mode){

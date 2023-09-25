@@ -160,7 +160,8 @@ Item {
                                 popup_patrol_list.mode = "sequence";
                             }else if(modelData == "위치 초기화"){
                                 supervisor.writelog("[UI] MAP : move to Localization")
-                                loadPage(plocalization);
+                                supervisor.resetLocalization();
+//                                loadPage(plocalization);
                             }
                         }
                     }
@@ -1408,9 +1409,9 @@ Item {
                                 }else{
                                     click_sound.play();
                                     if(popup_add_location.curpose_mode){
-                                        map.savelocation("location_cur",select_location_type, cur_group, tfield_location.text);
+                                        supervisor.savelocation("location_cur",select_location_type, cur_group, tfield_location.text);
                                     }else{
-                                        map.savelocation("location",select_location_type,cur_group, tfield_location.text)
+                                        supervisor.savelocation("location",select_location_type,cur_group, tfield_location.text)
                                     }
                                     supervisor.writelog("[QML] MAP PAGE : SAVE LOCATION -> "+select_location_type + ", "+cur_group+", "+tfield_location.text);
                                     map.setTool("move");

@@ -184,6 +184,9 @@ public:
         slam_map_reload(getMapname());
     }
 
+    void clearRobot();
+
+    Q_INVOKABLE int getLocalizationConfirm(){return probot->localization_confirm;}
     Q_INVOKABLE bool getDrawingFlag(){return maph->getDrawingFlag();}
 
     Q_INVOKABLE bool getDrawingUndoFlag(){return maph->getDrawingUndoFlag();}
@@ -211,14 +214,14 @@ public:
     Q_INVOKABLE void setLineColor(int color){maph->setLineColor(color);}
     Q_INVOKABLE void setLineWidth(int width){maph->setLineWidth(width);}
 
-    Q_INVOKABLE void saveLocation(QString type, int groupnum, QString name){maph->saveLocation(type,groupnum,name);}
+    Q_INVOKABLE void saveLocation(QString type, int groupnum, QString name);//{maph->saveLocation(type,groupnum,name);}
     Q_INVOKABLE void clearLocation(){maph->clearLocation();}
     Q_INVOKABLE void addLocation(int x, int y,float th){maph->addLocation(x,y,th);}
     Q_INVOKABLE void addLocationCur(int x, int y,float th){maph->addLocationCur(x,y,th);}
     Q_INVOKABLE void setLocation(int x, int y, float th){maph->setLocation(x,y,th);}
     Q_INVOKABLE void editLocation(int x, int y, float th){maph->editLocation(x,y,th);}
     Q_INVOKABLE int getLocationNum(int x, int y){return maph->getLocationNum(x,y);}
-    Q_INVOKABLE void removeLocation(int num){maph->removeLocation(num);}
+    Q_INVOKABLE void removeLocation(int num);//{maph->removeLocation(num);}
     Q_INVOKABLE bool getLocationAvailable(int num);
     Q_INVOKABLE void setTableNumberAuto(){maph->setTableNumberAuto();}
 //    Q_INVOKABLE int getLocationNum(QString type){return maph->getLocationNum(type);}
@@ -241,7 +244,7 @@ public:
 
 //    Q_INVOKABLE void saveAnnotation(QString filename){maph->saveAnnotation(filename);}
 
-
+    Q_INVOKABLE void selectLocation(int num);
 
     Q_INVOKABLE void writelog(QString msg);
 
@@ -250,6 +253,8 @@ public:
     Q_INVOKABLE void saveDrawingObject();
 
 
+    Q_INVOKABLE void setLocationUp(int num);
+    Q_INVOKABLE void setLocationDown(int num);
 
 
 
@@ -344,7 +349,7 @@ public:
         ui_state = state;
     }
 
-
+    Q_INVOKABLE void resetLocalization();
     ////*********************************************  LOG 관련   ***************************************************////
     QStringList curLog;
     QString log_folder = "ui_log";
@@ -405,7 +410,7 @@ public:
 
 
     bool isSameLocation(LOCATION l1, LOCATION l2){
-        if(l1.group == l2.group && l1.number == l2.number && l1.name == l2.name){
+        if(l1.group == l2.group && l1.name == l2.name){
             return true;
         }
         return false;
@@ -519,9 +524,10 @@ public:
     Q_INVOKABLE int getLocNum(QString name);
     Q_INVOKABLE int getLocNum(int x, int y);
 
+    Q_INVOKABLE void saveLocations();
     Q_INVOKABLE int getObjectSize(QString type);
     Q_INVOKABLE void removeObject(int num);
-    Q_INVOKABLE void removeLocation(QString name);
+//    Q_INVOKABLE void removeLocation(QString name);
 
     //******************************************************************Travel line
     Q_INVOKABLE bool saveAnnotation(QString filename);
@@ -552,6 +558,7 @@ public:
 //    Q_INVOKABLE void moveTo(QString target_num);
     Q_INVOKABLE void movePause();
     Q_INVOKABLE void moveResume();
+    Q_INVOKABLE void moveStopFlag();
     Q_INVOKABLE void moveStop();
     Q_INVOKABLE void moveToCharge();
     Q_INVOKABLE void moveToWait();
