@@ -1907,6 +1907,12 @@ QString Supervisor::getLocationCallID(int num){
 //    }
 //    return "";
 }
+void Supervisor::setLocationGroup(int num, int group){
+    if(num > -1 && num < pmap->locations.size()){
+        pmap->locations[num].group = group;
+        plog->write("[ANNOTATION] SET Location Group "+QString().sprintf("%d : %d",num,group));
+    }
+}
 QString Supervisor::getLocationGroup(int num){
     int count = 0;
     for(int i=0; i<pmap->locations.size(); i++){

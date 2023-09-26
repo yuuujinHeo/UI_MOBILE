@@ -495,6 +495,7 @@ public:
     Q_INVOKABLE int getLocationGroupNum(int num);
     Q_INVOKABLE QString getLocationCallID(int num);
 
+    Q_INVOKABLE void setLocationGroup(int num, int group);
     Q_INVOKABLE void removeLocationGroup(int num);
     Q_INVOKABLE void addLocationGroup(QString name);
     Q_INVOKABLE QString getLocGroupname(int num);

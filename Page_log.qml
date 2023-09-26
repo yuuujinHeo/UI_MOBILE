@@ -79,7 +79,6 @@ Item {
             }
             date_list.currentIndex = parseInt(date);
         }
-        print("?")
     }
     function setdate(new_date){
         model_date.clear();

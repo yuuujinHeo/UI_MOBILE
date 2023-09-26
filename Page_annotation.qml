@@ -2766,6 +2766,7 @@ Item {
             function groupchange(number, group){
                 print(" group change ",number,group,details.count);
                 if(number > 1 && number < details.count){
+                    supervisor.setLocationGroup(number,group);
                     locations.get(number-2).group = group;
                     locations.get(number-2).number = 0;
                 }
@@ -3323,8 +3324,20 @@ Item {
                     anchors.fill: parent
                     color: "transparent"
                 }
+                property string location_name: ""
                 onOpened:{
                     supervisor.setMotorLock(false);
+                    if(select_location == 0){
+                        text_men.text = "수정하실 충전위치로 로봇을 이동시켜 주세요"
+                        text_loc.text = ""
+                    }else if(select_location == 1){
+                        text_men.text = "수정하실 대기위치로 로봇을 이동시켜 주세요"
+                        text_loc.text = ""
+                    }else{
+                        text_men.text = "수정하실 서빙위치로 로봇을 이동시켜 주세요"
+                        text_loc.text = "( 이름 : "+details.get(select_location).name+" )"
+                    }
+
                 }
                 onClosed:{
                     supervisor.setMotorLock(true);
@@ -3336,17 +3349,20 @@ Item {
                     Column{
                         anchors.centerIn: parent
                         Text{
+                            id: text_men
                             anchors.horizontalCenter: parent.horizontalCenter
                             font.family:font_noto_r.name
                             font.pixelSize: 60
                             color: "white"
                             text:"수정하실 서빙위치로 로봇을 이동시켜 주세요"
-                        }Text{
+                        }
+                        Text{
+                            id: text_loc
                             anchors.horizontalCenter: parent.horizontalCenter
                             font.family:font_noto_r.name
                             font.pixelSize: 40
                             color: "white"
-                            text:"("+details.get(select_location).name+")"
+                            text:location_name
                         }
                         AnimatedImage{
                             id: image_robotmoving
@@ -3396,10 +3412,10 @@ Item {
                 anchors.centerIn: parent
                 background: Rectangle{
                     anchors.fill: parent
-                    color: "transparent"
+                    color: color_dark_navy
                 }
                 width : 500
-                height: 200
+                height: 300
                 property string calltype: ""
                 property var callid: 0
                 onOpened: {
@@ -3413,8 +3429,10 @@ Item {
                 Rectangle{
                     width: parent.width
                     height: parent.height
-                    radius: 20
-                    color: color_dark_navy
+                    radius: 10
+                    border.width: 2
+                    border.color: "white"
+                    color: "transparent"
                     Text{
                         anchors.centerIn: parent
                         text: "변경하실 호출벨을 눌러주세요."
@@ -3722,6 +3740,7 @@ Item {
                     height: 180
                     type: "round_text"
                     text: "고정장애물 인식"
+                    visible: false
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[ANNOTATION] Enter : Object Map");
@@ -4872,7 +4891,7 @@ Item {
                         }
                         Item_buttonRectIcon{
                             selected: select_mode===3
-                            icon: "icon/icon-drawing-free drawing.png"
+                            icon: "image/image_slam.png"
                             name: "경로 검사"
                             onClicked: {
                                 select_mode = 3;
