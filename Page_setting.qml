@@ -8547,7 +8547,6 @@ Item {
                     }else{
                         backPage();
                     }
-
                 }
             }
         }
