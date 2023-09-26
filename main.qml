@@ -290,7 +290,7 @@ Window {
 //        voice_all_stop();
         if(cur_location == "Charging0"){
             cur_location = "충전 장소";
-            playVoice("moveCharing");
+            playVoice("moveCharging");
         }else if(cur_location == "Resting0"){
             cur_location = "대기 장소";
             playVoice("moveResting");

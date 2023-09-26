@@ -52,6 +52,7 @@ Item {
 
     function init(){
         test_move_state = 0;
+        playMusic.stop();
     }
     function movestart(){
         test_move_state = 1;
@@ -61,16 +62,18 @@ Item {
         }else if(location_name === "Resting0"){
             location_name = "대기위치";
         }
-
+        playMusic.play();
         popup_moving.location = location_name;
         popup_moving.open();
     }
     function movedone(){
+        playMusic.stop();
         test_move_state = 0;
         popup_moving.close();
         popup_notice.close();
     }
     function movefail(errnum){
+        playMusic.stop();
         popup_notice.show_localization = false;
         popup_notice.show_motorinit = false;
         popup_moving.close();
@@ -6523,6 +6526,7 @@ Item {
                             click_sound.play();
                             supervisor.writelog("[ANNOTATION] Test Moving : Path Cancled")
                             supervisor.moveStop();
+                            playMusic.stop();
                             timer_check_pause.start();
                         }
                     }
@@ -6643,5 +6647,19 @@ Item {
     }
     Tool_Keyboard{
         id: keyboard
+    }
+    Audio{
+        id: playMusic
+        autoPlay: false
+        volume: volume_bgm/100
+        source: "bgm/song.mp3"
+        loops: 99
+        property bool isplaying: false
+        onStopped: {
+            isplaying = false;
+        }
+        onPlaying:{
+            isplaying = true;
+        }
     }
 }
