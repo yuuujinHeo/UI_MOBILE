@@ -2679,6 +2679,8 @@ Item {
             }
             Component.onDestruction: {
                 map_location_list.setEnable(false);
+                map_location_list.setCurrentLocation(-1);
+
             }
 
             Timer{

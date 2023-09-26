@@ -2824,12 +2824,12 @@ QVector<int> Supervisor::getOrigin(){
 
 void Supervisor::moveToServingTest(QString name){
     if(ui_state == UI_STATE_RESTING || ui_state == UI_STATE_MOVEFAIL || ui_state == UI_STATE_PICKUP){
-        if(name.left(8) == "Charging"){
+        if(name.left(8) == "Charging" || name == "충전위치"){
             current_target = getLocation("Charging0");
             ui_state = UI_STATE_MOVING;
             is_test_moving = true;
             plog->write("[COMMAND] Serving Test : "+name);
-        }else if(name.left(7) == "Resting"){
+        }else if(name.left(7) == "Resting"|| name == "대기위치"){
             current_target = getLocation("Resting0");
             ui_state = UI_STATE_MOVING;
             is_test_moving = true;
