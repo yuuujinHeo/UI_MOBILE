@@ -1401,7 +1401,6 @@ Item {
                 speed: 0.5
                 anchors.bottomMargin: -100
             }
-
             Item_buttons{
                 id: btn_right2
                 width: 200
