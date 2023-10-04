@@ -298,7 +298,7 @@ Window {
             cur_location = "퇴식 장소";
             playVoice("moveResting");
         }else{
-            if(supervisor.isCallingMode()){
+            if(supervisor.isCallingMode() || supervisor.getSetting("ROBOT_HW","type") === "CLEANING"){
                 playVoice("startCalling");
             }else{
                 playVoice("startServing");
@@ -372,7 +372,7 @@ Window {
             supervisor.writelog("[UI] Annotation Check : Moving Done (Serving Pickup) ");
             loader_page.item.movedone();
         }else{
-            if(supervisor.isCallingMode()){
+            if(supervisor.isCallingMode() || supervisor.getSetting("ROBOT_HW","type") === "CLEANING"){
                 supervisor.writelog("[UI] Force Page Change Pickup(Calling) : "+ loader_page.item.pos_name);
                 loadPage(ppickupCall);
                 loader_page.item.init();
@@ -404,10 +404,11 @@ Window {
     }
 
     function need_init(){
+        print("need_init");
         if(!debug_mode){
             if(loader_page.item.objectName != "page_annotation" && loader_page.item.objectName != "page_mapping"){
                 supervisor.writelog("[UI] Force Page Change : Robot disconnected");
-//                loadPage(pinit);
+                loadPage(pinit);
             }
         }
     }

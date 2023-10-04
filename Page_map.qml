@@ -160,6 +160,7 @@ Item {
                                 popup_patrol_list.mode = "sequence";
                             }else if(modelData == "위치 초기화"){
                                 supervisor.writelog("[UI] MAP : move to Localization")
+                                debug_mode = false;
                                 supervisor.resetLocalization();
 //                                loadPage(plocalization);
                             }

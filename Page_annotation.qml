@@ -2714,7 +2714,7 @@ Item {
                 for(var i=0; i<supervisor.getLocationNum("Serving"); i++){
                     locations.append({"name": supervisor.getLocationName(i,"Serving"),
                                    "group":supervisor.getLocationGroupNum(i),
-                                    "call_id" : supervisor.getLocationCallID(2+i),
+                                    "call_id" : supervisor.getLocationCallID(3+i),
                                    "error":false});
                 }
                 update();
@@ -3531,34 +3531,73 @@ Item {
                 anchors.centerIn: parent
                 background: Rectangle{
                     anchors.fill: parent
-                    color: color_dark_navy
+                    color: "transparent"
                 }
-                width : 500
-                height: 300
+                width : 1280
+                height: 400
                 property string calltype: ""
                 property var callid: 0
                 onOpened: {
                     supervisor.setCallbell(calltype, callid);
+                    cb_callbell_force.checked = false;
+                    if(calltype === "Resting" || calltype === "Cleaning"){
+                        row_call_force.visible = true;
+                    }else{
+                        row_call_force.visible = false;
+                    }
                 }
                 onClosed: {
                     supervisor.setCallbell("", -1);
+                    supervisor.setCallbellForce(calltype,cb_callbell_force.checked);
                 }
 
 
                 Rectangle{
                     width: parent.width
                     height: parent.height
-                    radius: 10
-                    border.width: 2
-                    border.color: "white"
-                    color: "transparent"
-                    Text{
+                    color: color_dark_navy
+                    Column{
                         anchors.centerIn: parent
-                        text: "변경하실 호출벨을 눌러주세요."
-                        font.family: font_noto_r.name
-                        font.pixelSize: 25
-                        color: "white"
+                        spacing: 30
+                        Text{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: "변경하실 호출벨을 눌러주세요."
+                            font.family: font_noto_r.name
+                            font.pixelSize: 50
+                            color: "white"
+                        }
+                        Row{
+                            id: row_call_force
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 50
+                            CheckBox{
+                                id: cb_callbell_force
+                                anchors.verticalCenter: parent.verticalCenter
+                                width:40
+                                height:40
+                            }
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: "강제 귀환"
+                                color: "white"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 30
+                            }
+                        }
+                        Item_buttons{
+                            width: 180
+                            height: 60
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            type: "round_text"
+                            text: "사용안함"
+                            onClicked: {
+                                click_sound.play();
+                                supervisor.clear_call();
+                                popup_add_callbell.close();
+                            }
+                        }
                     }
+
                 }
             }
             Popup{

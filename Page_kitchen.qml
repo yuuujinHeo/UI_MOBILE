@@ -66,6 +66,7 @@ Item {
 
         if(supervisor.isCallingMode() || supervisor.getCallQueueSize() > 0){
             print("!!!!!!",supervisor.isCallingMode(),supervisor.getCallQueueSize())
+            popup_clean_calling.cleaninglocation = false;
             popup_clean_calling.open();
         }
 
@@ -77,8 +78,8 @@ Item {
     }
 
     function cleaning(){
-        popup_clean_calling.close();
-        popup_clean_location.open();
+        popup_clean_calling.cleaninglocation = true;
+        popup_clean_calling.open();
     }
 
     property int tray_num: 3
@@ -469,7 +470,7 @@ Item {
                                         click_sound.play();
                                         count_resting = 0;
                                         if(cur_table == (col_num*row_num*cur_page)+index+1){
-                                            cur_table = 0;
+                                            cur_table = -1;
                                         }else{
                                             if(supervisor.isExistLocation(-1,(col_num*row_num*cur_page)+index)){
                                                 cur_table = (col_num*row_num*cur_page)+index+1;
@@ -1095,7 +1096,7 @@ Item {
                 }else{
                     click_sound_no.play();
                     count_resting = 0;
-                    cur_table = 0;
+                    cur_table = -1;
                 }
             }
             onReleased:{
@@ -1108,9 +1109,9 @@ Item {
                         }
                         supervisor.startServing();
                     }else{
-                        supervisor.goSerivng(model_group.get(cur_group).num,cur_table);
+                        supervisor.goServing(model_group.get(cur_group).num,cur_table);
                     }
-                    cur_table = 0;
+                    cur_table = -1;
                 }else{
                     popup_notice.open();
                 }
@@ -1500,7 +1501,7 @@ Item {
                         onReleased:{
                             btn_menu.color = "white";
                             count_resting = 0;
-                            cur_table = 0;
+                            cur_table = -1;
                             loadPage(pmenu);
                         }
                     }
@@ -1544,7 +1545,7 @@ Item {
                     onPressed:{
                         btn_charge.color = color_light_gray;
                         count_resting = 0;
-                        cur_table = 0;
+                        cur_table = -1;
                         if(btn_charge.active){
                             click_sound.play();
                             go_charge = true;
@@ -1601,7 +1602,7 @@ Item {
                     onPressed:{
                         btn_resting.color = color_light_gray;
                         count_resting = 0;
-                        cur_table = 0;
+                        cur_table = -1;
                         if(btn_resting.active){
                             click_sound.play();
                         }else{
@@ -2076,6 +2077,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            click_sound.play();
                             supervisor.clearCallQueue();
                         }
                     }
@@ -2103,6 +2105,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            click_sound.play();
                             supervisor.cleanTray();
                         }
                     }
@@ -2130,6 +2133,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            click_sound.play();
                             supervisor.moveToWait();
                         }
                     }
@@ -2157,6 +2161,7 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
+                            click_sound.play();
                             popup_clean_calling.close();
                         }
                     }

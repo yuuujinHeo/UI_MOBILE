@@ -342,7 +342,7 @@ public:
 
     ////*********************************************  MOVING 관련   *************************************************////
     Q_INVOKABLE bool isCallingMode(){return probot->is_calling;}
-    Q_INVOKABLE void goSerivng(int group, int table);
+    Q_INVOKABLE void goServing(int group, int table);
     Q_INVOKABLE LOCATION getLocationbyCall(QString call);
     Q_INVOKABLE LOCATION getLocation(QString name);
     Q_INVOKABLE LOCATION getLocationbyID(int id);
@@ -468,6 +468,7 @@ public:
     Q_INVOKABLE QString getCall(int id){return pmap->locations[id].call_id;}
     Q_INVOKABLE LOCATION getCallLocation(QString id);
     Q_INVOKABLE void setCallbell(QString type, int id);
+    Q_INVOKABLE void setCallbellForce(QString type, bool onoff);
     Q_INVOKABLE void acceptCall(bool yes);
     LOCATION getloc(QString name){
         for(int i=0; i<pmap->locations.size(); i++){

@@ -235,9 +235,7 @@ void Supervisor::new_call(){
             if(match_call){
                 call_queue.push_back(call->getBellID());
                 plog->write("[SUPERVISOR] NEW CALL (queue size "+QString::number(call_queue.size())+" ) : " + call->getBellID());
-
             }else{
-
                 plog->write("[SUPERVISOR] NEW CALL (Wrong ID ->Ignored) : " + call->getBellID());
 
             }
@@ -245,36 +243,55 @@ void Supervisor::new_call(){
     }
 }
 
-void Supervisor::setCallbell(QString type, int id){
-    //충전, 대기 위치가 1개보다 넘을 때를 대비해서 setting_Call_num 값을 세팅하는 용도
-    //각 타입과 타입 내 번호를 받아서 매핑.
-    int serving_num = -1;
-    setting_call_num = -1;
-    int resting_start_num = -1;
-    int num = 0;
-    for(int i=0; i<pmap->locations.size(); i++){
-        if(pmap->locations[i].type == type){
-            if(type == "Serving"){
-                qDebug() << i << num << id-2;
-                if(num == id-2){
-                    serving_num = i;
-                    break;
-                }else{
-                    num++;
-                }
-            }else if(type == "Resting"){
-                resting_start_num = i;
-                break;
-            }
+void Supervisor::setCallbellForce(QString type, bool onoff){
+    if(type == "Resting"){
+        if(onoff){
+            setSetting("ROBOT_SW/force_resting","true");
+        }else{
+            setSetting("ROBOT_SW/force_resting","false");
+        }
+    }else if(type == "Cleaning"){
+        if(onoff){
+            setSetting("ROBOT_SW/force_cleaning","true");
+        }else{
+            setSetting("ROBOT_SW/force_cleaning","false");
         }
     }
-    if(type == "Charging"){
-        setting_call_num = 0;
-    }else if(type == "Serving"){
-        setting_call_num = serving_num;
-    }else if(type == "Resting"){
-        setting_call_num = resting_start_num;
-    }
+}
+
+void Supervisor::setCallbell(QString type, int id){
+    setting_call_num = id;
+    //충전, 대기 위치가 1개보다 넘을 때를 대비해서 setting_Call_num 값을 세팅하는 용도
+    //각 타입과 타입 내 번호를 받아서 매핑.
+//    int serving_num = -1;
+//    setting_call_num = -1;
+//    int resting_start_num = -1;
+//    int num = 0;
+//    for(int i=0; i<pmap->locations.size(); i++){
+//        if(pmap->locations[i].type == type){
+//            if(type == "Serving"){
+//                qDebug() << i << num << id-2;
+//                if(num == id-2){
+//                    serving_num = i;
+//                    break;
+//                }else{
+//                    num++;
+//                }
+//            }else if(type == "Resting"){
+//                resting_start_num = i;
+//                break;
+//            }
+//        }
+//    }
+//    if(type == "Charging"){
+//        setting_call_num = 0;
+//    }else if(type == "Serving"){
+//        setting_call_num = serving_num;
+//    }else if(type == "Resting"){
+//        setting_call_num = resting_start_num;
+//    }else if(type == "Cleaning"){
+//        setting_call_num = 2;
+//    }
     plog->write("[SETTING] " + type + " " + QString::number(id)+" callbell setting num : "+QString::number(setting_call_num));
 }
 
@@ -501,25 +518,6 @@ void Supervisor::readSetting(QString map_name){
     setting_anot.endGroup();
 
 
-    bool cleaning_exist = false;
-    setting_anot.beginGroup("cleaning_locations");
-    loc_str = setting_anot.value("loc0").toString();
-    strlist = loc_str.split(",");
-    if(strlist.size()>1){
-        temp_loc.point = cv::Point2f(strlist[1].toFloat(),strlist[2].toFloat());
-        temp_loc.angle = strlist[3].toFloat();
-        temp_loc.type = "Cleaning";
-        temp_loc.group = 0;
-        temp_loc.name = strlist[0];
-        if(strlist.size() > 4)
-            temp_loc.call_id = strlist[4];
-        else
-            temp_loc.call_id = "";
-        cleaning_exist = true;
-        pmap->locations.push_back(temp_loc);
-    }
-    setting_anot.endGroup();
-
     setting_anot.beginGroup("resting_locations");
     loc_str = setting_anot.value("loc0").toString();
     strlist = loc_str.split(",");
@@ -534,11 +532,29 @@ void Supervisor::readSetting(QString map_name){
         else
             temp_loc.call_id = "";
         pmap->locations.push_back(temp_loc);
-        if(!cleaning_exist){
-            temp_loc.type = "Cleaning";
+
+    }
+    setting_anot.endGroup();
+
+    setting_anot.beginGroup("cleaning_locations");
+    loc_str = setting_anot.value("loc0").toString();
+    strlist = loc_str.split(",");
+    if(strlist.size()>1){
+        temp_loc.point = cv::Point2f(strlist[1].toFloat(),strlist[2].toFloat());
+        temp_loc.angle = strlist[3].toFloat();
+        temp_loc.type = "Cleaning";
+        temp_loc.group = 0;
+        temp_loc.name = strlist[0];
+        if(strlist.size() > 4)
+            temp_loc.call_id = strlist[4];
+        else
             temp_loc.call_id = "";
-            pmap->locations.push_back(temp_loc);
-        }
+        pmap->locations.push_back(temp_loc);
+    }else {
+        temp_loc.type = "Cleaning";
+        temp_loc.name = "Cleaning0";
+        temp_loc.call_id = "";
+        pmap->locations.push_back(temp_loc);
     }
     setting_anot.endGroup();
 
@@ -639,6 +655,7 @@ void Supervisor::readSetting(QString map_name){
 
 void Supervisor::editLocation(int num){
     plog->write("[ANNOTATION] Edit Location "+QString::number(num)+" : "+QString().sprintf("(%f,%f,%f) -> (%f,%f,%f)",
+                                                                                           pmap->locations[num].point.x,pmap->locations[num].point.y,pmap->locations[num].angle,
                                                                                                  probot->lastPose.point.x,probot->lastPose.point.y,probot->lastPose.angle));
     pmap->locations[num].point = probot->lastPose.point;
     pmap->locations[num].angle = probot->lastPose.angle;
@@ -2441,7 +2458,7 @@ bool Supervisor::saveAnnotation(QString filename){
             resting_num++;
         }else if(pmap->locations[i].type == "Cleaning"){
             str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle)+","+pmap->locations[i].call_id;
-            settings.setValue("cleaning_locations/loc"+QString::number(resting_num),str_name);
+            settings.setValue("cleaning_locations/loc"+QString::number(cleaning_num),str_name);
             cleaning_num++;
         }else if(pmap->locations[i].type == "Serving"){
             QString groupname = "serving_" + QString::number(pmap->locations[i].group);
@@ -2503,7 +2520,7 @@ void Supervisor::setTray(int tray_num, int table_num){
 }
 
 void Supervisor::startServing(){
-    if(ui_state == UI_STATE_RESTING){
+    if(ui_state == UI_STATE_RESTING|| ui_state == UI_STATE_CLEANING){
         QString tray_str = "";
         for(int i = 0; i<probot->trays.size(); i++){
             if(!probot->trays[i].empty){
@@ -2568,7 +2585,7 @@ void Supervisor::moveStop(){
     QMetaObject::invokeMethod(mMain, "movestopped");
 }
 void Supervisor::moveToCharge(){
-    if(ui_state == UI_STATE_RESTING || ui_state == UI_STATE_MOVEFAIL){
+    if(ui_state == UI_STATE_RESTING || ui_state == UI_STATE_MOVEFAIL|| ui_state == UI_STATE_CLEANING){
         plog->write("[COMMAND] Move to Charging");
         current_target = getLocation("Charging0");
         ui_state = UI_STATE_MOVING;
@@ -2580,7 +2597,7 @@ void Supervisor::moveToCharge(){
     }
 }
 void Supervisor::moveToWait(){
-    if(ui_state == UI_STATE_RESTING|| ui_state == UI_STATE_MOVEFAIL){
+    if(ui_state == UI_STATE_RESTING|| ui_state == UI_STATE_MOVEFAIL || ui_state == UI_STATE_CLEANING){
         plog->write("[COMMAND] Move to Resting");
         current_target = getLocation("Resting0");
         ui_state = UI_STATE_MOVING;
@@ -2863,7 +2880,7 @@ QVector<int> Supervisor::getOrigin(){
 }
 
 void Supervisor::moveToServingTest(QString name){
-    if(ui_state == UI_STATE_RESTING || ui_state == UI_STATE_MOVEFAIL || ui_state == UI_STATE_PICKUP){
+    if(ui_state == UI_STATE_RESTING || ui_state == UI_STATE_MOVEFAIL || ui_state == UI_STATE_PICKUP|| ui_state == UI_STATE_CLEANING){
         if(name.left(8) == "Charging" || name == "충전위치"){
             current_target = getLocation("Charging0");
             ui_state = UI_STATE_MOVING;
@@ -3406,7 +3423,7 @@ void Supervisor::onTimer(){
         break;
     }
     case UI_STATE_MOVING:{
-        static int timer_cnt = 0;
+        static int timer_cnt2 = 0;
         static bool paused = false;
         //ERROR
         if(probot->running_state == ROBOT_MOVING_PAUSED){
@@ -3485,8 +3502,8 @@ void Supervisor::onTimer(){
                             }else{
                                 plog->write("[SCHEDULER] CALLING MOVE ARRIVED (resting) ");
                             }
-                            QMetaObject::invokeMethod(mMain, "clearkitchen");
-                            ui_state = UI_STATE_CLENING;
+                            QMetaObject::invokeMethod(mMain, "waitkitchen");
+                            ui_state = UI_STATE_CLEANING;
                         }else{
                             plog->write("[SCHEDULER] GO HOME MOVING DONE -> waitkitchen");
                             QMetaObject::invokeMethod(mMain, "waitkitchen");
@@ -3494,9 +3511,29 @@ void Supervisor::onTimer(){
                             ui_state = UI_STATE_RESTING;
                         }
                     }else if(current_target.name == "Cleaning0"){
-                        QMetaObject::invokeMethod(mMain, "clearkitchen");
-                        ui_state = UI_STATE_CLENING;
-                        plog->write("[SCHEDULER] GO ClenaingLocation MOVING DONE -> clearkitchen");
+                        if(probot->is_patrol){
+                            ui_state = UI_STATE_MOVING;
+                            count_pass = 0;
+                            plog->write("[SCHEDULER] PICKUP -> AUTO PASS");
+                        }else if(probot->is_calling){
+                            if(call_queue.size() > 0){
+                                if(getCallLocation(call_queue[0]).name == "Cleaning0"){
+                                    plog->write("[SCHEDULER] CALLING MOVE ARRIVED "+call_queue[0]);
+                                    call_queue.pop_front();
+                                }else{
+                                    plog->write("[SCHEDULER] CALLING MOVE ARRIVED (max call) "+QString::number(call_queue.size()));
+                                }
+                            }else{
+                                plog->write("[SCHEDULER] CALLING MOVE ARRIVED (cleaning) ");
+                            }
+                            probot->is_calling = false;
+                            QMetaObject::invokeMethod(mMain, "clearkitchen");
+                            ui_state = UI_STATE_CLEANING;
+                        }else{
+                            plog->write("[SCHEDULER] GO HOME MOVING DONE -> clearkitchen");
+                            QMetaObject::invokeMethod(mMain, "clearkitchen");
+                            ui_state = UI_STATE_CLEANING;
+                        }
                     }else{
                         if(probot->is_calling){
                             if(call_queue.size() > 0){
@@ -3652,8 +3689,8 @@ void Supervisor::onTimer(){
                             current_target = cur_target;
                         }
                     }else{
-                        if(timer_cnt%5==0){
-                            if(count_moveto == 0){
+                        if(timer_cnt2%5==0){
+                            if(count_moveto++ == 0){
                                 if(current_target.name.left(7) == "Resting" || current_target.name.left(8) == "Cleaning"){
                                     int comeback_preset = getSetting("ROBOT_SW","comback_preset").toInt();
                                     if(comeback_preset == 0){
@@ -3698,7 +3735,7 @@ void Supervisor::onTimer(){
                             }
                         }
                     }
-                    timer_cnt++;
+                    timer_cnt2++;
                 }
                 is_test_moving = false;
             }else if(probot->running_state == ROBOT_MOVING_MOVING){
@@ -3742,7 +3779,7 @@ void Supervisor::onTimer(){
         }
         break;
     }
-    case UI_STATE_CLENING:{
+    case UI_STATE_CLEANING:{
         break;
     }
     case UI_STATE_PICKUP:{
@@ -3764,6 +3801,27 @@ void Supervisor::onTimer(){
                 ui_state = UI_STATE_MOVING;
                 count_pass = 0;
                 plog->write("[SCHEDULER] PICKUP -> AUTO PASS");
+            }
+        }
+        for(int i=0; i<call_queue.size(); i++){
+            if(getCallLocation(call_queue[i]).name == "Resting0" && getSetting("ROBOT_SW","force_resting") == "true"){
+                plog->write("[SCHEDULER] PICKUP -> FORCE MOVE RESTING");
+                count_pass = 0;
+                ui_state = UI_STATE_MOVING;
+                cmd_accept = false;
+                QString temp = call_queue[i];
+                call_queue.clear();
+                call_queue.append(temp);
+                break;
+            }else if(getCallLocation(call_queue[i]).name == "Cleaning0" && getSetting("ROBOT_SW","force_cleaning") == "true"){
+                plog->write("[SCHEDULER] PICKUP -> FORCE MOVE CLEANING");
+                count_pass = 0;
+                ui_state = UI_STATE_MOVING;
+                cmd_accept = false;
+                QString temp = call_queue[i];
+                call_queue.clear();
+                call_queue.append(temp);
+                break;
             }
         }
         break;
@@ -3886,8 +3944,8 @@ void Supervisor::readLog(QDateTime date){
     }
 }
 
-void Supervisor::goSerivng(int group, int table){
-    if(ui_state == UI_STATE_RESTING){
+void Supervisor::goServing(int group, int table){
+    if(ui_state == UI_STATE_RESTING || ui_state == UI_STATE_CLEANING){
         LOCATION target;
         patrol_mode = PATROL_NONE;
         int target_num = -1;
