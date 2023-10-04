@@ -144,6 +144,7 @@ typedef struct{
 
     int localization_confirm = 0;
 
+
     int err_code = 0;
 
     POSE curPose;

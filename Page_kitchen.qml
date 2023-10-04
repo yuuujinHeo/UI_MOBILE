@@ -75,6 +75,12 @@ Item {
             supervisor.setMotorLock(true);
         }
     }
+
+    function cleaning(){
+        popup_clean_calling.close();
+        popup_clean_location.open();
+    }
+
     property int tray_num: 3
     property int table_num: 5
     property int group_num: 1
@@ -1939,6 +1945,7 @@ Item {
         anchors.centerIn: parent
         width: 1280
         height: 800
+        property bool cleaninglocation: false
         background: Rectangle{
             anchors.fill: parent
             color: color_dark_black
@@ -2044,12 +2051,12 @@ Item {
                 anchors.bottomMargin: 100
                 anchors.horizontalCenter: parent.horizontalCenter
                 spacing: 30
-
                 Rectangle{
                     width: 250
                     height: 90
                     radius: 19
                     color:"#d0d0d0"
+                    visible: calling_list.visible
                     Image{
                         id: imm2
                         source: "icon/btn_yes.png"
@@ -2073,13 +2080,92 @@ Item {
                         }
                     }
                 }
-
-
-
                 Rectangle{
                     width: 250
                     height: 90
                     radius: 20
+                    visible: popup_clean_calling.cleaninglocation && calling_list.visible
+                    color: "#d0d0d0"
+                    Rectangle{
+                        width: 240
+                        height: 80
+                        anchors.centerIn: parent
+                        radius: 19
+                        color: "white"
+                        Text{
+                            text:"호출위치로"
+                            font.family: font_noto_b.name
+                            font.pixelSize: 30
+                            color:"#282828"
+                            anchors.centerIn: parent
+                        }
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.cleanTray();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 250
+                    height: 90
+                    radius: 20
+                    visible: popup_clean_calling.cleaninglocation
+                    color: "#d0d0d0"
+                    Rectangle{
+                        width: 240
+                        height: 80
+                        anchors.centerIn: parent
+                        radius: 19
+                        color: "white"
+                        Text{
+                            text:"대기위치로"
+                            font.family: font_noto_b.name
+                            font.pixelSize: 30
+                            color:"#282828"
+                            anchors.centerIn: parent
+                        }
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            supervisor.moveToWait();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 250
+                    height: 90
+                    radius: 20
+                    visible: popup_clean_calling.cleaninglocation
+                    color: "#d0d0d0"
+                    Rectangle{
+                        width: 240
+                        height: 80
+                        anchors.centerIn: parent
+                        radius: 19
+                        color: "white"
+                        Text{
+                            text:"닫기"
+                            font.family: font_noto_b.name
+                            font.pixelSize: 30
+                            color:"#282828"
+                            anchors.centerIn: parent
+                        }
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup_clean_calling.close();
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 250
+                    height: 90
+                    radius: 20
+                    visible: !popup_clean_calling.cleaninglocation
                     color: "#d0d0d0"
                     Rectangle{
                         width: 240

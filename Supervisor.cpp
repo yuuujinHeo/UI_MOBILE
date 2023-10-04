@@ -394,6 +394,12 @@ void Supervisor::readSetting(QString map_name){
     probot->radius = setting_robot.value("radius").toFloat();
     pmap->robot_radius = probot->radius;
     probot->type = setting_robot.value("type").toString();
+    if(probot->type == "CLEANING"){
+        use_cleaning_location = true;
+    }else{
+        use_cleaning_location = false;
+    }
+
     setting_robot.endGroup();
 
     plog->write("[SUPERVISOR] READ SETTING : robot_hw done");
@@ -495,11 +501,28 @@ void Supervisor::readSetting(QString map_name){
     setting_anot.endGroup();
 
 
-    qDebug() << "??";
+    bool cleaning_exist = false;
+    setting_anot.beginGroup("cleaning_locations");
+    loc_str = setting_anot.value("loc0").toString();
+    strlist = loc_str.split(",");
+    if(strlist.size()>1){
+        temp_loc.point = cv::Point2f(strlist[1].toFloat(),strlist[2].toFloat());
+        temp_loc.angle = strlist[3].toFloat();
+        temp_loc.type = "Cleaning";
+        temp_loc.group = 0;
+        temp_loc.name = strlist[0];
+        if(strlist.size() > 4)
+            temp_loc.call_id = strlist[4];
+        else
+            temp_loc.call_id = "";
+        cleaning_exist = true;
+        pmap->locations.push_back(temp_loc);
+    }
+    setting_anot.endGroup();
+
     setting_anot.beginGroup("resting_locations");
     loc_str = setting_anot.value("loc0").toString();
     strlist = loc_str.split(",");
-    qDebug() << "??? "<<strlist.size();
     if(strlist.size()>1){
         temp_loc.point = cv::Point2f(strlist[1].toFloat(),strlist[2].toFloat());
         temp_loc.angle = strlist[3].toFloat();
@@ -511,6 +534,11 @@ void Supervisor::readSetting(QString map_name){
         else
             temp_loc.call_id = "";
         pmap->locations.push_back(temp_loc);
+        if(!cleaning_exist){
+            temp_loc.type = "Cleaning";
+            temp_loc.call_id = "";
+            pmap->locations.push_back(temp_loc);
+        }
     }
     setting_anot.endGroup();
 
@@ -1032,8 +1060,8 @@ void Supervisor::checkRobotINI(){
     if(getSetting("ROBOT_SW","obs_preview_time").toInt()==0){
         setSetting("ROBOT_SW/obs_preview_time","3.0");
     }
-    if(getSetting("ROBOT_SW","use_obs_preivew") == ""){
-        setSetting("ROBOT_SW/use_obs_preivew","true");
+    if(getSetting("ROBOT_SW","use_obs_preview") == ""){
+        setSetting("ROBOT_SW/use_obs_preview","true");
     }
     if(getSetting("ROBOT_SW","use_avoid") == ""){
         setSetting("ROBOT_SW/use_avoid","false");
@@ -2391,6 +2419,7 @@ bool Supervisor::saveAnnotation(QString filename){
     int resting_num = 0;
     int charging_num = 0;
     int serving_num = 0;
+    int cleaning_num = 0;
     int group_num[pmap->location_groups.size()];
     for(int i=0; i<pmap->location_groups.size(); i++)
         group_num[i] = 0;
@@ -2410,6 +2439,10 @@ bool Supervisor::saveAnnotation(QString filename){
             str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle)+","+pmap->locations[i].call_id;
             settings.setValue("resting_locations/loc"+QString::number(resting_num),str_name);
             resting_num++;
+        }else if(pmap->locations[i].type == "Cleaning"){
+            str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle)+","+pmap->locations[i].call_id;
+            settings.setValue("cleaning_locations/loc"+QString::number(resting_num),str_name);
+            cleaning_num++;
         }else if(pmap->locations[i].type == "Serving"){
             QString groupname = "serving_" + QString::number(pmap->locations[i].group);
             str_name = pmap->locations[i].name + QString().sprintf(",%f,%f,%f",pmap->locations[i].point.x,pmap->locations[i].point.y,pmap->locations[i].angle)+","+pmap->locations[i].call_id;
@@ -2417,6 +2450,7 @@ bool Supervisor::saveAnnotation(QString filename){
             group_num[pmap->locations[i].group]++;
         }
     }
+    settings.setValue("cleaning_locations/num",cleaning_num);
     settings.setValue("resting_locations/num",resting_num);
     settings.setValue("serving_locations/group",pmap->location_groups.size());
     settings.setValue("other_locations/num",other_num);
@@ -3335,20 +3369,39 @@ void Supervisor::onTimer(){
 //                }
 
             }else if(probot->server_call_size == -1){
-                ipc->handsdown();
-                probot->server_call_size = 0;
+                if(use_cleaning_location){
+                    ipc->handsdown();
+                    probot->server_call_size = 0;
+                    //세팅 되지 않음 -> 고 홈
+                    plog->write("[SUPERVISOR] MOVING (No Target) : Back to CleaningLocation");
+                    probot->call_moving_count = 0;
+                    current_target = getLocation("Cleaning0");
+                    ui_state = UI_STATE_MOVING;
+                }else{
+                    ipc->handsdown();
+                    probot->server_call_size = 0;
+                    //세팅 되지 않음 -> 고 홈
+                    plog->write("[SUPERVISOR] MOVING (No Target) : Back to Resting");
+                    probot->call_moving_count = 0;
+                    current_target = getLocation("Resting0");
+                    ui_state = UI_STATE_MOVING;
+
+                }
+            }
+        }else{
+            if(use_cleaning_location){
+                //세팅 되지 않음 -> 고 홈
+                plog->write("[SUPERVISOR] MOVING (No Target) : Back to CleaningLocation");
+                probot->call_moving_count = 0;
+                current_target = getLocation("Cleaning0");
+                ui_state = UI_STATE_MOVING;
+            }else{
                 //세팅 되지 않음 -> 고 홈
                 plog->write("[SUPERVISOR] MOVING (No Target) : Back to Resting");
                 probot->call_moving_count = 0;
                 current_target = getLocation("Resting0");
                 ui_state = UI_STATE_MOVING;
             }
-        }else{
-            //세팅 되지 않음 -> 고 홈
-            plog->write("[SUPERVISOR] MOVING (No Target) : Back to Resting");
-            probot->call_moving_count = 0;
-            current_target = getLocation("Resting0");
-            ui_state = UI_STATE_MOVING;
         }
         break;
     }
@@ -3440,6 +3493,10 @@ void Supervisor::onTimer(){
                             ipc->handsup();
                             ui_state = UI_STATE_RESTING;
                         }
+                    }else if(current_target.name == "Cleaning0"){
+                        QMetaObject::invokeMethod(mMain, "clearkitchen");
+                        ui_state = UI_STATE_CLENING;
+                        plog->write("[SCHEDULER] GO ClenaingLocation MOVING DONE -> clearkitchen");
                     }else{
                         if(probot->is_calling){
                             if(call_queue.size() > 0){
@@ -3597,7 +3654,7 @@ void Supervisor::onTimer(){
                     }else{
                         if(timer_cnt%5==0){
                             if(count_moveto == 0){
-                                if(current_target.name.left(7) == "Resting"){
+                                if(current_target.name.left(7) == "Resting" || current_target.name.left(8) == "Cleaning"){
                                     int comeback_preset = getSetting("ROBOT_SW","comback_preset").toInt();
                                     if(comeback_preset == 0){
                                         //무브 명령 보냄

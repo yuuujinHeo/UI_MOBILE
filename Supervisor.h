@@ -55,6 +55,7 @@ public:
     //순회 모드, 순회 중 픽업해주세요 화면 띄울건지.
     int patrol_mode = PATROL_NONE;
     bool use_patrol_pickup = false;
+    bool use_cleaning_location = false;
 
     //
     ////*********************************************  STRUCT   ***************************************************////

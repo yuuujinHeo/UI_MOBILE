@@ -488,6 +488,7 @@ Item {
                                     popup_help_setting.addLine("서빙용 : 호출기능을 사용하지 않고 각 테이블을 서빙만 합니다.");
                                     popup_help_setting.addLine("호출용 : 서빙기능을 사용하지 않고 로봇이 대기하다가 호출이 울리면 이동합니다.");
                                     popup_help_setting.addLine("서빙+호출용 : 서빙기능과 호출기능을 동시에 사용합니다. 서빙을 우선적으로 진행합니다.");
+                                    popup_help_setting.addLine("퇴식전용 : 서빙+호출용과 동일하지만 서빙(호출)위치를 다녀온 뒤 퇴식위치로 이동합니다.");
                                 }
                             }
                         }
@@ -506,7 +507,7 @@ Item {
                                 onCurrentIndexChanged: {
                                     ischanged = true;
                                 }
-                                model:["서빙용","호출용","서빙+호출용"]
+                                model:["서빙용","호출용","서빙+호출용", "퇴식전용"]
                             }
                         }
                     }
@@ -8671,6 +8672,8 @@ Item {
                 supervisor.setSetting("ROBOT_HW/type","CALLING");
             }else if(combo_platform_type.currentIndex == 2){
                 supervisor.setSetting("ROBOT_HW/type","BOTH");
+            }else if(combo_platform_type.currentIndex == 3){
+                supervisor.setSetting("ROBOT_HW/type","CLEANING");
             }
         }
 
@@ -8871,7 +8874,7 @@ Item {
         }
 
         if(st_v.ischanged){
-            supervisor.setSetting("ROBOT_SW/st_v"                   ,st_v.text);
+            supervisor.setSetting("ROBOT_SW/st_v",st_v.text);
         }
 
         if(combo_wheel_dir.ischanged){
@@ -9038,8 +9041,10 @@ Item {
             combo_platform_type.currentIndex = 0;
         }else if(supervisor.getSetting("ROBOT_HW","type") === "CALLING"){
             combo_platform_type.currentIndex = 1;
-        }else{
+        }else if(supervisor.getSetting("ROBOT_HW","type") === "BOTH"){
             combo_platform_type.currentIndex = 2;
+        }else if(supervisor.getSetting("ROBOT_HW","type") === "CLEANING"){
+            combo_platform_type.currentIndex = 3;
         }
 
 

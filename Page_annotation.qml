@@ -2660,8 +2660,6 @@ Item {
                 }
             }
         }
-
-
     }
 
     Component{
@@ -2737,6 +2735,13 @@ Item {
                                    "group":0,
                                    "error":false,
                                    "call_id":supervisor.getLocationCallID(1)});
+                if(supervisor.getSetting("ROBOT_HW","type")==="CLEANING"){
+                    details.append({"ltype":"Cleaning",
+                                       "name":"퇴식위치",
+                                       "group":0,
+                                       "error":false,
+                                       "call_id":supervisor.getLocationCallID(2)});
+                }
                 for(var i=0; i<locations.count; i++){
                     details.append({"ltype":"Serving",
                                     "name":locations.get(i).name,
@@ -2786,10 +2791,20 @@ Item {
             function update_callbell(){
                 details.get(0).call_id = supervisor.getLocationCallID("Charging",0);
                 details.get(1).call_id = supervisor.getLocationCallID("Resting",0);
-                for(var i=2; i<details.count; i++){
-                    details.get(i).call_id = supervisor.getLocationCallID("Serving",i-2);
-                    print(i,details.get(i).call_id);
+                if(supervisor.getSetting("ROBOT_HW","type")==="CLEANING"){
+                    details.get(2).call_id = supervisor.getLocationCallID("Cleaning",0);
+
+                    for(var i=3; i<details.count; i++){
+                        details.get(i).call_id = supervisor.getLocationCallID("Serving",i-3);
+                        print(i,details.get(i).call_id);
+                    }
+                }else{
+                    for(var i=2; i<details.count; i++){
+                        details.get(i).call_id = supervisor.getLocationCallID("Serving",i-2);
+                        print(i,details.get(i).call_id);
+                    }
                 }
+
             }
 
             function checkLocationNumber(){
@@ -2958,8 +2973,16 @@ Item {
                             }
                             onTextChanged: {
                                 name = text;
-                                if(index > 1)
-                                    locations.get(index-2).name = name;
+                                if(supervisor.getSetting("ROBOT_HW","type") === "CLEANING"){
+                                    if(index > 2){
+                                        locations.get(index-3).name = name;
+                                    }
+
+                                }else{
+                                    if(index > 1){
+                                        locations.get(index-2).name = name;
+                                    }
+                                }
                             }
                         }
                         Image{
@@ -3108,6 +3131,17 @@ Item {
                                     popup_add_location_group.open();
                                 }
                             }
+                            Item_buttons{
+                                width: 140
+                                height: 60
+                                type: "round_text"
+                                text: "퇴식위치 추가"
+                                onClicked: {
+                                    click_sound.play();
+                                    select_location = -1;
+                                    popup_cleaning.open();
+                                }
+                            }
                         }
                     }
                 }
@@ -3248,6 +3282,86 @@ Item {
                 }
             }
             Popup{
+                id: popup_cleaning
+                anchors.centerIn: parent
+                width: 1280
+                height: 400
+                background: Rectangle{
+                    anchors.fill: parent
+                    color: "transparent"
+                }
+                Rectangle{
+                    width: parent.width
+                    height: parent.height
+                    color: color_dark_navy
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 30
+                        Text{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: "퇴식위치를 별도로 사용하십니까?"
+                            font.pixelSize: 50
+                            font.family: font_noto_r.name
+                            color: "white"
+                        }
+                        Column{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            Text{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "퇴식전용모드로 전환됩니다."
+                                font.pixelSize: 20
+                                font.family: font_noto_r.name
+                                color: "white"
+                            }
+                            Text{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "로봇이 테이블을 다녀온 뒤 퇴식위치로 이동하여 대기합니다. 추후 세팅에서 모드를 변경하실 수 있습니다."
+                                font.pixelSize: 20
+                                font.family: font_noto_r.name
+                                color: "white"
+                            }
+                            Text{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "퇴식위치의 기본값은 대기위치와 동일합니다. 변경을 원하시면 위치 수정을 해주세요."
+                                font.pixelSize: 20
+                                font.family: font_noto_r.name
+                                color: "white"
+                            }
+                        }
+                        Row{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 50
+                            Item_buttons{
+                                width: 150
+                                height: 60
+                                type: "round_text"
+                                text: "예"
+                                onClicked: {
+                                    click_sound.play();
+                                    supervisor.setSetting("ROBOT_HW/type","CLEANING");
+                                    annot_pages.item.readSetting();
+                                    popup_cleaning.close();
+                                }
+                            }
+                            Item_buttons{
+                                width: 150
+                                height: 60
+                                type: "round_text"
+                                text: "아니오"
+                                onClicked: {
+                                    click_sound.play();
+                                    supervisor.setSetting("ROBOT_HW/type","BOTH");
+                                    annot_pages.item.readSetting();
+                                    popup_cleaning.close();
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            Popup{
                 id: popup_remove_location
                 anchors.centerIn: parent
                 property string name : ""
@@ -3335,6 +3449,9 @@ Item {
                     }else if(select_location == 1){
                         text_men.text = "수정하실 대기위치로 로봇을 이동시켜 주세요"
                         text_loc.text = ""
+                    }else if(select_location == 2){
+                        text_men.text = "수정하실 퇴식위치로 로봇을 이동시켜 주세요"
+                        text_loc.text = ""
                     }else{
                         text_men.text = "수정하실 서빙위치로 로봇을 이동시켜 주세요"
                         text_loc.text = "( 이름 : "+details.get(select_location).name+" )"
@@ -3364,7 +3481,7 @@ Item {
                             font.family:font_noto_r.name
                             font.pixelSize: 40
                             color: "white"
-                            text:location_name
+                            text:popup_edit_serving.location_name
                         }
                         AnimatedImage{
                             id: image_robotmoving

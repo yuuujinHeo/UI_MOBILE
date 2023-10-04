@@ -294,6 +294,9 @@ Window {
         }else if(cur_location == "Resting0"){
             cur_location = "대기 장소";
             playVoice("moveResting");
+        }else if(cur_location == "Cleaning0"){
+            cur_location = "퇴식 장소";
+            playVoice("moveResting");
         }else{
             if(supervisor.isCallingMode()){
                 playVoice("startCalling");
@@ -339,7 +342,8 @@ Window {
 
     function clearkitchen(){
         loadPage(pkitchen)
-        supervisor.writelog("[UI] Force Page Change Kitchen : need Clear");
+        loader_page.item.cleaning();
+        supervisor.writelog("[UI] Force Page Cleaning Location");
     }
 
     function updatecamera(){
@@ -500,7 +504,7 @@ Window {
             statusbar.curTime = Qt.formatTime(new Date(), "hh:mm")
             if(loader_page.item.objectName == "page_kitchen"){
                 if(count_resting++ > 100){
-                    show_resting();
+//                    show_resting();
                 }
             }else{
                 count_resting =0;
