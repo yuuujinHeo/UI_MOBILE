@@ -229,6 +229,7 @@ public:
 //    Q_INVOKABLE int getLocationNum(QString type){return maph->getLocationNum(type);}
     Q_INVOKABLE int getLocGroupNum(int num){return maph->getLocGroupNum(num);}
     Q_INVOKABLE void saveMap(){maph->saveMap();}
+    Q_INVOKABLE void saveEditedMap(){maph->saveEditedMap();}
     Q_INVOKABLE void saveTline(){maph->saveTline();}
     Q_INVOKABLE void saveTlineTemp(){maph->saveTlineTemp();}
     Q_INVOKABLE void saveVelmap(){maph->saveVelmap();}

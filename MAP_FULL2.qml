@@ -308,6 +308,8 @@ Item {
             supervisor.editLocation(last_robot_x,last_robot_y,last_robot_th);
         }else if(mode==="location"){
             supervisor.saveLocation(type,0,name);
+        }else if(mode==="map_editor"){
+            supervisor.saveEditedMap();
         }else if(mode==="tline"){
             supervisor.saveTline();
             supervisor.slam_map_reload(supervisor.getMapname());

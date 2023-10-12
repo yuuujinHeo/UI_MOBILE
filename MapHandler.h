@@ -206,6 +206,7 @@ public:
     void initLocation();
     Q_INVOKABLE void saveMap();
     void setTline();
+    Q_INVOKABLE void saveEditedMap();
     Q_INVOKABLE void saveTline();
     Q_INVOKABLE void saveTlineTemp();
     Q_INVOKABLE void saveVelmap();

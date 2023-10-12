@@ -4974,7 +4974,7 @@ Item {
         Item{
             width: annot_pages.width
             height: annot_pages.height
-            property var select_mode: 0
+            property var select_mode: 1
             Rectangle{
                 anchors.fill: parent
                 color: color_dark_navy
@@ -5552,6 +5552,76 @@ Item {
 
                     }
                     }
+
+            }
+
+            Popup{
+                id: popup_save_map
+                width: parent.width
+                height: parent.height
+                background:Rectangle{
+                    anchors.fill: parent
+                    color: "#282828"
+                    opacity: 0.7
+                }
+                Rectangle{
+                    anchors.centerIn: parent
+                    width: 450
+                    height: 230
+                    color: "white"
+                    radius: 20
+
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 20
+                        Column{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            Text{
+                                text: "이대로 <font color=\"#12d27c\">저장</font>하시겠습니까?"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 30
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Text{
+                                text: "기존의 파일은 삭제됩니다."
+                                font.family: font_noto_r.name
+                                font.pixelSize: 20
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                        Row{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 20
+                            Item_buttons{
+                                type: "round_text"
+                                text: "저장 안하고 종료"
+                                width: 180
+                                height: 60
+                                onClicked:{
+                                    click_sound.play();
+                                    map.clear("all");
+                                    popup_save_map.close();
+                                    annot_pages.sourceComponent = page_annot_additional_menu;
+                                }
+                            }
+                            Item_buttons{
+                                type: "round_text"
+                                text: "확인"
+                                width: 180
+                                height: 60
+                                onClicked:{
+                                    //save temp Image
+                                    supervisor.writelog("[QML] MAP PAGE : SAVE MAP EDITOR ");
+                                    map.save("map_editor");
+                                    click_sound.play();
+                                    popup_save_map.close();
+                                    annot_pages.sourceComponent = page_annot_additional_menu;
+                                }
+                            }
+                        }
+                    }
+
+                }
 
             }
 

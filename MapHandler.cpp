@@ -1884,6 +1884,29 @@ void MapHandler::saveObjectPNG(){
 
     loadFile(map_name,"");
 }
+
+void MapHandler::saveEditedMap(){
+    cv::Mat temp_draw;
+    cv::Mat temp_mask;
+
+    cv::cvtColor(map_drawing,temp_draw,cv::COLOR_BGRA2GRAY);
+    cv::cvtColor(map_drawing_mask,temp_mask,cv::COLOR_BGRA2GRAY);
+    cv::multiply(cv::Scalar::all(1.0)-temp_mask,file_edited,file_edited);
+    cv::add(file_edited,temp_draw,file_edited);
+
+    cv::rotate(file_edited,file_edited,cv::ROTATE_90_CLOCKWISE);
+    cv::flip(file_edited,file_edited,0);
+
+    QString path = QDir::homePath() + "/maps/" + pmap->map_name + "/map_edited.png";
+    plog->write("[MapHandler] SAVE MAP "+path);
+    cv::imwrite(path.toStdString(),file_edited);
+    lines.clear();
+    line.clear();
+    spline_dot.clear();
+    lines_trash.clear();
+    initDrawing();
+    loadFile(map_name,"");
+}
 void MapHandler::saveTline(){
     cv::Mat temp_draw;
     cv::Mat temp_mask;
