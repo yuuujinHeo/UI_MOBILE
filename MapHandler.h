@@ -173,7 +173,10 @@ public:
     Q_INVOKABLE void startDrawingLine(int x, int y);
     Q_INVOKABLE void setDrawingLine(int x, int y);
     Q_INVOKABLE void stopDrawingLine(int x, int y);
-    Q_INVOKABLE void setLineColor(int color){cur_line_color = color;}
+    Q_INVOKABLE void setLineColor(int color){
+        cur_line_color = color;
+        qDebug() << "setlinecolor " << cur_line_color;
+    }
     Q_INVOKABLE void setLineWidth(int width){
         cur_line_width = width;
     }

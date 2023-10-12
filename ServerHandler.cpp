@@ -16,7 +16,7 @@ ServerHandler::ServerHandler()
 //    connect(connection_timer, SIGNAL(timeout()),&connection_loop,SLOT(quit()));
     timer->start(TIMER_MS);
 
-    myID = getSetting("SERVER","my_id");
+    myID = getSettingServer("SERVER","my_id");
 //    checkUpdate();
 //    sendConfig();
 //    sendMaps();
@@ -102,13 +102,13 @@ void ServerHandler::postStatus(){
         TIMER_MS = json_in["activate_level"].toString().toInt();
 
         if(json_in["server_group"].toString() != ""){
-            if(getSetting("SERVER","server_group") != json_in["server_group"].toString()){
-                setSetting("SERVER/server_group",json_in["server_group"].toString());
+            if(getSettingServer("SERVER","server_group") != json_in["server_group"].toString()){
+                setSettingServer("SERVER/server_group",json_in["server_group"].toString());
             }
         }
         if(json_in["server_name"].toString() != ""){
-            if(getSetting("SERVER","server_name") != json_in["server_name"].toString()){
-                setSetting("SERVER/server_name",json_in["server_name"].toString());
+            if(getSettingServer("SERVER","server_name") != json_in["server_name"].toString()){
+                setSettingServer("SERVER/server_name",json_in["server_name"].toString());
             }
         }
 //        qDebug() << "timer ms = " << TIMER_MS << json_in["activate_level"].toString() << json_in["activate_level"].toString().toInt();
@@ -116,16 +116,22 @@ void ServerHandler::postStatus(){
     }
 }
 
+void ServerHandler::setSettingServer(QString name, QString value){
+    QString ini_path = QDir::homePath()+"/server_config.ini";
+    QSettings setting(ini_path, QSettings::IniFormat);
+    setting.setValue(name,value);
+    plog->write("[SETTING] SET "+name+" VALUE TO "+value);
+}
 void ServerHandler::setSetting(QString name, QString value){
     QString ini_path = QDir::homePath()+"/robot_config.ini";
     QSettings setting(ini_path, QSettings::IniFormat);
     setting.setValue(name,value);
     plog->write("[SETTING] SET "+name+" VALUE TO "+value);
 }
+
 void ServerHandler::checkUpdate(){
     plog->write("[SERVER] Check Update");
     QByteArray response = generalGet(serverURL+"/update/"+myID);
-
     QJsonObject temp = QJsonDocument::fromJson(response).object();
     if(temp.size() > 0){
         if(temp["id"] == myID){
@@ -148,6 +154,7 @@ void ServerHandler::checkUpdate(){
             }else{
                 setSetting("ROBOT_SW/update_auto","false");
             }
+
             new_update = false;
             if(update_config){
                 if(config_version != getSetting("ROBOT_SW","config_version")){
@@ -183,8 +190,8 @@ void ServerHandler::checkUpdate(){
 
 void ServerHandler::getNewID(){
     ClearJson(json_out);
-    json_out["server_group"] = getSetting("SERVER","server_group");
-    json_out["server_name"] = getSetting("SERVER","server_name");
+    json_out["server_group"] = getSettingServer("SERVER","server_group");
+    json_out["server_name"] = getSettingServer("SERVER","server_name");
     json_out["id"] = myID;
 
     QByteArray temp_array = QJsonDocument(json_out).toJson();
@@ -197,12 +204,14 @@ void ServerHandler::getNewID(){
         ClearJson(json_in);
         json_in = QJsonDocument::fromJson(response).object();
         myID = json_in["id"].toString();
-        if(myID != "" || getSetting("SERVER","my_id") != ""){
+        if(myID != "" || getSettingServer("SERVER","my_id") != ""){
             plog->write("[SERVER] Get New Name : "+myID);
-            setSetting("SERVER/my_id",myID);
+            setSettingServer("SERVER/my_id",myID);
         }
     }
 }
+
+
 void ServerHandler::sendConfig(){
     QString dir = QDir::homePath()+"/robot_config.ini";
     QFile config(dir);
@@ -233,6 +242,13 @@ void ServerHandler::sendMaps(){
 
 QString ServerHandler::getSetting(QString group, QString name){
     QString ini_path = QDir::homePath()+"/robot_config.ini";
+    QSettings setting_robot(ini_path, QSettings::IniFormat);
+    setting_robot.beginGroup(group);
+    return setting_robot.value(name).toString();
+}
+
+QString ServerHandler::getSettingServer(QString group, QString name){
+    QString ini_path = QDir::homePath()+"/server_config.ini";
     QSettings setting_robot(ini_path, QSettings::IniFormat);
     setting_robot.beginGroup(group);
     return setting_robot.value(name).toString();

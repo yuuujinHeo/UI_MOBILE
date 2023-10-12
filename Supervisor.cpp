@@ -536,27 +536,29 @@ void Supervisor::readSetting(QString map_name){
     }
     setting_anot.endGroup();
 
-    setting_anot.beginGroup("cleaning_locations");
-    loc_str = setting_anot.value("loc0").toString();
-    strlist = loc_str.split(",");
-    if(strlist.size()>1){
-        temp_loc.point = cv::Point2f(strlist[1].toFloat(),strlist[2].toFloat());
-        temp_loc.angle = strlist[3].toFloat();
-        temp_loc.type = "Cleaning";
-        temp_loc.group = 0;
-        temp_loc.name = strlist[0];
-        if(strlist.size() > 4)
-            temp_loc.call_id = strlist[4];
-        else
+    if(probot->type == "CLEANING"){
+        setting_anot.beginGroup("cleaning_locations");
+        loc_str = setting_anot.value("loc0").toString();
+        strlist = loc_str.split(",");
+        if(strlist.size()>1){
+            temp_loc.point = cv::Point2f(strlist[1].toFloat(),strlist[2].toFloat());
+            temp_loc.angle = strlist[3].toFloat();
+            temp_loc.type = "Cleaning";
+            temp_loc.group = 0;
+            temp_loc.name = strlist[0];
+            if(strlist.size() > 4)
+                temp_loc.call_id = strlist[4];
+            else
+                temp_loc.call_id = "";
+            pmap->locations.push_back(temp_loc);
+        }else {
+            temp_loc.type = "Cleaning";
+            temp_loc.name = "Cleaning0";
             temp_loc.call_id = "";
-        pmap->locations.push_back(temp_loc);
-    }else {
-        temp_loc.type = "Cleaning";
-        temp_loc.name = "Cleaning0";
-        temp_loc.call_id = "";
-        pmap->locations.push_back(temp_loc);
+            pmap->locations.push_back(temp_loc);
+        }
+        setting_anot.endGroup();
     }
-    setting_anot.endGroup();
 
     qDebug() << "?";
     setting_anot.beginGroup("serving_locations");

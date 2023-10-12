@@ -1647,6 +1647,7 @@ void MapHandler::drawTline(){
     }
     prev_pose = pose;
 }
+
 void MapHandler::addLinePoint(int x, int y){
     curPoint.x = x;
     curPoint.y = y;

@@ -44,6 +44,7 @@ public:
     QByteArray generalPut(QString url, QByteArray put_data);
     QByteArray generalDelete(QString url);
     void ClearJson(QJsonObject &json);
+    void setSettingServer(QString name, QString value);
     void setSetting(QString name, QString value);
     void checkUpdate();
     void postStatus();
@@ -53,6 +54,7 @@ public:
     void sendMaps();
 
     QString getSetting(QString group, QString name);
+    QString getSettingServer(QString group, QString name);
     QJsonObject json_in;
     QJsonObject json_out;
     QProcess *process;
