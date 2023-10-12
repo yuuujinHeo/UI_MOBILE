@@ -2754,6 +2754,8 @@ Item {
                 checkLocationNumber();
 //                print("=================================");
 
+                list_location_detail.currentIndex = select_location;
+
                 if(isError()){
                     btn_right.enabled = false;
                 }else{
@@ -2857,7 +2859,8 @@ Item {
                                             keyboard.close();
                                             supervisor.setLocationUp(select_location);
                                             select_location--;
-                                            print("up select_location ",select_location);                                        readSetting();
+                                            print("up select_location ",select_location);
+                                            readSetting();
                                         }
                                     }else{
                                         if(select_location>2){
@@ -2866,7 +2869,8 @@ Item {
                                             keyboard.close();
                                             supervisor.setLocationUp(select_location);
                                             select_location--;
-                                            print("up select_location ",select_location);                                        readSetting();
+                                            print("up select_location ",select_location);
+                                            readSetting();
                                         }
                                     }
 
@@ -3056,7 +3060,6 @@ Item {
                             rows:2
                             anchors.horizontalCenter: parent.horizontalCenter
                             spacing: 10
-
                             Item_buttons{
                                 width: 140
                                 height: 60
@@ -3912,7 +3915,6 @@ Item {
                     height: 180
                     type: "round_text"
                     text: "맵 세부수정"
-                    visible: false
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[ANNOTATION] Enter : Map Editor");
