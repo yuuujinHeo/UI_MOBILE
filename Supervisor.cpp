@@ -1826,7 +1826,7 @@ void Supervisor::makeExtProcessShell(){
         stream << "else" << endl;
         stream << "     kill -9 $pid" << endl;
         stream << "fi" << endl;
-        stream << "cd /home/odroid/UI_MOBILE" << endl;
+        stream << "cd /home/odroid/UI_MOBILE_release" << endl;
         stream << "xterm ./ExtProcess" << endl;
     }
     file.close();
