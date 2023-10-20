@@ -1484,18 +1484,15 @@ void MapHandler::drawSpline(){
             }
 
         }else{
-//            //qDebug() <<"spline faile";
             line = spline_dot;
         }
     }else{
         if(spline_dot.size() == 1){
-//            //qDebug() <<"spline dot";
             line.push_back(spline_dot[0]);
             line.push_back(spline_dot[0]);
             cv::circle(map_drawing, spline_dot[0], 1, cv::Scalar(cur_line_color,cur_line_color,cur_line_color),-1,8,0);
             cv::circle(map_drawing_mask, spline_dot[0], 1, cv::Scalar::all(255),-1,8,0);
         }else if(spline_dot.size() == 2){
-//            //qDebug() <<"spline line";
             line.push_back(spline_dot[0]);
             line.push_back(spline_dot[1]);
             cv::line(map_drawing,spline_dot[0],spline_dot[1],cv::Scalar(cur_line_color,cur_line_color,cur_line_color),cur_line_width,8,0);

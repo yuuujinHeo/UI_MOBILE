@@ -19,6 +19,7 @@ Popup {
         color: "#653D92"
     }
 
+    property bool is_opened: false
     property var owner
     property string owner_text: ""
 
@@ -124,9 +125,12 @@ Popup {
         print("keyboard opened : ",owner_text);
         emitter.initHangul();
         rect_keyboard.height = 300;
+        is_opened = true;
     }
     onClosed: {
         rect_keyboard.height = 0;
+        is_opened = false;
+        owner.select(0,0);
     }
 
     Rectangle{

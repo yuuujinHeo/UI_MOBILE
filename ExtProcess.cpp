@@ -1,0 +1,324 @@
+#include "ExtProcess.h"
+#include <QDebug>
+
+#define THREAD_EXTPROCESS   200
+ExtProcess::ExtProcess(QObject *parent)
+    : QObject(parent)
+    , shm_command("process_command")
+    , shm_return("process_return")
+    , shm_wifilist("process_wifilist")
+{
+    tick = 0;
+    if(!shm_command.isAttached()){
+        if (!shm_command.create(sizeof(Command), QSharedMemory::ReadWrite) && shm_command.error() == QSharedMemory::AlreadyExists)
+        {
+            if(shm_command.attach()){
+                plog->write("[ExtProcess] SharedMemory is already exist. attach success. ");
+                if(shm_command.isAttached()){
+                    shm_command.lock();
+                    memset(shm_command.data(),0,sizeof(shm_command.data()));
+                    shm_command.unlock();
+                    plog->write("[ExtProcess] Clear ShardMemory");
+                }
+            }else{
+                plog->write("[ExtProcess] SharedMemory is already exist. attach failed. ");
+            }
+        }
+        else
+        {
+            plog->write("[ExtProcess] SharedMemory is created. size : "+QString::number(sizeof(Command)));
+        }
+    }
+    if(!shm_return.isAttached()){
+        if (!shm_return.create(sizeof(Return), QSharedMemory::ReadWrite) && shm_return.error() == QSharedMemory::AlreadyExists)
+        {
+            if(shm_return.attach()){
+                plog->write("[ExtProcess] SharedMemory(Return) is already exist. attach success. ");
+//                if(shm_return.isAttached()){
+//                    shm_return.lock();
+//                    memset(shm_return.data(),0,sizeof(shm_return.data()));
+//                    shm_return.unlock();
+//                    plog->write("[ExtProcess] Clear ShardMemory(Return)");
+//                }
+            }else{
+                plog->write("[ExtProcess] SharedMemory(Return) is already exist. attach failed. ");
+            }
+        }
+        else
+        {
+            plog->write("[ExtProcess] SharedMemory(Return) is created. size : "+QString::number(sizeof(Return)));
+        }
+    }
+    if(!shm_wifilist.isAttached()){
+        if (!shm_wifilist.create(sizeof(WifiList), QSharedMemory::ReadWrite) && shm_wifilist.error() == QSharedMemory::AlreadyExists)
+        {
+            if(shm_wifilist.attach()){
+                plog->write("[ExtProcess] SharedMemory(Wifilist) is already exist. attach success. ");
+//                if(shm_wifilist.isAttached()){
+//                    shm_wifilist.lock();
+//                    memset(shm_wifilist.data(),0,sizeof(shm_wifilist.data()));
+//                    shm_wifilist.unlock();
+//                    plog->write("[ExtProcess] Clear ShardMemory(Wifilist)");
+//                }
+            }else{
+                plog->write("[ExtProcess] SharedMemory(Wifilist) is already exist. attach failed. ");
+            }
+        }
+        else
+        {
+            plog->write("[ExtProcess] SharedMemory(Wifilist) is created. size : "+QString::number(sizeof(WifiList)));
+        }
+    }
+
+    command_list.clear();
+    program = new QProcess();
+    program->start(QDir::homePath()+"/start_extproc.sh");
+
+    timer = new QTimer();
+    connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
+    timer->start(THREAD_EXTPROCESS);
+
+    timer500 = new QTimer();
+    connect(timer500, SIGNAL(timeout()), this, SLOT(onTimer500()));
+    timer500->start(500);
+}
+
+ExtProcess::~ExtProcess(){
+    shm_command.detach();
+    shm_return.detach();
+    shm_wifilist.detach();
+}
+
+void ExtProcess::setSetting(QString name, QString value){
+    QString ini_path = QDir::homePath()+"/robot_config.ini";
+    QSettings setting(ini_path, QSettings::IniFormat);
+    setting.setValue(name,value);
+    plog->write("[SETTING] SET "+name+" VALUE TO "+value);
+}
+
+QString ExtProcess::getSetting(QString group, QString name){
+    QString ini_path = QDir::homePath()+"/robot_config.ini";
+    QSettings setting_robot(ini_path, QSettings::IniFormat);
+    setting_robot.beginGroup(group);
+    return setting_robot.value(name).toString();
+}
+
+void ExtProcess::onTimer500(){
+    //이전 명령 timeout 처리
+}
+
+void ExtProcess::onTimer(){
+    static uint32_t prev_tick = 0;
+    static uint32_t prev_wifilist_tick = 0;
+    ExtProcess::Return _return = get_return();
+    if(_return.tick != prev_tick){
+        timeout_count = 0;
+        if(_return.result == PROCESS_RETURN_ACCEPT){
+            plog->write("[ExtProcess] Accept : ");
+            process_working = true;
+            if(_return.command == PROCESS_CMD_SET_WIFI_IP){
+                char temp[100];
+                memcpy(temp,_return.params,sizeof(unsigned char)*100);
+                QString ssid = QString::fromUtf8(temp);
+                qDebug() << ssid;
+                probot->wifi_map[ssid].state = 1;
+            }
+            emit got_accept(_return.command);
+        }else if(_return.result == PROCESS_RETURN_DONE){
+            process_working = false;
+            if(_return.command == PROCESS_CMD_SET_SYSTEM_VOLUME){
+                plog->write("[ExtProcess] Done : Set System Volume ");
+            }else if(_return.command == PROCESS_CMD_GET_SYSTEM_VOLUME){
+                plog->write("[ExtProcess] Done : Get System Volume "+QString::number(_return.params[0]));
+                probot->volume_system = _return.params[0];
+            }else if(_return.command == PROCESS_CMD_GET_WIFI_LIST){
+                plog->write("[ExtProcess] Done : Get Wifi List " + QString::number(_return.params[0]));
+                wifi_list_size = _return.params[0];
+            }else if(_return.command == PROCESS_CMD_GET_WIFI_IP){
+                char temp[100];
+                char temp22[100];
+                char temp33[100];
+
+                memcpy(temp,_return.params,sizeof(unsigned char)*100);
+                probot->cur_ip = QString::fromUtf8(temp);
+
+                memcpy(temp22,_return.params2,sizeof(unsigned char)*100);
+                probot->cur_gateway = QString::fromUtf8(temp22);
+
+                memcpy(temp33,_return.params3,sizeof(unsigned char)*100);
+                probot->cur_dns = QString::fromUtf8(temp33);
+
+                plog->write("[ExtProcess] Done : Get Current IP -> "+probot->cur_ip+", "+probot->cur_gateway+", "+probot->cur_dns);
+            }else if(_return.command == PROCESS_CMD_CONNECT_WIFI){
+                char temp[100];
+                memcpy(temp, _return.params, 100);
+                QString ssid = QString::fromUtf8(temp);
+                plog->write("[ExtProcess] Done : Connect Wifi " + ssid);
+                probot->wifi_ssid = ssid;
+                probot->wifi_connection = true;
+            }else if(_return.command == PROCESS_CMD_SET_WIFI_IP){char temp[100];
+                char temp22[100];
+                char temp33[100];
+
+                memcpy(temp,_return.params,sizeof(unsigned char)*100);
+                probot->cur_ip = QString::fromUtf8(temp);
+
+                memcpy(temp22,_return.params2,sizeof(unsigned char)*100);
+                probot->cur_gateway = QString::fromUtf8(temp22);
+
+                memcpy(temp33,_return.params3,sizeof(unsigned char)*100);
+                probot->cur_dns = QString::fromUtf8(temp33);
+
+                plog->write("[ExtProcess] Done : Get Current IP -> "+probot->cur_ip+", "+probot->cur_gateway+", "+probot->cur_dns);
+            }else if(_return.command == PROCESS_CMD_CHECK_CONNECTION ){
+                char temp[100];
+                memcpy(temp,_return.params,sizeof(unsigned char)*100);
+                QString result = QString::fromUtf8(temp);
+                if(result == "full"){
+                    plog->write("[ExtProcess] Check Connection : Connected (Internet Good)");
+                    probot->wifi_connection = WIFI_CONNECT;
+                }else if(result == "limited"){
+                    plog->write("[ExtProcess] Check Connection : Connected (Internet Bad)");
+                    probot->wifi_connection = WIFI_CONNECT_NO_INTERNET;
+                }else if(result == "none"){
+                    plog->write("[ExtProcess] Check Connection : Disconnected (Or Connecting)");
+                    probot->wifi_connection = WIFI_NONE;
+                }else if(result == "unknown"){
+                    plog->write("[ExtProcess] Check Connection : Unknown");
+                    probot->wifi_connection = WIFI_UNKNOWN;
+                }
+            }else if(_return.command == PROCESS_CMD_CHECK_CONNECTION_SSID){
+
+            }
+            emit got_done(_return.command);
+        }else if(_return.result == PROCESS_RETURN_ERROR){
+            process_working = false;
+            plog->write("[ExtProcess] Error : ");
+            if(_return.command == PROCESS_CMD_CHECK_CONNECTION){
+                char temp[100];
+                memcpy(temp, _return.params, sizeof(char)*100);
+                QString ssid = QString::fromUtf8(temp);
+                setSetting("NETWORK/wifi_ssid",ssid);
+                plog->write("[ExtProcess] Check Connection : Disconnected "+ssid);
+                probot->wifi_map[ssid].state = 0;
+            }else if(_return.command == PROCESS_CMD_CONNECT_WIFI){
+                char temp[100];
+                memcpy(temp, _return.params, sizeof(char)*100);
+                QString ssid = QString::fromUtf8(temp);
+                plog->write("[ExtProcess] Connect Wifi Failed : "+ssid);
+
+            }
+            emit got_error(_return.command);
+        }
+        prev_tick = _return.tick;
+    }
+
+    if(!process_working){
+        if(command_list.size() > 0){
+            shm_command.lock();
+            command_list[0].tick = ++tick;
+            memcpy((char*)shm_command.data(), &command_list[0], sizeof(ExtProcess::Command));
+
+            timeout_sec = 10000;
+            prev_cmd = command_list[0].cmd;
+            if(command_list[0].cmd != PROCESS_CMD_GET_WIFI_LIST_INFO)
+                plog->write("[ExtProcess] Send CMD "+QString::number(command_list[0].cmd));
+
+            command_list.pop_front();
+            shm_command.unlock();
+        }
+    }
+
+    ExtProcess::WifiList _wifilist = get_wifilist();
+    if(_wifilist.tick != prev_wifilist_tick){
+        WifiList temp_wifi_list;
+        for(int i=0; i<_wifilist.size; i++){
+            ST_WIFI temp_wifi;
+            char temp[100];
+            memcpy(temp,_wifilist.ssid[i],sizeof(char)*100);
+            temp_wifi.ssid = QString::fromUtf8(temp);
+            temp_wifi.inuse = _wifilist.param[i][0];
+            temp_wifi.rate = _wifilist.param[i][1];
+            temp_wifi.level = _wifilist.param[i][2];
+            temp_wifi.security = _wifilist.param[i][3];
+            temp_wifi.discon_count = _wifilist.param[i][4];
+            temp_wifi.state = _wifilist.param[i][5];
+            temp_wifi.prev_state = _wifilist.param[i][6];
+
+            if(temp_wifi.inuse){
+                if(getSetting("NETWORK","wifi_ssid") == ""){
+                    setSetting("NETWORK/wifi_ssid",temp_wifi.ssid);
+                }
+                probot->wifi_ssid = temp_wifi.ssid;
+            }
+//            qDebug() << "Wifi List In : " << temp_wifi.ssid;
+            probot->wifi_map[temp_wifi.ssid] = temp_wifi;
+//            probot->wifi_list.append(temp_wifi);
+
+            prev_wifilist_tick = _wifilist.tick;
+
+        }
+
+        QList<QString> keys = probot->wifi_map.keys();
+        for(int i=0; i<keys.size(); i++){
+            if(probot->wifi_map[keys[i]].discon_count++ > 3){
+                probot->wifi_map.remove(keys[i]);
+            }
+        }
+//          plog->write("[ExtProcess] Done : Get Wifi Info -> " + temp_wifi.ssid);
+//        if(++wifi_list_count < wifi_list_size){
+//            Command temp;
+//            temp.cmd = PROCESS_CMD_GET_WIFI_LIST_INFO;
+//            temp.params[0] = wifi_list_count;
+
+//            set_command(temp);
+//        }
+    }
+    //timeout check
+    if(process_working){
+        if(timeout_count++ > timeout_sec/THREAD_EXTPROCESS){
+            process_working = false;
+            plog->write("[ExtProcess] Timeout ");
+            emit timeout(prev_cmd);
+        }
+    }
+}
+
+void ExtProcess::set_command(Command cmd, QString log){
+    bool match = false;
+    for(int i=0; i<command_list.size(); i++){
+        if(command_list[i].cmd == cmd.cmd){
+            match = true;
+        }
+    }
+    if(!match){
+        command_list.push_back(cmd);
+    }
+}
+
+ExtProcess::WifiList ExtProcess::get_wifilist(){
+    ExtProcess::WifiList res;
+    shm_wifilist.lock();
+    memcpy(&res, (char*)shm_wifilist.constData(), sizeof(ExtProcess::WifiList));
+    shm_wifilist.unlock();
+
+    return res;
+}
+ExtProcess::Return ExtProcess::get_return(){
+    ExtProcess::Return res;
+    shm_return.lock();
+    memcpy(&res, (char*)shm_return.constData(), sizeof(ExtProcess::Return));
+    shm_return.unlock();
+
+    return res;
+}
+
+ExtProcess::Command ExtProcess::get_command(){
+    ExtProcess::Command res;
+    shm_command.lock();
+    memcpy(&res, (char*)shm_command.constData(), sizeof(ExtProcess::Command));
+    shm_command.unlock();
+
+    return res;
+
+}

@@ -58,7 +58,12 @@ Supervisor::Supervisor(QObject *parent)
     zip = new ZIPHandler();
     ipc = new IPCHandler();
     call = new CallbellHandler();
+    extproc = new ExtProcess();
     git = new HTTPHandler();
+    connect(extproc, SIGNAL(timeout(int)),this,SLOT(process_timeout(int)));
+    connect(extproc, SIGNAL(got_done(int)),this,SLOT(process_done(int)));
+    connect(extproc, SIGNAL(got_accept(int)),this,SLOT(process_accept(int)));
+    connect(extproc, SIGNAL(got_error(int)),this,SLOT(process_error(int)));
     connect(call, SIGNAL(new_call()),this,SLOT(new_call()));
     connect(git, SIGNAL(pullSuccess()),this,SLOT(git_pull_success()));
     connect(git, SIGNAL(pullFailed()),this,SLOT(git_pull_failed()));
@@ -88,13 +93,6 @@ Supervisor::Supervisor(QObject *parent)
     connect(FSwatcher, SIGNAL(directoryChanged(QString)),this,SLOT(usb_detect()));
     usb_detect();
 
-
-    wifi_process = new QProcess();
-    connect(wifi_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_con_output()));
-    connect(wifi_process,SIGNAL(readyReadStandardError()),this,SLOT(wifi_con_error()));
-    wifi_check_process = new QProcess();
-    connect(wifi_check_process,SIGNAL(readyReadStandardOutput()),this,SLOT(wifi_ch_output()));
-    connect(wifi_check_process,SIGNAL(readyReadStandardError()),this,SLOT(wifi_ch_error()));
 }
 
 Supervisor::~Supervisor(){
@@ -107,7 +105,7 @@ Supervisor::~Supervisor(){
     QThread::sleep(1);
     slam_process->kill();
     slam_process->close();
-    wifi_process->close();
+//    wifi_process->close();
     plog->write("[BUILDER] KILLED SLAMNAV");
 }
 
@@ -662,6 +660,19 @@ void Supervisor::editLocation(int num){
     pmap->locations[num].point = probot->lastPose.point;
     pmap->locations[num].angle = probot->lastPose.angle;
 }
+
+void Supervisor::setSystemVolume(int volume){
+    ExtProcess::Command temp;
+    temp.cmd = ExtProcess::PROCESS_CMD_SET_SYSTEM_VOLUME;
+    temp.params[0] = volume;
+    extproc->set_command(temp);
+}
+void Supervisor::requestSystemVolume(){
+    ExtProcess::Command temp;
+    temp.cmd = ExtProcess::PROCESS_CMD_GET_SYSTEM_VOLUME;
+    extproc->set_command(temp);
+}
+
 void Supervisor::saveLocation(QString type, int groupnum, QString name){
     LOCATION temp;
     temp.type = type;
@@ -1801,6 +1812,31 @@ void Supervisor::updateUSB(){
     process.waitForReadyRead(3000);
 }
 
+void Supervisor::makeExtProcessShell(){
+    QString file_name = QDir::homePath() + "/start_extproc.sh";
+    QFile file(file_name);
+    if(file.open(QIODevice::ReadWrite)){
+        QTextStream stream(&file);
+        stream << "#!/bin/bash" << endl << endl;
+
+        stream << "pid=`ps -ef | grep \"ExtProcess\" | grep -v 'grep' | awk '{print $2}'`"<<endl;
+        stream << "if [ -z $pid ]" << endl;
+        stream << "then" << endl;
+        stream << "     echo \"ExtProcess not running\"" << endl;
+        stream << "else" << endl;
+        stream << "     kill -9 $pid" << endl;
+        stream << "fi" << endl;
+        stream << "cd /home/odroid/UI_MOBILE" << endl;
+        stream << "xterm ./ExtProcess" << endl;
+    }
+    file.close();
+    //Chmod
+    QProcess process;
+    process.setWorkingDirectory(QDir::homePath());
+    process.start("chmod +x start_extproc.sh");
+    process.waitForReadyRead(200);
+
+}
 void Supervisor::makeUSBShell(){
     QString file_name = QDir::homePath() + "/update.sh";
     QFile file(file_name);
@@ -2275,6 +2311,15 @@ POSE setAxisBack(cv::Point2f _point, float _angle){
     return temp;
 }
 
+bool sortWifi(const QString &w1, const QString &w2){
+    if(probot->wifi_map[w1].inuse)
+        return true;
+    else if(probot->wifi_map[w2].inuse)
+        return true;
+    else{
+        return probot->wifi_map[w1].level > probot->wifi_map[w2].level;
+    }
+}
 bool sortLocation2(const LOCATION &l1, const LOCATION &l2){
 //    if(l1.group == l2.group)
 //        return l1.number < l2.number;
@@ -2959,6 +3004,7 @@ void Supervisor::checkShellFiles(){
 //파일확인!
     QString file_path;
 
+
     QString path = QDir::homePath()+"/ui_log";
     QDir directory(path);
     if(!directory.exists()){
@@ -2971,6 +3017,12 @@ void Supervisor::checkShellFiles(){
     if(!QFile::exists(file_path)){
         plog->write("[SUPERVISOR] auto_test.sh not found. make new");
         makeStartShell();
+    }
+
+    file_path = QDir::homePath() + "/start_extproc.sh";
+    if(!QFile::exists(file_path)){
+        plog->write("[SUPERVISOR] start_extproc.sh not found. make new");
+        makeExtProcessShell();
     }
 
     //kill_slam.sh
@@ -3133,7 +3185,6 @@ void Supervisor::makeAllKillShell(){
 void Supervisor::onTimer(){
     static bool check_init = true;
     static int count_pass = 0;
-    static int wifi_cmd_count = 0;
     static int prev_state = -1;
     static int prev_running_state = -1;
     static int prev_local_state = -1;
@@ -3174,88 +3225,25 @@ void Supervisor::onTimer(){
     }
 
     //************************** WiFi *********************************//
-    if(wifi_temp_ssd != ""){
-        if(wifi_count++ > 1000/MAIN_THREAD){
-            QMetaObject::invokeMethod(mMain,"checkwifidone");
-            wifi_check_process->close();
-            wifi_temp_ssd = "";
-        }
-    }else{
-        wifi_count = 0;
-    }
+//    if(wifi_temp_ssd != ""){
+//        if(wifi_count++ > 1000/MAIN_THREAD){
+//            QMetaObject::invokeMethod(mMain,"checkwifidone");
+////            wifi_check_process->close();
+//            wifi_temp_ssd = "";
+//        }
+//    }else{
+//        wifi_count = 0;
+//    }
 
-//    getAllWifiList();
-
-//    if(setting.cur_ip == "" && getWifiConnection("")){
-//        qDebug() << "auto get wifi ip";
+//    if(probot->wifi_ssid == ""){
+//        probot->wifi_ssid = getSetting("NETWORK","wifi_ssid");
+//    }
+//    if(extproc->wifi_list_size == 0){
+//        getAllWifiList();
+//    }else if(probot->cur_ip == ""){// && getWifiConnection("")){
 //        getWifiIP();
 //    }
 
-    if(setting.cur_ip == "" && getWifiConnection("")){
-        getAllWifiList();
-        qDebug() << "auto get wifi ip";
-        getWifiIP();
-    }
-
-    if(wifi_cmd == WIFI_CMD_NONE && wifi_cmds.size() > 0){
-        wifi_cmd = wifi_cmds[0];
-        wifi_cmd_count = 0;
-        wifi_cmds.pop_front();
-
-        wifi_process->close();
-        if(setting.wifi_ssd == ""){
-            setting.wifi_ssd = getSetting("ROBOT_SW","wifi_ssd");
-        }
-        switch(wifi_cmd){
-        case WIFI_CMD_CONNECT:{
-            if(setting.wifi_passwd != ""){
-                plog->write("[SETTING] WIFI CONNECT : SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
-                wifi_process->start("nmcli --a device wifi connect "+setting.wifi_ssd+" password "+setting.wifi_passwd);
-            }else{
-                plog->write("[SETTING] WIFI CONNECT : SSD("+setting.wifi_ssd+")");
-                wifi_process->start("nmcli --a device wifi connect "+setting.wifi_ssd);
-            }
-            break;
-        }
-        case WIFI_CMD_GET_IP:{
-            wifi_process->start("nmcli con show "+setting.wifi_ssd);
-//            wifi_process->start("nmcli con show "+setting.wifi_ssd+" | grep -i ip[4]");
-            break;
-        }
-        case WIFI_CMD_SET_IP:{
-            plog->write("[SETTING] SET WIFI IP "+setting.wifi_ssd+" -> "+setting.wifi_ip+", "+setting.wifi_gateway+", "+setting.wifi_dns);
-            QString exe_str = "nmcli con mod "+setting.wifi_ssd;
-            exe_str += " ipv4.address "+setting.wifi_ip+"/24";
-            exe_str += " ipv4.dns "+setting.wifi_dns;
-            exe_str += " ipv4.gateway "+setting.wifi_gateway;
-            exe_str += " ipv4.method manual";
-
-            setting.cur_ip = "";
-            setWifiConnection(setting.wifi_ssd,0);
-            wifi_process->execute(exe_str);
-            wifi_process->waitForStarted();
-            wifi_process->start("nmcli con up "+setting.wifi_ssd);
-            wifi_process->waitForStarted();
-            break;
-        }
-        case WIFI_CMD_GET_LIST:{
-//            qDebug() << "get list wifi";
-            wifi_process->start("nmcli device wifi list");
-            break;
-        }
-        default:{
-            plog->write("[SUPERVISOR] WIFI CMD WRONG : "+QString::number(wifi_cmd));
-            wifi_cmd = WIFI_CMD_NONE;
-            break;
-        }
-        }
-    }else if(wifi_cmd != WIFI_CMD_NONE){
-        if(wifi_cmd_count++ > 5000/MAIN_THREAD){
-            plog->write("[WIFI] COMMAND IGNORED. ",wifi_cmd);
-            wifi_cmd_count = 0;
-            wifi_cmd = WIFI_CMD_NONE;
-        }
-    }
 
     if(probot->localization_state != LOCAL_READY){
         if(probot->localization_confirm == LOCAL_READY){
@@ -3296,7 +3284,11 @@ void Supervisor::onTimer(){
                 ipc->handsup();
             }
         }else if(probot->localization_confirm == LOCAL_READY){
-            qDebug() << "?!!!!!!!!!!!!!!!!!!!!!";
+            if(probot->status_charge == 1){
+                ui_state = UI_STATE_CHARGING;
+            }else{
+                qDebug() << "?!!!!!!!!!!!!!!!!!!!!!";
+            }
         }else{
             if(check_init){
                 QMetaObject::invokeMethod(mMain, "need_init");
@@ -4033,379 +4025,166 @@ void Supervisor::usbsave(QString usb, bool _ui, bool _slam, bool _config, bool _
     }
 }
 int Supervisor::getWifiNum(){
-    return wifi_list.size();
+    return probot->wifi_map.size();
 }
-QString Supervisor::getWifiSSD(int num){
-    if(num < wifi_list.size() && num > -1){
-        return wifi_list[num].ssid;
+QString Supervisor::getCurWifiSSID(){
+    return probot->wifi_ssid;
+//    QList<QString> keys = probot->wifi_map.keys();
+//    for(int i=0; i<keys.size(); i++){
+//        if(probot->wifi_map[keys[i]].inuse)
+//            return probot->wifi_map[keys[i]].ssid;
+//    }
+
+//    return getSetting("NETWORK","wifi_ssid");
+
+}
+QString Supervisor::getWifiSSID(int num){
+    QList<QString> keys = probot->wifi_map.keys();
+//    qDebug() << "Before : " << keys;
+    std::sort(keys.begin(),keys.end(),sortWifi);
+//    qDebug() << "After : " << keys;
+    if(num < keys.size() && num > -1){
+        return probot->wifi_map[keys[num]].ssid;
     }else
         return "unknown";
 }
-int Supervisor::getWifiConnection(QString ssd){
-    if(ssd == ""){
-        if(setting.wifi_ssd == ""){
-            ssd = getSetting("ROBOT_SW","wifi_ssd");
-        }else{
-            ssd = setting.wifi_ssd;
-        }
+int Supervisor::getWifiConnection(QString ssid){
+    if(ssid == ""){
+        ssid = probot->wifi_ssid;
     }
-//    qDebug() << "getwificonnection" << ssd;
-    for(int i=0; i<wifi_list.size(); i++){
-        if(ssd == wifi_list[i].ssid)
-            return wifi_list[i].state;
-    }
-    return 0;
-}
-int Supervisor::getPrevWifiConnection(QString ssd){
-    for(int i=0; i<wifi_list.size(); i++){
-        if(ssd == wifi_list[i].ssid)
-            return wifi_list[i].prev_state;
-    }
-    return 0;
-}
-void Supervisor::setWifiConnection(QString ssd, int con){
-    for(int i=0; i<wifi_list.size(); i++){
-        if(ssd == wifi_list[i].ssid)
-            wifi_list[i].state = con;
-    }
-}
-void Supervisor::setPrevWifiConnection(QString ssd, int state){
-    for(int i=0; i<wifi_list.size(); i++){
-        if(ssd == wifi_list[i].ssid)
-            wifi_list[i].prev_state = state;
-    }
-}
-void Supervisor::wifi_ch_output(){
-    QString output = QString(wifi_check_process->readAllStandardOutput());
-    output.replace(" ","");
-    QStringList outputs = output.split(":");
-    int temp_state;
-    if(outputs.size() > 1 && outputs[0] == "GENERAL.STATE"){
-        if(outputs[1] == "activated\n"){
-            temp_state = 2;
-        }else if(outputs[1] == "activating\n"){
-            temp_state = 1;
-        }else{
-            temp_state = 0;
-        }
+//    qDebug() << "getwificonnection" << ssid << probot->wifi_ssid <<  probot->wifi_connection;
+    if(probot->wifi_ssid == ssid){
+        return probot->wifi_connection;
     }else{
-        temp_state = 0;
+        return 0;
     }
-
-    setWifiConnection(wifi_temp_ssd,temp_state);
-
-    if(temp_state != getPrevWifiConnection(wifi_temp_ssd) || setting.cur_ip == ""){
-        getWifiIP();
-    }
-
-    setPrevWifiConnection(wifi_temp_ssd, temp_state);
-    QMetaObject::invokeMethod(mMain,"checkwifidone");
-
-    wifi_check_process->close();
-    wifi_temp_ssd = "";
+//    return probot->wifi_map[ssid].state;
 }
-void Supervisor::wifi_ch_error(){
-    wifi_check_process->close();
-    QMetaObject::invokeMethod(mMain,"checkwifidone");
-    wifi_temp_ssd = "";
+void Supervisor::setWifiConnection(QString ssid, int con){
+    probot->wifi_map[ssid].state = con;
 }
-void Supervisor::wifi_con_output(){
-    QString output = QString(wifi_process->readAllStandardOutput());
-    switch(wifi_cmd){
-    case WIFI_CMD_CONNECT:{
-        qDebug() << "WIFI CON OUTPUT : " << output;
-        QStringList outputs = output.split(" ");
-        for(int i=0; i<outputs.size(); i++){
-            if(outputs[i] == "successfully"){
-                plog->write("[SETTING] WIFI CONNECT SUCCESS : SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
-//                setSetting("ROBOT_SW/wifi_ssd",setting.wifi_ssd);
-//                setSetting("ROBOT_SW/wifi_passwd",setting.wifi_passwd);
-                readWifiState(setting.wifi_ssd);
-                QMetaObject::invokeMethod(mMain,"wifisuccess");
-            }
-        }
-        wifi_cmd = WIFI_CMD_NONE;
-        setting.cur_ip = "";
-        getWifiIP();
-        wifi_process->close();
-        break;
-    }
-    case WIFI_CMD_GET_LIST:{
-        QVector<ST_WIFI> wifi_all;
-        QStringList output_lines = output.split("\n");
-        for(int i=0; i<output_lines.size(); i++){
-            QStringList outputs = output_lines[i].split(" ");
 
-            QStringList output_final;
-            for(int j=0; j<outputs.size(); j++){
-                if(outputs[j] != ""){
-                    output_final << outputs[j];
-                }
-            }
-//            qDebug() << output_final;
-            //parsing
-            ST_WIFI temp;
-            if(output_final.size() > 8){
-                if(output_final[0] == "IN-USE"){
-                    continue;
-                }if(output_final[0] == "*"){
-                    if(getSetting("ROBOT_SW","wifi_ssd") == ""){
-                        setSetting("ROBOT_SW/wifi_ssd",output_final[2]);
-                        setting.wifi_ssd = output_final[2];
-                    }
-                    temp.inuse = true;
-                    temp.state = 2;
-                    temp.prev_state = 2;
-                }else{
-                    temp.state = 0;
-                    temp.prev_state = 0;
-                    temp.inuse = false;
-                    output_final.push_front(" ");
-                }
-            }else{
-                continue;
-            }
-            temp.ssid = output_final[2];
-            temp.rate = output_final[5].toInt();
-            if(output_final[8] == "▂▄▆█"){
-                temp.level = 4;
-            }else if(output_final[8] == "▂▄▆_"){
-                temp.level = 3;
-            }else if(output_final[8] == "▂▄__"){
-                temp.level = 2;
-            }else if(output_final[8] == "▂___"){
-                temp.level = 1;
-            }else{
-                temp.level = 0;
-            }
-            if(output_final[9].left(3) == "WPA"){
-                temp.security = true;
-            }else{
-                temp.security = false;
-            }
-            temp.discon_count = 0;
-//            qDebug() << temp.ssid << temp.inuse << temp.rate << temp.level << temp.security;
-            wifi_all.push_back(temp);
-        }
+void Supervisor::process_accept(int cmd){
 
-        QVector<ST_WIFI> temp_wifi;
-        for(int i=0; i<wifi_all.size(); i++){
-            bool already_in = false;
-            for(int k=0; k<temp_wifi.size(); k++){
-                if(wifi_all[i].ssid == temp_wifi[k].ssid){
-                    if(wifi_all[i].inuse){
-                        temp_wifi[k].inuse = true;
-                    }
-                    already_in = true;
-                }
-                if(wifi_all[i].ssid == "--")
-                    already_in = true;
-            }
-            if(!already_in){
-                if(wifi_all[i].ssid == "--"){
+}
 
-                }else{
-                    temp_wifi.push_back(wifi_all[i]);
-                }
-            }
-        }
-
-        for(int k=wifi_list.size()-1; k>-1; k--){
-            if(wifi_list[k].discon_count++ > 5){
-                wifi_list.removeAt(k);
-            }
-        }
-
-        bool is_pushed = false;
-        for(int i=0; i<temp_wifi.size(); i++){
-            bool already_in = false;
-            for(int k=0; k<wifi_list.size(); k++){
-                if(temp_wifi[i].ssid == wifi_list[k].ssid){
-                    wifi_list[k].inuse = temp_wifi[i].inuse;
-                    wifi_list[k].level = temp_wifi[i].level;
-                    wifi_list[k].discon_count = 0;
-                    already_in = true;
-                }
-            }
-            if(!already_in){
-                is_pushed = true;
-                wifi_list.push_back(temp_wifi[i]);
-            }
-        }
-
-
-//        if(is_pushed)
-//            plog->write("[SETTING] READ WIFI LIST CHANGED : "+QString::number(wifi_list.size()));
-
-        wifi_cmd = WIFI_CMD_NONE;
-        wifi_process->close();
-        break;
-    }
-    case WIFI_CMD_GET_IP:{
-        bool is_read = false;
-        QStringList output_lines = output.split("\n");
-        for(int i=0; i<output_lines.size(); i++){
-            output_lines[i].replace(" ","");
-            QStringList line = output_lines[i].split(":");
-            if(line.size() > 1){
-                if(line[0] == "IP4.ADDRESS[1]"){
-                    qDebug() << line;
-                    setting.cur_ip = line[1].split("/")[0];
-                }else if(line[0] == "IP4.GATEWAY"){
-                    qDebug() << line;
-                    setting.cur_gateway = line[1];
-                }else if(line[0] == "IP4.DNS[1]"){
-                    qDebug() << line;
-                    setting.cur_dns = line[1];
-                    is_read = true;
-                }
-            }
-        }
-        if(output_lines.size() > 0){
-            if(is_read){
-                plog->write("[SETTING] READ IP : "+setting.wifi_ssd+" IP("+setting.cur_ip+") GATEWAY("+setting.cur_gateway+") DNS("+setting.cur_dns+")");
-                QMetaObject::invokeMethod(mMain,"wifireset");
-                wifi_process->close();
-                wifi_cmd = WIFI_CMD_NONE;
-            }
-        }
-        break;
-    }
-    case WIFI_CMD_SET_IP:{
+void Supervisor::process_done(int cmd){
+    qDebug() << "Process done" << cmd;
+    if(cmd == ExtProcess::PROCESS_CMD_SET_WIFI_IP){
+//        getWifiIP();
         QMetaObject::invokeMethod(mMain,"wifireset");
-        setWifiConnection(setting.wifi_ssd,2);
-        wifi_cmd = WIFI_CMD_NONE;
-        wifi_process->close();
-        break;
-    }
+        setWifiConnection(probot->wifi_ssid,2);
+    }else if(cmd == ExtProcess::PROCESS_CMD_CHECK_CONNECTION){
+        QMetaObject::invokeMethod(mMain, "checkwifidone");
+    }else if(cmd == ExtProcess::PROCESS_CMD_CONNECT_WIFI){
+        readWifiState(probot->wifi_ssid);
+        QMetaObject::invokeMethod(mMain, "checkwifidone");
+    }else if(cmd == ExtProcess::PROCESS_CMD_GET_WIFI_IP){
+        QMetaObject::invokeMethod(mMain, "wifisuccess");
     }
 }
-void Supervisor::wifi_con_error(){
-    qDebug() << "wifi con error";
-    QString output = QString(wifi_process->readAllStandardError());
-    qDebug() << "WIFI CON ERROR : " << output;
 
-    switch(wifi_cmd){
-    case WIFI_CMD_CONNECT:{
-        QStringList outputs = output.split(" ");
-        for(int i=0; i<outputs.size(); i++){
-            if(outputs[i] == "invalid.\n"){
-                plog->write("[SETTING] WIFI CONNECT FAILED (PROPERTY): SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
-                QMetaObject::invokeMethod(mMain,"wififailed");
-                wifi_cmd = WIFI_CMD_NONE;
-                wifi_process->close();
-            }else if(outputs[i] == "No"){
-                plog->write("[SETTING] WIFI CONNECT FAILED (NO SSD) : SSD("+setting.wifi_ssd+") PASSWD("+setting.wifi_passwd+")");
-                QMetaObject::invokeMethod(mMain,"wififailed");
-                wifi_cmd = WIFI_CMD_NONE;
-                wifi_process->close();
-            }
-        }
-        break;
-    }
-    case WIFI_CMD_GET_LIST:{
-        plog->write("[SETTING] WIFI GET LIST FAILED");
-        wifi_cmd = WIFI_CMD_NONE;
-        wifi_process->close();
-        break;
-    }
-    case WIFI_CMD_GET_IP:{
-        plog->write("[SETTING] WIFI GET IP FAILED " + setting.wifi_ssd);
-        wifi_cmd = WIFI_CMD_NONE;
-        wifi_process->close();
-        break;
-    }
+void Supervisor::process_error(int cmd){
+    if(cmd == ExtProcess::PROCESS_CMD_CHECK_CONNECTION){
+        QMetaObject::invokeMethod(mMain, "checkwifidone");
+    }else if(cmd == ExtProcess::PROCESS_CMD_CONNECT_WIFI){
+        QMetaObject::invokeMethod(mMain, "wififailed");
+    }else if(cmd == ExtProcess::PROCESS_CMD_SET_WIFI_IP){
+        QMetaObject::invokeMethod(mMain, "setip_fail");
     }
 }
-void Supervisor::connectWifi(QString ssd, QString passwd){
-    qDebug() << "conwifi";
-    bool match = false;
-    for(int i=0; i<wifi_cmds.size(); i++){
-        if(wifi_cmds[i] == WIFI_CMD_CONNECT){
-            plog->write("[SETTING] CONNECT WIFI CMD : OVERWRITE PREV("+setting.wifi_ssd+") NEW("+ssd+")");
-            setting.wifi_ssd = ssd;
-            setting.wifi_passwd = passwd;
-            match = true;
-        }
-    }
-    if(!match){
-        setting.wifi_ssd = ssd;
-        setting.wifi_passwd = passwd;
-        wifi_cmds.append(WIFI_CMD_CONNECT);
-    }
+
+void Supervisor::process_timeout(int cmd){
+    QMetaObject::invokeMethod(mMain, "checkwifidone");
 }
+
+void Supervisor::connectWifi(QString ssid, QString passwd){
+    ExtProcess::Command temp;
+    temp.cmd = ExtProcess::PROCESS_CMD_CONNECT_WIFI;
+
+    memcpy(temp.params,ssid.toUtf8(),sizeof(char)*100);
+    memcpy(temp.params2,passwd.toUtf8(),sizeof(char)*100);
+    extproc->set_command(temp);
+}
+
 void Supervisor::setWifi(QString ip, QString gateway, QString dns){
-    qDebug() << "wifi set ";
-    bool match = false;
-    for(int i=0; i<wifi_cmds.size(); i++){
-        if(wifi_cmds[i] == WIFI_CMD_SET_IP){
-            plog->write("[SETTING] SET WIFI IP CMD : OVERWRITE PREV("+setting.wifi_ip+") NEW("+ip+")");
-            match = true;
+    ExtProcess::Command temp;
+    temp.cmd = ExtProcess::PROCESS_CMD_SET_WIFI_IP;
+    memcpy(temp.params,ip.toUtf8(),sizeof(char)*100);
+    memcpy(temp.params2,gateway.toUtf8(),sizeof(char)*100);
+    memcpy(temp.params3,dns.toUtf8(),sizeof(char)*100);
+    extproc->set_command(temp);
+}
+
+void Supervisor::readWifiState(QString ssid){
+    if(probot->wifi_ssid == ""){
+        QMetaObject::invokeMethod(mMain, "checkwifidone");
+    }else{
+        if(ssid == ""){
+            ssid = probot->wifi_ssid;
         }
-    }
-    setting.wifi_ip = ip;
-    setting.wifi_gateway = gateway;
-    setting.wifi_dns = dns;
-    if(!match)
-        wifi_cmds.append(WIFI_CMD_SET_IP);
-}
-void Supervisor::readWifiState(QString ssd){
-    if(wifi_temp_ssd == ""){
-        wifi_temp_ssd = ssd;
-        wifi_check_process->start("nmcli -f GENERAL.STATE con show "+wifi_temp_ssd);
+        if(probot->wifi_ssid != ssid){
+            QMetaObject::invokeMethod(mMain, "checkwifidone");
+        }else{
+            ExtProcess::Command temp;
+            temp.cmd = ExtProcess::PROCESS_CMD_CHECK_CONNECTION;
+            memcpy(temp.params,ssid.toUtf8(),sizeof(char)*100);
+            extproc->set_command(temp);
+        }
+
     }
 }
-void Supervisor::setWifiSSD(QString ssd){
-    setting.wifi_ssd = ssd;
+
+void Supervisor::setWifiSSD(QString ssid){
+    probot->wifi_ssid = ssid;
 }
+
 void Supervisor::getWifiIP(){
-    bool match = false;
-    for(int i=0; i<wifi_cmds.size(); i++){
-        if(wifi_cmds[i] == WIFI_CMD_GET_IP){
-            match = true;
-        }
+    ExtProcess::Command temp;
+    temp.cmd = ExtProcess::PROCESS_CMD_GET_WIFI_IP;
+    qDebug() << "getwifiip " << probot->wifi_ssid;
+    if(probot->wifi_ssid == ""){
+
+    }else{
+        memcpy(temp.params,probot->wifi_ssid.toUtf8(),sizeof(char)*100);
+        extproc->set_command(temp);
     }
-    if(!match)
-        wifi_cmds.append(WIFI_CMD_GET_IP);
 }
 QString Supervisor::getcurIP(){
-    return setting.cur_ip;
+    return probot->cur_ip;
 }
 QString Supervisor::getcurGateway(){
-    return setting.cur_gateway;
+    return probot->cur_gateway;
 }
 QString Supervisor::getcurDNS(){
-    return setting.cur_dns;
+    return probot->cur_dns;
 }
 void Supervisor::getAllWifiList(){
-//    qDebug() << "getAllWifiList" << wifi_cmds.size() << wifi_cmd;
-    if(wifi_cmds.size() == 0 && wifi_cmd == WIFI_CMD_NONE){
-        wifi_cmds.append(WIFI_CMD_GET_LIST);
+    ExtProcess::Command temp;
+    temp.cmd = ExtProcess::PROCESS_CMD_GET_WIFI_LIST;
+    extproc->set_command(temp, "Get Wifi List");
+}
+bool Supervisor::getWifiSecurity(QString ssid){
+    return probot->wifi_map[ssid].security;
+}
+int Supervisor::getWifiLevel(QString ssid){
+    if(probot->wifi_map[ssid].level < 20){
+        return 0;
+    }else if(probot->wifi_map[ssid].level < 40){
+        return 1;
+    }else if(probot->wifi_map[ssid].level < 60){
+        return 2;
+    }else if(probot->wifi_map[ssid].level < 80){
+        return 3;
+    }else{
+        return 4;
     }
 }
-bool Supervisor::getWifiSecurity(int num){
-    if(num > -1 && num < wifi_list.size()){
-        return wifi_list[num].security;
-    }
-    return false;
+int Supervisor::getWifiRate(QString ssid){
+    return probot->wifi_map[ssid].rate;
 }
-int Supervisor::getWifiLevel(int num){
-    if(num > -1 && num < wifi_list.size()){
-        return wifi_list[num].level;
-    }
-    return 0;
-}
-int Supervisor::getWifiRate(int num){
-    if(num > -1 && num < wifi_list.size()){
-        return wifi_list[num].rate;
-    }
-    return 0;
-}
-bool Supervisor::getWifiInuse(int num){
-    if(num > -1 && num < wifi_list.size()){
-        return wifi_list[num].inuse;
-    }
-    return false;
+bool Supervisor::getWifiInuse(QString ssid){
+    return probot->wifi_map[ssid].inuse;
 }
 
 void Supervisor::cleanTray(){

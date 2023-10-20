@@ -122,6 +122,7 @@ void ServerHandler::setSettingServer(QString name, QString value){
     setting.setValue(name,value);
     plog->write("[SETTING] SET "+name+" VALUE TO "+value);
 }
+
 void ServerHandler::setSetting(QString name, QString value){
     QString ini_path = QDir::homePath()+"/robot_config.ini";
     QSettings setting(ini_path, QSettings::IniFormat);

@@ -42,8 +42,15 @@ POSE setAxis(cv::Point2f _point, float _angle);
 POSE setAxisBack(cv::Point2f _point, float _angle);
 
 bool sortLocation2(const LOCATION &l1, const LOCATION &l2);
+bool sortWifi(const QString &w1, const QString &w2);
 
-
+enum{
+    WIFI_NONE = 0,
+    WIFI_CONNECTING,
+    WIFI_CONNECT_NO_INTERNET,
+    WIFI_CONNECT,
+    WIFI_UNKNOWN
+};
 typedef struct{
     int chunkSize = 0;
     int imageSize = 0;
@@ -111,6 +118,17 @@ typedef struct{
     bool empty=true;
     LOCATION location;
 }ST_TRAY;
+
+typedef struct{
+    bool inuse;
+    QString ssid;
+    int rate;
+    int level;
+    bool security;
+    int discon_count;
+    int state = 0;
+    int prev_state=0;
+}ST_WIFI;
 
 typedef struct{
     bool ipc_use = false;
@@ -181,24 +199,24 @@ typedef struct{
     int server_call_size=0;
     int server_call_location=-1;
 
+    int volume_system = 50;
     QString program_version;
     QString program_date;
     QString program_message;
     QVector<ST_GIT> gitList;
 
+    QMap<QString, ST_WIFI> wifi_map;
+    int wifi_connection = 0;
+    QString wifi_ssid = "";
+    QString wifi_passwd = "";
+    QString wifi_ip = "";
+    QString wifi_gateway = "";
+    QString wifi_dns = "";
+    QString cur_ip="";
+    QString cur_gateway="";
+    QString cur_dns="";
 }ST_ROBOT;
 extern ST_ROBOT *probot;
-
-typedef struct{
-    bool inuse;
-    QString ssid;
-    int rate;
-    int level;
-    bool security;
-    int discon_count;
-    int state;
-    int prev_state=0;
-}ST_WIFI;
 
 typedef struct{
     QString type;
@@ -218,21 +236,9 @@ typedef struct{
     int table_num;
     int table_col_num;
 
+    int volumeSystem;
     int volumeBGM;
     int volumeVoice;
-
-    int wifi_connection=0;
-    int prev_wifi_connection = 0;
-    QString wifi_ssd = "";
-    QString wifi_passwd = "";
-    QString wifi_ip = "";
-    QString wifi_gateway = "";
-    QString wifi_dns = "";
-
-    QString cur_ip="";
-    QString cur_gateway="";
-    QString cur_dns="";
-
     bool useAvoid;
     bool useAutoInit;
     bool useVoice;

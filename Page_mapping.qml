@@ -219,7 +219,7 @@ Item {
         Item{
             width: mapping_pages.width
             height: mapping_pages.height
-            property var select_grid: 3
+            property var select_grid: 5
             property var available_size: 0
             onSelect_gridChanged: {
                 available_size = select_grid*slider_mapsize.value/100;

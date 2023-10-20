@@ -34,6 +34,20 @@ Item {
         }
     }
 
+    function wifistatein(){
+        popup_loading.close();
+        loader_init.item.updatewifiState();
+    }
+    function wifi_con_failed(){
+        popup_loading.close();
+        loader_init.item.connect_fail();
+    }
+    function wifi_con_success(){
+        popup_loading.close();
+        loader_init.item.updatewifiState();
+        loader_init.item.ip_update();
+    }
+
     //init page main window
     Loader{
         id: loader_init
@@ -411,6 +425,7 @@ Item {
             }
             function updatewifiState(){
                 wizard_ip.connection = supervisor.getWifiConnection(wizard_ip.select_ssd);
+
             }
             function connect_fail(){
                 text_wifi76788.visible = true;
@@ -442,7 +457,7 @@ Item {
                     gateway_3.text = "";
                     gateway_4.text = "";
                 }
-                ip = supervisor.getcurDNS().split(".");
+                ip = supervisor.getcurGateway().split(".");
                 if(ip.length >3){
                     dnsmain_1.text = ip[0];
                     dnsmain_2.text = ip[1];
@@ -915,10 +930,10 @@ Item {
                         }
                     }
                     function init(){
-                        timer_load.start();
+//                        timer_load.start();
                     }
                     Component.onCompleted: {
-                        timer_load.start();
+//                        timer_load.start();
                     }
                     Component.onDestruction: {
                         timer_load.stop();
@@ -932,7 +947,7 @@ Item {
                         id: timer_load
                         interval: 500
                         repeat: true
-                        running: false
+                        running: swipeview_wizard.currentIndex === 3
                         onTriggered:{
                             //카메라 정보 요청
                             supervisor.requestCamera();
@@ -1237,8 +1252,10 @@ Item {
                         onTriggered: {
                             supervisor.getAllWifiList();
                             model_wifis.clear();
+
                             for(var i=0; i<supervisor.getWifiNum(); i++){
-                                model_wifis.append({"ssd":supervisor.getWifiSSD(i),"inuse":supervisor.getWifiInuse(i),"rate":supervisor.getWifiRate(i),"level":supervisor.getWifiLevel(i),"security":supervisor.getWifiSecurity(i)});
+                                var ssid = supervisor.getWifiSSID(i);
+                                model_wifis.append({"ssid":ssid,"inuse":supervisor.getWifiInuse(ssid),"rate":supervisor.getWifiRate(ssid),"level":supervisor.getWifiLevel(ssid),"security":supervisor.getWifiSecurity(ssid)});
                             }
                         }
                     }
@@ -1295,7 +1312,7 @@ Item {
                                                     anchors.centerIn: parent
                                                     font.family: font_noto_r.name
                                                     color:col_wifis.select_wifi===index?"white":"black"
-                                                    text: ssd
+                                                    text: ssid
                                                 }
                                                 Text{
                                                     font.family: font_noto_r.name
@@ -1412,11 +1429,10 @@ Item {
                                                 onClicked:{
                                                     click_sound.play();
                                                     col_wifis.select_wifi = index;
-                                                    wizard_ip.select_ssd = ssd;
+                                                    wizard_ip.select_ssd = ssid;
                                                     wizard_ip.select_inuse = inuse;
                                                     wizard_ip.select_security = security;
                                                     wizard_ip.select_level = level;
-                                                    supervisor.setWifiSSD(ssd);
                                                 }
                                             }
                                         }
@@ -1425,8 +1441,10 @@ Item {
                             }
 
                             Text{
+//                                visible: false
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.bottom: parent.bottom
+                                anchors.top: parent.bottom
+                                anchors.topMargin: 10
                                 color: color_dark_black
                                 font.family: font_noto_r.name
                                 font.pixelSize: 15
@@ -2271,7 +2289,8 @@ Item {
                                                 click_sound.play();
                                                 if(supervisor.getcurIP() === "")
                                                     supervisor.getWifiIP();
-                                                item_init_2.ip_update();
+
+                                                loader_init.item.ip_update();
                                             }
                                         }
                                     }
@@ -2308,9 +2327,9 @@ Item {
                                                 dnsmain_4.ischanged = false;
                                                 var dns_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
                                                 supervisor.setWifi(ip_str,gateway_str,dns_str);
-                                                supervisor.setSetting("ROBOT_SW/wifi_ip",ip_str);
-                                                supervisor.setSetting("ROBOT_SW/wifi_gateway",gateway_str);
-                                                supervisor.setSetting("ROBOT_SW/wifi_dnsmain",dns_str);
+                                                supervisor.setSetting("NETWORK/wifi_ip",ip_str);
+                                                supervisor.setSetting("NETWORK/wifi_gateway",gateway_str);
+                                                supervisor.setSetting("NETWORK/wifi_dnsmain",dns_str);
                                                 wizard_ip.connection = false;
                                                 popup_loading.open();
                                             }
@@ -2423,13 +2442,13 @@ Item {
                                     wizard_ip.setting_step++;
                                     popup_loading.open();
                                     timer_update_wifi.stop();
-                                    timer_update_state.start();
+//                                    timer_update_state.start();
                                 }else if(wizard_ip.setting_step == 1){
                                     supervisor.writelog("[USER INPUT] INIT PAGE : IP SETTING NEXT 2");
-//                                    supervisor.getWifiIP();
+                                    supervisor.getWifiIP();
                                     wizard_ip.setting_step++;
                                 }else{
-                                    supervisor.save
+//                                    supervisor.save
                                     supervisor.writelog("[USER INPUT] INIT PAGE : SETTING DONE");
                                     swipeview_wizard.currentIndex++;
                                 }
@@ -3473,19 +3492,6 @@ Item {
             }
         }
 
-    }
-
-    function wifistatein(){
-        popup_loading.close();
-        loader_init.item.updatewifiState();
-    }
-    function wifi_con_failed(){
-        popup_loading.close();
-        loader_init.item.connect_fail();
-    }
-    function wifi_con_success(){
-        popup_loading.close();
-        loader_init.item.updatewifiState();
     }
 
     Popup{

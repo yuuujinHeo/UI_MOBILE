@@ -280,7 +280,7 @@ Window {
     }
 
     function checkwifidone(){
-        if(loader_page.item.objectName == "page_init"){
+        if(loader_page.item.objectName == "page_init" || loader_page.item.objectName == "page_setting"){
             loader_page.item.wifistatein();
         }
     }
@@ -408,7 +408,7 @@ Window {
         if(!debug_mode){
             if(loader_page.item.objectName != "page_annotation" && loader_page.item.objectName != "page_mapping"){
                 supervisor.writelog("[UI] Force Page Change : Robot disconnected");
-                loadPage(pinit);
+//                loadPage(pinit);
             }
         }
     }
@@ -454,6 +454,12 @@ Window {
             loader_page.item.wifi_con_success();
     }
 
+    function setip_fail(){
+        if(loader_page.item.objectName == "page_setting" || loader_page.item.objectName == "page_init")
+            loader_page.item.wifi_set_failed();
+
+    }
+
     function wifireset(){
         if(loader_page.item.objectName == "page_setting" || loader_page.item.objectName == "page_init")
             loader_page.item.init();
@@ -492,7 +498,7 @@ Window {
             timer_update.start();
             loader_page.item.init();
         }
-        source: pinit
+        source: psetting//pinit
     }
 
     Timer{

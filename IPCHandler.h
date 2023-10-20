@@ -306,6 +306,7 @@ public:
 
     void handsup();
     void handsdown();
+
     ////*********************************************  COMMAND FUNCTIONS   ***************************************************////
     void moveToLocation(LOCATION target_loc, int preset);
     void moveToLocationTest(LOCATION target_loc, int preset);

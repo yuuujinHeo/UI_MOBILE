@@ -1341,7 +1341,7 @@ Item {
 
     Rectangle{
         id: rect_patrol_box
-        visible: !show_serving?true:false
+        visible: false
         width: (table_num/row_num).toFixed(0)*100 - 20 + 160
         height: parent.height - statusbar.height
         anchors.left: parent.left
@@ -1447,7 +1447,7 @@ Item {
         Text{
             id: text_go2
             anchors.centerIn: parent
-            text: "패트롤 시작"
+            text: "순회 시작"
             font.family: font_noto_r.name
             font.pixelSize: 35
             font.bold: true
@@ -1458,13 +1458,302 @@ Item {
             anchors.fill: parent
             onClicked: {
                 start_sound.play();
-                count_resting = 0;
+                popup_patrol_list.open();
+//                count_resting = 0;
                 go_patrol = true;
-                popup_question.visible = true;
-                print("patrol start button");
+//                popup_question.visible = true;
+//                print("patrol start button");
             }
         }
     }
+
+    Popup{
+        id: popup_patrol_list
+        property string mode: "sequence"
+        property var select_pos_mode: 0
+        anchors.centerIn: parent
+        width: 600
+        height: 740
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
+        onOpened:{
+            cols_patrol_bigmenu.visible = true;
+            flickable_patrol.visible = false;
+            update();
+        }
+
+        function update(){
+            model_patrols.clear();
+            print(supervisor.getLocationNum(""));
+            for(var i=0; i<supervisor.getLocationNum(""); i++){
+                model_patrols.append({"name":supervisor.getLocationName(i,""),"select":false});
+            }
+        }
+
+        Rectangle{
+            width: parent.width
+            height: parent.height
+            radius: 10
+            color: color_dark_navy
+            Column{
+                anchors.fill: parent
+                Rectangle{
+                    width: parent.width
+                    height: 90
+                    color: "transparent"
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_r.name
+                        font.pixelSize: 35
+                        text: "로봇이 지정된 위치로 이동합니다"
+                        color: "white"
+                    }
+                }
+                Rectangle{
+                    width: parent.width
+                    height: parent.height-90
+                    color: "transparent"
+                    Column{
+                        anchors.centerIn: parent
+                        spacing: 20
+
+                        Column{
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 5
+                            Text{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                font.family: font_noto_r.name
+                                font.pixelSize: 20
+                                text: "[ 순회 방식 설정 ]"
+                                color: "white"
+                            }
+                            Row{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: 20
+                                Rectangle{
+                                    width: 150
+                                    height: 60
+                                    border.width: 2
+                                    radius: 2
+                                    border.color:"white"
+                                    color: popup_patrol_list.mode==="random"?color_green:"transparent"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 20
+                                        text: "랜덤하게"
+                                        color: "white"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            click_sound.play();
+                                            popup_patrol_list.mode = "random";
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width: 150
+                                    height: 60
+                                    radius: 2
+                                    border.width: 2
+                                    border.color:"white"
+                                    color: popup_patrol_list.mode==="sequence"?color_green:"transparent"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 20
+                                        color: "white"
+                                        text: "순차적으로"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            click_sound.play();
+                                            popup_patrol_list.mode = "sequence";
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+
+                        Column{
+                            spacing: 5
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            Text{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                font.family: font_noto_r.name
+                                font.pixelSize: 20
+                                text: "[ 순회 위치 설정 ]"
+                                color: "white"
+                            }
+                            Column{
+                                height: 300
+                                id: cols_patrol_bigmenu
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                visible: true
+                                spacing: 20
+                                Rectangle{
+                                    width: 320
+                                    height: 80
+                                    radius: 10
+                                    color: popup_patrol_list.select_pos_mode === 0?color_green:"white"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        font.family: font_noto_r.name
+                                        text: "전체 위치"
+                                        font.pixelSize: 30
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            click_sound.play();
+                                            popup_patrol_list.select_pos_mode = 0;
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width: 320
+                                    height: 80
+                                    radius: 10
+                                    color: popup_patrol_list.select_pos_mode === 1?color_green:"white"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        font.family: font_noto_r.name
+                                        text: "서빙 위치"
+                                        font.pixelSize: 30
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            click_sound.play();
+                                            popup_patrol_list.select_pos_mode = 1;
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width: 320
+                                    height: 80
+                                    radius: 10
+                                    color: popup_patrol_list.select_pos_mode === 2?color_green:"white"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        font.family: font_noto_r.name
+                                        text: "직접 선택"
+                                        font.pixelSize: 30
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            popup_patrol_list.select_pos_mode = 2;
+                                            click_sound.play();
+                                            cols_patrol_bigmenu.visible = false;
+                                            flickable_patrol.visible = true;
+                                        }
+                                    }
+                                }
+                            }
+
+                            Flickable{
+                                id: flickable_patrol
+                                width: popup_patrol_list.width
+                                height: 300
+                                visible: false
+                                clip: true
+                                contentHeight: col_patlist.height
+                                Column{
+                                    id: col_patlist
+                                    anchors.centerIn: parent
+                                    spacing: 10
+                                    Repeater{
+                                        model: ListModel{id:model_patrols}
+                                        Rectangle{
+                                            width: popup_patrol_list.width*0.6
+                                            height: 50
+                                            radius: 5
+                                            color: select?color_green:"white"
+                                            Text{
+                                                anchors.centerIn: parent
+                                                font.family: font_noto_r.name
+                                                text: name
+                                                font.pixelSize: 20
+                                            }
+                                            MouseArea{
+                                                anchors.fill: parent
+                                                onClicked:{
+                                                    click_sound.play();
+                                                    if(select)
+                                                        select = false;
+                                                    else
+                                                        select = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        Rectangle{
+                            width: 200
+                            height: 80
+                            radius: 30
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: color_green
+                            Text{
+                                anchors.centerIn: parent
+                                text: "순회 시작"
+                                font.pixelSize: 40
+                                color: "white"
+                                font.family: font_noto_b.name
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    if(popup_patrol_list.select_pos_mode === 0){
+                                        click_sound.play();
+                                        supervisor.clearRotateList();
+                                        for(var i=0; i<supervisor.getLocationNum("");i++){
+                                            supervisor.setRotateList(supervisor.getLocationName(i,""));
+                                        }
+                                        supervisor.startPatrol(popup_patrol_list.mode,false);
+                                    }else if(popup_patrol_list.select_pos_mode === 1){
+                                        click_sound.play();
+                                        supervisor.clearRotateList();
+                                        for(var i=0; i<supervisor.getLocationNum("Serving");i++){
+                                            supervisor.setRotateList(supervisor.getLocationName(i,"Serving"));
+                                        }
+                                        supervisor.startPatrol(popup_patrol_list.mode,false);
+                                    }else if(popup_patrol_list.select_pos_mode === 2){
+                                        click_sound.play();
+                                        supervisor.clearRotateList();
+                                        for(var i=0; i<model_patrols.count; i++){
+                                            if(model_patrols.get(i).select){
+                                                supervisor.setRotateList(model_patrols.get(i).name);
+                                            }
+                                        }
+                                        supervisor.startPatrol(popup_patrol_list.mode,false);
+
+                                    }else{
+                                        click_sound2.play();
+                                    }
+
+                                    popup_patrol_list.close();
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+            }
+
+        }
+    }
+
 
     property var size_menu: 100
     Rectangle{

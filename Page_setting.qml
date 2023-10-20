@@ -35,12 +35,38 @@ Item {
         if(popup_camera.opened)
             popup_camera.update();
     }
+    function wifi_set_failed(){
+        popup_loading.close();
+        init();
+    }
+
+    function wifistatein(){
+        popup_loading.close();
+        popup_wifi.connection = supervisor.getWifiConnection(popup_wifi.select_ssd);
+    }
+    function wifi_con_failed(){
+        popup_loading.close();
+        popup_wifi.connect_fail();
+    }
+    function wifi_con_success(){
+        popup_loading.close();
+        init();
+        popup_wifi.connection = supervisor.getWifiConnection(popup_wifi.select_ssd);
+        popup_wifi.ip_update();
+    }
+    onIs_adminChanged: {
+        if(is_admin){
+            init();
+        }
+    }
+
     Component.onCompleted: {
         statusbar.visible = true;
         is_admin = false;
         is_reset_slam = false;
         supervisor.getAllWifiList();
         supervisor.getWifiIP();
+        supervisor.requestSystemVolume();
         init();
     }
 
@@ -323,17 +349,16 @@ Item {
                                 onTextChanged: {
                                     ischanged = true;
                                 }
-                                focus:false
-                                onFocusChanged: {
-                                    keyboard.owner = platform_name;
-                                    keyboard.owner_text = "platform_name";
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        if(ischanged){
-                                            is_reset_slam = true;
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        keyboard.owner = platform_name;
+                                        keyboard.owner_text = "platform_name";
+                                        platform_name.selectAll();
+
+                                        if(!keyboard.opened){
+                                            keyboard.open();
                                         }
-                                        keyboard.close();
                                     }
                                 }
                             }
@@ -1077,6 +1102,84 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_system_volume
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"시스템 볼륨"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            id: tt
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                spacing: 10
+                                anchors.centerIn: parent
+                                Image{
+                                    id: ttet12
+                                    source: "icon/icon_mute.png"
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            click_sound.play();
+                                            if(slider_volume_system.value == 0){
+                                                slider_volume_system.value  = 50;
+                                            }else{
+                                                slider_volume_system.value  = 0;
+                                            }
+                                            supervisor.setSystemVolume(slider_volume_system.value);
+
+                                        }
+                                    }
+                                }
+                                Slider{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    id: slider_volume_system
+//                                    anchors.centerIn: parent
+                                    width: tt.width*0.7 + 10 + ttet2132.width
+                                    height: 50
+                                    from: 0
+                                    to: 100
+                                    property bool ischanged: false
+                                    onValueChanged: {
+                                        ischanged = true;
+                                    }
+                                    value: supervisor.getSetting("ROBOT_SW","volume_system")
+                                    onPressedChanged: {
+                                        if(!pressed){
+                                            click_sound.play();
+                                            supervisor.setSystemVolume(slider_volume_system.value);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle{
                     id: set_bgm_volume
                     width: 840
                     height: 50
@@ -1106,7 +1209,7 @@ Item {
                             color: "#d0d0d0"
                         }
                         Rectangle{
-                            id: tt
+                            id: tte32
                             width: parent.width - 351
                             height: parent.height
                             Row{
@@ -1145,7 +1248,7 @@ Item {
                                 }
 
                                 Image{
-                                    id: ttet
+                                    id: ttet2132
                                     source: "icon/icon_test_play.png"
                                     anchors.verticalCenter: parent.verticalCenter
                                     MouseArea{
@@ -1154,10 +1257,10 @@ Item {
                                             click_sound.play();
                                             if(bgm_test.isplaying){
                                                 bgm_test.stop();
-                                                ttet.source = "icon/icon_test_play.png";
+                                                ttet2132.source = "icon/icon_test_play.png";
                                             }else{
                                                 bgm_test.play();
-                                                ttet.source = "icon/icon_test_stop.png";
+                                                ttet2132.source = "icon/icon_test_stop.png";
                                             }
                                         }
                                     }
@@ -1204,7 +1307,7 @@ Item {
                                 spacing: 10
                                 anchors.centerIn: parent
                                 Image{
-                                    id: ttet12
+                                    id: ttet124
                                     anchors.verticalCenter: parent.verticalCenter
                                     source: "icon/icon_mute.png"
                                     MouseArea{
@@ -1380,6 +1483,7 @@ Item {
                 Rectangle{
                     width: 1100
                     height: 40
+                    visible: is_admin
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
@@ -1393,6 +1497,7 @@ Item {
                 Rectangle{
                     id: set_use_server_call
                     width: 840
+                    visible: is_admin
                     height: 50
                     Row{
                         anchors.fill: parent
@@ -1437,6 +1542,7 @@ Item {
                 Rectangle{
                     id: set_use_multirobot
                     width: 840
+                    visible: is_admin
                     height: 50
                     Row{
                         anchors.fill: parent
@@ -1486,8 +1592,8 @@ Item {
                 Rectangle{
                     id: set_server_ip
                     width: 840
+                    visible: is_admin && use_multirobot
                     height: 50
-                    visible: use_multirobot
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -1524,15 +1630,17 @@ Item {
                                     id: server_ip_1
                                     width: 70
                                     height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = server_ip_1;
-                                        server_ip_1.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            keypad.close();
-                                            server_ip_1.select(0,0);
+                                    MouseArea{
+                                        anchors.fill:parent
+                                        onClicked: {
+                                            if(keypad.is_opened){
+                                                keypad.owner = server_ip_1;
+                                                server_ip_1.selectAll();
+                                            }else{
+                                                keypad.owner = server_ip_1;
+                                                server_ip_1.selectAll();
+                                                keypad.open();
+                                            }
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -1541,12 +1649,12 @@ Item {
                                         ischanged = true;
                                         if(server_ip_1.text.split(".").length > 1){
                                             server_ip_1.text = server_ip_1.text.split(".")[0];
-                                            server_ip_1.focus = false;
-                                            server_ip_2.focus = true;
+                                            server_ip_2.selectAll();
+                                            keypad.owner = server_ip_2;
                                         }
                                         if(server_ip_1.text.length == 3){
-                                            server_ip_1.focus = false;
-                                            server_ip_2.focus = true;
+                                            server_ip_2.selectAll();
+                                            keypad.owner = server_ip_2;
                                         }
                                     }
                                 }
@@ -1559,16 +1667,17 @@ Item {
                                     id: server_ip_2
                                     width: 70
                                     height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = server_ip_2;
-//                                        keyboard.owner_text = "server_ip_2";
-                                        server_ip_2.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            keypad.close();
-                                            server_ip_2.select(0,0);
+                                    MouseArea{
+                                        anchors.fill:parent
+                                        onClicked: {
+                                            if(keypad.is_opened){
+                                                keypad.owner = server_ip_2;
+                                                server_ip_2.selectAll();
+                                            }else{
+                                                keypad.owner = server_ip_2;
+                                                server_ip_2.selectAll();
+                                                keypad.open();
+                                            }
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -1581,12 +1690,12 @@ Item {
 
                                         if(server_ip_2.text.split(".").length > 1){
                                             server_ip_2.text = server_ip_2.text.split(".")[0];
-                                            server_ip_2.focus = false;
-                                            server_ip_3.focus = true;
+                                            server_ip_3.selectAll();
+                                            keypad.owner = server_ip_3;
                                         }
                                         if(server_ip_2.text.length == 3){
-                                            server_ip_2.focus = false;
-                                            server_ip_3.focus = true;
+                                            server_ip_3.selectAll();
+                                            keypad.owner = server_ip_3;
                                         }
                                     }
                                 }
@@ -1598,16 +1707,17 @@ Item {
                                     id: server_ip_3
                                     width: 70
                                     height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = server_ip_3;
-//                                        keyboard.owner_text = "server_ip_3";
-                                        server_ip_3.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            server_ip_3.select(0,0);
-                                            keypad.close();
+                                    MouseArea{
+                                        anchors.fill:parent
+                                        onClicked: {
+                                            if(keypad.is_opened){
+                                                keypad.owner = server_ip_3;
+                                                server_ip_3.selectAll();
+                                            }else{
+                                                keypad.owner = server_ip_3;
+                                                server_ip_3.selectAll();
+                                                keypad.open();
+                                            }
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -1620,12 +1730,12 @@ Item {
 
                                         if(server_ip_3.text.split(".").length > 1){
                                             server_ip_3.text = server_ip_3.text.split(".")[0];
-                                            server_ip_3.focus = false;
-                                            server_ip_4.focus = true;
+                                            server_ip_4.selectAll();
+                                            keypad.owner = server_ip_4;
                                         }
                                         if(server_ip_3.text.length == 3){
-                                            server_ip_3.focus = false;
-                                            server_ip_4.focus = true;
+                                            server_ip_4.selectAll();
+                                            keypad.owner = server_ip_4;
                                         }
                                     }
                                 }
@@ -1637,16 +1747,17 @@ Item {
                                     id: server_ip_4
                                     width: 70
                                     height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = server_ip_4;
-//                                        keyboard.owner_text = "server_ip_4";
-                                        server_ip_4.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            server_ip_4.select(0,0);
-                                            keypad.close();
+                                    MouseArea{
+                                        anchors.fill:parent
+                                        onClicked: {
+                                            if(keypad.is_opened){
+                                                keypad.owner = server_ip_4;
+                                                server_ip_4.selectAll();
+                                            }else{
+                                                keypad.owner = server_ip_4;
+                                                server_ip_4.selectAll();
+                                                keypad.open();
+                                            }
                                         }
                                     }
                                     color: ischanged?color_red:"black"
@@ -1659,10 +1770,10 @@ Item {
 
                                         if(server_ip_4.text.split(".").length > 1){
                                             server_ip_4.text = server_ip_4.text.split(".")[0];
-                                            server_ip_4.focus = false;
+                                            keypad.close();
                                         }
                                         if(server_ip_4.text.length == 3){
-                                            server_ip_4.focus = false;
+                                            keypad.close();
                                         }
                                     }
                                 }
@@ -1699,7 +1810,7 @@ Item {
                     id: set_server_id
                     width: 840
                     height: 50
-                    visible: use_multirobot
+                    visible: is_admin && use_multirobot
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -1736,18 +1847,21 @@ Item {
                                     ischanged = true;
                                     is_reset_slam = true;
                                 }
-                                focus:false
-                                color: ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_HW","fms_id");
-                                onFocusChanged: {
-                                    keyboard.owner = fms_id;
-                                    keyboard.owner_text = "fms_id";
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keyboard.is_opened){
+                                            keyboard.owner = fms_id;
+                                            fms_id.selectAll();
+                                        }else{
+                                            keyboard.owner = fms_id;
+                                            fms_id.selectAll();
+                                            keyboard.open();
+                                        }
                                     }
                                 }
+                                color: ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_HW","fms_id");
                             }
                         }
                     }
@@ -1756,7 +1870,7 @@ Item {
                     id: set_server_pw
                     width: 840
                     height: 50
-                    visible: use_multirobot
+                    visible: is_admin &&  use_multirobot
                     Row{
                         anchors.fill: parent
                         Rectangle{
@@ -1793,18 +1907,22 @@ Item {
                                     ischanged = true;
                                     is_reset_slam = true;
                                 }
-                                focus:false
-                                color: ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_HW","fms_pw");
-                                onFocusChanged: {
-                                    keyboard.owner = fms_pw;
-                                    keyboard.owner_text = "fms_pw";
-                                    if(focus){
-                                        keyboard.open();
-                                    }else{
-                                        keyboard.close();
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keyboard.is_opened){
+                                            keyboard.owner = fms_pw;
+                                            fms_pw.selectAll();
+                                        }else{
+                                            keyboard.owner = fms_pw;
+                                            fms_pw.selectAll();
+                                            keyboard.open();
+                                        }
                                     }
                                 }
+                                color: ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_HW","fms_pw");
+
                             }
                         }
                     }
@@ -1819,7 +1937,7 @@ Item {
                     Text{
                         anchors.centerIn: parent
                         font.family: font_noto_b.name
-                        text:"로봇 설정(전문가용)"
+                        text:"로봇 하드웨어 설정"
                         color: "white"
                         font.pixelSize: 20
                     }
@@ -1865,18 +1983,22 @@ Item {
                                     ischanged = true;
                                     is_reset_slam = true;
                                 }
-                                focus:false
-                                color: ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_HW","radius");
-                                onFocusChanged: {
-                                    keypad.owner = radius;
-//                                    keyboard.owner_text = "radius";
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = radius;
+                                            radius.selectAll();
+                                        }else{
+                                            keypad.owner = radius;
+                                            radius.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color: ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_HW","radius");
+
                             }
                         }
                     }
@@ -1922,18 +2044,22 @@ Item {
                                     ischanged = true;
                                     is_reset_slam = true;
                                 }
-                                focus:false
-                                color: ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT","wheel_base");
-                                onFocusChanged: {
-                                    keypad.owner = wheel_base;
-//                                    keyboard.owner_text = "wheel_base";
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = wheel_base;
+                                            wheel_base.selectAll();
+                                        }else{
+                                            keypad.owner = wheel_base;
+                                            wheel_base.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color: ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT","wheel_base");
+
                             }
                         }
                     }
@@ -1979,32 +2105,50 @@ Item {
                                     ischanged = true;
                                     is_reset_slam = true;
                                 }
-                                focus:false
-                                color: ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT","wheel_radius");
-                                onFocusChanged: {
-                                    keypad.owner = wheel_radius;
-//                                    keyboard.owner_text = "wheel_radius";
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = wheel_radius;
+                                            wheel_radius.selectAll();
+                                        }else{
+                                            keypad.owner = wheel_radius;
+                                            wheel_radius.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color: ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT","wheel_radius");
+
                             }
                         }
                     }
                 }
 
                 Rectangle{
-                    id: set_wifi_connection
+                    width: 1100
+                    height: 40
+                    visible: is_admin
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"무선 와이파이 설정"
+                        color: "white"
+                        font.pixelSize: 20
+                    }
+                }
+                Rectangle{
+                    id: set_wifi
                     width: 840
                     visible: is_admin && debug_use_ip
-                    height: 50
+                    height: 400
                     Row{
                         anchors.fill: parent
                         Rectangle{
-                            width: 350
+                            width: 200
                             height: parent.height
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
@@ -2027,385 +2171,791 @@ Item {
                             color: "#d0d0d0"
                         }
                         Rectangle{
-                            id: wifi_connection
-                            width: parent.width - 351
+                            width: parent.width - 201
                             height: parent.height
-                            property int connection: 0
-                            color: {
-                                if(wifi_connection.connection === 1){
-                                    color_yellow
-                                }else if(wifi_connection.connection === 2){
-                                    color_green
-                                }else{
-                                    color_red
-                                }
-                            }
-                            Text{
+                            Column{
                                 anchors.centerIn: parent
-                                font.family:font_noto_r.name
-                                font.pixelSize:20
-                                text:{
-                                    if(wifi_connection.connection === 1){
-                                        "연결중"
-                                    }else if(wifi_connection.connection === 2){
-                                        "연결됨"
-                                    }else{
-                                        "연결안됨"
-                                    }
-                                }
-                                color: "white"
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_wifi_ssd
-                    width: 840
-                    visible: is_admin && debug_use_ip
-                    height: 50
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 30
-                                font.family: font_noto_r.name
-                                text:"WIFI SSD"
-                                font.pixelSize: 20
-                                Component.onCompleted: {
-                                    scale = 1;
-                                    while(width*scale > parent.width*0.8){
-                                        scale=scale-0.01;
-                                    }
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                anchors.fill: parent
-                                TextField{
-                                    id: wifi_ssd
-                                    height: parent.height
-                                    width: parent.width*0.8
-                                    text:supervisor.getSetting("ROBOT_SW","wifi_ssd");
-                                }
+                                spacing: 10
                                 Rectangle{
-                                    height: parent.height
-                                    width: parent.width*0.2
-                                    radius: 5
-                                    color: "black"
+                                    id: wifi_connection
+                                    width: 500
+                                    height: 50
+                                    property int connection: 0
+                                    color: {
+                                        if(wifi_connection.connection === 1){
+                                            color_yellow
+                                        }else if(wifi_connection.connection === 2){
+                                            color_yellow
+                                        }else if(wifi_connection.connection === 3){
+                                            color_green
+                                        }else{
+                                            color_red
+                                        }
+                                    }
                                     Text{
                                         anchors.centerIn: parent
+                                        font.family:font_noto_r.name
+                                        font.pixelSize:20
+                                        text:{
+                                            if(wifi_connection.connection === 1){
+                                                "연결중"
+                                            }else if(wifi_connection.connection === 2){
+                                                "연결됨(인터넷 연결안됨)"
+                                            }else if(wifi_connection.connection === 3){
+                                                "연결됨"
+                                            }else{
+                                                "연결안됨"
+                                            }
+                                        }
                                         color: "white"
-                                        font.family: font_noto_r.name
-                                        text: "변경"
                                     }
-                                    MouseArea{
-                                        anchors.fill: parent
+                                }
+
+                                Row{
+                                    spacing: 5
+                                    Rectangle{
+                                        width: 150
+                                        height: 50
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 30
+                                            font.family: font_noto_r.name
+                                            text:"WIFI SSID"
+                                            font.pixelSize: 20
+                                            Component.onCompleted: {
+                                                scale = 1;
+                                                while(width*scale > parent.width*0.8){
+                                                    scale=scale-0.01;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Rectangle{
+                                        width: 1
+                                        height: 50
+                                        color: "#d0d0d0"
+                                    }
+                                    Rectangle{
+                                        width: 500-161
+                                        height: 50
+                                        Text{
+                                            id: wifi_ssid
+                                            anchors.centerIn: parent
+                                            font.family: font_noto_r.name
+                                            text:supervisor.getSetting("NETWORK","wifi_ssid");
+                                        }
+
+                                    }
+                                }
+
+                                Row{
+                                    spacing: 5
+                                    Rectangle{
+                                        width: 150
+                                        height: 50
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 30
+                                            font.family: font_noto_r.name
+                                            text:"IP"
+                                            font.pixelSize: 20
+                                            Component.onCompleted: {
+                                                scale = 1;
+                                                while(width*scale > parent.width*0.8){
+                                                    scale=scale-0.01;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Rectangle{
+                                        width: 1
+                                        height: 50
+                                        color: "#d0d0d0"
+                                    }
+
+                                    Rectangle{
+                                        width: 500-161
+                                        height: 50
+                                        Row{
+                                            spacing: 10
+                                            anchors.centerIn: parent
+                                            TextField{
+                                                id: ip_1
+                                                width: 60
+                                                height: 40
+                                                horizontalAlignment: TextField.AlignHCenter
+                                                MouseArea{
+                                                    anchors.fill:parent
+                                                    onClicked: {
+                                                        if(keypad.is_opened){
+                                                            keypad.owner = ip_1;
+                                                            ip_1.selectAll();
+                                                        }else{
+                                                            keypad.owner = ip_1;
+                                                            ip_1.selectAll();
+                                                            keypad.open();
+                                                        }
+                                                    }
+                                                }
+                                                color: ischanged?color_red:"black"
+                                                property bool ischanged: false
+                                                onTextChanged: {
+                                                    ischanged = true;
+                                                    if(ip_1.text.split(".").length > 1){
+                                                        ip_1.text = ip_1.text.split(".")[0];
+                                                        ip_2.selectAll();
+                                                        keypad.owner = ip_2;
+                                                    }
+                                                    if(ip_1.text.length == 3){
+                                                        ip_2.selectAll();
+                                                        keypad.owner = ip_2;
+                                                    }
+                                                }
+                                            }
+                                            Text{
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text:"."
+                                            }
+
+                                            TextField{
+                                                id: ip_2
+                                                width: 60
+                                                height: 40
+                                                horizontalAlignment: TextField.AlignHCenter
+                                                MouseArea{
+                                                    anchors.fill:parent
+                                                    onClicked: {
+                                                        if(keypad.is_opened){
+                                                            keypad.owner = ip_2;
+                                                            ip_2.selectAll();
+                                                        }else{
+                                                            keypad.owner = ip_2;
+                                                            ip_2.selectAll();
+                                                            keypad.open();
+                                                        }
+                                                    }
+                                                }
+                                                color: ischanged?color_red:"black"
+                                                property bool ischanged: false
+                                                onTextChanged: {
+                                                    ischanged = true;
+                                                    if(ip_2.text == "."){
+                                                        ip_2.text = ip_2.text.split(".")[0]
+                                                    }
+
+                                                    if(ip_2.text.split(".").length > 1){
+                                                        ip_2.text = ip_2.text.split(".")[0];
+                                                        ip_3.selectAll();
+                                                        keypad.owner = ip_3;
+                                                    }
+                                                    if(ip_2.text.length == 3){
+                                                        ip_3.selectAll();
+                                                        keypad.owner = ip_3;
+                                                    }
+                                                }
+                                            }
+                                            Text{
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text:"."
+                                            }
+                                            TextField{
+                                                id: ip_3
+                                                width: 60
+                                                height: 40
+                                                horizontalAlignment: TextField.AlignHCenter
+                                                MouseArea{
+                                                    anchors.fill:parent
+                                                    onClicked: {
+                                                        if(keypad.is_opened){
+                                                            keypad.owner = ip_3;
+                                                            ip_3.selectAll();
+                                                        }else{
+                                                            keypad.owner = ip_3;
+                                                            ip_3.selectAll();
+                                                            keypad.open();
+                                                        }
+                                                    }
+                                                }
+                                                color: ischanged?color_red:"black"
+                                                property bool ischanged: false
+                                                onTextChanged: {
+                                                    ischanged = true;
+                                                    if(ip_3.text == "."){
+                                                        ip_3.text = ip_3.text.split(".")[0]
+                                                    }
+
+                                                    if(ip_3.text.split(".").length > 1){
+                                                        ip_3.text = ip_3.text.split(".")[0];
+                                                        ip_4.selectAll();
+                                                        keypad.owner = ip_4;
+                                                    }
+                                                    if(ip_3.text.length == 3){
+                                                        ip_4.selectAll();
+                                                        keypad.owner = ip_4;
+                                                    }
+                                                }
+                                            }
+                                            Text{
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text:"."
+                                            }
+                                            TextField{
+                                                id: ip_4
+                                                width: 60
+                                                height: 40
+                                                horizontalAlignment: TextField.AlignHCenter
+                                                MouseArea{
+                                                    anchors.fill:parent
+                                                    onClicked: {
+                                                        if(keypad.is_opened){
+                                                            keypad.owner = ip_4;
+                                                            ip_4.selectAll();
+                                                        }else{
+                                                            keypad.owner = ip_4;
+                                                            ip_4.selectAll();
+                                                            keypad.open();
+                                                        }
+                                                    }
+                                                }
+                                                color: ischanged?color_red:"black"
+                                                property bool ischanged: false
+                                                onTextChanged: {
+                                                    ischanged = true;
+                                                    if(ip_4.text == "."){
+                                                        ip_4.text = ip_4.text.split(".")[0]
+                                                    }
+
+                                                    if(ip_4.text.split(".").length > 1){
+                                                        ip_4.text = ip_4.text.split(".")[0];
+                                                        keypad.close();
+                                                    }
+                                                    if(ip_4.text.length == 3){
+                                                        keypad.close();
+                                                    }
+                                                }
+                                            }
+
+                                            Rectangle{
+                                                height: parent.height
+                                                width: parent.width*0.2
+                                                radius: 5
+                                                visible: false
+                                                color: "black"
+                                                Text{
+                                                    anchors.centerIn: parent
+                                                    color: "white"
+                                                    font.family: font_noto_r.name
+                                                    text: "변경"
+                                                }
+                                                MouseArea{
+                                                    anchors.fill: parent
+                                                    onClicked:{
+                                                        click_sound.play();
+                                                        ip_1.ischanged = false;
+                                                        ip_2.ischanged = false;
+                                                        ip_3.ischanged = false;
+                                                        ip_4.ischanged = false;
+                                                        var ip_str = ip_1.text + "." + ip_2.text + "." + ip_3.text + "." + ip_4.text;
+                                                        gateway_1.ischanged = false;
+                                                        gateway_2.ischanged = false;
+                                                        gateway_3.ischanged = false;
+                                                        gateway_4.ischanged = false;
+                                                        var gateway_str = gateway_1.text + "." + gateway_2.text + "." + gateway_3.text + "." + gateway_4.text;
+                                                        dnsmain_1.ischanged = false;
+                                                        dnsmain_2.ischanged = false;
+                                                        dnsmain_3.ischanged = false;
+                                                        dnsmain_4.ischanged = false;
+                                                        var dns_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
+                                                        supervisor.setWifi(ip_str,gateway_str,dns_str);
+                                                        supervisor.setSetting("NETWORK/wifi_ip",ip_str);
+                                                        supervisor.setSetting("NETWORK/wifi_gateway",gateway_str);
+                                                        supervisor.setSetting("NETWORK/wifi_dnsmain",dns_str);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                                Row{
+                                    spacing: 5
+                                    Rectangle{
+                                        width: 150
+                                        height: 50
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 30
+                                            font.family: font_noto_r.name
+                                            text:"Gateway"
+                                            font.pixelSize: 20
+                                            Component.onCompleted: {
+                                                scale = 1;
+                                                while(width*scale > parent.width*0.8){
+                                                    scale=scale-0.01;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Rectangle{
+                                        width: 1
+                                        height: 50
+                                        color: "#d0d0d0"
+                                    }
+
+                                    Rectangle{
+                                        width: 500-161
+                                        height: 50
+                                        Row{
+                                            spacing: 10
+                                            anchors.centerIn: parent
+                                            TextField{
+                                                id: gateway_1
+                                                width: 60
+                                                height: 40
+                                                horizontalAlignment: TextField.AlignHCenter
+                                                MouseArea{
+                                                    anchors.fill:parent
+                                                    onClicked: {
+                                                        if(keypad.is_opened){
+                                                            keypad.owner = gateway_1;
+                                                            gateway_1.selectAll();
+                                                        }else{
+                                                            keypad.owner = gateway_1;
+                                                            gateway_1.selectAll();
+                                                            keypad.open();
+                                                        }
+                                                    }
+                                                }
+                                                color: ischanged?color_red:"black"
+                                                property bool ischanged: false
+                                                onTextChanged: {
+                                                    ischanged = true;
+                                                    if(gateway_1.text.split(".").length > 1){
+                                                        gateway_1.text = gateway_1.text.split(".")[0];
+                                                        keypad.owner = gateway_2;
+                                                        gateway_2.selectAll();
+                                                    }
+                                                    if(gateway_1.text.length == 3){
+                                                        keypad.owner = gateway_2;
+                                                        gateway_2.selectAll();
+                                                    }
+                                                }
+                                            }
+                                            Text{
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text:"."
+                                            }
+
+                                            TextField{
+                                                id: gateway_2
+                                                width: 60
+                                                height: 40
+                                                horizontalAlignment: TextField.AlignHCenter
+                                                MouseArea{
+                                                    anchors.fill:parent
+                                                    onClicked: {
+                                                        if(keypad.is_opened){
+                                                            keypad.owner = gateway_2;
+                                                            gateway_2.selectAll();
+                                                        }else{
+                                                            keypad.owner = gateway_2;
+                                                            gateway_2.selectAll();
+                                                            keypad.open();
+                                                        }
+                                                    }
+                                                }
+                                                color: ischanged?color_red:"black"
+                                                property bool ischanged: false
+                                                onTextChanged: {
+                                                    ischanged = true;
+                                                    if(gateway_2.text == "."){
+                                                        gateway_2.text = gateway_2.text.split(".")[0]
+                                                    }
+
+                                                    if(gateway_2.text.split(".").length > 1){
+                                                        gateway_2.text = gateway_2.text.split(".")[0];
+                                                        keypad.owner = gateway_3;
+                                                        gateway_3.selectAll();
+                                                    }
+                                                    if(gateway_2.text.length == 3){
+                                                        keypad.owner = gateway_3;
+                                                        gateway_3.selectAll();
+                                                    }
+                                                }
+                                            }
+                                            Text{
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text:"."
+                                            }
+                                            TextField{
+                                                id: gateway_3
+                                                width: 60
+                                                height: 40
+                                                horizontalAlignment: TextField.AlignHCenter
+                                                MouseArea{
+                                                    anchors.fill:parent
+                                                    onClicked: {
+                                                        if(keypad.is_opened){
+                                                            keypad.owner = gateway_3;
+                                                            gateway_3.selectAll();
+                                                        }else{
+                                                            keypad.owner = gateway_3;
+                                                            gateway_3.selectAll();
+                                                            keypad.open();
+                                                        }
+                                                    }
+                                                }
+                                                color: ischanged?color_red:"black"
+                                                property bool ischanged: false
+                                                onTextChanged: {
+                                                    ischanged = true;
+                                                    if(gateway_3.text == "."){
+                                                        gateway_3.text = gateway_3.text.split(".")[0]
+                                                    }
+
+                                                    if(gateway_3.text.split(".").length > 1){
+                                                        gateway_3.text = gateway_3.text.split(".")[0];
+                                                        keypad.owner = gateway_4;
+                                                        gateway_4.selectAll();
+                                                    }
+                                                    if(gateway_3.text.length == 3){
+                                                        keypad.owner = gateway_4;
+                                                        gateway_4.selectAll();
+                                                    }
+                                                }
+                                            }
+                                            Text{
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text:"."
+                                            }
+                                            TextField{
+                                                id: gateway_4
+                                                width: 60
+                                                height: 40
+                                                horizontalAlignment: TextField.AlignHCenter
+                                                MouseArea{
+                                                    anchors.fill:parent
+                                                    onClicked: {
+                                                        if(keypad.is_opened){
+                                                            keypad.owner = gateway_4;
+                                                            gateway_4.selectAll();
+                                                        }else{
+                                                            keypad.owner = gateway_4;
+                                                            gateway_4.selectAll();
+                                                            keypad.open();
+                                                        }
+                                                    }
+                                                }
+                                                color: ischanged?color_red:"black"
+                                                property bool ischanged: false
+                                                onTextChanged: {
+                                                    ischanged = true;
+                                                    if(gateway_4.text == "."){
+                                                        gateway_4.text = gateway_4.text.split(".")[0]
+                                                    }
+
+                                                    if(gateway_4.text.split(".").length > 1){
+                                                        gateway_4.text = gateway_4.text.split(".")[0];
+                                                        keypad.close();
+                                                    }
+                                                    if(gateway_4.text.length == 3){
+                                                        keypad.close();
+                                                    }
+                                                }
+                                            }
+                                            Rectangle{
+                                                height: parent.height
+                                                width: parent.width*0.2
+                                                radius: 5
+                                                visible: false
+                                                color: "black"
+                                                Text{
+                                                    anchors.centerIn: parent
+                                                    color: "white"
+                                                    font.family: font_noto_r.name
+                                                    text: "변경"
+                                                }
+                                                MouseArea{
+                                                    anchors.fill: parent
+                                                    onClicked:{
+                                                        click_sound.play();
+                                                        ip_1.ischanged = false;
+                                                        ip_2.ischanged = false;
+                                                        ip_3.ischanged = false;
+                                                        ip_4.ischanged = false;
+                                                        var ip_str = ip_1.text + "." + ip_2.text + "." + ip_3.text + "." + ip_4.text;
+                                                        gateway_1.ischanged = false;
+                                                        gateway_2.ischanged = false;
+                                                        gateway_3.ischanged = false;
+                                                        gateway_4.ischanged = false;
+                                                        var gateway_str = gateway_1.text + "." + gateway_2.text + "." + gateway_3.text + "." + gateway_4.text;
+                                                        dnsmain_1.ischanged = false;
+                                                        dnsmain_2.ischanged = false;
+                                                        dnsmain_3.ischanged = false;
+                                                        dnsmain_4.ischanged = false;
+                                                        var dns_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
+                                                        supervisor.setWifi(ip_str,gateway_str,dns_str);
+                                                        supervisor.setSetting("NETWORK/wifi_ip",ip_str);
+                                                        supervisor.setSetting("NETWORK/wifi_gateway",gateway_str);
+                                                        supervisor.setSetting("NETWORK/wifi_dnsmain",dns_str);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                                Row{
+                                    spacing: 5
+                                    Rectangle{
+                                        width: 150
+                                        height: 50
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 30
+                                            font.family: font_noto_r.name
+                                            text:"DNS"
+                                            font.pixelSize: 20
+                                            Component.onCompleted: {
+                                                scale = 1;
+                                                while(width*scale > parent.width*0.8){
+                                                    scale=scale-0.01;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Rectangle{
+                                        width: 1
+                                        height: 50
+                                        color: "#d0d0d0"
+                                    }
+
+                                    Rectangle{
+                                        width: 500-161
+                                        height: 50
+                                        Row{
+                                            spacing: 10
+                                            anchors.centerIn: parent
+                                            TextField{
+                                                id: dnsmain_1
+                                                width: 60
+                                                height: 40
+                                                horizontalAlignment: TextField.AlignHCenter
+                                                MouseArea{
+                                                    anchors.fill:parent
+                                                    onClicked: {
+                                                        if(keypad.is_opened){
+                                                            keypad.owner = dnsmain_1;
+                                                            dnsmain_1.selectAll();
+                                                        }else{
+                                                            keypad.owner = dnsmain_1;
+                                                            dnsmain_1.selectAll();
+                                                            keypad.open();
+                                                        }
+                                                    }
+                                                }
+                                                color: ischanged?color_red:"black"
+                                                property bool ischanged: false
+                                                onTextChanged: {
+                                                    ischanged = true;
+                                                    if(dnsmain_1.text.split(".").length > 1){
+                                                        dnsmain_1.text = dnsmain_1.text.split(".")[0];
+                                                        keypad.owner = dnsmain_2;
+                                                        dnsmain_2.selectAll();
+                                                    }
+                                                    if(dnsmain_1.text.length == 3){
+                                                        keypad.owner = dnsmain_2;
+                                                        dnsmain_2.selectAll();
+                                                    }
+                                                }
+                                            }
+                                            Text{
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text:"."
+                                            }
+
+                                            TextField{
+                                                id: dnsmain_2
+                                                width: 60
+                                                height: 40
+                                                horizontalAlignment: TextField.AlignHCenter
+                                                MouseArea{
+                                                    anchors.fill:parent
+                                                    onClicked: {
+                                                        if(keypad.is_opened){
+                                                            keypad.owner = dnsmain_2;
+                                                            dnsmain_2.selectAll();
+                                                        }else{
+                                                            keypad.owner = dnsmain_2;
+                                                            dnsmain_2.selectAll();
+                                                            keypad.open();
+                                                        }
+                                                    }
+                                                }
+                                                color: ischanged?color_red:"black"
+                                                property bool ischanged: false
+                                                onTextChanged: {
+                                                    ischanged = true;
+                                                    if(dnsmain_2.text == "."){
+                                                        dnsmain_2.text = dnsmain_2.text.split(".")[0]
+                                                    }
+
+                                                    if(dnsmain_2.text.split(".").length > 1){
+                                                        dnsmain_2.text = dnsmain_2.text.split(".")[0];
+                                                        keypad.owner = dnsmain_3;
+                                                        dnsmain_3.selectAll();
+                                                    }
+                                                    if(dnsmain_2.text.length == 3){
+                                                        keypad.owner = dnsmain_3;
+                                                        dnsmain_3.selectAll();
+                                                    }
+                                                }
+                                            }
+                                            Text{
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text:"."
+                                            }
+                                            TextField{
+                                                id: dnsmain_3
+                                                width: 60
+                                                height: 40
+                                                horizontalAlignment: TextField.AlignHCenter
+                                                MouseArea{
+                                                    anchors.fill:parent
+                                                    onClicked: {
+                                                        if(keypad.is_opened){
+                                                            keypad.owner = dnsmain_3;
+                                                            dnsmain_3.selectAll();
+                                                        }else{
+                                                            keypad.owner = dnsmain_3;
+                                                            dnsmain_3.selectAll();
+                                                            keypad.open();
+                                                        }
+                                                    }
+                                                }
+                                                color: ischanged?color_red:"black"
+                                                property bool ischanged: false
+                                                onTextChanged: {
+                                                    ischanged = true;
+                                                    if(dnsmain_3.text == "."){
+                                                        dnsmain_3.text = dnsmain_3.text.split(".")[0]
+                                                    }
+
+                                                    if(dnsmain_3.text.split(".").length > 1){
+                                                        dnsmain_3.text = dnsmain_3.text.split(".")[0];
+                                                        keypad.owner = dnsmain_4;
+                                                        dnsmain_4.selectAll();
+                                                    }
+                                                    if(dnsmain_3.text.length == 3){
+                                                        keypad.owner = dnsmain_4;
+                                                        dnsmain_4.selectAll();
+                                                    }
+                                                }
+                                            }
+                                            Text{
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text:"."
+                                            }
+                                            TextField{
+                                                id: dnsmain_4
+                                                width: 60
+                                                height: 40
+                                                horizontalAlignment: TextField.AlignHCenter
+                                                MouseArea{
+                                                    anchors.fill:parent
+                                                    onClicked: {
+                                                        if(keypad.is_opened){
+                                                            keypad.owner = dnsmain_4;
+                                                            dnsmain_4.selectAll();
+                                                        }else{
+                                                            keypad.owner = dnsmain_4;
+                                                            dnsmain_4.selectAll();
+                                                            keypad.open();
+                                                        }
+                                                    }
+                                                }
+                                                color: ischanged?color_red:"black"
+                                                property bool ischanged: false
+                                                onTextChanged: {
+                                                    ischanged = true;
+                                                    if(dnsmain_4.text == "."){
+                                                        dnsmain_4.text = dnsmain_4.text.split(".")[0]
+                                                    }
+
+                                                    if(dnsmain_4.text.split(".").length > 1){
+                                                        dnsmain_4.text = dnsmain_4.text.split(".")[0];
+                                                        keypad.close();
+                                                    }
+                                                    if(dnsmain_4.text.length == 3){
+                                                        keypad.close();
+                                                    }
+                                                }
+                                            }
+                                            Rectangle{
+                                                height: parent.height
+                                                width: parent.width*0.2
+                                                radius: 5
+                                                visible: false
+                                                color: "black"
+                                                Text{
+                                                    anchors.centerIn: parent
+                                                    color: "white"
+                                                    font.family: font_noto_r.name
+                                                    text: "변경"
+                                                }
+                                                MouseArea{
+                                                    anchors.fill: parent
+                                                    onClicked:{
+                                                        click_sound.play();
+                                                        ip_1.ischanged = false;
+                                                        ip_2.ischanged = false;
+                                                        ip_3.ischanged = false;
+                                                        ip_4.ischanged = false;
+                                                        var ip_str = ip_1.text + "." + ip_2.text + "." + ip_3.text + "." + ip_4.text;
+                                                        gateway_1.ischanged = false;
+                                                        gateway_2.ischanged = false;
+                                                        gateway_3.ischanged = false;
+                                                        gateway_4.ischanged = false;
+                                                        var gateway_str = gateway_1.text + "." + gateway_2.text + "." + gateway_3.text + "." + gateway_4.text;
+                                                        dnsmain_1.ischanged = false;
+                                                        dnsmain_2.ischanged = false;
+                                                        dnsmain_3.ischanged = false;
+                                                        dnsmain_4.ischanged = false;
+                                                        var dns_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
+                                                        supervisor.setWifi(ip_str,gateway_str,dns_str);
+                                                        supervisor.setSetting("NETWORK/wifi_ip",ip_str);
+                                                        supervisor.setSetting("NETWORK/wifi_gateway",gateway_str);
+                                                        supervisor.setSetting("NETWORK/wifi_dnsmain",dns_str);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Row{
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: 30
+                                    Item_buttons{
+                                        type: "round_text"
+                                        text: "WIFI선택"
+                                        width: 120
+                                        height: 50
                                         onClicked:{
-                                            click_sound.play();
-                                            //Debug
-                                            supervisor.connectWifi("mobile_robot_test","rainbow2011");
                                             popup_wifi.open();
                                         }
                                     }
-                                }
-                            }
-
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_wifi_passwd
-                    width: 840
-                    visible: false
-//                    visible: is_admin && debug_use_ip
-                    height: 50
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 30
-                                font.family: font_noto_r.name
-                                text:"WIFI Password"
-                                font.pixelSize: 20
-                                Component.onCompleted: {
-                                    scale = 1;
-                                    while(width*scale > parent.width*0.8){
-                                        scale=scale-0.01;
-                                    }
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                anchors.fill: parent
-                                TextField{
-                                    id: wifi_passwd
-                                    height: parent.height
-                                    width: parent.width*0.8
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    text:supervisor.getSetting("ROBOT_SW","wifi_passwd");
-                                    focus:false
-                                    onFocusChanged: {
-                                        keyboard.owner = wifi_passwd;
-                                        keyboard.owner_text = "wifi_passwd";
-                                        wifi_passwd.selectAll();
-                                        if(focus){
-                                            keyboard.open();
-                                        }else{
-                                            keyboard.close();
-                                            wifi_passwd.select(0,0);
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    height: parent.height
-                                    width: parent.width*0.2
-                                    radius: 5
-                                    color: "black"
-                                    Text{
-                                        anchors.centerIn: parent
-                                        color: "white"
-                                        font.family: font_noto_r.name
-                                        text: "변경"
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click_sound.play();
-                                            wifi_passwd.ischanged = false;
-                                            supervisor.setSetting("ROBOT_SW/wifi_passwd",wifi_passwd.text);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_ip
-                    width: 840
-                    height: 50
-                    visible: is_admin && debug_use_ip
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 30
-                                font.family: font_noto_r.name
-                                text:"IP"
-                                font.pixelSize: 20
-                                Component.onCompleted: {
-                                    scale = 1;
-                                    while(width*scale > parent.width*0.8){
-                                        scale=scale-0.01;
-                                    }
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                TextField{
-                                    id: ip_1
-                                    width: 70
-                                    height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = ip_1;
-//                                        keyboard.owner_text = "ip_1";
-                                        ip_1.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            keypad.close();
-                                            ip_1.select(0,0);
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(ip_1.text.split(".").length > 1){
-                                            ip_1.text = ip_1.text.split(".")[0];
-                                            ip_1.focus = false;
-                                            ip_2.focus = true;
-                                        }
-                                        if(ip_1.text.length == 3){
-                                            ip_1.focus = false;
-                                            ip_2.focus = true;
-                                        }
-                                    }
-                                }
-                                Text{
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text:"."
-                                }
-
-                                TextField{
-                                    id: ip_2
-                                    width: 70
-                                    height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = ip_2;
-//                                        keyboard.owner_text = "ip_2";
-                                        ip_2.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            keypad.close();
-                                            ip_2.select(0,0);
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(ip_2.text == "."){
-                                            ip_2.text = ip_2.text.split(".")[0]
-                                        }
-
-                                        if(ip_2.text.split(".").length > 1){
-                                            ip_2.text = ip_2.text.split(".")[0];
-                                            ip_2.focus = false;
-                                            ip_3.focus = true;
-                                        }
-                                        if(ip_2.text.length == 3){
-                                            ip_2.focus = false;
-                                            ip_3.focus = true;
-                                        }
-                                    }
-                                }
-                                Text{
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text:"."
-                                }
-                                TextField{
-                                    id: ip_3
-                                    width: 70
-                                    height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = ip_3;
-//                                        keyboard.owner_text = "ip_3";
-                                        ip_3.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            ip_3.select(0,0);
-                                            keypad.close();
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(ip_3.text == "."){
-                                            ip_3.text = ip_3.text.split(".")[0]
-                                        }
-
-                                        if(ip_3.text.split(".").length > 1){
-                                            ip_3.text = ip_3.text.split(".")[0];
-                                            ip_3.focus = false;
-                                            ip_4.focus = true;
-                                        }
-                                        if(ip_3.text.length == 3){
-                                            ip_3.focus = false;
-                                            ip_4.focus = true;
-                                        }
-                                    }
-                                }
-                                Text{
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text:"."
-                                }
-                                TextField{
-                                    id: ip_4
-                                    width: 70
-                                    height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = ip_4;
-//                                        keyboard.owner_text = "ip_4";
-                                        ip_4.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            ip_4.select(0,0);
-                                            keypad.close();
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(ip_4.text == "."){
-                                            ip_4.text = ip_4.text.split(".")[0]
-                                        }
-
-                                        if(ip_4.text.split(".").length > 1){
-                                            ip_4.text = ip_4.text.split(".")[0];
-                                            ip_4.focus = false;
-                                        }
-                                        if(ip_4.text.length == 3){
-                                            ip_4.focus = false;
-                                        }
-                                    }
-                                }
-
-                                Rectangle{
-                                    height: parent.height
-                                    width: parent.width*0.2
-                                    radius: 5
-                                    color: "black"
-                                    Text{
-                                        anchors.centerIn: parent
-                                        color: "white"
-                                        font.family: font_noto_r.name
-                                        text: "변경"
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
+                                    Item_buttons{
+                                        type: "round_text"
+                                        text: "변경값적용"
+                                        width: 120
+                                        height: 50
                                         onClicked:{
                                             click_sound.play();
                                             ip_1.ischanged = false;
@@ -2424,677 +2974,20 @@ Item {
                                             dnsmain_4.ischanged = false;
                                             var dns_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
                                             supervisor.setWifi(ip_str,gateway_str,dns_str);
-                                            supervisor.setSetting("ROBOT_SW/wifi_ip",ip_str);
-                                            supervisor.setSetting("ROBOT_SW/wifi_gateway",gateway_str);
-                                            supervisor.setSetting("ROBOT_SW/wifi_dnsmain",dns_str);
+                                            supervisor.setSetting("NETWORK/wifi_ip",ip_str);
+                                            supervisor.setSetting("NETWORK/wifi_gateway",gateway_str);
+                                            supervisor.setSetting("NETWORK/wifi_dnsmain",dns_str);
+                                            popup_loading.open();
                                         }
                                     }
                                 }
                             }
                         }
+
+
                     }
                 }
-                Rectangle{
-                    id: set_gateway
-                    width: 840
-                    height: 50
-                    visible: is_admin && debug_use_ip
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 30
-                                font.family: font_noto_r.name
-                                text:"Gateway"
-                                font.pixelSize: 20
-                                Component.onCompleted: {
-                                    scale = 1;
-                                    while(width*scale > parent.width*0.8){
-                                        scale=scale-0.01;
-                                    }
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
 
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                TextField{
-                                    id: gateway_1
-                                    width: 70
-                                    height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = gateway_1;
-//                                        keyboard.owner_text = "gateway_1";
-                                        gateway_1.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            keypad.close();
-                                            gateway_1.select(0,0);
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(gateway_1.text.split(".").length > 1){
-                                            gateway_1.text = gateway_1.text.split(".")[0];
-                                            gateway_1.focus = false;
-                                            gateway_2.focus = true;
-                                        }
-                                        if(gateway_1.text.length == 3){
-                                            gateway_1.focus = false;
-                                            gateway_2.focus = true;
-                                        }
-                                    }
-                                }
-                                Text{
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text:"."
-                                }
-
-                                TextField{
-                                    id: gateway_2
-                                    width: 70
-                                    height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = gateway_2;
-//                                        keyboard.owner_text = "gateway_2";
-                                        gateway_2.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            keypad.close();
-                                            gateway_2.select(0,0);
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(gateway_2.text == "."){
-                                            gateway_2.text = gateway_2.text.split(".")[0]
-                                        }
-
-                                        if(gateway_2.text.split(".").length > 1){
-                                            gateway_2.text = gateway_2.text.split(".")[0];
-                                            gateway_2.focus = false;
-                                            gateway_3.focus = true;
-                                        }
-                                        if(gateway_2.text.length == 3){
-                                            gateway_2.focus = false;
-                                            gateway_3.focus = true;
-                                        }
-                                    }
-                                }
-                                Text{
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text:"."
-                                }
-                                TextField{
-                                    id: gateway_3
-                                    width: 70
-                                    height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = gateway_3;
-//                                        keyboard.owner_text = "gateway_3";
-                                        gateway_3.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            gateway_3.select(0,0);
-                                            keypad.close();
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(gateway_3.text == "."){
-                                            gateway_3.text = gateway_3.text.split(".")[0]
-                                        }
-
-                                        if(gateway_3.text.split(".").length > 1){
-                                            gateway_3.text = gateway_3.text.split(".")[0];
-                                            gateway_3.focus = false;
-                                            gateway_4.focus = true;
-                                        }
-                                        if(gateway_3.text.length == 3){
-                                            gateway_3.focus = false;
-                                            gateway_4.focus = true;
-                                        }
-                                    }
-                                }
-                                Text{
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text:"."
-                                }
-                                TextField{
-                                    id: gateway_4
-                                    width: 70
-                                    height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = gateway_4;
-//                                        keyboard.owner_text = "gateway_4";
-                                        gateway_4.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            gateway_4.select(0,0);
-                                            keypad.close();
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(gateway_4.text == "."){
-                                            gateway_4.text = gateway_4.text.split(".")[0]
-                                        }
-
-                                        if(gateway_4.text.split(".").length > 1){
-                                            gateway_4.text = gateway_4.text.split(".")[0];
-                                            gateway_4.focus = false;
-                                        }
-                                        if(gateway_4.text.length == 3){
-                                            gateway_4.focus = false;
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    height: parent.height
-                                    width: parent.width*0.2
-                                    radius: 5
-                                    color: "black"
-                                    Text{
-                                        anchors.centerIn: parent
-                                        color: "white"
-                                        font.family: font_noto_r.name
-                                        text: "변경"
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click_sound.play();
-                                            ip_1.ischanged = false;
-                                            ip_2.ischanged = false;
-                                            ip_3.ischanged = false;
-                                            ip_4.ischanged = false;
-                                            var ip_str = ip_1.text + "." + ip_2.text + "." + ip_3.text + "." + ip_4.text;
-                                            gateway_1.ischanged = false;
-                                            gateway_2.ischanged = false;
-                                            gateway_3.ischanged = false;
-                                            gateway_4.ischanged = false;
-                                            var gateway_str = gateway_1.text + "." + gateway_2.text + "." + gateway_3.text + "." + gateway_4.text;
-                                            dnsmain_1.ischanged = false;
-                                            dnsmain_2.ischanged = false;
-                                            dnsmain_3.ischanged = false;
-                                            dnsmain_4.ischanged = false;
-                                            var dns_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
-                                            supervisor.setWifi(ip_str,gateway_str,dns_str);
-                                            supervisor.setSetting("ROBOT_SW/wifi_ip",ip_str);
-                                            supervisor.setSetting("ROBOT_SW/wifi_gateway",gateway_str);
-                                            supervisor.setSetting("ROBOT_SW/wifi_dnsmain",dns_str);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_dnsmain
-                    width: 840
-                    height: 50
-                    visible: is_admin && debug_use_ip
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 30
-                                font.family: font_noto_r.name
-                                text:"DNS(Main)"
-                                font.pixelSize: 20
-                                Component.onCompleted: {
-                                    scale = 1;
-                                    while(width*scale > parent.width*0.8){
-                                        scale=scale-0.01;
-                                    }
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                TextField{
-                                    id: dnsmain_1
-                                    width: 70
-                                    focus:false
-                                    height: 50
-                                    onFocusChanged: {
-                                        keypad.owner = dnsmain_1;
-//                                        keyboard.owner_text = "dnsmain_1";
-                                        dnsmain_1.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            keypad.close();
-                                            dnsmain_1.select(0,0);
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(dnsmain_1.text.split(".").length > 1){
-                                            dnsmain_1.text = dnsmain_1.text.split(".")[0];
-                                            dnsmain_1.focus = false;
-                                            dnsmain_2.focus = true;
-                                        }
-                                        if(dnsmain_1.text.length == 3){
-                                            dnsmain_1.focus = false;
-                                            dnsmain_2.focus = true;
-                                        }
-                                    }
-                                }
-                                Text{
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text:"."
-                                }
-
-                                TextField{
-                                    id: dnsmain_2
-                                    width: 70
-                                    height: 50
-                                    onFocusChanged: {
-                                        keypad.owner = dnsmain_2;
-//                                        keyboard.owner_text = "dnsmain_2";
-                                        dnsmain_2.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            keypad.close();
-                                            dnsmain_2.select(0,0);
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(dnsmain_2.text == "."){
-                                            dnsmain_2.text = dnsmain_2.text.split(".")[0]
-                                        }
-
-                                        if(dnsmain_2.text.split(".").length > 1){
-                                            dnsmain_2.text = dnsmain_2.text.split(".")[0];
-                                            dnsmain_2.focus = false;
-                                            dnsmain_3.focus = true;
-                                        }
-                                        if(dnsmain_2.text.length == 3){
-                                            dnsmain_2.focus = false;
-                                            dnsmain_3.focus = true;
-                                        }
-                                    }
-                                }
-                                Text{
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text:"."
-                                }
-                                TextField{
-                                    id: dnsmain_3
-                                    width: 70
-                                    height: 50
-                                    onFocusChanged: {
-                                        keypad.owner = dnsmain_3;
-//                                        keyboard.owner_text = "dnsmain_3";
-                                        dnsmain_3.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            dnsmain_3.select(0,0);
-                                            keypad.close();
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(dnsmain_3.text == "."){
-                                            dnsmain_3.text = dnsmain_3.text.split(".")[0]
-                                        }
-
-                                        if(dnsmain_3.text.split(".").length > 1){
-                                            dnsmain_3.text = dnsmain_3.text.split(".")[0];
-                                            dnsmain_3.focus = false;
-                                            dnsmain_4.focus = true;
-                                        }
-                                        if(dnsmain_3.text.length == 3){
-                                            dnsmain_3.focus = false;
-                                            dnsmain_4.focus = true;
-                                        }
-                                    }
-                                }
-                                Text{
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text:"."
-                                }
-                                TextField{
-                                    id: dnsmain_4
-                                    width: 70
-                                    focus:false
-                                    height: 50
-                                    onFocusChanged: {
-                                        keypad.owner = dnsmain_4;
-//                                        keyboard.owner_text = "dnsmain_4";
-                                        dnsmain_4.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            dnsmain_4.select(0,0);
-                                            keypad.close();
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(dnsmain_4.text == "."){
-                                            dnsmain_4.text = dnsmain_4.text.split(".")[0]
-                                        }
-
-                                        if(dnsmain_4.text.split(".").length > 1){
-                                            dnsmain_4.text = dnsmain_4.text.split(".")[0];
-                                            dnsmain_4.focus = false;
-                                        }
-                                        if(dnsmain_4.text.length == 3){
-                                            dnsmain_4.focus = false;
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    height: parent.height
-                                    width: parent.width*0.2
-                                    radius: 5
-                                    color: "black"
-                                    Text{
-                                        anchors.centerIn: parent
-                                        color: "white"
-                                        font.family: font_noto_r.name
-                                        text: "변경"
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click_sound.play();
-                                            ip_1.ischanged = false;
-                                            ip_2.ischanged = false;
-                                            ip_3.ischanged = false;
-                                            ip_4.ischanged = false;
-                                            var ip_str = ip_1.text + "." + ip_2.text + "." + ip_3.text + "." + ip_4.text;
-                                            gateway_1.ischanged = false;
-                                            gateway_2.ischanged = false;
-                                            gateway_3.ischanged = false;
-                                            gateway_4.ischanged = false;
-                                            var gateway_str = gateway_1.text + "." + gateway_2.text + "." + gateway_3.text + "." + gateway_4.text;
-                                            dnsmain_1.ischanged = false;
-                                            dnsmain_2.ischanged = false;
-                                            dnsmain_3.ischanged = false;
-                                            dnsmain_4.ischanged = false;
-                                            var dns_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
-                                            supervisor.setWifi(ip_str,gateway_str,dns_str);
-                                            supervisor.setSetting("ROBOT_SW/wifi_ip",ip_str);
-                                            supervisor.setSetting("ROBOT_SW/wifi_gateway",gateway_str);
-                                            supervisor.setSetting("ROBOT_SW/wifi_dnsmain",dns_str);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_dnsserve
-                    width: 840
-                    height: 50
-                    visible: false
-//                    visible: is_admin && debug_use_ip
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 30
-                                font.family: font_noto_r.name
-                                text:"DNS(Serv)"
-                                font.pixelSize: 20
-                                Component.onCompleted: {
-                                    scale = 1;
-                                    while(width*scale > parent.width*0.8){
-                                        scale=scale-0.01;
-                                    }
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                spacing: 10
-                                anchors.centerIn: parent
-                                TextField{
-                                    id: dnsserv_1
-                                    width: 70
-                                    focus:false
-                                    height: 50
-                                    onFocusChanged: {
-                                        keypad.owner = dnsserv_1;
-//                                        keyboard.owner_text = "dnsserv_1";
-                                        dnsserv_1.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            keypad.close();
-                                            dnsserv_1.select(0,0);
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(dnsserv_1.text.split(".").length > 1){
-                                            dnsserv_1.text = dnsserv_1.text.split(".")[0];
-                                            dnsserv_1.focus = false;
-                                            dnsserv_2.focus = true;
-                                        }
-                                        if(dnsserv_1.text.length == 3){
-                                            dnsserv_1.focus = false;
-                                            dnsserv_2.focus = true;
-                                        }
-                                    }
-                                }
-                                Text{
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text:"."
-                                }
-
-                                TextField{
-                                    id: dnsserv_2
-                                    width: 70
-                                    height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = dnsserv_2;
-//                                        keyboard.owner_text = "dnsserv_2";
-                                        dnsserv_2.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            keypad.close();
-                                            dnsserv_2.select(0,0);
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(dnsserv_2.text == "."){
-                                            dnsserv_2.text = dnsserv_2.text.split(".")[0]
-                                        }
-
-                                        if(dnsserv_2.text.split(".").length > 1){
-                                            dnsserv_2.text = dnsserv_2.text.split(".")[0];
-                                            dnsserv_2.focus = false;
-                                            dnsserv_3.focus = true;
-                                        }
-                                        if(dnsserv_2.text.length == 3){
-                                            dnsserv_2.focus = false;
-                                            dnsserv_3.focus = true;
-                                        }
-                                    }
-                                }
-                                Text{
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text:"."
-                                }
-                                TextField{
-                                    id: dnsserv_3
-                                    width: 70
-                                    height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = dnsserv_3;
-//                                        keyboard.owner_text = "dnsserv_3";
-                                        dnsserv_3.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            dnsserv_3.select(0,0);
-                                            keypad.close();
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(dnsserv_3.text == "."){
-                                            dnsserv_3.text = dnsserv_3.text.split(".")[0]
-                                        }
-
-                                        if(dnsserv_3.text.split(".").length > 1){
-                                            dnsserv_3.text = dnsserv_3.text.split(".")[0];
-                                            dnsserv_3.focus = false;
-                                            dnsserv_4.focus = true;
-                                        }
-                                        if(dnsserv_3.text.length == 3){
-                                            dnsserv_3.focus = false;
-                                            dnsserv_4.focus = true;
-                                        }
-                                    }
-                                }
-                                Text{
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text:"."
-                                }
-                                TextField{
-                                    id: dnsserv_4
-                                    width: 70
-                                    height: 50
-                                    focus:false
-                                    onFocusChanged: {
-                                        keypad.owner = dnsserv_4;
-//                                        keyboard.owner_text = "dnsserv_4";
-                                        dnsserv_4.selectAll();
-                                        if(focus){
-                                            keypad.open();
-                                        }else{
-                                            dnsserv_4.select(0,0);
-                                            keypad.close();
-                                        }
-                                    }
-                                    color: ischanged?color_red:"black"
-                                    property bool ischanged: false
-                                    onTextChanged: {
-                                        ischanged = true;
-                                        if(dnsserv_4.text == "."){
-                                            dnsserv_4.text = dnsserv_4.text.split(".")[0]
-                                        }
-
-                                        if(dnsserv_4.text.split(".").length > 1){
-                                            dnsserv_4.text = dnsserv_4.text.split(".")[0];
-                                            dnsserv_4.focus = false;
-                                        }
-                                        if(dnsserv_4.text.length == 3){
-                                            dnsserv_4.focus = false;
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    height: parent.height
-                                    width: parent.width*0.2
-                                    radius: 5
-                                    color: "black"
-                                    Text{
-                                        anchors.centerIn: parent
-                                        color: "white"
-                                        font.family: font_noto_r.name
-                                        text: "변경"
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click_sound.play();
-                                            dnsserv_1.ischanged = false;
-                                            dnsserv_2.ischanged = false;
-                                            dnsserv_3.ischanged = false;
-                                            dnsserv_4.ischanged = false;
-                                            var ip_str = dnsserv_1.text + "." + dnsserv_2.text + "." + dnsserv_3.text + "." + dnsserv_4.text;
-                                            supervisor.setSetting("ROBOT_SW/wifi_dnsserv",ip_str);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
                 Rectangle{
                     id: init_
                     width: 840
@@ -3154,7 +3047,6 @@ Item {
             }
 
         }
-
 
         Flickable{
             id: area_setting_slam
@@ -3284,23 +3176,23 @@ Item {
                                 anchors.fill: parent
                                 text:supervisor.getSetting("SENSOR","cam_exposure");
                                 property bool ischanged: false
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = cam_exposure;
-                                    cam_exposure.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        cam_exposure.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = cam_exposure;
+                                            cam_exposure.selectAll();
+                                        }else{
+                                            keypad.owner = cam_exposure;
+                                            cam_exposure.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
                                 onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
+                                    ischanged = true;
+                                    is_reset_slam = true;
                                 }
                             }
                         }
@@ -3617,23 +3509,23 @@ Item {
                                 objectName: "obs_height_min"
                                 text:supervisor.getSetting("ROBOT_SW","obs_height_min");
                                 property bool ischanged: false
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = obs_height_min;
-                                    obs_height_min.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_height_min.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = obs_height_min;
+                                            obs_height_min.selectAll();
+                                        }else{
+                                            keypad.owner = obs_height_min;
+                                            obs_height_min.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
                                 onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
+                                    ischanged = true;
+                                    is_reset_slam = true;
                                 }
                             }
                         }
@@ -3693,22 +3585,22 @@ Item {
                                 text:supervisor.getSetting("ROBOT_SW","obs_height_max");
                                 property bool ischanged: false
                                 color:ischanged?color_red:"black"
-                                focus:false
-                                onFocusChanged: {
-                                    keypad.owner = obs_height_max;
-                                    obs_height_max.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_height_max.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = obs_height_max;
+                                            obs_height_max.selectAll();
+                                        }else{
+                                            keypad.owner = obs_height_max;
+                                            obs_height_max.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
                                 onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
+                                    ischanged = true;
+                                    is_reset_slam = true;
                                 }
                             }
                         }
@@ -3787,23 +3679,24 @@ Item {
                                 anchors.fill: parent
                                 text:supervisor.getSetting("SENSOR","max_range");
                                 property bool ischanged: false
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = max_range;
-                                    max_range.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        max_range.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = max_range;
+                                            max_range.selectAll();
+                                        }else{
+                                            keypad.owner = max_range;
+                                            max_range.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
                                 onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
+                                    ischanged = true;
+                                    is_reset_slam = true;
+
                                 }
                             }
                         }
@@ -3866,19 +3759,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_near");
-                                onFocusChanged: {
-                                    keypad.owner = icp_near;
-                                    icp_near.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_near.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = icp_near;
+                                            icp_near.selectAll();
+                                        }else{
+                                            keypad.owner = icp_near;
+                                            icp_near.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_near");
                             }
                         }
                     }
@@ -3939,18 +3834,20 @@ Item {
                                     ischanged = true;
                                 }
                                 color:ischanged?color_red:"black"
-                                focus:false
-                                text:supervisor.getSetting("SENSOR","offset_x");
-                                onFocusChanged: {
-                                    keypad.owner = offset_x;
-                                    offset_x.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        offset_x.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = offset_x;
+                                            offset_x.selectAll();
+                                        }else{
+                                            keypad.owner = offset_x;
+                                            offset_x.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                text:supervisor.getSetting("SENSOR","offset_x");
                             }
                         }
                     }
@@ -4011,18 +3908,20 @@ Item {
                                     ischanged = true;
                                 }
                                 color:ischanged?color_red:"black"
-                                focus:false
-                                text:supervisor.getSetting("SENSOR","offset_y");
-                                onFocusChanged: {
-                                    keypad.owner = offset_y;
-                                    offset_y.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        offset_y.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = offset_y;
+                                            offset_y.selectAll();
+                                        }else{
+                                            keypad.owner = offset_y;
+                                            offset_y.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                text:supervisor.getSetting("SENSOR","offset_y");
                             }
                         }
                     }
@@ -4148,19 +4047,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","obs_preview_time");
-                                onFocusChanged: {
-                                    keypad.owner = obs_preview_time;
-                                    obs_preview_time.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_preview_time.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = obs_preview_time;
+                                            obs_preview_time.selectAll();
+                                        }else{
+                                            keypad.owner = obs_preview_time;
+                                            obs_preview_time.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","obs_preview_time");
                             }
                         }
                     }
@@ -4356,19 +4257,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","look_ahead_dist");
-                                onFocusChanged: {
-                                    keypad.owner = look_ahead_dist;
-                                    look_ahead_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        look_ahead_dist.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = look_ahead_dist;
+                                            look_ahead_dist.selectAll();
+                                        }else{
+                                            keypad.owner = look_ahead_dist;
+                                            look_ahead_dist.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","look_ahead_dist");
                             }
                         }
                     }
@@ -4428,19 +4331,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","min_look_ahead_dist");
-                                onFocusChanged: {
-                                    keypad.owner = min_look_ahead_dist;
-                                    min_look_ahead_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        min_look_ahead_dist.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = min_look_ahead_dist;
+                                            min_look_ahead_dist.selectAll();
+                                        }else{
+                                            keypad.owner = min_look_ahead_dist;
+                                            min_look_ahead_dist.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","min_look_ahead_dist");
                             }
                         }
                     }
@@ -4500,23 +4405,24 @@ Item {
                                 objectName: "obs_margin1"
                                 text:supervisor.getSetting("ROBOT_SW","obs_margin1");
                                 property bool ischanged: false
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = obs_margin1;
-                                    obs_margin1.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_margin1.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = obs_margin1;
+                                            obs_margin1.selectAll();
+                                        }else{
+                                            keypad.owner = obs_margin1;
+                                            obs_margin1.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
                                 onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
+                                    ischanged = true;
+                                    is_reset_slam = true;
+
                                 }
                             }
                         }
@@ -4577,23 +4483,23 @@ Item {
                                 objectName: "obs_margin0"
                                 text:supervisor.getSetting("ROBOT_SW","obs_margin0");
                                 property bool ischanged: false
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = obs_margin0;
-                                    obs_margin0.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_margin0.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = obs_margin0;
+                                            obs_margin0.selectAll();
+                                        }else{
+                                            keypad.owner = obs_margin0;
+                                            obs_margin0.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
                                 onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
+                                    ischanged = true;
+                                    is_reset_slam = true;
                                 }
                             }
                         }
@@ -4653,23 +4559,24 @@ Item {
                                 objectName: "obs_detect_area"
                                 text:supervisor.getSetting("ROBOT_SW","obs_detect_area");
                                 property bool ischanged: false
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = obs_detect_area;
-                                    obs_detect_area.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_detect_area.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = obs_detect_area;
+                                            obs_detect_area.selectAll();
+                                        }else{
+                                            keypad.owner = obs_detect_area;
+                                            obs_detect_area.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
                                 onTextChanged: {
-                                    if(focus){
-                                        ischanged = true;
-                                        is_reset_slam = true;
-                                    }
+                                    ischanged = true;
+                                    is_reset_slam = true;
+
                                 }
                             }
                         }
@@ -4728,23 +4635,24 @@ Item {
                                 objectName: "obs_detect_sensitivity"
                                 text:supervisor.getSetting("ROBOT_SW","obs_detect_sensitivity");
                                 property bool ischanged: false
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                onFocusChanged: {
-                                    keypad.owner = obs_detect_sensitivity;
-                                    obs_detect_sensitivity.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_detect_sensitivity.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = obs_detect_sensitivity;
+                                            obs_detect_sensitivity.selectAll();
+                                        }else{
+                                            keypad.owner = obs_detect_sensitivity;
+                                            obs_detect_sensitivity.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
                                 onTextChanged: {
-                                    if(focus){
                                         ischanged = true;
                                         is_reset_slam = true;
-                                    }
+
                                 }
                             }
                         }
@@ -4806,19 +4714,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","obs_deadzone");
-                                onFocusChanged: {
-                                    keypad.owner = obs_deadzone;
-                                    obs_deadzone.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_deadzone.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = obs_deadzone;
+                                            obs_deadzone.selectAll();
+                                        }else{
+                                            keypad.owner = obs_deadzone;
+                                            obs_deadzone.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","obs_deadzone");
                             }
                         }
                     }
@@ -4878,19 +4788,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","obs_wait_time");
-                                onFocusChanged: {
-                                    keypad.owner = obs_wait_time;
-                                    obs_wait_time.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        obs_wait_time.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = obs_wait_time;
+                                            obs_wait_time.selectAll();
+                                        }else{
+                                            keypad.owner = obs_wait_time;
+                                            obs_wait_time.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","obs_wait_time");
                             }
                         }
                     }
@@ -4950,19 +4862,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","path_out_dist");
-                                onFocusChanged: {
-                                    keypad.owner = path_out_dist;
-                                    path_out_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        path_out_dist.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = path_out_dist;
+                                            path_out_dist.selectAll();
+                                        }else{
+                                            keypad.owner = path_out_dist;
+                                            path_out_dist.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","path_out_dist");
                             }
                         }
                     }
@@ -5039,19 +4953,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_dist");
-                                onFocusChanged: {
-                                    keypad.owner = icp_dist;
-                                    icp_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_dist.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = icp_dist;
+                                            icp_dist.selectAll();
+                                        }else{
+                                            keypad.owner = icp_dist;
+                                            icp_dist.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_dist");
                             }
                         }
                     }
@@ -5114,19 +5030,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_error");
-                                onFocusChanged: {
-                                    keypad.owner = icp_error;
-                                    icp_error.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_error.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = icp_error;
+                                            icp_error.selectAll();
+                                        }else{
+                                            keypad.owner = icp_error;
+                                            icp_error.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_error");
                             }
                         }
                     }
@@ -5189,19 +5107,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_ratio");
-                                onFocusChanged: {
-                                    keypad.owner = icp_ratio;
-                                    icp_ratio.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_ratio.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = icp_ratio;
+                                            icp_ratio.selectAll();
+                                        }else{
+                                            keypad.owner = icp_ratio;
+                                            icp_ratio.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_ratio");
                             }
                         }
                     }
@@ -5264,19 +5184,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_odometry_weight");
-                                onFocusChanged: {
-                                    keypad.owner = icp_odometry_weight;
-                                    icp_odometry_weight.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_odometry_weight.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = icp_odometry_weight;
+                                            icp_odometry_weight.selectAll();
+                                        }else{
+                                            keypad.owner = icp_odometry_weight;
+                                            icp_odometry_weight.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_odometry_weight");
                             }
                         }
                     }
@@ -5336,19 +5258,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_repeat_dist");
-                                onFocusChanged: {
-                                    keypad.owner = icp_repeat_dist;
-                                    icp_repeat_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_repeat_dist.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = icp_repeat_dist;
+                                            icp_repeat_dist.selectAll();
+                                        }else{
+                                            keypad.owner = icp_repeat_dist;
+                                            icp_repeat_dist.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_repeat_dist");
                             }
                         }
                     }
@@ -5408,19 +5332,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","icp_repeat_time");
-                                onFocusChanged: {
-                                    keypad.owner = icp_repeat_time;
-                                    icp_repeat_time.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        icp_repeat_time.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = icp_repeat_time;
+                                            icp_repeat_time.selectAll();
+                                        }else{
+                                            keypad.owner = icp_repeat_time;
+                                            icp_repeat_time.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","icp_repeat_time");
                             }
                         }
                     }
@@ -5499,19 +5425,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","goal_dist");
-                                onFocusChanged: {
-                                    keypad.owner = goal_dist;
-                                    goal_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        goal_dist.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = goal_dist;
+                                            goal_dist.selectAll();
+                                        }else{
+                                            keypad.owner = goal_dist;
+                                            goal_dist.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_dist");
                             }
                         }
                     }
@@ -5573,19 +5501,22 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","goal_th");
-                                onFocusChanged: {
-                                    keypad.owner = goal_th;
-                                    goal_th.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        goal_th.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = goal_th;
+                                            goal_th.selectAll();
+                                        }else{
+                                            keypad.owner = goal_th;
+                                            goal_th.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_th");
+
                             }
                         }
                     }
@@ -5646,19 +5577,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","goal_near_dist");
-                                onFocusChanged: {
-                                    keypad.owner = goal_near_dist;
-                                    goal_near_dist.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        goal_near_dist.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = goal_near_dist;
+                                            goal_near_dist.selectAll();
+                                        }else{
+                                            keypad.owner = goal_near_dist;
+                                            goal_near_dist.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_near_dist");
                             }
                         }
                     }
@@ -5804,20 +5737,24 @@ Item {
                                 property bool ischanged: false
                                 onTextChanged: {
                                     ischanged = true;
+                                    is_reset_slam = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("MOTOR","pause_motor_current");
-                                onFocusChanged: {
-                                    keypad.owner = pause_motor_current;
-                                    pause_motor_current.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        pause_motor_current.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = pause_motor_current;
+                                            pause_motor_current.selectAll();
+                                        }else{
+                                            keypad.owner = pause_motor_current;
+                                            pause_motor_current.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","pause_motor_current");
+
                             }
                         }
                     }
@@ -5859,20 +5796,23 @@ Item {
                                 property bool ischanged: false
                                 onTextChanged: {
                                     ischanged = true;
+                                    is_reset_slam = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("MOTOR","pause_check_ms");
-                                onFocusChanged: {
-                                    keypad.owner = pause_check_ms;
-                                    pause_check_ms.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        pause_check_ms.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = pause_check_ms;
+                                            pause_check_ms.selectAll();
+                                        }else{
+                                            keypad.owner = pause_check_ms;
+                                            pause_check_ms.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","pause_check_ms");
                             }
                         }
                     }
@@ -5953,19 +5893,22 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","limit_pivot");
-                                focus:false
-                                onFocusChanged: {
-                                    keypad.owner = limit_pivot;
-                                    limit_pivot.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        limit_pivot.select(0,0);
+
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = limit_pivot;
+                                            limit_pivot.selectAll();
+                                        }else{
+                                            keypad.owner = limit_pivot;
+                                            limit_pivot.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_pivot");
                             }
                         }
                     }
@@ -6026,19 +5969,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                color:ischanged?color_red:"black"
-                                focus:false
-                                text:supervisor.getSetting("ROBOT_SW","limit_pivot_acc");
-                                onFocusChanged: {
-                                    keypad.owner = limit_pivot_acc;
-                                    limit_pivot_acc.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        limit_pivot_acc.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = limit_pivot_acc;
+                                            limit_pivot_acc.selectAll();
+                                        }else{
+                                            keypad.owner = limit_pivot_acc;
+                                            limit_pivot_acc.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_pivot_acc");
                             }
                         }
                     }
@@ -6099,19 +6044,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","limit_v");
-                                onFocusChanged: {
-                                    keypad.owner = limit_v;
-                                    limit_v.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        limit_v.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = limit_v;
+                                            limit_v.selectAll();
+                                        }else{
+                                            keypad.owner = limit_v;
+                                            limit_v.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_v");
                             }
                         }
                     }
@@ -6172,19 +6119,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","limit_v_acc");
-                                onFocusChanged: {
-                                    keypad.owner = limit_v_acc;
-                                    limit_v_acc.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        limit_v_acc.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = limit_v_acc;
+                                            limit_v_acc.selectAll();
+                                        }else{
+                                            keypad.owner = limit_v_acc;
+                                            limit_v_acc.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_v_acc");
                             }
                         }
                     }
@@ -6245,19 +6194,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","limit_w");
-                                onFocusChanged: {
-                                    keypad.owner = limit_w;
-                                    limit_w.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        limit_w.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = limit_w;
+                                            limit_w.selectAll();
+                                        }else{
+                                            keypad.owner = limit_w;
+                                            limit_w.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_w");
                             }
                         }
                     }
@@ -6318,19 +6269,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","limit_w_acc");
-                                onFocusChanged: {
-                                    keypad.owner = limit_w_acc;
-                                    limit_w_acc.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        limit_w_acc.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = limit_w_acc;
+                                            limit_w_acc.selectAll();
+                                        }else{
+                                            keypad.owner = limit_w_acc;
+                                            limit_w_acc.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_w_acc");
                             }
                         }
                     }
@@ -6391,19 +6344,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","limit_manual_v");
-                                onFocusChanged: {
-                                    keypad.owner = limit_manual_v;
-                                    limit_manual_v.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        limit_manual_v.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = limit_manual_v;
+                                            limit_manual_v.selectAll();
+                                        }else{
+                                            keypad.owner = limit_manual_v;
+                                            limit_manual_v.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_manual_v");
                             }
                         }
                     }
@@ -6464,19 +6419,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","limit_manual_w");
-                                onFocusChanged: {
-                                    keypad.owner = limit_manual_w;
-                                    limit_manual_w.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        limit_manual_w.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = limit_manual_w;
+                                            limit_manual_w.selectAll();
+                                        }else{
+                                            keypad.owner = limit_manual_w;
+                                            limit_manual_w.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","limit_manual_w");
                             }
                         }
                     }
@@ -6537,19 +6494,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","st_v");
-                                onFocusChanged: {
-                                    keypad.owner = st_v;
-                                    st_v.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        st_v.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = st_v;
+                                            st_v.selectAll();
+                                        }else{
+                                            keypad.owner = st_v;
+                                            st_v.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","st_v");
                             }
                         }
                     }
@@ -6610,19 +6569,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("ROBOT_SW","goal_v");
-                                onFocusChanged: {
-                                    keypad.owner = goal_v;
-                                    goal_v.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        goal_v.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = goal_v;
+                                            goal_v.selectAll();
+                                        }else{
+                                            keypad.owner = goal_v;
+                                            goal_v.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("ROBOT_SW","goal_v");
                             }
                         }
                     }
@@ -6822,19 +6783,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("MOTOR","gear_ratio");
-                                onFocusChanged: {
-                                    keypad.owner = gear_ratio;
-                                    gear_ratio.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        gear_ratio.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = gear_ratio;
+                                            gear_ratio.selectAll();
+                                        }else{
+                                            keypad.owner = gear_ratio;
+                                            gear_ratio.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","gear_ratio");
                             }
                         }
                     }
@@ -6880,19 +6843,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("MOTOR","k_p");
-                                onFocusChanged: {
-                                    keypad.owner = k_p;
-                                    k_p.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        k_p.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = k_p;
+                                            k_p.selectAll();
+                                        }else{
+                                            keypad.owner = k_p;
+                                            k_p.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","k_p");
                             }
                         }
                     }
@@ -6938,19 +6903,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("MOTOR","k_i");
-                                onFocusChanged: {
-                                    keypad.owner = k_i;
-                                    k_i.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        k_i.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = k_i;
+                                            k_i.selectAll();
+                                        }else{
+                                            keypad.owner = k_i;
+                                            k_i.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","k_i");
                             }
                         }
                     }
@@ -6996,19 +6963,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("MOTOR","k_d");
-                                onFocusChanged: {
-                                    keypad.owner = k_d;
-                                    k_d.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        k_d.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = k_d;
+                                            k_d.selectAll();
+                                        }else{
+                                            keypad.owner = k_d;
+                                            k_d.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","k_d");
                             }
                         }
                     }
@@ -7054,19 +7023,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("MOTOR","limit_v");
-                                onFocusChanged: {
-                                    keypad.owner = motor_limit_v;
-                                    motor_limit_v.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        motor_limit_v.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = motor_limit_v;
+                                            motor_limit_v.selectAll();
+                                        }else{
+                                            keypad.owner = motor_limit_v;
+                                            motor_limit_v.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","limit_v");
                             }
                         }
                     }
@@ -7112,19 +7083,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("MOTOR","limit_v_acc");
-                                onFocusChanged: {
-                                    keypad.owner = motor_limit_v_acc;
-                                    motor_limit_v_acc.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        motor_limit_v_acc.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = motor_limit_v_acc;
+                                            motor_limit_v_acc.selectAll();
+                                        }else{
+                                            keypad.owner = motor_limit_v_acc;
+                                            motor_limit_v_acc.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","limit_v_acc");
                             }
                         }
                     }
@@ -7170,19 +7143,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("MOTOR","limit_w");
-                                onFocusChanged: {
-                                    keypad.owner = motor_limit_w;
-                                    motor_limit_w.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        motor_limit_w.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = motor_limit_w;
+                                            motor_limit_w.selectAll();
+                                        }else{
+                                            keypad.owner = motor_limit_w;
+                                            motor_limit_w.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","limit_w");
                             }
                         }
                     }
@@ -7228,19 +7203,21 @@ Item {
                                     is_reset_slam = true;
                                     ischanged = true;
                                 }
-                                focus:false
-                                color:ischanged?color_red:"black"
-                                text:supervisor.getSetting("MOTOR","limit_w_acc");
-                                onFocusChanged: {
-                                    keypad.owner = motor_limit_w_acc;
-                                    motor_limit_w_acc.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        motor_limit_w_acc.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = motor_limit_w_acc;
+                                            motor_limit_w_acc.selectAll();
+                                        }else{
+                                            keypad.owner = motor_limit_w_acc;
+                                            motor_limit_w_acc.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                color:ischanged?color_red:"black"
+                                text:supervisor.getSetting("MOTOR","limit_w_acc");
                             }
                         }
                     }
@@ -8562,6 +8539,7 @@ Item {
                 width: 180
                 height: 60
                 radius: 10
+                visible: is_admin
                 color:"transparent"
                 border.width: 1
                 border.color: "#7e7e7e"
@@ -8730,7 +8708,7 @@ Item {
         }
 
         if(wifi_passwd.ischanged){
-            supervisor.setSetting("ROBOT_SW/wifi_passwd",wifi_passwd.text);
+            supervisor.setSetting("NETWORK/wifi_passwd",wifi_passwd.text);
         }
 
         if(fms_id.ischanged){
@@ -8742,22 +8720,22 @@ Item {
 
         if(ip_1.ischanged||ip_2.ischanged||ip_3.ischanged||ip_4.ischanged){
             var ip_str = ip_1.text + "." + ip_2.text + "." + ip_3.text + "." + ip_4.text;
-            supervisor.setSetting("ROBOT_SW/wifi_ip",ip_str);
+            supervisor.setSetting("NETWORK/wifi_ip",ip_str);
         }
 
         if(gateway_1.ischanged||gateway_2.ischanged||gateway_3.ischanged||gateway_4.ischanged){
             var ip_str = gateway_1.text + "." + gateway_2.text + "." + gateway_3.text + "." + gateway_4.text;
-            supervisor.setSetting("ROBOT_SW/wifi_gateway",ip_str);
+            supervisor.setSetting("NETWORK/wifi_gateway",ip_str);
         }
 
         if(dnsmain_1.ischanged||dnsmain_2.ischanged||dnsmain_3.ischanged||dnsmain_4.ischanged){
             var ip_str = dnsmain_1.text + "." + dnsmain_2.text + "." + dnsmain_3.text + "." + dnsmain_4.text;
-            supervisor.setSetting("ROBOT_SW/wifi_dnsmain",ip_str);
+            supervisor.setSetting("NETWORK/wifi_dnsmain",ip_str);
         }
 
         if(dnsserv_1.ischanged||dnsserv_2.ischanged||dnsserv_3.ischanged||dnsserv_4.ischanged){
             var ip_str = dnsserv_1.text + "." + dnsserv_2.text + "." + dnsserv_3.text + "." + dnsserv_4.text;
-            supervisor.setSetting("ROBOT_SW/wifi_dnsserv",ip_str);
+            supervisor.setSetting("NETWORK/wifi_dnsserv",ip_str);
 
         }
 
@@ -9015,7 +8993,9 @@ Item {
 
     function init(){
         supervisor.writelog("[QML] SETTING PAGE init");
+        wifi_check();
 
+        slider_volume_system.value = supervisor.getSystemVolume();
         platform_name.text = supervisor.getSetting("ROBOT_HW","model");
         combo_platform_serial.currentIndex = parseInt(supervisor.getSetting("ROBOT_HW","serial_num"))
         combo_platform_id.currentIndex = parseInt(supervisor.getSetting("ROBOT_SW","robot_id"))
@@ -9126,8 +9106,8 @@ Item {
         k_i.text = supervisor.getSetting("MOTOR","k_i");
         k_p.text = supervisor.getSetting("MOTOR","k_p");
 
-        wifi_ssd.text = supervisor.getSetting("ROBOT_SW","wifi_ssd");
-        wifi_passwd.text = supervisor.getSetting("ROBOT_SW","wifi_passwd");
+        wifi_ssid.text = supervisor.getCurWifiSSID();
+//        wifi_passwd.text = supervisor.getSetting("NETWORK","wifi_passwd");
 
         combo_left_id.currentIndex = parseInt(supervisor.getSetting("MOTOR","left_id"));
         combo_right_id.currentIndex = parseInt(supervisor.getSetting("MOTOR","right_id"));
@@ -9187,7 +9167,7 @@ Item {
         right_camera.text = supervisor.getSetting("SENSOR","right_camera");
         left_camera.text = supervisor.getSetting("SENSOR","left_camera");
 
-//        var ip = supervisor.getSetting("ROBOT_SW","wifi_ip").split(".");
+//        var ip = supervisor.getSetting("NETWORK","wifi_ip").split(".");
         var ip = supervisor.getcurIP().split(".");
         if(ip.length >3){
             ip_1.text = ip[0];
@@ -9195,11 +9175,6 @@ Item {
             ip_3.text = ip[2];
             ip_4.text = ip[3];
         }
-        ip_1.focus = false;
-        ip_2.focus = false;
-        ip_3.focus = false;
-        ip_4.focus = false;
-
         ip = supervisor.getSetting("SERVER","fms_ip").split(".");
         if(ip.length >3){
             server_ip_1.text = ip[0];
@@ -9207,11 +9182,7 @@ Item {
             server_ip_3.text = ip[2];
             server_ip_4.text = ip[3];
         }
-        server_ip_1.focus = false;
-        server_ip_2.focus = false;
-        server_ip_3.focus = false;
-        server_ip_4.focus = false;
-        ip = supervisor.getSetting("ROBOT_SW","wifi_gateway").split(".");
+        ip = supervisor.getSetting("NETWORK","wifi_gateway").split(".");
         ip = supervisor.getcurGateway().split(".");
         if(ip.length >3){
             gateway_1.text = ip[0];
@@ -9219,11 +9190,7 @@ Item {
             gateway_3.text = ip[2];
             gateway_4.text = ip[3];
         }
-        gateway_1.text.focus = false;
-        gateway_2.text.focus = false;
-        gateway_3.text.focus = false;
-        gateway_4.text.focus = false;
-        ip = supervisor.getSetting("ROBOT_SW","wifi_dnsmain").split(".");
+        ip = supervisor.getSetting("NETWORK","wifi_dnsmain").split(".");
         ip = supervisor.getcurDNS().split(".");
         if(ip.length >3){
             dnsmain_1.text = ip[0];
@@ -9231,22 +9198,6 @@ Item {
             dnsmain_3.text = ip[2];
             dnsmain_4.text = ip[3];
         }
-        dnsmain_1.text.focus = false;
-        dnsmain_2.text.focus = false;
-        dnsmain_3.text.focus = false;
-        dnsmain_4.text.focus = false;
-        ip = supervisor.getSetting("ROBOT_SW","wifi_dnsserv").split(".");
-        if(ip.length >3){
-            dnsserv_1.text = ip[0];
-            dnsserv_2.text = ip[1];
-            dnsserv_3.text = ip[2];
-            dnsserv_4.text = ip[3];
-        }
-
-        dnsserv_1.text.focus = false;
-        dnsserv_2.text.focus = false;
-        dnsserv_3.text.focus = false;
-        dnsserv_4.text.focus = false;
 
         //변수 초기화
         is_reset_slam = false;
@@ -9265,7 +9216,7 @@ Item {
 
         combo_movingpage.ischanged = false;
         combo_comeback_preset.ischanged = false;
-        wifi_passwd.ischanged = false;
+//        wifi_passwd.ischanged = false;
         ip_1.ischanged = false;
         ip_2.ischanged = false;
         ip_3.ischanged = false;
@@ -9278,10 +9229,6 @@ Item {
         dnsmain_2.ischanged = false;
         dnsmain_3.ischanged = false;
         dnsmain_4.ischanged = false;
-        dnsserv_1.ischanged = false;
-        dnsserv_2.ischanged = false;
-        dnsserv_3.ischanged = false;
-        dnsserv_4.ischanged = false;
 
         combo_multirobot.ischanged = false;
         server_ip_1.ischanged = false;
@@ -9364,7 +9311,6 @@ Item {
         if(slider_volume_bgm.ischanged) is_changed = true;
         if(slider_volume_voice.ischanged) is_changed = true;
         if(slider_volume_button.ischanged) is_changed = true;
-        if(wifi_passwd.ischanged) is_changed = true;
         if(ip_1.ischanged) is_changed = true;
         if(ip_2.ischanged) is_changed = true;
         if(ip_3.ischanged) is_changed = true;
@@ -9381,10 +9327,6 @@ Item {
         if(dnsmain_2.ischanged) is_changed = true;
         if(dnsmain_3.ischanged) is_changed = true;
         if(dnsmain_4.ischanged) is_changed = true;
-        if(dnsserv_1.ischanged) is_changed = true;
-        if(dnsserv_2.ischanged) is_changed = true;
-        if(dnsserv_3.ischanged) is_changed = true;
-        if(dnsserv_4.ischanged) is_changed = true;
         if(wheel_base.ischanged) is_changed = true;
         if(wheel_radius.ischanged) is_changed = true;
         if(radius.ischanged) is_changed = true;
@@ -9432,6 +9374,10 @@ Item {
         return is_changed;
     }
 
+    function wifi_check(){
+        supervisor.readWifiState("");
+    }
+
     Timer{
         running: true
         interval: 500
@@ -9446,6 +9392,12 @@ Item {
             }
 
             wifi_connection.connection = supervisor.getWifiConnection("");
+
+            if(wifi_connection.connection === 0 && supervisor.getcurIP() === ""){
+                supervisor.getWifiIP();
+            }
+
+
 
             motor_left_id = parseInt(supervisor.getSetting("MOTOR","left_id"));
             motor_right_id = parseInt(supervisor.getSetting("MOTOR","right_id"));
@@ -11556,19 +11508,21 @@ Item {
                             TextField{
                                 id: preset_limit_pivot
                                 width: 200
-                                focus:false
-                                height: 50
-                                text:"";
-                                onFocusChanged: {
-                                    keypad.owner = preset_limit_pivot;
-                                    preset_limit_pivot.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        preset_limit_pivot.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = preset_limit_pivot;
+                                            preset_limit_pivot.selectAll();
+                                        }else{
+                                            keypad.owner = preset_limit_pivot;
+                                            preset_limit_pivot.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                height: 50
+                                text:"";
                             }
                             Text{
                                 font.family: font_noto_r.name
@@ -11591,15 +11545,17 @@ Item {
                                 width: 200
                                 height: 50
                                 text:"";
-                                focus:false
-                                onFocusChanged: {
-                                    keypad.owner = preset_limit_pivot_acc;
-                                    preset_limit_pivot_acc.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        preset_limit_pivot_acc.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = preset_limit_pivot_acc;
+                                            preset_limit_pivot_acc.selectAll();
+                                        }else{
+                                            keypad.owner = preset_limit_pivot_acc;
+                                            preset_limit_pivot_acc.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
                             }
@@ -11623,18 +11579,20 @@ Item {
                                 id: preset_limit_v
                                 width: 200
                                 height: 50
-                                focus:false
-                                text:"";
-                                onFocusChanged: {
-                                    keypad.owner = preset_limit_v;
-                                    preset_limit_v.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        preset_limit_v.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = preset_limit_v;
+                                            preset_limit_v.selectAll();
+                                        }else{
+                                            keypad.owner = preset_limit_v;
+                                            preset_limit_v.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                text:"";
                             }
                             Text{
                                 font.family: font_noto_r.name
@@ -11656,18 +11614,20 @@ Item {
                                 id: preset_limit_vacc
                                 width: 200
                                 height: 50
-                                focus:false
-                                text:"";
-                                onFocusChanged: {
-                                    keypad.owner = preset_limit_vacc;
-                                    preset_limit_vacc.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        preset_limit_vacc.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = preset_limit_vacc;
+                                            preset_limit_vacc.selectAll();
+                                        }else{
+                                            keypad.owner = preset_limit_vacc;
+                                            preset_limit_vacc.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                text:"";
                             }
                             Text{
                                 font.family: font_noto_r.name
@@ -11689,18 +11649,20 @@ Item {
                                 id: preset_limit_w
                                 width: 200
                                 height: 50
-                                focus:false
-                                text:"";
-                                onFocusChanged: {
-                                    keypad.owner = preset_limit_w;
-                                    preset_limit_w.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        preset_limit_w.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = preset_limit_w;
+                                            preset_limit_w.selectAll();
+                                        }else{
+                                            keypad.owner = preset_limit_w;
+                                            preset_limit_w.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
+                                text:"";
                             }
                             Text{
                                 font.family: font_noto_r.name
@@ -11722,16 +11684,18 @@ Item {
                                 id: preset_limit_wacc
                                 width: 200
                                 height: 50
-                                focus:false
                                 text:"";
-                                onFocusChanged: {
-                                    keypad.owner = preset_limit_wacc;
-                                    preset_limit_wacc.selectAll();
-                                    if(focus){
-                                        keypad.open();
-                                    }else{
-                                        keypad.close();
-                                        preset_limit_wacc.select(0,0);
+                                MouseArea{
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        if(keypad.is_opened){
+                                            keypad.owner = preset_limit_wacc;
+                                            preset_limit_wacc.selectAll();
+                                        }else{
+                                            keypad.owner = preset_limit_wacc;
+                                            preset_limit_wacc.selectAll();
+                                            keypad.open();
+                                        }
                                     }
                                 }
                             }
@@ -11760,18 +11724,19 @@ Item {
                 width: 200
                 height: 70
                 horizontalAlignment: Text.AlignHCenter
-                focus:false
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: supervisor.getSetting("PRESET"+Number(popup_preset.select_preset),"name");
-                onFocusChanged: {
-                    keyboard.owner = preset_name;
-                    keyboard.owner_text = "preset_name";
-                    preset_name.selectAll();
-                    if(focus){
-                        keyboard.open();
-                    }else{
-                        keyboard.close();
-                        preset_name.select(0,0);
+                MouseArea{
+                    anchors.fill:parent
+                    onClicked: {
+                        if(keyboard.is_opened){
+                            keyboard.owner = preset_name;
+                            preset_name.selectAll();
+                        }else{
+                            keyboard.owner = preset_name;
+                            preset_name.selectAll();
+                            keyboard.open();
+                        }
                     }
                 }
             }
@@ -12215,18 +12180,19 @@ Item {
                     width: 80
                     height: 50
                     font.family: font_noto_r.name
-                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
-                    onFocusChanged: {
-                        keyboard.owner = tf_left_x;
-                        keyboard.owner_text = "tf_left_x";
-                        tf_left_x.selectAll();
-                        if(focus){
-                            keyboard.open();
-                        }else{
-                            keyboard.close();
-                            tf_left_x.select(0,0);
+                    MouseArea{
+                        anchors.fill:parent
+                        onClicked: {
+                            if(keyboard.is_opened){
+                                keyboard.owner = tf_left_x;
+                                tf_left_x.selectAll();
+                            }else{
+                                keyboard.owner = tf_left_x;
+                                tf_left_x.selectAll();
+                                keyboard.open();
+                            }
                         }
                     }
                 }
@@ -12241,18 +12207,19 @@ Item {
                     width: 80
                     height: 50
                     font.family: font_noto_r.name
-                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
-                    onFocusChanged: {
-                        keyboard.owner = tf_right_x;
-                        keyboard.owner_text = "tf_right_x";
-                        tf_right_x.selectAll();
-                        if(focus){
-                            keyboard.open();
-                        }else{
-                            keyboard.close();
-                            tf_right_x.select(0,0);
+                    MouseArea{
+                        anchors.fill:parent
+                        onClicked: {
+                            if(keyboard.is_opened){
+                                keyboard.owner = tf_right_x;
+                                tf_right_x.selectAll();
+                            }else{
+                                keyboard.owner = tf_right_x;
+                                tf_right_x.selectAll();
+                                keyboard.open();
+                            }
                         }
                     }
                 }
@@ -12261,18 +12228,19 @@ Item {
                     width: 80
                     height: 50
                     font.family: font_noto_r.name
-                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
-                    onFocusChanged: {
-                        keyboard.owner = tf_left_y;
-                        keyboard.owner_text = "tf_left_y";
-                        tf_left_y.selectAll();
-                        if(focus){
-                            keyboard.open();
-                        }else{
-                            keyboard.close();
-                            tf_left_y.select(0,0);
+                    MouseArea{
+                        anchors.fill:parent
+                        onClicked: {
+                            if(keyboard.is_opened){
+                                keyboard.owner = tf_left_y;
+                                tf_left_y.selectAll();
+                            }else{
+                                keyboard.owner = tf_left_y;
+                                tf_left_y.selectAll();
+                                keyboard.open();
+                            }
                         }
                     }
                 }
@@ -12287,18 +12255,19 @@ Item {
                     width: 80
                     height: 50
                     font.family: font_noto_r.name
-                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
-                    onFocusChanged: {
-                        keyboard.owner = tf_right_y;
-                        keyboard.owner_text = "tf_right_y";
-                        tf_right_y.selectAll();
-                        if(focus){
-                            keyboard.open();
-                        }else{
-                            keyboard.close();
-                            tf_right_y.select(0,0);
+                    MouseArea{
+                        anchors.fill:parent
+                        onClicked: {
+                            if(keyboard.is_opened){
+                                keyboard.owner = tf_right_y;
+                                tf_right_y.selectAll();
+                            }else{
+                                keyboard.owner = tf_right_y;
+                                tf_right_y.selectAll();
+                                keyboard.open();
+                            }
                         }
                     }
                 }
@@ -12307,18 +12276,19 @@ Item {
                     width: 80
                     height: 50
                     font.family: font_noto_r.name
-                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
-                    onFocusChanged: {
-                        keyboard.owner = tf_left_z;
-                        keyboard.owner_text = "tf_left_z";
-                        tf_left_z.selectAll();
-                        if(focus){
-                            keyboard.open();
-                        }else{
-                            keyboard.close();
-                            tf_left_z.select(0,0);
+                    MouseArea{
+                        anchors.fill:parent
+                        onClicked: {
+                            if(keyboard.is_opened){
+                                keyboard.owner = tf_left_z;
+                                tf_left_z.selectAll();
+                            }else{
+                                keyboard.owner = tf_left_z;
+                                tf_left_z.selectAll();
+                                keyboard.open();
+                            }
                         }
                     }
                 }
@@ -12333,18 +12303,19 @@ Item {
                     width: 80
                     height: 50
                     font.family: font_noto_r.name
-                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
-                    onFocusChanged: {
-                        keyboard.owner = tf_right_z;
-                        keyboard.owner_text = "tf_right_z";
-                        tf_right_z.selectAll();
-                        if(focus){
-                            keyboard.open();
-                        }else{
-                            keyboard.close();
-                            tf_right_z.select(0,0);
+                    MouseArea{
+                        anchors.fill:parent
+                        onClicked: {
+                            if(keyboard.is_opened){
+                                keyboard.owner = tf_right_z;
+                                tf_right_z.selectAll();
+                            }else{
+                                keyboard.owner = tf_right_z;
+                                tf_right_z.selectAll();
+                                keyboard.open();
+                            }
                         }
                     }
                 }
@@ -12353,18 +12324,19 @@ Item {
                     width: 80
                     height: 50
                     font.family: font_noto_r.name
-                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
-                    onFocusChanged: {
-                        keyboard.owner = tf_left_rx;
-                        keyboard.owner_text = "tf_left_rx";
-                        tf_left_rx.selectAll();
-                        if(focus){
-                            keyboard.open();
-                        }else{
-                            keyboard.close();
-                            tf_left_rx.select(0,0);
+                    MouseArea{
+                        anchors.fill:parent
+                        onClicked: {
+                            if(keyboard.is_opened){
+                                keyboard.owner = tf_left_rx;
+                                tf_left_rx.selectAll();
+                            }else{
+                                keyboard.owner = tf_left_rx;
+                                tf_left_rx.selectAll();
+                                keyboard.open();
+                            }
                         }
                     }
                 }
@@ -12379,18 +12351,19 @@ Item {
                     width: 80
                     height: 50
                     font.family: font_noto_r.name
-                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
-                    onFocusChanged: {
-                        keyboard.owner = tf_right_rx;
-                        keyboard.owner_text = "tf_right_rx";
-                        tf_right_rx.selectAll();
-                        if(focus){
-                            keyboard.open();
-                        }else{
-                            keyboard.close();
-                            tf_right_rx.select(0,0);
+                    MouseArea{
+                        anchors.fill:parent
+                        onClicked: {
+                            if(keyboard.is_opened){
+                                keyboard.owner = tf_right_rx;
+                                tf_right_rx.selectAll();
+                            }else{
+                                keyboard.owner = tf_right_rx;
+                                tf_right_rx.selectAll();
+                                keyboard.open();
+                            }
                         }
                     }
                 }
@@ -12399,18 +12372,19 @@ Item {
                     width: 80
                     horizontalAlignment: Text.AlignHCenter
                     height: 50
-                    focus:false
                     font.family: font_noto_r.name
                     font.pixelSize: 15
-                    onFocusChanged: {
-                        keyboard.owner = tf_left_ry;
-                        keyboard.owner_text = "tf_left_ry";
-                        tf_left_ry.selectAll();
-                        if(focus){
-                            keyboard.open();
-                        }else{
-                            keyboard.close();
-                            tf_left_ry.select(0,0);
+                    MouseArea{
+                        anchors.fill:parent
+                        onClicked: {
+                            if(keyboard.is_opened){
+                                keyboard.owner = tf_left_ry;
+                                tf_left_ry.selectAll();
+                            }else{
+                                keyboard.owner = tf_left_ry;
+                                tf_left_ry.selectAll();
+                                keyboard.open();
+                            }
                         }
                     }
                 }
@@ -12425,18 +12399,19 @@ Item {
                     width: 80
                     height: 50
                     font.family: font_noto_r.name
-                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
-                    onFocusChanged: {
-                        keyboard.owner = tf_right_ry;
-                        keyboard.owner_text = "tf_right_ry";
-                        tf_right_ry.selectAll();
-                        if(focus){
-                            keyboard.open();
-                        }else{
-                            keyboard.close();
-                            tf_right_ry.select(0,0);
+                    MouseArea{
+                        anchors.fill:parent
+                        onClicked: {
+                            if(keyboard.is_opened){
+                                keyboard.owner = tf_right_ry;
+                                tf_right_ry.selectAll();
+                            }else{
+                                keyboard.owner = tf_right_ry;
+                                tf_right_ry.selectAll();
+                                keyboard.open();
+                            }
                         }
                     }
                 }
@@ -12445,18 +12420,19 @@ Item {
                     width: 80
                     height: 50
                     font.family: font_noto_r.name
-                    focus:false
                     font.pixelSize: 15
                     horizontalAlignment: Text.AlignHCenter
-                    onFocusChanged: {
-                        keyboard.owner = tf_left_rz;
-                        keyboard.owner_text = "tf_left_rz";
-                        tf_left_rz.selectAll();
-                        if(focus){
-                            keyboard.open();
-                        }else{
-                            keyboard.close();
-                            tf_left_rz.select(0,0);
+                    MouseArea{
+                        anchors.fill:parent
+                        onClicked: {
+                            if(keyboard.is_opened){
+                                keyboard.owner = tf_left_rz;
+                                tf_left_rz.selectAll();
+                            }else{
+                                keyboard.owner = tf_left_rz;
+                                tf_left_rz.selectAll();
+                                keyboard.open();
+                            }
                         }
                     }
                 }
@@ -12471,21 +12447,21 @@ Item {
                     width: 80
                     height: 50
                     horizontalAlignment: Text.AlignHCenter
-                    focus:false
                     font.family: font_noto_r.name
                     font.pixelSize: 15
-                    onFocusChanged: {
-                        keyboard.owner = tf_right_rz;
-                        keyboard.owner_text = "tf_right_rz";
-                        tf_right_rz.selectAll();
-                        if(focus){
-                            keyboard.open();
-                        }else{
-                            keyboard.close();
-                            tf_right_rz.select(0,0);
+                    MouseArea{
+                        anchors.fill:parent
+                        onClicked: {
+                            if(keyboard.is_opened){
+                                keyboard.owner = tf_right_rz;
+                                tf_right_rz.selectAll();
+                            }else{
+                                keyboard.owner = tf_right_rz;
+                                tf_right_rz.selectAll();
+                                keyboard.open();
+                            }
                         }
                     }
-
                 }
             }
 
@@ -12553,255 +12529,1324 @@ Item {
         rightPadding: 0
         topPadding: 0
         bottomPadding: 0
-        width: 400
-        height: 500
+        width: 1280
+        height: 650
+        closePolicy: Popup.NoAutoClose
         background: Rectangle{
             anchors.fill: parent
-            color: "transparent"
+            color:"transparent"
+        }
+        function connect_fail(){
+            text_wifi_pass.visible = true;
+        }
+
+        function ip_update(){
+            var ip = supervisor.getcurIP().split(".");
+            if(ip.length >3){
+                ip__1.text = ip[0];
+                ip__2.text = ip[1];
+                ip__3.text = ip[2];
+                ip__4.text = ip[3];
+            }else{
+                ip__1.text = "";
+                ip__2.text = "";
+                ip__3.text = "";
+                ip__4.text = "";
+            }
+
+            ip = supervisor.getcurGateway().split(".");
+            if(ip.length >3){
+                gateway__1.text = ip[0];
+                gateway__2.text = ip[1];
+                gateway__3.text = ip[2];
+                gateway__4.text = ip[3];
+            }else{
+                gateway__1.text = "";
+                gateway__2.text = "";
+                gateway__3.text = "";
+                gateway__4.text = "";
+            }
+            ip = supervisor.getcurGateway().split(".");
+            if(ip.length >3){
+                dns_1.text = ip[0];
+                dns_2.text = ip[1];
+                dns_3.text = ip[2];
+                dns_4.text = ip[3];
+            }else{
+                dns_1.text = "";
+                dns_2.text = "";
+                dns_3.text = "";
+                dns_4.text = "";
+            }
+            ip__1.ischanged = false;
+            ip__2.ischanged = false;
+            ip__3.ischanged = false;
+            ip__4.ischanged = false;
+            gateway__1.ischanged = false;
+            gateway__2.ischanged = false;
+            gateway__3.ischanged = false;
+            gateway__4.ischanged = false;
+            dns_1.ischanged = false;
+            dns_2.ischanged = false;
+            dns_3.ischanged = false;
+            dns_4.ischanged = false;
+        }
+        property var connection : 0
+        property var setting_step: 0
+        property string select_ssd: ""
+        property bool select_inuse: false
+        property var select_level: 0
+        property bool select_security: false
+        property bool show_passwd: false
+        onSetting_stepChanged: {
+            if(setting_step === 0){
+                timer_update_wifi.start();
+                timer_update_state.stop();
+            }
+        }
+        function init(){
+            timer_update_wifi.start();
+            setting_step = 0;
         }
         onOpened:{
-            timer_update_wifi.start();
-            supervisor.getAllWifiList();
-            supervisor.readWifi();
+            init();
+//            timer_update_wifi.start();
         }
         onClosed:{
             timer_update_wifi.stop();
+            timer_update_state.stop();
+            init();
         }
         Timer{
             id: timer_update_wifi
             running: false
             repeat: true
-            interval: 1000
+            interval: 3000
             triggeredOnStart: true
             onTriggered: {
                 supervisor.getAllWifiList();
                 model_wifis.clear();
+
                 for(var i=0; i<supervisor.getWifiNum(); i++){
-                    model_wifis.append({"ssd":supervisor.getWifiSSD(i),"inuse":supervisor.getWifiInuse(i),"rate":supervisor.getWifiRate(i),"level":supervisor.getWifiLevel(i),"security":supervisor.getWifiSecurity(i)});
+                    var ssid = supervisor.getWifiSSID(i);
+                    model_wifis.append({"ssid":ssid,"inuse":supervisor.getWifiInuse(ssid),"rate":supervisor.getWifiRate(ssid),"level":supervisor.getWifiLevel(ssid),"security":supervisor.getWifiSecurity(ssid)});
                 }
+            }
+        }
+        Timer{
+            id: timer_update_state
+            running: false
+            repeat: true
+            interval: 500
+            triggeredOnStart: true
+            onTriggered: {
+//                popup_wifi.connection = supervisor.getWifiConnection(popup_wifi.select_ssd);
             }
         }
 
         Rectangle{
-            width: parent.width
-            height: parent.height
-            radius: 10
-            color: color_dark_navy
-            Text{
-                id: text_wifi
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: 30
-                text: "WIFI 설정"
-                color: "white"
-                font.family: font_noto_r.name
-                font.pixelSize: 20
-            }
-            Text{
-                id: text_wifi2
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: text_wifi.bottom
-                anchors.topMargin: 20
-                text: "하단의 리스트에서 연결할 WIFI를 선택해주세요."
-                color: "white"
-                font.family: font_noto_r.name
-                font.pixelSize: 15
-            }
-            Flickable{
-                id: flickable_wifi
-                width: parent.width
-                height: 250
-                clip: true
-                contentHeight: col_wifis.height
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: text_wifi2.bottom
-                anchors.topMargin: 15
+            anchors.fill: parent
+            color: "transparent"
+            Rectangle{
+                width: 1280
+                height: 600
+                anchors.bottom: parent.bottom
+                Column{
+                    anchors.centerIn: parent
+                    spacing:30
+                    visible: popup_wifi.setting_step ===0
+                    Text{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: color_dark_black
+                        font.family: font_noto_r.name
+                        font.pixelSize: 40
+                        text: "무선 WIFI를 설정해주세요."
+                    }
+                    Rectangle{
+                        width: 1280
+                        height: 450
+                        Flickable{
+                            id: flickable_wifi
+                            anchors.fill: parent
+                            clip: true
+                            contentHeight: col_wifis.height
+                            Column{
+                                id: col_wifis
+                                anchors.centerIn: parent
+                                property var select_wifi: -1
+                                spacing: 10
+                                Repeater{
+                                    model : ListModel{id: model_wifis}
+                                    Rectangle{
+                                        width: 700
+                                        height: 50
+                                        radius: 20
+                                        color:col_wifis.select_wifi===index?color_green:"white"
+                                        Rectangle{
+                                            width: 600
+                                            height: 50
+                                            anchors.centerIn: parent
+                                            color: "transparent"
+                                            Text{
+                                                anchors.centerIn: parent
+                                                font.family: font_noto_r.name
+                                                color:col_wifis.select_wifi===index?"white":"black"
+                                                text: ssid
+                                            }
+                                            Text{
+                                                font.family: font_noto_r.name
+                                                text: "(사용중)"
+                                                color: color_red
+                                                visible: inuse
+                                                font.pixelSize: 15
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                anchors.right: parent.right
+                                                anchors.rightMargin: 10
+                                            }
+                                            Image{
+                                                visible: !inuse && security
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                anchors.right: parent.right
+                                                source: "icon/icon_lock_2.png"
+                                                width: 50
+                                                height: 50
+                                                ColorOverlay{
+                                                    anchors.fill: parent
+                                                    source: parent
+                                                    color: color_gray
+                                                }
+                                            }
+                                            Rectangle{
+                                                width: 30
+                                                height: 30
+                                                radius: 5
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                anchors.left: parent.left
+                                                anchors.leftMargin: 10
+                                                Row{
+                                                    spacing: 1
+                                                    anchors.centerIn: parent
+                                                    Rectangle{
+                                                        width: 5
+                                                        anchors.bottom: parent.bottom
+                                                        height:level<1?2:5
+                                                        color:{
+                                                            if(level==0){
+                                                                color_red
+                                                            }else if(level==1){
+                                                                color_red
+                                                            }else if(level==2){
+                                                                color_yellow
+                                                            }else if(level==3){
+                                                                color_green
+                                                            }else if(level==4){
+                                                                color_green
+                                                            }
+                                                        }
+                                                    }
+                                                    Rectangle{
+                                                        width: 5
+                                                        anchors.bottom: parent.bottom
+                                                        height:level<2?2:10
+                                                        color:{
+                                                            if(level==0){
+                                                                color_red
+                                                            }else if(level==1){
+                                                                color_red
+                                                            }else if(level==2){
+                                                                color_yellow
+                                                            }else if(level==3){
+                                                                color_green
+                                                            }else if(level==4){
+                                                                color_green
+                                                            }
+                                                        }
+                                                    }
+                                                    Rectangle{
+                                                        width: 5
+                                                        anchors.bottom: parent.bottom
+                                                        height:level<3?2:15
+                                                        color:{
+                                                            if(level==0){
+                                                                color_red
+                                                            }else if(level==1){
+                                                                color_red
+                                                            }else if(level==2){
+                                                                color_yellow
+                                                            }else if(level==3){
+                                                                color_green
+                                                            }else if(level==4){
+                                                                color_green
+                                                            }
+                                                        }
+                                                    }
+                                                    Rectangle{
+                                                        width: 5
+                                                        anchors.bottom: parent.bottom
+                                                        height:level<4?2:20
+                                                        color:{
+                                                            if(level==0){
+                                                                color_red
+                                                            }else if(level==1){
+                                                                color_red
+                                                            }else if(level==2){
+                                                                color_yellow
+                                                            }else if(level==3){
+                                                                color_green
+                                                            }else if(level==4){
+                                                                color_green
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                            }
+                                        }
+
+                                        MouseArea{
+                                            anchors.fill: parent
+                                            onClicked:{
+                                                click_sound.play();
+                                                col_wifis.select_wifi = index;
+                                                popup_wifi.select_ssd = ssid;
+                                                popup_wifi.select_inuse = inuse;
+                                                popup_wifi.select_security = security;
+                                                popup_wifi.select_level = level;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 Column{
-                    id: col_wifis
                     anchors.centerIn: parent
-                    property var select_wifi: -1
-                    spacing: 10
-                    Repeater{
-                        model : ListModel{id: model_wifis}
+                    spacing:30
+                    visible: popup_wifi.setting_step ===1
+                    Text{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: color_dark_black
+                        font.family: font_noto_r.name
+                        font.pixelSize: 40
+                        text: "무선 WIFI에 연결합니다."
+                    }
+                    Rectangle{
+                        width: 1280
+                        height: 450
                         Rectangle{
-                            width: 330
+                            width: 1280
                             height: 50
-                            radius: 5
-                            border.width:4
-                            border.color: col_wifis.select_wifi===index?color_green:"white"
-                            Text{
-                                anchors.centerIn: parent
-                                font.family: font_noto_r.name
-                                text: ssd
-                            }
-                            Text{
-                                font.family: font_noto_r.name
-                                text: "(사용중)"
-                                color: color_red
-                                visible: inuse
-                                font.pixelSize: 15
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.right: parent.right
-                                anchors.rightMargin: 10
-                            }
-                            Image{
-                                visible: !inuse && security
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.right: parent.right
-                                source: "icon/icon_lock_2.png"
-                                width: 40
+                            radius: 20
+                            Rectangle{
+                                width: 600
                                 height: 50
-                                ColorOverlay{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                color: "transparent"
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    text: popup_wifi.select_ssd
+                                }
+                                Text{
+                                    font.family: font_noto_r.name
+                                    text: "(사용중)"
+                                    color: color_red
+                                    visible: popup_wifi.select_inuse
+                                    font.pixelSize: 15
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.right: parent.right
+                                    anchors.rightMargin: 10
+                                }
+                                Image{
+                                    visible: !popup_wifi.select_inuse && popup_wifi.select_security
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.right: parent.right
+                                    source: "icon/icon_lock_2.png"
+                                    width: 50
+                                    height: 50
+                                    ColorOverlay{
+                                        anchors.fill: parent
+                                        source: parent
+                                        color: color_gray
+                                    }
+                                }
+                                Rectangle{
+                                    width: 30
+                                    height: 30
+                                    radius: 5
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: 10
+                                    Row{
+                                        spacing: 1
+                                        anchors.centerIn: parent
+                                        Rectangle{
+                                            width: 5
+                                            anchors.bottom: parent.bottom
+                                            height:popup_wifi.select_level<1?2:5
+                                            color:{
+                                                if(popup_wifi.select_level==0){
+                                                    color_red
+                                                }else if(popup_wifi.select_level==1){
+                                                    color_red
+                                                }else if(popup_wifi.select_level==2){
+                                                    color_yellow
+                                                }else if(popup_wifi.select_level==3){
+                                                    color_green
+                                                }else if(popup_wifi.select_level==4){
+                                                    color_green
+                                                }
+                                            }
+                                        }
+                                        Rectangle{
+                                            width: 5
+                                            anchors.bottom: parent.bottom
+                                            height:popup_wifi.select_level<2?2:10
+                                            color:{
+                                                if(popup_wifi.select_level==0){
+                                                    color_red
+                                                }else if(popup_wifi.select_level==1){
+                                                    color_red
+                                                }else if(popup_wifi.select_level==2){
+                                                    color_yellow
+                                                }else if(popup_wifi.select_level==3){
+                                                    color_green
+                                                }else if(popup_wifi.select_level==4){
+                                                    color_green
+                                                }
+                                            }
+                                        }
+                                        Rectangle{
+                                            width: 5
+                                            anchors.bottom: parent.bottom
+                                            height:popup_wifi.select_level<3?2:15
+                                            color:{
+                                                if(popup_wifi.select_level==0){
+                                                    color_red
+                                                }else if(popup_wifi.select_level==1){
+                                                    color_red
+                                                }else if(popup_wifi.select_level==2){
+                                                    color_yellow
+                                                }else if(popup_wifi.select_level==3){
+                                                    color_green
+                                                }else if(popup_wifi.select_level==4){
+                                                    color_green
+                                                }
+                                            }
+                                        }
+                                        Rectangle{
+                                            width: 5
+                                            anchors.bottom: parent.bottom
+                                            height:popup_wifi.select_level<4?2:20
+                                            color:{
+                                                if(popup_wifi.select_level==0){
+                                                    color_red
+                                                }else if(popup_wifi.select_level==1){
+                                                    color_red
+                                                }else if(popup_wifi.select_level==2){
+                                                    color_yellow
+                                                }else if(popup_wifi.select_level==3){
+                                                    color_green
+                                                }else if(popup_wifi.select_level==4){
+                                                    color_green
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Column{
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.verticalCenterOffset: 25
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 25
+                            Rectangle{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                visible:{
+                                    if(popup_wifi.select_security){
+                                        if(popup_wifi.connection === 1){
+                                            false
+                                        }else if(popup_wifi.connection === 2 || popup_wifi.connection === 3){
+                                            true
+                                        }else{
+                                            false
+                                        }
+                                    }else{
+                                        true
+                                    }
+                                }
+                                color:popup_wifi.connection===0?color_red:popup_wifi.connection===1?color_yellow:color_green
+                                width: 500
+                                height: 50
+                                radius: 5
+                                Text{
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_r.name
+                                    color:popup_wifi.connection===0?"black":"white"
+                                    text:popup_wifi.connection===0?"연결 안됨":popup_wifi.connection===1?"연결 중":"연결 성공"
+                                    font.pixelSize: 20
+                                }
+                            }
+                            Text{
+                                visible: !popup_wifi.connection&&popup_wifi.select_security
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "비밀번호를 입력해주세요."
+                                font.family: font_noto_r.name
+                                font.pixelSize: 20
+                            }
+
+                            Row{
+                                visible: !popup_wifi.connection&&popup_wifi.select_security
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.horizontalCenterOffset: 35
+                                spacing: 20
+                                Column{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    Text{
+                                        id: text_wifi76788
+                                        visible: false
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        text: "비밀번호가 틀렸습니다."
+                                        color: color_red
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 17
+                                    }
+
+                                    TextField{
+                                        id: passwd_wifi
+                                        width: 400
+                                        height: 50
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        horizontalAlignment: Text.AlignHCenter
+                                        echoMode: popup_wifi.show_passwd?TextInput.Normal:TextInput.Password
+                                        MouseArea{
+                                            anchors.fill:parent
+                                            onClicked: {
+                                                if(keyboard.is_opened){
+                                                    keyboard.owner = passwd_wifi;
+                                                    passwd_wifi.selectAll();
+                                                }else{
+                                                    keyboard.owner = passwd_wifi;
+                                                    passwd_wifi.selectAll();
+                                                    keyboard.open();
+                                                }
+                                            }
+                                        }
+                                        onTextChanged: {
+                                            color = "black"
+                                            text_wifi76788.visible = false;
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: 50
+                                    height: 50
+                                    radius: 5
+                                    color: color_dark_navy
+                                    border.color: "white"
+                                    border.width: 1
+                                    Image{
+                                        anchors.centerIn: parent
+                                        width: 35
+                                        height: 35
+                                        source:popup_wifi.show_passwd?"icon/icon_obj_yes.png":"icon/icon_obj_no.png"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            click_sound.play();
+                                            if(popup_wifi.show_passwd){
+                                                popup_wifi.show_passwd = false;
+                                            }else{
+                                                popup_wifi.show_passwd = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 200
+                                height: 80
+                                radius: 40
+                                visible: !popup_wifi.connection
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                color: "black"
+                                Text{
+                                    anchors.centerIn: parent
+                                    text: "연결"
+                                    font.pixelSize: 35
+                                    font.family: font_noto_r.name
+                                    color: "white"
+                                }
+                                MouseArea{
                                     anchors.fill: parent
-                                    source: parent
-                                    color: color_gray
+                                    onClicked: {
+                                        click_sound.play();
+                                        if(popup_wifi.select_security){
+                                            if(passwd_wifi.text == ""){
+                                                text_wifi76788.visible = true;
+                                            }else{
+                                                print("check connect", popup_wifi.select_ssd, passwd_wifi.text);
+                                                supervisor.connectWifi(popup_wifi.select_ssd, passwd_wifi.text);
+                                                popup_loading.open();
+                                            }
+                                        }else{
+                                            print("check connect", popup_wifi.select_ssd, passwd_wifi.text);
+                                            supervisor.connectWifi(popup_wifi.select_ssd, passwd_wifi.text);
+                                            popup_loading.open();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Column{
+                    anchors.centerIn: parent
+                    spacing:30
+                    visible: popup_wifi.setting_step ===2
+                    Text{
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: color_dark_black
+                        font.family: font_noto_r.name
+                        font.pixelSize: 40
+                        text: "무선 WIFI의 IP를 세팅합니다."
+                    }
+                    Rectangle{
+                        width: 1280
+                        height: 450
+                        radius: 20
+                        Column{
+                            visible: !popup_loading.visible
+                            anchors.centerIn: parent
+                            spacing: 30
+                            Row{
+                                width: 700
+                                height: 50
+                                Rectangle{
+                                    width: 200
+                                    height: parent.height
+                                    Text{
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.left: parent.left
+                                        anchors.leftMargin: 50
+                                        font.family: font_noto_r.name
+                                        text:"IP"
+                                        font.pixelSize: 20
+                                    }
+                                }
+                                Rectangle{
+                                    width: 1
+                                    height: parent.height
+                                    color: "#d0d0d0"
+                                }
+                                Rectangle{
+                                    width: parent.width - 201
+                                    height: parent.height
+                                    Row{
+                                        spacing: 10
+                                        anchors.centerIn: parent
+                                        TextField{
+                                            id: ip__1
+                                            width: 70
+                                            height: 40
+                                            MouseArea{
+                                                anchors.fill:parent
+                                                onClicked: {
+                                                    if(keypad.is_opened){
+                                                        keypad.owner = ip__1;
+                                                        ip__1.selectAll();
+                                                    }else{
+                                                        keypad.owner = ip__1;
+                                                        ip__1.selectAll();
+                                                        keypad.open();
+                                                    }
+                                                }
+                                            }
+                                            color: ischanged?color_red:"black"
+                                            property bool ischanged: false
+                                            onTextChanged: {
+                                                ischanged = true;
+                                                if(ip__1.text.split(".").length > 1){
+                                                    ip__1.text = ip__1.text.split(".")[0];
+                                                    keypad.owner = ip__2;
+                                                    ip__2.selectAll();
+                                                }
+                                                if(ip__1.text.length == 3){
+                                                    keypad.owner = ip__2;
+                                                    ip__2.selectAll();
+                                                }
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text:"."
+                                        }
+
+                                        TextField{
+                                            id: ip__2
+                                            width: 70
+                                            height: 40
+                                            MouseArea{
+                                                anchors.fill:parent
+                                                onClicked: {
+                                                    if(keypad.is_opened){
+                                                        keypad.owner = ip__2;
+                                                        ip__2.selectAll();
+                                                    }else{
+                                                        keypad.owner = ip__2;
+                                                        ip__2.selectAll();
+                                                        keypad.open();
+                                                    }
+                                                }
+                                            }
+                                            color: ischanged?color_red:"black"
+                                            property bool ischanged: false
+                                            onTextChanged: {
+                                                ischanged = true;
+                                                if(ip__2.text == "."){
+                                                    ip__2.text = ip__2.text.split(".")[0]
+                                                }
+
+                                                if(ip__2.text.split(".").length > 1){
+                                                    ip__2.text = ip__2.text.split(".")[0];
+                                                    keypad.owner = ip__3;
+                                                    ip__3.selectAll();
+                                                }
+                                                if(ip__2.text.length == 3){
+                                                    keypad.owner = ip__3;
+                                                    ip__3.selectAll();
+                                                }
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text:"."
+                                        }
+                                        TextField{
+                                            id: ip__3
+                                            width: 70
+                                            height: 40
+                                            MouseArea{
+                                                anchors.fill:parent
+                                                onClicked: {
+                                                    if(keypad.is_opened){
+                                                        keypad.owner = ip__3;
+                                                        ip__3.selectAll();
+                                                    }else{
+                                                        keypad.owner = ip__3;
+                                                        ip__3.selectAll();
+                                                        keypad.open();
+                                                    }
+                                                }
+                                            }
+                                            color: ischanged?color_red:"black"
+                                            property bool ischanged: false
+                                            onTextChanged: {
+                                                ischanged = true;
+                                                if(ip__3.text == "."){
+                                                    ip__3.text = ip__3.text.split(".")[0]
+                                                }
+
+                                                if(ip__3.text.split(".").length > 1){
+                                                    ip__3.text = ip__3.text.split(".")[0];
+                                                    keypad.owner = ip__4;
+                                                    ip__4.selectAll();
+                                                }
+                                                if(ip__3.text.length == 3){
+                                                    keypad.owner = ip__4;
+                                                    ip__4.selectAll();
+                                                }
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text:"."
+                                        }
+                                        TextField{
+                                            id: ip__4
+                                            width: 70
+                                            height: 40
+                                            MouseArea{
+                                                anchors.fill:parent
+                                                onClicked: {
+                                                    if(keypad.is_opened){
+                                                        keypad.owner = ip__4;
+                                                        ip__4.selectAll();
+                                                    }else{
+                                                        keypad.owner = ip__4;
+                                                        ip__4.selectAll();
+                                                        keypad.open();
+                                                    }
+                                                }
+                                            }
+                                            color: ischanged?color_red:"black"
+                                            property bool ischanged: false
+                                            onTextChanged: {
+                                                ischanged = true;
+                                                if(ip__4.text == "."){
+                                                    ip__4.text = ip__4.text.split(".")[0]
+                                                }
+
+                                                if(ip__4.text.split(".").length > 1){
+                                                    ip__4.text = ip__4.text.split(".")[0];
+                                                    keypad.close();
+                                                }
+                                                if(ip__4.text.length == 3){
+                                                    keypad.close();
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
 
                             Row{
-                                spacing: 1
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 10
+                                width: 700
+                                height: 50
                                 Rectangle{
-                                    width: 5
-                                    anchors.bottom: parent.bottom
-                                    height:level<1?2:5
-                                    color:{
-                                        if(level==0){
-                                            color_red
-                                        }else if(level==1){
-                                            color_red
-                                        }else if(level==2){
-                                            color_yellow
-                                        }else if(level==3){
-                                            color_green
-                                        }else if(level==4){
-                                            color_green
-                                        }
+                                    width: 200
+                                    height: parent.height
+                                    Text{
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.left: parent.left
+                                        anchors.leftMargin: 50
+                                        font.family: font_noto_r.name
+                                        text:"Gateway"
+                                        font.pixelSize: 20
                                     }
                                 }
                                 Rectangle{
-                                    width: 5
-                                    anchors.bottom: parent.bottom
-                                    height:level<2?2:10
-                                    color:{
-                                        if(level==0){
-                                            color_red
-                                        }else if(level==1){
-                                            color_red
-                                        }else if(level==2){
-                                            color_yellow
-                                        }else if(level==3){
-                                            color_green
-                                        }else if(level==4){
-                                            color_green
+                                    width: 1
+                                    height: parent.height
+                                    color: "#d0d0d0"
+                                }
+
+                                Rectangle{
+                                    width: parent.width - 201
+                                    height: parent.height
+                                    Row{
+                                        spacing: 10
+                                        anchors.centerIn: parent
+                                        TextField{
+                                            id: gateway__1
+                                            width: 70
+                                            height: 40
+                                            MouseArea{
+                                                anchors.fill:parent
+                                                onClicked: {
+                                                    if(keypad.is_opened){
+                                                        keypad.owner = gateway__1;
+                                                        gateway__1.selectAll();
+                                                    }else{
+                                                        keypad.owner = gateway__1;
+                                                        gateway__1.selectAll();
+                                                        keypad.open();
+                                                    }
+                                                }
+                                            }
+                                            color: ischanged?color_red:"black"
+                                            property bool ischanged: false
+                                            onTextChanged: {
+                                                ischanged = true;
+                                                if(gateway__1.text.split(".").length > 1){
+                                                    gateway__1.text = gateway__1.text.split(".")[0];
+                                                    keypad.owner = gateway__2;
+                                                    gateway__2.selectAll();
+                                                }
+                                                if(gateway__1.text.length == 3){
+                                                    keypad.owner = gateway__2;
+                                                    gateway__2.selectAll();
+                                                }
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text:"."
+                                        }
+
+                                        TextField{
+                                            id: gateway__2
+                                            width: 70
+                                            height: 40
+                                            MouseArea{
+                                                anchors.fill:parent
+                                                onClicked: {
+                                                    if(keypad.is_opened){
+                                                        keypad.owner = gateway__2;
+                                                        gateway__2.selectAll();
+                                                    }else{
+                                                        keypad.owner = gateway__2;
+                                                        gateway__2.selectAll();
+                                                        keypad.open();
+                                                    }
+                                                }
+                                            }
+                                            color: ischanged?color_red:"black"
+                                            property bool ischanged: false
+                                            onTextChanged: {
+                                                ischanged = true;
+                                                if(gateway__2.text == "."){
+                                                    gateway__2.text = gateway__2.text.split(".")[0]
+                                                }
+
+                                                if(gateway__2.text.split(".").length > 1){
+                                                    gateway__2.text = gateway__2.text.split(".")[0];
+                                                    keypad.owner = gateway__3;
+                                                    gateway__3.selectAll();
+                                                }
+                                                if(gateway__2.text.length == 3){
+                                                    keypad.owner = gateway__3;
+                                                    gateway__3.selectAll();
+                                                }
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text:"."
+                                        }
+                                        TextField{
+                                            id: gateway__3
+                                            width: 70
+                                            height: 40
+                                            MouseArea{
+                                                anchors.fill:parent
+                                                onClicked: {
+                                                    if(keypad.is_opened){
+                                                        keypad.owner = gateway__3;
+                                                        gateway__3.selectAll();
+                                                    }else{
+                                                        keypad.owner = gateway__3;
+                                                        gateway__3.selectAll();
+                                                        keypad.open();
+                                                    }
+                                                }
+                                            }
+                                            color: ischanged?color_red:"black"
+                                            property bool ischanged: false
+                                            onTextChanged: {
+                                                ischanged = true;
+                                                if(gateway__3.text == "."){
+                                                    gateway__3.text = gateway__3.text.split(".")[0]
+                                                }
+
+                                                if(gateway__3.text.split(".").length > 1){
+                                                    gateway__3.text = gateway__3.text.split(".")[0];
+                                                    keypad.owner = gateway__4;
+                                                    gateway__4.selectAll();
+                                                }
+                                                if(gateway__3.text.length == 3){
+                                                    keypad.owner = gateway__4;
+                                                    gateway__4.selectAll();
+                                                }
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text:"."
+                                        }
+                                        TextField{
+                                            id: gateway__4
+                                            width: 70
+                                            height: 40
+                                            MouseArea{
+                                                anchors.fill:parent
+                                                onClicked: {
+                                                    if(keypad.is_opened){
+                                                        keypad.owner = gateway__4;
+                                                        gateway__4.selectAll();
+                                                    }else{
+                                                        keypad.owner = gateway__4;
+                                                        gateway__4.selectAll();
+                                                        keypad.open();
+                                                    }
+                                                }
+                                            }
+                                            color: ischanged?color_red:"black"
+                                            property bool ischanged: false
+                                            onTextChanged: {
+                                                ischanged = true;
+                                                if(gateway__4.text == "."){
+                                                    gateway__4.text = gateway__4.text.split(".")[0]
+                                                }
+
+                                                if(gateway__4.text.split(".").length > 1){
+                                                    gateway__4.text = gateway__4.text.split(".")[0];
+                                                    keypad.close();
+                                                }
+                                                if(gateway__4.text.length == 3){
+                                                    keypad.close();
+                                                }
+                                            }
                                         }
                                     }
                                 }
+
+                            }
+
+                            Row{
+                                width: 700
+                                height: 50
                                 Rectangle{
-                                    width: 5
-                                    anchors.bottom: parent.bottom
-                                    height:level<3?2:15
-                                    color:{
-                                        if(level==0){
-                                            color_red
-                                        }else if(level==1){
-                                            color_red
-                                        }else if(level==2){
-                                            color_yellow
-                                        }else if(level==3){
-                                            color_green
-                                        }else if(level==4){
-                                            color_green
-                                        }
+                                    width: 200
+                                    height: 50
+                                    Text{
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.left: parent.left
+                                        anchors.leftMargin: 50
+                                        font.family: font_noto_r.name
+                                        text:"DNS"
+                                        font.pixelSize: 20
                                     }
                                 }
                                 Rectangle{
-                                    width: 5
-                                    anchors.bottom: parent.bottom
-                                    height:level<4?2:20
-                                    color:{
-                                        if(level==0){
-                                            color_red
-                                        }else if(level==1){
-                                            color_red
-                                        }else if(level==2){
-                                            color_yellow
-                                        }else if(level==3){
-                                            color_green
-                                        }else if(level==4){
-                                            color_green
+                                    width: 1
+                                    height: parent.height
+                                    color: "#d0d0d0"
+                                }
+
+                                Rectangle{
+                                    width: parent.width - 201
+                                    height: parent.height
+                                    Row{
+                                        spacing: 10
+                                        anchors.centerIn: parent
+                                        TextField{
+                                            id: dns_1
+                                            width: 70
+                                            height: 40
+                                            MouseArea{
+                                                anchors.fill:parent
+                                                onClicked: {
+                                                    if(keypad.is_opened){
+                                                        keypad.owner = dns_1;
+                                                        dns_1.selectAll();
+                                                    }else{
+                                                        keypad.owner = dns_1;
+                                                        dns_1.selectAll();
+                                                        keypad.open();
+                                                    }
+                                                }
+                                            }
+                                            color: ischanged?color_red:"black"
+                                            property bool ischanged: false
+                                            onTextChanged: {
+                                                ischanged = true;
+                                                if(dns_1.text.split(".").length > 1){
+                                                    dns_1.text = dns_1.text.split(".")[0];
+                                                    keypad.owner = dns_2;
+                                                    dns_2.selectAll();
+                                                }
+                                                if(dns_1.text.length == 3){
+                                                    keypad.owner = dns_2;
+                                                    dns_2.selectAll();
+                                                }
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text:"."
+                                        }
+
+                                        TextField{
+                                            id: dns_2
+                                            width: 70
+                                            height: 40
+                                            MouseArea{
+                                                anchors.fill:parent
+                                                onClicked: {
+                                                    if(keypad.is_opened){
+                                                        keypad.owner = dns_2;
+                                                        dns_2.selectAll();
+                                                    }else{
+                                                        keypad.owner = dns_2;
+                                                        dns_2.selectAll();
+                                                        keypad.open();
+                                                    }
+                                                }
+                                            }
+                                            color: ischanged?color_red:"black"
+                                            property bool ischanged: false
+                                            onTextChanged: {
+                                                ischanged = true;
+                                                if(dns_2.text == "."){
+                                                    dns_2.text = dns_2.text.split(".")[0]
+                                                }
+
+                                                if(dns_2.text.split(".").length > 1){
+                                                    dns_2.text = dns_2.text.split(".")[0];
+                                                    keypad.owner = dns_3;
+                                                    dns_3.selectAll();
+                                                }
+                                                if(dns_2.text.length == 3){
+                                                    keypad.owner = dns_3;
+                                                    dns_3.selectAll();
+                                                }
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text:"."
+                                        }
+                                        TextField{
+                                            id: dns_3
+                                            width: 70
+                                            height: 40
+                                            MouseArea{
+                                                anchors.fill:parent
+                                                onClicked: {
+                                                    if(keypad.is_opened){
+                                                        keypad.owner = dns_3;
+                                                        dns_3.selectAll();
+                                                    }else{
+                                                        keypad.owner = dns_3;
+                                                        dns_3.selectAll();
+                                                        keypad.open();
+                                                    }
+                                                }
+                                            }
+                                            color: ischanged?color_red:"black"
+                                            property bool ischanged: false
+                                            onTextChanged: {
+                                                ischanged = true;
+                                                if(dns_3.text == "."){
+                                                    dns_3.text = dns_3.text.split(".")[0]
+                                                }
+
+                                                if(dns_3.text.split(".").length > 1){
+                                                    dns_3.text = dns_3.text.split(".")[0];
+                                                    keypad.owner = dns_4;
+                                                    dns_4.selectAll();
+                                                }
+                                                if(dns_3.text.length == 3){
+                                                    keypad.owner = dns_4;
+                                                    dns_4.selectAll();
+                                                }
+                                            }
+                                        }
+                                        Text{
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text:"."
+                                        }
+                                        TextField{
+                                            id: dns_4
+                                            width: 70
+                                            height: 40
+                                            MouseArea{
+                                                anchors.fill:parent
+                                                onClicked: {
+                                                    if(keypad.is_opened){
+                                                        keypad.owner = dns_4;
+                                                        dns_4.selectAll();
+                                                    }else{
+                                                        keypad.owner = dns_4;
+                                                        dns_4.selectAll();
+                                                        keypad.open();
+                                                    }
+                                                }
+                                            }
+                                            color: ischanged?color_red:"black"
+                                            property bool ischanged: false
+                                            onTextChanged: {
+                                                ischanged = true;
+                                                if(dns_4.text == "."){
+                                                    dns_4.text = dns_4.text.split(".")[0]
+                                                }
+
+                                                if(dns_4.text.split(".").length > 1){
+                                                    dns_4.text = dns_4.text.split(".")[0];
+                                                    keypad.close();
+                                                }
+                                                if(dns_4.text.length == 3){
+                                                    keypad.close();
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked:{
-                                    col_wifis.select_wifi = index;
+
+                            Row{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: 30
+                                Rectangle{
+                                    width: 200
+                                    height: 80
+                                    radius: 40
+                                    border.width: 1
+                                    Text{
+                                        anchors.centerIn: parent
+                                        text: "초기화"
+                                        font.pixelSize: 35
+                                        font.family: font_noto_r.name
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            click_sound.play();
+                                            if(supervisor.getcurIP() === "")
+                                                supervisor.getWifiIP();
+
+                                            popup_wifi.ip_update();
+                                        }
+                                    }
                                 }
+
+                                Rectangle{
+                                    width: 200
+                                    height: 80
+                                    radius: 40
+                                    color: "black"
+                                    Text{
+                                        anchors.centerIn: parent
+                                        text: "변경"
+                                        font.pixelSize: 35
+                                        font.family: font_noto_r.name
+                                        color: "white"
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            click_sound.play();
+                                            ip__1.ischanged = false;
+                                            ip__2.ischanged = false;
+                                            ip__3.ischanged = false;
+                                            ip__4.ischanged = false;
+                                            var ip_string = ip__1.text + "." + ip__2.text + "." + ip__3.text + "." + ip__4.text;
+                                            gateway__1.ischanged = false;
+                                            gateway__2.ischanged = false;
+                                            gateway__3.ischanged = false;
+                                            gateway__4.ischanged = false;
+                                            var gateway_string = gateway__1.text + "." + gateway__2.text + "." + gateway__3.text + "." + gateway__4.text;
+                                            dns_1.ischanged = false;
+                                            dns_2.ischanged = false;
+                                            dns_3.ischanged = false;
+                                            dns_4.ischanged = false;
+                                            var dns_string = dns_1.text + "." + dns_2.text + "." + dns_3.text + "." + dns_4.text;
+                                            supervisor.setWifi(ip_string,gateway_string,dns_string);
+                                            supervisor.setSetting("NETWORK/wifi_ip",ip_string);
+                                            supervisor.setSetting("NETWORK/wifi_gateway",gateway_string);
+                                            supervisor.setSetting("NETWORK/wifi_dnsmain",dns_string);
+                                            popup_wifi.connection = false;
+                                            popup_loading.open();
+                                        }
+                                    }
+                                }
+
                             }
                         }
                     }
                 }
-            }
-            Row{
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 30
-                spacing: 30
+
                 Rectangle{
-                    width: 150
-                    height: 50
-                    radius: 5
+                    width: 200
+                    height: 80
+                    radius: 50
                     color: "transparent"
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 30
+                    anchors.left: parent.left
+                    anchors.leftMargin: 50
                     border.width: 2
-                    border.color: "white"
+                    border.color: color_green
                     Text{
                         anchors.centerIn: parent
+                        text: popup_wifi.setting_step == 0 ?"취소":"이전"
+                        font.pixelSize: 35
                         font.family: font_noto_r.name
-                        text: "취소"
+                        color: color_dark_black
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            click_sound.play();
+                            if(popup_wifi.setting_step === 0){
+                                popup_wifi.close();
+                                init();
+                            }else{
+                                popup_wifi.setting_step--;
+                            }
+
+                        }
+                    }
+                }
+                Rectangle{
+                    width: 200
+                    height: 80
+                    radius: 50
+                    enabled:{
+                        if(popup_wifi.setting_step === 0){
+                            if(col_wifis.select_wifi > -1){
+                                true
+                            }else{
+                                false
+                            }
+                        }else{
+                            popup_wifi.connection
+                        }
+                    }
+                    color: enabled?color_green:color_gray
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 30
+                    anchors.right: parent.right
+                    anchors.rightMargin: 50
+                    Text{
+                        anchors.centerIn: parent
+                        text: popup_wifi.setting_step < 2 ?"다음":"설정 완료"
+                        font.pixelSize: 35
+                        font.family: font_noto_r.name
                         color: "white"
                     }
                     MouseArea{
                         anchors.fill: parent
-                        onClicked:{
-                            popup_wifi.close();
+                        onPressed:{
+                            click_sound.play();
+                            parent.color = color_mid_green;
                         }
-                    }
-                }
-                Rectangle{
-                    width: 150
-                    height: 50
-                    radius: 5
-                    color: "white"
-                    Text{
-                        anchors.centerIn: parent
-                        font.family: font_noto_r.name
-                        text: "확인"
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked:{
-                            timer_update_wifi.stop();
-                            if(model_wifis.get(col_wifis.select_wifi).inuse){
-                                popup_wifi.close();
-                            }else if(model_wifis.get(col_wifis.select_wifi).security){
-                                popup_wifi_passwd.ssd = model_wifis.get(col_wifis.select_wifi).ssd;
-                                popup_wifi_passwd.open();
-                            }else{
-                                print("check connect", model_wifis.get(col_wifis.select_wifi).ssd, "");
-                                supervisor.connectWifi(model_wifis.get(col_wifis.select_wifi).ssd, "")
+                        onReleased: {
+                            parent.color = color_green;
+                        }
+                        onClicked: {
+                            if(popup_wifi.setting_step == 0){
                                 popup_loading.open();
+                                supervisor.writelog("[USER INPUT] INIT PAGE : IP SETTING NEXT 1");
+                                popup_wifi.setting_step++;
+                                timer_update_wifi.stop();
+                                supervisor.readWifiState(popup_wifi.select_ssd);
+                                click_sound.play();
+        //                                    timer_update_state.start();
+                            }else if(popup_wifi.setting_step == 1){
+                                if(popup_wifi.connection === 2 || popup_wifi.connection === 3){
+                                    supervisor.writelog("[USER INPUT] INIT PAGE : IP SETTING NEXT 2");
+                                    supervisor.getWifiIP();
+                                    popup_wifi.setting_step++;
+                                    click_sound.play();
+                                }else{
+                                    click_sound_no.play();
+                                }
+                            }else{
+        //                                    supervisor.save
+                                click_sound.play();
+                                supervisor.writelog("[USER INPUT] INIT PAGE : SETTING DONE");
+                                popup_wifi.close();
                             }
                         }
                     }
                 }
+
             }
         }
+
     }
+
+
+
     Popup{
         id: popup_loading
         anchors.centerIn: parent
@@ -12816,9 +13861,11 @@ Item {
             color: "transparent"
         }
         onOpened:{
+            print("popup_loading open")
             loadi.play("image/loading_rb.gif");
         }
         onClosed:{
+            print("popup_loading close")
             loadi.stop();
         }
 
@@ -12853,23 +13900,23 @@ Item {
         }
     }
 
-    function wifi_con_failed(){
-        print("wifi_con_failed")
-        popup_loading.close();
-        passwd_wifi.color = color_red;
-        text_wifi76788.visible = true;
-    }
-    function wifi_con_success(){
-        print("wifi_con_success")
-        popup_loading.close();
-        popup_wifi_passwd.close();
-        popup_wifi.close();
-        init();
-    }
+//    function wifi_con_failed(){
+//        print("wifi_con_failed")
+//        popup_loading.close();
+//        passwd_wifi.color = color_red;
+//        text_wifi76788.visible = true;
+//    }
+//    function wifi_con_success(){
+//        print("wifi_con_success")
+//        popup_loading.close();
+//        popup_wifi_passwd.close();
+//        popup_wifi.close();
+//        init();
+//    }
 
     Popup{
         id: popup_wifi_passwd
-        property string ssd: ""
+        property string ssid: ""
         property bool show_passwd: false
         anchors.centerIn: parent
         leftPadding: 0
@@ -12883,8 +13930,8 @@ Item {
             color: "transparent"
         }
         onOpened:{
-            text_wifi76788.visible = false;
-            passwd_wifi.color = "black";
+            text_wifi_pass.visible = false;
+            passwd_wifi2.color = "black";
         }
 
         Rectangle{
@@ -12925,13 +13972,13 @@ Item {
                     Text{
                         id: text_wifi75
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: popup_wifi_passwd.ssd
+                        text: popup_wifi_passwd.ssid
                         color: "white"
                         font.family: font_noto_r.name
                         font.pixelSize: 20
                     }
                     Text{
-                        id: text_wifi76788
+                        id: text_wifi_pass
                         visible: false
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "비밀번호가 틀렸습니다."
@@ -12943,24 +13990,26 @@ Item {
                         spacing: 30
                         anchors.horizontalCenter: parent.horizontalCenter
                         TextField{
-                            id: passwd_wifi
+                            id: passwd_wifi2
                             width: 200
                             height: 50
-                            focus:false
+                            MouseArea{
+                                anchors.fill:parent
+                                onClicked: {
+                                    if(keyboard.is_opened){
+                                        keyboard.owner = passwd_wifi2;
+                                        passwd_wifi2.selectAll();
+                                    }else{
+                                        keyboard.owner = passwd_wifi2;
+                                        passwd_wifi2.selectAll();
+                                        keyboard.open();
+                                    }
+                                }
+                            }
                             horizontalAlignment: Text.AlignHCenter
                             anchors.verticalCenter: parent.verticalCenter
                             echoMode: popup_wifi_passwd.show_passwd?TextInput.Normal:TextInput.Password
-                            onFocusChanged: {
-                                keyboard.owner = passwd_wifi;
-                                keyboard.owner_text = "passwd_wifi";
-                                passwd_wifi.selectAll();
-                                if(focus){
-                                    keyboard.open();
-                                }else{
-                                    keyboard.close();
-                                    passwd_wifi.select(0,0);
-                                }
-                            }
+
                             onTextChanged: {
                                 color = "black"
                                 text_wifi76788.visible = false;
@@ -13033,8 +14082,8 @@ Item {
                     MouseArea{
                         anchors.fill: parent
                         onClicked:{
-                            print("check connect", popup_wifi_passwd.ssd, passwd_wifi.text);
-                            supervisor.connectWifi(popup_wifi_passwd.ssd, passwd_wifi.text);
+                            print("check connect", popup_wifi_passwd.ssid, passwd_wifi.text);
+                            supervisor.connectWifi(popup_wifi_passwd.ssid, passwd_wifi.text);
                             popup_loading.open();
                         }
                     }

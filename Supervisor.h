@@ -13,6 +13,8 @@
 #include "ServerHandler.h"
 #include "MapView.h"
 #include "MapHandler.h"
+#include "ExtProcess.h"
+#include "ExtProcess.h"
 #include <libusb-1.0/libusb.h>
 
 #define MOTOR_RUN(x)            ((x)&0x01)
@@ -29,15 +31,6 @@ enum{
     PATROL_RANDOM,
     PATROL_SEQUENCE
 };
-enum{
-    WIFI_CMD_NONE = 0,
-    WIFI_CMD_CONNECT,
-    WIFI_CMD_GET_LIST,
-    WIFI_CMD_GET_IP,
-    WIFI_CMD_SET_IP,
-    WIFI_CMD_GET_STATE
-};
-
 
 class Supervisor : public QObject
 {
@@ -85,44 +78,40 @@ public:
     Q_INVOKABLE void sendMapServer();
 
     ////*********************************************  IP SETTINGs   *********************************************////
-    QVector<ST_WIFI> wifi_list;
-    QString wifi_new_ip;
-    QString wifi_new_gateway;
-    QString wifi_new_dns;
-    QList<int> wifi_cmds;
-    int wifi_cmd = WIFI_CMD_NONE;
+
     QString wifi_temp_ssd = "";
-    Q_INVOKABLE int getWifiState(){return wifi_cmd;}
     Q_INVOKABLE int getWifiNum();
-    Q_INVOKABLE int getWifiConnection(QString ssd);
-    void setPrevWifiConnection(QString ssd, int state);
-    int getPrevWifiConnection(QString ssd);
-    void setWifiConnection(QString ssd, int con);
-    Q_INVOKABLE QString getWifiSSD(int num);
-    Q_INVOKABLE void connectWifi(QString ssd, QString passwd);
-    Q_INVOKABLE bool getWifiSecurity(int num);
-    Q_INVOKABLE int getWifiLevel(int num);
-    Q_INVOKABLE int getWifiRate(int num);
-    Q_INVOKABLE bool getWifiInuse(int num);
+    Q_INVOKABLE int getWifiConnection(QString ssid);
+    void setWifiConnection(QString ssid, int con);
+    Q_INVOKABLE QString getCurWifiSSID();
+    Q_INVOKABLE QString getWifiSSID(int num);
+    Q_INVOKABLE void connectWifi(QString ssid, QString passwd);
+
+    Q_INVOKABLE bool getWifiSecurity(QString ssid);
+    Q_INVOKABLE int getWifiLevel(QString ssid);
+    Q_INVOKABLE int getWifiRate(QString ssid);
+    Q_INVOKABLE bool getWifiInuse(QString ssid);
     Q_INVOKABLE void getAllWifiList();
     Q_INVOKABLE void getWifiIP();
     Q_INVOKABLE void setWifi(QString ip, QString gateway, QString dns);
-    Q_INVOKABLE QString getcurSSD(){return setting.wifi_ssd;}
+    Q_INVOKABLE QString getcurSSD(){return probot->wifi_ssid;}
     Q_INVOKABLE QString getcurIP();
     Q_INVOKABLE QString getcurGateway();
     Q_INVOKABLE QString getcurDNS();
-    Q_INVOKABLE void readWifiState(QString ssd);
-    Q_INVOKABLE void setWifiSSD(QString ssd);
+    Q_INVOKABLE void readWifiState(QString ssid);
+    Q_INVOKABLE void setWifiSSD(QString ssid);
 
+    Q_INVOKABLE int getSystemVolume(){return probot->volume_system;}
     Q_INVOKABLE void checkMoveFail();
     Q_INVOKABLE void passInit();
 
-    QProcess *wifi_process;
-    QProcess *wifi_check_process;
+//    QProcess *wifi_process;
+//    QProcess *wifi_check_process;
     ////*********************************************  CLASS   ***************************************************////
     ZIPHandler *zip;
     HTTPHandler *git;
     MapHandler *maph;
+    ExtProcess *extproc;
     CallbellHandler *call;
     IPCHandler *ipc;
     QProcess *slam_process;
@@ -242,6 +231,9 @@ public:
     Q_INVOKABLE int getY(){return maph->getY();}
     Q_INVOKABLE float getScale(){return maph->getScale();}
 
+    Q_INVOKABLE void setSystemVolume(int volume);
+    Q_INVOKABLE void requestSystemVolume();
+
     Q_INVOKABLE void setSize(int x, int y, float width){maph->setSize(x,y,width);}
     Q_INVOKABLE bool getCutBoxFlag(){return maph->getCutBoxFlag();}
 
@@ -271,6 +263,7 @@ public:
     void makeStartShell();
     void makeAllKillShell();
     void makeUSBShell();
+    void makeExtProcessShell();
 
 
     Q_INVOKABLE void killSLAM();
@@ -663,6 +656,7 @@ public:
     Q_INVOKABLE int getzipstate();
     Q_INVOKABLE void clear_call();
     Q_INVOKABLE void usbsave(QString usb="", bool _ui=true, bool _slam=true, bool _config=true, bool _map=true, bool _log=true);
+
 public slots:
     void onTimer();
     void path_changed();
@@ -672,11 +666,10 @@ public slots:
     void git_pull_failed();
     void git_pull_success();
     void new_call();
-    void wifi_con_output();
-    void wifi_con_error();
-    void wifi_ch_output();
-    void wifi_ch_error();
-
+    void process_accept(int cmd);
+    void process_done(int cmd);
+    void process_error(int cmd);
+    void process_timeout(int cmd);
 private:
     QTimer *timer;
     QQuickWindow *mMain;

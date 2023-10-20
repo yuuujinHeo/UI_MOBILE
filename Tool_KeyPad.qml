@@ -18,9 +18,18 @@ Popup {
         color: "transparent"
     }
 
-    onClosed:{
-        owner.focus = false;
+    property bool is_opened: false
+    onOpened:{
+        is_opened = true;
     }
+
+    onClosed:{
+        is_opened = false;
+        owner.focus = false;
+        owner.select(0,0);
+    }
+
+
 
     property var owner
 
