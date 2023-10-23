@@ -408,7 +408,7 @@ Window {
         if(!debug_mode){
             if(loader_page.item.objectName != "page_annotation" && loader_page.item.objectName != "page_mapping"){
                 supervisor.writelog("[UI] Force Page Change : Robot disconnected");
-//                loadPage(pinit);
+                loadPage(pinit);
             }
         }
     }
@@ -503,7 +503,7 @@ Window {
             timer_update.start();
             loader_page.item.init();
         }
-        source: psetting//pinit
+        source: pinit
     }
 
     Timer{

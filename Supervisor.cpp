@@ -1811,7 +1811,7 @@ void Supervisor::makeExtProcessShell(){
         stream << "else" << endl;
         stream << "     kill -9 $pid" << endl;
         stream << "fi" << endl;
-        stream << "cd /home/odroid/UI_MOBILE" << endl;
+        stream << "cd /home/odroid/UI_MOBILE_release" << endl;
         stream << "xterm ./ExtProcess" << endl;
     }
     file.close();
@@ -3151,6 +3151,14 @@ void Supervisor::makeAllKillShell(){
         stream << "if [ -z $pid ]" << endl;
         stream << "then" << endl;
         stream << "     echo \"SLAMNAV is not running\"" << endl;
+        stream << "else" << endl;
+        stream << "     kill -9 $pid" << endl;
+        stream << "fi" << endl;
+
+        stream << "pid=`ps -ef | grep \"ExtProcess\" | grep -v 'grep' | awk '{print $2}'`"<<endl;
+        stream << "if [ -z $pid ]" << endl;
+        stream << "then" << endl;
+        stream << "     echo \"ExtProcess is not running\"" << endl;
         stream << "else" << endl;
         stream << "     kill -9 $pid" << endl;
         stream << "fi" << endl;
