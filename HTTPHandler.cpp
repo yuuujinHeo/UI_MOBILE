@@ -68,9 +68,6 @@ void HTTPHandler::testGit(){
         plog->write("[GIT] Program Version already lastest");
     }else{
         plog->write("[GIT] Program Version Detected : "+probot->gitList[0].commit+" (Old ver : "+probot->program_version+")");
-
-        pullGit();
-
     }
 }
 
@@ -81,25 +78,7 @@ void HTTPHandler::getlocalLog(){
 
     connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(processLogOutput()));
 }
-void HTTPHandler::pullGit(){
-    //로컬 패스에서 git pull
-    process = new QProcess();
-    process->setWorkingDirectory(QGuiApplication::applicationDirPath());
-    process->start("git pull");
 
-    connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(processPullOutput()));
-    connect(process, SIGNAL(readyReadStandardError()), this, SLOT(processPullError()));
-}
-void HTTPHandler::resetGit(){
-    //로컬 패스에서 git pull
-    process_1 = new QProcess();
-    process_1->setWorkingDirectory(QGuiApplication::applicationDirPath());
-    process_1->start("git reset --hard origin/master");
-
-    qDebug() << "=========================================";
-    connect(process_1, SIGNAL(readyReadStandardOutput()), this, SLOT(processResetOutput()));
-    connect(process_1, SIGNAL(readyReadStandardError()), this, SLOT(processResetError()));
-}
 void HTTPHandler::updateGitArray(){
     //Server에서 Git commits 받아와서 gitList에 채움
 
@@ -123,45 +102,7 @@ void HTTPHandler::updateGitArray(){
     for(int i=0; i<probot->gitList.size(); i++){
         qDebug() << probot->gitList[i].commit << probot->gitList[i].date << probot->gitList[i].message;
     }
-
 }
-void HTTPHandler::processPullError(){
-    QString error = QString(process->readAllStandardError());
-    plog->write("[GIT] Program Update Failed : "+error);
-    probot->program_version = probot->gitList[0].commit;
-    probot->program_date = probot->gitList[0].date;
-    probot->program_message = probot->gitList[0].message;
-    emit pullFailed();
-}
-
-void HTTPHandler::processResetError(){
-    QString error = QString(process->readAllStandardError());
-    plog->write("[GIT] Program Reset Failed : "+error);
-    QProcess::startDetached(QApplication::applicationFilePath());
-    QApplication::exit(12);
-}
-
-void HTTPHandler::processResetOutput(){
-    QString output = QString(process->readAllStandardOutput());
-    plog->write("[GIT] Program Reset Success : "+output);
-    QProcess::startDetached(QApplication::applicationFilePath());
-    QApplication::exit(12);
-}
-void HTTPHandler::processPullOutput(){
-    QString output = QString(process->readAllStandardOutput());
-    plog->write("[GIT] Program Update Success : "+output+probot->gitList[0].date);
-    probot->program_version = probot->gitList[0].commit;
-    probot->program_date = probot->gitList[0].date;
-    probot->program_message = probot->gitList[0].message;
-    emit pullSuccess();
-    QProcess::startDetached(QApplication::applicationFilePath());
-    QApplication::exit(12);
-}
-void HTTPHandler::processLogOutput(){
-    QString output = QString(process->readAllStandardOutput());
-    plog->write("[GIT] Program Log : "+output);
-}
-
 
 void HTTPHandler::ClearJson(QJsonObject &json){
     QStringList keys = json.keys();

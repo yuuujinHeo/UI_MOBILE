@@ -318,7 +318,7 @@ public:
     Q_INVOKABLE QString getVoice(QString name, QString mode="");
     Q_INVOKABLE void checkTravelline();
     ////*********************************************  GIT 관련   ***************************************************////
-    Q_INVOKABLE void pullGit();
+    Q_INVOKABLE void updateProgram();
     Q_INVOKABLE bool isNewVersion();
     Q_INVOKABLE QString getLocalVersion();
     Q_INVOKABLE QString getServerVersion();
@@ -329,7 +329,6 @@ public:
 
     Q_INVOKABLE void checkUpdate();
     Q_INVOKABLE bool checkNewUpdateProgram();
-    Q_INVOKABLE void updateNow();
     Q_INVOKABLE QString getProgramUpdateVersion();
     Q_INVOKABLE QString getProgramVersion();
 //    Q_INVOKABLE QString

@@ -207,7 +207,7 @@ Item {
                         onReleased: {
                             start_sound.play();
                             supervisor.writelog("[INIT] PROGRAM UPDATE")
-                            supervisor.updateNow();
+                            supervisor.updateProgram();
                             parent.color = color_navy;
                         }
                     }

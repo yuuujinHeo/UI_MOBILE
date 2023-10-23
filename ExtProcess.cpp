@@ -156,7 +156,8 @@ void ExtProcess::onTimer(){
                 plog->write("[ExtProcess] Done : Connect Wifi " + ssid);
                 probot->wifi_ssid = ssid;
                 probot->wifi_connection = true;
-            }else if(_return.command == PROCESS_CMD_SET_WIFI_IP){char temp[100];
+            }else if(_return.command == PROCESS_CMD_SET_WIFI_IP){
+                char temp[100];
                 char temp22[100];
                 char temp33[100];
 
@@ -187,8 +188,28 @@ void ExtProcess::onTimer(){
                     plog->write("[ExtProcess] Check Connection : Unknown");
                     probot->wifi_connection = WIFI_UNKNOWN;
                 }
-            }else if(_return.command == PROCESS_CMD_CHECK_CONNECTION_SSID){
-
+            }else if(_return.command == PROCESS_CMD_GIT_PULL){
+                char temp[100];
+                char temp2[100];
+                char temp3[100];
+                memcpy(temp, _return.params,100);
+                memcpy(temp2, _return.params2,100);
+                memcpy(temp3, _return.params3,100);
+                probot->program_version = QString::fromUtf8(temp3);
+                probot->program_date = QString::fromUtf8(temp2);
+                probot->program_message = QString::fromUtf8(temp3);
+                plog->write("[ExtProcess] Git pull : Success");
+            }else if(_return.command == PROCESS_CMD_GIT_RESET){
+                char temp[100];
+                char temp2[100];
+                char temp3[100];
+                memcpy(temp, _return.params,100);
+                memcpy(temp2, _return.params2,100);
+                memcpy(temp3, _return.params3,100);
+                probot->program_version = QString::fromUtf8(temp3);
+                probot->program_date = QString::fromUtf8(temp2);
+                probot->program_message = QString::fromUtf8(temp3);
+                plog->write("[ExtProcess] Git reset : Success");
             }
             emit got_done(_return.command);
         }else if(_return.result == PROCESS_RETURN_ERROR){
@@ -206,7 +227,10 @@ void ExtProcess::onTimer(){
                 memcpy(temp, _return.params, sizeof(char)*100);
                 QString ssid = QString::fromUtf8(temp);
                 plog->write("[ExtProcess] Connect Wifi Failed : "+ssid);
-
+            }else if(_return.command == PROCESS_CMD_GIT_PULL){
+                plog->write("[ExtProcess] Git pull : Failed");
+            }else if(_return.command == PROCESS_CMD_GIT_RESET){
+                plog->write("[ExtProcess] Git reset : Failed");
             }
             emit got_error(_return.command);
         }
@@ -284,6 +308,33 @@ void ExtProcess::onTimer(){
     }
 }
 
+void ExtProcess::git_pull(){
+    Command temp;
+    temp.cmd = PROCESS_CMD_GIT_PULL;
+    QString path = QApplication::applicationDirPath();
+    if(path.toUtf8().size() > 100){
+        memcpy(temp.params,path.left(100).toUtf8(),100);
+        path.remove(0,100);
+        memcpy(temp.params2,path.toUtf8(),100);
+    }else{
+        memcpy(temp.params,QApplication::applicationDirPath().toUtf8(),100);
+    }
+    set_command(temp,"Git PUll");
+}
+void ExtProcess::git_reset(){
+    Command temp;
+    temp.cmd = PROCESS_CMD_GIT_RESET;
+    QString path = QApplication::applicationDirPath();
+    if(path.toUtf8().size() > 100){
+        memcpy(temp.params,path.left(100).toUtf8(),100);
+        path.remove(0,100);
+        memcpy(temp.params2,path.toUtf8(),100);
+    }else{
+        memcpy(temp.params,QApplication::applicationDirPath().toUtf8(),100);
+    }
+    set_command(temp,"Git Reset");
+
+}
 void ExtProcess::set_command(Command cmd, QString log){
     bool match = false;
     for(int i=0; i<command_list.size(); i++){

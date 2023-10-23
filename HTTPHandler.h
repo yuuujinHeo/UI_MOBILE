@@ -61,12 +61,6 @@ signals:
     void pullSuccess();
     void pullFailed();
 
-public slots:
-    void processLogOutput();
-    void processPullOutput();
-    void processPullError();
-    void processResetOutput();
-    void processResetError();
 
 private:
     // 네트워크 커넥션 관리 -----------------

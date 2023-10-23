@@ -443,6 +443,11 @@ Window {
         playVoice("moveWait");
     }
 
+    function pull_success(){
+        if(loader_page.item.objectName == "page_init" || loader_page.item.objectName == "page_setting"){
+            loader_page.item.pull_success();
+        }
+    }
 
     function wififailed(){
         if(loader_page.item.objectName == "page_setting" || loader_page.item.objectName == "page_init")

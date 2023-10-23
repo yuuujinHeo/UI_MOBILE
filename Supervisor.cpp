@@ -303,24 +303,9 @@ LOCATION Supervisor::getCallLocation(QString id){
 
 ////*********************************************  SETTING 관련   ***************************************************////
 void Supervisor::git_pull_success(){
-    QString date = probot->program_date;
-    plog->write("[SUPERVISOR] GIT PULL SUCCESS : "+probot->program_date+", "+date);
-    plog->write("[SUPERVISOR] GIT PULL SUCCESS : "+probot->program_message+", "+probot->program_version);
-    setSetting("ROBOT_SW/version_msg",probot->program_message);
-    setSetting("ROBOT_SW/version_date",date);//probot->program_date);
-    setSetting("ROBOT_SW/version",probot->program_version);
-    readSetting();
-    QMetaObject::invokeMethod(mMain,"pull_success");
 }
 
 void Supervisor::git_pull_failed(){
-    QString date = probot->program_date;
-    plog->write("[SUPERVISOR] GIT PULL FAILED : "+probot->program_date+", "+date);
-    setSetting("ROBOT_SW/version_msg",probot->program_message);
-    setSetting("ROBOT_SW/version_date",date);//probot->program_date);
-    setSetting("ROBOT_SW/version",probot->program_version);
-    readSetting();
-    git->resetGit();
 }
 
 bool Supervisor::isNewVersion(){
@@ -364,8 +349,8 @@ QString Supervisor::getServerVersionMessage(){
     }
 }
 
-void Supervisor::pullGit(){
-    git->pullGit();
+void Supervisor::updateProgram(){
+    extproc->git_pull();
 }
 
 void Supervisor::setSettingServer(QString name, QString value){
@@ -3080,9 +3065,6 @@ QString Supervisor::getProgramVersion(){
 QString Supervisor::getProgramUpdateVersion(){
     return server->program_version;
 }
-void Supervisor::updateNow(){
-    pullGit();
-}
 void Supervisor::makeKillSlam(){
     //Make kill_slam.sh
     QString file_name = QDir::homePath() + "/auto_reset.sh";
@@ -4081,6 +4063,13 @@ void Supervisor::process_done(int cmd){
         QMetaObject::invokeMethod(mMain, "checkwifidone");
     }else if(cmd == ExtProcess::PROCESS_CMD_GET_WIFI_IP){
         QMetaObject::invokeMethod(mMain, "wifisuccess");
+    }else if(cmd == ExtProcess::PROCESS_CMD_GIT_PULL || cmd == ExtProcess::PROCESS_CMD_GIT_RESET){
+        setSetting("ROBOT_SW/version_msg",probot->program_message);
+        setSetting("ROBOT_SW/version_date",probot->program_date);
+        setSetting("ROBOT_SW/version",probot->program_version);
+        readSetting();
+        QProcess::startDetached(QApplication::applicationFilePath());
+        QApplication::exit(12);
     }
 }
 
@@ -4091,6 +4080,8 @@ void Supervisor::process_error(int cmd){
         QMetaObject::invokeMethod(mMain, "wififailed");
     }else if(cmd == ExtProcess::PROCESS_CMD_SET_WIFI_IP){
         QMetaObject::invokeMethod(mMain, "setip_fail");
+    }else if(cmd == ExtProcess::PROCESS_CMD_GIT_PULL){
+        extproc->git_reset();
     }
 }
 

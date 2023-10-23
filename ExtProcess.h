@@ -6,6 +6,7 @@
 #include <QSettings>
 #include <QTimer>
 #include <QSharedMemory>
+#include <QApplication>
 #include "GlobalHeader.h"
 
 class ExtProcess : public QObject
@@ -32,7 +33,9 @@ public:
         PROCESS_CMD_SET_WIFI_IP,
         PROCESS_CMD_CONNECT_WIFI,
         PROCESS_CMD_CHECK_CONNECTION,
-        PROCESS_CMD_CHECK_CONNECTION_SSID
+        PROCESS_CMD_GIT_PULL,
+        PROCESS_CMD_GIT_RESET,
+        PROCESS_CMD_GIT_UPDATE
     };
     struct Command{
         uint32_t tick = 0;
@@ -95,6 +98,8 @@ public:
     QString getSetting(QString group, QString name);
     void set_command(Command cmd, QString log = "");
 
+    void git_pull();
+    void git_reset();
 
     int wifi_list_size = 0;
 

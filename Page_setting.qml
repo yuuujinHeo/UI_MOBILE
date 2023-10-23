@@ -10832,11 +10832,11 @@ Item {
                             onClicked: {
                                 supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> UPDATE START")
                                 if(is_admin){
-                                    supervisor.pullGit();
+                                    supervisor.updateProgram();
 //                                    if(supervisor.getSetting("ROBOT_SW","update_auto")==="true"){
 //                                        supervisor.updateNow();
 //                                    }else{
-//                                        supervisor.pullGit();
+//                                        supervisor.updateProgram();
 //                                    }
 
                                     popup_update.close();
@@ -11957,7 +11957,7 @@ Item {
         onClosed:{
             if(is_admin && popup_update.opened){
                 supervisor.writelog("[USER INPUT] Program Update : Password Correct -> pull start")
-                supervisor.pullGit();
+                supervisor.updateProgram();
                 popup_update.close();
             }
             if(open_menu){
