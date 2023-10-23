@@ -2274,16 +2274,28 @@ Item {
         Rectangle{
             anchors.fill: parent
             color: "transparent"
-            Text{
+            Column{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
-                anchors.topMargin: 100
-                color: "white"
-                horizontalAlignment: Text.AlignHCenter
-                font.family: font_noto_r.name
-                font.pixelSize: 50
-                text: "호출하신 곳에 다녀왔습니다.\n트레이를 비워주시고 확인버튼을 눌러주세요."
+                anchors.topMargin: 80
+                Text{
+                    color: "white"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    font.family: font_noto_r.name
+                    font.pixelSize: 45
+                    text: "다녀왔습니다"
+                }
+                Text{
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.family: font_noto_r.name
+                    font.pixelSize: 40
+                    text: "확인버튼을 누르시면 대기위치로 이동합니다\n바로 이동명령을 내리시려면 닫기를 눌러주세요"
+                }
             }
+
             Column{
                 id: calling_list
                 anchors.centerIn: parent
@@ -2412,7 +2424,7 @@ Item {
                         radius: 19
                         color: "white"
                         Text{
-                            text:"대기위치로"
+                            text:"확인"
                             font.family: font_noto_b.name
                             font.pixelSize: 30
                             color:"#282828"

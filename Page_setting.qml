@@ -8707,9 +8707,6 @@ Item {
             }
         }
 
-        if(wifi_passwd.ischanged){
-            supervisor.setSetting("NETWORK/wifi_passwd",wifi_passwd.text);
-        }
 
         if(fms_id.ischanged){
             supervisor.setSetting("SERVER/fms_id",fms_id.text);
@@ -8733,11 +8730,6 @@ Item {
             supervisor.setSetting("NETWORK/wifi_dnsmain",ip_str);
         }
 
-        if(dnsserv_1.ischanged||dnsserv_2.ischanged||dnsserv_3.ischanged||dnsserv_4.ischanged){
-            var ip_str = dnsserv_1.text + "." + dnsserv_2.text + "." + dnsserv_3.text + "." + dnsserv_4.text;
-            supervisor.setSetting("NETWORK/wifi_dnsserv",ip_str);
-
-        }
 
         if(wheel_base.ischanged){
             supervisor.setSetting("ROBOT_HW/wheel_base",wheel_base.text);
@@ -8983,6 +8975,7 @@ Item {
             supervisor.setSetting("ROBOT_SW/goal_near_dist"         ,goal_near_dist.text);
         }
 
+        supervisor.readSetting();
         if(is_reset_slam)
             supervisor.slam_ini_reload();
 //            supervisor.restartSLAM();
@@ -9297,6 +9290,14 @@ Item {
         pause_motor_current.ischanged = false;
         pause_check_ms.ischanged = false;
         goal_near_dist.ischanged = false;
+        combo_max_calling.ischanged = false;
+        combo_use_tray.ischanged = false;
+        combo_resting_lock.ischanged = false;
+        obs_height_max.ischanged = false;
+        obs_height_min.ischanged = false;
+        obs_margin1.ischanged = false;
+        obs_detect_area.ischanged = false;
+        obs_detect_sensitivity.ischanged = false;
     }
 
     function check_update(){

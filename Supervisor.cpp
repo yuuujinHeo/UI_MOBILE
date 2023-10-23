@@ -3172,6 +3172,14 @@ void Supervisor::makeAllKillShell(){
         stream << "else" << endl;
         stream << "     kill -9 $pid" << endl;
         stream << "fi" << endl;
+
+        stream << "pid=`ps -ef | grep \"ExtProcess\" | grep -v 'grep' | awk '{print $2}'`"<<endl;
+        stream << "if [ -z $pid ]" << endl;
+        stream << "then" << endl;
+        stream << "     echo \"ExtProcess is not running\"" << endl;
+        stream << "else" << endl;
+        stream << "     kill -9 $pid" << endl;
+        stream << "fi" << endl;
     }
     file.close();
     //Chmod
