@@ -92,7 +92,7 @@ Popup{
                         anchors.horizontalCenter: parent.horizontalCenter
                         color: "white"
                         font.family: font_noto_r.name
-                        text: "사용 가능한 맵 파일을 모두 찾았습니다."
+                        text: "사용 가능한 맵 파일을 모두 찾았습니다"
                         font.pixelSize: 20
                     }
                 }
@@ -108,10 +108,10 @@ Popup{
                         click_sound.play();
                         popup_maplist_help.setTitle("맵 불러오기");
                         popup_maplist_help.open();
-                        popup_maplist_help.addLine("맵 불러오기란 무엇인가요?","현재 저장된 모든 맵 파일을 불러올 수 있습니다.\n맵은 맵 이미지, 위치정보, 이동경로 맵으로 구성됩니다.\n기존에 저장했던 맵 설정 정보를 불러오고 싶다면 맵 이름을 클릭한 뒤 사용 버튼을 누르세요.");
-                        popup_maplist_help.addLine("잘못 불러오기를 했을 시 어떻게 하나요?","다시 이 페이지로 돌아와서 맵을 새로 불러오기하면 됩니다.");
-                        popup_maplist_help.addLine("잘못해서 기존 맵을 삭제해버렸어요.","삭제된 맵 파일을 복구하는 방법은 없습니다.\n부디 삭제를 하실 때에는 신중하게 고려해주세요.");
-                        popup_maplist_help.addLine("사용과 수정의 차이는 뭔가요?","맵 설정정보를 기존 그대로 사용하려면 [사용]을 누르세요.\n추후 맵 수정하기 페이지에서 변경하실 수도 있습니다.\n맵 설정정보가 없다면 [수정]버튼이 활성화 됩니다. 맵 이미지 파일만 사용하고 맵은 처음부터 수정하셔야 합니다.");
+                        popup_maplist_help.addLine("맵 불러오기란 무엇인가요?","현재 저장된 모든 맵 파일을 불러올 수 있습니다\n맵은 맵 이미지, 위치정보, 이동경로 맵으로 구성됩니다\n기존에 저장했던 맵 설정 정보를 불러오고 싶다면 맵 이름을 클릭한 뒤 사용 버튼을 누르세요");
+                        popup_maplist_help.addLine("잘못 불러오기를 했을 시 어떻게 하나요?","다시 이 페이지로 돌아와서 맵을 새로 불러오기하면 됩니다");
+                        popup_maplist_help.addLine("잘못해서 기존 맵을 삭제해버렸어요.","삭제된 맵 파일을 복구하는 방법은 없습니다.\n부디 삭제를 하실 때에는 신중하게 고려해주세요");
+                        popup_maplist_help.addLine("사용과 수정의 차이는 뭔가요?","맵 설정정보를 기존 그대로 사용하려면 [사용]을 누르세요\n추후 맵 수정하기 페이지에서 변경하실 수도 있습니다\n맵 설정정보가 없다면 [수정]버튼이 활성화 됩니다 맵 이미지 파일만 사용하고 맵은 처음부터 수정하셔야 합니다");
                     }
                 }
                 Item_buttons{
@@ -372,7 +372,7 @@ Popup{
                 Column{
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
-                        text: "기존 맵 설정이 삭제됩니다."
+                        text: "기존 맵 설정이 삭제됩니다"
                         font.family: font_noto_r.name
                         font.pixelSize: 20
                         anchors.horizontalCenter: parent.horizontalCenter

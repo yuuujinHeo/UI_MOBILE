@@ -31,6 +31,7 @@ SOURCES += \
     cv_to_qt.cpp \
     Logger.cpp \
     Supervisor.cpp \
+    lan_ko.cpp \
     main.cpp \
     quazip/JlCompress.cpp \
     quazip/qioapi.cpp \
@@ -77,6 +78,7 @@ HEADERS += \
     MapHandler.h \
     MapViewer.h \
     ServerHandler.h \
+    lan_ko.h \
     spline.h \
     Keyemitter.h \
     Logger.h \
@@ -108,6 +110,9 @@ HEADERS += \
     websocket/QtHttpHeader.h \
     websocket/QtHttpClientWrapper.h \
     HTTPHandler.h
+
+TRANSLATIONS += lang_en.ts
+OTHER_FILES += lang_en.qm
 
 # Libraries setting (for x86_64)
 contains(QT_ARCH, x86_64){
@@ -169,3 +174,4 @@ contains(QT_ARCH, arm64) {
 DISTFILES += \
     quazip/QuaZipConfig.cmake.in \
     quazip/quazip.pc.cmakein
+

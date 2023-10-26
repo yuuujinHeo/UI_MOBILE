@@ -95,9 +95,9 @@ Item {
     Image{
         id: image_robot
         source: {
-            if(pos_name == "충전 장소"){
+            if(pos_name == qsTr("충전 장소")){
                 "image/robot_move_charge.png"
-            }else if(pos_name == "대기 장소"){
+            }else if(pos_name == qsTr("대기 장소")){
                 "image/robot_move_wait.png"
             }else{
                 "image/robot_moving.png"
@@ -125,7 +125,7 @@ Item {
     Text{
         id: text_mention
         visible: !show_face
-        text: "(으)로 이동 중입니다."
+        text: qsTr("(으)로 이동 중입니다.")
         font.pixelSize: 40
         font.family: font_noto_r.name
         anchors.left: parent.horizontalCenter
@@ -137,7 +137,7 @@ Item {
     Text{
         id: target_posname
         text: pos_name
-        visible: !show_face
+        visible: false//!show_face
         font.pixelSize: 40
         font.family: font_noto_b.name
         color: "#12d27c"
@@ -170,7 +170,7 @@ Item {
             font.family: font_noto_b.name
             font.pixelSize: 50
             color: "#e2574c"
-            text: "다른 로봇의 이동을 기다리고 있습니다"
+            text: qsTr("다른 로봇의 이동을 기다리고 있습니다")
         }
         Text{
             anchors.horizontalCenter: parent.horizontalCenter
@@ -179,7 +179,7 @@ Item {
             font.family: font_noto_b.name
             font.pixelSize: 40
             color: "#e2574c"
-            text: "( 목적지 : "+pos_name+" )"
+            text: qsTr("( 목적지 : ")+pos_name+" )"
         }
         Row{
             anchors.horizontalCenter: parent.horizontalCenter
@@ -199,7 +199,7 @@ Item {
                     color: color_red
                     font.family: font_noto_r.name
                     font.pixelSize: 30
-                    text: "경로 취소"
+                    text: qsTr("경로 취소")
                 }
                 MouseArea{
                     anchors.fill: parent
@@ -258,7 +258,7 @@ Item {
             font.family: font_noto_b.name
             font.pixelSize: 50
             color: "#e2574c"
-            text: move_fail?"경로를 찾을 수 없습니다.":"일시정지 됨"
+            text: move_fail?qsTr("경로를 찾을 수 없습니다"):qsTr("일시정지 됨")
         }
         Text{
             anchors.horizontalCenter: parent.horizontalCenter
@@ -267,7 +267,7 @@ Item {
             font.family: font_noto_b.name
             font.pixelSize: 40
             color: "#e2574c"
-            text: "( 목적지 : "+pos_name+" )"
+            text: qsTr("( 목적지 : ")+pos_name+" )"
         }
         Row{
             anchors.horizontalCenter: parent.horizontalCenter
@@ -287,7 +287,7 @@ Item {
                     font.family: font_noto_r.name
                     font.pixelSize: 30
 //                    text: motor_lock?"수동 이동":"원래대로"
-                    text: "수동 이동"
+                    text: qsTr("수동 이동")
                 }
                 MouseArea{
                     anchors.fill: parent
@@ -314,7 +314,7 @@ Item {
                     color: color_red
                     font.family: font_noto_r.name
                     font.pixelSize: 30
-                    text: "경로 취소"
+                    text: qsTr("경로 취소")
                 }
                 MouseArea{
                     anchors.fill: parent
@@ -346,7 +346,7 @@ Item {
                     color: color_red
                     font.family: font_noto_r.name
                     font.pixelSize: 30
-                    text: "경로 재개"
+                    text: qsTr("경로 재개")
                 }
                 MouseArea{
                     anchors.fill: parent
@@ -394,13 +394,13 @@ Item {
                     color: color_red
                     font.family: font_noto_r.name
                     font.pixelSize: 35
-                    text: "로봇을 수동으로 이동하시겠습니까?"
+                    text: qsTr("로봇을 수동으로 이동하시겠습니까?")
                 }
                 Text{
                     color: color_red
                     font.family: font_noto_r.name
                     font.pixelSize: 30
-                    text: "기존의 경로는 취소되며 대기화면으로 넘어갑니다."
+                    text: qsTr("기존의 경로는 취소되며 대기화면으로 넘어갑니다")
                 }
             }
             Row{
@@ -421,7 +421,7 @@ Item {
                         font.family: font_noto_r.name
                         font.pixelSize: 25
                         color: color_red
-                        text: "수동이동"
+                        text: qsTr("수동이동")
                     }
                     MouseArea{
                         anchors.fill: parent
@@ -448,7 +448,7 @@ Item {
                         font.family: font_noto_r.name
                         font.pixelSize: 25
                         color: color_red
-                        text: "취 소"
+                        text: qsTr("취 소")
                     }
                     MouseArea{
                         anchors.fill: parent
@@ -502,7 +502,7 @@ Item {
                     color: color_red
                     font.family: font_noto_r.name
                     font.pixelSize: 35
-                    text: "로봇이 수동이동 중입니다."
+                    text: qsTr("로봇이 수동이동 중입니다")
                 }
                 Rectangle{
                     width: 140
@@ -516,7 +516,7 @@ Item {
                         font.family: font_noto_r.name
                         font.pixelSize: 25
                         color: color_red
-                        text: "원래대로"
+                        text: qsTr("원래대로")
                     }
                     MouseArea{
                         anchors.fill: parent

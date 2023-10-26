@@ -12,6 +12,7 @@
 extern Logger *plog;
 extern int ui_state;
 extern bool is_debug;
+extern QApplication *app;
 
 
 typedef struct{

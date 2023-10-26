@@ -25,6 +25,7 @@ Item {
     property int motor_left_id: 1
     property int motor_right_id: 0
 
+    property int cur_preset: -1
     property bool is_reset_slam: false
 
     property bool use_tray: false
@@ -326,9 +327,9 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("플랫폼 이름");
-                                    popup_help_setting.addLine("플랫폼을 지칭하는 이름을 적어주세요.");
-                                    popup_help_setting.addLine("반드시 영문이어야 합니다. ");
-                                    popup_help_setting.addLine("한글이나 특수문자가 들어가면 로봇이 움직이지 않을 수 있습니다.");
+                                    popup_help_setting.addLine("플랫폼을 지칭하는 이름을 적어주세요");
+                                    popup_help_setting.addLine("반드시 영문이어야 합니다");
+                                    popup_help_setting.addLine("한글이나 특수문자가 들어가면 로봇이 움직이지 않을 수 있습니다");
                                 }
                             }
                         }
@@ -401,9 +402,9 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("플랫폼 넘버");
-                                    popup_help_setting.addLine("로봇을 여러대 구동하며 동일한 로봇 이름을 사용하는 경우 사용합니다.");
-                                    popup_help_setting.addLine("로봇을 여러대 구동할 경우 각각 지정해줘야 합니다.");
-                                    popup_help_setting.addLine("각 로봇의 이름을 다르게 지정한 경우 지정하지 않으셔도 됩니다.");
+                                    popup_help_setting.addLine("로봇을 여러대 구동하며 동일한 로봇 이름을 사용하는 경우 사용합니다");
+                                    popup_help_setting.addLine("로봇을 여러대 구동할 경우 각각 지정해줘야 합니다");
+                                    popup_help_setting.addLine("각 로봇의 이름을 다르게 지정한 경우 지정하지 않으셔도 됩니다");
                                 }
                             }
                         }
@@ -509,11 +510,11 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("플랫폼 타입");
-                                    popup_help_setting.addLine("지정하기 전, 지원되는 모델인지 확인하세요.");
-                                    popup_help_setting.addLine("서빙용 : 호출기능을 사용하지 않고 각 테이블을 서빙만 합니다.");
-                                    popup_help_setting.addLine("호출용 : 서빙기능을 사용하지 않고 로봇이 대기하다가 호출이 울리면 이동합니다.");
-                                    popup_help_setting.addLine("서빙+호출용 : 서빙기능과 호출기능을 동시에 사용합니다. 서빙을 우선적으로 진행합니다.");
-                                    popup_help_setting.addLine("퇴식전용 : 서빙+호출용과 동일하지만 서빙(호출)위치를 다녀온 뒤 퇴식위치로 이동합니다.");
+                                    popup_help_setting.addLine("지정하기 전, 지원되는 모델인지 확인하세요");
+                                    popup_help_setting.addLine("서빙용 : 호출기능을 사용하지 않고 각 테이블을 서빙만 합니다");
+                                    popup_help_setting.addLine("호출용 : 서빙기능을 사용하지 않고 로봇이 대기하다가 호출이 울리면 이동합니다");
+                                    popup_help_setting.addLine("서빙+호출용 : 서빙기능과 호출기능을 동시에 사용합니다 서빙을 우선적으로 진행합니다");
+                                    popup_help_setting.addLine("퇴식전용 : 서빙+호출용과 동일하지만 서빙(호출)위치를 다녀온 뒤 퇴식위치로 이동합니다");
                                 }
                             }
                         }
@@ -535,6 +536,20 @@ Item {
                                 model:["서빙용","호출용","서빙+호출용", "퇴식전용"]
                             }
                         }
+                    }
+                }
+
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"기능 설정"
+                        color: "white"
+                        font.pixelSize: 20
                     }
                 }
                 Rectangle{
@@ -571,10 +586,10 @@ Item {
                                 onClicked:{
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("최대 호출 횟수");
-                                    popup_help_setting.addLine("지정하기 전, 지원되는 모델인지 확인하세요.");
-                                    popup_help_setting.addLine("로봇이 한 번 이동에 호출되는 최대 횟수입니다..");
+                                    popup_help_setting.addLine("지정하기 전, 지원되는 모델인지 확인하세요");
+                                    popup_help_setting.addLine("로봇이 한 번 이동에 호출되는 최대 횟수입니다");
                                     popup_help_setting.addLine("대기 위치에서 출발한 뒤 해당 횟수만큼 테이블을 이동하면");
-                                    popup_help_setting.addLine("추가적인 호출명령이 있어도 우선 대기위치로 돌아옵니다.");
+                                    popup_help_setting.addLine("추가적인 호출명령이 있어도 우선 대기위치로 돌아옵니다");
                                 }
                             }
                         }
@@ -633,9 +648,9 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("대기장소 모터 락 해제");
-                                    popup_help_setting.addLine("로봇이 대기장소에서 대기하고 있을 때 사람이 밀어서 움직일 수 있는지 설정합니다.");
-                                    popup_help_setting.addLine("매장 바닥 상황에 따라 로봇이 굴러서 저절로 이동할 수 있으니 기본적으론 사용 안함으로 이용해주세요.");
-                                    popup_help_setting.addLine("사용 시에도 서빙을 보내기 전 대기장소와 너무 떨어지지 않도록 유의해주세요.");
+                                    popup_help_setting.addLine("로봇이 대기장소에서 대기하고 있을 때 사람이 밀어서 움직일 수 있는지 설정합니다");
+                                    popup_help_setting.addLine("매장 바닥 상황에 따라 로봇이 굴러서 저절로 이동할 수 있으니 기본적으론 사용 안함으로 이용해주세요");
+                                    popup_help_setting.addLine("사용 시에도 서빙을 보내기 전 대기장소와 너무 떨어지지 않도록 유의해주세요");
                                 }
                             }
                         }
@@ -658,6 +673,301 @@ Item {
 
                             }
                         }
+                    }
+                }
+                Rectangle{
+                    id: set_comeback_preset
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"복귀 속도 지정"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    click_sound.play();
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("복귀 속도 지정");
+                                    popup_help_setting.addLine("로봇이 서빙 후 대기위치로 이동할 때 속도를 지정합니다");
+                                    popup_help_setting.addLine("사용하지 않으면 서빙 때 지정한 속도 그대로 사용합니다");
+                                    popup_help_setting.addLine("안전속도 구간에 진입하면 속도가 자동으로 저하됩니다");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_comeback_preset
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["사용 안함", "아주느리게","느리게","보통","빠르게","아주빠르게"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    id: set_preset
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"이동 속도"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                            Item_buttons{
+                                type: "circle_text"
+                                width: parent.height*0.8
+                                height: width
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 20
+                                text: "?"
+                                onClicked:{
+                                    click_sound.play();
+                                    popup_help_setting.open();
+                                    popup_help_setting.setTitle("이동 속도 (프리셋)");
+                                    popup_help_setting.addLine("이동속도는 5단계로 분류됩니다");
+                                    popup_help_setting.addLine("각각의 이동속도와 이름을 변경하실 수도 있습니다");
+                                    popup_help_setting.addLine("안전속도맵을 사용하시는 경우, 기본 프리셋 기준 아주느리게, 느리게로 지정됩니다");
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            Row{
+                                anchors.centerIn: parent
+                                spacing: 5
+                                Rectangle{
+                                    width:70
+                                    height: 50
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    radius: 5
+                                    Text{
+                                        id: text_preset_name_1
+                                        anchors.centerIn: parent
+                                        text: "preset 1"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
+                                        color: cur_preset===1?color_green:color_mid_black
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            click_sound.play();
+                                            cur_preset = 1;
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width:1
+                                    height: 45
+                                    radius: 1
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    color: color_gray
+                                }
+                                Rectangle{
+                                    width:70
+                                    height: 50
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    radius: 5
+                                    Text{
+                                        id: text_preset_name_2
+                                        anchors.centerIn: parent
+                                        text: "preset 2"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
+                                        color: cur_preset===2?color_green:color_mid_black
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            click_sound.play();
+                                            cur_preset = 2
+
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width:1
+                                    height: 45
+                                    radius: 1
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    color: color_gray
+                                }
+                                Rectangle{
+                                    width:70
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    height: 45
+                                    radius: 5
+                                    Text{
+                                        id: text_preset_name_3
+                                        anchors.centerIn: parent
+                                        text: "preset 3"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
+                                        color: cur_preset===3?color_green:color_mid_black
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            click_sound.play();
+                                            cur_preset = 3
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width:1
+                                    height: 45
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    radius: 1
+                                    color: color_gray
+                                }
+                                Rectangle{
+                                    width:70
+                                    height: 45
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    radius: 5
+                                    Text{
+                                        id: text_preset_name_4
+                                        anchors.centerIn: parent
+                                        text: "preset 4"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
+                                        color: cur_preset===4?color_green:color_mid_black
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            click_sound.play();
+                                            cur_preset = 4
+
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width:1
+                                    height: 45
+                                    radius: 1
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    color: color_gray
+                                }
+                                Rectangle{
+                                    width:70
+                                    height: 50
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    radius: 5
+                                    Text{
+                                        id: text_preset_name_5
+                                        anchors.centerIn: parent
+                                        text: "preset 5"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
+                                        color: cur_preset===5?color_green:color_mid_black
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            click_sound.play();
+                                            cur_preset = 5
+                                        }
+                                    }
+                                }
+                                Rectangle{
+                                    width:1
+                                    height: 45
+                                    radius: 1
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    color: color_gray
+                                }
+                                Rectangle{
+                                    width : 60
+                                    height: 45
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    radius: 5
+                                    color: color_dark_navy
+                                    Text{
+                                        anchors.centerIn: parent
+                                        text: "변경"
+                                        color: "white"
+                                        font.family: font_noto_r.name
+                                        font.pixelSize: 13
+                                    }
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        onClicked:{
+                                            click_sound.play();
+                                            popup_preset.select_preset = cur_preset;
+                                            popup_preset.open();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle{
+                    width: 1100
+                    height: 40
+                    color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Text{
+                        anchors.centerIn: parent
+                        font.family: font_noto_b.name
+                        text:"UI 설정"
+                        color: "white"
+                        font.pixelSize: 20
                     }
                 }
                 Rectangle{
@@ -695,9 +1005,9 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("트레이 별 서빙");
-                                    popup_help_setting.addLine("트레이 별로 각각의 서빙위치를 지정하려면 사용하세요.");
-                                    popup_help_setting.addLine("사용할 경우 서빙순서는 1번 트레이를 우선으로 이동합니다.");
-                                    popup_help_setting.addLine("대기화면이 변경되며 그룹을 사용하지 않고 각 테이블 번호로 이동합니다.");
+                                    popup_help_setting.addLine("트레이 별로 각각의 서빙위치를 지정하려면 사용하세요");
+                                    popup_help_setting.addLine("사용할 경우 서빙순서는 1번 트레이를 우선으로 이동합니다");
+                                    popup_help_setting.addLine("대기화면이 변경되며 그룹을 사용하지 않고 각 테이블 번호로 이동합니다");
                                 }
                             }
                         }
@@ -773,6 +1083,50 @@ Item {
                     }
                 }
                 Rectangle{
+                    id: set_language
+                    width: 840
+                    height: 50
+                    Row{
+                        anchors.fill: parent
+                        Rectangle{
+                            width: 350
+                            height: parent.height
+                            Text{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 30
+                                font.family: font_noto_r.name
+                                text:"언어"
+                                font.pixelSize: 20
+                                Component.onCompleted: {
+                                    scale = 1;
+                                    while(width*scale > parent.width*0.8){
+                                        scale=scale-0.01;
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle{
+                            width: 1
+                            height: parent.height
+                            color: "#d0d0d0"
+                        }
+                        Rectangle{
+                            width: parent.width - 351
+                            height: parent.height
+                            ComboBox{
+                                id: combo_language
+                                anchors.fill: parent
+                                property bool ischanged: false
+                                onCurrentIndexChanged: {
+                                    ischanged = true;
+                                }
+                                model:["한국어", "영어"]
+                            }
+                        }
+                    }
+                }
+                Rectangle{
                     id: set_movingpage
                     width: 840
                     height: 50
@@ -807,9 +1161,9 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("이동 중 화면");
-                                    popup_help_setting.addLine("로봇이 이동 중에 화면에 표시될 것을 고르세요.");
-                                    popup_help_setting.addLine("목적지 표시 : 목적지가 화면에 표시됩니다.");
-                                    popup_help_setting.addLine("귀여운 얼굴 : 귀여운 표정이 화면 가득 표시됩니다.");
+                                    popup_help_setting.addLine("로봇이 이동 중에 화면에 표시될 것을 고르세요");
+                                    popup_help_setting.addLine("목적지 표시 : 목적지가 화면에 표시됩니다");
+                                    popup_help_setting.addLine("귀여운 얼굴 : 귀여운 표정이 화면 가득 표시됩니다");
                                 }
                             }
                         }
@@ -829,230 +1183,6 @@ Item {
                                     ischanged = true;
                                 }
                                 model:["목적지 표시", "귀여운 얼굴"]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_comeback_preset
-                    width: 840
-                    height: 50
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 30
-                                font.family: font_noto_r.name
-                                text:"복귀 속도 지정"
-                                font.pixelSize: 20
-                                Component.onCompleted: {
-                                    scale = 1;
-                                    while(width*scale > parent.width*0.8){
-                                        scale=scale-0.01;
-                                    }
-                                }
-                            }
-                            Item_buttons{
-                                type: "circle_text"
-                                width: parent.height*0.8
-                                height: width
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.right: parent.right
-                                anchors.rightMargin: 20
-                                text: "?"
-                                onClicked:{
-                                    click_sound.play();
-                                    popup_help_setting.open();
-                                    popup_help_setting.setTitle("복귀 속도 지정");
-                                    popup_help_setting.addLine("로봇이 서빙 후 대기위치로 이동할 때 속도를 지정합니다.");
-                                    popup_help_setting.addLine("사용하지 않으면 서빙 때 지정한 속도 그대로 사용합니다.");
-                                    popup_help_setting.addLine("안전속도 구간에 진입하면 속도가 자동으로 저하됩니다.");
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            ComboBox{
-                                id: combo_comeback_preset
-                                anchors.fill: parent
-                                property bool ischanged: false
-                                onCurrentIndexChanged: {
-                                    ischanged = true;
-                                }
-                                model:["사용 안함", "아주느리게","느리게","보통","빠르게","아주빠르게"]
-                            }
-                        }
-                    }
-                }
-                Rectangle{
-                    id: set_preset
-                    width: 840
-                    height: 50
-                    Row{
-                        anchors.fill: parent
-                        Rectangle{
-                            width: 350
-                            height: parent.height
-                            Text{
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 30
-                                font.family: font_noto_r.name
-                                text:"이동 속도"
-                                font.pixelSize: 20
-                                Component.onCompleted: {
-                                    scale = 1;
-                                    while(width*scale > parent.width*0.8){
-                                        scale=scale-0.01;
-                                    }
-                                }
-                            }
-                            Item_buttons{
-                                type: "circle_text"
-                                width: parent.height*0.8
-                                height: width
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.right: parent.right
-                                anchors.rightMargin: 20
-                                text: "?"
-                                onClicked:{
-                                    click_sound.play();
-                                    popup_help_setting.open();
-                                    popup_help_setting.setTitle("이동 속도 (프리셋)");
-                                    popup_help_setting.addLine("이동속도는 5단계로 분류됩니다");
-                                    popup_help_setting.addLine("각각의 이동속도와 이름을 변경하실 수도 있습니다.");
-                                    popup_help_setting.addLine("안전속도맵을 사용하시는 경우, 기본 프리셋 기준 아주느리게, 느리게로 지정됩니다.");
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 1
-                            height: parent.height
-                            color: "#d0d0d0"
-                        }
-                        Rectangle{
-                            width: parent.width - 351
-                            height: parent.height
-                            Row{
-                                anchors.centerIn: parent
-                                spacing: 10
-                                Rectangle{
-                                    width:70
-                                    height: 50
-                                    radius: 5
-                                    border.width: 1
-                                    Text{
-                                        id: text_preset_name_1
-                                        anchors.centerIn: parent
-                                        text: "preset 1"
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 13
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click_sound.play();
-                                            popup_preset.select_preset = 1;
-                                            popup_preset.open();
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    width:70
-                                    height: 50
-                                    radius: 5
-                                    border.width: 1
-                                    Text{
-                                        id: text_preset_name_2
-                                        anchors.centerIn: parent
-                                        text: "preset 2"
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 13
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click_sound.play();
-                                            popup_preset.select_preset = 2;
-                                            popup_preset.open();
-
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    width:70
-                                    height: 50
-                                    radius: 5
-                                    border.width: 1
-                                    Text{
-                                        id: text_preset_name_3
-                                        anchors.centerIn: parent
-                                        text: "preset 3"
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 13
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click_sound.play();
-                                            popup_preset.select_preset = 3;
-                                            popup_preset.open();
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    width:70
-                                    height: 50
-                                    radius: 5
-                                    border.width: 1
-                                    Text{
-                                        id: text_preset_name_4
-                                        anchors.centerIn: parent
-                                        text: "preset 4"
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 13
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click_sound.play();
-                                            popup_preset.select_preset = 4;
-                                            popup_preset.open();
-
-                                        }
-                                    }
-                                }
-                                Rectangle{
-                                    width:70
-                                    height: 50
-                                    radius: 5
-                                    border.width: 1
-                                    Text{
-                                        id: text_preset_name_5
-                                        anchors.centerIn: parent
-                                        text: "preset 5"
-                                        font.family: font_noto_r.name
-                                        font.pixelSize: 13
-                                    }
-                                    MouseArea{
-                                        anchors.fill: parent
-                                        onClicked:{
-                                            click_sound.play();
-                                            popup_preset.select_preset = 5;
-                                            popup_preset.open();
-                                        }
-                                    }
-                                }
                             }
                         }
                     }
@@ -3491,7 +3621,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("최소 인식 높이");
-                                    popup_help_setting.addLine("장애물 감지에 사용되는 카메라 3D 데이터값의 최소높이값입니다.");
+                                    popup_help_setting.addLine("장애물 감지에 사용되는 카메라 3D 데이터값의 최소높이값입니다");
                                 }
                             }
                         }
@@ -3566,7 +3696,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("최대 인식 높이");
-                                    popup_help_setting.addLine("장애물 감지에 사용되는 카메라 3D 데이터값의 최대높이값입니다.");
+                                    popup_help_setting.addLine("장애물 감지에 사용되는 카메라 3D 데이터값의 최대높이값입니다");
                                 }
                             }
                         }
@@ -3661,8 +3791,8 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("데이터 최대 거리");
-                                    popup_help_setting.addLine("연산에 사용되는 라이다 데이터의 최대값입니다.");
-                                    popup_help_setting.addLine("이 값을 초과하는 라이다 데이터는 무시합니다.");
+                                    popup_help_setting.addLine("연산에 사용되는 라이다 데이터의 최대값입니다");
+                                    popup_help_setting.addLine("이 값을 초과하는 라이다 데이터는 무시합니다");
                                 }
                             }
                         }
@@ -3738,8 +3868,8 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("데이터 최소 거리");
-                                    popup_help_setting.addLine("연산에 사용되는 라이다 데이터의 최소값(로봇 중심기준)입니다.");
-                                    popup_help_setting.addLine("이 값보다 작은 라이다 데이터는 무시합니다.");
+                                    popup_help_setting.addLine("연산에 사용되는 라이다 데이터의 최소값(로봇 중심기준)입니다");
+                                    popup_help_setting.addLine("이 값보다 작은 라이다 데이터는 무시합니다");
                                 }
                             }
                         }
@@ -3813,7 +3943,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("오프셋 X");
-                                    popup_help_setting.addLine("로봇 중심기준으로 라이다센서의 X축 오프셋입니다.");
+                                    popup_help_setting.addLine("로봇 중심기준으로 라이다센서의 X축 오프셋입니다");
                                 }
                             }
                         }
@@ -3887,7 +4017,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("오프셋 Y");
-                                    popup_help_setting.addLine("로봇 중심기준으로 라이다센서의 Y축 오프셋입니다.");
+                                    popup_help_setting.addLine("로봇 중심기준으로 라이다센서의 Y축 오프셋입니다");
                                 }
                             }
                         }
@@ -4027,7 +4157,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("경로추종 최대거리");
-                                    popup_help_setting.addLine("로봇과 로봇이 추종하는 경로 상 한 점 사이 최대 거리입니다.");
+                                    popup_help_setting.addLine("로봇과 로봇이 추종하는 경로 상 한 점 사이 최대 거리입니다");
                                 }
                             }
                         }
@@ -4237,7 +4367,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("경로추종 최대거리");
-                                    popup_help_setting.addLine("로봇과 로봇이 추종하는 경로 상 한 점 사이 최대 거리입니다.");
+                                    popup_help_setting.addLine("로봇과 로봇이 추종하는 경로 상 한 점 사이 최대 거리입니다");
                                 }
                             }
                         }
@@ -4311,7 +4441,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("경로추종 최대거리");
-                                    popup_help_setting.addLine("로봇과 로봇이 추종하는 경로 상 한 점 사이 최소 거리입니다.");
+                                    popup_help_setting.addLine("로봇과 로봇이 추종하는 경로 상 한 점 사이 최소 거리입니다");
                                 }
                             }
                         }
@@ -4385,7 +4515,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("감지 거리 Level 1");
-                                    popup_help_setting.addLine("주행 중 장애물을 감지하는 범위의 level 1 값입니다.");
+                                    popup_help_setting.addLine("주행 중 장애물을 감지하는 범위의 level 1 값입니다");
                                     popup_help_setting.addLine("로봇 중심 기준으로 동적장애물로 판단되는 것이 이 범위 안에 들어오면");
                                     popup_help_setting.addLine("감속하고 놀란 표정을 띄웁니다.(바닥의 LED 색은 보라색)");
                                 }
@@ -4463,7 +4593,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("감지 거리 Level 0");
-                                    popup_help_setting.addLine("주행 중 장애물을 감지하는 범위의 level 0 값입니다.");
+                                    popup_help_setting.addLine("주행 중 장애물을 감지하는 범위의 level 0 값입니다");
                                     popup_help_setting.addLine("로봇 중심 기준으로 동적장애물로 판단되는 것이 이 범위 안에 들어오면");
                                     popup_help_setting.addLine("로봇을 즉시 정지하며 우는 표정을 띄웁니다.(바닥의 LED 색은 붉은색)");
                                 }
@@ -4540,8 +4670,8 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("장애물 넓이");
-                                    popup_help_setting.addLine("감지되는 동적 센서 데이타가 이 값만큼 뭉쳐있다면 장애물로 판단합니다.");
-                                    popup_help_setting.addLine("단위는 pixel로 현재 설정된 픽셀 당 크기 값을 참조하세요.");
+                                    popup_help_setting.addLine("감지되는 동적 센서 데이타가 이 값만큼 뭉쳐있다면 장애물로 판단합니다");
+                                    popup_help_setting.addLine("단위는 pixel로 현재 설정된 픽셀 당 크기 값을 참조하세요");
                                 }
                             }
                         }
@@ -4617,7 +4747,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("장애물 감지 민감도");
-                                    popup_help_setting.addLine("동적장애물로 판단하는 픽셀의 민감도 입니다.");
+                                    popup_help_setting.addLine("동적장애물로 판단하는 픽셀의 민감도 입니다");
                                 }
                             }
                         }
@@ -4768,7 +4898,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("감지 후 대기시간");
-                                    popup_help_setting.addLine("장애물을 감지 후 로봇이 멈춘 뒤 다시 출발할 때 까지 걸리는 대기시간입니다.");
+                                    popup_help_setting.addLine("장애물을 감지 후 로봇이 멈춘 뒤 다시 출발할 때 까지 걸리는 대기시간입니다");
                                 }
                             }
                         }
@@ -4842,7 +4972,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("경로이탈 거리");
-                                    popup_help_setting.addLine("로봇이 경로에서 이 값 이상 떨어지면 경로를 이탈했다고 판단합니다.");
+                                    popup_help_setting.addLine("로봇이 경로에서 이 값 이상 떨어지면 경로를 이탈했다고 판단합니다");
                                 }
                             }
                         }
@@ -4932,8 +5062,8 @@ Item {
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("Inlier 판단거리");
                                     popup_help_setting.addLine("로봇이 위치추정할 때, 실제 라이다데이터와 맵상 대응점과의 위치차이가");
-                                    popup_help_setting.addLine("이 값보다 작다면 inlier(일치)한다고 판단합니다.");
-                                    popup_help_setting.addLine("이 값이 작을 수록 위치추정이 정밀하지만 위치추정에 실패할 가능성도 높아집니다.");
+                                    popup_help_setting.addLine("이 값보다 작다면 inlier(일치)한다고 판단합니다");
+                                    popup_help_setting.addLine("이 값이 작을 수록 위치추정이 정밀하지만 위치추정에 실패할 가능성도 높아집니다");
                                 }
                             }
                         }
@@ -5009,8 +5139,8 @@ Item {
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("평균오차 최소값(icp_error)");
                                     popup_help_setting.addLine("Inlier 판단된 데이터들의 실제 라이다데이터와 맵상 대응점과의 위치차이의 평균이");
-                                    popup_help_setting.addLine("이 값보다 작다면 위치추정에 성공했다고 판단합니다.");
-                                    popup_help_setting.addLine("위치추정은 평균오차의 최소값과 Inlier 비율이 모두 기준에 부합해야 성공으로 간주합니다.");
+                                    popup_help_setting.addLine("이 값보다 작다면 위치추정에 성공했다고 판단합니다");
+                                    popup_help_setting.addLine("위치추정은 평균오차의 최소값과 Inlier 비율이 모두 기준에 부합해야 성공으로 간주합니다");
                                 }
                             }
                         }
@@ -5085,9 +5215,9 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("Inlier 비율 (icp_ratio)");
-                                    popup_help_setting.addLine("전체 라이다데이터 대비 lnlier 판단된 데이터 값의 비율입니다.");
-                                    popup_help_setting.addLine("실제 값이 이 기준보다 높아야 위치추정에 성공했다고 판단합니다.");
-                                    popup_help_setting.addLine("위치추정은 평균오차의 최소값과 Inlier 비율이 모두 기준에 부합해야 성공으로 간주합니다.");
+                                    popup_help_setting.addLine("전체 라이다데이터 대비 lnlier 판단된 데이터 값의 비율입니다");
+                                    popup_help_setting.addLine("실제 값이 이 기준보다 높아야 위치추정에 성공했다고 판단합니다");
+                                    popup_help_setting.addLine("위치추정은 평균오차의 최소값과 Inlier 비율이 모두 기준에 부합해야 성공으로 간주합니다");
                                 }
                             }
                         }
@@ -5162,9 +5292,9 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("모터 위치추정 비율");
-                                    popup_help_setting.addLine("모터의 엔코더값으로 계산되는 위치추정 값을 얼마나 사용할지의 비율입니다.");
+                                    popup_help_setting.addLine("모터의 엔코더값으로 계산되는 위치추정 값을 얼마나 사용할지의 비율입니다");
                                     popup_help_setting.addLine("값이 0에 가까울 수록 라이다데이타로 추정하는 ICP를 신뢰하고");
-                                    popup_help_setting.addLine("값이 1에 가까울 수록 라이다데이타는 사용하지 않습니다.");
+                                    popup_help_setting.addLine("값이 1에 가까울 수록 라이다데이타는 사용하지 않습니다");
                                 }
                             }
                         }
@@ -5238,7 +5368,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("위치추정 최소 거리");
-                                    popup_help_setting.addLine("로봇이 주행하며 이 거리 이상 움직이면 위치추정을 시도합니다.");
+                                    popup_help_setting.addLine("로봇이 주행하며 이 거리 이상 움직이면 위치추정을 시도합니다");
                                 }
                             }
                         }
@@ -5312,7 +5442,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("위치추정 최소 시간");
-                                    popup_help_setting.addLine("로봇은 이 시간 간격으로 자동으로 위치추정을 시도합니다.");
+                                    popup_help_setting.addLine("로봇은 이 시간 간격으로 자동으로 위치추정을 시도합니다");
                                 }
                             }
                         }
@@ -5403,9 +5533,9 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("도착점 허용 오차");
-                                    popup_help_setting.addLine("로봇의 현재 위치와 목적지의 위치차이가 이 값보다 작으면 목적지에 도착했다고 판단합니다.");
+                                    popup_help_setting.addLine("로봇의 현재 위치와 목적지의 위치차이가 이 값보다 작으면 목적지에 도착했다고 판단합니다");
                                     popup_help_setting.addLine("값이 작을 수록 목작지에 정확하게 도달하지만 조금만 틀어져도 목적지에 도착했다고 판단하지 않아서");
-                                    popup_help_setting.addLine("주행실패하거나 이상동작을 할 수 있습니다.");
+                                    popup_help_setting.addLine("주행실패하거나 이상동작을 할 수 있습니다");
                                 }
                             }
                         }
@@ -5479,9 +5609,9 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("도착점 허용 오차");
-                                    popup_help_setting.addLine("로봇의 현재 위치와 목적지의 위치차이가 이 값보다 작으면 목적지에 도착했다고 판단합니다.");
+                                    popup_help_setting.addLine("로봇의 현재 위치와 목적지의 위치차이가 이 값보다 작으면 목적지에 도착했다고 판단합니다");
                                     popup_help_setting.addLine("값이 작을 수록 목작지에 정확하게 도달하지만 조금만 틀어져도 목적지에 도착했다고 판단하지 않아서");
-                                    popup_help_setting.addLine("주행실패하거나 이상동작을 할 수 있습니다.");
+                                    popup_help_setting.addLine("주행실패하거나 이상동작을 할 수 있습니다");
                                 }
                             }
                         }
@@ -5557,7 +5687,7 @@ Item {
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("경로탐색 최소거리");
                                     popup_help_setting.addLine("출발점과 도착점이 이 값보다 작으면 경로를 탐색하지 않고");
-                                    popup_help_setting.addLine("point to point 방식으로 이동합니다.");
+                                    popup_help_setting.addLine("point to point 방식으로 이동합니다");
                                 }
                             }
                         }
@@ -5673,8 +5803,8 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("모터전류 감지");
-                                    popup_help_setting.addLine("로봇이 주행 중, 충돌했다고 판단할만큼 모터의 전류가 높다면 자동으로 일시정지합니다.");
-                                    popup_help_setting.addLine("감도를 올리거나 내리고 싶다면 모터전류 제한값을 변경해 주세요.");
+                                    popup_help_setting.addLine("로봇이 주행 중, 충돌했다고 판단할만큼 모터의 전류가 높다면 자동으로 일시정지합니다");
+                                    popup_help_setting.addLine("감도를 올리거나 내리고 싶다면 모터전류 제한값을 변경해 주세요");
                                 }
                             }
                         }
@@ -5872,8 +6002,8 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("제자리 회전속도(limit_pivot)");
-                                    popup_help_setting.addLine("로봇이 출발점에서 출발하기 전, 도착점에 도착 후 제자리 회전을 할때의 속도입니다.");
-                                    popup_help_setting.addLine("속도 제한값으로 로봇이 제자리회전 시, 이 속도를 초과하지 않습니다.");
+                                    popup_help_setting.addLine("로봇이 출발점에서 출발하기 전, 도착점에 도착 후 제자리 회전을 할때의 속도입니다");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 제자리회전 시, 이 속도를 초과하지 않습니다");
                                 }
                             }
                         }
@@ -5948,8 +6078,8 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("제자리 회전가속도(limit_pivot_acc)");
-                                    popup_help_setting.addLine("로봇이 출발점에서 출발하기 전, 도착점에 도착 후 제자리 회전을 할때의 가속도입니다.");
-                                    popup_help_setting.addLine("속도 제한값으로 로봇이 제자리회전 시, 이 속도를 초과하지 않습니다.");
+                                    popup_help_setting.addLine("로봇이 출발점에서 출발하기 전, 도착점에 도착 후 제자리 회전을 할때의 가속도입니다");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 제자리회전 시, 이 속도를 초과하지 않습니다");
                                 }
                             }
                         }
@@ -6023,8 +6153,8 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("주행 속도(limit_v)");
-                                    popup_help_setting.addLine("로봇이 주행할 때의 최대 속도입니다.");
-                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 속도를 초과하지 않습니다.");
+                                    popup_help_setting.addLine("로봇이 주행할 때의 최대 속도입니다");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 속도를 초과하지 않습니다");
                                 }
                             }
                         }
@@ -6098,8 +6228,8 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("주행 가속도(limit_v)");
-                                    popup_help_setting.addLine("로봇이 주행할 때의 최대 가속도입니다.");
-                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 가속도를 초과하지 않습니다.");
+                                    popup_help_setting.addLine("로봇이 주행할 때의 최대 가속도입니다");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 가속도를 초과하지 않습니다");
                                 }
                             }
                         }
@@ -6173,8 +6303,8 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("주행 회전속도(limit_w)");
-                                    popup_help_setting.addLine("로봇이 주행할 때의 최대 회전속도입니다.");
-                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 회전속도를 초과하지 않습니다.");
+                                    popup_help_setting.addLine("로봇이 주행할 때의 최대 회전속도입니다");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 회전속도를 초과하지 않습니다");
                                 }
                             }
                         }
@@ -6248,8 +6378,8 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("주행 회전 가속도(limit_w_acc)");
-                                    popup_help_setting.addLine("로봇이 주행할 때의 최대 회전 가속도입니다.");
-                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 회전 가속도를 초과하지 않습니다.");
+                                    popup_help_setting.addLine("로봇이 주행할 때의 최대 회전 가속도입니다");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 회전 가속도를 초과하지 않습니다");
                                 }
                             }
                         }
@@ -6323,8 +6453,8 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("JOG 속도(limit_manual_v)");
-                                    popup_help_setting.addLine("로봇을 Joystick 혹은 JOG로 움직일 때의 최대 속도입니다.");
-                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 속도를 초과하지 않습니다.");
+                                    popup_help_setting.addLine("로봇을 Joystick 혹은 JOG로 움직일 때의 최대 속도입니다");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 속도를 초과하지 않습니다");
                                 }
                             }
                         }
@@ -6398,8 +6528,8 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("JOG 회전속도(limit_manual_v)");
-                                    popup_help_setting.addLine("로봇을 Joystick 혹은 JOG로 움직일 때의 최대 회전속도입니다.");
-                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 회전속도를 초과하지 않습니다.");
+                                    popup_help_setting.addLine("로봇을 Joystick 혹은 JOG로 움직일 때의 최대 회전속도입니다");
+                                    popup_help_setting.addLine("속도 제한값으로 로봇이 주행 시, 이 회전속도를 초과하지 않습니다");
                                 }
                             }
                         }
@@ -6473,8 +6603,8 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("출발 속도(st_v)");
-                                    popup_help_setting.addLine("로봇이 출발할 때, 처음으로 주어지는 속도값입니다.");
-                                    popup_help_setting.addLine("작을 수록 천천히 출발합니다.");
+                                    popup_help_setting.addLine("로봇이 출발할 때, 처음으로 주어지는 속도값입니다");
+                                    popup_help_setting.addLine("작을 수록 천천히 출발합니다");
                                 }
                             }
                         }
@@ -6549,7 +6679,7 @@ Item {
                                     click_sound.play();
                                     popup_help_setting.open();
                                     popup_help_setting.setTitle("도착 속도(goal_v)");
-                                    popup_help_setting.addLine("로봇이 목적지에 인접했을 때, 감속되는 최종 속도값입니다.");
+                                    popup_help_setting.addLine("로봇이 목적지에 인접했을 때, 감속되는 최종 속도값입니다");
                                 }
                             }
                         }
@@ -8627,6 +8757,19 @@ Item {
             supervisor.setSetting("ROBOT_SW/call_maximum",combo_max_calling.currentText);
         }
 
+        supervisor.setPreset(cur_preset);
+        if(combo_language.ischanged){
+            var str_lan;
+            if(combo_language.currentIndex === 0){
+                str_lan = "KR";
+
+            }else if(combo_language.currentIndex === 1){
+                str_lan = "US";
+            }
+            supervisor.setSetting("ROBOT_HW/langauge",str_lan);
+            supervisor.setLangauge(str_lan);
+        }
+
         if(combo_multirobot.ischanged){
             if(combo_multirobot.currentIndex == 0){
                 supervisor.setSetting("ROBOT_SW/use_multirobot","false");
@@ -8689,7 +8832,7 @@ Item {
             }else if(combo_voice_mode.currentIndex == 1){
                 supervisor.setSetting("ROBOT_SW/voice_mode","woman");
             }
-
+            readVoice();
         }
 
         if(combo_use_tray.ischanged){
@@ -8988,6 +9131,7 @@ Item {
         supervisor.writelog("[QML] SETTING PAGE init");
         wifi_check();
 
+        cur_preset = parseInt(supervisor.getSetting("ROBOT_SW","cur_preset"));
         slider_volume_system.value = supervisor.getSystemVolume();
         platform_name.text = supervisor.getSetting("ROBOT_HW","model");
         combo_platform_serial.currentIndex = parseInt(supervisor.getSetting("ROBOT_HW","serial_num"))
@@ -9008,6 +9152,11 @@ Item {
             combo_server_calling.currentIndex = 0;
         }
 
+        if(supervisor.getSetting("ROBOT_HW","langauge") === "KR"){
+            combo_language.currentIndex = 0;
+        }else if(supervisor.getSetting("ROBOT_HW","langauge") === "US"){
+            combo_language.currentIndex = 1;
+        }
 
 
         if(supervisor.getSetting("ROBOT_HW","type") === "SERVING"){
@@ -9207,6 +9356,7 @@ Item {
         slider_volume_voice.ischanged = false;
         slider_volume_button.ischanged = false;
 
+        combo_language.ischanged = false;
         combo_movingpage.ischanged = false;
         combo_comeback_preset.ischanged = false;
 //        wifi_passwd.ischanged = false;
@@ -9888,17 +10038,17 @@ Item {
                     }
                 }else if(supervisor.getzipstate() === 2){
                     if(popup_usb_notice.mode== "compress"){
-                        text_usb_state.text = "저장에 성공하였습니다.";
+                        text_usb_state.text = "저장에 성공하였습니다";
                     }else{
                         btn_usb_confirm.visible = true;
-                        text_usb_state.text = "파일을 성공적으로 가져왔습니다.\n확인을 누르시면 업데이트를 진행합니다.";
+                        text_usb_state.text = "파일을 성공적으로 가져왔습니다\n확인을 누르시면 업데이트를 진행합니다";
                     }
 
                 }else if(supervisor.getzipstate() === 3){
                     if(popup_usb_notice.mode== "compress"){
-                        text_usb_state.text = "저장에 성공하였지만 일부 과정에서 에러가 발생했습니다.";
+                        text_usb_state.text = "저장에 성공하였지만 일부 과정에서 에러가 발생했습니다";
                     }else{
-                        text_usb_state.text = "파일을 성공적으로 가져왔습니다만 일부 과정에서 에러가 발생했습니다.\n확인을 누르시면 업데이트를 진행합니다.";
+                        text_usb_state.text = "파일을 성공적으로 가져왔습니다만 일부 과정에서 에러가 발생했습니다\n확인을 누르시면 업데이트를 진행합니다";
                         btn_usb_confirm.visible = true;
                     }
                     model_usb_error.clear();
@@ -9908,9 +10058,9 @@ Item {
                 }else if(supervisor.getzipstate() === 4){
                     text_usb_state.color = color_red;
                     if(popup_usb_notice.mode== "compress"){
-                        text_usb_state.text = "저장에 실패했습니다.";
+                        text_usb_state.text = "저장에 실패했습니다";
                     }else{
-                        text_usb_state.text = "파일을 가져오지 못했습니다.";
+                        text_usb_state.text = "파일을 가져오지 못했습니다";
                     }
                     model_usb_error.clear();
                     for(var i=0; i<supervisor.getusberrorsize(); i++){
@@ -9918,7 +10068,7 @@ Item {
                     }
                 }else{
                     print(supervisor.getzipstate());
-                    text_usb_state.text = "잠시만 기다려주세요.";
+                    text_usb_state.text = "잠시만 기다려주세요";
                 }
             }
         }
@@ -9926,7 +10076,7 @@ Item {
             timer_usb_check.start();
             model_usb_error.clear();
             btn_usb_confirm.visible = false;
-            text_usb_state.text = "잠시만 기다려주세요.";
+            text_usb_state.text = "잠시만 기다려주세요";
             is_new = true;
         }
         onClosed: {
@@ -9947,7 +10097,7 @@ Item {
                     color: "white"
                     font.pixelSize: 30
                     horizontalAlignment: Text.AlignHCenter
-                    text:"잠시만 기다려주세요."
+                    text:"잠시만 기다려주세요"
                 }
                 Repeater{
                     model: ListModel{id:model_usb_error}
@@ -10050,9 +10200,9 @@ Item {
                     color: "white"
                     text: {
                         if(popup_usb_download.index === 0)
-                            "가져오실 파일 목록을 선택해주세요."
+                            "가져오실 파일 목록을 선택해주세요"
                         else if(popup_usb_download.index === 1)
-                            "가져오실 목록을 선택해주세요."
+                            "가져오실 목록을 선택해주세요"
                     }
                 }
             }
@@ -10381,9 +10531,9 @@ Item {
                     color: "white"
                     text: {
                         if(popup_usb_select.index === 0)
-                            "저장소를 선택해주세요."
+                            "저장소를 선택해주세요"
                         else if(popup_usb_select.index === 1)
-                            "저장할 목록을 선택해주세요."
+                            "저장할 목록을 선택해주세요"
                     }
                 }
             }
@@ -10402,7 +10552,7 @@ Item {
                     font.pixelSize: 25
                     horizontalAlignment: Text.AlignHCenter
                     color: color_red
-                    text: "** USB를 인식할 수 없습니다. **\nUSB를 뺏다 꼽아주시면 인식될 수 있습니다."
+                    text: "** USB를 인식할 수 없습니다 **\nUSB를 뺏다 꼽아주시면 인식될 수 있습니다"
                 }
                 Column{
                     anchors.centerIn: parent
@@ -10595,7 +10745,7 @@ Item {
             anchors.fill: parent
             Text{
                 anchors.centerIn: parent
-                text: "변경하실 호출벨을 눌러주세요."
+                text: "변경하실 호출벨을 눌러주세요"
                 font.family: font_noto_r.name
                 font.pixelSize: 25
             }
@@ -10719,7 +10869,7 @@ Item {
                     font.family: font_noto_r.name
                     font.pixelSize: 40
                     color: "white"
-                    text:"프로그램이 이미 최신입니다."
+                    text:"프로그램이 이미 최신입니다"
                 }
                 Text{
                     id: text_version
@@ -10939,7 +11089,7 @@ Item {
                     color: "white"
                     font.family: font_noto_r.name
                     font.pixelSize: 20
-                    text: "카메라 정보를 확인한 후, 위치를 지정하여주세요."
+                    text: "카메라 정보를 확인한 후, 위치를 지정하여주세요"
                 }
             }
             Rectangle{
@@ -11901,8 +12051,8 @@ Item {
     Popup{
         id: popup_password
         anchors.centerIn: parent
-        width: 400
-        height: 600
+        width: 360
+        height: 550
         background: Rectangle{
             anchors.fill: parent
             color: "transparent"
@@ -11944,6 +12094,7 @@ Item {
             answer = "";
             input_len = 0;
         }
+
         function setfailed(){
             for(var i=0; i<model_passwd.count; i++){
                 model_passwd.get(i).failed = true;
@@ -11968,63 +12119,36 @@ Item {
         }
 
         Rectangle{
-            radius: 20
+            radius: 40
             clip: true
             anchors.centerIn: parent
-            width: parent.width*0.99
-            height: parent.height*0.99
-            border.width: 3
-            border.color: color_dark_navy
-            Rectangle{
-                radius: 20
-                id: rect_password_top
-                width: parent.width
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                Rectangle{
-                    width: parent.width
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    height: 20
-                    color: color_dark_navy
-                }
-                height: 80
-                color: color_dark_navy
-                Text{
-                    anchors.centerIn: parent
-                    color: "white"
-                    font.family: font_noto_r.name
-                    font.pixelSize: 30
-                    text: "패스워드를 입력하세요."
-                }
-            }
+            width: parent.width
+            height: parent.height
+            color: color_dark_navy
             Column{
+                anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: rect_password_top.bottom
-                anchors.topMargin: 30
+                anchors.verticalCenterOffset: -20
                 spacing: 50
                 Rectangle{
                     width: 260
+                    color: color_dark_navy
                     anchors.horizontalCenter: parent.horizontalCenter
                     height: 60
-                    border.width: 1
-                    border.color: color_dark_navy
                     Row{
                         anchors.centerIn: parent
-                        spacing: 10
+                        spacing: 15
                         Repeater{
                             model: ListModel{id: model_passwd}
                             Rectangle{
                                 width: 50
-                                height: 55
-                                radius: 5
+                                height: 50
+                                radius: 50
                                 color: "transparent"
                                 Rectangle{
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    anchors.top: parent.top
-                                    anchors.topMargin: 5
                                     visible: show
-                                    width: 40
+                                    width: 46
                                     height: width
                                     radius: width
                                     color: failed ? color_red : color_green
@@ -12032,79 +12156,99 @@ Item {
                                 Rectangle{
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     anchors.bottom: parent.bottom
-                                    anchors.bottomMargin: 3
+                                    anchors.bottomMargin: -10
                                     width: 50
                                     height: 2
-                                    color: color_dark_navy
+                                    color: color_gray
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            Grid{
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 40
-                spacing: 17
-                rows: 4
-                columns: 3
-                Repeater{
-                    model: ListModel{id: model_pad}
-                    Rectangle{
-                        width: 68
-                        height: width
-                        radius: 5
-                        color: color_navy
-                        Text{
-                            text: name
-                            font.family: font_noto_r.name
-                            font.pixelSize: 25
-                            anchors.centerIn: parent
-                            color: "white"
-                        }
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                if(name==="clear"){
-                                    popup_password.setfailclear();
-                                    popup_password.is_fail = false;
-                                    popup_password.input_len = 0;
-                                    model_passwd.set(0,{"show":false});
-                                    model_passwd.set(1,{"show":false});
-                                    model_passwd.set(2,{"show":false});
-                                    model_passwd.set(3,{"show":false});
-                                    popup_password.answer = "";
-                                }else if(name==="<-"){
-                                    if(popup_password.input_len === 0){
-
+                Grid{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 17
+                    rows: 4
+                    columns: 3
+                    Repeater{
+                        model: ListModel{id: model_pad}
+                        Rectangle{
+                            width: 70
+                            height: width
+                            radius: 70
+                            color: color_navy
+                            Text{
+                                text: name
+                                visible:name!=="clear"&&name!=="<-"
+                                font.family: font_noto_r.name
+                                font.pixelSize: 30
+                                anchors.centerIn: parent
+                                color: "white"
+                            }
+                            Image{
+                                anchors.centerIn: parent
+                                width: {
+                                    if(name=="clear"){
+                                        50
                                     }else{
-                                        popup_password.input_len--;
-                                        model_passwd.set(popup_password.input_len,{"show":false});
-                                        popup_password.answer = popup_password.answer.slice(0,popup_password.input_len);
+                                        50
                                     }
-                                    popup_password.is_fail = false;
-                                }else{
-                                    if(popup_password.input_len === 4){
-                                        is_admin = false;
-                                        popup_password.is_fail = true;
-                                        supervisor.writelog("[USER INPUT] SETTING PAGE -> ADMIN LOGIN FAILED "+popup_password.answer);
+                                }
+
+                                height: width
+                                visible:name==="clear"||name==="<-"
+                                source:{
+                                    if(name=="clear"){
+                                        "icon/icon_trashcan.png"
                                     }else{
+                                        "icon/btn_reset.png"
+                                    }
+                                }
+                            }
+
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    if(name==="clear"){
+                                        popup_password.setfailclear();
                                         popup_password.is_fail = false;
-                                        popup_password.answer += name;
-                                        model_passwd.set(popup_password.input_len,{"show":true});
-                                        popup_password.input_len++;
-                                        if(popup_password.answer===popup_password.passwd){
-                                            supervisor.writelog("[USER INPUT] SETTING PAGE -> ADMIN LOGIN SUCCESS");
-                                            is_admin = true;
-                                            popup_password.is_fail = true;
-                                            popup_password.close();
-                                        }else if(popup_password.input_len === 4){
+                                        popup_password.input_len = 0;
+                                        model_passwd.set(0,{"show":false});
+                                        model_passwd.set(1,{"show":false});
+                                        model_passwd.set(2,{"show":false});
+                                        model_passwd.set(3,{"show":false});
+                                        popup_password.answer = "";
+                                    }else if(name==="<-"){
+                                        if(popup_password.input_len === 0){
+
+                                        }else{
+                                            popup_password.input_len--;
+                                            model_passwd.set(popup_password.input_len,{"show":false});
+                                            popup_password.answer = popup_password.answer.slice(0,popup_password.input_len);
+                                        }
+                                        popup_password.is_fail = false;
+                                    }else{
+                                        if(popup_password.input_len === 4){
                                             is_admin = false;
                                             popup_password.is_fail = true;
                                             supervisor.writelog("[USER INPUT] SETTING PAGE -> ADMIN LOGIN FAILED "+popup_password.answer);
                                         }else{
+                                            popup_password.is_fail = false;
+                                            popup_password.answer += name;
+                                            model_passwd.set(popup_password.input_len,{"show":true});
+                                            popup_password.input_len++;
+                                            if(popup_password.answer===popup_password.passwd){
+                                                supervisor.writelog("[USER INPUT] SETTING PAGE -> ADMIN LOGIN SUCCESS");
+                                                is_admin = true;
+                                                popup_password.is_fail = true;
+                                                popup_password.close();
+                                            }else if(popup_password.input_len === 4){
+                                                is_admin = false;
+                                                popup_password.is_fail = true;
+                                                supervisor.writelog("[USER INPUT] SETTING PAGE -> ADMIN LOGIN FAILED "+popup_password.answer);
+                                            }else{
+                                            }
                                         }
                                     }
                                 }
@@ -12112,6 +12256,7 @@ Item {
                         }
                     }
                 }
+
             }
 
         }
@@ -12661,7 +12806,7 @@ Item {
                         color: color_dark_black
                         font.family: font_noto_r.name
                         font.pixelSize: 40
-                        text: "무선 WIFI를 설정해주세요."
+                        text: "무선 WIFI를 설정해주세요"
                     }
                     Rectangle{
                         width: 1280
@@ -12995,7 +13140,7 @@ Item {
                             Text{
                                 visible: !popup_wifi.connection&&popup_wifi.select_security
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                text: "비밀번호를 입력해주세요."
+                                text: "비밀번호를 입력해주세요"
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
                             }
@@ -13011,7 +13156,7 @@ Item {
                                         id: text_wifi76788
                                         visible: false
                                         anchors.horizontalCenter: parent.horizontalCenter
-                                        text: "비밀번호가 틀렸습니다."
+                                        text: "비밀번호가 틀렸습니다"
                                         color: color_red
                                         font.family: font_noto_r.name
                                         font.pixelSize: 17
@@ -13117,7 +13262,7 @@ Item {
                         color: color_dark_black
                         font.family: font_noto_r.name
                         font.pixelSize: 40
-                        text: "무선 WIFI의 IP를 세팅합니다."
+                        text: "무선 WIFI의 IP를 세팅합니다"
                     }
                     Rectangle{
                         width: 1280
@@ -13955,7 +14100,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: text_wifi222.bottom
                 anchors.topMargin: 20
-                text: "비밀번호를 입력해주세요."
+                text: "비밀번호를 입력해주세요"
                 color: "white"
                 font.family: font_noto_r.name
                 font.pixelSize: 15
@@ -13982,7 +14127,7 @@ Item {
                         id: text_wifi_pass
                         visible: false
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: "비밀번호가 틀렸습니다."
+                        text: "비밀번호가 틀렸습니다"
                         color: color_red
                         font.family: font_noto_r.name
                         font.pixelSize: 17
@@ -14126,7 +14271,7 @@ Item {
 
                 Text{
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: "변경한 값으로 저장하시려면 확인 버튼을 눌러주세요.\n취소하시면 저장되지 않습니다."
+                    text: "변경한 값으로 저장하시려면 확인 버튼을 눌러주세요\n취소하시면 저장되지 않습니다"
                     color: "white"
                     horizontalAlignment: Text.AlignHCenter
                     font.family: font_noto_r.name

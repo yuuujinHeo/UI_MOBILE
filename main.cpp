@@ -11,6 +11,8 @@
 
 Logger *plog;
 QObject *object;
+QApplication *app;//(argc, argv);
+
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -19,9 +21,14 @@ int main(int argc, char *argv[])
     qmlRegisterType<KeyEmitter>("io.qt.Keyemitter",1,0, "Keyemitter");
     qmlRegisterType<MapViewer>("io.qt.MapViewer",1,0, "MapViewer");
 
-    QApplication app(argc, argv);
-    app.setOrganizationName("Mobile");
-    app.setOrganizationDomain("Mobile");
+    app = new QApplication(argc,argv);
+    app->setOrganizationName("Mobile");
+    app->setOrganizationDomain("Mobile");
+
+//    QTranslator *translator = new QTranslator();
+//    QString pahhh = QApplication::applicationDirPath() + "/lang_en.qm";
+//    qDebug() << pahhh << translator->load(pahhh);
+//    app->installTranslator(translator);
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("applicationDirPath", QGuiApplication::applicationDirPath());
@@ -32,5 +39,5 @@ int main(int argc, char *argv[])
         QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     object = engine.rootObjects()[0];
-    return app.exec();
+    return app->exec();
 }

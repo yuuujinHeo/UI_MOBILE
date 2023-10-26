@@ -35,6 +35,7 @@ Window {
             }
         }
     }
+    property color color_more_gray: "#777777";
     property color color_dark_gray: "#999999";
     property color color_red: "#E7584D"
     property color color_dark_red: "#D6473C"
@@ -42,6 +43,7 @@ Window {
     property color color_mid_green: "#0FB168"
     property color color_yellow: "#F7DB0D"
     property color color_dark_black: "#282828"
+    property color color_mid_black: "#464646"
     property color color_gray: "#d8d8d8"
     property color color_mid_gray: "#e8e8e8"
     property color color_light_gray: "#F4F4F4"
@@ -82,6 +84,20 @@ Window {
     function setVoice(str){
         next_sound = str;
     }
+    function readVoice(){
+        voice_movecharge.source = supervisor.getVoice("start_move_charge");
+        voice_serving.source = supervisor.getVoice("start_serving");
+        voice_calling.source = supervisor.getVoice("start_calling");
+        voice_avoid.source = supervisor.getVoice("serving");
+        voice_wait.source = supervisor.getVoice("wait");
+        voice_movefail.source = supervisor.getVoice("error_no_path");
+        voice_movewait.source = supervisor.getVoice("start_move_resting");
+        voice_localfail.source = supervisor.getVoice("error_localization");
+        voice_motor_error.source = supervisor.getVoice("error_call_manager");
+        voice_emergency.source = supervisor.getVoice("error_emo");
+        voice_battery.source = supervisor.getVoice("low_battery");
+    }
+
     function playVoice(str){
         print("playVoice ",str);
         if(str === "startServing"){
@@ -289,13 +305,13 @@ Window {
         cur_location = supervisor.getcurLoc();
 //        voice_all_stop();
         if(cur_location == "Charging0"){
-            cur_location = "충전 장소";
+            cur_location = qsTr("충전 장소");
             playVoice("moveCharging");
         }else if(cur_location == "Resting0"){
-            cur_location = "대기 장소";
+            cur_location = qsTr("대기 장소");
             playVoice("moveResting");
         }else if(cur_location == "Cleaning0"){
-            cur_location = "퇴식 장소";
+            cur_location = qsTr("퇴식 장소");
             playVoice("moveResting");
         }else{
             if(supervisor.isCallingMode() || supervisor.getSetting("ROBOT_HW","type") === "CLEANING"){
@@ -341,9 +357,14 @@ Window {
     }
 
     function clearkitchen(){
-        loadPage(pkitchen)
-        loader_page.item.cleaning();
-        supervisor.writelog("[UI] Force Page Cleaning Location");
+        if(loader_page.item.objectName == "page_annotation"){
+            supervisor.writelog("[UI] Annotation Check : Moving Done (Cleaning) ");
+            loader_page.item.movedone();
+        }else{
+            loadPage(pkitchen)
+            loader_page.item.cleaning();
+            supervisor.writelog("[UI] Force Page Cleaning Location");
+        }
     }
 
     function updatecamera(){
@@ -385,9 +406,9 @@ Window {
                 var tempstr = "";
                 for(var i=0; i<trays.length; i++){
                     if(tempstr === ""){
-                        tempstr = Number(trays[i])+"번";
+                        tempstr = Number(trays[i])+qsTr("번");
                     }else{
-                        tempstr += "과 " + Number(trays[i])+"번";
+                        tempstr += qsTr("과 ") + Number(trays[i])+qsTr("번");
                     }
                     if(trays[i] === 1){
                         loader_page.item.pickup_1 = true;
@@ -406,7 +427,7 @@ Window {
     function need_init(){
         print("need_init");
         if(!debug_mode){
-            if(loader_page.item.objectName != "page_annotation" && loader_page.item.objectName != "page_mapping"){
+            if(loader_page.item.objectName != "page_annotation" && loader_page.item.objectName != "page_mapping"&& loader_page.item.objectName != "page_init"){
                 supervisor.writelog("[UI] Force Page Change : Robot disconnected");
                 loadPage(pinit);
             }

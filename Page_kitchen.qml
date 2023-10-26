@@ -24,6 +24,7 @@ Item {
         cur_table = -1;
         cur_group = 0;
         cur_page = 0;
+        cur_preset = parseInt(supervisor.getSetting("ROBOT_SW","cur_preset"));
 
         view_mode = 1;
         group_num = supervisor.getLocationGroupNum();
@@ -133,6 +134,7 @@ Item {
             color: "white"
         }
     }
+
     ListModel{
         id: patrolmodel
     }
@@ -154,82 +156,92 @@ Item {
                         btn_charge.active = false;
                         btn_resting.active = false;
                         rect_go.color = color_red;
-                        rect_go_safe.color = color_gray
-                        text_go.text = "비상스위치가 눌려있음"
+                        text_go.color = color_dark_gray;
+                        text_go.text = qsTr("비상스위치가 눌려있음")
                         text_go.font.pixelSize = 25
-                        popup_notice.main_str = "비상스위치가 눌려있습니다."
-                        popup_notice.sub_str = "비상스위치를 풀어주세요"
+                        popup_notice.main_str = qsTr("비상스위치가 눌려있습니다")
+                        popup_notice.sub_str = qsTr("비상스위치를 풀어주세요")
                         popup_notice.show_localization = false
                         popup_notice.show_motorinit = false;
+                        popup_notice.show_restart = false;
                     }else if(supervisor.getMotorState() === 0){
                         btn_go.active = false;
                         btn_charge.active = false;
                         btn_resting.active = false;
                         rect_go.color = color_red;
-                        rect_go_safe.color = color_gray
-                        text_go.text = "모터 에러"
+                        text_go.color = color_dark_gray;
+                        text_go.text = qsTr("모터 초기화필요")
                         text_go.font.pixelSize = 25
                         if(supervisor.getMotorStatus(0) === 0 || supervisor.getMotorStatus(1) === 0){
-                            popup_notice.main_str = "모터 초기화가 되지 않았습니다."
-                            popup_notice.sub_str = "모터 초기화를 해주세요."
+                            popup_notice.main_str = qsTr("모터 초기화가 되지 않았습니다.")
+                            popup_notice.sub_str = qsTr("모터 초기화를 해주세요")
                         }else{
-                            popup_notice.main_str = "모터에 에러가 발생했습니다."
-                            popup_notice.sub_str = "모터 초기화를 해주세요."
+                            popup_notice.main_str = qsTr("모터에 에러가 발생했습니다")
+                            popup_notice.sub_str = qsTr("모터 초기화를 해주세요")
                         }
                         popup_notice.show_motorinit = true;
-                        popup_notice.show_localization = false
+                        popup_notice.show_localization = false;
+                        popup_notice.show_restart = false;
 
                     }else if(supervisor.getLocalizationState() === 2){
                         btn_go.active = true;
                         btn_charge.active = true;
                         btn_resting.active = true;
                         rect_go.color = color_blue;
-                        rect_go_safe.color = color_blue
-                        text_go.text = "서빙 시작"
+
+                        text_go.color = "white";
+                        text_go.text = qsTr("서빙 시작")
                         text_go.font.pixelSize = 35
                         popup_notice.main_str = ""
                         popup_notice.sub_str = ""
                         popup_notice.show_localization = false
                         popup_notice.show_motorinit = false;
+                        popup_notice.show_restart = false;
                     }else{
                         btn_go.active = false;
                         btn_charge.active = false;
                         btn_resting.active = false;
                         rect_go.color = color_red;
-                        rect_go_safe.color = color_gray
-                        text_go.text = "로봇 위치 에러"
+                        text_go.color = color_dark_gray;
+                        text_go.text = qsTr("위치 초기화필요")
                         text_go.font.pixelSize = 30
-                        popup_notice.main_str = "위치를 찾을 수 없습니다."
-                        popup_notice.sub_str = "위치 초기화를 다시 해주세요."
+                        popup_notice.main_str = qsTr("위치를 찾을 수 없습니다")
+                        popup_notice.sub_str = qsTr("위치 초기화를 다시 해주세요")
                         popup_notice.show_localization = true;
                         popup_notice.show_motorinit = false;
+                        popup_notice.show_restart = false;
                     }
                 }else{
                     btn_go.active = false;
                     btn_charge.active = false;
                     btn_resting.active = false;
                     rect_go.color = color_gray;
-                    rect_go_safe.color = color_gray
-                    text_go.text = "로봇 전원 안켜짐"
+                    text_go.color = color_dark_gray;
+                    text_go.text = qsTr("로봇 전원 안켜짐")
                     text_go.font.pixelSize = 35
-                    popup_notice.main_str = "로봇 전원이 꺼져있습니다."
+                    popup_notice.main_str = qsTr("로봇 전원이 꺼져있습니다")
                     popup_notice.sub_str = ""
                     popup_notice.show_localization = false
                     popup_notice.show_motorinit = false;
+                    popup_notice.show_restart = true;
                 }
             }else{
                 btn_go.active = false;
                 btn_charge.active = false;
                 btn_resting.active = false;
-                rect_go_safe.color = color_gray
                 rect_go.color = color_gray;
-                text_go.text = "로봇 연결 안됨"
+                text_go.color = color_dark_gray;
+                text_go.text = qsTr("로봇 연결 안됨")
                 text_go.font.pixelSize = 35
-                popup_notice.main_str = "로봇이 연결되지 않았습니다."
-                popup_notice.sub_str = "프로그램을 재시작 해주세요."
-                popup_notice.show_localization = false
+                popup_notice.main_str = qsTr("로봇이 연결되지 않았습니다")
+                popup_notice.sub_str = qsTr("프로그램을 재시작 해주세요")
+                popup_notice.show_localization = false;
                 popup_notice.show_motorinit = false;
+                popup_notice.show_restart = true;
             }
+
+
+
         }
     }
 
@@ -237,7 +249,13 @@ Item {
         model_group.clear();
         for(var i=0; i<supervisor.getLocationGroupNum(); i++){
             if(supervisor.getLocationGroupSize(i) > 0){
-                model_group.append({"num":i,"name":supervisor.getLocGroupname(i)});
+                if(supervisor.getLocGroupname(i) === "DEFAULT" || supervisor.getLocGroupname(i) === "Default"){
+                    model_group.append({"num":i,"name":"그룹"});
+                }else{
+
+                    model_group.append({"num":i,"name":supervisor.getLocGroupname(i)});
+                }
+
             }
         }
         if(model_group.count > 0)
@@ -410,7 +428,7 @@ Item {
             color:"white"
             font.bold: true
             font.family: font_noto_b.name
-            text: "테이블 번호"
+            text: qsTr("테이블 번호")
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 40
@@ -622,11 +640,12 @@ Item {
 
     Rectangle{
         id: rect_table_group
-        width: 1280
+        width: 1280;// - 150 - rect_menu_box.width
         height: 580
         anchors.top: parent.top
         anchors.topMargin: statusbar.height;// (parent.height - statusbar.height - height - rect_go.height)/2
         anchors.left: parent.left
+//        anchors.leftMargin: 50
         color: color_dark_navy
         visible: show_serving && !use_tray
         ListModel{
@@ -675,21 +694,20 @@ Item {
             id: tableNameCompo
             Rectangle{
                 id: rect_table_groups
-                width:130
-                height:80
-                radius:20
+                width:153
+                height:82
+                radius:15
+                color: color_navy
                 enabled:available
-                color: (num == cur_table)?"#12d27c":"#d0d0d0"
                 Rectangle{
-                    width:120
-                    height:70
-                    radius:15
-                    color: "#f4f4f4"
-                    anchors.centerIn: parent
+                    width:153
+                    height:75
+                    radius:10
+                    color: (num == cur_table)?color_green:color_light_gray
                     Text{
                         anchors.centerIn: parent
                         text: name
-                        color: available?"#525252":color_red
+                        color: available?num==cur_table?"white":"#525252":color_red
                         font.family: font_noto_r.name
                         Component.onCompleted: {
                             scale = 1;
@@ -697,7 +715,7 @@ Item {
                                 scale=scale-0.01;
                             }
                         }
-                        font.pixelSize: 30
+                        font.pixelSize: 25
                     }
                 }
                 MouseArea{
@@ -709,343 +727,366 @@ Item {
                     }
                 }
             }
-
         }
 
         Rectangle{
             id: rect_group
+            width: 1280 - 150 - rect_menu_box.width
             height: parent.height
-            width: 900
-            color: "transparent"
             anchors.left: parent.left
-            anchors.leftMargin: (rect_menu_box.x - width)/2
-            Rectangle{
-                id: rect_group_category
-                width: rect_group.width
-                height: 70
-                color: "transparent"
-                anchors.top: parent.top
-                anchors.topMargin: 10
-                anchors.horizontalCenter: parent.horizontalCenter
-                Row{
-                    spacing: 5
-                    Repeater{
-                        model: model_group
-                        Rectangle{
-                            width: 150
-                            height: 65
-                            radius: 10
-                            color: "transparent"
-                            border.color: cur_group==index?color_green:"white"
-                            border.width: cur_group==index?5:2
-                            Text{
-                                anchors.centerIn: parent
-                                font.family: font_noto_b.name
-                                font.pixelSize: 20
-                                text: name
-                                color: cur_group==index?color_green:color_light_gray
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked:{
-                                    click_sound.play();
-                                    cur_group = index;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            Rectangle{
-                width: rect_group.width
-                anchors.top: rect_group_category.bottom
-                anchors.topMargin: - 20
-                border.color: color_green
-                border.width: 5
-                radius: 10
-                clip: true
-                anchors.horizontalCenter: parent.horizontalCenter
-                height: rect_group.height - rect_group_category.height
-                color: color_dark_navy
-                Row{
-                    anchors.left: parent.left
-                    anchors.leftMargin: 5
-                    spacing: 15
-                    Repeater{
-                        model:model_group
-                        Rectangle{
-                            width: 140
-                            height: 30
-                            color: color_dark_navy
-                            opacity: cur_group === index?1:0
-                        }
-                    }
-                }
-                SwipeView{
-                    id: swipeview_group
+            anchors.leftMargin: 50
+            color: "transparent"
+            Column{
+                Rectangle{
+                    id: rect_group_category
+                    width: rect_group.width
+                    height: 70
+                    color: "transparent"
                     anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.top
-                    width: parent.width*0.9
-                    height: parent.height*0.9
-                    currentIndex: 0
-                    clip: true
-                    onCurrentIndexChanged: {
-                        if(currentIndex > -1)
-                            cur_page = currentIndex;
-                        update_table();
+                    Rectangle{
+                        anchors.bottom: parent.bottom
+                        width: parent.width
+                        height: 3
+                        radius: 3
+                        color: color_dark_gray
                     }
-                    Repeater{
-                        id: page_group
-                        model: Math.ceil((table_num/(col_num*row_num)))
-                        Item{
-                            Grid{
-                                rows: row_num
-                                columns: col_num//table_num-(col_num*row_num*(cur_page+1))>0?col_num:((table_num-(col_num*row_num*cur_page))/row_num + 1).toFixed(0)
-                                spacing: 20
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.verticalCenter: parent.verticalCenter
-//                                flow: Grid.TopToBottom
-                                Repeater{
-                                    id: column_table_group
-                                    delegate: {
-                                        if(view_mode === 1){
-                                            tableNameCompo
-                                        }else{
-                                            tableNumCompo
-                                        }
+                    Row{
+                        spacing: 5
+                        Repeater{
+                            model: model_group
+                            Rectangle{
+                                width: 150
+                                height: 70
+                                color: "transparent"
+                                DropShadow{
+                                    anchors.fill: textt
+                                    source: textt
+                                    visible: cur_group==index
+                                    radius: 3
+                                    color: color_more_gray
+                                }
+                                Text{
+                                    id: textt
+                                    anchors.centerIn: parent
+                                    font.family: font_noto_b.name
+                                    font.pixelSize: 30
+                                    text: name
+                                    color: cur_group==index?color_green:color_dark_gray
+                                }
+                                Rectangle{
+                                    anchors.bottom: parent.bottom
+                                    width: parent.width*0.9
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    radius: 2
+                                    height: 3
+                                    color: cur_group==index?color_green:"transparent"
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        click_sound.play();
+                                        cur_group = index;
                                     }
-                                    model: model_group_table
                                 }
-
-                            }
-                        }
-                    }
-                }
-                PageIndicator{
-                    id: indicator_tables_group
-                    count: swipeview_group.count
-                    currentIndex: swipeview_group.currentIndex
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 20
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    delegate: Rectangle{
-                        implicitWidth: 15
-                        implicitHeight: 15
-                        radius: width
-                        color: index===swipeview_group.currentIndex?"#12d27c":"#525252"
-                        Behavior on color{
-                            ColorAnimation {
-                                duration: 200
                             }
                         }
                     }
                 }
                 Rectangle{
-                    id: btn_lock_group
-                    color: "transparent"
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 20
-                    anchors.right: parent.right
-                    anchors.rightMargin: 20
-                    width: 50
-                    radius: 50
-                    height: 50
-                    visible: true;//group_num>row_num?true:false
-                    Image{
-                        anchors.fill: parent
-                        source: "icon/btn_lock.png"
-                    }
-                    MouseArea{
-                        anchors.fill: parent
-                        onPressAndHold: {
-                            click_sound.play();
-                            count_resting = 0;
-                            supervisor.writelog("[USER INPUT] TABLE NUM CHANGED DONE : "+Number(col_num));
-                            btn_lock_group.visible = false;
-                            btns_table_group.visible = true;
+                    width: rect_group.width
+                    radius: 10
+                    clip: true
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: rect_group.height - rect_group_category.height
+                    color: color_dark_navy
+                    Row{
+                        anchors.left: parent.left
+                        anchors.leftMargin: 5
+                        spacing: 15
+                        Repeater{
+                            model:model_group
+                            Rectangle{
+                                width: 140
+                                height: 30
+                                color: color_dark_navy
+                                opacity: cur_group === index?1:0
+                            }
                         }
                     }
-                }
-                Row{
-                    id: btns_table_group
-                    visible: false
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 10
-                    anchors.right: parent.right
-                    anchors.rightMargin: 10
-                    spacing: 10
-                    Grid{
-                        rows: 2
-                        columns: 4
-                        horizontalItemAlignment: Grid.AlignHCenter
-                        verticalItemAlignment: Grid.AlignVCenter
-                        spacing: 5
-                        Text{
-                            font.family: font_noto_r.name
-                            font.pixelSize: 15
-                            color: "white"
-                            text: "row"
+                    SwipeView{
+                        id: swipeview_group
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.top: parent.top
+                        width: parent.width*0.9
+                        height: parent.height*0.96
+                        currentIndex: 0
+                        clip: true
+                        onCurrentIndexChanged: {
+                            if(currentIndex > -1)
+                                cur_page = currentIndex;
+                            update_table();
                         }
-                        Text{
-                            font.family: font_noto_r.name
-                            font.pixelSize: 15
-                            color: "white"
-                            text: ":"
-                        }
-                        Rectangle{
-                            width: 32
-                            height: 32
-                            radius: 32
-                            enabled: row_num > 1
-                            color: enabled?color_dark_black:color_dark_gray
-                            border.color: "#e8e8e8"
-                            border.width: 1
-                            Text{
-                                anchors.centerIn: parent
-                                text:"-"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                font.family: font_noto_b.name
-                                font.pixelSize: 32
-                                color: "#e8e8e8"
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    click_sound.play();
-                                    count_resting = 0;
-                                    supervisor.setSetting("FLOOR/group_row_num",row_num-1);
-                                    row_num--;
-                                    update_table();
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 32
-                            height: 32
-                            radius: 32
-                            enabled: row_num < max_row
-                            color: enabled?color_dark_black:color_dark_gray
-                            border.color: "#e8e8e8"
-                            border.width: 1
-                            Text{
-                                anchors.centerIn: parent
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                text:"+"
-                                font.family: font_noto_b.name
-                                font.pixelSize: 32
-                                color: "#e8e8e8"
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    click_sound.play();
-                                    count_resting = 0;
-                                    supervisor.setSetting("FLOOR/group_row_num",row_num+1);
-                                    row_num++;
-                                    update_table();
-                                }
-                            }
-                        }
+                        Repeater{
+                            id: page_group
+                            model: Math.ceil((table_num/(col_num*row_num)))
+                            Item{
+                                Grid{
+                                    rows: row_num
+                                    columns: col_num//table_num-(col_num*row_num*(cur_page+1))>0?col_num:((table_num-(col_num*row_num*cur_page))/row_num + 1).toFixed(0)
+                                    spacing: 20
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    Repeater{
+                                        id: column_table_group
+                                        delegate: {
+                                            if(view_mode === 1){
+                                                tableNameCompo
+                                            }else{
+                                                tableNumCompo
+                                            }
+                                        }
+                                        model: model_group_table
+                                    }
 
-                        Text{
-                            font.family: font_noto_r.name
-                            font.pixelSize: 15
-                            color: "white"
-                            text: "col"
-                        }
-                        Text{
-                            font.family: font_noto_r.name
-                            font.pixelSize: 15
-                            color: "white"
-                            text: ":"
-                        }
-                        Rectangle{
-                            width: 32
-                            height: 32
-                            radius: 32
-                            enabled: col_num > 1
-                            color: enabled?color_dark_black:color_dark_gray
-                            border.color: "#e8e8e8"
-                            border.width: 1
-                            Text{
-                                anchors.centerIn: parent
-                                text:"-"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                font.family: font_noto_b.name
-                                font.pixelSize: 32
-                                color: "#e8e8e8"
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    click_sound.play();
-                                    count_resting = 0;
-                                    supervisor.setSetting("FLOOR/group_col_num",col_num-1);
-                                    col_num--;
-                                    update_table();
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: 32
-                            height: 32
-                            radius: 32
-                            enabled: col_num < max_col
-                            color: enabled?color_dark_black:color_dark_gray
-                            border.color: "#e8e8e8"
-                            border.width: 1
-                            Text{
-                                anchors.centerIn: parent
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                text:"+"
-                                font.family: font_noto_b.name
-                                font.pixelSize: 32
-                                color: "#e8e8e8"
-                            }
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    click_sound.play();
-                                    count_resting = 0;
-                                    supervisor.setSetting("FLOOR/group_col_num",col_num+1);
-                                    col_num++;
-                                    update_table();
                                 }
                             }
                         }
                     }
-
+                    PageIndicator{
+                        id: indicator_tables_group
+                        count: swipeview_group.count
+                        currentIndex: swipeview_group.currentIndex
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        delegate: Rectangle{
+                            implicitWidth: 15
+                            implicitHeight: 15
+                            radius: width
+                            color: index===swipeview_group.currentIndex?"#12d27c":"#525252"
+                            Behavior on color{
+                                ColorAnimation {
+                                    duration: 200
+                                }
+                            }
+                        }
+                    }
                     Rectangle{
-                        id: btn_confirm_tables_group
-                        color: "#282828"
-                        width: 40
-                        height: 40
-                        radius: 40
-                        anchors.verticalCenter: parent.verticalCenter
-                        border.color: "#e8e8e8"
-                        border.width: 1
+                        id: btn_lock_group
+                        color: "transparent"
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 20
+                        anchors.right: parent.right
+                        width: 50
+                        radius: 50
+                        height: 50
+                        visible: true;//group_num>row_num?true:false
                         Image{
                             anchors.fill: parent
-                            source: "icon/btn_yes.png"
+                            source: "icon/btn_lock.png"
                         }
                         MouseArea{
                             anchors.fill: parent
-                            onClicked: {
+                            onPressAndHold: {
                                 click_sound.play();
                                 count_resting = 0;
-                                supervisor.writelog("[USER INPUT] TABLE NUM CHANGED");
-                                btn_lock_group.visible = true;
-                                btns_table_group.visible = false;
+                                supervisor.writelog("[USER INPUT] TABLE NUM CHANGED DONE : "+Number(col_num));
+                                btn_lock_group.visible = false;
+                                btns_table_group.visible = true;
                             }
                         }
                     }
+                    Row{
+                        id: btns_table_group
+                        visible: false
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 10
+                        anchors.right: parent.right
+                        spacing: 10
+                        Grid{
+                            rows: 2
+                            columns: 4
+                            horizontalItemAlignment: Grid.AlignHCenter
+                            verticalItemAlignment: Grid.AlignVCenter
+                            spacing: 5
+                            Text{
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                color: "white"
+                                text: "가로줄개수"
+                            }
+                            Text{
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                color: "white"
+                                text: ":"
+                            }
+                            Rectangle{
+                                width: 30
+                                height: 30
+                                radius: 30
+                                enabled: row_num > 1
+                                color: enabled?color_dark_black:color_dark_gray
+                                border.color: "#e8e8e8"
+                                border.width: 1
 
+                                Rectangle{
+                                    width: 14
+                                    radius: 2
+                                    height: 2
+                                    anchors.centerIn: parent
+                                    color: color_mid_gray
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        click_sound.play();
+                                        count_resting = 0;
+                                        supervisor.setSetting("FLOOR/group_row_num",row_num-1);
+                                        row_num--;
+                                        update_table();
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 30
+                                height: 30
+                                radius: 30
+                                enabled: row_num < max_row
+                                color: enabled?color_dark_black:color_dark_gray
+                                border.color: "#e8e8e8"
+                                border.width: 1
+                                Rectangle{
+                                    width: 2
+                                    radius: 2
+                                    height: 14
+                                    anchors.centerIn: parent
+                                    color: color_mid_gray
+                                }
+                                Rectangle{
+                                    width: 14
+                                    radius: 2
+                                    height: 2
+                                    anchors.centerIn: parent
+                                    color: color_mid_gray
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        click_sound.play();
+                                        count_resting = 0;
+                                        supervisor.setSetting("FLOOR/group_row_num",row_num+1);
+                                        row_num++;
+                                        update_table();
+                                    }
+                                }
+                            }
+
+                            Text{
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                color: "white"
+                                text: "세로열개수"
+                            }
+                            Text{
+                                font.family: font_noto_r.name
+                                font.pixelSize: 15
+                                color: "white"
+                                text: ":"
+                            }
+                            Rectangle{
+                                width: 30
+                                height: 30
+                                radius: 30
+                                enabled: col_num > 1
+                                color: enabled?color_dark_black:color_dark_gray
+                                border.color: "#e8e8e8"
+                                border.width: 1
+
+                                Rectangle{
+                                    width: 14
+                                    radius: 2
+                                    height: 2
+                                    anchors.centerIn: parent
+                                    color: color_mid_gray
+                                }
+
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        click_sound.play();
+                                        count_resting = 0;
+                                        supervisor.setSetting("FLOOR/group_col_num",col_num-1);
+                                        col_num--;
+                                        update_table();
+                                    }
+                                }
+                            }
+                            Rectangle{
+                                width: 30
+                                height: 30
+                                radius: 30
+                                enabled: col_num < max_col
+                                color: enabled?color_dark_black:color_dark_gray
+                                border.color: "#e8e8e8"
+                                border.width: 1
+                                Rectangle{
+                                    width: 2
+                                    radius: 2
+                                    height: 14
+                                    anchors.centerIn: parent
+                                    color: color_mid_gray
+                                }
+                                Rectangle{
+                                    width: 14
+                                    radius: 2
+                                    height: 2
+                                    anchors.centerIn: parent
+                                    color: color_mid_gray
+                                }
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        click_sound.play();
+                                        count_resting = 0;
+                                        supervisor.setSetting("FLOOR/group_col_num",col_num+1);
+                                        col_num++;
+                                        update_table();
+                                    }
+                                }
+                            }
+                        }
+
+                        Rectangle{
+                            id: btn_confirm_tables_group
+                            color: "#282828"
+                            width: 40
+                            height: 40
+                            radius: 40
+                            anchors.verticalCenter: parent.verticalCenter
+                            border.color: "#e8e8e8"
+                            border.width: 1
+                            Image{
+                                anchors.fill: parent
+                                source: "icon/btn_yes.png"
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    click_sound.play();
+                                    count_resting = 0;
+                                    supervisor.writelog("[USER INPUT] TABLE NUM CHANGED");
+                                    btn_lock_group.visible = true;
+                                    btns_table_group.visible = false;
+                                }
+                            }
+                        }
+
+                    }
                 }
+
             }
+
         }
     }
     Rectangle{
@@ -1079,7 +1120,7 @@ Item {
         Text{
             id: text_go
             anchors.centerIn: parent
-            text: "서빙 시작"
+            text: qsTr("서빙 시작")
             font.family: font_noto_r.name
             font.pixelSize: 35
             font.bold: true
@@ -1087,87 +1128,61 @@ Item {
         }
         MouseArea{
             id: btn_go
-            property bool active: false
+            property bool active: true
+            property bool hold: false
             anchors.fill: parent
             onPressed:{
                 if(active){
-                    start_sound.play();
-                    count_resting = 0;
+                    hold = false;
+                    if(cur_table==-1){
+                        click_sound_no.play();
+                        count_resting = 0;
+                    }else{
+                        start_sound.play();
+                        count_resting = 0;
+                    }
                 }else{
                     click_sound_no.play();
                     count_resting = 0;
                     cur_table = -1;
                 }
             }
+            onPressAndHold: {
+                if(active){
+                    print("hold");
+                    hold = true;
+                    popup_preset_menu.open();
+                }
+            }
+
             onReleased:{
                 if(active){
-                    supervisor.setMotorLock(true);
-                    supervisor.setPreset(cur_preset);
-                    if(supervisor.getSetting("ROBOT_SW","use_tray") === "true"){
-                        for(var i=0; i<tray_num; i++){
-                            supervisor.setTray(i,traymodel.get(i).set_table);
+                    if(!hold){
+                        if(cur_table>-1){
+                            supervisor.setMotorLock(true);
+                            if(supervisor.getSetting("ROBOT_SW","use_tray") === "true"){
+                                for(var i=0; i<tray_num; i++){
+                                    supervisor.setTray(i,traymodel.get(i).set_table);
+                                }
+                                supervisor.startServing();
+                            }else{
+                                supervisor.goServing(model_group.get(cur_group).num,cur_table);
+                            }
+                            cur_table = -1;
                         }
-                        supervisor.startServing();
-                    }else{
-                        supervisor.goServing(model_group.get(cur_group).num,cur_table);
+
                     }
-                    cur_table = -1;
+
                 }else{
                     popup_notice.open();
                 }
             }
         }
-    }
-    Rectangle{
-        id: rect_go_safe
-        width: 150
-        visible: show_serving?true:false
-        height: 80
-        radius: 80
-        anchors.verticalCenter: rect_go.verticalCenter
-        anchors.left: rect_go.right
-        anchors.leftMargin : 20
-        color: "#24a9f7"
-        Column{
-            anchors.centerIn: parent
-            spacing: 3
-            Text{
-                text: "현재 속도"
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.family: font_noto_r.name
-                font.pixelSize: 15
-                font.bold: true
-                color: "white"
-            }
-            Text{
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: supervisor.getSetting("PRESET"+cur_preset.toString(),"name");
-                font.family: font_noto_r.name
-                font.pixelSize: 20
-                font.bold: true
-                color: "white"
-            }
-        }
 
-        MouseArea{
-            id: btn_go_safe
-            anchors.fill: parent
-            onClicked: {
-                if(btn_go.active){
-
-                    click_sound.play();
-                    popup_preset_menu.open();
-                }else{
-                    popup_notice.open();
-                    click_sound_no.play();
-                }
-            }
-        }
         Popup{
             id: popup_preset_menu
-//            anchors.centerIn: parent
-            width: 400
-            height: 80
+            width: 600
+            height: 120
             leftPadding: 0
             rightPadding: 0
             topPadding: 0
@@ -1186,16 +1201,26 @@ Item {
                 }
 
                 SequentialAnimation{
-                    NumberAnimation{
-                        target: rect_preset
-                        duration: 500
-                        to: popup_preset_menu.width
-                        from: 150
-                        property: "width"
+                    ParallelAnimation{
+                        NumberAnimation{
+                            target: rect_preset
+                            duration: 300
+                            to: popup_preset_menu.width
+                            from: 300
+                            property: "width"
+                        }
+                        NumberAnimation{
+                            target: rect_preset
+                            duration: 300
+                            to: -150
+                            from: 0
+                            property: "x"
+                        }
                     }
+
                     NumberAnimation{
                         target: row_preset
-                        duration: 100
+                        duration: 50
                         to: 1
                         from: 0
                         property: "opacity"
@@ -1206,139 +1231,155 @@ Item {
                 id: rect_preset
                 width: parent.width
                 height: parent.height
-                radius: width
+                radius: 100
                 color: color_blue
                 Row{
                     id: row_preset
                     opacity: 0
                     anchors.centerIn: parent
                     spacing: 15
+                    Text{
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.family: font_noto_r.name
+                        font.pixelSize: 25
+                        color: "white"
+                        text: "속도설정"
+                    }
+                    Rectangle{
+                        width: 1
+                        height: 70
+                        color: color_mid_gray
+                    }
                     Rectangle{
                         width: 60
-                        height: width
-                        radius: width
+                        height: 60
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: "transparent"
                         Text{
                             anchors.centerIn: parent
                             font.family: font_noto_r.name
-                            font.pixelSize: 20
-                            Component.onCompleted: {
-                                scale = 1;
-                                while(width*scale > parent.width*0.8){
-                                    scale=scale-0.01;
-                                }
-                            }
-                            text: supervisor.getSetting("PRESET1","name");
+                            font.pixelSize: 50
+                            color: cur_preset===1?"white":color_dark_gray
+                            text: "1"
                         }
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                click_sound.play();
                                 cur_preset = 1;
-                                popup_preset_menu.close();
+                                supervisor.setPreset(cur_preset);
                             }
                         }
                     }
                     Rectangle{
+                        width: 1
+                        height: 70
+                        color: color_mid_gray
+                    }
+                    Rectangle{
                         width: 60
-                        height: width
-                        radius: width
+                        height: 60
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: "transparent"
                         Text{
                             anchors.centerIn: parent
                             font.family: font_noto_r.name
-                            font.pixelSize: 20
-                            Component.onCompleted: {
-                                scale = 1;
-                                while(width*scale > parent.width*0.8){
-                                    scale=scale-0.01;
-                                }
-                            }
-                            text: supervisor.getSetting("PRESET2","name");
+                            font.pixelSize: 50
+                            color: cur_preset===2?"white":color_dark_gray
+                            text: "2"
                         }
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                click_sound.play();
                                 cur_preset = 2;
-                                popup_preset_menu.close();
+                                supervisor.setPreset(cur_preset);
                             }
                         }
                     }
                     Rectangle{
+                        width: 1
+                        height: 70
+                        color: color_mid_gray
+                    }
+                    Rectangle{
                         width: 60
-                        height: width
-                        radius: width
+                        height: 60
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: "transparent"
                         Text{
                             anchors.centerIn: parent
                             font.family: font_noto_r.name
-                            font.pixelSize: 20
-                            Component.onCompleted: {
-                                scale = 1;
-                                while(width*scale > parent.width*0.8){
-                                    scale=scale-0.01;
-                                }
-                            }
-                            text: supervisor.getSetting("PRESET3","name");
+                            font.pixelSize: 50
+                            color: cur_preset===3?"white":color_dark_gray
+                            text: "3"
                         }
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                click_sound.play();
                                 cur_preset = 3;
-                                popup_preset_menu.close();
+                                supervisor.setPreset(cur_preset);
                             }
                         }
                     }
                     Rectangle{
+                        width: 1
+                        height: 70
+                        color: color_mid_gray
+                    }
+                    Rectangle{
                         width: 60
-                        height: width
-                        radius: width
+                        height: 60
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: "transparent"
                         Text{
                             anchors.centerIn: parent
                             font.family: font_noto_r.name
-                            font.pixelSize: 20
-                            Component.onCompleted: {
-                                scale = 1;
-                                while(width*scale > parent.width*0.8){
-                                    scale=scale-0.01;
-                                }
-                            }
-                            text: supervisor.getSetting("PRESET4","name");
+                            font.pixelSize: 50
+                            color: cur_preset===4?"white":color_dark_gray
+                            text: "4"
                         }
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                click_sound.play();
                                 cur_preset = 4;
-                                popup_preset_menu.close();
+                                supervisor.setPreset(cur_preset);
                             }
                         }
                     }
                     Rectangle{
+                        width: 1
+                        height: 70
+                        color: color_mid_gray
+                    }
+                    Rectangle{
                         width: 60
-                        height: width
-                        radius: width
+                        height: 60
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: "transparent"
                         Text{
                             anchors.centerIn: parent
                             font.family: font_noto_r.name
-                            font.pixelSize: 20
-                            Component.onCompleted: {
-                                scale = 1;
-                                while(width*scale > parent.width*0.8){
-                                    scale=scale-0.01;
-                                }
-                            }
-                            text: supervisor.getSetting("PRESET5","name");
+                            font.pixelSize: 50
+                            color: cur_preset===5?"white":color_dark_gray
+                            text: "5"
                         }
                         MouseArea{
                             anchors.fill: parent
                             onClicked:{
+                                click_sound.play();
                                 cur_preset = 5;
-                                popup_preset_menu.close();
+                                supervisor.setPreset(cur_preset);
                             }
                         }
                     }
                 }
             }
         }
+
     }
-
-
     Rectangle{
         id: rect_patrol_box
         visible: false
@@ -1353,7 +1394,7 @@ Item {
             color:"white"
             font.bold: true
             font.family: font_noto_b.name
-            text: "로봇 이동경로"
+            text: qsTr("로봇 이동경로")
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 40
@@ -1429,7 +1470,7 @@ Item {
             color:"white"
             font.bold: true
             font.family: font_noto_b.name
-            text: "호출 대기 중"
+            text: qsTr("호출 대기 중")
             anchors.centerIn: parent
             font.pixelSize: 50
         }
@@ -1447,7 +1488,7 @@ Item {
         Text{
             id: text_go2
             anchors.centerIn: parent
-            text: "순회 시작"
+            text: qsTr("순회 시작")
             font.family: font_noto_r.name
             font.pixelSize: 35
             font.bold: true
@@ -1507,7 +1548,7 @@ Item {
                         anchors.centerIn: parent
                         font.family: font_noto_r.name
                         font.pixelSize: 35
-                        text: "로봇이 지정된 위치로 이동합니다"
+                        text: qsTr("로봇이 지정된 위치로 이동합니다")
                         color: "white"
                     }
                 }
@@ -1526,7 +1567,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
-                                text: "[ 순회 방식 설정 ]"
+                                text: qsTr("[ 순회 방식 설정 ]")
                                 color: "white"
                             }
                             Row{
@@ -1543,7 +1584,7 @@ Item {
                                         anchors.centerIn: parent
                                         font.family: font_noto_r.name
                                         font.pixelSize: 20
-                                        text: "랜덤하게"
+                                        text: qsTr("랜덤하게")
                                         color: "white"
                                     }
                                     MouseArea{
@@ -1566,7 +1607,7 @@ Item {
                                         font.family: font_noto_r.name
                                         font.pixelSize: 20
                                         color: "white"
-                                        text: "순차적으로"
+                                        text: qsTr("순차적으로")
                                     }
                                     MouseArea{
                                         anchors.fill: parent
@@ -1587,7 +1628,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
-                                text: "[ 순회 위치 설정 ]"
+                                text: qsTr("[ 순회 위치 설정 ]")
                                 color: "white"
                             }
                             Column{
@@ -1604,7 +1645,7 @@ Item {
                                     Text{
                                         anchors.centerIn: parent
                                         font.family: font_noto_r.name
-                                        text: "전체 위치"
+                                        text: qsTr("전체 위치")
                                         font.pixelSize: 30
                                     }
                                     MouseArea{
@@ -1623,7 +1664,7 @@ Item {
                                     Text{
                                         anchors.centerIn: parent
                                         font.family: font_noto_r.name
-                                        text: "서빙 위치"
+                                        text: qsTr("서빙 위치")
                                         font.pixelSize: 30
                                     }
                                     MouseArea{
@@ -1642,7 +1683,7 @@ Item {
                                     Text{
                                         anchors.centerIn: parent
                                         font.family: font_noto_r.name
-                                        text: "직접 선택"
+                                        text: qsTr("직접 선택")
                                         font.pixelSize: 30
                                     }
                                     MouseArea{
@@ -1705,7 +1746,7 @@ Item {
                             color: color_green
                             Text{
                                 anchors.centerIn: parent
-                                text: "순회 시작"
+                                text: qsTr("순회 시작")
                                 font.pixelSize: 40
                                 color: "white"
                                 font.family: font_noto_b.name
@@ -1760,6 +1801,7 @@ Item {
         id: rect_menu_box
         width: 120
         height: width*3
+        clip: true
         anchors.right: parent.right
         anchors.rightMargin: 50
         anchors.top: parent.top
@@ -1809,9 +1851,9 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 Rectangle{
                     width: size_menu
-                    color: parent.color
                     height: image_charge.height+text_charge.height
                     anchors.centerIn: parent
+                    color: parent.color
                     Image{
                         id: image_charge
                         scale: 1.2
@@ -1820,10 +1862,10 @@ Item {
                     }
                     Text{
                         id: text_charge
-                        text:"충전위치로"
+                        text:qsTr("충전위치로")
                         font.family: font_noto_r.name
                         font.pixelSize: 15
-                        color: btn_charge.active?"#525252":color_red
+                        color: color_dark_black
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: image_charge.bottom
                         anchors.topMargin: 10
@@ -1877,10 +1919,10 @@ Item {
                     }
                     Text{
                         id: text_wait
-                        text:"대기위치로"
+                        text:qsTr("대기위치로")
                         font.family: font_noto_r.name
                         font.pixelSize: 15
-                        color: btn_resting.active?"#525252":color_red
+                        color: color_dark_black
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: image_wait.bottom
                         anchors.topMargin: 10
@@ -1904,7 +1946,6 @@ Item {
                             go_wait = true;
                             popup_question.visible = true;
                         }else{
-
                             popup_notice.open();
                         }
                     }
@@ -1913,129 +1954,169 @@ Item {
         }
     }
 
+
     Popup{
         id: popup_notice
         anchors.centerIn: parent
-        width: 800
-        height: 300
+        width: parent.width
+        height: 320
         property string main_str: ""
         property string sub_str: ""
         property bool show_localization: false
         property bool show_motorinit: false
+        property bool show_restart: false
         background:Rectangle{
             anchors.fill: parent
             color: "transparent"
         }
+        topPadding: 0
+        bottomPadding: 0
+        rightPadding: 0
+        leftPadding: 0
         Rectangle{
             width: parent.width
             height: parent.height
-            opacity: 0.8
-            radius: 10
-            color: color_dark_black
-        }
-        Rectangle{
-            anchors.centerIn: parent
-            width: parent.width-20
-            height: parent.height-20
-//            opacity: 0.8
-            radius: 10
-            color: "transparent"
-            border.color: color_red
-            border.width: 5
-            Image{
-                id: image_warn
-                width: 120
-                height: 120
-                source: "image/icon_warning.png"
-                anchors.verticalCenter: parent.verticalCenter
+            color: color_dark_navy
+            Rectangle{
                 anchors.left: parent.left
-                anchors.leftMargin: 50
-            }
-            Column{
+                anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.left: image_warn.right
-                anchors.leftMargin: 50
-                Text{
-                    color: color_red
-                    font.family: font_noto_r.name
-                    font.pixelSize: 40
-                    text: popup_notice.main_str
-                }
-                Text{
-                    color: color_red
-                    font.family: font_noto_r.name
-                    font.pixelSize: 30
-                    text: popup_notice.sub_str
-                }
-            }
-            MouseArea{
-                anchors.fill: parent
-                onClicked:{
-                    popup_notice.close();
-                }
-            }
-            Rectangle{
-                width:  120
-                height: 60
-                anchors.right: parent.right
-                anchors.rightMargin: 20
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 20
-                color: "transparent"
-                border.color: color_red
-                border.width: 3
-                radius: 10
-                visible: !popup_notice.show_localization
-                Text{
-                    anchors.centerIn: parent
-                    color: color_red
-                    font.family: font_noto_r.name
-                    font.pixelSize: 20
-                    text: "위치초기화"
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onPressed:{
-                        parent.color = color_dark_black
-                        click_sound.play()
+                height: parent.height-30
+                width: parent.width
+                color: color_light_gray
+//                color: color_dark_black
+                Row{
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 150
+                    spacing: 100
+                    Image{
+                        id: image_warn
+                        width: 160
+                        height: 160
+                        source: "image/icon_warning.png"
+                        anchors.verticalCenter: parent.verticalCenter
                     }
-                    onReleased:{
-                        parent.color = "transparent"
-                        loadPage(plocalization);
+                    Column{
+                        spacing: 10
+                        anchors.verticalCenter: parent.verticalCenter
+                        Text{
+                            color: color_dark_navy
+                            font.family: font_noto_r.name
+                            font.pixelSize: 50
+                            text: popup_notice.main_str
+                        }
+                        Text{
+                            color: color_dark_navy
+                            font.family: font_noto_r.name
+                            font.pixelSize: 35
+                            text: popup_notice.sub_str
+                        }
                     }
-                }
-            }
-            Rectangle{
-                width:  120
-                height: 60
-                color: "transparent"
-                border.color: color_red
-                border.width: 3
-                anchors.right: parent.right
-                anchors.rightMargin: 20
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 20
-                radius: 10
-                visible: popup_notice.show_motorinit
-                Text{
-                    anchors.centerIn: parent
-                    color: color_red
-                    font.family: font_noto_r.name
-                    font.pixelSize: 20
-                    text: "모터초기화"
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onPressed:{
-                        parent.color = color_dark_black
-                        click_sound.play()
-                    }
-                    onReleased:{
-                        parent.color = "transparent"
 
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked:{
+                        popup_notice.close();
+                    }
+                }
+                Rectangle{
+                    width:  150
+                    height: 70
+                    anchors.right: parent.right
+                    anchors.rightMargin: 50
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 20
+                    color: color_dark_navy
+                    radius: 40
+                    visible: popup_notice.show_localization
+                    Text{
+                        anchors.centerIn: parent
+                        color: "white"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 25
+                        text: qsTr("위치초기화")
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onPressed:{
+                            parent.color = color_dark_black
+                            click_sound.play()
+                        }
+                        onReleased:{
+                            parent.color = "transparent"
+                            loadPage(plocalization);
+                        }
+                    }
+                }
+                Rectangle{
+                    id: btn_restart
+                    width:  150
+                    height: 70
+                    anchors.right: parent.right
+                    anchors.rightMargin: 50
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 20
+                    color: color_dark_navy
+                    radius: 40
+                    visible: popup_notice.show_restart
+                    Rectangle{
+                        width:  150
+                        height: 70
+                        color: color_dark_navy
+                        radius: 40
+                        Text{
+                            anchors.centerIn: parent
+                            color: "white"
+                            font.family: font_noto_r.name
+                            font.pixelSize: 25
+                            text: qsTr("재시작")
+                        }
+                        MouseArea{
+                            anchors.fill: parent
+                            onPressed:{
+                                parent.color = color_dark_black
+                                click_sound.play()
+                            }
+                            onReleased:{
+                                parent.color = "transparent"
+                                supervisor.programRestart();
+                            }
+                        }
+                    }
+                }
+                Rectangle{
+                    width:  150
+                    height: 70
+                    anchors.right: parent.right
+                    anchors.rightMargin: 50
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 20
+                    color: color_dark_navy
+                    radius: 40
+                    visible: popup_notice.show_motorinit
+                    Text{
+                        anchors.centerIn: parent
+                        color: "white"
+                        font.family: font_noto_r.name
+                        font.pixelSize: 25
+                        text: qsTr("모터초기화")
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onPressed:{
+                            parent.color = color_dark_black
+                            click_sound.play()
+                        }
+                        onReleased:{
+                            parent.color = "transparent"
+
+                        }
                     }
                 }
             }
+
         }
     }
 
@@ -2069,13 +2150,13 @@ Item {
             color: "#12d27c"
             text: {
                 if(go_wait){
-                    "대기 장소로 이동<font color=\"white\">하시겠습니까?</font>"
+                    qsTr("대기 장소로 이동<font color=\"white\">하시겠습니까?</font>")
                 }else if(go_charge){
-                    "충전기로 이동<font color=\"white\">하시겠습니까?</font>"
+                    qsTr("충전기로 이동<font color=\"white\">하시겠습니까?</font>")
                 }else if(go_patrol){
-                    "패트롤을 시작 <font color=\"white\">하시겠습니까?</font>"
+                    qsTr("패트롤을 시작 <font color=\"white\">하시겠습니까?</font>")
                 }else if(calling_mode){
-                    "트레이를 모두 비우고<font color=\"white\"> 확인 버튼을 눌러주세요.</font>"
+                    qsTr("트레이를 모두 비우고<font color=\"white\"> 확인 버튼을 눌러주세요.</font>")
                 }else{
                     ""
                 }
@@ -2100,7 +2181,7 @@ Item {
             }
             Text{
                 id:text_confirm
-                text:"확인"
+                text:qsTr("확인")
                 font.family: font_noto_b.name
                 font.pixelSize: 30
                 color:"#282828"
@@ -2152,7 +2233,7 @@ Item {
             }
             Text{
                 id:text_nono
-                text:"아니오"
+                text:qsTr("아니오")
                 font.family: font_noto_b.name
                 font.pixelSize: 30
                 color:"#282828"
@@ -2198,7 +2279,7 @@ Item {
                 anchors.leftMargin: 20
             }
             Text{
-                text:"네"
+                text:qsTr("네")
                 font.family: font_noto_b.name
                 font.pixelSize: 30
                 color:"#282828"
@@ -2284,7 +2365,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     font.family: font_noto_r.name
                     font.pixelSize: 45
-                    text: "다녀왔습니다"
+                    text: qsTr("다녀왔습니다")
                 }
                 Text{
                     color: "white"
@@ -2292,7 +2373,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.family: font_noto_r.name
                     font.pixelSize: 40
-                    text: "확인버튼을 누르시면 대기위치로 이동합니다\n바로 이동명령을 내리시려면 닫기를 눌러주세요"
+                    text: qsTr("확인버튼을 누르시면 대기위치로 이동합니다\n바로 이동명령을 내리시려면 닫기를 눌러주세요")
                 }
             }
 
@@ -2306,7 +2387,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     font.family: font_noto_r.name
                     font.pixelSize: 30
-                    text: "호출 대기열"
+                    text: qsTr("호출 대기열")
                 }
                 Flickable{
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -2367,7 +2448,7 @@ Item {
                         anchors.leftMargin: 20
                     }
                     Text{
-                        text:"대기열 지우기"
+                        text:qsTr("대기열 지우기")
                         font.family: font_noto_b.name
                         font.pixelSize: 25
                         color:"#282828"
@@ -2396,7 +2477,7 @@ Item {
                         radius: 19
                         color: "white"
                         Text{
-                            text:"호출위치로"
+                            text:qsTr("호출위치로")
                             font.family: font_noto_b.name
                             font.pixelSize: 30
                             color:"#282828"
@@ -2424,7 +2505,7 @@ Item {
                         radius: 19
                         color: "white"
                         Text{
-                            text:"확인"
+                            text:qsTr("확인")
                             font.family: font_noto_b.name
                             font.pixelSize: 30
                             color:"#282828"
@@ -2452,7 +2533,7 @@ Item {
                         radius: 19
                         color: "white"
                         Text{
-                            text:"닫기"
+                            text:qsTr("닫기")
                             font.family: font_noto_b.name
                             font.pixelSize: 30
                             color:"#282828"
@@ -2487,7 +2568,7 @@ Item {
                             anchors.leftMargin: 20
                         }
                         Text{
-                            text:"확인"
+                            text:qsTr("확인")
                             font.family: font_noto_b.name
                             font.pixelSize: 30
                             color:"#282828"

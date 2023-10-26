@@ -554,7 +554,7 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
                     Text{
-                        text: "동일한 이름의 맵을 덮어씌워집니다."
+                        text: "동일한 이름의 맵을 덮어씌워집니다"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -687,7 +687,7 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
                     Text{
-                        text: "기존의 파일은 삭제됩니다."
+                        text: "기존의 파일은 삭제됩니다"
                         font.family: font_noto_r.name
                         font.pixelSize: 15
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -1278,7 +1278,7 @@ Item {
                                 font.pixelSize: 20
                                 color: color_red
                                 horizontalAlignment: Text.AlignHCenter
-                                text: "그룹 지정된 위치가 존재합니다.\n삭제하려면 그룹을 전부 비워주세요."
+                                text: "그룹 지정된 위치가 존재합니다\n삭제하려면 그룹을 전부 비워주세요"
                             }
                             Text{
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -1570,10 +1570,10 @@ Item {
         leftPadding: 0
         rightPadding: 0
         function set_overwrite(){
-            text_msg.text = "이미 설정한 위치가 존재합니다. \n저장하시면 설정된 위치를 덮어씁니다.";
+            text_msg.text = "이미 설정한 위치가 존재합니다 \n저장하시면 설정된 위치를 덮어씁니다";
         }
         function set_obs(){
-            text_msg.text = "장애물과 너무 가깝습니다. \n위치를 저장할 수 없습니다."
+            text_msg.text = "장애물과 너무 가깝습니다 \n위치를 저장할 수 없습니다"
         }
 
         background: Rectangle{
@@ -1598,7 +1598,7 @@ Item {
                     font.pixelSize: 20
                     horizontalAlignment: Text.AlignHCenter
                     color: color_red
-                    text: "이미 설정한 위치가 존재합니다. \n저장하시면 설정된 위치를 덮어씁니다."
+                    text: "이미 설정한 위치가 존재합니다 \n저장하시면 설정된 위치를 덮어씁니다"
                 }
             }
             MouseArea{

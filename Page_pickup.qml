@@ -30,7 +30,7 @@ Item {
         text_hello.visible = false;
         timer_hello.stop();
         voice_pickup.play();
-        statusbar.visible = true;
+        statusbar.visible = false;
     }
 
     function play_voice(){
@@ -139,7 +139,7 @@ Item {
             anchors.top: parent.top
             Text{
                 id: target_pos
-                text: pos + " 트레이 <font color=\"white\">의</font>"
+                text: pos + qsTr(" 트레이 <font color=\"white\">의</font>")
                 font.pixelSize: 70
                 font.bold: true
                 font.family: font_noto_b.name
@@ -147,7 +147,7 @@ Item {
             }
             Text{
                 id: text_mention
-                text: "제품을 수령해주세요."
+                text: qsTr("제품을 수령해주세요")
                 font.pixelSize: 70
                 font.family: font_noto_b.name
                 color: "white"
@@ -159,7 +159,7 @@ Item {
             }
             Text{
                 id: text_mention3
-                text: "수령 후 아래 <font color=\"#12d27c\">확인버튼</font>을 눌러주세요."
+                text: qsTr("수령 후 아래 <font color=\"#12d27c\">확인버튼</font>을 눌러주세요")
                 font.pixelSize: 45
                 font.family: font_noto_b.name
                 color: "white"
@@ -196,7 +196,7 @@ Item {
         }
         Text{
             id: text_hello
-            text:"감사합니다."
+            text:qsTr("감사합니다")
             visible: false
             font.pixelSize: 80
             font.family: font_noto_b.name
@@ -291,8 +291,4 @@ Item {
             supervisor.writelog("[QML] PICKUP PAGE -> Move to Next");
         }
     }
-//    SoundEffect{
-//        id: click_start
-//        source: "bgm/click_start.wav"
-//    }
 }

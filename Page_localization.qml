@@ -128,7 +128,7 @@ Item {
     Text{
         id: text_failed_connection
         visible: local_find_state===10
-        text: "로봇과 연결이 되지 않았습니다."
+        text: "로봇과 연결이 되지 않았습니다"
         color: "white"
         font.pixelSize: 60
         anchors.horizontalCenter: parent.horizontalCenter
@@ -139,7 +139,7 @@ Item {
     Text{
         id: text_find
         visible: local_find_state===2||local_find_state===3
-        text:local_find_state===2?"로봇의 위치를 찾았습니다. 로봇의 위치가 정확합니까?":"로봇의 위치를 찾을 수 없습니다. 로봇의 위치를 맵 상에서 표시해주세요."
+        text:local_find_state===2?"로봇의 위치를 찾았습니다 로봇의 위치가 정확합니까?":"로봇의 위치를 찾을 수 없습니다 로봇의 위치를 맵 상에서 표시해주세요"
         font.pixelSize: 30
         horizontalAlignment: Text.AlignHCenter
         anchors.horizontalCenter: parent.horizontalCenter
@@ -237,13 +237,13 @@ Item {
             popup_annot_help.open();
             popup_annot_help.setTitle("로봇 위치 초기화");
             if(local_find_state === 2){
-                popup_annot_help.addLine("파란색으로 표시된 라이다맵과 실제 맵이 일치하는 지 확인해주세요.");
-                popup_annot_help.addLine("로봇이 충전, 대기, 서빙 위치 근처에 있으면 보다 정확하고 빠르게 위치를 찾습니다.");
-                popup_annot_help.addLine("로봇은 위치를 찾았다고 생각하지만 라이다맵이 실제 맵과 일치 하지 않으면\n로봇이 주행 중 이상한 곳으로 가거나 충돌이 날 수 있습니다.");
+                popup_annot_help.addLine("파란색으로 표시된 라이다맵과 실제 맵이 일치하는 지 확인해주세요");
+                popup_annot_help.addLine("로봇이 충전, 대기, 서빙 위치 근처에 있으면 보다 정확하고 빠르게 위치를 찾습니다");
+                popup_annot_help.addLine("로봇은 위치를 찾았다고 생각하지만 라이다맵이 실제 맵과 일치 하지 않으면\n로봇이 주행 중 이상한 곳으로 가거나 충돌이 날 수 있습니다");
             }else{
-                popup_annot_help.addLine("로봇을 충전, 대기, 서빙 위치 근처로 이동시킨 뒤 [다시시도]를 하시면 보다 정확하고 빠르게 위치를 찾습니다.");
-                popup_annot_help.addLine("아니라면 [수동지정]을 통해 맵 상의 로봇의 위치와 방향을 표시해주세요. 그 위치에서 초기화를 시도합니다.");
-                popup_annot_help.addLine("로봇이 이동할 수 있는 상황이 아니고 수동지정도 어려우면 [자동위치찾기]버튼을 누르세요.\n시간이 조금 소요됩니다.");
+                popup_annot_help.addLine("로봇을 충전, 대기, 서빙 위치 근처로 이동시킨 뒤 [다시시도]를 하시면 보다 정확하고 빠르게 위치를 찾습니다");
+                popup_annot_help.addLine("아니라면 [수동지정]을 통해 맵 상의 로봇의 위치와 방향을 표시해주세요 그 위치에서 초기화를 시도합니다");
+                popup_annot_help.addLine("로봇이 이동할 수 있는 상황이 아니고 수동지정도 어려우면 [자동위치찾기]버튼을 누르세요\n시간이 조금 소요됩니다");
             }
 
         }
@@ -351,7 +351,6 @@ Item {
             print(count);
             if(count++ > 4){
                 count = 0;
-                print("???????????");
                 debug_mode = true;
             }
         }

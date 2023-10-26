@@ -273,7 +273,7 @@ Item {
                 font.family: font_noto_b.name
                 font.pixelSize: 50
                 color: "#12d27c"
-                text: "프로그램을 종료<font color=\"white\">하시겠습니까?</font>"
+                text: qsTr("프로그램을 종료<font color=\"white\">하시겠습니까?</font>")
             }
             Row{
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -301,7 +301,7 @@ Item {
                             height: 90
                             color: "transparent"
                             Text{
-                                text:"취소"
+                                text:qsTr("취소")
                                 font.family: font_noto_b.name
                                 font.pixelSize: 30
                                 color:"#282828"
@@ -347,7 +347,7 @@ Item {
                             height: 90
                             color: "transparent"
                             Text{
-                                text:"다시시작"
+                                text:qsTr("다시시작")
                                 font.family: font_noto_b.name
                                 font.pixelSize: 30
                                 color:"#282828"
@@ -393,7 +393,7 @@ Item {
                             height: 90
                             color: "transparent"
                             Text{
-                                text:"종료"
+                                text:qsTr("종료")
                                 font.family: font_noto_b.name
                                 font.pixelSize: 30
                                 color:"#282828"
@@ -566,34 +566,34 @@ Item {
     function update_detail(){
         model_details.clear();
         if(is_con_joystick){
-            model_details.append({"detail":"조이스틱이 연결되었습니다.","icon":"icon/icon_joy_connect.png","error":false});
+            model_details.append({"detail":qsTr("조이스틱이 연결되었습니다"),"icon":"icon/icon_joy_connect.png","error":false});
         }
         if(is_con_server){
-            model_details.append({"detail":"서버에 연결되었습니다.","icon":"icon/icon_server_connect.png","error":false});
+            model_details.append({"detail":qsTr("서버에 연결되었습니다"),"icon":"icon/icon_server_connect.png","error":false});
         }
         if(!is_con_robot){
-            model_details.append({"detail":"로봇과 연결되지 않았습니다.","icon":"icon/icon_lcm_discon.png","error":true});
+            model_details.append({"detail":qsTr("로봇과 연결되지 않았습니다"),"icon":"icon/icon_lcm_discon.png","error":true});
         }
         if(is_motor_error){
-            model_details.append({"detail":"모터에 에러가 발생했습니다.","icon":"icon/icon_motor_error.png","error":true});
+            model_details.append({"detail":qsTr("모터초기화가 필요합니다"),"icon":"icon/icon_motor_error.png","error":true});
         }
         if(is_local_not_ready){
-            model_details.append({"detail":"로봇 위치 초기화가 필요합니다.","icon":"icon/icon_local_error.png","error":true});
+            model_details.append({"detail":qsTr("로봇 위치 초기화가 필요합니다"),"icon":"icon/icon_local_error.png","error":true});
         }
         if(is_motor_power){
-            model_details.append({"detail":"모터에 전원이 인가되었습니다.","icon":"icon/motor_power_on.png","error":false});
+            model_details.append({"detail":qsTr("모터전원이 정상입니다"),"icon":"icon/motor_power_on.png","error":false});
         }else{
-            model_details.append({"detail":"모터에 전원이 인가되지 않았습니다.","icon":"icon/motor_power_off.png","error":true});
+            model_details.append({"detail":qsTr("모터전원을 켜주세요"),"icon":"icon/motor_power_off.png","error":true});
         }
 
         if(is_emergency){
-            model_details.append({"detail":"비상스위치가 눌렸습니다.","icon":"icon/icon_emergency.png","error":true});
+            model_details.append({"detail":qsTr("비상스위치가 눌렸습니다"),"icon":"icon/icon_emergency.png","error":true});
         }
         if(is_motor_hot){
-            model_details.append({"detail":"모터가 기준치 이상 뜨겁습니다.","icon":"icon/icon_lcm_discon.png","error":true});
+            model_details.append({"detail":qsTr("모터가 뜨겁습니다"),"icon":"icon/icon_lcm_discon.png","error":true});
         }
         if(robot_battery < 30 && is_con_robot){
-            model_details.append({"detail":"배터리가 부족합니다.","icon":"icon/bat_1.png","error":true});
+            model_details.append({"detail":qsTr("배터리가 부족합니다"),"icon":"icon/bat_1.png","error":true});
         }
     }
 

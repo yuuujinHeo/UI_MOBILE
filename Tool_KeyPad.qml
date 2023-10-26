@@ -57,7 +57,7 @@ Popup {
                 font.family: font_noto_r.name
                 font.pixelSize: 16
                 color: "white"
-                text: "숫자키를 사용해 입력하세요."
+                text: "숫자키를 사용해 입력하세요"
             }
 
             Column{
@@ -180,13 +180,11 @@ Popup {
                             anchors.fill: parent
                             onClicked:{
                                 emitter.keyPressed(owner,".");
-
                             }
                         }
                     }
                 }
             }
-
         }
     }
 }

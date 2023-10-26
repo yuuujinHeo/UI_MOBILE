@@ -78,14 +78,14 @@ Item {
                 anchors.topMargin: 120
                 spacing: 30
                 Text{
-                    text: "맵 생성을 시작합니다."
+                    text: "맵 생성을 시작합니다"
                     color: "white"
                     font.pixelSize: 80
                     font.family: font_noto_b.name
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
                 Text{
-                    text: "매장환경을 정돈하신 후 가급적 테이블의 이동을 삼가 해주시기 바랍니다.\n지금부터 로봇을 밀며 이동할 수 있습니다."
+                    text: "매장환경을 정돈하신 후 가급적 테이블의 이동을 삼가 해주시기 바랍니다\n지금부터 로봇을 밀며 이동할 수 있습니다"
                     color: "white"
                     font.pixelSize: 30
                     horizontalAlignment: Text.AlignHCenter
@@ -116,8 +116,8 @@ Item {
                     onClicked:{
                         click_sound.play();
                         popup_help.setTitle("맵 생성");
-                        popup_help.addTip("맵 생성이 무엇인가요?","로봇을 처음 세팅하거나 매장의 환경이 많이 바뀌었을 때 매장의 지도를 다시 그려야 합니다.\n맵을 생성하고 저장하면 기존의 데이터는 더 이상 사용하지 않으며 새로 세팅해야 합니다.\n맵을 그린 뒤 각각의 서빙, 충전 위치 등을 지정하고 이동경로를 학습하려면 [시작] 버튼을 누르세요.");
-                        popup_help.addTip("맵 생성을 했다가 다시 되돌릴 수 있나요?","맵을 저장하지 않으면 기존 데이터를 덮어쓰지 않습니다.\n만일 맵을 저장했다 하더라도 기존에 저장된 맵과 서빙포인트를 되살리고 싶다면 맵 설정 페이지에서 맵 불러오기를 실행하세요");
+                        popup_help.addTip("맵 생성이 무엇인가요?","로봇을 처음 세팅하거나 매장의 환경이 많이 바뀌었을 때 매장의 지도를 다시 그려야 합니다\n맵을 생성하고 저장하면 기존의 데이터는 더 이상 사용하지 않으며 새로 세팅해야 합니다\n맵을 그린 뒤 각각의 서빙, 충전 위치 등을 지정하고 이동경로를 학습하려면 [시작] 버튼을 누르세요");
+                        popup_help.addTip("맵 생성을 했다가 다시 되돌릴 수 있나요?","맵을 저장하지 않으면 기존 데이터를 덮어쓰지 않습니다\n만일 맵을 저장했다 하더라도 기존에 저장된 맵과 서빙포인트를 되살리고 싶다면 맵 설정 페이지에서 맵 불러오기를 실행하세요");
                         popup_help.open();
                     }
                 }
@@ -308,7 +308,7 @@ Item {
                             font.family: font_noto_r.name
                             font.pixelSize: 15
                             color: "white"
-                            text: "맵의 크기가 커질 수록 이동을 시작할 때나 맵을 그릴 때 느려질 수 있습니다."
+                            text: "맵의 크기가 커질 수록 이동을 시작할 때나 맵을 그릴 때 느려질 수 있습니다"
                         }
                     }
                     Slider{
@@ -340,7 +340,7 @@ Item {
                             font.family: font_noto_r.name
                             font.pixelSize: 15
                             color: "white"
-                            text: "픽셀크기가 작을 수록 정밀한 로봇 이동이 가능합니다."
+                            text: "픽셀크기가 작을 수록 정밀한 로봇 이동이 가능합니다"
                         }
                     }
 
@@ -627,9 +627,9 @@ Item {
                     onClicked:{
                         click_sound.play();
                         popup_help.setTitle("맵 생성");
-                        popup_help.addTip("맵을 새로 그리고 싶어요","[취소] 버튼을 누르고 새로 시작해 주세요.");
-                        popup_help.addTip("맵이 틀어진 것 같아요","맵을 그리다보면 간혹 기존 맵과 일치하지 않게 틀어진 맵이 추가로 그려질 수 있습니다.\n이때 틀어졌다고 판단되는 구간에서 잠시 정지하여 기다려주세요.\n로봇은 주기적으로 맵의 오차를 계산하고 이를 복구하기 위해 노력합니다.");
-                        popup_help.addTip("맵이 끝에서 잘립니다","맵 생성이 가능한 사이즈는 정해져있습니다.\n맵을 그리기 시작할 때 로봇의 위치는 맵의 중심좌표가 됩니다\n로봇을 맵의 중앙에 가깝게 이동시켜주신뒤 새로 그려주세요.\n");
+                        popup_help.addTip("맵을 새로 그리고 싶어요","[취소] 버튼을 누르고 새로 시작해 주세요");
+                        popup_help.addTip("맵이 틀어진 것 같아요","맵을 그리다보면 간혹 기존 맵과 일치하지 않게 틀어진 맵이 추가로 그려질 수 있습니다\n이때 틀어졌다고 판단되는 구간에서 잠시 정지하여 기다려주세요\n로봇은 주기적으로 맵의 오차를 계산하고 이를 복구하기 위해 노력합니다");
+                        popup_help.addTip("맵이 끝에서 잘립니다","맵 생성이 가능한 사이즈는 정해져있습니다\n맵을 그리기 시작할 때 로봇의 위치는 맵의 중심좌표가 됩니다\n로봇을 맵의 중앙에 가깝게 이동시켜주신뒤 새로 그려주세요\n");
                         popup_help.open();
                     }
                 }
@@ -761,14 +761,14 @@ Item {
                     }
                 }
                 Text{
-                    text: "맵 생성을 완료하였습니다."
+                    text: "맵 생성을 완료하였습니다"
                     color: "white"
                     font.pixelSize: 60
                     font.family: font_noto_b.name
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
                 Text{
-                    text: "다음으로 맵 설정을 진행합니다."
+                    text: "다음으로 맵 설정을 진행합니다"
                     color: "white"
                     font.pixelSize: 60
                     font.family: font_noto_b.name

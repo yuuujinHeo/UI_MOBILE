@@ -72,7 +72,9 @@ ExtProcess::ExtProcess(QObject *parent)
 
     command_list.clear();
     program = new QProcess();
-    program->start(QDir::homePath()+"/start_extproc.sh");
+    program->setWorkingDirectory(QDir::homePath());
+    program->start("xterm ./start_extproc.sh");
+//    program->start(QDir::homePath()+"/start_extproc.sh");
 
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
@@ -87,6 +89,8 @@ ExtProcess::~ExtProcess(){
     shm_command.detach();
     shm_return.detach();
     shm_wifilist.detach();
+    proc->kill();
+    proc->close();
 }
 
 void ExtProcess::setSetting(QString name, QString value){
@@ -319,7 +323,7 @@ void ExtProcess::git_pull(){
     }else{
         memcpy(temp.params,QApplication::applicationDirPath().toUtf8(),100);
     }
-    set_command(temp,"Git PUll");
+    set_command(temp,"Git Pull");
 }
 void ExtProcess::git_reset(){
     Command temp;

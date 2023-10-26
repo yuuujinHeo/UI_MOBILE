@@ -47,6 +47,7 @@ Item{
             fontcolor = color_dark_navy;
         }else if(type == "circle_text"){
             cur_rect = circle_text
+            visible=false;
         }else if(type == "round_text"){
             cur_rect = round_text
         }else if(type == "circle_image"){

@@ -24,6 +24,7 @@ Item {
         init_mode = 0;
         update_timer.start();
         supervisor.clearSharedMemory();
+        supervisor.setUiState(1);
 //        supervisor.checkUpdate();
     }
 
@@ -115,7 +116,7 @@ Item {
                     color: "#7e7e7e"
                     anchors.horizontalCenter: parent.horizontalCenter
                     horizontalAlignment: Text.AlignHCenter
-                    text: "새로운 업데이트가 있습니다"
+                    text: qsTr("새로운 업데이트가 있습니다")
                     font.pixelSize: 60
                 }
                 Text{
@@ -123,7 +124,7 @@ Item {
                     color: "#7e7e7e"
                     anchors.horizontalCenter: parent.horizontalCenter
                     horizontalAlignment: Text.AlignHCenter
-                    text: "업데이트를 진행하면 프로그램이 재시작됩니다"
+                    text: qsTr("업데이트를 진행하면 프로그램이 재시작됩니다")
                     font.pixelSize: 40
                 }
             }
@@ -137,13 +138,13 @@ Item {
                 Text{
                     font.family: font_noto_r.name
                     color: "#7e7e7e"
-                    text: "최신 버전 : "+supervisor.getProgramUpdateVersion()
+                    text: qsTr("최신 버전 : ")+supervisor.getProgramUpdateVersion()
                     font.pixelSize: 20
                 }
                 Text{
                     font.family: font_noto_r.name
                     color: "#7e7e7e"
-                    text: "현재 버전 : "+supervisor.getProgramVersion()
+                    text: qsTr("현재 버전 : ")+supervisor.getProgramVersion()
                     font.pixelSize: 20
                 }
             }
@@ -191,7 +192,7 @@ Item {
                             }
                         }
                         Text{
-                            text: "업데이트"
+                            text: qsTr("업데이트")
                             anchors.verticalCenter: parent.verticalCenter
                             color: "white"
                             font.family: font_noto_r.name
@@ -237,7 +238,7 @@ Item {
                         }
                         Text{
                             id: text_slam_pass
-                            text: "넘어가기"
+                            text: qsTr("넘어가기")
                             color: color_navy
                             font.family: font_noto_r.name
                             font.pixelSize: 30
@@ -285,7 +286,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenterOffset: -100
-                text: "로봇과 연결이 되지 않습니다.\n재시작 후에도 연결이 되지 않으면 로봇을 재부팅해주세요."
+                text: qsTr("로봇과 연결이 되지 않습니다\n재시작 후에도 연결이 되지 않으면 로봇을 재부팅해주세요")
                 font.pixelSize: 40
             }
 
@@ -316,7 +317,7 @@ Item {
                             }
                         }
                         Text{
-                            text: "재시작"
+                            text: qsTr("재시작")
                             anchors.verticalCenter: parent.verticalCenter
                             color: "white"
                             font.family: font_noto_r.name
@@ -363,7 +364,7 @@ Item {
                         }
                         Text{
                             id: text_slam_pass
-                            text: "넘어가기"
+                            text: qsTr("넘어가기")
                             color: color_navy
                             font.family: font_noto_r.name
                             font.pixelSize: 30
@@ -527,13 +528,13 @@ Item {
                                 anchors.bottom: parent.bottom
                                 anchors.bottomMargin: 30
                                 Text{
-                                    text: "로봇이 처음 시작된 것 같습니다.";
+                                    text: qsTr("로봇이 처음 시작된 것 같습니다")
                                     color: color_dark_black
                                     font.pixelSize: 40
                                     font.family: font_noto_b.name
                                 }
                                 Text{
-                                    text: "<font color=\"#12d27c\">첫 실행 마법사</font>를 시작할까요?";
+                                    text: qsTr("<font color=\"#12d27c\">첫 실행 마법사</font>를 시작할까요?");
                                     color: color_dark_black
                                     font.pixelSize: 50
                                     font.family: font_noto_b.name
@@ -553,7 +554,7 @@ Item {
                                 enabled: supervisor.getusbsize()>0?true:false
                                 color: "transparent"
                                 Text{
-                                    text: "USB에서 가져오기"
+                                    text: qsTr("USB에서 가져오기")
                                     font.pixelSize: 23
                                     font.family: font_noto_r.name
                                     color:btn_usb_load.enabled?color_dark_black:color_gray
@@ -576,7 +577,7 @@ Item {
                                 color: color_green
                                 Text{
                                     anchors.centerIn: parent
-                                    text: "시작"
+                                    text: qsTr("시작")
                                     font.pixelSize: 35
                                     font.family: font_noto_r.name
                                     color: "white"
@@ -611,7 +612,7 @@ Item {
                                     }
                                     Text{
                                         id: text_slam_pass
-                                        text: "넘어가기 (DEBUG)"
+                                        text: qsTr("넘어가기 (DEBUG)")
                                         font.family: font_noto_r.name
                                         font.pixelSize: 15
                                     }
@@ -641,7 +642,7 @@ Item {
                         anchors.centerIn: parent
                         spacing:80
                         Text{
-                            text: "이 로봇은 어떤 목적으로 사용됩니까?";
+                            text: qsTr("이 로봇은 어떤 목적으로 사용됩니까?");
                             color: color_dark_black
                             anchors.horizontalCenter: parent.horizontalCenter
                             font.pixelSize: 50
@@ -659,7 +660,7 @@ Item {
                                 border.color : color_green
                                 Text{
                                     anchors.centerIn: parent
-                                    text: "서빙용"
+                                    text: qsTr("서빙용")
                                     font.pixelSize: 35
                                     font.family: font_noto_r.name
                                     color: color_dark_black
@@ -683,7 +684,7 @@ Item {
                                 border.color : color_green
                                 Text{
                                     anchors.centerIn: parent
-                                    text: "호출용"
+                                    text: qsTr("호출용")
                                     font.pixelSize: 35
                                     font.family: font_noto_r.name
                                     color: color_dark_black
@@ -707,7 +708,7 @@ Item {
                                 border.color : color_green
                                 Text{
                                     anchors.centerIn: parent
-                                    text: "서빙+호출용"
+                                    text: qsTr("서빙+호출용")
                                     font.pixelSize: 35
                                     font.family: font_noto_r.name
                                     color: color_dark_black
@@ -742,7 +743,7 @@ Item {
                             spacing: 40
                             anchors.horizontalCenter: parent.horizontalCenter
                             Text{
-                                text: "로봇의 이름"
+                                text: qsTr("로봇의 이름")
                                 color: color_dark_black
                                 font.pixelSize: 30
                                 font.family: font_noto_b.name
@@ -779,7 +780,7 @@ Item {
                                 }
                             }
                             Text{
-                                text: "로봇의 번호"
+                                text: qsTr("로봇의 번호")
                                 color: color_dark_black
                                 font.pixelSize: 30
                                 font.family: font_noto_b.name
@@ -843,7 +844,7 @@ Item {
                         border.color: color_green
                         Text{
                             anchors.centerIn: parent
-                            text: "이전"
+                            text: qsTr("이전")
                             font.pixelSize: 35
                             font.family: font_noto_r.name
                             color: color_dark_black
@@ -868,7 +869,7 @@ Item {
                         anchors.rightMargin: 50
                         Text{
                             anchors.centerIn: parent
-                            text: "다음"
+                            text: qsTr("다음")
                             font.pixelSize: 35
                             font.family: font_noto_r.name
                             color: "white"
@@ -963,7 +964,7 @@ Item {
                             color: color_dark_black
                             font.family: font_noto_r.name
                             font.pixelSize: 40
-                            text: "카메라의 왼/오른쪽(로봇 기준)이 일치하도록 위치를 지정해주세요."
+                            text: qsTr("카메라의 왼/오른쪽(로봇 기준)이 일치하도록 위치를 지정해주세요")
                         }
                         Rectangle{
                             width: 1280
@@ -977,7 +978,7 @@ Item {
                                     spacing: 30
                                     Text{
                                         id: text_left
-                                        text: "왼쪽"
+                                        text: qsTr("왼쪽")
                                         color: "white"
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         font.family: font_noto_b.name
@@ -1037,7 +1038,7 @@ Item {
                                         }
                                         Text{
                                             anchors.verticalCenter: parent.verticalCenter
-                                            text: "위치\n바꾸기"
+                                            text: qsTr("위치\n바꾸기")
                                             color: "white"
                                             horizontalAlignment: Text.AlignHCenter
                                             font.family: font_noto_r.name
@@ -1071,7 +1072,7 @@ Item {
                                     spacing: 20
                                     Text{
                                         id: text_right
-                                        text: "오른쪽"
+                                        text: qsTr("오른쪽")
                                         color: "white"
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         font.family: font_noto_b.name
@@ -1128,7 +1129,7 @@ Item {
                             color: "white"
                             horizontalAlignment: Text.AlignHCenter
                             font.family: font_noto_b.name
-                            text: "카메라를 찾을 수 없습니다.\n건너뛰기를 누르시면 로봇이 제대로 동작하지 않으며, 계속 이 페이지가 뜹니다."
+                            text: qsTr("카메라를 찾을 수 없습니다\n건너뛰기를 누르시면 로봇이 제대로 동작하지 않으며, 계속 이 페이지가 뜹니다")
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Row{
@@ -1144,7 +1145,7 @@ Item {
                                     anchors.centerIn: parent
                                     font.family: font_noto_r.name
                                     font.pixelSize: 20
-                                    text: "건너뛰기"
+                                    text: qsTr("건너뛰기")
 
                                 }
                                 MouseArea{
@@ -1172,7 +1173,7 @@ Item {
                         border.color: color_green
                         Text{
                             anchors.centerIn: parent
-                            text: "이전"
+                            text: qsTr("이전")
                             font.pixelSize: 35
                             font.family: font_noto_r.name
                             color: color_dark_black
@@ -1197,7 +1198,7 @@ Item {
                         anchors.rightMargin: 50
                         Text{
                             anchors.centerIn: parent
-                            text: "다음"
+                            text: qsTr("다음")
                             font.pixelSize: 35
                             font.family: font_noto_r.name
                             color: "white"
@@ -1280,7 +1281,7 @@ Item {
                             color: color_dark_black
                             font.family: font_noto_r.name
                             font.pixelSize: 40
-                            text: "무선 WIFI를 설정해주세요."
+                            text: qsTr("무선 WIFI를 설정해주세요")
                         }
                         Rectangle{
                             width: 800
@@ -1316,7 +1317,7 @@ Item {
                                                 }
                                                 Text{
                                                     font.family: font_noto_r.name
-                                                    text: "(사용중)"
+                                                    text: qsTr("(사용중)")
                                                     color: color_red
                                                     visible: inuse
                                                     font.pixelSize: 15
@@ -1448,7 +1449,7 @@ Item {
                                 color: color_dark_black
                                 font.family: font_noto_r.name
                                 font.pixelSize: 15
-                                text: "(사용 가능한 WIFI를 찾고 있습니다.)"
+                                text: qsTr("(사용 가능한 WIFI를 찾고 있습니다.)")
                             }
                         }
                     }
@@ -1464,7 +1465,7 @@ Item {
                             color: color_dark_black
                             font.family: font_noto_r.name
                             font.pixelSize: 40
-                            text: "무선 WIFI에 연결합니다."
+                            text: qsTr("무선 WIFI에 연결합니다")
                         }
                         Rectangle{
                             width: 800
@@ -1486,7 +1487,7 @@ Item {
                                     }
                                     Text{
                                         font.family: font_noto_r.name
-                                        text: "(사용중)"
+                                        text: qsTr("(사용중)")
                                         color: color_red
                                         visible: wizard_ip.select_inuse
                                         font.pixelSize: 15
@@ -1621,14 +1622,14 @@ Item {
                                         anchors.centerIn: parent
                                         font.family: font_noto_r.name
                                         color:wizard_ip.connection===0?"black":"white"
-                                        text:wizard_ip.connection===0?"연결 안됨":wizard_ip.connection===1?"연결 중":"연결 성공"
+                                        text:wizard_ip.connection===0?qsTr("연결 안됨"):wizard_ip.connection===1?qsTr("연결 중"):qsTr("연결 성공")
                                         font.pixelSize: 20
                                     }
                                 }
                                 Text{
                                     visible: !wizard_ip.connection&&wizard_ip.select_security
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    text: "비밀번호를 입력해주세요."
+                                    text: qsTr("비밀번호를 입력해주세요")
                                     font.family: font_noto_r.name
                                     font.pixelSize: 20
                                 }
@@ -1644,7 +1645,7 @@ Item {
                                             id: text_wifi76788
                                             visible: false
                                             anchors.horizontalCenter: parent.horizontalCenter
-                                            text: "비밀번호가 틀렸습니다."
+                                            text: qsTr("비밀번호가 틀렸습니다")
                                             color: color_red
                                             font.family: font_noto_r.name
                                             font.pixelSize: 17
@@ -1708,7 +1709,7 @@ Item {
                                     color: "black"
                                     Text{
                                         anchors.centerIn: parent
-                                        text: "연결"
+                                        text: qsTr("연결")
                                         font.pixelSize: 35
                                         font.family: font_noto_r.name
                                         color: "white"
@@ -1748,7 +1749,7 @@ Item {
                             color: color_dark_black
                             font.family: font_noto_r.name
                             font.pixelSize: 40
-                            text: "무선 WIFI의 IP를 세팅합니다."
+                            text: qsTr("무선 WIFI의 IP를 세팅합니다")
                         }
                         Rectangle{
                             width: 800
@@ -2279,7 +2280,7 @@ Item {
                                         border.width: 1
                                         Text{
                                             anchors.centerIn: parent
-                                            text: "초기화"
+                                            text: qsTr("초기화")
                                             font.pixelSize: 35
                                             font.family: font_noto_r.name
                                         }
@@ -2302,7 +2303,7 @@ Item {
                                         color: "black"
                                         Text{
                                             anchors.centerIn: parent
-                                            text: "변경"
+                                            text: qsTr("변경")
                                             font.pixelSize: 35
                                             font.family: font_noto_r.name
                                             color: "white"
@@ -2354,7 +2355,7 @@ Item {
                         border.color: color_green
                         Text{
                             anchors.centerIn: parent
-                            text: "이전"
+                            text: qsTr("이전")
                             font.pixelSize: 35
                             font.family: font_noto_r.name
                             color: color_dark_black
@@ -2386,7 +2387,7 @@ Item {
                         anchors.rightMargin: 50 + 230 + 20
                         Text{
                             anchors.centerIn: parent
-                            text: "건너뛰기"
+                            text: qsTr("건너뛰기")
                             font.pixelSize: 35
                             font.family: font_noto_r.name
                         }
@@ -2421,7 +2422,7 @@ Item {
                         anchors.rightMargin: 50
                         Text{
                             anchors.centerIn: parent
-                            text: wizard_ip.setting_step < 2 ?"다음":"설정 완료"
+                            text: wizard_ip.setting_step < 2 ?qsTr("다음"):qsTr("설정 완료")
                             font.pixelSize: 35
                             font.family: font_noto_r.name
                             color: "white"
@@ -2484,7 +2485,7 @@ Item {
 
                     Text{
                         id: tnke
-                        text: "초기 세팅이 완료되었습니다.";
+                        text: qsTr("초기 세팅이 완료되었습니다")
                         anchors.centerIn: parent
                         color: color_dark_black
                         font.pixelSize: 50
@@ -2565,7 +2566,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenterOffset: -100
-                text: "맵 파일을 찾을 수 없습니다.";
+                text: qsTr("맵 파일을 찾을 수 없습니다")
                 font.pixelSize: 40
             }
 
@@ -2595,7 +2596,7 @@ Item {
                             }
                         }
                         Text{
-                            text: "맵 새로만들기"
+                            text: qsTr("맵 새로만들기")
                             Component.onCompleted: {
                                 scale = 1;
                                 while(width*scale > 200){
@@ -2642,7 +2643,7 @@ Item {
                             }
                         }
                         Text{
-                            text: "맵 불러오기"
+                            text: qsTr("맵 불러오기")
                             Component.onCompleted: {
                                 scale = 1;
                                 while(width*scale > 200){
@@ -2700,7 +2701,7 @@ Item {
                             }
                             color: "white"
                             anchors.horizontalCenter: parent.horizontalCenter
-                            text: "USB에서 가져오기"
+                            text: qsTr("USB에서 가져오기")
                             font.family: font_noto_r.name
                             font.pixelSize: 30
                         }
@@ -2743,7 +2744,7 @@ Item {
                             }
                         }
                         Text{
-                            text: "넘어가기"
+                            text: qsTr("넘어가기")
                             color: color_navy
                             anchors.horizontalCenter: parent.horizontalCenter
                             font.family: font_noto_r.name
@@ -2822,7 +2823,7 @@ Item {
                     anchors.rightMargin: 10 + 20
                     color: "#E7584D"
                     font.family: font_noto_b.name
-                    text: "설정중이던 맵이 있습니다."
+                    text: qsTr("설정중이던 맵이 있습니다")
                     font.bold: true
                     font.pixelSize: 15
                 }
@@ -2868,7 +2869,7 @@ Item {
                     anchors.rightMargin: 10 + 20
                     color: "#E7584D"
                     font.family: font_noto_b.name
-                    text: "사용가능한 맵이 있습니다."
+                    text: qsTr("사용가능한 맵이 있습니다")
                     font.bold: true
                     font.pixelSize: 12
                 }
@@ -3006,7 +3007,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     color: color_dark_gray
                     font.family: font_noto_b.name
-                    text: "로봇을 지정된 대기위치로 이동시켜 주세요.\n이동하신 후 시작버튼을 눌러주세요."
+                    text: qsTr("로봇을 지정된 대기위치로 이동시켜 주세요\n이동하신 후 시작버튼을 눌러주세요")
                     font.pixelSize: 50
                 }
                 Rectangle{
@@ -3022,7 +3023,7 @@ Item {
                     Text{
                         id: text_slam_do_init
                         anchors.centerIn: parent
-                        text: "시   작"
+                        text: qsTr("시   작")
                         color: "white"
                         font.family: font_noto_r.name
                         font.pixelSize: 40
@@ -3073,7 +3074,7 @@ Item {
                         }
                         Text{
                             id: text_slam_pass
-                            text: "맵 새로만들기"
+                            text: qsTr("맵 새로만들기")
                             font.family: font_noto_r.name
                             font.pixelSize: 15
                         }
@@ -3110,7 +3111,7 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Text{
-                            text: "넘어가기 (DEBUG)"
+                            text: qsTr("넘어가기 (DEBUG)")
                             font.family: font_noto_r.name
                             font.pixelSize: 15
                         }
@@ -3155,7 +3156,7 @@ Item {
                 color: color_navy
                 Text{
                     id: text_finding
-                    text: "로봇의 위치를 찾고 있습니다."
+                    text: qsTr("로봇의 위치를 찾고 있습니다")
                     color: "white"
                     opacity: 0
                     Behavior on opacity {
@@ -3178,7 +3179,7 @@ Item {
                 anchors.bottom: parent.bottom
                 color: color_navy
                 Text{
-                    text:"로봇의 위치를 찾았습니다. 로봇의 위치가 정확합니까?"
+                    text:qsTr("로봇의 위치를 찾았습니다. 로봇의 위치가 정확합니까?")
                     font.pixelSize: 40
                     horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -3193,7 +3194,7 @@ Item {
                     width: 200
                     height: 80
                     type: "round_text"
-                    text: "일치 합니다"
+                    text:qsTr("일치 합니다")
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right
                     anchors.bottomMargin: 50
@@ -3211,7 +3212,7 @@ Item {
                     width: 200
                     height: 80
                     type: "round_text"
-                    text: "틀립니다.\n(수동초기화)"
+                    text: qsTr("틀립니다.\n(수동초기화)")
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.bottomMargin: 50
@@ -3232,7 +3233,7 @@ Item {
                 anchors.bottom: parent.bottom
                 color: color_navy
                 Text{
-                    text:"로봇의 위치를 찾을 수 없습니다. 로봇의 위치를 맵 상에서 표시해주세요."
+                    text:qsTr("로봇의 위치를 찾을 수 없습니다 로봇의 위치를 맵 상에서 표시해주세요")
                     font.pixelSize: 30
                     horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -3246,7 +3247,7 @@ Item {
                     width: 200
                     height: 80
                     type: "round_text"
-                    text: "일치 합니다"
+                    text: qsTr("일치 합니다")
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right
                     anchors.bottomMargin: 50
@@ -3270,7 +3271,7 @@ Item {
                         height: 80
                         type: "round_text"
                         selected: map.tool==="move"
-                        text: "이 동"
+                        text: qsTr("이 동")
                         onClicked: {
                             click_sound.play();
                             map.setTool("move");
@@ -3281,7 +3282,7 @@ Item {
                         height: 80
                         type: "round_text"
                         selected: map.tool==="slam_init"
-                        text:  "수동 지정"
+                        text:  qsTr("수동 지정")
                         onClicked: {
                             click_sound.play();
                             map.setTool("slam_init");
@@ -3293,7 +3294,7 @@ Item {
                         width: 200
                         height: 80
                         type: "round_text"
-                        text:  "다시 시도"
+                        text:  qsTr("다시 시도")
                         onClicked: {
                             click_sound.play();
                             map.setTool("move");
@@ -3307,7 +3308,7 @@ Item {
                         height: 100
                         running: false
                         type: "start_progress"
-                        text: "자동위치찾기\n(1분소요)"
+                        text: qsTr("자동위치찾기\n(1분소요)")
                         shadowcolor: color_dark_black
                         onClicked: {
                             click_sound.play();
@@ -3327,7 +3328,7 @@ Item {
                 color: color_navy
                 Text{
                     id: text_failed_connection
-                    text: "로봇과 연결이 되지 않았습니다."
+                    text: qsTr("로봇과 연결이 되지 않았습니다")
                     color: "white"
                     font.pixelSize: 60
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -3341,7 +3342,7 @@ Item {
                     width: 200
                     height: 80
                     type: "round_text"
-                    text: "프로그램 다시시작"
+                    text: qsTr("프로그램 다시시작")
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right
                     anchors.bottomMargin: 50
@@ -3428,7 +3429,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 color: color_dark_gray
                 font.family: font_noto_b.name
-                text: "모터가 초기화되지 않았습니다.\n비상 스위치를 눌렀다가 풀어주세요."
+                text: qsTr("모터가 초기화되지 않았습니다.\n비상 스위치를 눌렀다가 풀어주세요.")
                 font.pixelSize: 50
             }
             Rectangle{
@@ -3455,7 +3456,7 @@ Item {
                     }
                     Text{
                         id: text_slam_pass
-                        text: "넘어가기 (DEBUG)"
+                        text: qsTr("넘어가기 (DEBUG)")
                         font.family: font_noto_r.name
                         font.pixelSize: 15
                     }
@@ -3601,9 +3602,9 @@ Item {
                     color: "white"
                     text: {
                         if(popup_usb_download.index === 0)
-                            "가져오실 파일 목록을 선택해주세요."
+                            qsTr("가져오실 파일 목록을 선택해주세요")
                         else if(popup_usb_download.index === 1)
-                            "가져오실 목록을 선택해주세요."
+                            qsTr("가져오실 목록을 선택해주세요")
                     }
                 }
             }
@@ -3619,7 +3620,7 @@ Item {
                     color: color_navy
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
-                        text: "가장 최신 파일"
+                        text: qsTr("가장 최신 파일")
                         anchors.centerIn: parent
                         font.family: font_noto_r.name
                         font.pixelSize: 15
@@ -3653,7 +3654,7 @@ Item {
                         anchors.centerIn: parent
                         font.family: font_noto_r.name
                         font.pixelSize: 15
-                        text: "확인"
+                        text: qsTr("확인")
                     }
                     MouseArea{
                         anchors.fill: parent
@@ -3673,7 +3674,7 @@ Item {
                     color: color_navy
                     anchors.horizontalCenter: parent.horizontalCenter
                     Text{
-                        text: "그 외 발견한 파일 목록"
+                        text: qsTr("그 외 발견한 파일 목록")
                         anchors.centerIn: parent
                         font.family: font_noto_r.name
                         font.pixelSize: 15
@@ -3818,7 +3819,7 @@ Item {
                     font.family: font_noto_r.name
                     font.pixelSize: 15
                     color:"white"
-                    text: "확인"
+                    text: qsTr("확인")
                 }
                 MouseArea{
                     anchors.fill: parent
@@ -3894,23 +3895,23 @@ Item {
                 }
                 if(supervisor.getzipstate() === 1){
                     if(popup_usb_notice.mode== "compress"){
-                        text_usb_state.text = "파일을 압축하여 저장 중..";
+                        text_usb_state.text = qsTr("파일을 압축하여 저장 중..");
                     }else{
-                        text_usb_state.text = "파일을 가져오는 중..";
+                        text_usb_state.text = qsTr("파일을 가져오는 중..");
                     }
                 }else if(supervisor.getzipstate() === 2){
                     if(popup_usb_notice.mode== "compress"){
-                        text_usb_state.text = "저장에 성공하였습니다.";
+                        text_usb_state.text = qsTr("저장에 성공하였습니다");
                     }else{
                         btn_usb_confirm.visible = true;
-                        text_usb_state.text = "파일을 성공적으로 가져왔습니다.\n확인을 누르시면 업데이트를 진행합니다.";
+                        text_usb_state.text = qsTr("파일을 성공적으로 가져왔습니다\n확인을 누르시면 업데이트를 진행합니다");
                     }
 
                 }else if(supervisor.getzipstate() === 3){
                     if(popup_usb_notice.mode== "compress"){
-                        text_usb_state.text = "저장에 성공하였지만 일부 과정에서 에러가 발생했습니다.";
+                        text_usb_state.text = qsTr("저장에 성공하였지만 일부 과정에서 에러가 발생했습니다");
                     }else{
-                        text_usb_state.text = "파일을 성공적으로 가져왔습니다만 일부 과정에서 에러가 발생했습니다.\n확인을 누르시면 업데이트를 진행합니다.";
+                        text_usb_state.text = qsTr("파일을 성공적으로 가져왔습니다만 일부 과정에서 에러가 발생했습니다\n확인을 누르시면 업데이트를 진행합니다");
                         btn_usb_confirm.visible = true;
                     }
                     model_usb_error.clear();
@@ -3919,9 +3920,9 @@ Item {
                     }
                 }else if(supervisor.getzipstate() === 4){
                     if(popup_usb_notice.mode== "compress"){
-                        text_usb_state.text = "저장에 실패했습니다.";
+                        text_usb_state.text = qsTr("저장에 실패했습니다");
                     }else{
-                        text_usb_state.text = "파일을 가져오지 못했습니다.";
+                        text_usb_state.text = qsTr("파일을 가져오지 못했습니다");
                     }
                     model_usb_error.clear();
                     for(var i=0; i<supervisor.getusberrorsize(); i++){
@@ -3929,7 +3930,7 @@ Item {
                     }
                 }else{
                     print(supervisor.getzipstate());
-                    text_usb_state.text = "잠시만 기다려주세요.";
+                    text_usb_state.text = qsTr("잠시만 기다려주세요");
                 }
             }
         }
@@ -3937,7 +3938,7 @@ Item {
             timer_usb_check.start();
             model_usb_error.clear();
             btn_usb_confirm.visible = false;
-            text_usb_state.text = "잠시만 기다려주세요.";
+            text_usb_state.text = qsTr("잠시만 기다려주세요");
             is_new = true;
         }
         onClosed: {
@@ -3958,7 +3959,7 @@ Item {
                     color: "white"
                     font.pixelSize: 20
                     horizontalAlignment: Text.AlignHCenter
-                    text:"잠시만 기다려주세요."
+                    text:qsTr("잠시만 기다려주세요")
                 }
                 Repeater{
                     model: ListModel{id:model_usb_error}

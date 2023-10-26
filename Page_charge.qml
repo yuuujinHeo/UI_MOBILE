@@ -19,7 +19,7 @@ Item {
     onBatteryChanged: {
         if(battery == 100){
             timer_bat.stop();
-            text_mention.text = "충전이 완료되었습니다."
+            text_mention.text = qsTr("충전이 완료되었습니다")
             image_battery.source =  "image/battery_full.png"
         }
     }
@@ -46,7 +46,7 @@ Item {
             image_battery.source = "image/battery_1.png"
         }
         timer_bat.stop();
-        text_mention.text = "충전 케이블을 연결해 주세요."
+        text_mention.text = qsTr("충전 케이블을 연결해 주세요")
     }
 
     Rectangle{
@@ -84,7 +84,7 @@ Item {
                     voice_charging.play();
                     is_charging = true;
                 }
-                text_mention.text = "충전 중입니다."
+                text_mention.text = qsTr("충전 중입니다")
             }else{
                 if(is_charging){
                     init();
@@ -101,22 +101,22 @@ Item {
 
             if(popup_question.visible){
                 if(supervisor.getIPCConnection() && supervisor.getStateMoving() !== 0){
-                    text_quest.text = "대기 장소로 이동<font color=\"white\">하시겠습니까?</font>";
+                    text_quest.text = qsTr("대기 장소로 이동<font color=\"white\">하시겠습니까?</font>")
                     btn_yes.visible = true;
                     btn_no.visible = true;
                     area_cancel3.enabled = false;
                 }else if(supervisor.getChargeStatus()){
-                    text_quest.text = "충전 케이블을 분리해주세요.";
+                    text_quest.text = qsTr("충전 케이블을 분리해주세요");
                     btn_yes.visible = false;
                     btn_no.visible = false;
                     area_cancel3.enabled = true;
                 }else if(supervisor.getEmoStatus()){
-                    text_quest.text = "비상스위치를 풀어주세요.";
+                    text_quest.text = qsTr("비상스위치를 풀어주세요");
                     btn_yes.visible = false;
                     btn_no.visible = false;
                     area_cancel3.enabled = true;
                 }else{
-                    text_quest.text = "로봇이 준비상태가 아닙니다.";
+                    text_quest.text = qsTr("로봇이 준비상태가 아닙니다");
                     btn_yes.visible = false;
                     btn_no.visible = false;
                     area_cancel3.enabled = true;
@@ -126,7 +126,7 @@ Item {
     }
     Text{
         id: text_mention
-        text: "충전 중 입니다."
+        text: qsTr("충전 중 입니다")
         font.pixelSize: 50
         color: "white"
         font.family: font_noto_b.name
@@ -171,23 +171,23 @@ Item {
         visible: false
         Component.onCompleted: {
             if(supervisor.getIPCConnection() && supervisor.getStateMoving() !== 0){
-                text_quest.text = "대기 장소로 이동<font color=\"white\">하시겠습니까?</font>";
+                text_quest.text = qsTr("대기 장소로 이동<font color=\"white\">하시겠습니까?</font>");
                 btn_yes.visible = true;
                 btn_no.visible = true;
                 area_cancel3.enabled = false;
             }else if(supervisor.getChargeStatus()){
-                text_quest.text = "충전 케이블을 분리해주세요.";
+                text_quest.text = qsTr("충전 케이블을 분리해주세요");
                 btn_yes.visible = false;
                 btn_no.visible = false;
                 area_cancel3.enabled = true;
             }else if(supervisor.getEmoStatus()){
-                text_quest.text = "비상스위치를 풀어주세요.";
+                text_quest.text = qsTr("비상스위치를 풀어주세요");
                 btn_yes.visible = false;
                 btn_no.visible = false;
                 area_cancel3.enabled = true;
             }else{
                 loadPage(pkitchen);
-//                text_quest.text = "로봇이 준비상태가 아닙니다.";
+//                text_quest.text = "로봇이 준비상태가 아닙니다";
 //                btn_yes.visible = false;
 //                btn_no.visible = false;
 //                area_cancel3.enabled = true;
@@ -216,7 +216,7 @@ Item {
             font.family: font_noto_b.name
             font.pixelSize: 40
             color: "#12d27c"
-            text: "대기 장소로 이동<font color=\"white\">하시겠습니까?</font>"
+            text: qsTr("대기 장소로 이동<font color=\"white\">하시겠습니까?</font>")
         }
         Row{
             anchors.horizontalCenter: parent.horizontalCenter
@@ -238,7 +238,7 @@ Item {
                 }
                 Text{
                     id:text_nono
-                    text:"아니오"
+                    text:qsTr("아니오")
                     font.family: font_noto_b.name
                     font.pixelSize: 30
                     color:"#282828"
@@ -276,7 +276,7 @@ Item {
                     anchors.leftMargin: 20
                 }
                 Text{
-                    text:"네"
+                    text:qsTr("네")
                     font.family: font_noto_b.name
                     font.pixelSize: 30
                     color:"#282828"

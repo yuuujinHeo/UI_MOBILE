@@ -333,6 +333,8 @@ public:
     Q_INVOKABLE QString getProgramVersion();
 //    Q_INVOKABLE QString
 
+    Q_INVOKABLE void setLangauge(QString lan);
+
     ////*********************************************  MOVING 관련   *************************************************////
     Q_INVOKABLE bool isCallingMode(){return probot->is_calling;}
     Q_INVOKABLE void goServing(int group, int table);
@@ -673,6 +675,7 @@ private:
     QTimer *timer;
     QQuickWindow *mMain;
     QObject *mObject = nullptr;
+    QTranslator *translator;
 };
 
 

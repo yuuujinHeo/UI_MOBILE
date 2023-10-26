@@ -1438,6 +1438,7 @@ void MapHandler::endSpline(bool save){
     lines_trash.clear();
     setMap();
 }
+
 void MapHandler::drawSpline(){
     line.clear();
     setMapDrawing();

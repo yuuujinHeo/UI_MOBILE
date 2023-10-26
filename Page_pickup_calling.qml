@@ -23,6 +23,7 @@ Item {
         btn_confirm.visible = true;
         voice_pickup.play();
         text_hello.visible = false;
+        statusbar.visible = false;
         timer_hello.stop();
     }
 
@@ -53,9 +54,9 @@ Item {
                 id: target_pos
                 text: {
                     if(type == 0){
-                        "고객님, 부르셨나요?"
+                        qsTr("고객님, 부르셨나요?")
                     }else if(type == 1){
-                        "<font color=\"#12d27c\">다 드신 그릇</font> 은"
+                        qsTr("<font color=\"#12d27c\">다 드신 그릇</font> 은")
                     }
                 }
                 font.pixelSize: 70
@@ -65,7 +66,7 @@ Item {
             Text{
                 id: target_pos2
                 visible:type==1?true:false
-                text: "저에게 전달해 주세요."
+                text: qsTr("저에게 전달해 주세요")
                 font.pixelSize: 60
                 font.family: font_noto_b.name
                 color: "white"
@@ -79,9 +80,9 @@ Item {
                 id: text_mention
                 text:  {
                     if(type == 0){
-                        "이용이 끝나시면 <font color=\"#12d27c\">확인버튼</font>을 눌러주세요."
+                        qsTr("이용이 끝나시면 <font color=\"#12d27c\">확인버튼</font>을 눌러주세요")
                     }else if(type == 1){
-                        "완료 후 아래 <font color=\"#12d27c\">확인버튼</font>을 눌러주세요."
+                        qsTr("완료 후 아래 <font color=\"#12d27c\">확인버튼</font>을 눌러주세요")
                     }
                 }
                 font.pixelSize: 45
@@ -120,7 +121,7 @@ Item {
         }
         Text{
             id: text_hello
-            text:"감사합니다."
+            text:qsTr("감사합니다")
             visible: false
             font.pixelSize: 80
             font.family: font_noto_b.name

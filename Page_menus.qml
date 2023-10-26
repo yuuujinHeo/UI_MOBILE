@@ -33,7 +33,7 @@ Item {
         color: "#282828"
         Text{
             id: text_menu
-            text: "메뉴"
+            text: qsTr("메뉴")
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 150
@@ -135,7 +135,7 @@ Item {
                     }
                     Text{
                         id: text_charge
-                        text:"최소화"
+                        text:qsTr("최소화")
                         font.family: font_noto_r.name
                         font.pixelSize: 15
                         horizontalAlignment: Text.AlignHCenter
@@ -177,7 +177,7 @@ Item {
                     }
                     Text{
                         id: text_wait
-                        text:"프로그램 종료"
+                        text:qsTr("프로그램 종료")
                         font.family: font_noto_r.name
                         font.pixelSize: 15
                         color: "#525252"
@@ -227,7 +227,7 @@ Item {
                 font.family: font_noto_b.name
                 font.pixelSize: 40
                 color: "#12d27c"
-                text: "프로그램을 종료<font color=\"white\">하시겠습니까?</font>"
+                text: qsTr("프로그램을 종료<font color=\"white\">하시겠습니까?</font>")
             }
             Row{
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -247,7 +247,7 @@ Item {
                     }
                     Text{
                         id:text_nono
-                        text:"취소"
+                        text:qsTr("취소")
                         font.family: font_noto_b.name
                         font.pixelSize: 30
                         color:"#282828"
@@ -283,7 +283,7 @@ Item {
                         anchors.leftMargin: 20
                     }
                     Text{
-                        text:"종료"
+                        text:qsTr("종료")
                         font.family: font_noto_b.name
                         font.pixelSize: 30
                         color:"#282828"
@@ -320,7 +320,7 @@ Item {
                         anchors.leftMargin: 20
                     }
                     Text{
-                        text:"다시시작"
+                        text:qsTr("다시시작")
                         font.family: font_noto_b.name
                         font.pixelSize: 30
                         color:"#282828"

@@ -819,22 +819,22 @@ Item {
                 if(show_connection){
                     if(supervisor.getMappingflag()){
                         rect_notice.visible = true;
-                        rect_notice.msg =  "맵 생성 중";
+                        rect_notice.msg =  qsTr("맵 생성 중");
                         rect_notice.color = color_navy;
                         rect_notice.show_icon = false;
                     }else if(supervisor.getObjectflag()){
                         rect_notice.visible = true;
-                        rect_notice.msg =  "오브젝트 생성 중";
+                        rect_notice.msg =  qsTr("오브젝트 생성 중");
                         rect_notice.color = color_navy;
                         rect_notice.show_icon = false;
                     }else if(supervisor.getLocalizationState()===1){
                         rect_notice.visible = true;
-                        rect_notice.msg =  "위치 초기화 중";
+                        rect_notice.msg =  qsTr("위치 초기화 중");
                         rect_notice.color = color_navy;
                         rect_notice.show_icon = false;
                     }else if(!is_slam_running && supervisor.getMode() !== "mapping"){
                         rect_notice.visible = true;
-                        rect_notice.msg =  "주행 활성화 안됨";
+                        rect_notice.msg =  qsTr("주행 활성화 안됨");
                         rect_notice.color = color_red;
                         rect_notice.show_icon = true;
                     }else{
@@ -847,7 +847,7 @@ Item {
                 if(show_connection){
 
                     rect_notice.visible = true;
-                    rect_notice.msg =  "로봇 연결 안됨";
+                    rect_notice.msg =  qsTr("로봇 연결 안됨");
                     rect_notice.color = color_red;
                     rect_notice.show_icon = true;
                 }

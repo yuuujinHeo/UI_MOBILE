@@ -58,9 +58,11 @@ Item {
         test_move_state = 1;
         var location_name = supervisor.getcurLoc();
         if(location_name === "Charging0"){
-            location_name = "충전위치";
+            location_name = qsTr("충전위치");
         }else if(location_name === "Resting0"){
-            location_name = "대기위치";
+            location_name = qsTr("대기위치");
+        }else if(location_name === "Cleaning0"){
+            location_name = qsTr("퇴식위치");
         }
         playMusic.play();
         popup_moving.location = location_name;
@@ -78,24 +80,24 @@ Item {
         popup_notice.show_motorinit = false;
         popup_moving.close();
         if(errnum === 0){
-            popup_notice.main_str = "경로를 찾지 못했습니다.";
+            popup_notice.main_str = qsTr("경로를 찾지 못했습니다");
             popup_notice.sub_str = "";
         }else if(errnum === 1){
-            popup_notice.main_str = "로봇의 위치를 찾을 수 없습니다.";
-            popup_notice.sub_str = "로봇초기화를 다시 해주세요.";
+            popup_notice.main_str = qsTr("로봇의 위치를 찾을 수 없습니다");
+            popup_notice.sub_str = qsTr("로봇초기화를 다시 해주세요");
             popup_notice.show_localization = true;
             popup_notice.show_motorinit = false;
         }else if(errnum === 2){
-            popup_notice.main_str = "비상스위치가 눌려있습니다.";
-            popup_notice.sub_str = "비상스위치를 풀어주세요.";
+            popup_notice.main_str = qsTr("비상스위치가 눌려있습니다");
+            popup_notice.sub_str = qsTr("비상스위치를 풀어주세요");
         }else if(errnum === 3){
-            popup_notice.main_str = "경로가 취소되었습니다.";
+            popup_notice.main_str = qsTr("경로가 취소되었습니다");
             popup_notice.sub_str = "";
         }else if(errnum === 4){
-            popup_notice.main_str = "모터가 초기화 되지 않았습니다.";
-            popup_notice.sub_str = "비상스위치를 눌렀다 풀어주세요.";
+            popup_notice.main_str = qsTr("모터가 초기화 되지 않았습니다");
+            popup_notice.sub_str = qsTr("비상스위치를 눌렀다 풀어주세요");
         }else if(errnum === 5){
-            popup_notice.main_str = "모터와 연결되지 않았습니다.";
+            popup_notice.main_str = qsTr("모터와 연결되지 않았습니다");
             popup_notice.sub_str = "";
         }
         popup_notice.open();
@@ -165,14 +167,14 @@ Item {
                         Column{
                             anchors.horizontalCenter: parent.horizontalCenter
                             Text{
-                                text: "정말로 초기화하고 다시 세팅하시겠습니까?"
+                                text: qsTr("정말로 초기화하고 다시 세팅하시겠습니까?")
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 font.family: font_noto_r.name
                                 font.pixelSize: 30
                                 color: "white"
                             }
                             Text{
-                                text: "(이전 세팅이 모두 사라지며 복구가 불가능합니다)"
+                                text: qsTr("(이전 세팅이 모두 사라지며 복구가 불가능합니다)")
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
@@ -189,7 +191,7 @@ Item {
                                 color: color_green
                                 Text{
                                     anchors.centerIn: parent
-                                    text: "확인"
+                                    text: qsTr("확인")
                                     font.family: font_noto_r.name
                                     font.pixelSize: 20
                                     color: "white"
@@ -213,7 +215,7 @@ Item {
                                 color: color_light_gray
                                 Text{
                                     anchors.centerIn: parent
-                                    text: "취소"
+                                    text: qsTr("취소")
                                     font.family: font_noto_r.name
                                     font.pixelSize: 20
                                 }
@@ -232,7 +234,7 @@ Item {
 
             Text{
                 id: text_title1
-                text: "맵을 수정합니다."
+                text: qsTr("맵을 수정합니다")
                 color: "white"
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 60
@@ -243,7 +245,7 @@ Item {
             }
             Text{
                 id: text_title12
-                text: "수정하실 단계를 선택하여 진행해주세요."
+                text: qsTr("수정하실 단계를 선택하여 진행해주세요")
                 color: "white"
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 40
@@ -265,7 +267,7 @@ Item {
                     height: 150
                     fontsize: 30
                     type: "round_text"
-                    text:"이전세팅 초기화\n다시 세팅"
+                    text:qsTr("이전세팅 초기화\n다시 세팅")
                     onClicked: {
                         click_sound.play();
                         popup_ask_reset.open();
@@ -276,7 +278,7 @@ Item {
                     height: 150
                     fontsize: 30
                     type: "round_text"
-                    text:"맵 회전\n잘라내기"
+                    text:qsTr("맵 회전\n잘라내기")
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[ANNOTATION] MENU : Rotate / Cut Map");
@@ -288,7 +290,7 @@ Item {
                     height: 150
                     fontsize: 30
                     type: "round_text"
-                    text: "충전위치 변경"
+                    text: qsTr("충전위치 변경")
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[ANNOTATION] MENU : Change Charging Location");
@@ -300,7 +302,7 @@ Item {
                     height: 150
                     fontsize: 30
                     type: "round_text"
-                    text: "대기위치 변경"
+                    text: qsTr("대기위치 변경")
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[ANNOTATION] MENU : Change Resting Location");
@@ -312,7 +314,7 @@ Item {
                     height: 150
                     fontsize: 30
                     type: "round_text"
-                    text: "서빙위치 변경"
+                    text: qsTr("서빙위치 변경")
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[ANNOTATION] MENU : Change Serving Location");
@@ -324,7 +326,7 @@ Item {
                     height: 150
                     fontsize: 30
                     type: "round_text"
-                    text: "추가 설정"
+                    text: qsTr("추가 설정")
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[ANNOTATION] MENU : Additional menu");
@@ -338,10 +340,10 @@ Item {
                 height: 80
                 type: "round_text"
                 text: {
-                    if(supervisor.getSetting("ROBOT_SW","use_multirobot")=="true"){
-                        "맵 보내기/가져오기"
+                    if(supervisor.getSetting("ROBOT_SW","use_multirobot")==="true"){
+                        qsTr("맵 보내기/가져오기")
                     }else{
-                        "맵 불러오기"
+                        qsTr("맵 불러오기")
                     }
                 }
 
@@ -364,7 +366,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "종 료"
+                text: qsTr("종 료")
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.bottomMargin: 50
@@ -426,7 +428,7 @@ Item {
             }
 
             Text{
-                text: "맵을 회전하고 맵의 영역만큼 지정해주세요."
+                text: qsTr("맵을 회전하고 맵의 영역만큼 지정해주세요")
                 color: "white"
                 font.pixelSize: 40
                 font.family: font_noto_b.name
@@ -447,9 +449,9 @@ Item {
                 onClicked:{
                     click_sound.play();
                     popup_annot_help.open();
-                    popup_annot_help.setTitle("맵 회전 / 잘라내기");
-                    popup_annot_help.addLine("매장에 대한 로봇의 방향을 직관적으로 알 수 있도록 맵을 회전시켜주세요.\n맵을 회전하지 않아도 로봇 주행에는 문제가 없습니다.\n이미 사용중인 맵을 회전시키면 기존에 설정한 위치들이 전부 삭제되므로 신중하게 결정해주세요.");
-                    popup_annot_help.addLine("맵 생성을 한 뒤 맵의 여백이 너무 많은 경우 잘라내기를 할 수 있습니다.\n로봇이 이동해야할 부분을 잘라내기 하지 않도록 주의해주세요.");
+                    popup_annot_help.setTitle(qsTr("맵 회전 / 잘라내기"));
+                    popup_annot_help.addLine(qsTr("매장에 대한 로봇의 방향을 직관적으로 알 수 있도록 맵을 회전시켜주세요\n맵을 회전하지 않아도 로봇 주행에는 문제가 없습니다\n이미 사용중인 맵을 회전시키면 기존에 설정한 위치들이 전부 삭제되므로 신중하게 결정해주세요"));
+                    popup_annot_help.addLine(qsTr("맵 생성을 한 뒤 맵의 여백이 너무 많은 경우 잘라내기를 할 수 있습니다\n로봇이 이동해야할 부분을 잘라내기 하지 않도록 주의해주세요"));
                 }
             }
             Row{
@@ -574,7 +576,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "저 장"
+                text: qsTr("저 장")
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.bottomMargin: 50
@@ -621,7 +623,7 @@ Item {
                     height: 80
                     type: "round_text"
                     selected: map.tool==="move"
-                    text: "이 동"
+                    text: qsTr("이 동")
                     onClicked: {
                         click_sound.play();
                         map.setTool("move");
@@ -631,7 +633,7 @@ Item {
                     width: 200
                     height: 80
                     type: "round_text"
-                    text: "맵 잘라내기"
+                    text: qsTr("맵 잘라내기")
                     selected: map.tool==="cut_map"
                     onClicked: {
                         click_sound.play();
@@ -642,7 +644,7 @@ Item {
                     width: 200
                     height: 80
                     type: "round_text"
-                    text: "초기화"
+                    text: qsTr("초기화")
                     onClicked: {
                         click_sound.play();
                         map.clear("rotate");
@@ -671,13 +673,13 @@ Item {
                         Column{
                             anchors.horizontalCenter: parent.horizontalCenter
                             Text{
-                                text: "맵을 <font color=\"#12d27c\">잘라내기</font>하시겠습니까?"
+                                text: qsTr("맵을 <font color=\"#12d27c\">잘라내기</font>하시겠습니까?")
                                 font.family: font_noto_r.name
                                 font.pixelSize: 30
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "맵을 자르면 기존의 설정은 모두 삭제되며 새로 설정하셔야 합니다."
+                                text: qsTr("맵을 자르면 기존의 설정은 모두 삭제되며 새로 설정하셔야 합니다")
                                 font.family: font_noto_r.name
                                 font.pixelSize: 15
                                 color: color_red
@@ -689,7 +691,7 @@ Item {
                             spacing: 20
                             Item_buttons{
                                 type: "round_text"
-                                text: "잘라내지 않음"
+                                text: qsTr("잘라내지 않음")
                                 width: 180
                                 height: 100
                                 onClicked:{
@@ -707,7 +709,7 @@ Item {
                             }
                             Item_buttons{
                                 type: "round_text"
-                                text: "확인"
+                                text: qsTr("확인")
                                 width: 180
                                 height: 100
                                 onClicked:{
@@ -811,7 +813,7 @@ Item {
             Text{
                 id: text_finding
                 visible: local_find_state<2
-                text: "로봇의 위치를 찾고 있습니다."
+                text: qsTr("로봇의 위치를 찾고 있습니다")
                 color: "white"
                 opacity: 0
                 Behavior on opacity {
@@ -828,7 +830,7 @@ Item {
             Text{
                 id: text_failed_connection
                 visible: local_find_state===10
-                text: "로봇과 연결이 되지 않았습니다."
+                text: qsTr("로봇과 연결이 되지 않았습니다")
                 color: "white"
                 font.pixelSize: 60
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -839,7 +841,7 @@ Item {
             Text{
                 id: text_find
                 visible: local_find_state===2||local_find_state===3
-                text:local_find_state===2?"로봇의 위치를 찾았습니다. 로봇의 위치가 정확합니까?":"로봇의 위치를 찾을 수 없습니다. 로봇의 위치를 맵 상에서 표시해주세요."
+                text:local_find_state===2?qsTr("로봇의 위치를 찾았습니다. 로봇의 위치가 정확합니까?"):qsTr("로봇의 위치를 찾을 수 없습니다. 로봇의 위치를 맵 상에서 표시해주세요")
                 font.pixelSize: 30
                 horizontalAlignment: Text.AlignHCenter
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -859,7 +861,7 @@ Item {
                     height: 80
                     type: "round_text"
                     selected: map.tool==="move"
-                    text: "이 동"
+                    text: qsTr("이 동")
                     onClicked: {
                         click_sound.play();
                         map.setTool("move");
@@ -871,7 +873,7 @@ Item {
                     height: 80
                     type: "round_text"
                     selected: map.tool==="slam_init"
-                    text: "수동 지정"
+                    text: qsTr("수동 지정")
                     onClicked: {
                         click_sound.play();
                         map.setTool("slam_init");
@@ -884,7 +886,7 @@ Item {
                     width: 200
                     height: 80
                     type: "round_text"
-                    text:  "다시 시도"
+                    text:  qsTr("다시 시도")
                     onClicked: {
                         click_sound.play();
                         map.setTool("move");
@@ -899,7 +901,7 @@ Item {
                     height: 100
                     running: false
                     type: "start_progress"
-                    text: "자동위치찾기\n(1분소요)"
+                    text: qsTr("자동위치찾기\n(1분소요)")
                     shadowcolor: color_dark_black
                     onClicked: {
                         click_sound.play();
@@ -932,15 +934,15 @@ Item {
                 onClicked:{
                     click_sound.play();
                     popup_annot_help.open();
-                    popup_annot_help.setTitle("로봇 위치 초기화");
+                    popup_annot_help.setTitle(qsTr("로봇 위치 초기화"));
                     if(local_find_state === 2){
-                        popup_annot_help.addLine("파란색으로 표시된 라이다맵과 실제 맵이 일치하는 지 확인해주세요.");
-                        popup_annot_help.addLine("로봇이 충전, 대기, 서빙 위치 근처에 있으면 보다 정확하고 빠르게 위치를 찾습니다.");
-                        popup_annot_help.addLine("로봇은 위치를 찾았다고 생각하지만 라이다맵이 실제 맵과 일치 하지 않으면\n로봇이 주행 중 이상한 곳으로 가거나 충돌이 날 수 있습니다.");
+                        popup_annot_help.addLine(qsTr("파란색으로 표시된 라이다맵과 실제 맵이 일치하는 지 확인해주세요"));
+                        popup_annot_help.addLine(qsTr("로봇이 충전, 대기, 서빙 위치 근처에 있으면 보다 정확하고 빠르게 위치를 찾습니다"));
+                        popup_annot_help.addLine(qsTr("로봇은 위치를 찾았다고 생각하지만 라이다맵이 실제 맵과 일치 하지 않으면\n로봇이 주행 중 이상한 곳으로 가거나 충돌이 날 수 있습니다"));
                     }else{
-                        popup_annot_help.addLine("로봇을 충전, 대기, 서빙 위치 근처로 이동시킨 뒤 [다시시도]를 하시면 보다 정확하고 빠르게 위치를 찾습니다.");
-                        popup_annot_help.addLine("아니라면 [수동지정]을 통해 맵 상의 로봇의 위치와 방향을 표시해주세요. 그 위치에서 초기화를 시도합니다.");
-                        popup_annot_help.addLine("로봇이 이동할 수 있는 상황이 아니고 수동지정도 어려우면 [자동위치찾기]버튼을 누르세요.\n시간이 조금 소요됩니다.");
+                        popup_annot_help.addLine(qsTr("로봇을 충전, 대기, 서빙 위치 근처로 이동시킨 뒤 [다시시도]를 하시면 보다 정확하고 빠르게 위치를 찾습니다"));
+                        popup_annot_help.addLine(qsTr("아니라면 [수동지정]을 통해 맵 상의 로봇의 위치와 방향을 표시해주세요. 그 위치에서 초기화를 시도합니다"));
+                        popup_annot_help.addLine(qsTr("로봇이 이동할 수 있는 상황이 아니고 수동지정도 어려우면 [자동위치찾기]버튼을 누르세요\n시간이 조금 소요됩니다"));
                     }
 
                 }
@@ -951,7 +953,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "넘어가기"
+                text: qsTr("넘어가기")
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.bottomMargin: 150
@@ -968,7 +970,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "일치 합니다"
+                text: qsTr("일치 합니다")
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.bottomMargin: 50
@@ -989,7 +991,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "일치 합니다"
+                text: qsTr("일치 합니다")
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.bottomMargin: 50
@@ -1011,7 +1013,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "프로그램 다시시작"
+                text: qsTr("프로그램 다시시작")
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.bottomMargin: 50
@@ -1028,7 +1030,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "틀립니다.\n(수동초기화)"
+                text: qsTr("틀립니다.\n(수동초기화)")
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.bottomMargin: 50
@@ -1071,7 +1073,7 @@ Item {
                 anchors.topMargin: 80
                 spacing: 30
                 Text{
-                    text: "로봇을 충전 위치로 이동시켜주세요"
+                    text: qsTr("로봇을 충전 위치로 이동시켜주세요")
                     color: "white"
                     font.pixelSize: 80
                     font.family: font_noto_b.name
@@ -1079,7 +1081,7 @@ Item {
                 }
                 Column{
                     Text{
-                        text: "* 충전 위치란?"
+                        text: qsTr("* 충전 위치란?")
                         color: color_green
                         font.bold: true
                         font.pixelSize: 20
@@ -1087,14 +1089,14 @@ Item {
                         font.family: font_noto_r.name
                     }
                     Text{
-                        text: "로봇이 비 운영 중에 충전을 위해 서 있는 장소입니다."
+                        text: qsTr("로봇이 비 운영 중에 충전을 위해 서 있는 장소입니다")
                         color: "white"
                         font.pixelSize: 20
                         horizontalAlignment: Text.AlignHCenter
                         font.family: font_noto_r.name
                     }
                     Text{
-                        text: "충전기가 꼽혀있는 콘센트 주변으로 지정해주세요."
+                        text: qsTr("충전기가 꼽혀있는 콘센트 주변으로 지정해주세요")
                         color: "white"
                         font.pixelSize: 20
                         horizontalAlignment: Text.AlignHCenter
@@ -1119,7 +1121,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "위치 초기화"
+                text: qsTr("위치 초기화")
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.bottomMargin: 50
@@ -1137,7 +1139,7 @@ Item {
                 height: 80
                 visible: !annotation_after_mapping
                 type: "round_text"
-                text: "취 소"
+                text: qsTr("취 소")
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.bottomMargin: 150
@@ -1152,7 +1154,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "이동했습니다."
+                text: qsTr("이동했습니다")
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.bottomMargin: 50
@@ -1186,7 +1188,7 @@ Item {
                     text_save_done.visible = false;
                     model_chargings.clear();
                     for(var i=0; i<supervisor.getLocationNum("Charging"); i++){
-                        model_chargings.append({"name":"충전위치"+Number(i)});
+                        model_chargings.append({"name":qsTr("충전위치")+Number(i)});
                     }
                 }
             }
@@ -1197,7 +1199,7 @@ Item {
             }
             Text{
                 id: text_save_done
-                text: "로봇의 충전 위치를 저장했습니다."
+                text: qsTr("로봇의 충전 위치를 저장했습니다")
                 color: "white"
                 visible: false
                 font.pixelSize: 80
@@ -1210,7 +1212,7 @@ Item {
                 anchors.centerIn: parent
                 spacing: 50
                 Text{
-                    text: "이미 세팅된 충전위치가 있습니다."
+                    text: qsTr("이미 세팅된 충전위치가 있습니다")
                     color: "white"
                     font.pixelSize: 80
                     font.family: font_noto_b.name
@@ -1249,7 +1251,7 @@ Item {
                         width: 200
                         height: 80
                         type: "round_text"
-                        text: "덮어쓰기"
+                        text: qsTr("덮어쓰기")
                         onClicked:{
                             last_robot_x = supervisor.getlastRobotx();
                             last_robot_y = supervisor.getlastRoboty();
@@ -1265,7 +1267,7 @@ Item {
                         width: 200
                         height: 80
                         type: "round_text"
-                        text: "새로추가"
+                        text: qsTr("새로추가")
                         onClicked:{
                             last_robot_x = supervisor.getlastRobotx();
                             last_robot_y = supervisor.getlastRoboty();
@@ -1281,7 +1283,7 @@ Item {
                         width: 200
                         height: 80
                         type: "round_text"
-                        text: "취 소"
+                        text: qsTr("취 소")
                         onClicked:{
                             btn_right.enabled = true;
                             supervisor.writelog("[Annotation] Location Save : Charging -> Done");
@@ -1300,7 +1302,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "다시 지정"
+                text: qsTr("다시 지정")
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.bottomMargin: 50
@@ -1317,7 +1319,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "다음으로"
+                text: qsTr("다음으로")
                 enabled: false
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
@@ -1362,7 +1364,7 @@ Item {
                 anchors.topMargin: 80
                 spacing: 30
                 Text{
-                    text: "로봇을 대기위치로 이동시켜주세요"
+                    text: qsTr("로봇을 대기위치로 이동시켜주세요")
                     color: "white"
                     font.pixelSize: 80
                     font.family: font_noto_b.name
@@ -1370,7 +1372,7 @@ Item {
                 }
                 Column{
                     Text{
-                        text: "* 대기위치란?"
+                        text: qsTr("* 대기위치란?")
                         color: color_green
                         font.bold: true
                         font.pixelSize: 20
@@ -1378,14 +1380,14 @@ Item {
                         font.family: font_noto_r.name
                     }
                     Text{
-                        text: "로봇이 서빙을 시작하기 전, 음식을 받기 위해 기다리는 장소입니다."
+                        text: qsTr("로봇이 서빙을 시작하기 전, 음식을 받기 위해 기다리는 장소입니다")
                         color: "white"
                         font.pixelSize: 20
                         horizontalAlignment: Text.AlignHCenter
                         font.family: font_noto_r.name
                     }
                     Text{
-                        text: "주방에서 음식을 올리기 편한 위치로 지정해주세요."
+                        text: qsTr("주방에서 음식을 올리기 편한 위치로 지정해주세요")
                         color: "white"
                         font.pixelSize: 20
                         horizontalAlignment: Text.AlignHCenter
@@ -1410,7 +1412,7 @@ Item {
                 height: 80
                 visible: !annotation_after_mapping
                 type: "round_text"
-                text: "취 소"
+                text: qsTr("취 소")
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.bottomMargin: 150
@@ -1425,7 +1427,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "이동했습니다."
+                text: qsTr("이동했습니다")
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.bottomMargin: 50
@@ -1459,7 +1461,7 @@ Item {
                     text_save_done.visible = false;
                     model_resting.clear();
                     for(var i=0; i<supervisor.getLocationNum("Resting"); i++){
-                        model_resting.append({"name":"대기위치"+Number(i)});
+                        model_resting.append({"name":qsTr("대기위치")+Number(i)});
                     }
                 }
 //                loading.show();
@@ -1471,7 +1473,7 @@ Item {
             }
             Text{
                 id: text_save_done
-                text: "로봇의 대기위치를 저장했습니다."
+                text: qsTr("로봇의 대기위치를 저장했습니다")
                 color: "white"
                 visible: false
                 font.pixelSize: 80
@@ -1484,7 +1486,7 @@ Item {
                 anchors.centerIn: parent
                 spacing: 50
                 Text{
-                    text: "이미 세팅된 대기위치가 있습니다."
+                    text: qsTr("이미 세팅된 대기위치가 있습니다")
                     color: "white"
                     font.pixelSize: 80
                     font.family: font_noto_b.name
@@ -1523,7 +1525,7 @@ Item {
                         width: 200
                         height: 80
                         type: "round_text"
-                        text: "덮어쓰기"
+                        text: qsTr("덮어쓰기")
                         onClicked:{
                             last_robot_x = supervisor.getlastRobotx();
                             last_robot_y = supervisor.getlastRoboty();
@@ -1539,7 +1541,7 @@ Item {
                         width: 200
                         height: 80
                         type: "round_text"
-                        text: "새로추가"
+                        text: qsTr("새로추가")
                         onClicked:{
                             last_robot_x = supervisor.getlastRobotx();
                             last_robot_y = supervisor.getlastRoboty();
@@ -1555,7 +1557,7 @@ Item {
                         width: 200
                         height: 80
                         type: "round_text"
-                        text: "취 소"
+                        text: qsTr("취 소")
                         onClicked:{
                             btn_right.enabled = true;
                         }
@@ -1568,7 +1570,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "다시 지정"
+                text: qsTr("다시 지정")
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.bottomMargin: 50
@@ -1585,7 +1587,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "다음으로"
+                text: qsTr("다음으로")
                 enabled: false
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
@@ -1621,7 +1623,7 @@ Item {
                 color: color_dark_navy
             }
             Text{
-                text: "충전 위치와 대기 위치 사이의 이동을 확인합니다."
+                text: qsTr("충전 위치와 대기 위치 사이의 이동을 확인합니다")
                 color: "white"
                 font.pixelSize:60
                 font.family: font_noto_b.name
@@ -1641,9 +1643,9 @@ Item {
                 onClicked:{
                     click_sound.play();
                     popup_annot_help.open();
-                    popup_annot_help.setTitle("충전위치/대기위치");
-                    popup_annot_help.addLine("충전위치와 대기위치를 지정하고 그 경로주행을 확인합니다.\n도착위치를 변경하고 싶으면 각 위치를 [다시지정]해주세요");
-                    popup_annot_help.addLine("로봇이 주행하거나 끌고 이동하는 모든 경로는 기억됩니다.");
+                    popup_annot_help.setTitle(qsTr("충전위치/대기위치"));
+                    popup_annot_help.addLine(qsTr("충전위치와 대기위치를 지정하고 그 경로주행을 확인합니다\n도착위치를 변경하고 싶으면 각 위치를 [다시지정]해주세요"));
+                    popup_annot_help.addLine(qsTr("로봇이 주행하거나 끌고 이동하는 모든 경로는 기억됩니다"));
                 }
             }
             Row{
@@ -1653,7 +1655,7 @@ Item {
                     width: 220
                     height: 120
                     type: "round_text"
-                    text: "충전 위치로"
+                    text: qsTr("충전 위치로")
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[Annotation] Location Test : go Charging");
@@ -1664,7 +1666,7 @@ Item {
                     width: 220
                     height: 120
                     type: "round_text"
-                    text: "대기 위치로"
+                    text: qsTr("대기 위치로")
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[Annotation] Location Test : go Resting");
@@ -1683,7 +1685,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "대기위치 다시 지정"
+                text: qsTr("대기위치 다시 지정")
                 onClicked: {
                     click_sound.play();
                     supervisor.writelog("[Annotation] Location Save : Resting -> Canceled");
@@ -1698,7 +1700,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "충전위치 다시 지정"
+                text: qsTr("충전위치 다시 지정")
                 onClicked: {
                     click_sound.play();
                     supervisor.writelog("[Annotation] Location Save : Charging -> Canceled");
@@ -1713,7 +1715,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: annotation_after_mapping?"다음으로":"확 인"
+                text: annotation_after_mapping?qsTr("다음으로"):qsTr("확 인")
                 onClicked: {
                     click_sound.play();
                     supervisor.writelog("[Annotation] Location Test : Done");
@@ -1747,7 +1749,7 @@ Item {
                 color: color_dark_navy
             }
             Text{
-                text: "지금부터 서빙위치를 지정하겠습니다.\n로봇을 대기위치로 이동시켜주세요."
+                text: qsTr("지금부터 서빙위치를 지정하겠습니다\n로봇을 대기위치로 이동시켜주세요")
                 color: "white"
                 font.pixelSize:60
                 horizontalAlignment: Text.AlignHCenter
@@ -1769,10 +1771,10 @@ Item {
                 onClicked:{
                     click_sound.play();
                     popup_annot_help.open();
-                    popup_annot_help.setTitle("대기위치로 이동");
-                    popup_annot_help.addLine("로봇이 주행하거나 끌고 이동하는 모든 경로는 기억됩니다.");
-                    popup_annot_help.addLine("이 단계가 필요한 이유는 서빙위치와 대기위치는 서로 경로로 연결되어야하기 때문입니다.");
-                    popup_annot_help.addLine("대기위치에서 서빙위치로 출발하는 경로를 기억하기 위해서 대기위치로 이동한 뒤 서빙위치를 설정합니다.");
+                    popup_annot_help.setTitle(qsTr("대기위치로 이동"));
+                    popup_annot_help.addLine(qsTr("로봇이 주행하거나 끌고 이동하는 모든 경로는 기억됩니다"));
+                    popup_annot_help.addLine(qsTr("이 단계가 필요한 이유는 서빙위치와 대기위치는 서로 경로로 연결되어야하기 때문입니다"));
+                    popup_annot_help.addLine(qsTr("대기위치에서 서빙위치로 출발하는 경로를 기억하기 위해서 대기위치로 이동한 뒤 서빙위치를 설정합니다"));
                 }
             }
             Item_buttons{
@@ -1782,7 +1784,7 @@ Item {
                 width: 240
                 height: 140
                 type: "round_text"
-                text: "대기 위치로"
+                text: qsTr("대기 위치로")
                 onClicked: {
                     click_sound.play();
                     supervisor.writelog("[Annotation] Location Test : go Resting");
@@ -1799,7 +1801,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "로봇이 대기위치입니다"
+                text: qsTr("로봇이 대기위치입니다")
                 onClicked: {
                     click_sound.play();
                     supervisor.writelog("[Annotation] Location Test : Resting -> Done");
@@ -1872,7 +1874,7 @@ Item {
                 anchors.top: parent.top
                 anchors.topMargin: 30
                 Text{
-                    text: "로봇을 주 이동경로를 따라 끌고 이동해주세요."
+                    text: qsTr("로봇을 주 이동경로를 따라 끌고 이동해주세요")
                     color: "white"
                     font.pixelSize: 50
                     horizontalAlignment: Text.AlignHCenter
@@ -1881,7 +1883,7 @@ Item {
                 }
                 Column{
                     Text{
-                        text: "* 주 이동경로란?"
+                        text: qsTr("* 주 이동경로란?")
                         color: color_green
                         font.bold: true
                         font.pixelSize:15
@@ -1889,28 +1891,28 @@ Item {
                         font.family: font_noto_r.name
                     }
                     Text{
-                        text: "로봇이 이동할 때 사용하는 경로입니다. 매장내부를 여러번 이동하면서 경로를 그려주세요."
+                        text: qsTr("로봇이 이동할 때 사용하는 경로입니다 매장내부를 여러번 이동하면서 경로를 그려주세요")
                         color: "white"
                         font.pixelSize: 15
                         horizontalAlignment: Text.AlignHCenter
                         font.family: font_noto_r.name
                     }
                     Text{
-                        text: "테이블의 의자가 빠지는 것을 생각해서 통로의 중앙을 통하며 경로를 그려줘야합니다."
+                        text: qsTr("테이블의 의자가 빠지는 것을 생각해서 통로의 중앙을 통하며 경로를 그려줘야합니다")
                         color: "white"
                         font.pixelSize: 15
                         horizontalAlignment: Text.AlignHCenter
                         font.family: font_noto_r.name
                     }
                     Text{
-                        text: "각 테이블의 서빙위치는 뒷 단계에서 진행하니 매장의 통로를 따라서만 진행하시면 됩니다."
+                        text: qsTr("각 테이블의 서빙위치는 뒷 단계에서 진행하니 매장의 통로를 따라서만 진행하시면 됩니다")
                         color: "white"
                         font.pixelSize: 15
                         horizontalAlignment: Text.AlignHCenter
                         font.family: font_noto_r.name
                     }
                     Text{
-                        text: "로봇이 접근하지 말아야 하는 장소는 제외해주세요. 추가 설정에서 수정가능합니다."
+                        text: qsTr("로봇이 접근하지 말아야 하는 장소는 제외해주세요 추가 설정에서 수정가능합니다")
                         color: "white"
                         font.pixelSize: 15
                         horizontalAlignment: Text.AlignHCenter
@@ -1926,7 +1928,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "초기화"
+                text: qsTr("초기화")
                 visible: false
                 onClicked: {
                     click_sound.play();
@@ -1941,7 +1943,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "전부 완료했습니다"
+                text: qsTr("전부 완료했습니다")
                 onClicked: {
                     click_sound.play();
                     supervisor.writelog("[Annotation] Main Travelline : Done");
@@ -2021,7 +2023,7 @@ Item {
                 anchors.top: parent.top
                 anchors.topMargin: 30
                 Text{
-                    text: "로봇을 각 테이블의 서빙위치로 이동시켜주신 후 저장 버튼을 누르세요"
+                    text: qsTr("로봇을 각 테이블의 서빙위치로 이동시켜주신 후 저장 버튼을 누르세요")
                     color: "white"
                     font.pixelSize: 40
                     horizontalAlignment: Text.AlignHCenter
@@ -2030,7 +2032,7 @@ Item {
                 }
                 Column{
                     Text{
-                        text: "* 서빙위치란?"
+                        text: qsTr("* 서빙위치란?")
                         color: color_green
                         font.bold: true
                         font.pixelSize:15
@@ -2038,14 +2040,14 @@ Item {
                         font.family: font_noto_r.name
                     }
                     Text{
-                        text: "로봇이 각 테이블에 음식을 서빙하기위해 서는 장소입니다."
+                        text: qsTr("로봇이 각 테이블에 음식을 서빙하기위해 서는 장소입니다")
                         color: "white"
                         font.pixelSize: 15
                         horizontalAlignment: Text.AlignHCenter
                         font.family: font_noto_r.name
                     }
                     Text{
-                        text: "로봇이 도착 후 회전할 수 있을 만큼은 테이블로부터 떨어트려주세요."
+                        text: qsTr("로봇이 도착 후 회전할 수 있을 만큼은 테이블로부터 떨어트려주세요")
                         color: "white"
                         font.pixelSize: 15
                         horizontalAlignment: Text.AlignHCenter
@@ -2063,7 +2065,7 @@ Item {
                     width: 200
                     height: 80
                     type: "round_text"
-                    text: show_map?"맵 끄기":"맵 표시"
+                    text: show_map?qsTr("맵 끄기"):qsTr("맵 표시")
                     onClicked: {
                         click_sound.play();
                         if(show_map){
@@ -2078,7 +2080,7 @@ Item {
                     width: 200
                     height: 80
                     type: "round_text"
-                    text: "목록 보기"
+                    text: qsTr("목록 보기")
                     onClicked: {
                         click_sound.play();
                         popup_serving_list.open();
@@ -2093,7 +2095,7 @@ Item {
                 width: 220
                 height: 120
                 type: "round_text"
-                text: "저 장"
+                text: qsTr("저 장")
                 onClicked: {
                     click_sound.play();
                     supervisor.writelog("[ANNOTATION] LOCAION SAVE : Serving "+Number(supervisor.getlastRobotx())+", "+Number(supervisor.getlastRoboty())+", "+Number(supervisor.getlastRobotth()));
@@ -2108,7 +2110,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "전부 완료했습니다"
+                text: qsTr("전부 완료했습니다")
                 onClicked: {
                     click_sound.play();
 //                    annot_pages.sourceComponent = page_annot_location_serving;
@@ -2154,7 +2156,7 @@ Item {
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
                                 horizontalAlignment: Text.AlignHCenter
-                                text: "로봇을 끌고 움직이는 대로 이동경로를 학습합니다.\n로봇이 주행가능한 길을\n대기위치와 각 서빙위치 별로\n가능한 여러번 학습시켜주세요."
+                                text: qsTr("로봇을 끌고 움직이는 대로 이동경로를 학습합니다\n로봇이 주행가능한 길을\n대기위치와 각 서빙위치 별로\n가능한 여러번 학습시켜주세요")
                             }
                             Row{
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -2163,7 +2165,7 @@ Item {
                                     width: 200
                                     height: 80
                                     type: "round_text"
-                                    text: "창 닫기\n(학습된 기록은 유지)"
+                                    text: qsTr("창 닫기\n(학습된 기록은 유지)")
                                     onClicked: {
                                         click_sound.play();
                                         popup_drawing_notice.close();
@@ -2173,7 +2175,7 @@ Item {
                                     width: 200
                                     height: 80
                                     type: "round_text"
-                                    text: "완 료"
+                                    text: qsTr("완 료")
                                     onClicked: {
                                         click_sound.play();
                                         supervisor.writelog("[ANNOTATION] LOCAION SAVE : Serving Done ");
@@ -2248,7 +2250,7 @@ Item {
                             width: 1280
                             height: 100
                             Text{
-                                text: "서빙위치를 추가합니다"
+                                text: qsTr("서빙위치를 추가합니다")
                                 anchors.centerIn: parent
                                 font.pixelSize: 50
                                 horizontalAlignment: Text.AlignHCenter
@@ -2276,7 +2278,7 @@ Item {
                                     Column{
                                         spacing : 20
                                         Text{
-                                            text: "위치 이름"
+                                            text: qsTr("위치 이름")
                                             font.pixelSize: 40
                                             color: "white"
                                             horizontalAlignment: Text.AlignHCenter
@@ -2306,7 +2308,7 @@ Item {
                                     Column{
                                         spacing: 20
                                         Text{
-                                            text: "그룹 지정"
+                                            text: qsTr("그룹 지정")
                                             font.pixelSize: 40
                                             color: "white"
                                             horizontalAlignment: Text.AlignHCenter
@@ -2320,13 +2322,13 @@ Item {
                                                 width: 180
                                                 height: 80
                                                 type: "round_text"
-                                                text: "지정 안함"
+                                                text: qsTr("지정 안함")
                                             }
                                             Item_buttons{
                                                 width: 180
                                                 height: 80
                                                 type: "round_text"
-                                                text:  "그룹 사용"
+                                                text:  qsTr("그룹 사용")
                                                 onClicked: {
                                                     click_sound.play();
                                                     popup_add_serving.use_group = true;
@@ -2386,7 +2388,7 @@ Item {
                                     width: 180
                                     height: 80
                                     type: "round_text"
-                                    text: "취소"
+                                    text: qsTr("취소")
                                     onClicked: {
                                         click_sound.play();
                                         popup_add_serving.close();
@@ -2396,7 +2398,7 @@ Item {
                                     width: 180
                                     height: 80
                                     type: "round_text"
-                                    text: "확인"
+                                    text: qsTr("확인")
                                     onClicked: {
                                         if(textfield_loc_name.text == ""){
                                             click_sound_no.play();
@@ -2441,7 +2443,7 @@ Item {
                     color: color_dark_navy
                     Text{
                         anchors.centerIn: parent
-                        text: "변경하실 호출벨을 눌러주세요."
+                        text: qsTr("변경하실 호출벨을 눌러주세요")
                         font.family: font_noto_r.name
                         font.pixelSize: 25
                         color: "white"
@@ -2450,7 +2452,7 @@ Item {
                         width: 100
                         height: 60
                         type: "round_text"
-                        text: "사용안함"
+                        text: qsTr("사용안함")
                         onClicked: {
                             supervisor.clear_call();
                         }
@@ -2481,7 +2483,7 @@ Item {
                     color: "#323744"
                     Text{
                         anchors.centerIn: parent
-                        text: "그룹 추가"
+                        text: qsTr("그룹 추가")
                         font.pixelSize: 40
                         font.family: font_noto_r.name
                         color: "white"
@@ -2523,7 +2525,7 @@ Item {
                                 width: 150
                                 height: 60
                                 type: "round_text"
-                                text: "취소"
+                                text: qsTr("취소")
                                 onClicked: {
                                     click_sound.play();
                                     popup_add_location_group.close();
@@ -2533,7 +2535,7 @@ Item {
                                 width: 150
                                 height: 60
                                 type: "round_text"
-                                text: "확인"
+                                text: qsTr("확인")
                                 onClicked: {
                                     if(tfield_group.text == ""){
                                         click_sound_no.play();
@@ -2577,7 +2579,7 @@ Item {
                         anchors.centerIn: parent
                         spacing:1
                         Text{
-                            text: "저장된 서빙위치 목록"
+                            text: qsTr("저장된 서빙위치 목록")
                             font.family: font_noto_r.name
                             font.pixelSize: 50
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -2589,7 +2591,7 @@ Item {
                                 height: 40
                                 color: color_navy
                                 Text{
-                                    text: "그 룹"
+                                    text: qsTr("그 룹")
                                     color: "white"
                                     anchors.centerIn: parent
                                     font.family: font_noto_r.name
@@ -2601,7 +2603,7 @@ Item {
                                 height: 40
                                 color: color_navy
                                 Text{
-                                    text: "이 름"
+                                    text: qsTr("이 름")
                                     color: "white"
                                     anchors.centerIn: parent
                                     font.family: font_noto_r.name
@@ -2726,18 +2728,18 @@ Item {
                 details.clear();
                 print("READ SETTING!!!!!!!!!!!!!!!!!!!!!!");
                 details.append({"ltype":"Charging",
-                                   "name":"충전위치",
+                                   "name":qsTr("충전위치"),
                                    "group":0,
                                    "error":false,
                                    "call_id":supervisor.getLocationCallID(0)});
                 details.append({"ltype":"Resting",
-                                   "name":"대기위치",
+                                   "name":qsTr("대기위치"),
                                    "group":0,
                                    "error":false,
                                    "call_id":supervisor.getLocationCallID(1)});
                 if(supervisor.getSetting("ROBOT_HW","type")==="CLEANING"){
                     details.append({"ltype":"Cleaning",
-                                       "name":"퇴식위치",
+                                       "name":qsTr("퇴식위치"),
                                        "group":0,
                                        "error":false,
                                        "call_id":supervisor.getLocationCallID(2)});
@@ -2810,7 +2812,6 @@ Item {
             }
 
             function checkLocationNumber(){
-
                 for(var i=0; i<details.count; i++){
                     for(var j=i+1; j<details.count; j++){
                         if(details.get(i).call_id === "" || details.get(i).call_id === "-")
@@ -2873,8 +2874,6 @@ Item {
                                             readSetting();
                                         }
                                     }
-
-
                                 }
                             }
                         }
@@ -3035,7 +3034,7 @@ Item {
 
             Text{
                 id: teeeeee
-                text: annotation_after_mapping?"서빙 위치를 다시한번 확인해주세요.":"서빙위치를 수정합니다."
+                text: annotation_after_mapping?qsTr("서빙 위치를 다시한번 확인해주세요"):qsTr("서빙위치를 수정합니다")
                 color: "white"
                 font.pixelSize: 60
                 horizontalAlignment: Text.AlignHCenter
@@ -3065,7 +3064,7 @@ Item {
                                 height: 60
                                 enabled: select_location>-1
                                 type: "round_text"
-                                text: "호출벨 설정"
+                                text: qsTr("호출벨 설정")
                                 fontsize: 20
                                 onClicked: {
                                     click_sound.play();
@@ -3079,7 +3078,7 @@ Item {
                                 height: 60
                                 enabled: select_location>-1
                                 type: "round_text"
-                                text: "테스트 주행"
+                                text: qsTr("테스트 주행")
                                 fontsize: 20
                                 onClicked: {
                                     click_sound.play();
@@ -3092,7 +3091,7 @@ Item {
                                 height: 60
                                 enabled: select_location>1
                                 type: "round_text"
-                                text: "삭제"
+                                text: qsTr("삭제")
                                 fontsize: 20
                                 onClicked: {
                                     click_sound.play();
@@ -3104,7 +3103,7 @@ Item {
                                 height: 60
                                 enabled: select_location>-1
                                 type: "round_text"
-                                text: "위치 수정"
+                                text: qsTr("위치 수정")
                                 fontsize: 20
                                 onClicked: {
                                     click_sound.play();
@@ -3128,7 +3127,7 @@ Item {
                                 width: 140
                                 height: 60
                                 type: "round_text"
-                                text: "서빙위치 추가"
+                                text: qsTr("서빙위치 추가")
                                 onClicked: {
                                     click_sound.play();
                                     supervisor.writelog("[ANNOTATION] LOCAION SAVE : Back to Serving");
@@ -3139,7 +3138,7 @@ Item {
                                 width: 140
                                 height: 60
                                 type: "round_text"
-                                text: "그룹 추가"
+                                text: qsTr("그룹 추가")
                                 fontsize: 20
                                 onClicked: {
                                     click_sound.play();
@@ -3150,7 +3149,7 @@ Item {
                                 width: 140
                                 height: 60
                                 type: "round_text"
-                                text: "퇴식위치 추가"
+                                text: qsTr("퇴식위치 추가")
                                 onClicked: {
                                     click_sound.play();
                                     select_location = -1;
@@ -3183,7 +3182,7 @@ Item {
                                 color: color_navy
                                 Text{
                                     anchors.centerIn: parent
-                                    text: "번호"
+                                    text: qsTr("번호")
                                     font.family: font_noto_r.name
                                     color: "white"
                                 }
@@ -3194,7 +3193,7 @@ Item {
                                 color: color_navy
                                 Text{
                                     anchors.centerIn: parent
-                                    text: "그룹"
+                                    text: qsTr("그룹")
                                     font.family: font_noto_r.name
                                     color: "white"
                                 }
@@ -3205,7 +3204,7 @@ Item {
                                 color: color_navy
                                 Text{
                                     anchors.centerIn: parent
-                                    text: "이름"
+                                    text: qsTr("이름")
                                     font.family: font_noto_r.name
                                     color: "white"
                                 }
@@ -3216,7 +3215,7 @@ Item {
                                 color: color_navy
                                 Text{
                                     anchors.centerIn: parent
-                                    text: "호출벨"
+                                    text: qsTr("호출벨")
                                     font.family: font_noto_r.name
                                     color: "white"
                                 }
@@ -3260,7 +3259,7 @@ Item {
                 anchors.bottomMargin: 50
                 anchors.rightMargin: 50
                 enabled: false
-                text: "저 장"
+                text: qsTr("저 장")
                 onClicked: {
                     click_sound.play();
                     print("save location");
@@ -3284,7 +3283,7 @@ Item {
                     width: 180
                     height: 80
                     type: "round_text"
-                    text: "번호 자동세팅"
+                    text: qsTr("번호 자동세팅")
                     visible: false
                     onClicked: {
                         for(var i=0; i<details.count-2; i++){
@@ -3314,7 +3313,7 @@ Item {
                         spacing: 30
                         Text{
                             anchors.horizontalCenter: parent.horizontalCenter
-                            text: "퇴식위치를 별도로 사용하십니까?"
+                            text: qsTr("퇴식위치를 별도로 사용하십니까?")
                             font.pixelSize: 50
                             font.family: font_noto_r.name
                             color: "white"
@@ -3323,21 +3322,21 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             Text{
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                text: "퇴식전용모드로 전환됩니다."
+                                text: qsTr("퇴식전용모드로 전환됩니다")
                                 font.pixelSize: 20
                                 font.family: font_noto_r.name
                                 color: "white"
                             }
                             Text{
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                text: "로봇이 테이블을 다녀온 뒤 퇴식위치로 이동하여 대기합니다. 추후 세팅에서 모드를 변경하실 수 있습니다."
+                                text: qsTr("로봇이 테이블을 다녀온 뒤 퇴식위치로 이동하여 대기합니다 추후 세팅에서 모드를 변경하실 수 있습니다")
                                 font.pixelSize: 20
                                 font.family: font_noto_r.name
                                 color: "white"
                             }
                             Text{
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                text: "퇴식위치의 기본값은 대기위치와 동일합니다. 변경을 원하시면 위치 수정을 해주세요."
+                                text: qsTr("퇴식위치의 기본값은 대기위치와 동일합니다 변경을 원하시면 위치 수정을 해주세요")
                                 font.pixelSize: 20
                                 font.family: font_noto_r.name
                                 color: "white"
@@ -3350,7 +3349,7 @@ Item {
                                 width: 150
                                 height: 60
                                 type: "round_text"
-                                text: "예"
+                                text: qsTr("예")
                                 onClicked: {
                                     click_sound.play();
                                     supervisor.setSetting("ROBOT_HW/type","CLEANING");
@@ -3363,7 +3362,7 @@ Item {
                                 width: 150
                                 height: 60
                                 type: "round_text"
-                                text: "아니오"
+                                text: qsTr("아니오")
                                 onClicked: {
                                     click_sound.play();
                                     supervisor.setSetting("ROBOT_HW/type","BOTH");
@@ -3404,14 +3403,14 @@ Item {
                             spacing: 10
                             Text{
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                text: "삭제하시겠습니까?"
+                                text: qsTr("삭제하시겠습니까?")
                                 font.pixelSize: 40
                                 font.family: font_noto_r.name
                                 color: "white"
                             }
                             Text{
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                text: "위치 : "+popup_remove_location.name
+                                text: qsTr("위치 : ")+popup_remove_location.name
                                 font.pixelSize: 35
                                 font.family: font_noto_r.name
                                 color: "white"
@@ -3425,7 +3424,7 @@ Item {
                                 width: 150
                                 height: 60
                                 type: "round_text"
-                                text: "예"
+                                text: qsTr("예")
                                 onClicked: {
                                     click_sound.play();
                                     supervisor.removeLocation(select_location);
@@ -3438,7 +3437,7 @@ Item {
                                 width: 150
                                 height: 60
                                 type: "round_text"
-                                text: "아니오"
+                                text: qsTr("아니오")
                                 onClicked: {
                                     click_sound.play();
                                     popup_remove_location.close();
@@ -3461,19 +3460,25 @@ Item {
                 onOpened:{
                     supervisor.setMotorLock(false);
                     if(select_location == 0){
-                        text_men.text = "수정하실 충전위치로 로봇을 이동시켜 주세요"
+                        text_men.text = qsTr("수정하실 충전위치로 로봇을 이동시켜 주세요")
                         text_loc.text = ""
                     }else if(select_location == 1){
-                        text_men.text = "수정하실 대기위치로 로봇을 이동시켜 주세요"
-                        text_loc.text = ""
-                    }else if(select_location == 2){
-                        text_men.text = "수정하실 퇴식위치로 로봇을 이동시켜 주세요"
+                        text_men.text = qsTr("수정하실 대기위치로 로봇을 이동시켜 주세요")
                         text_loc.text = ""
                     }else{
-                        text_men.text = "수정하실 서빙위치로 로봇을 이동시켜 주세요"
-                        text_loc.text = "( 이름 : "+details.get(select_location).name+" )"
+                        if(supervisor.getSetting("ROBOT_HW","type")==="CLEANING"){
+                            if(select_location == 2){
+                                text_men.text = qsTr("수정하실 퇴식위치로 로봇을 이동시켜 주세요")
+                                text_loc.text = ""
+                            }else{
+                                text_men.text = qsTr("수정하실 서빙위치로 로봇을 이동시켜 주세요")
+                                text_loc.text = qsTr("( 이름 : ")+details.get(select_location).name+" )"
+                            }
+                        }else{
+                            text_men.text = qsTr("수정하실 서빙위치로 로봇을 이동시켜 주세요")
+                            text_loc.text = qsTr("( 이름 : ")+details.get(select_location).name+" )"
+                        }
                     }
-
                 }
                 onClosed:{
                     supervisor.setMotorLock(true);
@@ -3490,7 +3495,7 @@ Item {
                             font.family:font_noto_r.name
                             font.pixelSize: 60
                             color: "white"
-                            text:"수정하실 서빙위치로 로봇을 이동시켜 주세요"
+                            text:qsTr("수정하실 서빙위치로 로봇을 이동시켜 주세요")
                         }
                         Text{
                             id: text_loc
@@ -3513,7 +3518,7 @@ Item {
                         type:"round_text"
                         width: 200
                         height: 80
-                        text:"이동했습니다"
+                        text:qsTr("이동했습니다")
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 50
                         anchors.right: parent.right
@@ -3534,7 +3539,7 @@ Item {
                         anchors.bottomMargin: 50
                         anchors.left: parent.left
                         anchors.leftMargin: 50
-                        text:"취소"
+                        text:qsTr("취소")
                         onClicked:{
                             popup_edit_serving.close();
                         }
@@ -3578,7 +3583,7 @@ Item {
                         spacing: 30
                         Text{
                             anchors.horizontalCenter: parent.horizontalCenter
-                            text: "변경하실 호출벨을 눌러주세요."
+                            text: qsTr("변경하실 호출벨을 눌러주세요")
                             font.family: font_noto_r.name
                             font.pixelSize: 50
                             color: "white"
@@ -3595,7 +3600,7 @@ Item {
                             }
                             Text{
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: "강제 귀환"
+                                text: qsTr("강제 귀환")
                                 color: "white"
                                 font.family: font_noto_r.name
                                 font.pixelSize: 30
@@ -3606,7 +3611,7 @@ Item {
                             height: 60
                             anchors.horizontalCenter: parent.horizontalCenter
                             type: "round_text"
-                            text: "사용안함"
+                            text: qsTr("사용안함")
                             onClicked: {
                                 click_sound.play();
                                 supervisor.clear_call();
@@ -3641,7 +3646,7 @@ Item {
                     color: "#323744"
                     Text{
                         anchors.centerIn: parent
-                        text: "그룹 추가"
+                        text: qsTr("그룹 추가")
                         font.pixelSize: 20
                         font.family: font_noto_r.name
                         color: "white"
@@ -3683,7 +3688,7 @@ Item {
                                 width: 130
                                 height: 50
                                 type: "round_text"
-                                text: "취소"
+                                text: qsTr("취소")
                                 onClicked: {
                                     click_sound.play();
                                     popup_add_location_group.close();
@@ -3693,7 +3698,7 @@ Item {
                                 width: 130
                                 height: 50
                                 type: "round_text"
-                                text: "확인"
+                                text: qsTr("확인")
                                 onClicked: {
                                     if(tfield_group.text == ""){
                                         click_sound_no.play();
@@ -3749,7 +3754,7 @@ Item {
             }
             Text{
                 id: text_title1
-                text: "수고하셨습니다"
+                text: qsTr("수고하셨습니다")
                 color: "white"
                 opacity: 0
                 Behavior on opacity {
@@ -3766,7 +3771,7 @@ Item {
             }
             Text{
                 id: text_title12
-                text: "맵 설정이 저장되었습니다"
+                text: qsTr("맵 설정이 저장되었습니다")
                 color: "white"
                 opacity: 0
                 Behavior on opacity {
@@ -3784,7 +3789,7 @@ Item {
 
             Text{
                 id: text_title2
-                text: "추가로 맵의 안전속도 구간과 이동경로를 수정하실 수 있습니다.\n설정을 여기서 완료하시거나 추가 설정을 원하신다면 아래 버튼을 눌러주세요"
+                text: qsTr("추가로 맵의 안전속도 구간과 이동경로를 수정하실 수 있습니다.\n설정을 여기서 완료하시거나 추가 설정을 원하신다면 아래 버튼을 눌러주세요")
                 color: "white"
                 opacity: 0
                 Behavior on opacity {
@@ -3804,7 +3809,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "종 료"
+                text: qsTr("종 료")
                 opacity: 0
                 Behavior on opacity {
                     NumberAnimation{
@@ -3827,7 +3832,7 @@ Item {
                 width: 200
                 height: 80
                 type: "round_text"
-                text: "추가 설정"
+                text: qsTr("추가 설정")
                 opacity: 0
                 Behavior on opacity {
                     NumberAnimation{
@@ -3863,7 +3868,7 @@ Item {
 
             Text{
                 id: text_title1
-                text: "맵의 추가설정을 합니다."
+                text: qsTr("맵의 추가설정을 합니다")
                 color: "white"
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 60
@@ -3874,7 +3879,7 @@ Item {
             }
             Text{
                 id: text_title12
-                text: "이 부분은 로봇 운영에 있어 필수는 아닙니다."
+                text: qsTr("이 부분은 로봇 운영에 있어 필수는 아닙니다")
                 color: "white"
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 40
@@ -3891,7 +3896,7 @@ Item {
                     width: 220
                     height: 180
                     type: "round_text"
-                    text: "안전속도\n구간설정"
+                    text: qsTr("안전속도\n구간설정")
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[ANNOTATION] Enter : Velocity Map");
@@ -3902,7 +3907,7 @@ Item {
                     width: 220
                     height: 180
                     type: "round_text"
-                    text: "이동경로\n설정"
+                    text: qsTr("이동경로\n설정")
                     onClicked: {
                         click_sound.play();
                         supervisor.loadFile(supervisor.getMapname(),"");
@@ -3914,7 +3919,7 @@ Item {
                     width: 220
                     height: 180
                     type: "round_text"
-                    text: "맵 세부수정"
+                    text: qsTr("맵 세부수정")
                     onClicked: {
                         click_sound.play();
                         supervisor.writelog("[ANNOTATION] Enter : Map Editor");
@@ -3925,7 +3930,7 @@ Item {
                     width: 220
                     height: 180
                     type: "round_text"
-                    text: "고정장애물 인식"
+                    text: qsTr("고정장애물 인식")
                     visible: false
                     onClicked: {
                         click_sound.play();
@@ -3937,7 +3942,7 @@ Item {
                     width: 220
                     height: 180
                     type: "round_text"
-                    text: "맵\n예쁘게그리기"
+                    text: qsTr("맵\n예쁘게그리기")
                     visible: false
                     onClicked: {
                         click_sound.play();
@@ -3955,7 +3960,7 @@ Item {
                 width: 220
                 height: 90
                 type: "round_text"
-                text: "종 료"
+                text: qsTr("종 료")
                 onClicked: {
                     click_sound.play();
                     supervisor.writelog("[ANNOTATION] All Done");
@@ -4029,946 +4034,946 @@ Item {
                     if(map.is_drawing_undo)
                         btn_undo.enabled = true;
                     else
-                        btn_undo.enabled = false;
+                            btn_undo.enabled = false;
 
-                    if(supervisor.getObjectflag()){
-                        is_object = true;
-                        btn_undo.enabled = true;
-                        btn_clear.enabled = true;
-                    }else{
-                        is_object = false;
-                        btn_undo.enabled = false;
-                        btn_clear.enabled = false;
-                    }
-                }
-            }
-
-            Timer{
-                id: timer_check_drawing
-                interval: 500
-                repeat: true
-                onTriggered:{
-                    if(supervisor.getObjectflag()){
-                        btn_do_drawing.running = true;
-                    }else{
-                        if(btn_do_drawing.running){
-                            btn_do_drawing.running = false;
-                            timer_check_drawing.stop();
+                        if(supervisor.getObjectflag()){
+                            is_object = true;
+                            btn_undo.enabled = true;
+                            btn_clear.enabled = true;
+                        }else{
+                            is_object = false;
+                            btn_undo.enabled = false;
+                            btn_clear.enabled = false;
                         }
                     }
                 }
-            }
 
-            Row{
-                Rectangle{
-                    width: 200
-                    color: color_dark_navy
-                    height: annot_pages.height
-                    Column{
-                        anchors.centerIn: parent
-                        spacing: 50
-                        Item_buttonRectIcon{
-                            selected: select_mode===0
-                            icon: "icon/icon_mapping_start.png"
-                            name: "오브젝트"
-                            onClicked: {
-                                select_mode = 0;
-                                map.setTool("move");
-                            }
-                        }
-                        Item_buttonRectIcon{
-                            selected: select_mode===1
-                            icon: "icon/icon_lidar.png"
-                            name: "카메라 인식"
-                            onClicked: {
-                                select_mode = 1;
-                                map.setTool("move");
-                            }
-                        }
-                        Item_buttonRectIcon{
-                            selected: select_mode===2
-                            visible: !mode_drawing
-                            icon: "icon/icon_edit.png"
-                            name: "직접 그리기"
-                            onClicked: {
-                                select_mode = 2;
-                                map.setTool("move");
-                            }
-                        }
-                        Item_buttonRectIcon{
-                            selected: select_mode===3
-                            visible: mode_drawing
-                            icon: "icon/icon_edit.png"
-                            name: "직접 그리기"
-                            onClicked: {
-                                select_mode = 3;
-                                map.setTool("move");
+                Timer{
+                    id: timer_check_drawing
+                    interval: 500
+                    repeat: true
+                    onTriggered:{
+                        if(supervisor.getObjectflag()){
+                            btn_do_drawing.running = true;
+                        }else{
+                            if(btn_do_drawing.running){
+                                btn_do_drawing.running = false;
+                                timer_check_drawing.stop();
                             }
                         }
                     }
                 }
 
-                Column{
+                Row{
                     Rectangle{
-                        width: annot_pages.width - 200
-                        height: 100
-                        color: "transparent"
-                        Text{
-                            text: "고정장애물 인식"
-                            color: "white"
-                            horizontalAlignment: Text.AlignHCenter
-                            font.pixelSize: 40
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.horizontalCenterOffset: -100
-                            font.family: font_noto_b.name
+                        width: 200
+                        color: color_dark_navy
+                        height: annot_pages.height
+                        Column{
                             anchors.centerIn: parent
+                            spacing: 50
+                            Item_buttonRectIcon{
+                                selected: select_mode===0
+                                icon: "icon/icon_mapping_start.png"
+                                name: qsTr("오브젝트")
+                                onClicked: {
+                                    select_mode = 0;
+                                    map.setTool("move");
+                                }
+                            }
+                            Item_buttonRectIcon{
+                                selected: select_mode===1
+                                icon: "icon/icon_lidar.png"
+                                name: qsTr("카메라 인식")
+                                onClicked: {
+                                    select_mode = 1;
+                                    map.setTool("move");
+                                }
+                            }
+                            Item_buttonRectIcon{
+                                selected: select_mode===2
+                                visible: !mode_drawing
+                                icon: "icon/icon_edit.png"
+                                name: qsTr("직접 그리기")
+                                onClicked: {
+                                    select_mode = 2;
+                                    map.setTool("move");
+                                }
+                            }
+                            Item_buttonRectIcon{
+                                selected: select_mode===3
+                                visible: mode_drawing
+                                icon: "icon/icon_edit.png"
+                                name: qsTr("직접 그리기")
+                                onClicked: {
+                                    select_mode = 3;
+                                    map.setTool("move");
+                                }
+                            }
+                        }
+                    }
+
+                    Column{
+                        Rectangle{
+                            width: annot_pages.width - 200
+                            height: 100
+                            color: "transparent"
+                            Text{
+                                text: qsTr("고정장애물 인식")
+                                color: "white"
+                                horizontalAlignment: Text.AlignHCenter
+                                font.pixelSize: 40
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.horizontalCenterOffset: -100
+                                font.family: font_noto_b.name
+                                anchors.centerIn: parent
+                            }
+                            Row{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: 30
+                                spacing: 20
+                                Item_buttons{
+                                    type: "circle_text"
+                                    text: "?"
+                                    width: 60
+                                    height: 60
+                                    onClicked:{
+                                        click_sound.play();
+                                        popup_annot_help.open();
+                                        popup_annot_help.setTitle(qsTr("고정장애물 인식"));
+                                        popup_annot_help.addLine(qsTr("로봇은 주행 중 장애물을 마주치면 감속하거나 멈춰 대기합니다"));
+                                        popup_annot_help.addLine(qsTr("이동경로가 장애물에 너무 가깝게 지나가거나 장애물이 튀어"));
+                                    }
+                                }
+                                Item_buttons{
+                                    type: "round_text"
+                                    width: 120
+                                    height: 60
+                                    text:qsTr("종료")
+                                    onClicked:{
+                                        click_sound.play();
+                                        supervisor.writelog("[MAPPING] Object : Save and Exit");
+                                        popup_save_object.open()
+                                    }
+                                }
+                            }
                         }
                         Row{
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.right: parent.right
-                            anchors.rightMargin: 30
-                            spacing: 20
-                            Item_buttons{
-                                type: "circle_text"
-                                text: "?"
-                                width: 60
-                                height: 60
-                                onClicked:{
-                                    click_sound.play();
-                                    popup_annot_help.open();
-                                    popup_annot_help.setTitle("고정장애물 인식");
-                                    popup_annot_help.addLine("로봇은 주행 중 장애물을 마주치면 감속하거나 멈춰 대기합니다.");
-                                    popup_annot_help.addLine("이동경로가 장애물에 너무 가깝게 지나가거나 장애물이 튀어");
-                                }
+                            Rectangle{
+                                width: (annot_pages.width - map.width)/2 - 200
+                                height: map.height
+                                visible: select_mode===0
+                                color: color_dark_navy
                             }
-                            Item_buttons{
-                                type: "round_text"
-                                width: 120
-                                height: 60
-                                text:"종료"
-                                onClicked:{
-                                    click_sound.play();
-                                    supervisor.writelog("[MAPPING] Object : Save and Exit");
-                                    popup_save_object.open()
-                                }
-                            }
-                        }
-                    }
-                    Row{
-                        Rectangle{
-                            width: (annot_pages.width - map.width)/2 - 200
-                            height: map.height
-                            visible: select_mode===0
-                            color: color_dark_navy
-                        }
-                        Rectangle{
-                            visible: select_mode===1
-                            width: annot_pages.width - map.width - 200
-                            height: map.height
-                            color: color_light_gray
+                            Rectangle{
+                                visible: select_mode===1
+                                width: annot_pages.width - map.width - 200
+                                height: map.height
+                                color: color_light_gray
 
-                            Item_buttons{
-                                type: "start_progress"
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.verticalCenterOffset: -50
-                                width: 220
-                                height: 180
-                                running: is_object
-                                id: btn_do_drawing
-                                text: "인식 시작"
-                                onClicked:{
-                                    map.setTool("move");
-                                    if(running){
-                                        click_sound.play();
-                                        supervisor.writelog("[ANNOTATION] Object : Drawing Stop");
-                                        supervisor.stopDrawObject();
-                                    }else{
-                                        click_sound.play();
-                                        supervisor.writelog("[ANNOTATION] Object : Drawing Start");
-                                        supervisor.startDrawObject();
-                                        timer_check_drawing.start();
-                                    }
-                                }
-                            }
-                            Item_buttons{
-                                type: "round_text"
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.bottom: parent.bottom
-                                anchors.bottomMargin : 50
-                                text : "저 장"
-                                width: 200
-                                height: 100
-                                onClicked:{
-                                    click_sound.play();
-                                    supervisor.writelog("[ANNOTATION] Object : Drawing Save");
-                                    popup_save_object.open();
-                                }
-                            }
-                        }
-                        Rectangle{
-                            width: annot_pages.width - map.width - 200
-                            height: map.height
-                            visible: select_mode===2
-                            color: color_light_gray
-                            Column{
-                                anchors.top: parent.top
-                                anchors.topMargin: 60
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                spacing: 30
-                                Row{
-                                    id: rect_annot_boxs
+                                Item_buttons{
+                                    type: "start_progress"
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: 20
-                                    Item_button{
-                                        id: btn_move
-                                        width: 80
-                                        shadow_color: color_gray
-                                        highlight: map.tool=="move"
-                                        icon: "icon/icon_move.png"
-                                        name: "이동"
-                                        MouseArea{
-                                            anchors.fill: parent
-                                            onPressed: {
-                                                parent.pressed();
-                                            }
-                                            onReleased:{
-                                                parent.released();
-                                            }
-                                            onClicked: {
-//                                                supervisor.writelog("[ANNOTATION] Object : Set Tool to move");
-                                                map.setTool("move");
-                                                map.clear("all");
-                                            }
-                                        }
-                                    }
-                                    Item_button{
-                                        id: btn_add
-                                        width: 80
-                                        shadow_color: color_gray
-                                        highlight: map.tool=="add_object" || map.tool=="add_point"
-                                        icon: "icon/icon_add.png"
-                                        name: "추가"
-                                        MouseArea{
-                                            anchors.fill: parent
-                                            onPressed: {
-                                                parent.pressed();
-                                            }
-                                            onReleased:{
-                                                parent.released();
-                                            }
-                                            onClicked: {
-//                                                supervisor.writelog("[ANNOTATION] Object : Set Tool to add Object");
-                                                map.setTool("add_object");
-                                                map.clear("all");
-                                            }
-                                        }
-                                    }
-                                    Item_button{
-                                        id: btn_edit
-                                         width: 80
-                                         enabled: false
-                                         btn_color: enabled?"white":color_gray
-                                        shadow_color: color_gray
-                                        highlight: map.tool=="edit_object"
-                                        icon: "icon/icon_draw.png"
-                                        name: "수정"
-                                        MouseArea{
-                                            anchors.fill: parent
-                                            onPressed: {
-                                                parent.pressed();
-                                            }
-                                            onReleased:{
-                                                parent.released();
-                                            }
-                                            onClicked: {
-                                                map.clear("object");
-//                                                supervisor.writelog("[ANNOTATION] Object : Set Tool to add Object");
-                                                map.setTool("edit_object");
-                                            }
-                                        }
-                                    }
-                                    Item_button{
-                                        id: btn_erase
-                                        width: 80
-                                        enabled: false
-                                        shadow_color: color_gray
-                                        btn_color: enabled?"white":color_gray
-                                        icon: "icon/icon_remove.png"
-                                        name: "삭제"
-                                        overcolor: true
-                                        MouseArea{
-                                            anchors.fill: parent
-                                            onPressed: {
-                                                parent.pressed();
-                                            }
-                                            onReleased:{
-                                                parent.released();
-                                            }
-                                            onClicked: {
-                                                supervisor.removeObject(select_object);
-                                                select_object = -1;
-                                                update_object();
-                                                supervisor.writelog("[ANNOTATION] Object : Remove "+Number(select_object));
-                                            }
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.verticalCenterOffset: -50
+                                    width: 220
+                                    height: 180
+                                    running: is_object
+                                    id: btn_do_drawing
+                                    text: qsTr("인식 시작")
+                                    onClicked:{
+                                        map.setTool("move");
+                                        if(running){
+                                            click_sound.play();
+                                            supervisor.writelog("[ANNOTATION] Object : Drawing Stop");
+                                            supervisor.stopDrawObject();
+                                        }else{
+                                            click_sound.play();
+                                            supervisor.writelog("[ANNOTATION] Object : Drawing Start");
+                                            supervisor.startDrawObject();
+                                            timer_check_drawing.start();
                                         }
                                     }
                                 }
-
-                                Column{
-                                    spacing: 3
-                                    Rectangle{
-                                        id: rect_annot_tline_2
-                                        width: rect_annot_boxs.width
-                                        height: 60
-                                        visible: map.tool === "add_object" || map.tool === "add_point"
-                                        color: "white"
-                                        Row{
-                                            anchors.centerIn: parent
-                                            spacing: 20
-                                            Rectangle{
-                                                width: 100
-                                                height: 50
-                                                color: "transparent"
-                                                Row{
-                                                    anchors.centerIn: parent
-                                                    spacing: 10
-                                                    Rectangle{
-                                                        width: 50
-                                                        height: width
-                                                        radius: width
-                                                        color: map.tool === "add_object"?color_green:color_gray
-                                                        Image{
-                                                            source: "icon/icon-drawing-square.png"
-                                                            width: 30
-                                                            height: 30
-                                                            anchors.centerIn: parent
-                                                        }
-                                                    }
-                                                    Text{
-                                                        anchors.verticalCenter: parent.verticalCenter
-                                                        font.family: font_noto_r.name
-                                                        color: map.tool === "add_object"?"black":color_gray
-                                                        text: "사각형"
-                                                    }
-                                                }
-                                                MouseArea{
-                                                    anchors.fill: parent
-                                                    onClicked:{
-//                                                        supervisor.writelog("[ANNOTATION] ㅒㅠㅓ");
-                                                        map.clear("object");
-                                                        map.setTool("add_object");
-                                                    }
-                                                }
-                                            }
-                                            Rectangle{
-                                                width: 100
-                                                height: 50
-                                                color: "transparent"
-                                                Row{
-                                                    anchors.centerIn: parent
-                                                    spacing: 10
-                                                    Rectangle{
-                                                        width: 50
-                                                        height: width
-                                                        radius: width
-                                                        color: map.tool === "add_point"?color_green:color_gray
-                                                        Image{
-                                                            source: "icon/icon-drawing-polygon.png"
-                                                            width: 30
-                                                            height: 30
-                                                            anchors.centerIn: parent
-                                                        }
-                                                    }
-                                                    Text{
-                                                        anchors.verticalCenter: parent.verticalCenter
-                                                        font.family: font_noto_r.name
-                                                        color: map.tool === "add_point"?"black":color_gray
-                                                        text: "다각형"
-                                                    }
-                                                }
-
-                                                MouseArea{
-                                                    anchors.fill: parent
-                                                    onClicked:{
-//                                                        supervisor.writelog("[ANNOTATION] Travel line : Set tool to straight");
-                                                        map.clear("object");
-                                                        map.setTool("add_point");
-                                                    }
-                                                }
-                                            }
-
-                                        }
+                                Item_buttons{
+                                    type: "round_text"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.bottom: parent.bottom
+                                    anchors.bottomMargin : 50
+                                    text : qsTr("저 장")
+                                    width: 200
+                                    height: 100
+                                    onClicked:{
+                                        click_sound.play();
+                                        supervisor.writelog("[ANNOTATION] Object : Drawing Save");
+                                        popup_save_object.open();
                                     }
-
-                                    Rectangle{
-                                        width: rect_annot_boxs.width
-                                        height: 60
-                                        visible: map.tool === "add_object" || map.tool === "add_point"
-                                        color: "white"
-                                        Row{
-                                            id: row_redo
-                                            spacing: 20
-                                            anchors.centerIn: parent
-
-                                            Rectangle{
-                                                width: 80
-                                                height: 40
-                                                radius: 5
-                                                color: "transparent"
-                                                border.width: 2
-                                                border.color: color_dark_navy
-                                                Text{
-                                                    anchors.centerIn: parent
-                                                    text: "저 장"
-                                                    font.family: font_noto_r.name
+                                }
+                            }
+                            Rectangle{
+                                width: annot_pages.width - map.width - 200
+                                height: map.height
+                                visible: select_mode===2
+                                color: color_light_gray
+                                Column{
+                                    anchors.top: parent.top
+                                    anchors.topMargin: 60
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: 30
+                                    Row{
+                                        id: rect_annot_boxs
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        spacing: 20
+                                        Item_button{
+                                            id: btn_move
+                                            width: 80
+                                            shadow_color: color_gray
+                                            highlight: map.tool=="move"
+                                            icon: "icon/icon_move.png"
+                                            name: qsTr("이동")
+                                            MouseArea{
+                                                anchors.fill: parent
+                                                onPressed: {
+                                                    parent.pressed();
                                                 }
-                                                MouseArea{
-                                                    anchors.fill: parent
-                                                    onClicked:{
-                                                        map.setTool("move");
-                                                        supervisor.saveObject();
-                                                        update_object();
-                                                    }
+                                                onReleased:{
+                                                    parent.released();
                                                 }
-                                            }
-                                            Rectangle{
-                                                width: 80
-                                                height: 40
-                                                radius: 5
-                                                color: "transparent"
-                                                border.width: 2
-                                                border.color: color_dark_navy
-                                                Text{
-                                                    anchors.centerIn: parent
-                                                    text: "취 소"
-                                                    font.family: font_noto_r.name
-                                                }
-                                                MouseArea{
-                                                    anchors.fill: parent
-                                                    onClicked:{
-                                                        supervisor.clearObjectAll();
-                                                        map.setTool("move");
-                                                    }
-                                                }
-                                            }
-                                            Item_buttons{
-                                                id: btn_undo
-                                                type: "circle_image"
-                                                enabled: false
-                                                source: "icon/icon_undo.png"
-                                                width: 40
-                                                height: 40
-                                                onClicked:{
-                                                    click_sound.play();
-                                                    supervisor.writelog("[ANNOTATION] Object : UNDO")
-                                                    supervisor.undoObject();
-                                                }
-                                            }
-                                            Item_buttons{
-                                                id: btn_clear
-                                                type: "circle_image"
-                                                enabled: false
-                                                source: "icon/icon_trashcan.png"
-                                                width: 40
-                                                height: 40
-                                                onClicked:{
-                                                    click_sound.play();
-                                                    supervisor.writelog("[ANNOTATION] Object : Clear");
+                                                onClicked: {
+    //                                                supervisor.writelog("[ANNOTATION] Object : Set Tool to move");
+                                                    map.setTool("move");
                                                     map.clear("all");
                                                 }
                                             }
                                         }
+                                        Item_button{
+                                            id: btn_add
+                                            width: 80
+                                            shadow_color: color_gray
+                                            highlight: map.tool=="add_object" || map.tool=="add_point"
+                                            icon: "icon/icon_add.png"
+                                            name: qsTr("추가")
+                                            MouseArea{
+                                                anchors.fill: parent
+                                                onPressed: {
+                                                    parent.pressed();
+                                                }
+                                                onReleased:{
+                                                    parent.released();
+                                                }
+                                                onClicked: {
+    //                                                supervisor.writelog("[ANNOTATION] Object : Set Tool to add Object");
+                                                    map.setTool("add_object");
+                                                    map.clear("all");
+                                                }
+                                            }
+                                        }
+                                        Item_button{
+                                            id: btn_edit
+                                             width: 80
+                                             enabled: false
+                                             btn_color: enabled?"white":color_gray
+                                            shadow_color: color_gray
+                                            highlight: map.tool=="edit_object"
+                                            icon: "icon/icon_draw.png"
+                                            name: qsTr("수정")
+                                            MouseArea{
+                                                anchors.fill: parent
+                                                onPressed: {
+                                                    parent.pressed();
+                                                }
+                                                onReleased:{
+                                                    parent.released();
+                                                }
+                                                onClicked: {
+                                                    map.clear("object");
+    //                                                supervisor.writelog("[ANNOTATION] Object : Set Tool to add Object");
+                                                    map.setTool("edit_object");
+                                                }
+                                            }
+                                        }
+                                        Item_button{
+                                            id: btn_erase
+                                            width: 80
+                                            enabled: false
+                                            shadow_color: color_gray
+                                            btn_color: enabled?"white":color_gray
+                                            icon: "icon/icon_remove.png"
+                                            name: qsTr("삭제")
+                                            overcolor: true
+                                            MouseArea{
+                                                anchors.fill: parent
+                                                onPressed: {
+                                                    parent.pressed();
+                                                }
+                                                onReleased:{
+                                                    parent.released();
+                                                }
+                                                onClicked: {
+                                                    supervisor.removeObject(select_object);
+                                                    select_object = -1;
+                                                    update_object();
+                                                    supervisor.writelog("[ANNOTATION] Object : Remove "+Number(select_object));
+                                                }
+                                            }
+                                        }
                                     }
 
-                                }
-                                Flickable{
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    width: rect_annot_boxs.width
-                                    height: 300
-                                    clip: true
-                                    contentHeight: col_objs.height
                                     Column{
-                                        id: col_objs
+                                        spacing: 3
+                                        Rectangle{
+                                            id: rect_annot_tline_2
+                                            width: rect_annot_boxs.width
+                                            height: 60
+                                            visible: map.tool === "add_object" || map.tool === "add_point"
+                                            color: "white"
+                                            Row{
+                                                anchors.centerIn: parent
+                                                spacing: 20
+                                                Rectangle{
+                                                    width: 100
+                                                    height: 50
+                                                    color: "transparent"
+                                                    Row{
+                                                        anchors.centerIn: parent
+                                                        spacing: 10
+                                                        Rectangle{
+                                                            width: 50
+                                                            height: width
+                                                            radius: width
+                                                            color: map.tool === "add_object"?color_green:color_gray
+                                                            Image{
+                                                                source: "icon/icon-drawing-square.png"
+                                                                width: 30
+                                                                height: 30
+                                                                anchors.centerIn: parent
+                                                            }
+                                                        }
+                                                        Text{
+                                                            anchors.verticalCenter: parent.verticalCenter
+                                                            font.family: font_noto_r.name
+                                                            color: map.tool === "add_object"?"black":color_gray
+                                                            text: qsTr("사각형")
+                                                        }
+                                                    }
+                                                    MouseArea{
+                                                        anchors.fill: parent
+                                                        onClicked:{
+    //                                                        supervisor.writelog("[ANNOTATION] ㅒㅠㅓ");
+                                                            map.clear("object");
+                                                            map.setTool("add_object");
+                                                        }
+                                                    }
+                                                }
+                                                Rectangle{
+                                                    width: 100
+                                                    height: 50
+                                                    color: "transparent"
+                                                    Row{
+                                                        anchors.centerIn: parent
+                                                        spacing: 10
+                                                        Rectangle{
+                                                            width: 50
+                                                            height: width
+                                                            radius: width
+                                                            color: map.tool === "add_point"?color_green:color_gray
+                                                            Image{
+                                                                source: "icon/icon-drawing-polygon.png"
+                                                                width: 30
+                                                                height: 30
+                                                                anchors.centerIn: parent
+                                                            }
+                                                        }
+                                                        Text{
+                                                            anchors.verticalCenter: parent.verticalCenter
+                                                            font.family: font_noto_r.name
+                                                            color: map.tool === "add_point"?"black":color_gray
+                                                            text: qsTr("다각형")
+                                                        }
+                                                    }
+
+                                                    MouseArea{
+                                                        anchors.fill: parent
+                                                        onClicked:{
+    //                                                        supervisor.writelog("[ANNOTATION] Travel line : Set tool to straight");
+                                                            map.clear("object");
+                                                            map.setTool("add_point");
+                                                        }
+                                                    }
+                                                }
+
+                                            }
+                                        }
+
+                                        Rectangle{
+                                            width: rect_annot_boxs.width
+                                            height: 60
+                                            visible: map.tool === "add_object" || map.tool === "add_point"
+                                            color: "white"
+                                            Row{
+                                                id: row_redo
+                                                spacing: 20
+                                                anchors.centerIn: parent
+
+                                                Rectangle{
+                                                    width: 80
+                                                    height: 40
+                                                    radius: 5
+                                                    color: "transparent"
+                                                    border.width: 2
+                                                    border.color: color_dark_navy
+                                                    Text{
+                                                        anchors.centerIn: parent
+                                                        text: qsTr("저 장")
+                                                        font.family: font_noto_r.name
+                                                    }
+                                                    MouseArea{
+                                                        anchors.fill: parent
+                                                        onClicked:{
+                                                            map.setTool("move");
+                                                            supervisor.saveObject();
+                                                            update_object();
+                                                        }
+                                                    }
+                                                }
+                                                Rectangle{
+                                                    width: 80
+                                                    height: 40
+                                                    radius: 5
+                                                    color: "transparent"
+                                                    border.width: 2
+                                                    border.color: color_dark_navy
+                                                    Text{
+                                                        anchors.centerIn: parent
+                                                        text: qsTr("취 소")
+                                                        font.family: font_noto_r.name
+                                                    }
+                                                    MouseArea{
+                                                        anchors.fill: parent
+                                                        onClicked:{
+                                                            supervisor.clearObjectAll();
+                                                            map.setTool("move");
+                                                        }
+                                                    }
+                                                }
+                                                Item_buttons{
+                                                    id: btn_undo
+                                                    type: "circle_image"
+                                                    enabled: false
+                                                    source: "icon/icon_undo.png"
+                                                    width: 40
+                                                    height: 40
+                                                    onClicked:{
+                                                        click_sound.play();
+                                                        supervisor.writelog("[ANNOTATION] Object : UNDO")
+                                                        supervisor.undoObject();
+                                                    }
+                                                }
+                                                Item_buttons{
+                                                    id: btn_clear
+                                                    type: "circle_image"
+                                                    enabled: false
+                                                    source: "icon/icon_trashcan.png"
+                                                    width: 40
+                                                    height: 40
+                                                    onClicked:{
+                                                        click_sound.play();
+                                                        supervisor.writelog("[ANNOTATION] Object : Clear");
+                                                        map.clear("all");
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                    Flickable{
                                         anchors.horizontalCenter: parent.horizontalCenter
-                                        spacing: 10
-                                        Repeater{
-                                            model:ListModel{id:model_objs}
-                                            Rectangle{
-                                                width: rect_annot_boxs.width
-                                                height: 40
-                                                color: select_object === index?color_green:"white"
-                                                Text{
-                                                    anchors.centerIn: parent
-                                                    text: index
-                                                }
-                                                MouseArea{
-                                                    anchors.fill: parent
-                                                    onClicked:{
-                                                        if(select_object == index){
-                                                            select_object = -1;
-                                                        }else{
-                                                            select_object = index;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                            }
-
-                            Item_buttons{
-                                type: "round_text"
-                                visible: select_mode===1 || (select_mode ===2 && map.tool ==="move")
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.bottom: parent.bottom
-                                anchors.bottomMargin : 50
-                                text : "저 장"
-                                width: 200
-                                height: 100
-                                onClicked:{
-                                    click_sound.play();
-                                    popup_save_object.open();
-                                }
-                            }
-                        }
-
-                        Rectangle{
-                            width: annot_pages.width - map.width - 200
-                            height: map.height
-                            visible: select_mode===3
-                            color: color_light_gray
-                            Column{
-                                anchors.top: parent.top
-                                anchors.topMargin: 60
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                spacing: 10
-                                Row{
-                                    id: rect_annot_boxs33
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: 20
-                                    Item_button{
-                                        id: btn_move33
-//                                            width: 80
-                                        shadow_color: color_gray
-                                        highlight: map.tool=="move"
-                                        icon: "icon/icon_move.png"
-                                        name: "이동"
-                                        MouseArea{
-                                            anchors.fill: parent
-                                            onPressed: {
-                                                parent.pressed();
-                                            }
-                                            onReleased:{
-                                                parent.released();
-                                            }
-
-                                            onClicked: {
-                                                supervisor.writelog("[ANNOTATION] Travel Line : Set Tool to move");
-                                                map.setTool("move");
-                                            }
-                                        }
-                                    }
-                                    Item_button{
-                                        id: btn_draw
-//                                            width: 80
-                                        shadow_color: color_gray
-                                        highlight: map.tool=="draw" || map.tool=="erase" || map.tool=="draw_rect"
-                                        icon: "icon/icon_draw.png"
-                                        name: "수정"
-                                        MouseArea{
-                                            anchors.fill: parent
-                                            onPressed: {
-                                                parent.pressed();
-                                            }
-                                            onReleased:{
-                                                parent.released();
-                                            }
-                                            onClicked: {
-                                                supervisor.writelog("[ANNOTATION] Object : Set Tool to draw");
-                                                map.setTool("draw");
-                                                map.setDrawingColor(255);
-                                                map.setDrawingWidth(slider_brush.value);
-                                            }
-                                        }
-                                    }
-                                    Item_button{
-                                        id: btn_erase33
-//                                            width: 80
-                                        shadow_color: color_gray
-                                        icon: "icon/icon_trashcan.png"
-                                        name: "초기화"
-                                        overcolor: true
-                                        MouseArea{
-                                            anchors.fill: parent
-                                            onPressed: {
-                                                parent.pressed();
-                                            }
-                                            onReleased:{
-                                                parent.released();
-                                            }
-                                            onClicked: {
-                                                map.clear("spline");
-                                                map.clear("object_png");
-                                                map.clear("all");
-                                                supervisor.writelog("[ANNOTATION] Object : Clear")
-                                            }
-                                        }
-                                    }
-                                }
-
-                                Column{
-                                    spacing: 3
-                                    Rectangle{
                                         width: rect_annot_boxs.width
-                                        height: 60
-                                        visible: map.tool === "draw" || map.tool === "draw_rect" || map.tool === "erase"
-                                        color: "white"
-                                        Row{
-                                            id: row_redo33
-                                            spacing: 30
-                                            anchors.right: parent.right
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.rightMargin: 30
-                                            Item_buttons{
-                                                id: btn_undo33
-                                                type: "circle_image"
-                                                enabled: false
-                                                source: "icon/icon_undo.png"
-                                                width: 40
-                                                height: 40
-                                                onClicked:{
-                                                    click_sound.play();
-                                                    supervisor.writelog("[ANNOTATION] Object : UNDO")
-                                                    map.drawing_undo();
-                                                }
-                                            }
-                                            Item_buttons{
-                                                id: btn_redo
-                                                type: "circle_image"
-                                                enabled: false
-                                                source: "icon/icon_redo.png"
-                                                width: 40
-                                                height: 40
-                                                onClicked:{
-                                                    click_sound.play();
-                                                    supervisor.writelog("[ANNOTATION] Object : REDO")
-                                                    map.drawing_redo();
-                                                }
-                                            }
-                                        }
-                                    }
-                                    Rectangle{
-                                        id: rect_annot_obj
-                                        width: rect_annot_boxs.width
-                                        height: 60
-                                        visible: map.tool === "draw" || map.tool === "draw_rect" || map.tool === "erase"
-                                        color: "white"
-                                        Row{
-                                            anchors.centerIn: parent
-                                            spacing: 20
-                                            Rectangle{
-                                                width: 100
-                                                height: 50
-                                                color: "transparent"
-                                                Row{
-                                                    anchors.centerIn: parent
-                                                    spacing: 10
-                                                    Rectangle{
-                                                        width: 50
-                                                        height: width
-                                                        radius: width
-                                                        color: map.tool === "draw"?color_green:color_gray
-                                                        Image{
-                                                            source: "icon/icon-drawing-free drawing.png"
-                                                            width: 30
-                                                            height: 30
-                                                            anchors.centerIn: parent
-                                                        }
-                                                    }
+                                        height: 300
+                                        clip: true
+                                        contentHeight: col_objs.height
+                                        Column{
+                                            id: col_objs
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            spacing: 10
+                                            Repeater{
+                                                model:ListModel{id:model_objs}
+                                                Rectangle{
+                                                    width: rect_annot_boxs.width
+                                                    height: 40
+                                                    color: select_object === index?color_green:"white"
                                                     Text{
-                                                        anchors.verticalCenter: parent.verticalCenter
-                                                        font.family: font_noto_r.name
-                                                        color: map.tool === "draw"?"black":color_gray
-                                                        text: "그리기"
+                                                        anchors.centerIn: parent
+                                                        text: index
                                                     }
-                                                }
-                                                MouseArea{
-                                                    anchors.fill: parent
-                                                    onClicked:{
-                                                        supervisor.writelog("[ANNOTATION] Object : Set tool to draw");
-                                                        map.setTool("draw");
-                                                        map.setDrawingColor(255);
-                                                        map.setDrawingWidth(slider_brush.value);
-                                                    }
-                                                }
-                                            }
-                                            Rectangle{
-                                                width: 100
-                                                height: 50
-                                                color: "transparent"
-                                                Row{
-                                                    anchors.centerIn: parent
-                                                    spacing: 10
-                                                    Rectangle{
-                                                        width: 50
-                                                        height: width
-                                                        radius: width
-                                                        color: map.tool==="draw_rect"? color_green: color_gray
-                                                        Image{
-                                                            source: "icon/icon-drawing-square.png"
-                                                            width: 30
-                                                            height: 30
-                                                            anchors.centerIn: parent
-                                                        }
-                                                    }
-                                                    Text{
-                                                        anchors.verticalCenter: parent.verticalCenter
-                                                        font.family: font_noto_r.name
-                                                        color: map.tool === "draw_rect"?"black":color_gray
-                                                        text: "사각형"
-                                                    }
-                                                }
-
-                                                MouseArea{
-                                                    anchors.fill: parent
-                                                    onClicked:{
-                                                        supervisor.writelog("[ANNOTATION] Object : Set tool to Rectangle")
-                                                        map.setTool("draw_rect");
-                                                        map.setDrawingColor(255);
-                                                        map.setDrawingWidth(slider_brush.value);
-                                                    }
-                                                }
-                                            }
-                                            Rectangle{
-                                                width: 100
-                                                height: 50
-                                                color: "transparent"
-                                                Row{
-                                                    anchors.centerIn: parent
-                                                    spacing: 10
-                                                    Rectangle{
-                                                        width: 50
-                                                        height: width
-                                                        radius: width
-                                                        color: map.tool === "erase"?color_green:color_gray
-                                                        Image{
-                                                            source: "icon/icon_erase.png"
-                                                            width: 30
-                                                            height: 30
-                                                            anchors.centerIn: parent
-                                                            ColorOverlay{
-                                                                source: parent
-                                                                anchors.fill: parent
-                                                                color: "white"
+                                                    MouseArea{
+                                                        anchors.fill: parent
+                                                        onClicked:{
+                                                            if(select_object == index){
+                                                                select_object = -1;
+                                                            }else{
+                                                                select_object = index;
                                                             }
                                                         }
                                                     }
-                                                    Text{
-                                                        anchors.verticalCenter: parent.verticalCenter
-                                                        font.family: font_noto_r.name
-                                                        color: map.tool === "erase"?"black":color_gray
-                                                        text: "지우개"
-                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+
+                                Item_buttons{
+                                    type: "round_text"
+                                    visible: select_mode===1 || (select_mode ===2 && map.tool ==="move")
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.bottom: parent.bottom
+                                    anchors.bottomMargin : 50
+                                    text : qsTr("저 장")
+                                    width: 200
+                                    height: 100
+                                    onClicked:{
+                                        click_sound.play();
+                                        popup_save_object.open();
+                                    }
+                                }
+                            }
+
+                            Rectangle{
+                                width: annot_pages.width - map.width - 200
+                                height: map.height
+                                visible: select_mode===3
+                                color: color_light_gray
+                                Column{
+                                    anchors.top: parent.top
+                                    anchors.topMargin: 60
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: 10
+                                    Row{
+                                        id: rect_annot_boxs33
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        spacing: 20
+                                        Item_button{
+                                            id: btn_move33
+    //                                            width: 80
+                                            shadow_color: color_gray
+                                            highlight: map.tool=="move"
+                                            icon: "icon/icon_move.png"
+                                            name: qsTr("이동")
+                                            MouseArea{
+                                                anchors.fill: parent
+                                                onPressed: {
+                                                    parent.pressed();
+                                                }
+                                                onReleased:{
+                                                    parent.released();
                                                 }
 
-                                                MouseArea{
-                                                    anchors.fill: parent
+                                                onClicked: {
+                                                    supervisor.writelog("[ANNOTATION] Travel Line : Set Tool to move");
+                                                    map.setTool("move");
+                                                }
+                                            }
+                                        }
+                                        Item_button{
+                                            id: btn_draw
+    //                                            width: 80
+                                            shadow_color: color_gray
+                                            highlight: map.tool=="draw" || map.tool=="erase" || map.tool=="draw_rect"
+                                            icon: "icon/icon_draw.png"
+                                            name: qsTr("수정")
+                                            MouseArea{
+                                                anchors.fill: parent
+                                                onPressed: {
+                                                    parent.pressed();
+                                                }
+                                                onReleased:{
+                                                    parent.released();
+                                                }
+                                                onClicked: {
+                                                    supervisor.writelog("[ANNOTATION] Object : Set Tool to draw");
+                                                    map.setTool("draw");
+                                                    map.setDrawingColor(255);
+                                                    map.setDrawingWidth(slider_brush.value);
+                                                }
+                                            }
+                                        }
+                                        Item_button{
+                                            id: btn_erase33
+    //                                            width: 80
+                                            shadow_color: color_gray
+                                            icon: "icon/icon_trashcan.png"
+                                            name: qsTr("초기화")
+                                            overcolor: true
+                                            MouseArea{
+                                                anchors.fill: parent
+                                                onPressed: {
+                                                    parent.pressed();
+                                                }
+                                                onReleased:{
+                                                    parent.released();
+                                                }
+                                                onClicked: {
+                                                    map.clear("spline");
+                                                    map.clear("object_png");
+                                                    map.clear("all");
+                                                    supervisor.writelog("[ANNOTATION] Object : Clear")
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Column{
+                                        spacing: 3
+                                        Rectangle{
+                                            width: rect_annot_boxs.width
+                                            height: 60
+                                            visible: map.tool === "draw" || map.tool === "draw_rect" || map.tool === "erase"
+                                            color: "white"
+                                            Row{
+                                                id: row_redo33
+                                                spacing: 30
+                                                anchors.right: parent.right
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                anchors.rightMargin: 30
+                                                Item_buttons{
+                                                    id: btn_undo33
+                                                    type: "circle_image"
+                                                    enabled: false
+                                                    source: "icon/icon_undo.png"
+                                                    width: 40
+                                                    height: 40
                                                     onClicked:{
-                                                        supervisor.writelog("[ANNOTATION] Object : Set tool to erase");
-                                                        map.setDrawingWidth(slider_erase.value);
-                                                        map.setTool("erase");
+                                                        click_sound.play();
+                                                        supervisor.writelog("[ANNOTATION] Object : UNDO")
+                                                        map.drawing_undo();
+                                                    }
+                                                }
+                                                Item_buttons{
+                                                    id: btn_redo
+                                                    type: "circle_image"
+                                                    enabled: false
+                                                    source: "icon/icon_redo.png"
+                                                    width: 40
+                                                    height: 40
+                                                    onClicked:{
+                                                        click_sound.play();
+                                                        supervisor.writelog("[ANNOTATION] Object : REDO")
+                                                        map.drawing_redo();
                                                     }
                                                 }
                                             }
                                         }
-                                    }
+                                        Rectangle{
+                                            id: rect_annot_obj
+                                            width: rect_annot_boxs.width
+                                            height: 60
+                                            visible: map.tool === "draw" || map.tool === "draw_rect" || map.tool === "erase"
+                                            color: "white"
+                                            Row{
+                                                anchors.centerIn: parent
+                                                spacing: 20
+                                                Rectangle{
+                                                    width: 100
+                                                    height: 50
+                                                    color: "transparent"
+                                                    Row{
+                                                        anchors.centerIn: parent
+                                                        spacing: 10
+                                                        Rectangle{
+                                                            width: 50
+                                                            height: width
+                                                            radius: width
+                                                            color: map.tool === "draw"?color_green:color_gray
+                                                            Image{
+                                                                source: "icon/icon-drawing-free drawing.png"
+                                                                width: 30
+                                                                height: 30
+                                                                anchors.centerIn: parent
+                                                            }
+                                                        }
+                                                        Text{
+                                                            anchors.verticalCenter: parent.verticalCenter
+                                                            font.family: font_noto_r.name
+                                                            color: map.tool === "draw"?"black":color_gray
+                                                            text: qsTr("그리기")
+                                                        }
+                                                    }
+                                                    MouseArea{
+                                                        anchors.fill: parent
+                                                        onClicked:{
+                                                            supervisor.writelog("[ANNOTATION] Object : Set tool to draw");
+                                                            map.setTool("draw");
+                                                            map.setDrawingColor(255);
+                                                            map.setDrawingWidth(slider_brush.value);
+                                                        }
+                                                    }
+                                                }
+                                                Rectangle{
+                                                    width: 100
+                                                    height: 50
+                                                    color: "transparent"
+                                                    Row{
+                                                        anchors.centerIn: parent
+                                                        spacing: 10
+                                                        Rectangle{
+                                                            width: 50
+                                                            height: width
+                                                            radius: width
+                                                            color: map.tool==="draw_rect"? color_green: color_gray
+                                                            Image{
+                                                                source: "icon/icon-drawing-square.png"
+                                                                width: 30
+                                                                height: 30
+                                                                anchors.centerIn: parent
+                                                            }
+                                                        }
+                                                        Text{
+                                                            anchors.verticalCenter: parent.verticalCenter
+                                                            font.family: font_noto_r.name
+                                                            color: map.tool === "draw_rect"?"black":color_gray
+                                                            text: qsTr("사각형")
+                                                        }
+                                                    }
 
-                                    Rectangle{
-                                        id: rect_annot_box3
-                                        width: rect_annot_boxs.width
-                                        height: 60
-                                        color: "white"
-                                        visible: map.tool === "draw"
-                                        Text{
-                                            text: "브러시 사이즈"
-                                            font.family: font_noto_r.name
-                                            font.pixelSize: 15
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.left: parent.left
-                                            anchors.leftMargin: 30
-                                        }
-                                        Slider {
-                                            id: slider_brush
-                                            x: 300
-                                            y: 330
-                                            value: 10
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.right: parent.right
-                                            anchors.rightMargin: 30
-                                            width: 170
-                                            height: 18
-                                            from: 0
-                                            stepSize: 5
-                                            to : 50
-                                            onValueChanged: {
-                                                map.setDrawingWidth(value)
-                                            }
-                                            onPressedChanged: {
-                                                if(slider_brush.pressed){
-                                                    map.show_brush = true;
-                                                }else{
-                                                    map.show_brush = false;
+                                                    MouseArea{
+                                                        anchors.fill: parent
+                                                        onClicked:{
+                                                            supervisor.writelog("[ANNOTATION] Object : Set tool to Rectangle")
+                                                            map.setTool("draw_rect");
+                                                            map.setDrawingColor(255);
+                                                            map.setDrawingWidth(slider_brush.value);
+                                                        }
+                                                    }
+                                                }
+                                                Rectangle{
+                                                    width: 100
+                                                    height: 50
+                                                    color: "transparent"
+                                                    Row{
+                                                        anchors.centerIn: parent
+                                                        spacing: 10
+                                                        Rectangle{
+                                                            width: 50
+                                                            height: width
+                                                            radius: width
+                                                            color: map.tool === "erase"?color_green:color_gray
+                                                            Image{
+                                                                source: "icon/icon_erase.png"
+                                                                width: 30
+                                                                height: 30
+                                                                anchors.centerIn: parent
+                                                                ColorOverlay{
+                                                                    source: parent
+                                                                    anchors.fill: parent
+                                                                    color: "white"
+                                                                }
+                                                            }
+                                                        }
+                                                        Text{
+                                                            anchors.verticalCenter: parent.verticalCenter
+                                                            font.family: font_noto_r.name
+                                                            color: map.tool === "erase"?"black":color_gray
+                                                            text: qsTr("지우개")
+                                                        }
+                                                    }
+
+                                                    MouseArea{
+                                                        anchors.fill: parent
+                                                        onClicked:{
+                                                            supervisor.writelog("[ANNOTATION] Object : Set tool to erase");
+                                                            map.setDrawingWidth(slider_erase.value);
+                                                            map.setTool("erase");
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                    Rectangle{
-                                        width: rect_annot_boxs.width
-                                        height: 60
-                                        color: "white"
-                                        visible: map.tool === "erase"
-                                        Text{
-                                            text: "브러시 사이즈"
-                                            font.family: font_noto_r.name
-                                            font.pixelSize: 15
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.left: parent.left
-                                            anchors.leftMargin: 30
-                                        }
-                                        Slider {
-                                            id: slider_erase
-                                            x: 300
-                                            y: 330
-                                            value: 30
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.right: parent.right
-                                            anchors.rightMargin: 30
-                                            width: 170
-                                            height: 18
-                                            from: 10
-                                            to : 100
-                                            onValueChanged: {
-                                                map.setDrawingWidth(value);
+
+                                        Rectangle{
+                                            id: rect_annot_box3
+                                            width: rect_annot_boxs.width
+                                            height: 60
+                                            color: "white"
+                                            visible: map.tool === "draw"
+                                            Text{
+                                                text: qsTr("브러시 사이즈")
+                                                font.family: font_noto_r.name
+                                                font.pixelSize: 15
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                anchors.left: parent.left
+                                                anchors.leftMargin: 30
                                             }
-                                            onPressedChanged: {
-                                                if(slider_erase.pressed){
-                                                    map.show_brush = true;
-                //                                    map.brushchanged();
-                                                }else{
-                                                    map.show_brush = false;
-                //                                    map.brushdisappear();
+                                            Slider {
+                                                id: slider_brush
+                                                x: 300
+                                                y: 330
+                                                value: 10
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                anchors.right: parent.right
+                                                anchors.rightMargin: 30
+                                                width: 170
+                                                height: 18
+                                                from: 0
+                                                stepSize: 5
+                                                to : 50
+                                                onValueChanged: {
+                                                    map.setDrawingWidth(value)
+                                                }
+                                                onPressedChanged: {
+                                                    if(slider_brush.pressed){
+                                                        map.show_brush = true;
+                                                    }else{
+                                                        map.show_brush = false;
+                                                    }
                                                 }
                                             }
                                         }
+                                        Rectangle{
+                                            width: rect_annot_boxs.width
+                                            height: 60
+                                            color: "white"
+                                            visible: map.tool === "erase"
+                                            Text{
+                                                text: qsTr("브러시 사이즈")
+                                                font.family: font_noto_r.name
+                                                font.pixelSize: 15
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                anchors.left: parent.left
+                                                anchors.leftMargin: 30
+                                            }
+                                            Slider {
+                                                id: slider_erase
+                                                x: 300
+                                                y: 330
+                                                value: 30
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                anchors.right: parent.right
+                                                anchors.rightMargin: 30
+                                                width: 170
+                                                height: 18
+                                                from: 10
+                                                to : 100
+                                                onValueChanged: {
+                                                    map.setDrawingWidth(value);
+                                                }
+                                                onPressedChanged: {
+                                                    if(slider_erase.pressed){
+                                                        map.show_brush = true;
+                    //                                    map.brushchanged();
+                                                    }else{
+                                                        map.show_brush = false;
+                    //                                    map.brushdisappear();
+                                                    }
+                                                }
+                                            }
+                                        }
+
                                     }
 
                                 }
-
-                            }
-                            Item_buttons{
-                                type: "round_text"
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.bottom: parent.bottom
-                                anchors.bottomMargin : 50
-                                text : "저 장"
-                                width: 200
-                                height: 100
-                                onClicked:{
-                                    click_sound.play();
-                                    popup_save_object.open();
+                                Item_buttons{
+                                    type: "round_text"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.bottom: parent.bottom
+                                    anchors.bottomMargin : 50
+                                    text : qsTr("저 장")
+                                    width: 200
+                                    height: 100
+                                    onClicked:{
+                                        click_sound.play();
+                                        popup_save_object.open();
+                                    }
                                 }
                             }
-                        }
-                        MAP_FULL2{
-                            id: map
-                            objectName: "annot_object"
-                            width: height
-                            height: annot_pages.height - 100
+                            MAP_FULL2{
+                                id: map
+                                objectName: "annot_object"
+                                width: height
+                                height: annot_pages.height - 100
+                            }
                         }
                     }
-                    }
 
-            }
-
-            Popup{
-                id: popup_save_object
-                width: parent.width
-                height: parent.height
-                background:Rectangle{
-                    anchors.fill: parent
-                    color: "#282828"
-                    opacity: 0.7
                 }
-                property string save_mode: "tline"
-                property bool edited_mode: false
-                Rectangle{
-                    anchors.centerIn: parent
-                    width: 450
-                    height: 230
-                    color: "white"
-                    radius: 20
 
-                    Column{
+                Popup{
+                    id: popup_save_object
+                    width: parent.width
+                    height: parent.height
+                    background:Rectangle{
+                        anchors.fill: parent
+                        color: "#282828"
+                        opacity: 0.7
+                    }
+                    property string save_mode: "tline"
+                    property bool edited_mode: false
+                    Rectangle{
                         anchors.centerIn: parent
-                        spacing: 20
+                        width: 450
+                        height: 230
+                        color: "white"
+                        radius: 20
+
                         Column{
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            Text{
-                                text: "이대로 <font color=\"#12d27c\">저장</font>하시겠습니까?"
-                                font.family: font_noto_r.name
-                                font.pixelSize: 30
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                        }
-                        Row{
-                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.centerIn: parent
                             spacing: 20
-                            Item_buttons{
-                                type: "round_text"
-                                text: "저장 안하고 종료"
-                                width: 180
-                                height: 60
-                                onClicked:{
-                                    click_sound.play();
-                                    map.clear("all");
-                                    popup_save_object.close();
-                                    annot_pages.sourceComponent = page_annot_additional_menu;
+                            Column{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                Text{
+                                    text: qsTr("이대로 <font color=\"#12d27c\">저장</font>하시겠습니까?")
+                                    font.family: font_noto_r.name
+                                    font.pixelSize: 30
+                                    anchors.horizontalCenter: parent.horizontalCenter
                                 }
                             }
-                            Item_buttons{
-                                type: "round_text"
-                                text: "확인"
-                                width: 180
-                                height: 60
-                                onClicked:{
-                                    //save temp Image
-                                    supervisor.writelog("[QML] MAP PAGE : SAVE Object ");
-                                    click_sound.play();
-                                    print(supervisor.getObjectflag())
-                                    if(supervisor.getObjectflag()){
-                                        supervisor.saveDrawObject();
-                                        supervisor.setMode("annot_object_png");
-                                    }else if(mode_drawing){
-                                        supervisor.saveObjectPNG();
-                                        annot_pages.sourceComponent = page_annot_additional_menu;
-                                    }else{
-                                        supervisor.saveAnnotation(supervisor.getMapname());
+                            Row{
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: 20
+                                Item_buttons{
+                                    type: "round_text"
+                                    text: qsTr("저장 안하고 종료")
+                                    width: 180
+                                    height: 60
+                                    onClicked:{
+                                        click_sound.play();
+                                        map.clear("all");
+                                        popup_save_object.close();
                                         annot_pages.sourceComponent = page_annot_additional_menu;
                                     }
-                                    popup_save_object.close();
-                                    update_object();
+                                }
+                                Item_buttons{
+                                    type: "round_text"
+                                    text: qsTr("확인")
+                                    width: 180
+                                    height: 60
+                                    onClicked:{
+                                        //save temp Image
+                                        supervisor.writelog("[QML] MAP PAGE : SAVE Object ");
+                                        click_sound.play();
+                                        print(supervisor.getObjectflag())
+                                        if(supervisor.getObjectflag()){
+                                            supervisor.saveDrawObject();
+                                            supervisor.setMode("annot_object_png");
+                                        }else if(mode_drawing){
+                                            supervisor.saveObjectPNG();
+                                            annot_pages.sourceComponent = page_annot_additional_menu;
+                                        }else{
+                                            supervisor.saveAnnotation(supervisor.getMapname());
+                                            annot_pages.sourceComponent = page_annot_additional_menu;
+                                        }
+                                        popup_save_object.close();
+                                        update_object();
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-    }
 
+    }
     Component{
         id: page_annot_map_editor
         Item{
@@ -5028,7 +5033,7 @@ Item {
                         Item_buttonRectIcon{
                             selected: select_mode===1
                             icon: "icon/icon-drawing-free drawing.png"
-                            name: "맵 수정"
+                            name: qsTr("맵 수정")
                             onClicked: {
                                 select_mode = 1;
                                 map.setTool("move");
@@ -5044,7 +5049,7 @@ Item {
                         height: 100
                         color: "transparent"
                         Text{
-                            text: "맵의 노이즈를 제거합니다."
+                            text: qsTr("맵의 노이즈를 제거합니다")
                             color: "white"
                             horizontalAlignment: Text.AlignHCenter
                             font.pixelSize: 40
@@ -5062,7 +5067,7 @@ Item {
                                 type: "round_text"
                                 width: 120
                                 height: 60
-                                text:"종료"
+                                text:qsTr("종료")
                                 onClicked:{
                                     click_sound.play();
                                     supervisor.writelog("[MAPPING] Map Editor : Save and Exit");
@@ -5098,7 +5103,7 @@ Item {
                                         shadow_color: color_gray
                                         highlight: map.tool=="move"
                                         icon: "icon/icon_move.png"
-                                        name: "이동"
+                                        name: qsTr("이동")
                                         MouseArea{
                                             anchors.fill: parent
                                             onPressed: {
@@ -5121,7 +5126,7 @@ Item {
                                         shadow_color: color_gray
                                         highlight: map.tool=="draw" || map.tool=="erase" || map.tool=="straight"
                                         icon: "icon/icon_draw.png"
-                                        name: "수정"
+                                        name: qsTr("수정")
                                         MouseArea{
                                             anchors.fill: parent
                                             onPressed: {
@@ -5145,7 +5150,7 @@ Item {
 //                                            width: 80
                                         shadow_color: color_gray
                                         icon: "icon/icon_trashcan.png"
-                                        name: "초기화"
+                                        name: qsTr("초기화")
                                         overcolor: true
                                         MouseArea{
                                             anchors.fill: parent
@@ -5239,7 +5244,7 @@ Item {
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         font.family: font_noto_r.name
                                                         color: map.tool === "draw"?"black":color_gray
-                                                        text: "그리기"
+                                                        text: qsTr("그리기")
                                                     }
                                                 }
                                                 MouseArea{
@@ -5289,7 +5294,7 @@ Item {
                                                                 anchors.verticalCenter: parent.verticalCenter
                                                                 font.family: font_noto_r.name
                                                                 color: map.tool === "erase"?"black":color_gray
-                                                                text: "지우개"
+                                                                text: qsTr("지우개")
                                                             }
                                                         }
 
@@ -5335,7 +5340,7 @@ Item {
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         font.family: font_noto_r.name
                                                         color: map.cur_color === 255?"black":color_gray
-                                                        text: "장애물"
+                                                        text: qsTr("장애물")
                                                     }
                                                 }
                                                 MouseArea{
@@ -5365,7 +5370,7 @@ Item {
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         font.family: font_noto_r.name
                                                         color: map.cur_color === 127?"black":color_gray
-                                                        text: "바닥"
+                                                        text: qsTr("바닥")
                                                     }
                                                 }
                                                 MouseArea{
@@ -5396,7 +5401,7 @@ Item {
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         font.family: font_noto_r.name
                                                         color: map.cur_color === 0?"black":color_gray
-                                                        text: "외부"
+                                                        text: qsTr("외부")
                                                     }
                                                 }
                                                 MouseArea{
@@ -5422,7 +5427,7 @@ Item {
                                                 type: "round_text"
                                                 width: 120
                                                 height: 40
-                                                text: "취소"
+                                                text: qsTr("취소")
                                                 fontsize: 20
                                                 onClicked:{
                                                     click_sound.play();
@@ -5436,7 +5441,7 @@ Item {
                                                 width: 120
                                                 height: 40
                                                 fontsize: 20
-                                                text: "저장"
+                                                text: qsTr("저장")
                                                 onClicked:{
                                                     click_sound.play();
                                                     supervisor.writelog("[ANNOTATION] Map Editor : Save dot spline");
@@ -5453,7 +5458,7 @@ Item {
                                         color: "white"
                                         visible: map.tool === "draw" || map.tool === "straight" || map.tool === "dot_spline"
                                         Text{
-                                            text: "브러시 사이즈"
+                                            text: qsTr("브러시 사이즈")
                                             font.family: font_noto_r.name
                                             font.pixelSize: 15
                                             anchors.verticalCenter: parent.verticalCenter
@@ -5491,7 +5496,7 @@ Item {
                                         color: "white"
                                         visible: map.tool === "erase"
                                         Text{
-                                            text: "브러시 사이즈"
+                                            text: qsTr("브러시 사이즈")
                                             font.family: font_noto_r.name
                                             font.pixelSize: 15
                                             anchors.verticalCenter: parent.verticalCenter
@@ -5534,7 +5539,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 anchors.bottom: parent.bottom
                                 anchors.bottomMargin : 50
-                                text : "저 장"
+                                text : qsTr("저 장")
                                 width: 200
                                 height: 100
                                 onClicked:{
@@ -5577,13 +5582,13 @@ Item {
                         Column{
                             anchors.horizontalCenter: parent.horizontalCenter
                             Text{
-                                text: "이대로 <font color=\"#12d27c\">저장</font>하시겠습니까?"
+                                text: qsTr("이대로 <font color=\"#12d27c\">저장</font>하시겠습니까?")
                                 font.family: font_noto_r.name
                                 font.pixelSize: 30
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "기존의 파일은 삭제됩니다."
+                                text: qsTr("기존의 파일은 삭제됩니다")
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -5594,7 +5599,7 @@ Item {
                             spacing: 20
                             Item_buttons{
                                 type: "round_text"
-                                text: "저장 안하고 종료"
+                                text: qsTr("저장 안하고 종료")
                                 width: 180
                                 height: 60
                                 onClicked:{
@@ -5606,7 +5611,7 @@ Item {
                             }
                             Item_buttons{
                                 type: "round_text"
-                                text: "확인"
+                                text: qsTr("확인")
                                 width: 180
                                 height: 60
                                 onClicked:{
@@ -5710,7 +5715,7 @@ Item {
                         Item_buttonRectIcon{
                             selected: select_mode===0
                             icon: "icon/icon_mapping_start.png"
-                            name: "경로 보기"
+                            name: qsTr("경로 보기")
                             onClicked: {
                                 select_mode = 0;
                                 map.setTool("move");
@@ -5719,7 +5724,7 @@ Item {
                         Item_buttonRectIcon{
                             selected: select_mode===1
                             icon: "icon/icon_local_error.png"
-                            name: "경로 학습"
+                            name: qsTr("경로 학습")
                             onClicked: {
                                 select_mode = 1;
                                 map.setTool("move");
@@ -5728,7 +5733,7 @@ Item {
                         Item_buttonRectIcon{
                             selected: select_mode===2
                             icon: "icon/icon-drawing-free drawing.png"
-                            name: "경로 수정"
+                            name: qsTr("경로 수정")
                             onClicked: {
                                 select_mode = 2;
                                 map.setTool("move");
@@ -5737,7 +5742,7 @@ Item {
                         Item_buttonRectIcon{
                             selected: select_mode===3
                             icon: "image/image_slam.png"
-                            name: "경로 검사"
+                            name: qsTr("경로 검사")
                             onClicked: {
                                 select_mode = 3;
                                 map.setTool("move");
@@ -5753,7 +5758,7 @@ Item {
                         height: 100
                         color: "transparent"
                         Text{
-                            text: "이동경로를 수정합니다."
+                            text: qsTr("이동경로를 수정합니다")
                             color: "white"
                             horizontalAlignment: Text.AlignHCenter
                             font.pixelSize: 40
@@ -5775,17 +5780,17 @@ Item {
                                 onClicked:{
                                     click_sound.play();
                                     popup_annot_help.open();
-                                    popup_annot_help.setTitle("이동 경로");
-                                    popup_annot_help.addLine("이동경로는 로봇이 목적지로 이동할 때 사용하는 경로의 집합입니다.\n보다 많은 경로를 학습시킬 수록 최적의 경로를 찾을 수 있습니다.");
-                                    popup_annot_help.addLine("로봇을 끌고 학습시킬 때 최대한 직진성을 유지해주세요.\n경로가 구불구불해도 최대한 부드럽게 이동하려고 하겠지만 보기에 다소 어색할 수 있습니다.");
-                                    popup_annot_help.addLine("대기, 충전 위치와 각 서빙위치 사이를 여러번 왕복시켜주세요.");
+                                    popup_annot_help.setTitle(qsTr("이동 경로"));
+                                    popup_annot_help.addLine(qsTr("이동경로는 로봇이 목적지로 이동할 때 사용하는 경로의 집합입니다\n보다 많은 경로를 학습시킬 수록 최적의 경로를 찾을 수 있습니다"));
+                                    popup_annot_help.addLine(qsTr("로봇을 끌고 학습시킬 때 최대한 직진성을 유지해주세요\n경로가 구불구불해도 최대한 부드럽게 이동하려고 하겠지만 보기에 다소 어색할 수 있습니다"));
+                                    popup_annot_help.addLine(qsTr("대기, 충전 위치와 각 서빙위치 사이를 여러번 왕복시켜주세요"));
                                 }
                             }
                             Item_buttons{
                                 type: "round_text"
                                 width: 120
                                 height: 60
-                                text:"종료"
+                                text:qsTr("종료")
                                 onClicked:{
                                     click_sound.play();
                                     supervisor.writelog("[MAPPING] Travel line : Save and Exit");
@@ -5815,7 +5820,7 @@ Item {
                                 width: 220
                                 height: 180
                                 id: btn_do_drawing
-                                text: "경로 학습 시작"
+                                text: qsTr("경로 학습 시작")
                                 onClicked:{
                                     map.setTool("move");
                                     if(running){
@@ -5837,7 +5842,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 anchors.bottom: parent.bottom
                                 anchors.bottomMargin : 50
-                                text : "저 장"
+                                text : qsTr("저 장")
                                 width: 200
                                 height: 100
                                 onClicked:{
@@ -5870,7 +5875,7 @@ Item {
                                         shadow_color: color_gray
                                         highlight: map.tool=="move"
                                         icon: "icon/icon_move.png"
-                                        name: "이동"
+                                        name: qsTr("이동")
                                         MouseArea{
                                             anchors.fill: parent
                                             onPressed: {
@@ -5893,7 +5898,7 @@ Item {
                                         shadow_color: color_gray
                                         highlight: map.tool=="draw" || map.tool=="erase" || map.tool=="straight"
                                         icon: "icon/icon_draw.png"
-                                        name: "수정"
+                                        name: qsTr("수정")
                                         MouseArea{
                                             anchors.fill: parent
                                             onPressed: {
@@ -5917,7 +5922,7 @@ Item {
 //                                            width: 80
                                         shadow_color: color_gray
                                         icon: "icon/icon_trashcan.png"
-                                        name: "초기화"
+                                        name: qsTr("초기화")
                                         overcolor: true
                                         MouseArea{
                                             anchors.fill: parent
@@ -6010,7 +6015,7 @@ Item {
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         font.family: font_noto_r.name
                                                         color: map.tool === "draw"?"black":color_gray
-                                                        text: "그리기"
+                                                        text: qsTr("그리기")
                                                     }
                                                 }
                                                 MouseArea{
@@ -6058,7 +6063,7 @@ Item {
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         font.family: font_noto_r.name
                                                         color: map.tool === "straight"?"black":color_gray
-                                                        text: "직선"
+                                                        text: qsTr("직선")
                                                     }
                                                 }
 
@@ -6113,7 +6118,7 @@ Item {
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         font.family: font_noto_r.name
                                                         color: map.tool === "dot_spline"?"black":color_gray
-                                                        text: "곡선"
+                                                        text: qsTr("곡선")
                                                     }
                                                 }
 
@@ -6156,7 +6161,7 @@ Item {
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         font.family: font_noto_r.name
                                                         color: map.tool === "erase"?"black":color_gray
-                                                        text: "지우개"
+                                                        text: qsTr("지우개")
                                                     }
                                                 }
 
@@ -6185,7 +6190,7 @@ Item {
                                                 type: "round_text"
                                                 width: 120
                                                 height: 40
-                                                text: "취소"
+                                                text: qsTr("취소")
                                                 fontsize: 20
                                                 onClicked:{
                                                     click_sound.play();
@@ -6199,7 +6204,7 @@ Item {
                                                 width: 120
                                                 height: 40
                                                 fontsize: 20
-                                                text: "저장"
+                                                text: qsTr("저장")
                                                 onClicked:{
                                                     click_sound.play();
                                                     supervisor.writelog("[ANNOTATION] Travel line : Save dot spline");
@@ -6216,7 +6221,7 @@ Item {
                                         color: "white"
                                         visible: map.tool === "draw" || map.tool === "straight" || map.tool === "dot_spline"
                                         Text{
-                                            text: "브러시 사이즈"
+                                            text: qsTr("브러시 사이즈")
                                             font.family: font_noto_r.name
                                             font.pixelSize: 15
                                             anchors.verticalCenter: parent.verticalCenter
@@ -6254,7 +6259,7 @@ Item {
                                         color: "white"
                                         visible: map.tool === "erase"
                                         Text{
-                                            text: "브러시 사이즈"
+                                            text: qsTr("브러시 사이즈")
                                             font.family: font_noto_r.name
                                             font.pixelSize: 15
                                             anchors.verticalCenter: parent.verticalCenter
@@ -6297,7 +6302,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 anchors.bottom: parent.bottom
                                 anchors.bottomMargin : 50
-                                text : "저 장"
+                                text : qsTr("저 장")
                                 width: 200
                                 height: 100
                                 onClicked:{
@@ -6342,13 +6347,13 @@ Item {
                         Column{
                             anchors.horizontalCenter: parent.horizontalCenter
                             Text{
-                                text: "이대로 <font color=\"#12d27c\">저장</font>하시겠습니까?"
+                                text: qsTr("이대로 <font color=\"#12d27c\">저장</font>하시겠습니까?")
                                 font.family: font_noto_r.name
                                 font.pixelSize: 30
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "기존의 파일은 삭제됩니다."
+                                text: qsTr("기존의 파일은 삭제됩니다")
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -6359,7 +6364,7 @@ Item {
                             spacing: 20
                             Item_buttons{
                                 type: "round_text"
-                                text: "저장 안하고 종료"
+                                text: qsTr("저장 안하고 종료")
                                 width: 180
                                 height: 60
                                 onClicked:{
@@ -6371,7 +6376,7 @@ Item {
                             }
                             Item_buttons{
                                 type: "round_text"
-                                text: "확인"
+                                text: qsTr("확인")
                                 width: 180
                                 height: 60
                                 onClicked:{
@@ -6438,7 +6443,7 @@ Item {
                         height: 100
                         color: "transparent"
                         Text{
-                            text: "안전속도 구간을 설정합니다."
+                            text: qsTr("안전속도 구간을 설정합니다")
                             color: "white"
                             horizontalAlignment: Text.AlignHCenter
                             font.pixelSize: 40
@@ -6460,15 +6465,15 @@ Item {
                                 onClicked:{
                                     click_sound.play();
                                     popup_annot_help.open();
-                                    popup_annot_help.setTitle("안전속도 구간");
-                                    popup_annot_help.addLine("사람이 붐비거나 통로가 비좁아서 로봇이 천천히 움직여야 하는 구간을 표시해주세요");
-                                    popup_annot_help.addLine("로봇이 주행 중 해당 구간에 진입하면 자동으로 속도를 1,2단계로 낮춥니다.");
-                                    popup_annot_help.addLine("각 속도 구간의 상세 속도를 지정하고 싶으시다면 세팅 페이지의 프리셋 수정을 이용하세요.")
+                                    popup_annot_help.setTitle(qsTr("안전속도 구간"));
+                                    popup_annot_help.addLine(qsTr("사람이 붐비거나 통로가 비좁아서 로봇이 천천히 움직여야 하는 구간을 표시해주세요"));
+                                    popup_annot_help.addLine(qsTr("로봇이 주행 중 해당 구간에 진입하면 자동으로 속도를 1,2단계로 낮춥니다"));
+                                    popup_annot_help.addLine(qsTr("각 속도 구간의 상세 속도를 지정하고 싶으시다면 세팅 페이지의 프리셋 수정을 이용하세요"))
                                 }
                             }
                             Item_buttons{
                                 type: "round_text"
-                                text: "저장 후 종료"
+                                text: qsTr("저장 후 종료")
                                 width: 120
                                 height: 60
                                 onClicked:{
@@ -6498,7 +6503,7 @@ Item {
                                         shadow_color: color_gray
                                         highlight: map.tool=="move"
                                         icon: "icon/icon_move.png"
-                                        name: "이동"
+                                        name: qsTr("이동")
                                         MouseArea{
                                             anchors.fill: parent
                                             onPressed: {
@@ -6517,7 +6522,7 @@ Item {
                                         shadow_color: color_gray
                                         highlight: map.tool=="draw" || map.tool=="erase" || map.tool=="draw_rect"
                                         icon: "icon/icon_draw.png"
-                                        name: "수정"
+                                        name: qsTr("수정")
                                         MouseArea{
                                             anchors.fill: parent
                                             onPressed: {
@@ -6539,7 +6544,7 @@ Item {
                                         id: btn_erase
                                         shadow_color: color_gray
                                         icon: "icon/icon_trashcan.png"
-                                        name: "초기화"
+                                        name: qsTr("초기화")
                                         overcolor: true
                                         MouseArea{
                                             anchors.fill: parent
@@ -6633,7 +6638,7 @@ Item {
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         font.family: font_noto_r.name
                                                         color: map.tool === "draw"?"black":color_gray
-                                                        text: "그리기"
+                                                        text: qsTr("그리기")
                                                     }
                                                 }
 
@@ -6668,7 +6673,7 @@ Item {
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         font.family: font_noto_r.name
                                                         color: map.tool === "draw_rect"?"black":color_gray
-                                                        text: "사각형"
+                                                        text: qsTr("사각형")
                                                     }
                                                 }
 
@@ -6707,7 +6712,7 @@ Item {
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         font.family: font_noto_r.name
                                                         color: map.tool === "erase"?"black":color_gray
-                                                        text: "지우개"
+                                                        text: qsTr("지우개")
                                                     }
                                                 }
 
@@ -6758,7 +6763,7 @@ Item {
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         font.family: font_noto_r.name
                                                         color: select_preset===1?"black":color_gray
-                                                        text: "느리게"
+                                                        text: qsTr("느리게")
                                                     }
                                                 }
 
@@ -6799,7 +6804,7 @@ Item {
                                                         anchors.verticalCenter: parent.verticalCenter
                                                         font.family: font_noto_r.name
                                                         color: select_preset===2?"black":color_gray
-                                                        text: "매우 느리게"
+                                                        text: qsTr("매우 느리게")
                                                     }
                                                 }
 
@@ -6821,7 +6826,7 @@ Item {
                                         color: "white"
                                         visible: map.tool === "draw" || map.tool === "erase" || map.tool === "draw_rect"
                                         Text{
-                                            text: "브러시 사이즈"
+                                            text: qsTr("브러시 사이즈")
                                             font.family: font_noto_r.name
                                             font.pixelSize: 15
                                             anchors.verticalCenter: parent.verticalCenter
@@ -6861,7 +6866,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 anchors.bottom: parent.bottom
                                 anchors.bottomMargin : 50
-                                text : "저 장"
+                                text : qsTr("저 장")
                                 width: 200
                                 height: 100
                                 onClicked:{
@@ -6923,13 +6928,13 @@ Item {
                         Column{
                             anchors.horizontalCenter: parent.horizontalCenter
                             Text{
-                                text: "이대로 <font color=\"#12d27c\">저장</font>하시겠습니까?"
+                                text: qsTr("이대로 <font color=\"#12d27c\">저장</font>하시겠습니까?")
                                 font.family: font_noto_r.name
                                 font.pixelSize: 30
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                             Text{
-                                text: "기존의 파일은 삭제됩니다."
+                                text: qsTr("기존의 파일은 삭제됩니다")
                                 font.family: font_noto_r.name
                                 font.pixelSize: 20
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -6940,7 +6945,7 @@ Item {
                             spacing: 20
                             Item_buttons{
                                 type: "round_text"
-                                text: "저장 안하고 종료"
+                                text: qsTr("저장 안하고 종료")
                                 width: 180
                                 height: 60
                                 onClicked:{
@@ -6952,7 +6957,7 @@ Item {
                             }
                             Item_buttons{
                                 type: "round_text"
-                                text: "확인"
+                                text: qsTr("확인")
                                 width: 180
                                 height: 60
                                 onClicked:{
@@ -6991,7 +6996,7 @@ Item {
                         color: "transparent"
                         Text{
                             anchors.centerIn: parent
-                            text: "도움말"
+                            text: qsTr("도움말")
                             font.family: font_noto_r.name
                             font.pixelSize: 50
                             color:"white"
@@ -7008,14 +7013,14 @@ Item {
                                 spacing: 10
                                 width: 550
                                 Text{
-                                    text: "Q. 안전속도 구간이란?"
+                                    text: qsTr("Q. 안전속도 구간이란?")
                                     font.family: font_noto_r.name
                                     font.pixelSize: 25
                                     color:"white"
                                 }
                                 Text{
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    text: "로봇이 이동 중 해당 구간에 진입하면 '느리게', '아주 느리게' 속도로 이동합니다.\n각 속도의 설정 값은 세팅화면에서 변경 가능합니다."
+                                    text: qsTr("로봇이 이동 중 해당 구간에 진입하면 '느리게', '아주 느리게' 속도로 이동합니다\n각 속도의 설정 값은 세팅화면에서 변경 가능합니다")
                                     font.family: font_noto_r.name
                                     font.pixelSize: 20
                                     color:"white"
@@ -7071,7 +7076,7 @@ Item {
                     font.family: font_noto_r.name
                     font.pixelSize: 40
                     color: color_dark_navy
-                    text : "맵 보내기/가져오기"
+                    text : qsTr("맵 보내기/가져오기")
                 }
                 Rectangle{
                     width: 300
@@ -7086,7 +7091,7 @@ Item {
                         font.family: font_noto_r.name
                         font.pixelSize: 25
                         color: color_dark_navy
-                        text : "서버로 보내기"
+                        text : qsTr("서버로 보내기")
                     }
                     MouseArea{
                         anchors.fill: parent
@@ -7111,7 +7116,7 @@ Item {
                         font.pixelSize: 20
                         anchors.centerIn: parent
                         color: color_dark_navy
-                        text : "서버로부터 가져오기"
+                        text : qsTr("서버로부터 가져오기")
                     }
                     MouseArea{
                         anchors.fill: parent
@@ -7135,7 +7140,7 @@ Item {
                         font.family: font_noto_r.name
                         font.pixelSize: 20
                         color: color_dark_navy
-                        text : "로컬로부터 불러오기"
+                        text : qsTr("로컬로부터 불러오기")
                     }
                     MouseArea{
                         anchors.fill: parent
@@ -7233,7 +7238,7 @@ Item {
                     color: color_red
                     font.family: font_noto_r.name
                     font.pixelSize: 20
-                    text: "위치초기화"
+                    text: qsTr("위치초기화")
                 }
                 MouseArea{
                     anchors.fill: parent
@@ -7265,7 +7270,7 @@ Item {
                     color: color_red
                     font.family: font_noto_r.name
                     font.pixelSize: 20
-                    text: "모터초기화"
+                    text: qsTr("모터초기화")
                 }
                 MouseArea{
                     anchors.fill: parent
@@ -7322,21 +7327,21 @@ Item {
                     color: color_blue
                     font.family: font_noto_r.name
                     font.pixelSize: 45
-                    text: popup_moving.location===""?"로봇이 이동 중입니다.":"로봇이 "+popup_moving.location+"로"
+                    text: popup_moving.location===""?qsTr("로봇이 이동 중입니다"):qsTr("로봇이 ")+popup_moving.location+qsTr("로")
                 }
                 Text{
                     visible: !robot_paused && popup_moving.location !==""
                     color: color_blue
                     font.family: font_noto_r.name
                     font.pixelSize: 45
-                    text: "이동 중입니다."
+                    text: qsTr("이동 중입니다")
                 }
                 Text{
                     visible: robot_paused
                     color: color_blue
                     font.family: font_noto_r.name
                     font.pixelSize: 50
-                    text: "로봇이 일시정지 되었습니다."
+                    text: qsTr("로봇이 일시정지 되었습니다")
                 }
                 Row{
                     visible: robot_paused
@@ -7349,7 +7354,7 @@ Item {
                         fontcolor: color_blue
                         btncolor: color_dark_black
                         bordercolor: color_blue
-                        text: "경로 재개"
+                        text: qsTr("경로 재개")
                         onClicked:{
                             click_sound.play();
                             supervisor.writelog("[ANNOTATION] Test Moving : Resume")
@@ -7364,7 +7369,7 @@ Item {
                         fontcolor: color_blue
                         btncolor: color_dark_black
                         bordercolor: color_blue
-                        text: "경로 취소"
+                        text: qsTr("경로 취소")
                         onClicked:{
                             click_sound.play();
                             supervisor.writelog("[ANNOTATION] Test Moving : Path Cancled")
@@ -7408,7 +7413,7 @@ Item {
                     color: color_red
                     font.family: font_noto_r.name
                     font.pixelSize: 20
-                    text: "위치초기화"
+                    text: qsTr("위치초기화")
                 }
                 MouseArea{
                     anchors.fill: parent
@@ -7439,7 +7444,7 @@ Item {
                     color: color_red
                     font.family: font_noto_r.name
                     font.pixelSize: 20
-                    text: "모터초기화"
+                    text: qsTr("모터초기화")
                 }
                 MouseArea{
                     anchors.fill: parent

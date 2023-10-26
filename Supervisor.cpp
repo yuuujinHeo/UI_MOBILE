@@ -40,6 +40,14 @@ Supervisor::Supervisor(QObject *parent)
     plog->write("");
     plog->write("[BUILDER] Program Started. Supervisor constructed.");
 
+    //기존 SLAM/NAV 모두 종료하고 다시 시작
+    QList<QString> path_home_str = QDir::homePath().split("/");
+    QProcess *process = new QProcess(this);
+    QString file = QDir::homePath() + "/auto_reset.sh";
+    process->start(file);
+    process->waitForReadyRead(3000);
+
+
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()),this,SLOT(onTimer()));
     timer->start(MAIN_THREAD);
@@ -73,16 +81,8 @@ Supervisor::Supervisor(QObject *parent)
 
     checkRobotINI();
     readSetting();
+    startSLAM();
 
-    //기존 SLAM/NAV 모두 종료하고 다시 시작
-    QList<QString> path_home_str = QDir::homePath().split("/");
-    if(path_home_str[path_home_str.size()-1] == "odroid"){
-        QProcess *process = new QProcess(this);
-        QString file = QDir::homePath() + "/auto_reset.sh";
-        process->start(file);
-        process->waitForReadyRead(3000);
-        startSLAM();
-    }
 
     //Test USB
     QFileSystemWatcher *FSwatcher;
@@ -92,6 +92,9 @@ Supervisor::Supervisor(QObject *parent)
     FSwatcher->addPath(path.c_str());
     connect(FSwatcher, SIGNAL(directoryChanged(QString)),this,SLOT(usb_detect()));
     usb_detect();
+
+    translator = new QTranslator();
+    setLangauge(getSetting("ROBOT_HW","langauge"));
 
 }
 
@@ -415,6 +418,7 @@ void Supervisor::readSetting(QString map_name){
     pmap->use_uicmd = setting_robot.value("use_uicmd").toBool();
     pmap->mapping_width = setting_robot.value("map_size").toInt();
     pmap->mapping_gridwidth = setting_robot.value("grid_size").toFloat();
+    probot->cur_preset = setting_robot.value("cur_preset").toInt();
     setting_robot.endGroup();
 
     plog->write("[SUPERVISOR] READ SETTING : robot_sw done");
@@ -668,7 +672,7 @@ void Supervisor::saveLocation(QString type, int groupnum, QString name){
     temp.angle = setAxisBack(maph->new_location.angle);
 
     if(pmap->location_groups.size() == 0){
-        pmap->location_groups.push_back("DEFAULT");
+        pmap->location_groups.push_back("Default");
     }
 
     bool overwrite = false;
@@ -1803,16 +1807,17 @@ void Supervisor::makeExtProcessShell(){
     if(file.open(QIODevice::ReadWrite)){
         QTextStream stream(&file);
         stream << "#!/bin/bash" << endl << endl;
-
-        stream << "pid=`ps -ef | grep \"ExtProcess\" | grep -v 'grep' | awk '{print $2}'`"<<endl;
-        stream << "if [ -z $pid ]" << endl;
-        stream << "then" << endl;
-        stream << "     echo \"ExtProcess not running\"" << endl;
-        stream << "else" << endl;
-        stream << "     kill -9 $pid" << endl;
-        stream << "fi" << endl;
-        stream << "cd /home/odroid/UI_MOBILE_release" << endl;
-        stream << "xterm ./ExtProcess" << endl;
+        stream << "while [ 1 ]"<<endl;
+        stream << "do"<<endl;
+        stream << "     pid=`ps -ef | grep \"ExtProcess\" | grep -v 'grep' | awk '{print $2}'`"<<endl;
+        stream << "     if [ -z $pid ]" << endl;
+        stream << "     then" << endl;
+        stream << "         /home/odroid/UI_MOBILE_release/ExtProcess" << endl;
+        stream << "     else" << endl;
+        stream << "         kill -9 $pid" << endl;
+        stream << "         /home/odroid/UI_MOBILE_release/ExtProcess" << endl;
+        stream << "     fi" << endl;
+        stream << "done" << endl;
     }
     file.close();
     //Chmod
@@ -2569,6 +2574,7 @@ void Supervisor::startServing(){
 void Supervisor::setPreset(int preset){
     plog->write("[COMMAND] SET PRESET : "+QString::number(preset));
     probot->cur_preset = preset;
+    setSetting("ROBOT_SW/cur_preset",QString::number(preset));
 }
 void Supervisor::confirmPickup(){
     if(ui_state == UI_STATE_PICKUP){
@@ -2913,13 +2919,18 @@ QVector<int> Supervisor::getOrigin(){
 
 void Supervisor::moveToServingTest(QString name){
     if(ui_state == UI_STATE_RESTING || ui_state == UI_STATE_MOVEFAIL || ui_state == UI_STATE_PICKUP|| ui_state == UI_STATE_CLEANING){
-        if(name.left(8) == "Charging" || name == "충전위치"){
+        if(name.left(8) == "Charging" || name == tr("충전위치")){
             current_target = getLocation("Charging0");
             ui_state = UI_STATE_MOVING;
             is_test_moving = true;
             plog->write("[COMMAND] Serving Test : "+name);
-        }else if(name.left(7) == "Resting"|| name == "대기위치"){
+        }else if(name.left(7) == "Resting"|| name == tr("대기위치")){
             current_target = getLocation("Resting0");
+            ui_state = UI_STATE_MOVING;
+            is_test_moving = true;
+            plog->write("[COMMAND] Serving Test : "+name);
+        }else if(name.left(8) == "Cleaning"|| name == tr("퇴식위치")){
+            current_target = getLocation("Cleaning0");
             ui_state = UI_STATE_MOVING;
             is_test_moving = true;
             plog->write("[COMMAND] Serving Test : "+name);
@@ -3056,6 +3067,16 @@ void Supervisor::makeKillShell(){
 void Supervisor::checkUpdate(){
 //    server->checkUpdate();
 }
+void Supervisor::setLangauge(QString lan){
+    plog->write("[SUPERVISOR] SET LANGAUGE : "+lan);
+    app->removeTranslator(translator);
+    if(lan == "KR"){
+    }else if(lan=="US"){
+        QString pahhh = QApplication::applicationDirPath() + "/lang_en.qm";
+        qDebug() << pahhh << translator->load(pahhh);
+        app->installTranslator(translator);
+    }
+}
 bool Supervisor::checkNewUpdateProgram(){
     return server->new_update;
 }
@@ -3084,6 +3105,13 @@ void Supervisor::makeKillSlam(){
         stream << "if [ -z $pid ]" << endl;
         stream << "then" << endl;
         stream << "     echo \"SLAMNAV is not running\"" << endl;
+        stream << "else" << endl;
+        stream << "     kill -9 $pid" << endl;
+        stream << "fi" << endl;
+        stream << "pid=`ps -ef | grep \"ExtProcess\" | grep -v 'grep' | awk '{print $2}'`"<<endl;
+        stream << "if [ -z $pid ]" << endl;
+        stream << "then" << endl;
+        stream << "     echo \"ExtProcess is not running\"" << endl;
         stream << "else" << endl;
         stream << "     kill -9 $pid" << endl;
         stream << "fi" << endl;
