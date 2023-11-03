@@ -38,21 +38,28 @@ class ServerHandler : public QObject
     Q_OBJECT
 public:
     ServerHandler();
-    QByteArray sendfilePost(QString file_dir, QString url);
-    QByteArray generalPost(QByteArray post_data, QString url);
-    QByteArray generalGet(QString url);
-    QByteArray generalPut(QString url, QByteArray put_data);
-    QByteArray generalDelete(QString url);
+    void sendfilePost(QString file_dir, QString url);
+    void generalPost(QByteArray post_data, QString url);
+    void generalGet(QString url);
+    void generalPut(QString url, QByteArray put_data);
+    void generalDelete(QString url);
     void ClearJson(QJsonObject &json);
     void setSettingServer(QString name, QString value);
     void setSetting(QString name, QString value);
     void checkUpdate();
     void postStatus();
 
+    void uploadRelease(QString file, QString message);
+
     void getNewID();
     void sendConfig();
     void sendMaps();
 
+    void getGitCommits();
+
+    bool need_update();
+
+    void parsingReply(QString type, QString url, QNetworkReply *reply);
     QString getSetting(QString group, QString name);
     QString getSettingServer(QString group, QString name);
     QJsonObject json_in;
@@ -62,8 +69,11 @@ public:
     bool connection = true;
     bool send_config = false;
     bool send_map = false;
+    bool first_response = false;
 
+    bool check_update = false;
     bool new_update = false;
+    bool new_update_local = false;
     bool update_config = false;
     bool update_program = false;
     bool update_map = false;
@@ -79,18 +89,13 @@ public:
 
     int TIMER_MS = 1000;
     QString serverURL = "http://rbyujin.com:8080";
-    QString myID = "";//"serving.001.01.test34";
+    QString myID = "";
 
 private slots:
     void onTimer();
-    void response();
-
 private:
     QNetworkAccessManager   *manager;
-//    QEventLoop              connection_loop;
-
     QTimer  *timer;
-//    QTimer  *connection_timer;
 };
 
 #endif // SERVERHANDLER_H

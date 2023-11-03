@@ -31,7 +31,6 @@ SOURCES += \
     cv_to_qt.cpp \
     Logger.cpp \
     Supervisor.cpp \
-    lan_ko.cpp \
     main.cpp \
     quazip/JlCompress.cpp \
     quazip/qioapi.cpp \
@@ -51,8 +50,7 @@ SOURCES += \
     websocket/QtHttpReply.cpp \
     websocket/QtHttpRequest.cpp \
     websocket/QtHttpHeader.cpp \
-    websocket/QtHttpClientWrapper.cpp \
-    HTTPHandler.cpp
+    websocket/QtHttpClientWrapper.cpp
 
 
 RESOURCES += qml.qrc
@@ -78,7 +76,6 @@ HEADERS += \
     MapHandler.h \
     MapViewer.h \
     ServerHandler.h \
-    lan_ko.h \
     spline.h \
     Keyemitter.h \
     Logger.h \
@@ -108,8 +105,7 @@ HEADERS += \
     websocket/QtHttpReply.h \
     websocket/QtHttpRequest.h \
     websocket/QtHttpHeader.h \
-    websocket/QtHttpClientWrapper.h \
-    HTTPHandler.h
+    websocket/QtHttpClientWrapper.h
 
 TRANSLATIONS += lang_en.ts
 OTHER_FILES += lang_en.qm

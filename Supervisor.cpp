@@ -67,14 +67,11 @@ Supervisor::Supervisor(QObject *parent)
     ipc = new IPCHandler();
     call = new CallbellHandler();
     extproc = new ExtProcess();
-    git = new HTTPHandler();
     connect(extproc, SIGNAL(timeout(int)),this,SLOT(process_timeout(int)));
     connect(extproc, SIGNAL(got_done(int)),this,SLOT(process_done(int)));
     connect(extproc, SIGNAL(got_accept(int)),this,SLOT(process_accept(int)));
     connect(extproc, SIGNAL(got_error(int)),this,SLOT(process_error(int)));
     connect(call, SIGNAL(new_call()),this,SLOT(new_call()));
-    connect(git, SIGNAL(pullSuccess()),this,SLOT(git_pull_success()));
-    connect(git, SIGNAL(pullFailed()),this,SLOT(git_pull_failed()));
     connect(ipc, SIGNAL(pathchanged()),this,SLOT(path_changed()));
     connect(ipc, SIGNAL(mappingin()),this,SLOT(mapping_update()));
     connect(ipc, SIGNAL(cameraupdate()),this,SLOT(camera_update()));
@@ -312,34 +309,28 @@ void Supervisor::git_pull_failed(){
 }
 
 bool Supervisor::isNewVersion(){
-    git->updateGitArray();
-    if(probot->gitList.size() > 0){
-        if(probot->gitList[0].date == probot->program_date){
-            return true;
-        }else{
-            return false;
-        }
-    }
+    //깃 최신버전인지.
+    return server->need_update();
+}
+bool Supervisor::isNeedUpdate(){
+    //서버업데이트 필요한 지.
+    return server->new_update;
 }
 QString Supervisor::getLocalVersion(){
     return probot->program_version;
 }
 QString Supervisor::getServerVersion(){
-    if(probot->gitList.size() > 0){
-        return probot->gitList[0].commit;
+    if(server->program_version != ""){
+        return server->program_version;
     }else{
-        return "";
+        if(probot->gitList.size() > 0)
+            return probot->gitList[0].date;
+        else
+            return "NONE";
     }
 }
 QString Supervisor::getLocalVersionDate(){
     return probot->program_date;
-}
-QString Supervisor::getServerVersionDate(){
-    if(probot->gitList.size() > 0){
-        return probot->gitList[0].date;
-    }else{
-        return "";
-    }
 }
 QString Supervisor::getLocalVersionMessage(){
     return probot->program_message;
@@ -354,6 +345,11 @@ QString Supervisor::getServerVersionMessage(){
 
 void Supervisor::updateProgram(){
     extproc->git_pull();
+}
+
+void Supervisor::checkVersionAgain(){
+    server->check_update = true;
+    server->checkUpdate();
 }
 
 void Supervisor::setSettingServer(QString name, QString value){
@@ -888,7 +884,7 @@ void Supervisor::slam_ini_reload(){
 //}
 ////*********************************************  INIT PAGE 관련   ***************************************************////
 bool Supervisor::isConnectServer(){
-    return false;
+    return server->connection && server->first_response;
 }
 void Supervisor::deleteEditedMap(){
     plog->write("[USER INPUT] Remove Edited Map Data");
@@ -4169,7 +4165,7 @@ void Supervisor::setWifiSSD(QString ssid){
 void Supervisor::getWifiIP(){
     ExtProcess::Command temp;
     temp.cmd = ExtProcess::PROCESS_CMD_GET_WIFI_IP;
-    qDebug() << "getwifiip " << probot->wifi_ssid;
+//    qDebug() << "getwifiip " << probot->wifi_ssid;
     if(probot->wifi_ssid == ""){
 
     }else{

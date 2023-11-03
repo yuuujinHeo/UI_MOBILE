@@ -7,7 +7,6 @@
 #include <QQuickWindow>
 #include "GlobalHeader.h"
 #include "CallbellHandler.h"
-#include "HTTPHandler.h"
 #include "ZIPHandler.h"
 #include "IPCHandler.h"
 #include "ServerHandler.h"
@@ -109,7 +108,6 @@ public:
 //    QProcess *wifi_check_process;
     ////*********************************************  CLASS   ***************************************************////
     ZIPHandler *zip;
-    HTTPHandler *git;
     MapHandler *maph;
     ExtProcess *extproc;
     CallbellHandler *call;
@@ -319,11 +317,12 @@ public:
     Q_INVOKABLE void checkTravelline();
     ////*********************************************  GIT 관련   ***************************************************////
     Q_INVOKABLE void updateProgram();
+    Q_INVOKABLE void checkVersionAgain();
     Q_INVOKABLE bool isNewVersion();
+    Q_INVOKABLE bool isNeedUpdate();
     Q_INVOKABLE QString getLocalVersion();
     Q_INVOKABLE QString getServerVersion();
     Q_INVOKABLE QString getLocalVersionDate();
-    Q_INVOKABLE QString getServerVersionDate();
     Q_INVOKABLE QString getLocalVersionMessage();
     Q_INVOKABLE QString getServerVersionMessage();
 

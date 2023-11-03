@@ -373,7 +373,5 @@ ExtProcess::Command ExtProcess::get_command(){
     shm_command.lock();
     memcpy(&res, (char*)shm_command.constData(), sizeof(ExtProcess::Command));
     shm_command.unlock();
-
     return res;
-
 }

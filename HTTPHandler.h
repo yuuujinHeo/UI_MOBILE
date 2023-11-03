@@ -38,36 +38,20 @@ class HTTPHandler : public QObject
 
 public:
     HTTPHandler();
-    QByteArray generalPost(QByteArray post_data, QString url);
-    QByteArray generalGet(QString url);
+    void generalPost(QByteArray post_data, QString url);
+    void generalGet(QString url);
 
-    QString getLocalVersion();
-
-    void testGit();
-
-    void getlocalLog();
-    void pullGit();
-    void resetGit();
+    void parsingReply(QString type, QString url, QNetworkReply *reply);
     void updateGitArray();
 
     QJsonDocument json_in;
     QJsonObject json_out;
     QProcess *process;
-    QProcess *process_1;
-
     void ClearJson(QJsonObject &json);
-
-signals:
-    void pullSuccess();
-    void pullFailed();
-
 
 private:
     // 네트워크 커넥션 관리 -----------------
     QNetworkAccessManager   *manager;
-    QEventLoop              connection_loop;
-
-    QTimer  *connection_timer;
 };
 
 #endif // HTTPHANDLER_H

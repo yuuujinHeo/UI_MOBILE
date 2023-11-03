@@ -145,100 +145,100 @@ Item {
         running: true
         repeat: true
         onTriggered: {
-            is_con_robot = supervisor.getIPCConnection();
+            is_con_robot = true;//supervisor.getIPCConnection();
             is_emergency = supervisor.getEmoStatus();
-            is_motor_power = supervisor.getPowerStatus();
+            is_motor_power = true;//supervisor.getPowerStatus();
 
-            if(is_con_robot){
-                if(is_motor_power){
-                    if(is_emergency){
-                        btn_go.active = false;
-                        btn_charge.active = false;
-                        btn_resting.active = false;
-                        rect_go.color = color_red;
-                        text_go.color = color_dark_gray;
-                        text_go.text = qsTr("비상스위치가 눌려있음")
-                        text_go.font.pixelSize = 25
-                        popup_notice.main_str = qsTr("비상스위치가 눌려있습니다")
-                        popup_notice.sub_str = qsTr("비상스위치를 풀어주세요")
-                        popup_notice.show_localization = false
-                        popup_notice.show_motorinit = false;
-                        popup_notice.show_restart = false;
-                    }else if(supervisor.getMotorState() === 0){
-                        btn_go.active = false;
-                        btn_charge.active = false;
-                        btn_resting.active = false;
-                        rect_go.color = color_red;
-                        text_go.color = color_dark_gray;
-                        text_go.text = qsTr("모터 초기화필요")
-                        text_go.font.pixelSize = 25
-                        if(supervisor.getMotorStatus(0) === 0 || supervisor.getMotorStatus(1) === 0){
-                            popup_notice.main_str = qsTr("모터 초기화가 되지 않았습니다.")
-                            popup_notice.sub_str = qsTr("모터 초기화를 해주세요")
-                        }else{
-                            popup_notice.main_str = qsTr("모터에 에러가 발생했습니다")
-                            popup_notice.sub_str = qsTr("모터 초기화를 해주세요")
-                        }
-                        popup_notice.show_motorinit = true;
-                        popup_notice.show_localization = false;
-                        popup_notice.show_restart = false;
+//            if(is_con_robot){
+//                if(is_motor_power){
+//                    if(is_emergency){
+//                        btn_go.active = false;
+//                        btn_charge.active = false;
+//                        btn_resting.active = false;
+//                        rect_go.color = color_red;
+//                        text_go.color = color_dark_gray;
+//                        text_go.text = qsTr("비상스위치가 눌려있음")
+//                        text_go.font.pixelSize = 25
+//                        popup_notice.main_str = qsTr("비상스위치가 눌려있습니다")
+//                        popup_notice.sub_str = qsTr("비상스위치를 풀어주세요")
+//                        popup_notice.show_localization = false
+//                        popup_notice.show_motorinit = false;
+//                        popup_notice.show_restart = false;
+//                    }else if(supervisor.getMotorState() === 0){
+//                        btn_go.active = false;
+//                        btn_charge.active = false;
+//                        btn_resting.active = false;
+//                        rect_go.color = color_red;
+//                        text_go.color = color_dark_gray;
+//                        text_go.text = qsTr("모터 초기화필요")
+//                        text_go.font.pixelSize = 25
+//                        if(supervisor.getMotorStatus(0) === 0 || supervisor.getMotorStatus(1) === 0){
+//                            popup_notice.main_str = qsTr("모터 초기화가 되지 않았습니다.")
+//                            popup_notice.sub_str = qsTr("모터 초기화를 해주세요")
+//                        }else{
+//                            popup_notice.main_str = qsTr("모터에 에러가 발생했습니다")
+//                            popup_notice.sub_str = qsTr("모터 초기화를 해주세요")
+//                        }
+//                        popup_notice.show_motorinit = true;
+//                        popup_notice.show_localization = false;
+//                        popup_notice.show_restart = false;
 
-                    }else if(supervisor.getLocalizationState() === 2){
-                        btn_go.active = true;
-                        btn_charge.active = true;
-                        btn_resting.active = true;
-                        rect_go.color = color_blue;
+//                    }else if(supervisor.getLocalizationState() === 2){
+//                        btn_go.active = true;
+//                        btn_charge.active = true;
+//                        btn_resting.active = true;
+//                        rect_go.color = color_blue;
 
-                        text_go.color = "white";
-                        text_go.text = qsTr("서빙 시작")
-                        text_go.font.pixelSize = 35
-                        popup_notice.main_str = ""
-                        popup_notice.sub_str = ""
-                        popup_notice.show_localization = false
-                        popup_notice.show_motorinit = false;
-                        popup_notice.show_restart = false;
-                    }else{
-                        btn_go.active = false;
-                        btn_charge.active = false;
-                        btn_resting.active = false;
-                        rect_go.color = color_red;
-                        text_go.color = color_dark_gray;
-                        text_go.text = qsTr("위치 초기화필요")
-                        text_go.font.pixelSize = 30
-                        popup_notice.main_str = qsTr("위치를 찾을 수 없습니다")
-                        popup_notice.sub_str = qsTr("위치 초기화를 다시 해주세요")
-                        popup_notice.show_localization = true;
-                        popup_notice.show_motorinit = false;
-                        popup_notice.show_restart = false;
-                    }
-                }else{
-                    btn_go.active = false;
-                    btn_charge.active = false;
-                    btn_resting.active = false;
-                    rect_go.color = color_gray;
-                    text_go.color = color_dark_gray;
-                    text_go.text = qsTr("로봇 전원 안켜짐")
-                    text_go.font.pixelSize = 35
-                    popup_notice.main_str = qsTr("로봇 전원이 꺼져있습니다")
-                    popup_notice.sub_str = ""
-                    popup_notice.show_localization = false
-                    popup_notice.show_motorinit = false;
-                    popup_notice.show_restart = true;
-                }
-            }else{
-                btn_go.active = false;
-                btn_charge.active = false;
-                btn_resting.active = false;
-                rect_go.color = color_gray;
-                text_go.color = color_dark_gray;
-                text_go.text = qsTr("로봇 연결 안됨")
-                text_go.font.pixelSize = 35
-                popup_notice.main_str = qsTr("로봇이 연결되지 않았습니다")
-                popup_notice.sub_str = qsTr("프로그램을 재시작 해주세요")
-                popup_notice.show_localization = false;
-                popup_notice.show_motorinit = false;
-                popup_notice.show_restart = true;
-            }
+//                        text_go.color = "white";
+//                        text_go.text = qsTr("서빙 시작")
+//                        text_go.font.pixelSize = 35
+//                        popup_notice.main_str = ""
+//                        popup_notice.sub_str = ""
+//                        popup_notice.show_localization = false
+//                        popup_notice.show_motorinit = false;
+//                        popup_notice.show_restart = false;
+//                    }else{
+//                        btn_go.active = false;
+//                        btn_charge.active = false;
+//                        btn_resting.active = false;
+//                        rect_go.color = color_red;
+//                        text_go.color = color_dark_gray;
+//                        text_go.text = qsTr("위치 초기화필요")
+//                        text_go.font.pixelSize = 30
+//                        popup_notice.main_str = qsTr("위치를 찾을 수 없습니다")
+//                        popup_notice.sub_str = qsTr("위치 초기화를 다시 해주세요")
+//                        popup_notice.show_localization = true;
+//                        popup_notice.show_motorinit = false;
+//                        popup_notice.show_restart = false;
+//                    }
+//                }else{
+//                    btn_go.active = false;
+//                    btn_charge.active = false;
+//                    btn_resting.active = false;
+//                    rect_go.color = color_gray;
+//                    text_go.color = color_dark_gray;
+//                    text_go.text = qsTr("로봇 전원 안켜짐")
+//                    text_go.font.pixelSize = 35
+//                    popup_notice.main_str = qsTr("로봇 전원이 꺼져있습니다")
+//                    popup_notice.sub_str = ""
+//                    popup_notice.show_localization = false
+//                    popup_notice.show_motorinit = false;
+//                    popup_notice.show_restart = true;
+//                }
+//            }else{
+//                btn_go.active = false;
+//                btn_charge.active = false;
+//                btn_resting.active = false;
+//                rect_go.color = color_gray;
+//                text_go.color = color_dark_gray;
+//                text_go.text = qsTr("로봇 연결 안됨")
+//                text_go.font.pixelSize = 35
+//                popup_notice.main_str = qsTr("로봇이 연결되지 않았습니다")
+//                popup_notice.sub_str = qsTr("프로그램을 재시작 해주세요")
+//                popup_notice.show_localization = false;
+//                popup_notice.show_motorinit = false;
+//                popup_notice.show_restart = true;
+//            }
 
 
 

@@ -10,14 +10,14 @@ HTTPHandler::HTTPHandler()
 {
     // 네트워크 연결 관리
     manager = new QNetworkAccessManager(this);
-    connect(manager, SIGNAL(finished(QNetworkReply*)), &connection_loop, SLOT(quit()));
-    connection_timer = new QTimer();
-    connect(connection_timer, SIGNAL(timeout()),&connection_loop,SLOT(quit()));
+//    connect(manager, SIGNAL(finished(QNetworkReply*)), &connection_loop, SLOT(quit()));
+//    connection_timer = new QTimer();
+//    connect(connection_timer, SIGNAL(timeout()),&connection_loop,SLOT(quit()));
 
 }
 
 // 공통적으로 사용되는 POST 구문 : 출력으로 응답 정보를 보냄
-QByteArray HTTPHandler::generalPost(QByteArray post_data, QString url){
+void HTTPHandler::generalPost(QByteArray post_data, QString url){
     QByteArray postDataSize = QByteArray::number(post_data.size());
     QUrl serviceURL(url);
     QNetworkRequest request(serviceURL);
@@ -38,46 +38,13 @@ QByteArray HTTPHandler::generalPost(QByteArray post_data, QString url){
     return ret;
 }
 
-QByteArray HTTPHandler::generalGet(QString url){
+void HTTPHandler::generalGet(QString url){
     QUrl serviceURL(url);
     QNetworkRequest request(serviceURL);
 
     QNetworkReply *reply = manager->get(request);
-    connection_timer->start(1000);
-    connection_loop.exec();
-
-    reply->waitForReadyRead(200);
-    QByteArray ret = reply->readAll();
-    reply->deleteLater();
-    return ret;
 }
 
-
-void HTTPHandler::testGit(){
-    updateGitArray();
-
-    for(int i=0; i<probot->gitList.size(); i++){
-        qDebug() << probot->gitList[i].commit;
-    }
-
-    if(probot->program_version == ""){
-        getlocalLog();
-    }
-
-    if(probot->gitList[0].commit == probot->program_version){
-        plog->write("[GIT] Program Version already lastest");
-    }else{
-        plog->write("[GIT] Program Version Detected : "+probot->gitList[0].commit+" (Old ver : "+probot->program_version+")");
-    }
-}
-
-void HTTPHandler::getlocalLog(){
-    process = new QProcess();
-    process->setWorkingDirectory(QGuiApplication::applicationDirPath());
-    process->start("git log");
-
-    connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(processLogOutput()));
-}
 
 void HTTPHandler::updateGitArray(){
     //Server에서 Git commits 받아와서 gitList에 채움

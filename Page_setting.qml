@@ -1225,6 +1225,11 @@ Item {
                                 property bool ischanged: false
                                 onCurrentIndexChanged: {
                                     ischanged = true;
+                                    if(currentIndex == 0){
+                                        voice_test.source = supervisor.getVoice("start_serving","child");
+                                    }else if(currentIndex == 1){
+                                        voice_test.source = supervisor.getVoice("start_serving","woman");
+                                    }
                                 }
                                 model:["어린이", "여성"]
                             }
@@ -8850,10 +8855,10 @@ Item {
             }
         }
 
-
         if(fms_id.ischanged){
             supervisor.setSetting("SERVER/fms_id",fms_id.text);
         }
+
         if(fms_pw.ischanged){
             supervisor.setSetting("SERVER/fms_pw",fms_pw.text);
         }
@@ -9340,6 +9345,8 @@ Item {
             dnsmain_3.text = ip[2];
             dnsmain_4.text = ip[3];
         }
+
+        voice_test.source = supervisor.getVoice("start_serving");
 
         //변수 초기화
         is_reset_slam = false;
@@ -10806,18 +10813,28 @@ Item {
 
         onOpened: {
             //버전 체크
-//            supervisor.checkUpdate();
+            if(supervisor.isNewVersion()){
+                if(supervisor.isNeedUpdate()){
+                    //Server Update
+                }else{
+                    //Local Git Update
+                }
+            }else{
+
+            }
+
             if(!supervisor.isNewVersion()){
                 supervisor.writelog("[USER INPUT] UPDATE PROGRAM -> CHECK NEW VERSION")
                 //새로운 버전 확인됨
                 rect_lastest.visible = false;
                 rect_need_update.visible = true;
                 text_version1.text = "현재 버전 : " + supervisor.getLocalVersionDate()
-                text_version2.text = "최신 버전 : " + supervisor.getProgramUpdateVersion()
+                text_version2.text = "최신 버전 : " + supervisor.getServerVersion()
             }else{
                 rect_lastest.visible = true;
                 rect_need_update.visible = false;
                 text_version.text = "현재 버전 : " + supervisor.getLocalVersionDate()
+//                text_version2.text = "최신 버전 : " + supervisor.getServerVersionDate()
             }
 
 
@@ -10937,7 +10954,7 @@ Item {
                         font.family: font_noto_r.name
                         font.pixelSize: 25
                         color: "white"
-                        text:"최신 버전 : "+supervisor.getServerVersionDate()
+                        text:"최신 버전 : "+supervisor.getServerVersion()
                     }
                 }
                 Row{
